@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head (title)" th:assert="${!#strings.isEmpty(title)}">
+    <title th:text="${title}">Igor</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta charset="utf-8"/>
+
+    <link href="../static/css/igor.css" th:href="@{/css/igor.css}" rel="stylesheet"/>
+    <script src="js/igor.js"></script>
+
+    <link href="../static/css/jquery-ui.css" th:href="@{/css/jquery-ui.css}" rel="stylesheet"/>
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery-ui.js"></script>
+</head>
+
+<body>
+
+<div th:fragment="mainmenu (section)" th:assert="${!#strings.isEmpty(section)}">
+    <div id="mainmenu">
+        <ul>
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="jobs.html">Jobs</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><h1 th:text="#{${section}}">Title</h1></li>
+        </ul>
+
+    </div>
+</div>
+
+</body>
+</html>

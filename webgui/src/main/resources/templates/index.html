@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="fragments/layout :: head ('Igor - Dashboard')"/>
+
+<body>
+
+<div th:include="fragments/layout :: mainmenu (index.title)"/>
+
+<div id="content">
+    <h1 th:text="#{index.title}">Home</h1>
+</div>
+
+</body>
+</html>

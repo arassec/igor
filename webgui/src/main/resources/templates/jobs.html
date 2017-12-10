@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="fragments/layout :: head ('Igor - Jobs')"/>
+
+<body>
+
+<div th:include="fragments/layout :: mainmenu (jobs.title)"/>
+
+<div id="content">
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>DESCRIPTION</th>
+            <th>TRIGGER</th>
+        </tr>
+        <tr th:each="job : ${jobs}">
+            <td th:text="${job.id}">Job-ID</td>
+            <td th:text="${job.description}">Job-Description</td>
+            <td th:text="${job.trigger}">Job-Trigger</td>
+        </tr>
+    </table>
+
+</div>
+
+</body>
+</html>
