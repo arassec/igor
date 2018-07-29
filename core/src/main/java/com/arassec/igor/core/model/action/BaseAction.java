@@ -54,7 +54,7 @@ public abstract class BaseAction implements Action {
      * {@inheritDoc}
      */
     @Override
-    public void finalize() {
+    public void complete() {
         // Nothing to do here...
     }
 

@@ -16,4 +16,6 @@ public @interface IgorParam {
 
     boolean secured() default false;
 
+    boolean optional() default false;
+
 }

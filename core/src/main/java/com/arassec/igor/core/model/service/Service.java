@@ -22,17 +22,10 @@ public interface Service {
     void setId(String id);
 
     /**
-     * Returns the service's description.
+     * Tests the service's configuration.
      *
-     * @return The service's description.
+     * @throws ServiceException In case of errors.
      */
-    String getDescription();
-
-    /**
-     * Sets the service's description.
-     *
-     * @param description The description to set.
-     */
-    void setDescription(String description);
+    void testConfiguration() throws ServiceException;
 
 }

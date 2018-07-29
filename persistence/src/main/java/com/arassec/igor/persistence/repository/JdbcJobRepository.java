@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Andreas Sensen on 15.04.2017.
@@ -35,10 +36,13 @@ public class JdbcJobRepository implements JobRepository {
      */
     @Override
     public void upsert(Job job) {
-        JobEntity jobEntity = jobDao.findOne(job.getId());
-        if (jobEntity == null) {
+        Optional<JobEntity> jobEntityOptional = jobDao.findById(job.getId());
+        JobEntity jobEntity;
+        if (!jobEntityOptional.isPresent()) {
             jobEntity = new JobEntity();
             jobEntity.setId(job.getId());
+        } else {
+            jobEntity = jobEntityOptional.get();
         }
         jobEntity.setContent(jobConverter.convert(job));
         jobDao.save(jobEntity);
@@ -58,8 +62,11 @@ public class JdbcJobRepository implements JobRepository {
 
     @Override
     public Job findById(String id) {
-        JobEntity jobEntity = jobDao.findOne(id);
-        return jobConverter.convert(jobEntity.getContent());
+        Optional<JobEntity> jobEntityOptional = jobDao.findById(id);
+        if (jobEntityOptional.isPresent()) {
+            return jobConverter.convert(jobEntityOptional.get().getContent());
+        }
+        return null;
     }
 
 }

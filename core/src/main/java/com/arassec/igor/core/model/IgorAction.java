@@ -12,11 +12,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IgorAction {
 
-    /**
-     * Defines the type of the Action.
-     *
-     * @return The action's type.
-     */
-    String type();
-
 }

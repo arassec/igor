@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Andreas Sensen on 01.05.2017.
@@ -27,19 +28,30 @@ public class JdbcServiceRepository implements ServiceRepository {
 
     @Override
     public void upsert(Service service) {
-        ServiceEntity serviceEntity = serviceDao.findOne(service.getId());
-        if (serviceEntity == null) {
+        Optional<ServiceEntity> serviceEntityOptional = serviceDao.findById(service.getId());
+        ServiceEntity serviceEntity;
+        if (!serviceEntityOptional.isPresent()) {
             serviceEntity = new ServiceEntity();
             serviceEntity.setId(service.getId());
+        } else {
+            serviceEntity = serviceEntityOptional.get();
         }
         serviceEntity.setContent(serviceConverter.convert(service));
         serviceDao.save(serviceEntity);
     }
 
     @Override
+    public void deleteById(String id) {
+        serviceDao.deleteById(id);
+    }
+
+    @Override
     public Service findById(String id) {
-        ServiceEntity serviceEntity = serviceDao.findOne(id);
-        return serviceConverter.convert(serviceEntity.getContent());
+        Optional<ServiceEntity> serviceEntityOptional = serviceDao.findById(id);
+        if (serviceEntityOptional.isPresent()) {
+            return serviceConverter.convert(serviceEntityOptional.get().getContent());
+        }
+        return null;
     }
 
     @Override

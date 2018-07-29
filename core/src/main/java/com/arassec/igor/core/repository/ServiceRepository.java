@@ -18,6 +18,8 @@ public interface ServiceRepository {
      */
     void upsert(Service service);
 
+    void deleteById(String id);
+
     Service findById(String id);
 
     List<Service> findAll();

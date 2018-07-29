@@ -31,20 +31,42 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>webgui</artifactId>
+            <artifactId>web</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>module-misc</artifactId>
+            <artifactId>module-ftp</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>module-file</artifactId>
+            <artifactId>module-localfs</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>module-ssh</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- JAXB-Dependencies for Spring-Boot to work with Java 10 -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
         </dependency>
 
     </dependencies>

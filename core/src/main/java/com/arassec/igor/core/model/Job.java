@@ -8,8 +8,6 @@ import java.util.List;
 
 /**
  * Defines an igor job.
- * <p>
- * Created by sensen on 3/26/17.
  */
 public class Job {
 

@@ -12,11 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IgorService {
 
-    /**
-     * Defines the type of the Service.
-     *
-     * @return The service's type.
-     */
-    String type();
+    String label();
 
 }

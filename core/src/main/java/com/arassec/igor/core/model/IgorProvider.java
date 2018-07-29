@@ -14,11 +14,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IgorProvider {
 
-    /**
-     * Defines the type of the provider.
-     *
-     * @return The provider's type.
-     */
-    String type();
-
 }

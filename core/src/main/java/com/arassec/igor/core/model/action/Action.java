@@ -27,7 +27,7 @@ public interface Action {
     /**
      * Finalizes the action after all data has been processed.
      */
-    void finalize();
+    void complete();
 
     /**
      * Returns the number of threads this action should be executed with.

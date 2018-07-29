@@ -1,7 +1,8 @@
 package com.arassec.igor.core.application.factory;
 
+import com.arassec.igor.core.application.schema.ParameterDefinition;
 import com.arassec.igor.core.model.IgorParam;
-import org.jasypt.util.text.BasicTextEncryptor;
+import org.jasypt.util.text.StrongTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,9 +11,9 @@ import org.springframework.util.ReflectionUtils;
 import javax.annotation.PostConstruct;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Security;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -21,7 +22,7 @@ public abstract class ModelFactory<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ModelFactory.class);
 
-    protected Map<String, String> typeToClass = new HashMap<>();
+    protected Set<String> types = new HashSet<>();
 
     @Value("${igor.security.parameters.key}")
     private String password;
@@ -29,7 +30,7 @@ public abstract class ModelFactory<T> {
     /**
      * TODO: With Java-9 this should be changed to strong encryption!
      */
-    private BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+    private StrongTextEncryptor textEncryptor = new StrongTextEncryptor();
 
     @PostConstruct
     public void initialize() {
@@ -42,10 +43,10 @@ public abstract class ModelFactory<T> {
     }
 
     public T createInstance(String type) {
-        if (typeToClass.containsKey(type)) {
+        if (types.contains(type)) {
             try {
-                return (T) Class.forName(typeToClass.get(type)).newInstance();
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                return (T) Class.forName(type).getConstructor(null).newInstance();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
                 throw new IllegalStateException(e);
             }
         }
@@ -84,12 +85,16 @@ public abstract class ModelFactory<T> {
     }
 
     public Map<String, Object> getParameters(T instance) {
+        return getParameters(instance, false);
+    }
+
+    public Map<String, Object> getParameters(T instance, boolean clearTextValues) {
         Map<String, Object> parameters = new HashMap<>();
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
             if (field.isAnnotationPresent(IgorParam.class)) {
                 try {
                     field.setAccessible(true);
-                    if (isSecured(field)) {
+                    if (isSecured(field) && !clearTextValues) {
                         parameters.put(field.getName(), textEncryptor.encrypt((String) field.get(instance)));
                     } else {
                         parameters.put(field.getName(), field.get(instance));
@@ -101,6 +106,23 @@ public abstract class ModelFactory<T> {
             }
         });
         return parameters;
+    }
+
+    public List<ParameterDefinition> getParameterDefinitions(T instance) {
+        List<ParameterDefinition> parameterDefinitions = new LinkedList<>();
+        ReflectionUtils.doWithFields(instance.getClass(), field -> {
+            if (field.isAnnotationPresent(IgorParam.class)) {
+                boolean secured = field.getAnnotation(IgorParam.class).secured();
+                boolean optional = field.getAnnotation(IgorParam.class).optional();
+                String type = field.getType().getName();
+                parameterDefinitions.add(new ParameterDefinition(field.getName(), type, optional, secured));
+            }
+        });
+        return parameterDefinitions;
+    }
+
+    public String getType(T instance) {
+        return instance.getClass().getName();
     }
 
     private boolean isSecured(Field field) {

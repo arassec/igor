@@ -101,7 +101,7 @@ public class Task {
         }
 
         for (Action action : actions) {
-            action.finalize();
+            action.complete();
         }
     }
 

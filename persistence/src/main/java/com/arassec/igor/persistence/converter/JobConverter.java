@@ -5,18 +5,21 @@ import com.arassec.igor.core.application.factory.ProviderFactory;
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorProvider;
 import com.arassec.igor.core.model.Job;
+import com.arassec.igor.core.model.Task;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
-import com.arassec.igor.core.model.Task;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -24,6 +27,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class JobConverter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JobConverter.class);
 
     private static final String SERVICE = "Service";
 
@@ -58,22 +63,36 @@ public class JobConverter {
 
         JSONArray tasksArray = jobJson.getJSONArray(JsonKeys.TASKS);
         for (int i = 0; i < tasksArray.length(); i++) {
-            job.getTasks().add(convertJsonToTask(tasksArray.getJSONObject(i)));
+            try {
+                job.getTasks().add(convertJsonToTask(tasksArray.getJSONObject(i)));
+            } catch (ConversionException e) {
+                LOG.error("Error during conversion of job {}: {}", job.getId(), e.getMessage());
+                return null;
+            }
         }
 
         return job;
     }
 
-    private Task convertJsonToTask(JSONObject taskJson) {
+    private Task convertJsonToTask(JSONObject taskJson) throws ConversionException {
         Task task = new Task();
-        task.setName(taskJson.getString(JsonKeys.NAME));
+        String taskName = taskJson.getString(JsonKeys.NAME);
+        if (taskName == null || taskName.isEmpty()) {
+            throw new ConversionException("Task name is empty!");
+        }
+        task.setName(taskName);
         task.setDescription(taskJson.optString(JsonKeys.DESCRIPTION));
-        task.setProvider(convertJsonToProvider(taskJson.getJSONObject(JsonKeys.PROVIDER)));
+        Provider provider = convertJsonToProvider(taskJson.getJSONObject(JsonKeys.PROVIDER));
+        if (provider == null) {
+            throw new ConversionException("Provider is null!");
+        }
+        task.setProvider(provider);
 
         JSONArray actionsArray = taskJson.getJSONArray(JsonKeys.ACTIONS);
         for (int i = 0; i < actionsArray.length(); i++) {
             task.getActions().add(convertJsonToAction(actionsArray.getJSONObject(i)));
         }
+        task.getActions().removeIf(Objects::isNull);
 
         return task;
     }
@@ -113,14 +132,14 @@ public class JobConverter {
 
     private JSONObject convertProviderToJson(Provider provider) {
         JSONObject providerJson = new JSONObject();
-        providerJson.put(JsonKeys.TYPE, provider.getClass().getAnnotation(IgorProvider.class).type());
+        providerJson.put(JsonKeys.TYPE, provider.getClass().getName());
         providerJson.put(JsonKeys.PARAMETERS, convertParametersToJson(providerFactory.getParameters(provider)));
         return providerJson;
     }
 
     private JSONObject convertActionToJson(Action action) {
         JSONObject actionJson = new JSONObject();
-        actionJson.put(JsonKeys.TYPE, action.getClass().getAnnotation(IgorAction.class).type());
+        actionJson.put(JsonKeys.TYPE, action.getClass().getName());
         actionJson.put(JsonKeys.PARAMETERS, convertParametersToJson(actionFactory.getParameters(action)));
         return actionJson;
     }

@@ -27,7 +27,7 @@ public class ProviderFactory extends ModelFactory<Provider> {
                 Class<?> c = Class.forName(beanDefinition.getBeanClassName());
                 if (Provider.class.isAssignableFrom(c)) {
                     String className = beanDefinition.getBeanClassName();
-                    typeToClass.put(Class.forName(className).getAnnotation(IgorProvider.class).type(), className);
+                    types.add(className);
                     LOG.debug("Registered provider: {}", beanDefinition.getBeanClassName());
                 }
             } catch (ClassNotFoundException e) {

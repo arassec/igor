@@ -27,7 +27,7 @@ public class ActionFactory extends ModelFactory<Action> {
                 Class<?> c = Class.forName(beanDefinition.getBeanClassName());
                 if (Action.class.isAssignableFrom(c)) {
                     String className = beanDefinition.getBeanClassName();
-                    typeToClass.put(Class.forName(className).getAnnotation(IgorAction.class).type(), className);
+                    types.add(className);
                     LOG.debug("Registered action: {}", beanDefinition.getBeanClassName());
                 }
             } catch (ClassNotFoundException e) {

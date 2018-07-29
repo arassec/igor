@@ -9,7 +9,7 @@ import javax.persistence.Version;
  * Created by Andreas Sensen on 15.04.2017.
  */
 @Entity
-@Table(name = "job")
+@Table(name = "job", schema = "igor")
 public class JobEntity {
 
     @Id
