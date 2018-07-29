@@ -23,4 +23,5 @@ dist/
 nbdist/
 .nb-gradle/
 
+dbdata/
 src/test/resources/files/out
