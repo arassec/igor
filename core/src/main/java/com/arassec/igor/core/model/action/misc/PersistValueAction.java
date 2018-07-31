@@ -21,7 +21,7 @@ public class PersistValueAction extends BaseAction {
     @Override
     public boolean process(IgorData data) {
         if (isValid(data)) {
-            service.save((String) data.get(dataKey));
+            service.save(data.getJobId(), data.getTaskName(), (String) data.get(dataKey));
         }
         return true;
     }

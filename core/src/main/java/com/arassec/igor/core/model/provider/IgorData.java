@@ -8,6 +8,16 @@ import java.util.StringJoiner;
  */
 public class IgorData extends HashMap<String, Object> {
 
+    private String jobId;
+
+    private String taskName;
+
+    public IgorData(String jobId, String taskName) {
+        super();
+        this.jobId = jobId;
+        this.taskName = taskName;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("IgorData[");
@@ -16,5 +26,13 @@ public class IgorData extends HashMap<String, Object> {
         sb.append(sj.toString());
         sb.append("]");
         return sb.toString();
+    }
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    public String getTaskName() {
+        return taskName;
     }
 }

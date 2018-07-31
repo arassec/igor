@@ -80,7 +80,7 @@ public class Task {
         actions.stream().forEach(Action::initialize);
 
         // Read the data from the provider and start working:
-        provider.initialize();
+        provider.initialize(jobId, name);
         while (provider.hasNext()) {
             IgorData data = provider.next();
             boolean added = false;

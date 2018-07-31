@@ -10,7 +10,7 @@ public interface Provider {
     /**
      * Initializes the provider.
      */
-    void initialize();
+    void initialize(String jobId, String taskName);
 
     /**
      * Returns {@code true}, if there is further data to process.

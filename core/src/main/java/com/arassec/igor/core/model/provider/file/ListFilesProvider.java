@@ -47,7 +47,8 @@ public class ListFilesProvider extends BaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void initialize() {
+    public void initialize(String jobId, String taskName) {
+        super.initialize(jobId, taskName);
         files.clear();
         files.addAll(sourceService.listFiles(directory));
         currentFile = 0;
@@ -70,7 +71,7 @@ public class ListFilesProvider extends BaseProvider {
      */
     @Override
     public IgorData next() {
-        IgorData igorData = new IgorData();
+        IgorData igorData = new IgorData(getJobId(), getTaskName());
         igorData.put(dataKey, files.get(currentFile));
         currentFile++;
         return igorData;

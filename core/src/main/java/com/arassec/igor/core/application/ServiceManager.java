@@ -63,7 +63,11 @@ public class ServiceManager {
         serviceRepository.deleteById(id);
     }
 
-    public String getType(Service service) {
+    public ServiceCategory getCategory(Service service) {
+        return serviceFactory.getCategory(service);
+    }
+
+    public ServiceType getType(Service service) {
         return serviceFactory.getType(service);
     }
 }

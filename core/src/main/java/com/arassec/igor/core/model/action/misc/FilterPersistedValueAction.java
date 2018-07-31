@@ -21,19 +21,6 @@ public class FilterPersistedValueAction extends BaseAction {
     private PersistenceService service;
 
     /**
-     * List of persisted values to use for filtering.
-     */
-    private List<String> persistedValues;
-
-    /**
-     * Loads all persisted values to use for filtering later.
-     */
-    @Override
-    public void initialize() {
-        persistedValues = service.loadAll();
-    }
-
-    /**
      * Retrieves the value from the supplied data and searches it in the persisted values. If it is already persisted, the data
      * is ignored.
      *
@@ -42,9 +29,7 @@ public class FilterPersistedValueAction extends BaseAction {
     @Override
     public boolean process(IgorData data) {
         if (isValid(data)) {
-            if (persistedValues.contains(data.get(dataKey))) {
-                return false;
-            }
+            return !service.isPersisted(data.getJobId(), data.getTaskName(), (String) data.get(dataKey));
         }
         return true;
     }

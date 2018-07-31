@@ -121,10 +121,6 @@ public abstract class ModelFactory<T> {
         return parameterDefinitions;
     }
 
-    public String getType(T instance) {
-        return instance.getClass().getName();
-    }
-
     private boolean isSecured(Field field) {
         Annotation annotation = field.getAnnotation(IgorParam.class);
         IgorParam igorParam = (IgorParam) annotation;

@@ -57,7 +57,8 @@ public class ServiceRestController {
         if (service != null) {
             ServiceModel serviceModel = new ServiceModel();
             serviceModel.setId(service.getId());
-            serviceModel.setType(serviceManager.getType(service));
+            serviceModel.setServiceCategory(serviceManager.getCategory(service));
+            serviceModel.setServiceType(serviceManager.getType(service));
             serviceModel.setParameters(serviceManager.loadParameters(service));
             return new ResponseEntity<>(serviceModel, HttpStatus.OK);
         }

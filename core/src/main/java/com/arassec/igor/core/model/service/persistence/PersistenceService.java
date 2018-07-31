@@ -11,8 +11,10 @@ import java.util.List;
 @IgorServiceCategory(label = "Persistence")
 public interface PersistenceService extends Service {
 
-    void save(String value);
+    void save(String jobId, String taskName, String value);
 
-    List<String> loadAll();
+    List<String> loadAll(String jobId, String taskName);
+
+    boolean isPersisted(String jobId, String taskName, String value);
 
 }
