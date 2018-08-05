@@ -20,14 +20,16 @@ public abstract class BaseSshFileService extends BaseFileService {
      */
     protected Session connect(String host, int port, String username, String password) {
         try {
-            Session session = (new JSch()).getSession(username, host, port);
+            JSch jsch = new JSch();
+            Session session = jsch.getSession(username, host, port);
             session.setPassword(password);
             // TODO: Config!
             session.setConfig("StrictHostKeyChecking", "no");
+            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
             session.connect(30000);
             return session;
         } catch (JSchException e) {
-            throw new ServiceException("Could not connect to server " + host + ":" + port + ".", e);
+            throw new ServiceException("Could not connect to server " + host + ":" + port, e);
         }
     }
 

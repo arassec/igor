@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 /**
  * TODO: Document class.
  */
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api")
 public class ServiceRestController {
@@ -89,7 +88,11 @@ public class ServiceRestController {
             service.testConfiguration();
             return new ResponseEntity<>("Test result: OK", HttpStatus.OK);
         } catch (ServiceException e) {
-            return new ResponseEntity<>("Test result: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            String result = "Test result: " + e.getMessage();
+            if (e.getCause() != null) {
+                result += " (" + e.getCause().getMessage() + ")";
+            }
+            return new ResponseEntity<>(result , HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -101,7 +104,7 @@ public class ServiceRestController {
     public static Map<String, Object> jsonToMap(JSONObject json) throws JSONException {
         Map<String, Object> retMap = new HashMap<>();
 
-        if(json != JSONObject.NULL) {
+        if (json != JSONObject.NULL) {
             retMap = toMap(json);
         }
         return retMap;
@@ -111,15 +114,13 @@ public class ServiceRestController {
         Map<String, Object> map = new HashMap<>();
 
         Iterator<String> keysItr = object.keys();
-        while(keysItr.hasNext()) {
+        while (keysItr.hasNext()) {
             String key = keysItr.next();
             Object value = object.get(key);
 
-            if(value instanceof JSONArray) {
+            if (value instanceof JSONArray) {
                 value = toList((JSONArray) value);
-            }
-
-            else if(value instanceof JSONObject) {
+            } else if (value instanceof JSONObject) {
                 value = toMap((JSONObject) value);
             }
             map.put(key, value);
@@ -129,13 +130,11 @@ public class ServiceRestController {
 
     public static List<Object> toList(JSONArray array) throws JSONException {
         List<Object> list = new ArrayList<>();
-        for(int i = 0; i < array.length(); i++) {
+        for (int i = 0; i < array.length(); i++) {
             Object value = array.get(i);
-            if(value instanceof JSONArray) {
+            if (value instanceof JSONArray) {
                 value = toList((JSONArray) value);
-            }
-
-            else if(value instanceof JSONObject) {
+            } else if (value instanceof JSONObject) {
                 value = toMap((JSONObject) value);
             }
             list.add(value);
