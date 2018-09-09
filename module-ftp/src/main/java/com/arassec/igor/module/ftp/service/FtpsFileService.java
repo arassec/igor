@@ -1,7 +1,9 @@
 package com.arassec.igor.module.ftp.service;
 
+import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.model.service.file.BaseFileService;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPSClient;
 
@@ -21,6 +23,11 @@ public class FtpsFileService extends FtpFileService {
         try {
             FTPClient ftpsClient = new FTPSClient();
             ftpsClient.connect(host, port);
+            if (passiveMode) {
+                ftpsClient.enterLocalPassiveMode();
+            } else {
+                ftpsClient.enterLocalActiveMode();
+            }
             String user = username;
             String pass = password;
             if (user == null || pass == null) {

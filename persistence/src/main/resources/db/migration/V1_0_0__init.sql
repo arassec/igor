@@ -1,13 +1,17 @@
 CREATE SCHEMA IF NOT EXISTS igor;
 
 CREATE TABLE igor.job (
-    id VARCHAR(256) PRIMARY KEY,
+    id INTEGER PRIMARY KEY auto_increment,
     version INTEGER,
+    name VARCHAR(256) NOT NULL UNIQUE,
     content TEXT
 );
+CREATE SEQUENCE JOB_ID_SEQUENCE;
 
 CREATE TABLE igor.service (
-    id VARCHAR(256) PRIMARY KEY,
+    id INTEGER PRIMARY KEY auto_increment,
     version INTEGER,
+    name VARCHAR(256) NOT NULL UNIQUE,
     content TEXT
 );
+CREATE SEQUENCE SERVICE_ID_SEQUENCE;

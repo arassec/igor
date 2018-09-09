@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Provides files from a specified directory.
  */
-@IgorProvider
+@IgorProvider(label = "List Files")
 public class ListFilesProvider extends BaseProvider {
 
     /**

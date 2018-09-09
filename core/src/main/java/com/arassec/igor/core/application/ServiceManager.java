@@ -1,15 +1,14 @@
 package com.arassec.igor.core.application;
 
 import com.arassec.igor.core.application.factory.ServiceFactory;
-import com.arassec.igor.core.application.schema.ParameterDefinition;
-import com.arassec.igor.core.application.schema.ServiceCategory;
-import com.arassec.igor.core.application.schema.ServiceType;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Manages service handling.
@@ -23,31 +22,15 @@ public class ServiceManager {
     @Autowired
     private ServiceFactory serviceFactory;
 
-    public List<ServiceCategory> loadCategories() {
-        List<ServiceCategory> categories = new LinkedList<>(serviceFactory.getServiceCategories());
-        Collections.sort(categories, Comparator.comparing(ServiceCategory::getType));
-        return categories;
-    }
-
-    public List<ServiceType> loadTypesOfCategory(String category) {
-        List<ServiceType> types = new LinkedList<>(serviceFactory.getTypesByCategory(category));
-        Collections.sort(types, Comparator.comparing(ServiceType::getLabel));
-        return types;
-    }
-
-    public List<ParameterDefinition> loadParametersOfType(String type) {
-        return serviceFactory.getParameterDefinitions(serviceFactory.createInstance(type));
-    }
-
-    public Map<String, Object> loadParameters(Service service) {
-        return serviceFactory.getParameters(service, true);
+    public Set<String> getTypes() {
+        return serviceFactory.getTypes();
     }
 
     public void save(Service service) {
         serviceRepository.upsert(service);
     }
 
-    public Service load(String id) {
+    public Service load(Long id) {
         return serviceRepository.findById(id);
     }
 
@@ -59,15 +42,8 @@ public class ServiceManager {
         return serviceFactory.createInstance(type, parameters, false);
     }
 
-    public void deleteService(String id) {
+    public void deleteService(Long id) {
         serviceRepository.deleteById(id);
     }
 
-    public ServiceCategory getCategory(Service service) {
-        return serviceFactory.getCategory(service);
-    }
-
-    public ServiceType getType(Service service) {
-        return serviceFactory.getType(service);
-    }
 }

@@ -28,28 +28,28 @@ public class JdbcServiceRepository implements ServiceRepository {
 
     @Override
     public void upsert(Service service) {
-        Optional<ServiceEntity> serviceEntityOptional = serviceDao.findById(service.getId());
         ServiceEntity serviceEntity;
-        if (!serviceEntityOptional.isPresent()) {
+        if (service.getId() == null) {
             serviceEntity = new ServiceEntity();
-            serviceEntity.setId(service.getId());
         } else {
+            Optional<ServiceEntity> serviceEntityOptional = serviceDao.findById(service.getId());
+            if (!serviceEntityOptional.isPresent()) {
+                throw new IllegalStateException("No service with ID " + service.getId() + " available!");
+            }
             serviceEntity = serviceEntityOptional.get();
         }
+        serviceEntity.setName(service.getName());
         serviceEntity.setContent(serviceConverter.convert(service));
         serviceDao.save(serviceEntity);
     }
 
     @Override
-    public void deleteById(String id) {
-        serviceDao.deleteById(id);
-    }
-
-    @Override
-    public Service findById(String id) {
+    public Service findById(Long id) {
         Optional<ServiceEntity> serviceEntityOptional = serviceDao.findById(id);
         if (serviceEntityOptional.isPresent()) {
-            return serviceConverter.convert(serviceEntityOptional.get().getContent());
+            Service service = serviceConverter.convert(serviceEntityOptional.get().getContent());
+            service.setId(id);
+            return service;
         }
         return null;
     }
@@ -59,11 +59,17 @@ public class JdbcServiceRepository implements ServiceRepository {
         List<Service> result = new LinkedList<>();
         for (ServiceEntity serviceEntity : serviceDao.findAll()) {
             Service service = serviceConverter.convert(serviceEntity.getContent());
+            service.setId(serviceEntity.getId());
             if (service != null) {
                 result.add(service);
             }
         }
         return result;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        serviceDao.deleteById(id);
     }
 
 }

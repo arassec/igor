@@ -5,9 +5,9 @@ package com.arassec.igor.persistence.converter;
  */
 public interface JsonKeys {
 
-    String ID = "id";
-
     String TRIGGER = "trigger";
+
+    String ACTIVE = "active";
 
     String TASKS = "tasks";
 

@@ -18,9 +18,9 @@ public interface ServiceRepository {
      */
     void upsert(Service service);
 
-    void deleteById(String id);
+    void deleteById(Long id);
 
-    Service findById(String id);
+    Service findById(Long id);
 
     List<Service> findAll();
 

@@ -36,16 +36,31 @@ public class JdbcJobRepository implements JobRepository {
      */
     @Override
     public void upsert(Job job) {
-        Optional<JobEntity> jobEntityOptional = jobDao.findById(job.getId());
+
         JobEntity jobEntity;
-        if (!jobEntityOptional.isPresent()) {
+        if (job.getId() == null) {
             jobEntity = new JobEntity();
-            jobEntity.setId(job.getId());
         } else {
+            Optional<JobEntity> jobEntityOptional = jobDao.findById(job.getId());
+            if (!jobEntityOptional.isPresent()) {
+                throw new IllegalStateException("No job with ID " + job.getId() + " available!");
+            }
             jobEntity = jobEntityOptional.get();
         }
+        jobEntity.setName(job.getName());
         jobEntity.setContent(jobConverter.convert(job));
         jobDao.save(jobEntity);
+    }
+
+    @Override
+    public Job findById(Long id) {
+        Optional<JobEntity> jobEntityOptional = jobDao.findById(id);
+        if (jobEntityOptional.isPresent()) {
+            Job job =  jobConverter.convert(jobEntityOptional.get().getContent());
+            job.setId(id);
+            return job;
+        }
+        return null;
     }
 
     @Override
@@ -53,6 +68,7 @@ public class JdbcJobRepository implements JobRepository {
         List<Job> result = new LinkedList<>();
         for (JobEntity jobEntity : jobDao.findAll()) {
             Job job = jobConverter.convert(jobEntity.getContent());
+            job.setId(jobEntity.getId());
             if (job != null) {
                 result.add(job);
             }
@@ -61,12 +77,8 @@ public class JdbcJobRepository implements JobRepository {
     }
 
     @Override
-    public Job findById(String id) {
-        Optional<JobEntity> jobEntityOptional = jobDao.findById(id);
-        if (jobEntityOptional.isPresent()) {
-            return jobConverter.convert(jobEntityOptional.get().getContent());
-        }
-        return null;
+    public void deleteById(Long id) {
+        jobDao.deleteById(id);
     }
 
 }

@@ -10,13 +10,18 @@ public abstract class BaseService implements Service {
     /**
      * The service's ID.
      */
-    private String id;
+    private Long id;
+
+    /**
+     * The service's name.
+     */
+    private String name;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -24,8 +29,24 @@ public abstract class BaseService implements Service {
      * {@inheritDoc}
      */
     @Override
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

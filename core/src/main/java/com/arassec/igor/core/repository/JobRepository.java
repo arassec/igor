@@ -31,6 +31,8 @@ public interface JobRepository {
      * @param id The job's ID.
      * @return The {@link Job}.
      */
-    Job findById(String id);
+    Job findById(Long id);
+
+    void deleteById(Long id);
 
 }

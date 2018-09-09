@@ -46,12 +46,23 @@ public class FtpFileService extends BaseFileService {
     protected String password;
 
     /**
+     * Activates active or passive FTP mode.
+     */
+    @IgorParam(optional = true)
+    protected boolean passiveMode = true;
+
+    /**
      * Initializes the FTP client.
      */
     protected FTPClient connect() {
         try {
             FTPClient ftpClient = new FTPClient();
             ftpClient.connect(host, port);
+            if (passiveMode) {
+                ftpClient.enterLocalPassiveMode();
+            } else {
+                ftpClient.enterLocalActiveMode();
+            }
             String user = username;
             String pass = password;
             if (user == null || pass == null) {

@@ -1,5 +1,6 @@
 package com.arassec.igor.core.model;
 
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * Defines an igor job.
  */
+@Data
 public class Job {
 
     /**
@@ -19,7 +21,12 @@ public class Job {
     /**
      * The job's ID.
      */
-    private String id;
+    private Long id;
+
+    /**
+     * The job's name.
+     */
+    private String name;
 
     /**
      * A job description.
@@ -32,6 +39,11 @@ public class Job {
     private String trigger;
 
     /**
+     * Indicates if this job is active or not.
+     */
+    private boolean active;
+
+    /**
      * The tasks this job will perform.
      */
     private List<Task> tasks = new LinkedList<>();
@@ -42,36 +54,9 @@ public class Job {
     public void run() {
         LOG.debug("Running job: {}", getId());
         for (Task task : tasks) {
-            task.run(id);
+            task.run(name);
         }
         LOG.debug("Finished job: {}", getId());
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTrigger() {
-        return trigger;
-    }
-
-    public void setTrigger(String trigger) {
-        this.trigger = trigger;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

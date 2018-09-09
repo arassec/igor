@@ -1,50 +1,33 @@
 package com.arassec.igor.web.api.model;
 
-import com.arassec.igor.core.application.schema.ServiceCategory;
-import com.arassec.igor.core.application.schema.ServiceType;
+import lombok.Data;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
+@Data
 public class ServiceModel {
 
-    private String id;
+    private Long id;
+
+    private String name;
 
     private ServiceCategory serviceCategory;
 
     private ServiceType serviceType;
 
-    private Map<String, Object> parameters = new HashMap<>();
+    private List<ParameterDefinition> parameters = new LinkedList<>();
 
-    public String getId() {
-        return id;
+    public ServiceModel() {
     }
 
-    public void setId(String id) {
+    public ServiceModel(Long id, String name, ServiceCategory serviceCategory, ServiceType serviceType, List<ParameterDefinition> parameters) {
         this.id = id;
-    }
-
-    public ServiceCategory getServiceCategory() {
-        return serviceCategory;
-    }
-
-    public void setServiceCategory(ServiceCategory serviceCategory) {
+        this.name = name;
         this.serviceCategory = serviceCategory;
-    }
-
-    public ServiceType getServiceType() {
-        return serviceType;
-    }
-
-    public void setServiceType(ServiceType serviceType) {
         this.serviceType = serviceType;
-    }
-
-    public Map<String, Object> getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
 }

@@ -30,7 +30,7 @@ public class JobConverter {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobConverter.class);
 
-    private static final String SERVICE = "Service";
+    private static final String SERVICE_SUFFIX = "_IgorService";
 
     @Autowired
     private ActionFactory actionFactory;
@@ -43,9 +43,10 @@ public class JobConverter {
 
     public String convert(Job job) {
         JSONObject jobJson = new JSONObject();
-        jobJson.put(JsonKeys.ID, job.getId());
+        jobJson.put(JsonKeys.NAME, job.getName());
         jobJson.put(JsonKeys.TRIGGER, job.getTrigger());
         jobJson.put(JsonKeys.DESCRIPTION, job.getDescription());
+        jobJson.put(JsonKeys.ACTIVE, job.isActive());
 
         JSONArray tasksJson = new JSONArray();
         job.getTasks().stream().map(task -> convertTaskToJson(task)).forEach(jsonObject -> tasksJson.put(jsonObject));
@@ -57,9 +58,10 @@ public class JobConverter {
         JSONObject jobJson = new JSONObject(jobString);
 
         Job job = new Job();
-        job.setId(jobJson.getString(JsonKeys.ID));
+        job.setName(jobJson.getString(JsonKeys.NAME));
         job.setTrigger(jobJson.getString(JsonKeys.TRIGGER));
         job.setDescription(jobJson.optString(JsonKeys.DESCRIPTION));
+        job.setActive(jobJson.optBoolean(JsonKeys.ACTIVE));
 
         JSONArray tasksArray = jobJson.getJSONArray(JsonKeys.TASKS);
         for (int i = 0; i < tasksArray.length(); i++) {
@@ -109,11 +111,10 @@ public class JobConverter {
 
     private Map<String, Object> convertJsonToParameters(JSONObject parameters) {
         Map<String, Object> params = new HashMap<>();
-        for (int i=0; i < parameters.length(); i++) {
+        for (int i = 0; i < parameters.length(); i++) {
             String parameterName = parameters.names().getString(i);
-            // TODO: There has to be a better way to identify a service!
-            if (parameterName.equalsIgnoreCase(SERVICE) || parameterName.endsWith(SERVICE)) {
-                params.put(parameterName, serviceRepository.findById(parameters.getString(parameterName)));
+            if (parameterName.endsWith(SERVICE_SUFFIX)) {
+                params.put(parameterName.replace(SERVICE_SUFFIX, ""), serviceRepository.findById(parameters.getLong(parameterName)));
             } else {
                 params.put(parameterName, parameters.get(parameterName));
             }
@@ -149,7 +150,7 @@ public class JobConverter {
         for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
             if (parameter.getValue() instanceof Service) {
                 Service service = (Service) parameter.getValue();
-                params.put(parameter.getKey(), service.getId());
+                params.put(parameter.getKey() + SERVICE_SUFFIX, service.getId());
             } else {
                 params.put(parameter.getKey(), parameter.getValue());
             }

@@ -8,18 +8,32 @@ package com.arassec.igor.core.model.service;
 public interface Service {
 
     /**
-     * Returns the system wide unique ID of the service.
+     * Returns the system-wide unique ID of the service.
      *
      * @return The ID.
      */
-    String getId();
+    Long getId();
 
     /**
      * Sets the ID of the service.
      *
      * @param id The service's ID.
      */
-    void setId(String id);
+    void setId(Long id);
+
+    /**
+     * Returns the service's name.
+     *
+     * @return The service's name.
+     */
+    String getName();
+
+    /**
+     * Sets the service's name.
+     *
+     * @param name The new service name to set.
+     */
+    void setName(String name);
 
     /**
      * Tests the service's configuration.

@@ -22,7 +22,7 @@ public class ServiceConverter {
 
     public String convert(Service service) {
         JSONObject serviceJson = new JSONObject();
-        serviceJson.put(JsonKeys.ID, service.getId());
+        serviceJson.put(JsonKeys.NAME, service.getName());
         serviceJson.put(JsonKeys.TYPE, service.getClass().getName());
 
         Map<String, Object> parameters = serviceFactory.getParameters(service);
@@ -43,7 +43,7 @@ public class ServiceConverter {
 
     public Service convert(String serviceString) {
         JSONObject jsonObject = new JSONObject(serviceString);
-        String id = jsonObject.getString(JsonKeys.ID);
+        String name = jsonObject.getString(JsonKeys.NAME);
         String type = jsonObject.getString(JsonKeys.TYPE);
 
         Map<String, Object> parameters = new HashMap<>();
@@ -61,7 +61,7 @@ public class ServiceConverter {
 
         Service result = serviceFactory.createInstance(type, parameters);
         if (result != null) {
-            result.setId(id);
+            result.setName(name);
         }
 
         return result;

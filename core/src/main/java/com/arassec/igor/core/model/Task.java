@@ -46,7 +46,7 @@ public class Task {
     /**
      * Runs the task.
      */
-    public void run(String jobId) {
+    public void run(String jobName) {
 
         // Scan all actions to create lists of actions that belong to the same concurrency group (i.e. use the same number of
         // threads):
@@ -71,7 +71,7 @@ public class Task {
         BlockingQueue<IgorData> inputQueue = providerInputQueue;
 
         for (List<Action> concurrencyList : concurrencyLists) {
-            String concurrencyGroupId = String.format(CONCURRENCY_GROUP_ID_PATTERN, jobId, getName(), concurrencyLists.indexOf(concurrencyList));
+            String concurrencyGroupId = String.format(CONCURRENCY_GROUP_ID_PATTERN, jobName, getName(), concurrencyLists.indexOf(concurrencyList));
             ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueue, concurrencyGroupId);
             inputQueue = concurrencyGroup.getOutputQueue();
             concurrencyGroups.add(concurrencyGroup);
@@ -80,7 +80,7 @@ public class Task {
         actions.stream().forEach(Action::initialize);
 
         // Read the data from the provider and start working:
-        provider.initialize(jobId, name);
+        provider.initialize(jobName, name);
         while (provider.hasNext()) {
             IgorData data = provider.next();
             boolean added = false;

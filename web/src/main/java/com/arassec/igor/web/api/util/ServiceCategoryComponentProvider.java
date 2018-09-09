@@ -1,4 +1,4 @@
-package com.arassec.igor.core.application.factory.util;
+package com.arassec.igor.web.api.util;
 
 import com.arassec.igor.core.model.IgorServiceCategory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;

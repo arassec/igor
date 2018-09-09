@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
  * Created by Andreas Sensen on 14.04.2017.
  */
 @Repository
-public interface JobDao extends CrudRepository<JobEntity, String> {
+public interface JobDao extends CrudRepository<JobEntity, Long> {
 
 }
