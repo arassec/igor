@@ -1,0 +1,65 @@
+<template>
+    <div class="panel">
+        <slot/>
+    </div>
+</template>
+
+<script>
+export default {
+  name: 'core-panel'
+}
+</script>
+
+<style scoped>
+
+    .panel {
+        color: var(--font-color-light);
+        background-color: var(--panel-background-color);
+        padding: 15px;
+        margin-bottom: 10px;
+        -webkit-box-shadow: 2px 2px 5px 0px rgba(163,163,163,0.75);
+        -moz-box-shadow: 2px 2px 5px 0px rgba(163,163,163,0.75);
+        box-shadow: 2px 2px 5px 0px rgba(163,163,163,0.75);
+    }
+
+    .panel table tr {
+        line-height: 30px;
+    }
+
+    .panel table td {
+        text-align: left;
+        padding-right: 15px;
+    }
+
+    .panel table tr td label {
+        color: var(--font-color-light);
+        margin-right: 15px;
+    }
+
+    .panel table tr td input, select {
+        border: none;
+        background-color: var(--element-background-color);
+        height: 25px;
+        min-width: 300px;
+        color: var(--font-color-light);
+    }
+
+    .panel table tr td input {
+        padding-left: 5px;
+    }
+
+    .panel table tr td select option {
+        border: none;
+        outline: none;
+        background-color: var(--element-background-color);
+        height: 25px;
+    }
+
+    .panel table tr td select:focus,
+    .panel table tr td input:focus {
+        background-color: var(--element-background-color-focus);
+        color: var(--panel-background-color);
+        outline: none;
+    }
+
+</style>

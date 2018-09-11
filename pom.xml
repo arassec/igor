@@ -29,10 +29,11 @@
     <modules>
         <module>core</module>
         <module>persistence</module>
-        <module>web</module>
         <module>module-localfs</module>
         <module>module-ftp</module>
         <module>module-ssh</module>
+        <module>frontend</module>
+        <module>web</module>
         <module>application</module>
     </modules>
 
