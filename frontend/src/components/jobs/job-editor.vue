@@ -51,10 +51,7 @@
 
                 <button-row>
                     <p slot="right">
-                        <input-button v-on:clicked="addTask()">
-                            <font-awesome-icon icon="plus"/>
-                            Add Task
-                        </input-button>
+                        <input-button v-on:clicked="addTask()" icon="plus"/>
                     </p>
                 </button-row>
 
@@ -70,19 +67,12 @@
 
                 <button-row>
                     <p slot="left">
-                        <input-button v-on:clicked="cancel()">
-                            <font-awesome-icon icon="times"/>
-                        </input-button>
+                        <input-button v-on:clicked="cancel()" icon="times"/>
                     </p>
 
                     <p slot="right">
-                        <input-button class="margin-right" v-on:clicked="testConfiguration()">
-                            <font-awesome-icon icon="plug"/>
-                        </input-button>
-
-                        <input-button v-on:clicked="saveConfiguration()">
-                            <font-awesome-icon icon="save"/>
-                        </input-button>
+                        <input-button v-on:clicked="testConfiguration()" icon="plug"/>
+                        <input-button v-on:clicked="saveConfiguration()" icon="save"/>
                     </p>
                 </button-row>
 
@@ -98,8 +88,6 @@
 import TaskEditor from './task-editor'
 import SpacerItem from '../common/spacer-item'
 import CorePanel from '../common/core-panel'
-import AlertBox from '../common/alert-box'
-import InfoBox from '../common/info-box'
 import InputButton from '../common/input-button'
 import ServicePicker from '../services/service-picker'
 import CoreContainer from '../common/core-container'
@@ -120,8 +108,6 @@ export default {
     CorePanel,
     InputButton,
     SpacerItem,
-    InfoBox,
-    AlertBox,
     TaskEditor
   },
   data: function () {
@@ -133,6 +119,7 @@ export default {
       requestInProgress: false,
       nameValidationError: '',
       triggerValidationError: '',
+      cronTriggerIconClass: '',
       jobConfiguration: {
         id: '',
         trigger: '',

@@ -52,22 +52,15 @@
             </core-panel>
 
             <core-panel>
-                <feedback-panel :feedback="feedback" :feedbackOk="feedbackOk" :requestInProgress="requestInProgress"/>
+                <feedback-panel :feedback="feedback" :alert="!feedbackOk" :requestInProgress="requestInProgress"/>
 
                 <button-row>
                     <p slot="left">
-                        <input-button v-on:clicked="cancel()">
-                            <font-awesome-icon icon="times"/>
-                        </input-button>
+                        <input-button v-on:clicked="cancel()" icon="times"/>
                     </p>
                     <p slot="right">
-                        <input-button class="margin-right" v-on:clicked="testConfiguration()">
-                            <font-awesome-icon icon="plug"/>
-                        </input-button>
-
-                        <input-button v-on:clicked="saveConfiguration()">
-                            <font-awesome-icon icon="save"/>
-                        </input-button>
+                        <input-button v-on:clicked="testConfiguration()" icon="plug"/>
+                        <input-button v-on:clicked="saveConfiguration()" icon="save"/>
                     </p>
                 </button-row>
 
@@ -82,8 +75,6 @@
 <script>
 import SpacerItem from '../common/spacer-item'
 import ParameterEditor from '../common/parameter-editor'
-import AlertBox from '../common/alert-box'
-import InfoBox from '../common/info-box'
 import InputButton from '../common/input-button'
 import CorePanel from '../common/core-panel'
 import CoreContainer from '../common/core-container'
@@ -102,8 +93,6 @@ export default {
     CoreContainer,
     CorePanel,
     InputButton,
-    InfoBox,
-    AlertBox,
     ParameterEditor,
     SpacerItem
   },
@@ -213,12 +202,8 @@ export default {
 
       if (this.newService) {
         this.$http.post('/api/service', this.serviceConfiguration).then(function () {
-          component.$router.push({
-            name: 'services',
-            params: {
-              saveResult: 'Service ' + component.serviceConfiguration.name + ' saved.'
-            }
-          })
+          component.$root.$data.store.setFeedback('Service ' + component.serviceConfiguration.name + ' saved.', false)
+          component.$router.push({name: 'services'})
         }).catch(function (error) {
           component.feedback = 'Saving failed! (' + error.response.data.error + ')'
           component.feedbackOk = false
@@ -226,12 +211,8 @@ export default {
         })
       } else {
         this.$http.put('/api/service', this.serviceConfiguration).then(function () {
-          component.$router.push({
-            name: 'services',
-            params: {
-              saveResult: 'Service ' + component.serviceConfiguration.name + ' updated.'
-            }
-          })
+          component.$root.$data.store.setFeedback('Service ' + component.serviceConfiguration.name + ' updated.', false)
+          component.$router.push({name: 'services'})
         }).catch(function (error) {
           component.feedback = 'Saving failed! (' + error.response.data.error + ')'
           component.feedbackOk = false
@@ -274,9 +255,5 @@ export default {
 </script>
 
 <style scoped>
-
-    .feeback-panel {
-        margin-bottom: 10px;
-    }
 
 </style>

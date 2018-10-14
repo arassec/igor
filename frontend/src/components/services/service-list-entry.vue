@@ -7,13 +7,8 @@
                 {{ name }}
             </list-name>
             <p slot="right">
-                <input-button v-on:clicked="editService(id)" class="margin-right">
-                    <font-awesome-icon icon="cog"/>
-                </input-button>
-
-                <input-button v-on:clicked="showDeleteDialog = !showDeleteDialog">
-                    <font-awesome-icon icon="trash-alt"/>
-                </input-button>
+                <input-button v-on:clicked="editService(id)" icon="cog"/>
+                <input-button v-on:clicked="showDeleteDialog = !showDeleteDialog" icon="trash-alt" />
             </p>
         </button-row>
 
@@ -23,14 +18,10 @@
             <div slot="footer">
                 <button-row>
                     <p slot="left">
-                        <input-button v-on:clicked="showDeleteDialog = false">
-                            <font-awesome-icon icon="times"/>
-                        </input-button>
+                        <input-button v-on:clicked="showDeleteDialog = false" icon="times"/>
                     </p>
                     <p slot="right">
-                        <input-button class="right" v-on:clicked="deleteService(id)">
-                            <font-awesome-icon icon="check"/>
-                        </input-button>
+                        <input-button class="right" v-on:clicked="deleteService(id)" icon="check"/>
                     </p>
                 </button-row>
             </div>
@@ -67,10 +58,12 @@ export default {
       this.showDeleteDialog = false
       let component = this
       this.$http.delete('/api/service/' + id).then(function () {
-        component.$emit('actionPerformed', "Service '" + component.name + "' has been deleted.", true)
+        component.$root.$data.store.setFeedback("Service '" + component.name + "' has been deleted.", false)
+        component.$emit('actionPerformed')
       }).catch(function (error) {
         console.log(error)
-        component.$emit('actionPerformed', "Service '" + component.name + "' could not be deleted!", false)
+        component.$root.$data.store.setFeedback("Service '" + component.name + "' could not be deleted!", false)
+        component.$emit('actionPerformed')
       })
     }
   }

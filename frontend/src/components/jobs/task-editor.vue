@@ -38,10 +38,7 @@
 
             <button-row>
                 <p slot="right">
-                    <input-button class="right" v-on:clicked="addAction()">
-                        <font-awesome-icon icon="plus"/>
-                        Add Action
-                    </input-button>
+                    <input-button class="right" v-on:clicked="addAction()" icon="plus"/>
                 </p>
             </button-row>
 

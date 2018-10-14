@@ -22,21 +22,21 @@ export default {
         box-shadow: 2px 2px 5px 0px rgba(163,163,163,0.75);
     }
 
-    .panel table tr {
-        line-height: 30px;
+    .panel >>> table tr {
+        line-height: 25px;
     }
 
-    .panel table td {
+    .panel >>> table td {
         text-align: left;
         padding-right: 15px;
     }
 
-    .panel table tr td label {
+    .panel >>> label {
         color: var(--font-color-light);
         margin-right: 15px;
     }
 
-    .panel table tr td input, select {
+    .panel >>> input, select {
         border: none;
         background-color: var(--element-background-color);
         height: 25px;
@@ -44,19 +44,19 @@ export default {
         color: var(--font-color-light);
     }
 
-    .panel table tr td input {
-        padding-left: 5px;
+    .panel >>> input {
+      text-indent: 5px;
     }
 
-    .panel table tr td select option {
+    .panel >>> select option {
         border: none;
         outline: none;
         background-color: var(--element-background-color);
         height: 25px;
     }
 
-    .panel table tr td select:focus,
-    .panel table tr td input:focus {
+    .panel >>> select:focus,
+    .panel >>> input:focus {
         background-color: var(--element-background-color-focus);
         color: var(--panel-background-color);
         outline: none;

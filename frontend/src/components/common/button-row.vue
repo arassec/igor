@@ -30,8 +30,4 @@ export default {
         margin-left: auto;
     }
 
-    .margin-right {
-        margin-right: 5px;
-    }
-
 </style>

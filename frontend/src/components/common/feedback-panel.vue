@@ -1,26 +1,25 @@
 <template>
-    <div v-if="feedback.length > 0" class="feedback-panel">
-        <alert-box v-if="feedback.length > 0 && !feedbackOk" :text="feedback"/>
-        <info-box v-if="feedback.length > 0 && feedbackOk && requestInProgress" :text="feedback"
+    <div v-if="feedback.length > 0">
+        <feedback-box v-if="feedback.length > 0 && alert" :text="feedback" :alert="alert"/>
+        <feedback-box v-if="feedback.length > 0 && !alert && requestInProgress" :text="feedback"
                   :icon="'spinner'" :iconClass="'fa-spin'"/>
-        <info-box v-if="feedback.length > 0 && feedbackOk && !requestInProgress" :text="feedback"/>
+        <feedback-box v-if="feedback.length > 0 && !alert && !requestInProgress" :text="feedback"/>
     </div>
 </template>
 
 <script>
-import AlertBox from './alert-box'
-import InfoBox from './info-box'
+import FeedbackBox from './feedback-box'
 export default {
   name: 'feedback-panel',
-  components: {InfoBox, AlertBox},
-  props: ['feedback', 'feedbackOk', 'requestInProgress']
+  components: {FeedbackBox},
+  props: ['feedback', 'alert', 'requestInProgress']
 }
 </script>
 
 <style scoped>
 
-    .feeback-panel {
-        margin-bottom: 10px;
+    div {
+        margin-bottom: 15px;
     }
 
 </style>

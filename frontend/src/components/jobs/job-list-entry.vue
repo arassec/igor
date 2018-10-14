@@ -7,7 +7,7 @@
                 {{ name }}
             </list-name>
             <p slot="right">
-                <input-button v-on:clicked="editJob(id)" class="margin-right">
+                <input-button v-on:clicked="editJob(id)">
                     <font-awesome-icon icon="cog"/>
                 </input-button>
 

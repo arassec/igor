@@ -12,17 +12,9 @@
                                 v-bind:key="service.id"
                                 v-bind:id="service.id"
                                 v-bind:name="service.name"
-                                @actionPerformed="setActionFeedback"/>
+                                @actionPerformed="loadServices()"/>
 
-            <feedback-snackbar :show="actionFeedback.length > 0" :feedbackOk="actionFeedbackOk"
-                               @timedOut="resetActionFeedback()">
-                {{actionFeedback}}
-            </feedback-snackbar>
-
-            <feedback-snackbar :show="feedback.length > 0" :feedbackOk="feedbackOk"
-                               @timedOut="resetFeedback()">
-                {{feedback}}
-            </feedback-snackbar>
+            <feedback-snackbar/>
 
         </core-content>
 
@@ -36,8 +28,6 @@ import SpacerItem from '../common/spacer-item'
 import ListHeader from '../common/list-header'
 import ServiceListEntry from './service-list-entry'
 import CorePanel from '../common/core-panel'
-import InfoBox from '../common/info-box'
-import AlertBox from '../common/alert-box'
 import CoreContainer from '../common/core-container'
 import CoreContent from '../common/core-content'
 import FeedbackSnackbar from '../common/feedback-snackbar'
@@ -48,8 +38,6 @@ export default {
     FeedbackSnackbar,
     CoreContent,
     CoreContainer,
-    AlertBox,
-    InfoBox,
     CorePanel,
     ServiceListEntry,
     ListHeader,
@@ -58,18 +46,11 @@ export default {
   data: function () {
     return {
       services: [],
-      feedback: '',
-      feedbackOk: true,
-      showFeedback: false,
-      filterText: '',
-      actionFeedback: '',
-      actionFeedbackOk: true
+      filterText: ''
     }
   },
   methods: {
     loadServices: function () {
-      this.feedback = ''
-      this.feedbackOk = true
       let component = this
       this.$http.get('/api/service').then(function (response) {
         for (let i = component.services.length; i > 0; i--) {
@@ -81,27 +62,11 @@ export default {
         component.services.sort((a, b) => a.name.localeCompare(b.name))
       }).catch(function (error) {
         console.log(error)
-        component.feedback = 'Services could not be loaded!'
-        component.feedbackOk = false
+        component.$root.$data.store.setFeedback('Services could not be loaded!', true)
       })
     },
     filter: function (filterTextFromListHeader) {
       this.filterText = filterTextFromListHeader
-    },
-    setActionFeedback: function (newFeedback, newFeedbackOk) {
-      this.actionFeedback = newFeedback
-      this.actionFeedbackOk = newFeedbackOk
-      if (newFeedbackOk) {
-        this.loadServices()
-      }
-    },
-    resetActionFeedback: function () {
-      this.actionFeedback = ''
-      this.actionFeedbackOk = true
-    },
-    resetFeedback: function () {
-      this.feedback = ''
-      this.feedbackOk = true
     }
   },
   computed: {

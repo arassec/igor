@@ -16,9 +16,8 @@
                     <input v-if="!isNumber(param.type) && !isBoolean(param.type)" autocomplete="off"
                            :type="parameterInputTypes[index]" v-model.trim="param.value"/>
 
-                    <font-awesome-icon icon="eye" class="cleartext-icon"
-                        v-if="!isNumber(param.type) && !isBoolean(param.type) && param.secured"
-                                       v-on:click="toggleCleartext(index)"/>
+                    <input-button icon="eye" v-if="!isNumber(param.type) && !isBoolean(param.type) && param.secured"
+                        v-on:clicked="toggleCleartext(index)"/>
 
                 </td>
                 <td>
@@ -129,51 +128,4 @@ export default {
 </script>
 
 <style scoped>
-
-    table tr {
-        line-height: 30px;
-    }
-
-    table td {
-        text-align: left;
-        padding-right: 15px;
-    }
-
-    table tr td label, svg {
-        color: var(--font-color-light);
-        margin-right: 15px;
-    }
-
-    table tr td input, select {
-        border: none;
-        background-color: var(--element-background-color);
-        height: 25px;
-        min-width: 300px;
-        color: var(--font-color-light);
-        padding-left: 5px;
-    }
-
-    table tr td select option {
-        border: none;
-        outline: none;
-        background-color: var(--element-background-color);
-        height: 25px;
-    }
-
-    table tr td select:focus,
-    table tr td input:focus {
-        background-color: var(--element-background-color-focus);
-        color: var(--panel-background-color);
-        outline: none;
-    }
-
-    .cleartext-icon {
-        margin: 0px 0px -2px 5px;
-    }
-
-    .cleartext-icon:hover {
-        color: var(--font-color-dark);
-        cursor: pointer;
-    }
-
 </style>

@@ -1,29 +1,31 @@
 <template>
-    <div class="header-container">
-        <h1>
-            <slot name="title">default title</slot>
-        </h1>
-        <div class="button-row">
-            <input type="text" v-model="filterText"/>
-            <font-awesome-icon v-if="filterText.length <= 0" class="search-icon" icon="search"/>
-            <font-awesome-icon v-if="filterText.length > 0" class="clear-icon" icon="times"
-                v-on:click="filterText = ''"/>
-            <router-link :to="addButtonTarget">
-                <input-button>
-                    <font-awesome-icon icon="plus"/>
-                    {{addButtonText}}
-                </input-button>
-            </router-link>
-        </div>
-    </div>
+  <core-panel>
+    <h1>
+      <slot name="title">default title</slot>
+    </h1>
+    <button-row>
+      <div class="filter" slot="left">
+        <input id="filter-input" type="text" v-model="filterText" placeholder="filter list"/>
+        <font-awesome-icon icon="search"/>
+        <input-button icon="times" v-if="filterText.length > 0" v-on:clicked="filterText = ''"/>
+      </div>
+      <p slot="right">
+        <router-link :to="addButtonTarget">
+          <input-button icon="plus"/>
+        </router-link>
+      </p>
+    </button-row>
+  </core-panel>
 </template>
 
 <script>
 import InputButton from './input-button'
+import ButtonRow from './button-row'
+import CorePanel from './core-panel'
 
 export default {
   name: 'list-header',
-  components: {InputButton},
+  components: {CorePanel, ButtonRow, InputButton},
   props: ['filter', 'addButtonText', 'addButtonTarget'],
   data: function () {
     return {
@@ -47,63 +49,23 @@ export default {
 
 <style scoped>
 
-    .header-container {
-        display: flex;
-        flex-direction: column;
-        background-color: var(--panel-background-color);
-        color: var(--font-color-light);
-        padding: 15px;
-        margin-bottom: 10px;
-        -webkit-box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
-        -moz-box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
-        box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
-    }
+  .filter {
+    position: relative;
+  }
 
-    .header-container h1 {
-        font-size: 150%;
-        color: var(--font-color-light);
-    }
+  .filter >>> input {
+    padding-left: 25px;
+  }
 
-    .button-row {
-        display: flex;
-    }
+  .filter >>> input:focus + .fa-search {
+    color: var(--panel-background-color);
+  }
 
-    .button-row input {
-        border: none;
-        background-color: var(--element-background-color);
-        height: 25px;
-        min-width: 300px;
-        color: var(--font-color-light);
-        padding-left: 5px;
-    }
-
-    .button-row input:focus {
-        background-color: var(--element-background-color-focus);
-        color: var(--panel-background-color);
-        outline: none;
-    }
-
-    .button-row input:focus + .search-icon {
-        color: var(--element-background-color);
-    }
-
-    .button-row a {
-        margin-left: auto;
-    }
-
-    .search-icon {
-        margin: 5px 0px 0px -20px;
-        color: var(--element-background-color-focus);
-    }
-
-    .clear-icon {
-        margin: 5px 0px 0px -20px;
-        color: var(--element-background-color);
-    }
-
-    .clear-icon:hover {
-        color: var(--font-color-dark);
-        cursor: pointer;
-    }
+  .filter .fa-search {
+    position: absolute;
+    top: 5px;
+    left: 7px;
+    font-size: 15px;
+  }
 
 </style>

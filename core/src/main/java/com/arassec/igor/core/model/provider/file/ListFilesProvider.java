@@ -16,16 +16,16 @@ import java.util.List;
 public class ListFilesProvider extends BaseProvider {
 
     /**
-     * Defines the directory to list files in.
-     */
-    @IgorParam
-    private String directory;
-
-    /**
      * The service to use for file listing.
      */
     @IgorParam
     private FileService sourceService;
+
+    /**
+     * Defines the directory to list files in.
+     */
+    @IgorParam
+    private String directory;
 
     /**
      * The key the files are listed under.

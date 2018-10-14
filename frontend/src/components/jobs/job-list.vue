@@ -7,9 +7,7 @@
             <list-header :addButtonTarget="'job-editor'" :addButtonText="'Add Job'" :filter="filter">
                 <p slot="title">Available Jobs</p>
                 <p slot="feedback">
-                    <alert-box v-if="feedback.length > 0 && !feedbackOk" :text="feedback"/>
-                    <info-box v-if="feedback.length > 0 && feedbackOk" :text="feedback"/>
-                    <info-box v-if="saveResult" :text="saveResult"/>
+                    <feedback-box v-if="feedback.length > 0" :text="feedback" :alert="!feedbackOk"/>
                 </p>
             </list-header>
 
@@ -29,15 +27,14 @@
 import SpacerItem from '../common/spacer-item'
 import ListHeader from '../common/list-header'
 import CorePanel from '../common/core-panel'
-import InfoBox from '../common/info-box'
-import AlertBox from '../common/alert-box'
 import JobListEntry from './job-list-entry'
 import CoreContainer from '../common/core-container'
 import CoreContent from '../common/core-content'
+import FeedbackBox from '../common/feedback-box'
 
 export default {
   name: 'job-list',
-  components: {CoreContent, CoreContainer, AlertBox, InfoBox, CorePanel, JobListEntry, ListHeader, SpacerItem},
+  components: {CoreContent, CoreContainer, FeedbackBox, CorePanel, JobListEntry, ListHeader, SpacerItem},
   props: ['saveResult'],
   data: function () {
     return {

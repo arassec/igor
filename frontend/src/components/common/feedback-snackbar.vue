@@ -1,7 +1,7 @@
 <template>
-    <transition name="snackbar" v-if="show">
-        <div class="snackbar" :class="{'alert': !feedbackOk, 'feedback': feedbackOk}">
-            <slot/>
+    <transition name="snackbar" v-if="feedback.message.length > 0">
+        <div class="snackbar" :class="{'alert': feedback.alert, 'feedback': !feedback.alert}">
+            {{ feedback.message }}
         </div>
     </transition>
 </template>
@@ -9,12 +9,10 @@
 <script>
 export default {
   name: 'feedback-snackbar',
-  props: ['show', 'feedbackOk'],
-  mounted: function () {
-    let component = this
-    setTimeout(function () {
-      component.$emit('timedOut')
-    }, 10000)
+  computed: {
+    feedback: function () {
+      return this.$root.$data.store.getFeedback()
+    }
   }
 }
 </script>
