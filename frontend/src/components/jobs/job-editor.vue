@@ -1,87 +1,93 @@
 <template>
-    <core-container>
+  <core-container>
 
-        <spacer-item/>
+    <spacer-item/>
 
-        <core-content>
-            <core-panel>
-                <h1>{{ newJob ? 'New Job' : 'Edit Job'}}</h1>
+    <core-content>
+      <core-panel>
+        <h1>{{ newJob ? 'New Job' : 'Edit Job'}}</h1>
 
-                <table>
-                    <tr>
-                        <td><label>Name</label></td>
-                        <td>
-                            <input type="text" autocomplete="off" v-model="jobConfiguration.name"/>
-                        </td>
-                        <td>
-                            <validation-error v-if="nameValidationError.length > 0">
-                                {{nameValidationError}}
-                            </validation-error>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for="trigger-input">Trigger</label></td>
-                        <td>
-                            <input id="trigger-input" type="text" autocomplete="off"
-                                   v-model="jobConfiguration.trigger"/>
-                        </td>
-                        <td>
-                            <div v-if="triggerValidationError.length > 0" class="validation-error">
-                                {{triggerValidationError}}
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for="description-input">Description</label></td>
-                        <td>
-                            <input id="description-input" type="text" autocomplete="off"
-                                   v-model="jobConfiguration.description"/>
-                        </td>
-                        <td/>
-                    </tr>
-                    <tr>
-                        <td><label>Active</label></td>
-                        <td>
-                            <font-awesome-icon :icon="jobConfiguration.active ? 'check-square' : 'square'"
-                                               v-on:click="jobConfiguration.active = !jobConfiguration.active"/>
-                        </td>
-                        <td/>
-                    </tr>
-                </table>
+        <table>
+          <tr>
+            <td><label>Name</label></td>
+            <td>
+              <input type="text" autocomplete="off" v-model="jobConfiguration.name"/>
+            </td>
+            <td>
+              <validation-error v-if="nameValidationError.length > 0">
+                {{nameValidationError}}
+              </validation-error>
+            </td>
+          </tr>
+          <tr>
+            <td><label for="trigger-input">Trigger</label></td>
+            <td>
+              <input id="trigger-input" type="text" autocomplete="off"
+                     v-model="jobConfiguration.trigger"/>
+              <input-button v-on:clicked="showCronTrigger = true" icon="clock"/>
+            </td>
+            <td>
+              <validation-error v-if="triggerValidationError.length > 0">
+                {{triggerValidationError}}
+              </validation-error>
+            </td>
+          </tr>
+          <tr>
+            <td><label for="description-input">Description</label></td>
+            <td>
+              <input id="description-input" type="text" autocomplete="off"
+                     v-model="jobConfiguration.description"/>
+            </td>
+            <td/>
+          </tr>
+          <tr>
+            <td><label>Active</label></td>
+            <td>
+              <font-awesome-icon :icon="jobConfiguration.active ? 'check-square' : 'square'"
+                                 v-on:click="jobConfiguration.active = !jobConfiguration.active"/>
+            </td>
+            <td/>
+          </tr>
+        </table>
 
-                <button-row>
-                    <p slot="right">
-                        <input-button v-on:clicked="addTask()" icon="plus"/>
-                    </p>
-                </button-row>
+        <button-row>
+          <p slot="right">
+            <input-button v-on:clicked="addTask()" icon="plus"/>
+          </p>
+        </button-row>
 
-            </core-panel>
+      </core-panel>
 
-            <task-editor v-for="(task, index) in jobConfiguration.tasks"
-                         v-bind:task="task"
-                         v-bind:index="index"
-                         v-bind:key="task"/>
+      <task-editor v-for="(task, index) in jobConfiguration.tasks"
+                   v-bind:task="task"
+                   v-bind:index="index"
+                   v-bind:key="index"
+                   v-on:delete="deleteTask(index)"
+                   ref="taskEditors"/>
 
-            <core-panel>
-                <feedback-panel :feedback="feedback" :feedbackOk="feedbackOk" :requestInProgress="requestInProgress"/>
+      <core-panel>
+        <feedback-panel :feedback="feedback" :alert="!feedbackOk" :requestInProgress="requestInProgress"/>
 
-                <button-row>
-                    <p slot="left">
-                        <input-button v-on:clicked="cancel()" icon="times"/>
-                    </p>
+        <button-row>
+          <p slot="left">
+            <input-button v-on:clicked="cancel()" icon="times"/>
+          </p>
 
-                    <p slot="right">
-                        <input-button v-on:clicked="testConfiguration()" icon="plug"/>
-                        <input-button v-on:clicked="saveConfiguration()" icon="save"/>
-                    </p>
-                </button-row>
+          <p slot="right">
+            <input-button v-on:clicked="testConfiguration()" icon="plug"/>
+            <input-button v-on:clicked="saveConfiguration()" icon="save"/>
+          </p>
+        </button-row>
 
-            </core-panel>
-        </core-content>
+        <cron-picker v-show="showCronTrigger" v-on:selected="setCronTrigger" v-on:cancel="showCronTrigger = false"/>
 
-        <spacer-item/>
+      </core-panel>
 
-    </core-container>
+    </core-content>
+
+    <spacer-item/>
+
+  </core-container>
 </template>
 
 <script>
@@ -89,39 +95,39 @@ import TaskEditor from './task-editor'
 import SpacerItem from '../common/spacer-item'
 import CorePanel from '../common/core-panel'
 import InputButton from '../common/input-button'
-import ServicePicker from '../services/service-picker'
 import CoreContainer from '../common/core-container'
 import CoreContent from '../common/core-content'
 import ButtonRow from '../common/button-row'
 import ValidationError from '../common/validation-error'
 import FeedbackPanel from '../common/feedback-panel'
+import CronPicker from '../common/cron-picker'
 
 export default {
   name: 'job-editor',
   components: {
+    CronPicker,
     FeedbackPanel,
     ValidationError,
     ButtonRow,
     CoreContent,
     CoreContainer,
-    ServicePicker,
     CorePanel,
     InputButton,
     SpacerItem,
     TaskEditor
   },
+  props: ['jobId'],
   data: function () {
     return {
       newJob: true,
-      jobId: '',
       feedback: '',
       feedbackOk: true,
       requestInProgress: false,
       nameValidationError: '',
       triggerValidationError: '',
-      cronTriggerIconClass: '',
+      showCronTrigger: false,
       jobConfiguration: {
-        id: '',
+        name: '',
         trigger: '',
         description: '',
         active: true,
@@ -142,19 +148,34 @@ export default {
       })
     },
     saveConfiguration: function () {
+      if (!this.validateInput()) {
+        return
+      }
+
       this.feedback = 'Saving...'
       this.requestInProgress = true
 
       let component = this
-      this.$http.post('/api/job', this.jobConfiguration).then(function () {
-        component.feedback = 'Saved'
-        component.feedbackOk = true
-        component.requestInProgress = false
-      }).catch(function (error) {
-        component.feedback = error.response.data
-        component.feedbackOk = false
-        component.requestInProgress = false
-      })
+
+      if (this.newJob) {
+        this.$http.post('/api/job', this.jobConfiguration).then(function () {
+          component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' saved.', false)
+          component.$router.push({name: 'jobs'})
+        }).catch(function (error) {
+          component.feedback = 'Saving failed! (' + error.response.data.error + ')'
+          component.feedbackOk = false
+          component.requestInProgress = false
+        })
+      } else {
+        this.$http.put('/api/job', this.jobConfiguration).then(function () {
+          component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' updated.', false)
+          component.$router.push({name: 'jobs'})
+        }).catch(function (error) {
+          component.feedback = 'Saving failed! (' + error.response.data.error + ')'
+          component.feedbackOk = false
+          component.requestInProgress = false
+        })
+      }
     },
     testConfiguration: function () {
 
@@ -170,18 +191,45 @@ export default {
       }
       this.jobConfiguration.tasks.push(task)
     },
+    deleteTask: function (index) {
+      this.$delete(this.jobConfiguration.tasks, index)
+    },
     validateInput: function () {
+      this.feedback = ''
+      this.feedbackOk = true
+      this.nameValidationError = ''
+      this.triggerValidationError = ''
 
+      let nameValidationResult = true
+      if (this.jobConfiguration.name == null || this.jobConfiguration.name === '') {
+        this.nameValidationError = 'Name must be set'
+        nameValidationResult = false
+      }
+
+      let triggerValidationResult = true
+      if (this.jobConfiguration.trigger == null || this.jobConfiguration.trigger === '') {
+        this.triggerValidationError = 'Trigger must be set'
+        triggerValidationResult = false
+      }
+
+      let taskEditorsResult = true
+      for (let i in this.$refs.taskEditors) {
+        taskEditorsResult = taskEditorsResult && this.$refs.taskEditors[i].validateInput()
+      }
+
+      return (nameValidationResult && triggerValidationResult && taskEditorsResult)
     },
     cancel: function () {
       this.$router.back()
+    },
+    setCronTrigger: function (value) {
+      this.jobConfiguration.trigger = value
+      this.showCronTrigger = false
     }
   },
   mounted () {
-    this.jobId = this.$route.params.id
     if (this.jobId != null) {
       this.newJob = false
-      this.showConfiguration = false
       this.loadJob(this.jobId)
     }
   }

@@ -52,11 +52,11 @@ public class Job {
      * Runs the job.
      */
     public void run() {
-        LOG.debug("Running job: {}", getId());
+        LOG.debug("Running job: {} ({})", name, id);
         for (Task task : tasks) {
             task.run(name);
         }
-        LOG.debug("Finished job: {}", getId());
+        LOG.debug("Finished job: {} ({})", name, id);
     }
 
 }

@@ -1,75 +1,76 @@
 <template>
-    <core-container>
-        <spacer-item/>
+  <core-container>
 
-        <core-content>
-            <core-panel>
-                <h1>{{ newService ? 'New Service' : 'Edit Service'}}</h1>
+    <spacer-item/>
 
-                <table>
-                    <tr>
-                        <td><label>Name</label></td>
-                        <td><input type="text" autocomplete="off"
-                                   v-model="serviceConfiguration.name"/></td>
-                        <td>
-                            <validation-error v-if="nameValidationError.length > 0">
-                                {{nameValidationError}}
-                            </validation-error>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for="category-input">Category</label></td>
-                        <td>
-                            <select id="category-input" v-model="selectedCategory"
-                                    v-on:change="loadServiceTypes(selectedCategory)" :disabled="!newService">
-                                <option v-for="category in serviceCategories" v-bind:value="category.type"
-                                        v-bind:key="category.type">
-                                    {{category.label}}
-                                </option>
-                            </select>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><label for="type-input">Type</label></td>
-                        <td>
-                            <select id="type-input" v-model="serviceConfiguration.serviceType"
-                                    v-on:change="loadTypeParameters(serviceConfiguration.serviceType.type)"
-                                    :disabled="!newService">
-                                <option v-for="type in serviceTypes" v-bind:value="type" v-bind:key="type.type">
-                                    {{type.label}}
-                                </option>
-                            </select>
-                        </td>
-                        <td></td>
-                    </tr>
-                </table>
-            </core-panel>
+    <core-content>
+      <core-panel>
+        <h1>{{ newService ? 'New Service' : 'Edit Service'}}</h1>
 
-            <core-panel v-if="Object.keys(serviceConfiguration.parameters).length > 0">
-                <h2>Parameters</h2>
-                <parameter-editor :parameters="serviceConfiguration.parameters" ref="parameterEditor"/>
-            </core-panel>
+        <table>
+          <tr>
+            <td><label>Name</label></td>
+            <td><input type="text" autocomplete="off"
+                       v-model="serviceConfiguration.name"/></td>
+            <td>
+              <validation-error v-if="nameValidationError.length > 0">
+                {{nameValidationError}}
+              </validation-error>
+            </td>
+          </tr>
+          <tr>
+            <td><label for="category-input">Category</label></td>
+            <td>
+              <select id="category-input" v-model="selectedCategory"
+                      v-on:change="loadServiceTypes(selectedCategory)" :disabled="!newService">
+                <option v-for="category in serviceCategories" v-bind:value="category.type"
+                        v-bind:key="category.type">
+                  {{category.label}}
+                </option>
+              </select>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><label for="type-input">Type</label></td>
+            <td>
+              <select id="type-input" v-model="serviceConfiguration.serviceType"
+                      v-on:change="loadTypeParameters(serviceConfiguration.serviceType.type)"
+                      :disabled="!newService">
+                <option v-for="type in serviceTypes" v-bind:value="type" v-bind:key="type.type">
+                  {{type.label}}
+                </option>
+              </select>
+            </td>
+            <td></td>
+          </tr>
+        </table>
+      </core-panel>
 
-            <core-panel>
-                <feedback-panel :feedback="feedback" :alert="!feedbackOk" :requestInProgress="requestInProgress"/>
+      <core-panel v-if="Object.keys(serviceConfiguration.parameters).length > 0">
+        <h2>Parameters</h2>
+        <parameter-editor :parameters="serviceConfiguration.parameters" ref="parameterEditor"/>
+      </core-panel>
 
-                <button-row>
-                    <p slot="left">
-                        <input-button v-on:clicked="cancel()" icon="times"/>
-                    </p>
-                    <p slot="right">
-                        <input-button v-on:clicked="testConfiguration()" icon="plug"/>
-                        <input-button v-on:clicked="saveConfiguration()" icon="save"/>
-                    </p>
-                </button-row>
+      <core-panel>
+        <feedback-panel :feedback="feedback" :alert="!feedbackOk" :requestInProgress="requestInProgress"/>
 
-            </core-panel>
-        </core-content>
+        <button-row>
+          <p slot="left">
+            <input-button v-on:clicked="cancel()" icon="times"/>
+          </p>
+          <p slot="right">
+            <input-button v-on:clicked="testConfiguration()" icon="plug"/>
+            <input-button v-on:clicked="saveConfiguration()" icon="save"/>
+          </p>
+        </button-row>
 
-        <spacer-item/>
+      </core-panel>
+    </core-content>
 
-    </core-container>
+    <spacer-item/>
+
+  </core-container>
 </template>
 
 <script>
@@ -202,7 +203,7 @@ export default {
 
       if (this.newService) {
         this.$http.post('/api/service', this.serviceConfiguration).then(function () {
-          component.$root.$data.store.setFeedback('Service ' + component.serviceConfiguration.name + ' saved.', false)
+          component.$root.$data.store.setFeedback('Service \'' + component.serviceConfiguration.name + '\' saved.', false)
           component.$router.push({name: 'services'})
         }).catch(function (error) {
           component.feedback = 'Saving failed! (' + error.response.data.error + ')'
@@ -211,7 +212,7 @@ export default {
         })
       } else {
         this.$http.put('/api/service', this.serviceConfiguration).then(function () {
-          component.$root.$data.store.setFeedback('Service ' + component.serviceConfiguration.name + ' updated.', false)
+          component.$root.$data.store.setFeedback('Service \'' + component.serviceConfiguration.name + '\' updated.', false)
           component.$router.push({name: 'services'})
         }).catch(function (error) {
           component.feedback = 'Saving failed! (' + error.response.data.error + ')'

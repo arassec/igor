@@ -1,10 +1,13 @@
 package com.arassec.igor.web.api.util;
 
+import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.web.api.model.ParameterDefinition;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -18,6 +21,9 @@ import java.util.Map;
 @Component
 public class ParameterUtil {
 
+    @Autowired
+    private ServiceManager serviceManager;
+
     public <T> List<ParameterDefinition> getParameters(T instance) {
         List<ParameterDefinition> parameterDefinitions = new LinkedList<>();
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
@@ -27,7 +33,8 @@ public class ParameterUtil {
                 Object parameterValue = getFieldValue(instance, parameterName);
                 boolean secured = field.getAnnotation(IgorParam.class).secured();
                 boolean optional = field.getAnnotation(IgorParam.class).optional();
-                parameterDefinitions.add(new ParameterDefinition(parameterName, parameterType, parameterValue, optional, secured));
+                boolean service = Service.class.isAssignableFrom(field.getType());
+                parameterDefinitions.add(new ParameterDefinition(parameterName, parameterType, parameterValue, optional, secured, service));
             }
         });
         return parameterDefinitions;
@@ -38,11 +45,16 @@ public class ParameterUtil {
         for (int i = 0; i < parametersArray.length(); i++) {
             JSONObject parameterObject = parametersArray.getJSONObject(i);
             Object value = parameterObject.opt("value");
+            boolean isService = parameterObject.getBoolean("service");
             if (value != null) {
                 if (value instanceof String && StringUtils.isEmpty(value)) {
                     continue;
                 }
-                result.put(parameterObject.getString("name"), value);
+                if (isService && value instanceof Integer) {
+                    result.put(parameterObject.getString("name"), serviceManager.load(Long.valueOf((Integer) value)));
+                } else {
+                    result.put(parameterObject.getString("name"), value);
+                }
             }
         }
         return result;

@@ -1,5 +1,5 @@
 <template>
-    <div/>
+  <div/>
 </template>
 
 <script>
@@ -10,9 +10,9 @@ export default {
 
 <style scoped>
 
-    div {
-        flex-grow: 1;
-        flex-basis: 0;
-    }
+  div {
+    flex-grow: 1;
+    flex-basis: 0;
+  }
 
 </style>

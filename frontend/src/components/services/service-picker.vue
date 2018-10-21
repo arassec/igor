@@ -1,67 +1,58 @@
 <template>
-    <modal-dialog>
-        <p slot="header">Select Service</p>
-        <p slot="body">
-        <template>
-            <div class="service-entry" v-for="service in services" :key="service.id">
-                <div class="service-entry-name">
-                    {{ service.name }}
-                </div>
-            </div>
-        </template>
-        </p>
-    </modal-dialog>
+  <modal-dialog>
+
+    <p slot="header">Select Service</p>
+
+    <table slot="body">
+      <tr v-for="service in services" :key="service.id">
+        <td class="first">
+          {{ service.name }}
+        </td>
+        <td class="last">
+          <input-button icon="crosshairs" v-on:clicked="$emit('selected', service)"/>
+        </td>
+      </tr>
+    </table>
+
+    <button-row slot="footer">
+      <input-button slot="left" icon="times" v-on:clicked="$emit('cancel')"/>
+    </button-row>
+
+  </modal-dialog>
 </template>
 
 <script>
 import ModalDialog from '../common/modal-dialog'
 import CorePanel from '../common/core-panel'
 import ServiceEditor from './service-editor'
+import ButtonRow from '../common/button-row'
+import InputButton from '../common/input-button'
 
 export default {
   name: 'service-picker',
-  components: {ServiceEditor, CorePanel, ModalDialog},
-  props: ['serviceCategory'],
+  components: {InputButton, ButtonRow, ServiceEditor, CorePanel, ModalDialog},
+  props: ['services'],
   data: function () {
     return {
-      services: [],
       feedback: '',
       feedbackOk: true
     }
-  },
-  methods: {
-    loadServices: function () {
-      this.feedback = ''
-      this.feedbackOk = true
-      let component = this
-      this.$http.get('/api/service/category/' + this.serviceCategory).then(function (response) {
-        for (let i = component.services.length; i > 0; i--) {
-          component.services.pop()
-        }
-        Array.from(response.data).forEach(function (item) {
-          component.services.push(item)
-        })
-        component.services.sort((a, b) => a.localeCompare(b))
-      }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
-      })
-    }
-  },
-  mounted () {
-    this.loadServices()
   }
 }
 </script>
 
 <style scoped>
 
-    .service-entry {
-    }
+  table {
+    width: 100%;
+  }
 
-    .service-entry-name {
-        margin-top: 2px;
-        font-weight: bold;
-    }
+  .first {
+    width: 100%;
+  }
+
+  .last {
+    padding-right: 0px !important;
+  }
 
 </style>

@@ -6,6 +6,7 @@ import com.arassec.igor.web.api.model.JobModel;
 import com.arassec.igor.web.api.model.converter.JobConverter;
 import com.github.openjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -20,10 +21,14 @@ public class JobRestController extends BaseRestController {
     @Autowired
     private JobManager jobManager;
 
+    @Autowired
+    @Qualifier("webJobConverter")
+    private JobConverter jobConverter;
+
     @GetMapping("/job/id")
     public List<JobModel> getJobIds() {
         List<Job> jobs = jobManager.loadAll();
-        return jobs.stream().map(job -> new JobModel(job.getId(), job.getName())).collect(Collectors.toList());
+        return jobs.stream().map(job -> new JobModel(job.getId(), job.getName(), job.isActive())).collect(Collectors.toList());
     }
 
     @GetMapping("/job/{id}")
@@ -33,7 +38,7 @@ public class JobRestController extends BaseRestController {
         }
         Job job = jobManager.load(id);
         if (job != null) {
-            return new ResponseEntity<>(JobConverter.convert(job), HttpStatus.OK);
+            return new ResponseEntity<>(jobConverter.convert(job), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -41,7 +46,7 @@ public class JobRestController extends BaseRestController {
     @PostMapping("/job")
     public ResponseEntity<String> saveJob(@RequestBody String jobProperties) {
         JSONObject properties = new JSONObject(jobProperties);
-        Job job = JobConverter.convert(properties);
+        Job job = jobConverter.convert(properties);
         job.setId(null);
         jobManager.save(job);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -50,7 +55,7 @@ public class JobRestController extends BaseRestController {
     @PutMapping("/job")
     public ResponseEntity<String> updateJob(@RequestBody String jobProperties) {
         JSONObject properties = new JSONObject(jobProperties);
-        Job job = JobConverter.convert(properties);
+        Job job = jobConverter.convert(properties);
         job.setId(properties.getLong("id"));
         jobManager.save(job);
         return new ResponseEntity<>(HttpStatus.OK);

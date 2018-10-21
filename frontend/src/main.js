@@ -21,6 +21,7 @@ Vue.prototype.$http = window.axios
 
 const store = {
   debug: true,
+  timeout: undefined,
   feedback: {
     message: '',
     alert: false
@@ -32,7 +33,10 @@ const store = {
     this.feedback.alert = alert
     this.routeChanged = false
     let component = this
-    setTimeout(function () {
+    if (this.timeout !== undefined) {
+      clearTimeout(this.timeout)
+    }
+    this.timeout = setTimeout(function () {
       component.clearFeedback()
     }, 5000)
   },
@@ -55,12 +59,12 @@ new Vue({
     store: store
   },
   router,
-  components: { App },
+  components: {App},
   template: '<App/>'
 })
 
 router.beforeEach((to, from, next) => {
-  // First route change keeps the message save
+  // First route change keeps the message save so it can be displayed on the route's target site.
   if (!store.routeChanged) {
     store.routeChanged = true
   } else {

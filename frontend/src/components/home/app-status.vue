@@ -1,7 +1,7 @@
 <template>
-    <div>
-        TODO: Add home content!
-    </div>
+  <div>
+    TODO: Add home content!
+  </div>
 </template>
 
 <script>
@@ -12,8 +12,8 @@ export default {
 
 <style scoped>
 
-    div {
-        margin-left: 25px;
-    }
+  div {
+    margin-left: 25px;
+  }
 
 </style>

@@ -1,19 +1,31 @@
 package com.arassec.igor.web.api.model.converter;
 
+import com.arassec.igor.core.application.ProviderManager;
 import com.arassec.igor.core.model.Job;
 import com.arassec.igor.core.model.Task;
+import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.web.api.model.JobModel;
 import com.arassec.igor.web.api.model.TaskModel;
+import com.arassec.igor.web.api.util.ParameterUtil;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;
 
+@Component("webJobConverter")
 public class JobConverter {
 
-    public static Job convert(JSONObject jobJson) {
+    @Autowired
+    private ProviderManager providerManager;
+
+    @Autowired
+    private ParameterUtil parameterUtil;
+
+    public Job convert(JSONObject jobJson) {
         Long id = jobJson.optLong("id");
         String name = jobJson.getString("name");
         if (StringUtils.isEmpty(name)) {
@@ -36,7 +48,7 @@ public class JobConverter {
         return job;
     }
 
-    public static JobModel convert(Job job) {
+    public JobModel convert(Job job) {
         JobModel jobModel = new JobModel();
         jobModel.setId(job.getId());
         jobModel.setName(job.getName());
@@ -48,7 +60,7 @@ public class JobConverter {
         return jobModel;
     }
 
-    private static List<Task> convertTasks(JSONArray taskJsons) {
+    private List<Task> convertTasks(JSONArray taskJsons) {
         List<Task> tasks = new LinkedList<>();
         if (taskJsons != null) {
             for (int i = 0; i < taskJsons.length(); i++) {
@@ -56,14 +68,14 @@ public class JobConverter {
                 Task task = new Task();
                 task.setName(taskJson.getString("name"));
                 task.setDescription(taskJson.getString("description"));
-                // TODO: Copy remaining provider attributes.
+                task.setProvider(convertProvider(taskJson.getJSONObject("provider")));
                 tasks.add(task);
             }
         }
         return tasks;
     }
 
-    private static List<TaskModel> convertTasks(List<Task> tasks) {
+    private List<TaskModel> convertTasks(List<Task> tasks) {
         List<TaskModel> taskModels = new LinkedList<>();
         if (tasks != null && !tasks.isEmpty()) {
             tasks.stream().forEach(task -> {
@@ -76,4 +88,11 @@ public class JobConverter {
         }
         return taskModels;
     }
+
+    private Provider convertProvider(JSONObject providerJson) {
+        String type = providerJson.getString("type");
+        JSONArray parameters = providerJson.getJSONArray("parameters");
+        return providerManager.createProvider(type, parameterUtil.convertParameters(parameters));
+    }
+
 }

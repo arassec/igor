@@ -30,10 +30,11 @@ export default new Router({
     {
       path: '/jobs',
       name: 'jobs',
-      component: JobList
+      component: JobList,
+      props: true
     },
     {
-      path: '/job-editor/:id?',
+      path: '/job-editor/:jobId?',
       name: 'job-editor',
       component: JobEditor,
       props: true

@@ -10,7 +10,7 @@ export default {
   props: ['icon'],
   computed: {
     iconstyle: function () {
-      if (this.icon === 'eye') {
+      if (this.icon === 'eye' || this.icon === 'clock' || this.icon === 'cogs' || this.icon === 'crosshairs') {
         return 'minus-four'
       }
       return ''

@@ -1,14 +1,15 @@
 <template>
-    <div v-if="feedback.length > 0">
-        <feedback-box v-if="feedback.length > 0 && alert" :text="feedback" :alert="alert"/>
-        <feedback-box v-if="feedback.length > 0 && !alert && requestInProgress" :text="feedback"
+  <div v-if="feedback.length > 0">
+    <feedback-box v-if="feedback.length > 0 && alert" :text="feedback" :alert="alert"/>
+    <feedback-box v-if="feedback.length > 0 && !alert && requestInProgress" :text="feedback"
                   :icon="'spinner'" :iconClass="'fa-spin'"/>
-        <feedback-box v-if="feedback.length > 0 && !alert && !requestInProgress" :text="feedback"/>
-    </div>
+    <feedback-box v-if="feedback.length > 0 && !alert && !requestInProgress" :text="feedback"/>
+  </div>
 </template>
 
 <script>
 import FeedbackBox from './feedback-box'
+
 export default {
   name: 'feedback-panel',
   components: {FeedbackBox},
@@ -18,8 +19,8 @@ export default {
 
 <style scoped>
 
-    div {
-        margin-bottom: 15px;
-    }
+  div {
+    margin-bottom: 15px;
+  }
 
 </style>

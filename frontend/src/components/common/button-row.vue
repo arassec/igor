@@ -1,12 +1,12 @@
 <template>
-    <div class="row">
-        <div class="left">
-            <slot name="left"/>
-        </div>
-        <div class="right">
-            <slot name="right"/>
-        </div>
+  <div class="row">
+    <div class="left">
+      <slot name="left"/>
     </div>
+    <div class="right">
+      <slot name="right"/>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -17,17 +17,17 @@ export default {
 
 <style scoped>
 
-    .row {
-        display: flex;
-        flex-direction: row;
-    }
+  .row {
+    display: flex;
+    flex-direction: row;
+  }
 
-    .left {
+  .left {
 
-    }
+  }
 
-    .right {
-        margin-left: auto;
-    }
+  .right {
+    margin-left: auto;
+  }
 
 </style>

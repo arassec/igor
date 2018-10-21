@@ -1,7 +1,7 @@
 <template>
-    <div class="content">
-        <slot/>
-    </div>
+  <div class="content">
+    <slot/>
+  </div>
 </template>
 
 <script>
@@ -12,8 +12,8 @@ export default {
 
 <style scoped>
 
-    .content {
-        min-width: var(--content-width);
-    }
+  .content {
+    min-width: var(--content-width);
+  }
 
 </style>

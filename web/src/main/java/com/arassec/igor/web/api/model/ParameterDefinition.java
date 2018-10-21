@@ -15,12 +15,15 @@ public class ParameterDefinition {
 
     private boolean secured;
 
-    public ParameterDefinition(String name, String type, Object value, boolean optional, boolean secured) {
+    private boolean service;
+
+    public ParameterDefinition(String name, String type, Object value, boolean optional, boolean secured, boolean service) {
         this.name = name;
         this.type = type;
         this.value = value;
         this.optional = optional;
         this.secured = secured;
+        this.service = service;
     }
 
 }

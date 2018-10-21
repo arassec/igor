@@ -1,72 +1,61 @@
 <template>
+  <core-panel>
 
-    <core-panel>
+    <button-row>
+      <list-name slot="left">
+        {{ name }} <span v-if="!active">(inactive)</span>
+      </list-name>
+      <p slot="right">
+        <input-button v-on:clicked="showDeleteDialog = !showDeleteDialog" icon="trash-alt"/>
+        <input-button v-on:clicked="editJob(id)" icon="cog"/>
+      </p>
+    </button-row>
 
+    <modal-dialog v-if="showDeleteDialog">
+      <p slot="header">Delete Job?</p>
+      <p slot="body">Do you really want to delete job '{{name}}'?</p>
+      <div slot="footer">
         <button-row>
-            <list-name slot="left">
-                {{ name }}
-            </list-name>
-            <p slot="right">
-                <input-button v-on:clicked="editJob(id)">
-                    <font-awesome-icon icon="cog"/>
-                </input-button>
-
-                <input-button v-on:clicked="showDeleteDialog = !showDeleteDialog">
-                    <font-awesome-icon icon="trash-alt"/>
-                </input-button>
-            </p>
+          <input-button slot="left" v-on:clicked="showDeleteDialog = false" icon="times"/>
+          <input-button slot="right" v-on:clicked="deleteJob(id)" icon="check"/>
         </button-row>
+      </div>
+    </modal-dialog>
 
-        <modal-dialog v-if="showDeleteDialog">
-            <p slot="header">Delete Job?</p>
-            <p slot="body">Do you really want to delete job '{{name}}'?</p>
-            <div slot="footer">
-                <button-row>
-                    <p slot="left">
-                        <input-button v-on:clicked="showDeleteDialog = false">
-                            <font-awesome-icon icon="times"/>
-                        </input-button>
-                    </p>
-                    <p slot="right">
-                        <input-button class="right" v-on:clicked="deleteJob(id)">
-                            <font-awesome-icon icon="check"/>
-                        </input-button>
-                    </p>
-                </button-row>
-            </div>
-        </modal-dialog>
-
-    </core-panel>
+  </core-panel>
 </template>
 
 <script>
 
 import ModalDialog from '../common/modal-dialog'
+import InputButton from '../common/input-button'
+import CorePanel from '../common/core-panel'
+import ListName from '../common/list-name'
+import ButtonRow from '../common/button-row'
+
 export default {
   name: 'job-list-entry',
-  components: {ModalDialog},
-  props: ['id', 'name'],
+  components: {ButtonRow, ListName, CorePanel, InputButton, ModalDialog},
+  props: ['id', 'name', 'active'],
   data: function () {
     return {
-      showDeleteDialog: false,
-      feedback: '',
-      feedbackOk: true
+      showDeleteDialog: false
     }
   },
   methods: {
     editJob: function (jobId) {
-      this.$router.push({name: 'editor', params: {id: jobId}})
+      this.$router.push({name: 'job-editor', params: {jobId: jobId}})
     },
     deleteJob: function (jobId) {
-      this.feedback = ''
-      this.feedbackOk = true
       this.showDeleteDialog = false
       let component = this
       this.$http.delete('/api/job/' + jobId).then(function () {
+        component.$root.$data.store.setFeedback('Job \'' + component.name + '\' has been deleted.', false)
         component.$emit('job-deleted')
       }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
+        console.log(error)
+        component.$root.$data.store.setFeedback('Job \'' + component.name + '\' could not be deleted!', true)
+        component.$emit('job-deleted')
       })
     }
   }

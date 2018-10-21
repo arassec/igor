@@ -8,12 +8,12 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -63,6 +63,9 @@ public class JobManager implements InitializingBean, DisposableBean {
         try {
             scheduledJobs.put(job.getId(), taskScheduler.schedule(new Thread(() -> job.run()),
                     new CronTrigger(job.getTrigger())));
+            CronSequenceGenerator cronTrigger = new CronSequenceGenerator(job.getTrigger());
+            Date nextRun = cronTrigger.next(Calendar.getInstance().getTime());
+            log.info("Scheduled job: {} ({}). Next run at: {}", job.getName(), job.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(nextRun));
         } catch (IllegalArgumentException e) {
             log.warn("Illegal trigger configured!", e);
         }
@@ -82,6 +85,7 @@ public class JobManager implements InitializingBean, DisposableBean {
             if (!scheduledJobs.get(job.getId()).cancel(true)) {
                 throw new ServiceException("Job " + job.getId() + " could not be cancelled!");
             }
+            scheduledJobs.remove(job.getId());
         }
     }
 }

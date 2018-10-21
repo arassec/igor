@@ -1,7 +1,7 @@
 <template>
-    <div class="error">
-        <slot/>
-    </div>
+  <div class="error">
+    <slot/>
+  </div>
 </template>
 
 <script>
@@ -12,12 +12,12 @@ export default {
 
 <style scoped>
 
-    .error {
-        padding: 0px 0px 0px 5px;
-        line-height: 24px;
-        min-width: 300px;
-        background-color: var(--alert-background-color);
-        color: var(--font-color-light);
-    }
+  .error {
+    padding: 0px 0px 0px 5px;
+    line-height: 24px;
+    min-width: 300px;
+    background-color: var(--alert-background-color);
+    color: var(--font-color-light);
+  }
 
 </style>

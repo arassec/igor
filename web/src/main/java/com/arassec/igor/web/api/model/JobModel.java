@@ -23,8 +23,9 @@ public class JobModel {
     public JobModel() {
     }
 
-    public JobModel(Long id, String name) {
+    public JobModel(Long id, String name, boolean active) {
         this.id = id;
         this.name = name;
+        this.active = active;
     }
 }

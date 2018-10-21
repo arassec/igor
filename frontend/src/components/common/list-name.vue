@@ -1,7 +1,7 @@
 <template>
-    <div class="list-name">
-        <slot/>
-    </div>
+  <div class="list-name">
+    <slot/>
+  </div>
 </template>
 
 <script>
@@ -11,8 +11,8 @@ export default {
 </script>
 
 <style scoped>
-    .list-name {
-        margin-top: 2px;
-        font-weight: bold;
-    }
+  .list-name {
+    margin-top: 2px;
+    font-weight: bold;
+  }
 </style>

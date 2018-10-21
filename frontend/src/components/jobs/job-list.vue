@@ -1,26 +1,27 @@
 <template>
-    <core-container>
+  <core-container>
 
-        <spacer-item/>
+    <spacer-item/>
 
-        <core-content>
-            <list-header :addButtonTarget="'job-editor'" :addButtonText="'Add Job'" :filter="filter">
-                <p slot="title">Available Jobs</p>
-                <p slot="feedback">
-                    <feedback-box v-if="feedback.length > 0" :text="feedback" :alert="!feedbackOk"/>
-                </p>
-            </list-header>
+    <core-content>
+      <list-header :addButtonTarget="'job-editor'" :addButtonText="'Add Job'" :filter="filter">
+        <p slot="title">Available Jobs</p>
+        <p slot="feedback">
+          <feedback-box v-if="feedback.length > 0" :text="feedback" :alert="!feedbackOk"/>
+        </p>
+      </list-header>
 
-            <job-list-entry v-for="job in filteredJobs"
-                            v-bind:key="job.id"
-                            v-bind:id="job.id"
-                            v-bind:name="job.name"
-                            v-on:job-deleted="loadJobs()"/>
-        </core-content>
+      <job-list-entry v-for="job in filteredJobs"
+                      v-bind:key="job.id"
+                      v-bind:id="job.id"
+                      v-bind:name="job.name"
+                      v-bind:active="job.active"
+                      v-on:job-deleted="loadJobs()"/>
+    </core-content>
 
-        <spacer-item/>
+    <spacer-item/>
 
-    </core-container>
+  </core-container>
 </template>
 
 <script>

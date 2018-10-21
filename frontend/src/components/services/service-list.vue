@@ -1,26 +1,24 @@
 <template>
-    <core-container>
+  <core-container>
 
-        <spacer-item/>
+    <spacer-item/>
 
-        <core-content>
-            <list-header :addButtonTarget="'service-editor'" :addButtonText="'Add Service'" :filter="filter">
-                <p slot="title">Available Services</p>
-            </list-header>
+    <core-content>
+      <list-header :addButtonTarget="'service-editor'" :addButtonText="'Add Service'" :filter="filter">
+        <p slot="title">Available Services</p>
+      </list-header>
 
-            <service-list-entry v-for="service in filteredServices"
-                                v-bind:key="service.id"
-                                v-bind:id="service.id"
-                                v-bind:name="service.name"
-                                @actionPerformed="loadServices()"/>
+      <service-list-entry v-for="service in filteredServices"
+                          v-bind:key="service.id"
+                          v-bind:id="service.id"
+                          v-bind:name="service.name"
+                          @actionPerformed="loadServices()"/>
 
-            <feedback-snackbar/>
+    </core-content>
 
-        </core-content>
+    <spacer-item/>
 
-        <spacer-item/>
-
-    </core-container>
+  </core-container>
 </template>
 
 <script>
@@ -41,7 +39,8 @@ export default {
     CorePanel,
     ServiceListEntry,
     ListHeader,
-    SpacerItem},
+    SpacerItem
+  },
   props: ['saveResult'],
   data: function () {
     return {
