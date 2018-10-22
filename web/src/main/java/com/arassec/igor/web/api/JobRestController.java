@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -56,9 +57,14 @@ public class JobRestController extends BaseRestController {
     public ResponseEntity<String> updateJob(@RequestBody String jobProperties) {
         JSONObject properties = new JSONObject(jobProperties);
         Job job = jobConverter.convert(properties);
-        job.setId(properties.getLong("id"));
         jobManager.save(job);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/job/test")
+    public Map<String, Object> testJob(@RequestBody String jobProperties) {
+        Job job = jobConverter.convert(new JSONObject(jobProperties));
+        return job.dryRun();
     }
 
     @DeleteMapping("/job/{id}")

@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Component("webJobConverter")
 public class JobConverter {
@@ -82,7 +84,7 @@ public class JobConverter {
                 TaskModel taskModel = new TaskModel();
                 taskModel.setName(task.getName());
                 taskModel.setDescription(task.getDescription());
-                // TODO: Copy remaining provider attributes.
+                taskModel.setProvider(convertProvider(task.getProvider()));
                 taskModels.add(taskModel);
             });
         }
@@ -93,6 +95,13 @@ public class JobConverter {
         String type = providerJson.getString("type");
         JSONArray parameters = providerJson.getJSONArray("parameters");
         return providerManager.createProvider(type, parameterUtil.convertParameters(parameters));
+    }
+
+    private Map<String, Object> convertProvider(Provider provider) {
+        Map<String, Object> providerJson = new HashMap<>();
+        providerJson.put("type", provider.getClass().getName());
+        providerJson.put("parameters", parameterUtil.getParameters(provider));
+        return providerJson;
     }
 
 }

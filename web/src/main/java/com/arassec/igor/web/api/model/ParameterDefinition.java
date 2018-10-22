@@ -17,6 +17,8 @@ public class ParameterDefinition {
 
     private boolean service;
 
+    private String serviceName;
+
     public ParameterDefinition(String name, String type, Object value, boolean optional, boolean secured, boolean service) {
         this.name = name;
         this.type = type;

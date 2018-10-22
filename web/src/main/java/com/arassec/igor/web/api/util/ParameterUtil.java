@@ -34,7 +34,12 @@ public class ParameterUtil {
                 boolean secured = field.getAnnotation(IgorParam.class).secured();
                 boolean optional = field.getAnnotation(IgorParam.class).optional();
                 boolean service = Service.class.isAssignableFrom(field.getType());
-                parameterDefinitions.add(new ParameterDefinition(parameterName, parameterType, parameterValue, optional, secured, service));
+                ParameterDefinition paramDef = new ParameterDefinition(parameterName, parameterType, parameterValue, optional, secured, service);
+                if (service && parameterValue != null) {
+                    paramDef.setServiceName(((Service) parameterValue).getName());
+                    paramDef.setValue(((Service) parameterValue).getId());
+                }
+                parameterDefinitions.add(paramDef);
             }
         });
         return parameterDefinitions;

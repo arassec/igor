@@ -1,11 +1,14 @@
 package com.arassec.igor.core.model;
 
+import com.arassec.igor.core.model.provider.IgorData;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Defines an igor job.
@@ -57,6 +60,21 @@ public class Job {
             task.run(name);
         }
         LOG.debug("Finished job: {} ({})", name, id);
+    }
+
+    /**
+     * Performs a dry-run of the job.
+     *
+     * @return The result data created during job execution.
+     */
+    public Map<String, Object> dryRun() {
+        LOG.debug("Dry-running job: {}", name);
+        Map<String, Object> dryRunResults = new HashMap<>();
+        List<List<IgorData>> taskResults = new LinkedList<>();
+        dryRunResults.put("taskResults", taskResults);
+        tasks.stream().forEach(task -> task.dryRun(dryRunResults, name));
+        LOG.debug("Finished dry-run of job: {}", name);
+        return dryRunResults;
     }
 
 }

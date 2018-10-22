@@ -21,6 +21,11 @@
 
     <spacer-item/>
 
+    <div style="font-size: 48px;">
+      <font-awesome-icon icon="flask" class="background-icon-left fa-6x"/>
+      <font-awesome-icon icon="flask" class="background-icon fa-10x"/>
+    </div>
+
   </core-container>
 </template>
 
@@ -82,5 +87,23 @@ export default {
 </script>
 
 <style scoped>
+
+  .background-icon {
+    color: var(--nav-background-color);
+    opacity: 0.3;
+    position: fixed;
+    bottom: -20px;
+    right: -20px;
+    z-index: -1;
+  }
+
+  .background-icon-left {
+    color: var(--nav-background-color);
+    opacity: 0.3;
+    position: fixed;
+    bottom: -20px;
+    right: 420px;
+    z-index: -1;
+  }
 
 </style>

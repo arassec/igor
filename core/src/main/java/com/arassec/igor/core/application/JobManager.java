@@ -86,6 +86,7 @@ public class JobManager implements InitializingBean, DisposableBean {
                 throw new ServiceException("Job " + job.getId() + " could not be cancelled!");
             }
             scheduledJobs.remove(job.getId());
+            log.info("Canceled job: {} ({})", job.getName(), job.getId());
         }
     }
 }

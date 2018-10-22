@@ -62,7 +62,9 @@
                    v-bind:task="task"
                    v-bind:index="index"
                    v-bind:key="index"
+                   v-bind:show-test-result-marker="showTaskTestResultMarker(index)"
                    v-on:delete="deleteTask(index)"
+                   v-on:show-test-results="showTaskTestResult(index)"
                    ref="taskEditors"/>
 
       <core-panel>
@@ -85,6 +87,8 @@
 
     </core-content>
 
+    <test-result-container :selected-test-results="selectedTestResults" v-if="selectedTestResults != null" v-on:close="selectedTestResults = null"/>
+
     <spacer-item/>
 
   </core-container>
@@ -101,10 +105,12 @@ import ButtonRow from '../common/button-row'
 import ValidationError from '../common/validation-error'
 import FeedbackPanel from '../common/feedback-panel'
 import CronPicker from '../common/cron-picker'
+import TestResultContainer from './test-result-container'
 
 export default {
   name: 'job-editor',
   components: {
+    TestResultContainer,
     CronPicker,
     FeedbackPanel,
     ValidationError,
@@ -126,6 +132,8 @@ export default {
       nameValidationError: '',
       triggerValidationError: '',
       showCronTrigger: false,
+      testResults: null,
+      selectedTestResults: null,
       jobConfiguration: {
         name: '',
         trigger: '',
@@ -178,7 +186,27 @@ export default {
       }
     },
     testConfiguration: function () {
+      if (!this.validateInput()) {
+        return
+      }
 
+      this.testResults = null
+      this.selectedTestResults = null
+      this.feedback = 'Testing...'
+      this.requestInProgress = true
+
+      let component = this
+
+      this.$http.post('/api/job/test', this.jobConfiguration).then(function (response) {
+        component.testResults = response.data
+        component.feedback = 'OK'
+        component.feedbackOk = true
+        component.requestInProgress = false
+      }).catch(function (error) {
+        component.feedback = 'Testing failed! (' + error.response.data.error + ')'
+        component.feedbackOk = false
+        component.requestInProgress = false
+      })
     },
     addTask: function () {
       let task = {
@@ -214,7 +242,7 @@ export default {
 
       let taskEditorsResult = true
       for (let i in this.$refs.taskEditors) {
-        taskEditorsResult = taskEditorsResult && this.$refs.taskEditors[i].validateInput()
+        taskEditorsResult = (this.$refs.taskEditors[i].validateInput() && taskEditorsResult)
       }
 
       return (nameValidationResult && triggerValidationResult && taskEditorsResult)
@@ -225,6 +253,14 @@ export default {
     setCronTrigger: function (value) {
       this.jobConfiguration.trigger = value
       this.showCronTrigger = false
+    },
+    showTaskTestResultMarker: function (index) {
+      return this.testResults != null
+    },
+    showTaskTestResult: function (index) {
+      if (this.testResults != null) {
+        this.selectedTestResults = this.testResults.taskResults[index]
+      }
     }
   },
   mounted () {

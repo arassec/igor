@@ -1,7 +1,10 @@
 <template>
-  <div class="content">
     <core-panel>
+
+      <test-result-marker v-if="showTestResultMarker" v-on:clicked="$emit('show-test-results')"/>
+
       <h1>Task{{ task.name != null ? ': ' + task.name : ''}}</h1>
+
       <table>
         <tr>
           <td><label>Name</label></td>
@@ -59,7 +62,6 @@
       </modal-dialog>
 
     </core-panel>
-  </div>
 </template>
 
 <script>
@@ -69,11 +71,12 @@ import ParameterEditor from '../common/parameter-editor'
 import ButtonRow from '../common/button-row'
 import ValidationError from '../common/validation-error'
 import ModalDialog from '../common/modal-dialog'
+import TestResultMarker from './test-result-marker'
 
 export default {
   name: 'task-editor',
-  components: {ModalDialog, ValidationError, ButtonRow, ParameterEditor, CorePanel, InputButton},
-  props: ['task'],
+  components: {TestResultMarker, ModalDialog, ValidationError, ButtonRow, ParameterEditor, CorePanel, InputButton},
+  props: ['task', 'showTestResultMarker'],
   data: function () {
     return {
       feedback: '',
@@ -94,8 +97,10 @@ export default {
         Array.from(response.data).forEach(function (item) {
           component.providerTypes.push(item)
         })
-        component.task.provider.type = component.providerTypes[0].type
-        component.loadTypeParameters(component.task.provider.type)
+        if (typeof component.task.provider.type === 'undefined' || component.task.provider.type === '') {
+          component.task.provider.type = component.providerTypes[0].type
+          component.loadTypeParameters(component.task.provider.type)
+        }
       }).catch(function (error) {
         component.feedback = error
         component.feedbackOk = false
@@ -124,6 +129,8 @@ export default {
         parameterValidationResult = this.$refs.parameterEditor.validateInput()
       }
 
+      this.$forceUpdate()
+
       return (nameValidationResult && parameterValidationResult)
     },
     deleteTask: function () {
@@ -140,7 +147,7 @@ export default {
 <style scoped>
 
   .provider-parameters {
-    margin-top: 25px;
+    margin: 25px 0px 0px 0px;
   }
 
 </style>

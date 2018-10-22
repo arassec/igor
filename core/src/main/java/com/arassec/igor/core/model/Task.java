@@ -5,8 +5,10 @@ import com.arassec.igor.core.model.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.provider.Provider;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -103,6 +105,21 @@ public class Task {
         for (Action action : actions) {
             action.complete();
         }
+    }
+
+    /**
+     * Performs a dry-run of the task collecting data.
+     *
+     * @param dryRunResults The target object to store results in.
+     * @param jobName       The name of the job currently executing.
+     */
+    public void dryRun(Map<String, Object> dryRunResults, String jobName) {
+        provider.initialize(jobName, name);
+        List<IgorData> providerData = new LinkedList<>();
+        while (provider.hasNext()) {
+            providerData.add(provider.next());
+        }
+        ((List<List<IgorData>>) dryRunResults.get("taskResults")).add(providerData);
     }
 
     public String getName() {

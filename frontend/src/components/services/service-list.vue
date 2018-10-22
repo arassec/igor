@@ -18,6 +18,10 @@
 
     <spacer-item/>
 
+    <div style="font-size: 48px;">
+      <font-awesome-icon icon="cogs" class="background-icon fa-10x"/>
+    </div>
+
   </core-container>
 </template>
 
@@ -83,5 +87,14 @@ export default {
 </script>
 
 <style scoped>
+
+  .background-icon {
+    color: var(--nav-background-color);
+    opacity: 0.3;
+    position: fixed;
+    bottom: -20px;
+    left: -20px;
+    z-index: -1;
+  }
 
 </style>
