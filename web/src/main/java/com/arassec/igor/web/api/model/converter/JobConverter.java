@@ -1,9 +1,12 @@
 package com.arassec.igor.web.api.model.converter;
 
+import com.arassec.igor.core.application.ActionManager;
 import com.arassec.igor.core.application.ProviderManager;
 import com.arassec.igor.core.model.Job;
 import com.arassec.igor.core.model.Task;
+import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.provider.Provider;
+import com.arassec.igor.web.api.model.ActionModel;
 import com.arassec.igor.web.api.model.JobModel;
 import com.arassec.igor.web.api.model.TaskModel;
 import com.arassec.igor.web.api.util.ParameterUtil;
@@ -26,6 +29,9 @@ public class JobConverter {
 
     @Autowired
     private ParameterUtil parameterUtil;
+
+    @Autowired
+    private ActionManager actionManager;
 
     public Job convert(JSONObject jobJson) {
         Long id = jobJson.optLong("id");
@@ -59,6 +65,7 @@ public class JobConverter {
         jobModel.setActive(job.isActive());
 
         jobModel.setTasks(convertTasks(job.getTasks()));
+
         return jobModel;
     }
 
@@ -71,6 +78,7 @@ public class JobConverter {
                 task.setName(taskJson.getString("name"));
                 task.setDescription(taskJson.getString("description"));
                 task.setProvider(convertProvider(taskJson.getJSONObject("provider")));
+                task.getActions().addAll(convertActions(taskJson.getJSONArray("actions")));
                 tasks.add(task);
             }
         }
@@ -85,6 +93,7 @@ public class JobConverter {
                 taskModel.setName(task.getName());
                 taskModel.setDescription(task.getDescription());
                 taskModel.setProvider(convertProvider(task.getProvider()));
+                taskModel.setActions(convertActions(task.getActions()));
                 taskModels.add(taskModel);
             });
         }
@@ -102,6 +111,26 @@ public class JobConverter {
         providerJson.put("type", provider.getClass().getName());
         providerJson.put("parameters", parameterUtil.getParameters(provider));
         return providerJson;
+    }
+
+    private List<Action> convertActions(JSONArray actionJsons) {
+        List<Action> actions = new LinkedList<>();
+        for (int i = 0; i < actionJsons.length(); i++) {
+            JSONObject actionJson = actionJsons.getJSONObject(i);
+            actions.add(actionManager.createAction(actionJson.getString("type"),
+                    parameterUtil.convertParameters(actionJson.getJSONArray("parameters"))));
+        }
+        return actions;
+    }
+
+    private List<ActionModel> convertActions(List<Action> actions) {
+        List<ActionModel> result = new LinkedList<>();
+        for (Action action : actions) {
+            ActionModel actionModel = new ActionModel(action.getClass().getName(), "label");
+            actionModel.setParameters(parameterUtil.getParameters(action));
+            result.add(actionModel);
+        }
+        return result;
     }
 
 }

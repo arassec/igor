@@ -3,6 +3,7 @@ package com.arassec.igor.core.model.action.file;
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.BaseAction;
+import com.arassec.igor.core.model.dryrun.DryRunActionResult;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.service.file.FileService;
 import com.arassec.igor.core.model.service.file.FileStreamData;
@@ -11,7 +12,7 @@ import com.arassec.igor.core.model.service.file.FileStreamData;
 /**
  * Copies a file from one service to another.
  */
-@IgorAction
+@IgorAction(label = "Copy file")
 public class CopyFileAction extends BaseAction {
 
     /**
@@ -36,16 +37,16 @@ public class CopyFileAction extends BaseAction {
     private FileService sourceService;
 
     /**
-     * The target directory to copy/move the file to.
-     */
-    @IgorParam
-    private String targetDirectory;
-
-    /**
      * The destination for the copied file.
      */
     @IgorParam
     private FileService targetService;
+
+    /**
+     * The target directory to copy/move the file to.
+     */
+    @IgorParam
+    private String targetDirectory;
 
     /**
      * Creates a new CopyFileAction.
@@ -63,16 +64,30 @@ public class CopyFileAction extends BaseAction {
      */
     @Override
     public boolean process(IgorData data) {
+        return processInternal(data, false);
+    }
+
+    @Override
+    public boolean dryRun(IgorData data) {
+        return processInternal(data, true);
+    }
+
+    private boolean processInternal(IgorData data, boolean isDryRun) {
         if (isValid(data)) {
             String sourceFile = (String) data.get(dataKey);
             String targetFile = getTargetFile(sourceFile);
-            String targetFileInTransfer = targetFile + IN_TRANSFER_SUFFIX;
-            FileStreamData fileStreamData = sourceService.readStream(sourceFile);
-            targetService.writeStream(targetFileInTransfer, fileStreamData);
-            sourceService.finalizeStream(fileStreamData);
-            targetService.move(targetFileInTransfer, targetFile);
+            if (!isDryRun) {
+                String targetFileInTransfer = targetFile + IN_TRANSFER_SUFFIX;
+                FileStreamData fileStreamData = sourceService.readStream(sourceFile);
+                targetService.writeStream(targetFileInTransfer, fileStreamData);
+                sourceService.finalizeStream(fileStreamData);
+                targetService.move(targetFileInTransfer, targetFile);
+            }
             data.put(KEY_SOURCE_FILENAME, sourceFile);
             data.put(KEY_TARGET_FILENAME, targetFile);
+            if (isDryRun) {
+                data.put("dryRunComment", sourceFile + " copied to " + targetFile);
+            }
         }
         return true;
     }

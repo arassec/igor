@@ -2,7 +2,7 @@
   <transition name="fade">
     <div class="test-result-container">
       <button-row>
-      <h1 slot="left">Überschrift</h1>
+      <h1 slot="left">{{heading}}</h1>
       <input-button slot="right" icon="times" v-on:clicked="$emit('close')"/>
       </button-row>
       <pre>

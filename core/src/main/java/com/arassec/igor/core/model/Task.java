@@ -2,8 +2,12 @@ package com.arassec.igor.core.model;
 
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.concurrent.ConcurrencyGroup;
+import com.arassec.igor.core.model.dryrun.DryRunActionResult;
+import com.arassec.igor.core.model.dryrun.DryRunJobResult;
+import com.arassec.igor.core.model.dryrun.DryRunTaskResult;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.provider.Provider;
+import com.rits.cloning.Cloner;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -11,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
 
 /**
  * A task is an encapsulated unit of work in a job. It is responsible for processing actions, either in the main thread of the
@@ -110,16 +115,31 @@ public class Task {
     /**
      * Performs a dry-run of the task collecting data.
      *
-     * @param dryRunResults The target object to store results in.
-     * @param jobName       The name of the job currently executing.
+     * @param result  The target object to store results in.
+     * @param jobName The name of the job currently executing.
      */
-    public void dryRun(Map<String, Object> dryRunResults, String jobName) {
+    public void dryRun(DryRunJobResult result, String jobName) {
         provider.initialize(jobName, name);
-        List<IgorData> providerData = new LinkedList<>();
+        DryRunTaskResult taskResult = new DryRunTaskResult();
+
+        Cloner cloner = new Cloner();
+
+        List<IgorData> providerResult = new LinkedList<>();
         while (provider.hasNext()) {
-            providerData.add(provider.next());
+            IgorData igorData = provider.next();
+            providerResult.add(igorData);
+            taskResult.getProviderResults().add(cloner.deepClone(igorData));
         }
-        ((List<List<IgorData>>) dryRunResults.get("taskResults")).add(providerData);
+
+        List<IgorData> actionData = providerResult;
+        for (Action action : actions) {
+            DryRunActionResult actionResult = new DryRunActionResult();
+            actionData = actionData.stream().filter(igorData -> action.dryRun(igorData)).collect(Collectors.toList());
+            actionData.stream().forEach(igorData -> actionResult.getResults().add(cloner.deepClone(igorData)));
+            taskResult.getActionResults().add(actionResult);
+        }
+
+        result.getTaskResults().add(taskResult);
     }
 
     public String getName() {

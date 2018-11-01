@@ -8,7 +8,7 @@ import com.arassec.igor.core.model.provider.IgorData;
 /**
  * Filters the supplied data by matching a configured prefix.
  */
-@IgorAction
+@IgorAction(label = "Filter by prefix")
 public class FilterByPrefixAction extends BaseAction {
 
     /**
@@ -27,7 +27,7 @@ public class FilterByPrefixAction extends BaseAction {
     public boolean process(IgorData data) {
         if (isValid(data)) {
             if (!((String) data.get(dataKey)).startsWith(prefix)) {
-                data.remove(dataKey);
+                return false;
             }
         }
         return true;

@@ -9,7 +9,7 @@ import com.arassec.igor.core.model.service.file.FileService;
 /**
  * Reads the content of a file.
  */
-@IgorAction
+@IgorAction(label = "Read file")
 public class ReadFileAction extends BaseAction {
 
     private static final String KEY_FILE_CONTENTS = "fileContents";

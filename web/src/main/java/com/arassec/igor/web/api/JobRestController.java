@@ -2,6 +2,7 @@ package com.arassec.igor.web.api;
 
 import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.model.Job;
+import com.arassec.igor.core.model.dryrun.DryRunJobResult;
 import com.arassec.igor.web.api.model.JobModel;
 import com.arassec.igor.web.api.model.converter.JobConverter;
 import com.github.openjson.JSONObject;
@@ -62,7 +63,7 @@ public class JobRestController extends BaseRestController {
     }
 
     @PostMapping("/job/test")
-    public Map<String, Object> testJob(@RequestBody String jobProperties) {
+    public DryRunJobResult testJob(@RequestBody String jobProperties) {
         Job job = jobConverter.convert(new JSONObject(jobProperties));
         return job.dryRun();
     }

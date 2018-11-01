@@ -51,12 +51,11 @@
         </table>
 
         <button-row>
-          <p slot="right">
-            <input-button v-on:clicked="addTask()" icon="plus"/>
-          </p>
+          <input-button slot="right" v-on:clicked="addTask()" icon="plus"/>
         </button-row>
-
       </core-panel>
+
+      <cron-picker v-show="showCronTrigger" v-on:selected="setCronTrigger" v-on:cancel="showCronTrigger = false"/>
 
       <task-editor v-for="(task, index) in jobConfiguration.tasks"
                    v-bind:task="task"
@@ -67,7 +66,7 @@
                    v-on:show-test-results="showTaskTestResult(index)"
                    ref="taskEditors"/>
 
-      <core-panel>
+      <core-panel class="button-panel">
         <feedback-panel :feedback="feedback" :alert="!feedbackOk" :requestInProgress="requestInProgress"/>
 
         <button-row>
@@ -80,14 +79,12 @@
             <input-button v-on:clicked="saveConfiguration()" icon="save"/>
           </p>
         </button-row>
-
-        <cron-picker v-show="showCronTrigger" v-on:selected="setCronTrigger" v-on:cancel="showCronTrigger = false"/>
-
       </core-panel>
 
     </core-content>
 
-    <test-result-container :selected-test-results="selectedTestResults" v-if="selectedTestResults != null" v-on:close="selectedTestResults = null"/>
+    <test-result-container :selected-test-results="selectedTestResults" :heading="'Test results'"
+                           v-if="selectedTestResults != null" v-on:close="selectedTestResults = null"/>
 
     <spacer-item/>
 
@@ -202,6 +199,7 @@ export default {
         component.feedback = 'OK'
         component.feedbackOk = true
         component.requestInProgress = false
+        console.log('Test results: ' + JSON.stringify(component.testResults))
       }).catch(function (error) {
         component.feedback = 'Testing failed! (' + error.response.data.error + ')'
         component.feedbackOk = false
@@ -215,7 +213,8 @@ export default {
         provider: {
           type: '',
           parameters: {}
-        }
+        },
+        actions: []
       }
       this.jobConfiguration.tasks.push(task)
     },
@@ -274,5 +273,9 @@ export default {
 </script>
 
 <style scoped>
+
+  .button-panel {
+    margin-top: 25px;
+  }
 
 </style>

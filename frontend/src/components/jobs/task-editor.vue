@@ -1,4 +1,5 @@
 <template>
+  <div class="task-editor">
     <core-panel>
 
       <test-result-marker v-if="showTestResultMarker" v-on:clicked="$emit('show-test-results')"/>
@@ -62,6 +63,14 @@
       </modal-dialog>
 
     </core-panel>
+
+    <action-editor v-for="(action, index) in task.actions"
+                   v-bind:action="action"
+                   v-bind:index="index"
+                   v-bind:key="index"
+                   ref="actionEditors"/>
+
+  </div>
 </template>
 
 <script>
@@ -72,10 +81,20 @@ import ButtonRow from '../common/button-row'
 import ValidationError from '../common/validation-error'
 import ModalDialog from '../common/modal-dialog'
 import TestResultMarker from './test-result-marker'
+import ActionEditor from './action-editor'
 
 export default {
   name: 'task-editor',
-  components: {TestResultMarker, ModalDialog, ValidationError, ButtonRow, ParameterEditor, CorePanel, InputButton},
+  components: {
+    ActionEditor,
+    TestResultMarker,
+    ModalDialog,
+    ValidationError,
+    ButtonRow,
+    ParameterEditor,
+    CorePanel,
+    InputButton
+  },
   props: ['task', 'showTestResultMarker'],
   data: function () {
     return {
@@ -129,13 +148,25 @@ export default {
         parameterValidationResult = this.$refs.parameterEditor.validateInput()
       }
 
+      let actionEditorsResult = true
+      for (let i in this.$refs.actionEditors) {
+        actionEditorsResult = (this.$refs.actionEditors[i].validateInput() && actionEditorsResult)
+      }
+
       this.$forceUpdate()
 
-      return (nameValidationResult && parameterValidationResult)
+      return (nameValidationResult && parameterValidationResult && actionEditorsResult)
     },
     deleteTask: function () {
       this.showDeleteDialog = false
       this.$emit('delete')
+    },
+    addAction: function () {
+      let action = {
+        type: '',
+        parameters: {}
+      }
+      this.task.actions.push(action)
     }
   },
   mounted () {
@@ -145,6 +176,10 @@ export default {
 </script>
 
 <style scoped>
+
+  .task-editor {
+    margin-top: 25px;
+  }
 
   .provider-parameters {
     margin: 25px 0px 0px 0px;

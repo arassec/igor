@@ -1,5 +1,6 @@
 package com.arassec.igor.core.model.action;
 
+import com.arassec.igor.core.model.dryrun.DryRunActionResult;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.IgorParam;
 
@@ -48,6 +49,14 @@ public abstract class BaseAction implements Action {
     @Override
     public void initialize() {
         // Nothing to do here...
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean dryRun(IgorData data) {
+        return process(data);
     }
 
     /**

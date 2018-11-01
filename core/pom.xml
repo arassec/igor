@@ -27,6 +27,12 @@
             <artifactId>jasypt</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>uk.com.robust-it</groupId>
+            <artifactId>cloning</artifactId>
+            <version>1.9.10</version>
+        </dependency>
+
     </dependencies>
 
 </project>

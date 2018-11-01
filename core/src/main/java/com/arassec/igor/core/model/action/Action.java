@@ -1,5 +1,6 @@
 package com.arassec.igor.core.model.action;
 
+import com.arassec.igor.core.model.dryrun.DryRunActionResult;
 import com.arassec.igor.core.model.provider.IgorData;
 
 import java.util.Set;
@@ -23,6 +24,9 @@ public interface Action {
      * @return {@code true}, if the data should further be processed, {@code false} otherwise.
      */
     boolean process(IgorData data);
+
+
+    boolean dryRun(IgorData data);
 
     /**
      * Finalizes the action after all data has been processed.

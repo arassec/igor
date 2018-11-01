@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Action that filters data of which a value has already been persisted.
  */
-@IgorAction
+@IgorAction(label = "Filter persisted value")
 public class FilterPersistedValueAction extends BaseAction {
 
     /**

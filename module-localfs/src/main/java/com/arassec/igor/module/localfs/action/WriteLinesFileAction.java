@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Writes all provided data into a file. Each {@link IgorData} is processed as one line of the target file.
  */
-@IgorAction
+@IgorAction(label = "Write lines to file")
 public class WriteLinesFileAction extends BaseAction {
 
     /**
