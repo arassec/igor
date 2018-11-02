@@ -2,7 +2,7 @@
   <div class="task-editor">
     <core-panel>
 
-      <test-result-marker v-if="showTestResultMarker" v-on:clicked="$emit('show-test-results')"/>
+      <test-result-marker v-if="showTestResultMarker()" v-on:clicked="$emit('show-task-test-results')"/>
 
       <h1>Task{{ task.name != null ? ': ' + task.name : ''}}</h1>
 
@@ -45,19 +45,30 @@
 
       <button-row>
         <p slot="right">
-          <input-button v-on:clicked="showDeleteDialog = true" icon="trash-alt"/>
+          <input-button v-on:clicked="showDeleteTaskDialog = true" icon="trash-alt"/>
           <input-button v-on:clicked="addAction()" icon="plus"/>
         </p>
       </button-row>
 
-      <modal-dialog v-if="showDeleteDialog" @close="showDeleteDialog = false">
+      <modal-dialog v-if="showDeleteTaskDialog" @close="showDeleteTaskDialog = false">
         <p slot="header">Delete Task?</p>
         <p slot="body" v-if="task.name.length > 0">Do you really want to delete task '{{task.name}}'?</p>
         <p slot="body" v-if="task.name.length == 0">Do you really want to delete this task?</p>
         <div slot="footer">
           <button-row>
-            <input-button slot="left" v-on:clicked="showDeleteDialog = false" icon="times"/>
+            <input-button slot="left" v-on:clicked="showDeleteTaskDialog = false" icon="times"/>
             <input-button slot="right" v-on:clicked="deleteTask()" icon="check"/>
+          </button-row>
+        </div>
+      </modal-dialog>
+
+      <modal-dialog v-if="showDeleteActionDialog" @close="showDeleteActionDialog = false">
+        <p slot="header">Delete Action?</p>
+        <p slot="body">Do you really want to delete this Action?</p>
+        <div slot="footer">
+          <button-row>
+            <input-button slot="left" v-on:clicked="showDeleteActionDialog = false" icon="times"/>
+            <input-button slot="right" v-on:clicked="deleteAction()" icon="check"/>
           </button-row>
         </div>
       </modal-dialog>
@@ -68,6 +79,13 @@
                    v-bind:action="action"
                    v-bind:index="index"
                    v-bind:key="index"
+                   v-bind:task-index="taskIndex"
+                   v-bind:action-index="index"
+                   v-bind:test-results="testResults"
+                   v-on:show-action-test-results="showActionTestResult(index)"
+                   v-on:move-up="moveActionUp(index)"
+                   v-on:move-down="moveActionDown(index)"
+                   v-on:delete-action="prepareDeleteAction(index)"
                    ref="actionEditors"/>
 
   </div>
@@ -95,12 +113,14 @@ export default {
     CorePanel,
     InputButton
   },
-  props: ['task', 'showTestResultMarker'],
+  props: ['task', 'taskIndex', 'testResults'],
   data: function () {
     return {
       feedback: '',
       feedbackOk: true,
-      showDeleteDialog: false,
+      showDeleteTaskDialog: false,
+      showDeleteActionDialog: false,
+      deleteActionIndex: 0,
       nameValidationError: '',
       requestInProgress: false,
       providerTypes: []
@@ -158,7 +178,7 @@ export default {
       return (nameValidationResult && parameterValidationResult && actionEditorsResult)
     },
     deleteTask: function () {
-      this.showDeleteDialog = false
+      this.showDeleteTaskDialog = false
       this.$emit('delete')
     },
     addAction: function () {
@@ -167,6 +187,46 @@ export default {
         parameters: {}
       }
       this.task.actions.push(action)
+    },
+    prepareDeleteAction: function (index) {
+      this.deleteActionIndex = index
+      this.showDeleteActionDialog = true
+    },
+    deleteAction: function () {
+      this.showDeleteActionDialog = false
+      this.task.actions.splice(this.deleteActionIndex, 1)
+    },
+    showTestResultMarker: function () {
+      if (this.testResults != null && this.testResults.taskResults != null) {
+        let taskResults = this.testResults.taskResults
+        if (taskResults[this.taskIndex] != null && taskResults[this.taskIndex].actionResults != null) {
+          return true
+        }
+      }
+      return false
+    },
+    showActionTestResult: function (index) {
+      this.$emit('show-action-test-results', this.taskIndex, index)
+    },
+    moveActionUp: function (index) {
+      if (index == 0) {
+        return
+      }
+      this.arrayMove(this.task.actions, index, index -1)
+    },
+    moveActionDown: function (index) {
+      if (index < this.task.actions.length -1) {
+        this.arrayMove(this.task.actions, index, index +1)
+      }
+    },
+    arrayMove: function (array, oldIndex, newIndex) {
+      if (newIndex >= array.length) {
+        let k = newIndex - array.length + 1;
+        while (k--) {
+          array.push(undefined);
+        }
+      }
+      array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
     }
   },
   mounted () {

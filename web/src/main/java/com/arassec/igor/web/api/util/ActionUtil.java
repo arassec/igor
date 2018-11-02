@@ -2,6 +2,7 @@ package com.arassec.igor.web.api.util;
 
 import com.arassec.igor.core.application.ActionManager;
 import com.arassec.igor.core.model.IgorAction;
+import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.web.api.model.ActionModel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

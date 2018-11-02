@@ -2,6 +2,7 @@ package com.arassec.igor.web.api.model.converter;
 
 import com.arassec.igor.core.application.ActionManager;
 import com.arassec.igor.core.application.ProviderManager;
+import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.Job;
 import com.arassec.igor.core.model.Task;
 import com.arassec.igor.core.model.action.Action;
@@ -126,7 +127,7 @@ public class JobConverter {
     private List<ActionModel> convertActions(List<Action> actions) {
         List<ActionModel> result = new LinkedList<>();
         for (Action action : actions) {
-            ActionModel actionModel = new ActionModel(action.getClass().getName(), "label");
+            ActionModel actionModel = new ActionModel(action.getClass().getName(), action.getClass().getAnnotation(IgorAction.class).label());
             actionModel.setParameters(parameterUtil.getParameters(action));
             result.add(actionModel);
         }

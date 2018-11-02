@@ -5,10 +5,12 @@ import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.service.BaseService;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.model.service.persistence.PersistenceService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -23,6 +25,7 @@ import static java.nio.file.StandardOpenOption.CREATE;
 /**
  * TODO: Document class.
  */
+@Slf4j
 @IgorService(label = "Filesystem")
 public class LocalFilesystemPersistenceService extends BaseService implements PersistenceService {
 
@@ -53,7 +56,10 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
     @Override
     public boolean isPersisted(String jobId, String taskName, String value) {
         try (Stream<String> stream = Files.lines(Paths.get(getFileName(jobId, taskName)))) {
-            return stream.noneMatch(line -> value.equals(line));
+            return !stream.noneMatch(line -> value.equals(line));
+        } catch (NoSuchFileException e) {
+            log.debug("Persistence file does not (yet) exist: {}", getFileName(jobId, taskName));
+            return false;
         } catch (IOException e) {
             throw new ServiceException("Could not read persisted values: " + getFileName(jobId, taskName), e);
         }
