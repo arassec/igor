@@ -5,7 +5,7 @@
 
     <core-content>
       <core-panel>
-        <h1>{{ newService ? 'New Service' : 'Edit Service'}}</h1>
+        <h1>{{ newService ? 'New Service' : 'Service: ' + serviceConfiguration.name }}</h1>
 
         <table>
           <tr>
@@ -45,11 +45,11 @@
             <td></td>
           </tr>
         </table>
-      </core-panel>
 
-      <core-panel v-if="Object.keys(serviceConfiguration.parameters).length > 0">
-        <h2>Parameters</h2>
-        <parameter-editor :parameters="serviceConfiguration.parameters" ref="parameterEditor"/>
+        <div class="service-parameters" v-if="Object.keys(serviceConfiguration.parameters).length > 0">
+          <h3>Parameters</h3>
+          <parameter-editor :parameters="serviceConfiguration.parameters" ref="parameterEditor"/>
+        </div>
       </core-panel>
 
       <core-panel>
@@ -256,5 +256,9 @@ export default {
 </script>
 
 <style scoped>
+
+  .service-parameters {
+    margin: 25px 0px 0px 0px;
+  }
 
 </style>

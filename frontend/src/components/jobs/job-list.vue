@@ -21,10 +21,7 @@
 
     <spacer-item/>
 
-    <div style="font-size: 48px;">
-      <font-awesome-icon icon="flask" class="background-icon-left fa-6x"/>
-      <font-awesome-icon icon="flask" class="background-icon fa-10x"/>
-    </div>
+    <background-icon right="true" icon-one="flask" icon-two="flask"/>
 
   </core-container>
 </template>
@@ -37,10 +34,11 @@ import JobListEntry from './job-list-entry'
 import CoreContainer from '../common/core-container'
 import CoreContent from '../common/core-content'
 import FeedbackBox from '../common/feedback-box'
+import BackgroundIcon from '../common/background-icon'
 
 export default {
   name: 'job-list',
-  components: {CoreContent, CoreContainer, FeedbackBox, CorePanel, JobListEntry, ListHeader, SpacerItem},
+  components: {BackgroundIcon, CoreContent, CoreContainer, FeedbackBox, CorePanel, JobListEntry, ListHeader, SpacerItem},
   props: ['saveResult'],
   data: function () {
     return {

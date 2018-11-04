@@ -39,7 +39,7 @@
       </table>
 
       <div class="provider-parameters">
-        <h3>Provider Parameters</h3>
+        <h3>Parameters</h3>
         <parameter-editor :parameters="task.provider.parameters" ref="parameterEditor"/>
       </div>
 
@@ -82,6 +82,7 @@
                    v-bind:task-index="taskIndex"
                    v-bind:action-index="index"
                    v-bind:test-results="testResults"
+                   v-bind:num-actions="task.actions.length"
                    v-on:show-action-test-results="showActionTestResult(index)"
                    v-on:move-up="moveActionUp(index)"
                    v-on:move-down="moveActionDown(index)"
@@ -209,24 +210,24 @@ export default {
       this.$emit('show-action-test-results', this.taskIndex, index)
     },
     moveActionUp: function (index) {
-      if (index == 0) {
+      if (index === 0) {
         return
       }
-      this.arrayMove(this.task.actions, index, index -1)
+      this.arrayMove(this.task.actions, index, index - 1)
     },
     moveActionDown: function (index) {
-      if (index < this.task.actions.length -1) {
-        this.arrayMove(this.task.actions, index, index +1)
+      if (index < this.task.actions.length - 1) {
+        this.arrayMove(this.task.actions, index, index + 1)
       }
     },
     arrayMove: function (array, oldIndex, newIndex) {
       if (newIndex >= array.length) {
-        let k = newIndex - array.length + 1;
+        let k = newIndex - array.length + 1
         while (k--) {
-          array.push(undefined);
+          array.push(undefined)
         }
       }
-      array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
+      array.splice(newIndex, 0, array.splice(oldIndex, 1)[0])
     }
   },
   mounted () {

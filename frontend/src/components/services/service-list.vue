@@ -18,9 +18,7 @@
 
     <spacer-item/>
 
-    <div style="font-size: 48px;">
-      <font-awesome-icon icon="cogs" class="background-icon fa-10x"/>
-    </div>
+    <background-icon left="true" icon-one="cogs"/>
 
   </core-container>
 </template>
@@ -33,10 +31,12 @@ import CorePanel from '../common/core-panel'
 import CoreContainer from '../common/core-container'
 import CoreContent from '../common/core-content'
 import FeedbackSnackbar from '../common/feedback-snackbar'
+import BackgroundIcon from '../common/background-icon'
 
 export default {
   name: 'service-list',
   components: {
+    BackgroundIcon,
     FeedbackSnackbar,
     CoreContent,
     CoreContainer,
