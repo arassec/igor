@@ -7,11 +7,13 @@ import com.arassec.igor.core.model.dryrun.DryRunActionResult;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.service.file.FileService;
 import com.arassec.igor.core.model.service.file.FileStreamData;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
  * Copies a file from one service to another.
  */
+@Slf4j
 @IgorAction(label = "Copy file")
 public class CopyFileAction extends BaseAction {
 
@@ -49,6 +51,12 @@ public class CopyFileAction extends BaseAction {
     private String targetDirectory;
 
     /**
+     * The key to the directory the source files are in.
+     */
+    @IgorParam
+    private String directoryKey = "directory";
+
+    /**
      * Creates a new CopyFileAction.
      */
     public CopyFileAction() {
@@ -75,18 +83,21 @@ public class CopyFileAction extends BaseAction {
     private boolean processInternal(IgorData data, boolean isDryRun) {
         if (isValid(data)) {
             String sourceFile = (String) data.get(dataKey);
+            String sourceDirectory = (String) data.get(directoryKey);
             String targetFile = getTargetFile(sourceFile);
             if (!isDryRun) {
                 String targetFileInTransfer = targetFile + IN_TRANSFER_SUFFIX;
-                FileStreamData fileStreamData = sourceService.readStream(sourceFile);
+                FileStreamData fileStreamData = sourceService.readStream(getSourceFileWithPath(sourceDirectory, sourceFile));
                 targetService.writeStream(targetFileInTransfer, fileStreamData);
                 sourceService.finalizeStream(fileStreamData);
                 targetService.move(targetFileInTransfer, targetFile);
+                log.debug("{} copied to {}", getSourceFileWithPath(sourceDirectory, sourceFile), getTargetFile(sourceFile));
             }
             data.put(KEY_SOURCE_FILENAME, sourceFile);
             data.put(KEY_TARGET_FILENAME, targetFile);
             if (isDryRun) {
-                data.put("dryRunComment", sourceFile + " copied to " + targetFile);
+                data.put("dryRunComment", getSourceFileWithPath(sourceDirectory, sourceFile)
+                        + " copied to " + getTargetFile(sourceFile));
             }
         }
         return true;
@@ -103,6 +114,13 @@ public class CopyFileAction extends BaseAction {
             targetDirectory += "/";
         }
         return targetDirectory + file;
+    }
+
+    private String getSourceFileWithPath(String sourceDirectory, String file) {
+        if (!sourceDirectory.endsWith("/")) {
+            sourceDirectory += "/";
+        }
+        return sourceDirectory + file;
     }
 
 }

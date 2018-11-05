@@ -58,7 +58,6 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
         try (Stream<String> stream = Files.lines(Paths.get(getFileName(jobId, taskName)))) {
             return !stream.noneMatch(line -> value.equals(line));
         } catch (NoSuchFileException e) {
-            log.debug("Persistence file does not (yet) exist: {}", getFileName(jobId, taskName));
             return false;
         } catch (IOException e) {
             throw new ServiceException("Could not read persisted values: " + getFileName(jobId, taskName), e);
@@ -87,7 +86,13 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
         if (!result.endsWith(File.separator)) {
             result += File.separator;
         }
-        return result + jobId + "_" + taskName + ".igor.log";
+        return result + clean(jobId) + "_" + clean(taskName) + ".igor.log";
     }
 
+    private String clean(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        return input.replaceAll("/", "_").replaceAll("\\\\", "_").replaceAll("\\s", "_");
+    }
 }

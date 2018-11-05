@@ -34,6 +34,12 @@ public class ListFilesProvider extends BaseProvider {
     private String dataKey = "data";
 
     /**
+     * The key that contains the configured directory.
+     */
+    @IgorParam
+    private String directoryKey = "directory";
+
+    /**
      * The files in the configured directory.
      */
     private List<String> files = new LinkedList<>();
@@ -72,7 +78,12 @@ public class ListFilesProvider extends BaseProvider {
     @Override
     public IgorData next() {
         IgorData igorData = new IgorData(getJobId(), getTaskName());
-        igorData.put(dataKey, files.get(currentFile));
+        igorData.put(directoryKey, directory);
+        String file = files.get(currentFile);
+        if (file.startsWith(directory)) {
+            file = file.replace(directory, "");
+        }
+        igorData.put(dataKey, file);
         currentFile++;
         return igorData;
     }

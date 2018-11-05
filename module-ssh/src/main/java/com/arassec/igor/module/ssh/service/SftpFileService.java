@@ -91,6 +91,7 @@ public class SftpFileService extends BaseSshFileService {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(data.getBytes())) {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
             channel.put(inputStream, file);
             channel.disconnect();
             session.disconnect();
@@ -107,6 +108,7 @@ public class SftpFileService extends BaseSshFileService {
         try {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
             Vector<ChannelSftp.LsEntry> lsEntries = channel.ls(file);
             if (lsEntries != null && !lsEntries.isEmpty()) {
                 FileStreamData result = new FileStreamData();
@@ -117,6 +119,9 @@ public class SftpFileService extends BaseSshFileService {
                 sshConnectionData.setSession(session);
                 sshConnectionData.setChannel(channel);
                 result.setSourceConnectionData(sshConnectionData);
+
+                channel.disconnect();
+                session.disconnect();
 
                 return result;
             } else {
@@ -135,6 +140,7 @@ public class SftpFileService extends BaseSshFileService {
         try {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
             channel.put(fileStreamData.getData(), file);
             channel.disconnect();
             session.disconnect();
@@ -164,6 +170,7 @@ public class SftpFileService extends BaseSshFileService {
         try {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
             channel.rm(file);
             channel.disconnect();
             session.disconnect();
@@ -180,6 +187,7 @@ public class SftpFileService extends BaseSshFileService {
         try {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
             channel.rename(source, target);
             channel.disconnect();
             session.disconnect();
