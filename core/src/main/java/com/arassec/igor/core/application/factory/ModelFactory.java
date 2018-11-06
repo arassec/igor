@@ -63,7 +63,7 @@ public abstract class ModelFactory<T> implements InitializingBean {
     public T createInstance(String type) {
         if (types.contains(type)) {
             try {
-                return (T) Class.forName(type).getConstructor(null).newInstance();
+                return (T) Class.forName(type).getConstructor().newInstance();
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
                 throw new IllegalStateException(e);
             }
