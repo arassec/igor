@@ -9,13 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -61,6 +59,32 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
             return false;
         } catch (IOException e) {
             throw new ServiceException("Could not read persisted values: " + getFileName(jobId, taskName), e);
+        }
+    }
+
+    @Override
+    public void cleanup(String jobId, String taskName, int numEntriesToKeep)  {
+        Path persistenceFile = Paths.get(getFileName(jobId, taskName));
+        Path tempFile = Paths.get(getFileName(jobId, taskName) + "_TEMP");
+        boolean cleanedUp = false;
+        try (Stream<String> streamOne = Files.lines(persistenceFile)) {
+            long numLines = streamOne.count();
+            if (numLines > numEntriesToKeep) {
+                try (Stream<String> streamTwo = Files.lines(persistenceFile)) {
+                    Files.deleteIfExists(tempFile);
+                    Files.write(tempFile, streamTwo.skip(numLines - numEntriesToKeep).collect(Collectors.toList()));
+                    cleanedUp = true;
+                }
+            }
+        } catch (IOException e) {
+            log.error("Could not cleanup persistence store!", e);
+        }
+        if (cleanedUp) {
+            try {
+                Files.move(tempFile, persistenceFile, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                log.error("Could not move cleaned persistence store!", e);
+            }
         }
     }
 

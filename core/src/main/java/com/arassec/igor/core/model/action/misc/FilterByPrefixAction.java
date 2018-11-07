@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.action.file;
+package com.arassec.igor.core.model.action.misc;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;

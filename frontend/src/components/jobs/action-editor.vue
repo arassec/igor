@@ -26,9 +26,9 @@
 
     <button-row>
       <p slot="right">
-        <input-button icon="trash-alt" v-on:clicked="$emit('delete-action')"/>
         <input-button icon="arrow-up" v-if="actionIndex > 0" v-on:clicked="$emit('move-up')"/>
         <input-button icon="arrow-down" v-if="actionIndex < numActions -1" v-on:clicked="$emit('move-down')"/>
+        <input-button icon="trash-alt" v-on:clicked="$emit('delete-action')"/>
       </p>
     </button-row>
 

@@ -31,7 +31,7 @@ public interface Action {
     /**
      * Finalizes the action after all data has been processed.
      */
-    void complete();
+    void complete(String jobId, String taskName);
 
     /**
      * Returns the number of threads this action should be executed with.

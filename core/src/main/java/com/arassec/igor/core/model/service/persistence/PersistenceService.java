@@ -17,4 +17,6 @@ public interface PersistenceService extends Service {
 
     boolean isPersisted(String jobId, String taskName, String value);
 
+    void cleanup(String jobId, String taskName, int numEntriesToKeep);
+
 }

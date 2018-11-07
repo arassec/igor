@@ -5,7 +5,7 @@
 
     <core-content>
       <core-panel>
-        <h1>{{ newJob ? 'New Job' : 'Job: ' + jobConfiguration.name }}</h1>
+        <h1>{{ jobConfiguration.name.length > 0 ? 'Job: ' + jobConfiguration.name : 'New Job' }}</h1>
 
         <table>
           <tr>
@@ -49,10 +49,6 @@
             <td/>
           </tr>
         </table>
-
-        <button-row>
-          <input-button slot="right" v-on:clicked="addTask()" icon="plus"/>
-        </button-row>
       </core-panel>
 
       <cron-picker v-show="showCronTrigger" v-on:selected="setCronTrigger" v-on:cancel="showCronTrigger = false"/>
@@ -67,6 +63,12 @@
                    v-on:show-task-test-results="showTaskTestResult(index)"
                    v-on:show-action-test-results="showActionTestResult"
                    ref="taskEditors"/>
+
+      <core-panel class="button-panel">
+        <button-row>
+          <label-button slot="right" v-on:clicked="addTask()" icon="plus" label="Add Task"/>
+        </button-row>
+      </core-panel>
 
       <core-panel class="button-panel">
         <feedback-panel :feedback="feedback" :alert="!feedbackOk" :requestInProgress="requestInProgress"/>
@@ -105,10 +107,12 @@ import ValidationError from '../common/validation-error'
 import FeedbackPanel from '../common/feedback-panel'
 import CronPicker from '../common/cron-picker'
 import TestResultContainer from './test-result-container'
+import LabelButton from '../common/label-button'
 
 export default {
   name: 'job-editor',
   components: {
+    LabelButton,
     TestResultContainer,
     CronPicker,
     FeedbackPanel,
@@ -287,6 +291,12 @@ export default {
 
   .button-panel {
     margin-top: 25px;
+  }
+
+  .add-task-button {
+    margin-top: 25px;
+    color: var(--font-color-light);
+    background-color: var(--panel-background-color);
   }
 
 </style>

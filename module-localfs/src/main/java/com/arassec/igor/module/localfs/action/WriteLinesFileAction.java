@@ -79,8 +79,8 @@ public class WriteLinesFileAction extends BaseAction {
      * Closes the output file.
      */
     @Override
-    public void complete() {
-        super.complete();
+    public void complete(String jobId, String taskName) {
+        super.complete(jobId, taskName);
         try {
             bufferedWriter.flush();
             bufferedWriter.close();

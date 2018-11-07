@@ -4,7 +4,7 @@
 
       <test-result-marker v-if="showTestResultMarker()" v-on:clicked="$emit('show-task-test-results')"/>
 
-      <h1>Task{{ task.name != null ? ': ' + task.name : ''}}</h1>
+      <h1>{{ task.name.length > 0 ? 'Task: ' + task.name : 'New Task' }}</h1>
 
       <table>
         <tr>
@@ -44,10 +44,7 @@
       </div>
 
       <button-row>
-        <p slot="right">
-          <input-button v-on:clicked="showDeleteTaskDialog = true" icon="trash-alt"/>
-          <input-button v-on:clicked="addAction()" icon="plus"/>
-        </p>
+        <input-button slot="right" v-on:clicked="showDeleteTaskDialog = true" icon="trash-alt"/>
       </button-row>
 
       <modal-dialog v-if="showDeleteTaskDialog" @close="showDeleteTaskDialog = false">
@@ -89,6 +86,12 @@
                    v-on:delete-action="prepareDeleteAction(index)"
                    ref="actionEditors"/>
 
+    <core-panel>
+      <button-row>
+        <label-button slot="right" v-on:clicked="addAction()" icon="plus" label="Add Action"/>
+      </button-row>
+    </core-panel>
+
   </div>
 </template>
 
@@ -101,10 +104,12 @@ import ValidationError from '../common/validation-error'
 import ModalDialog from '../common/modal-dialog'
 import TestResultMarker from './test-result-marker'
 import ActionEditor from './action-editor'
+import LabelButton from '../common/label-button'
 
 export default {
   name: 'task-editor',
   components: {
+    LabelButton,
     ActionEditor,
     TestResultMarker,
     ModalDialog,
@@ -239,11 +244,16 @@ export default {
 <style scoped>
 
   .task-editor {
-    margin-top: 25px;
+    margin-top: 35px;
   }
 
   .provider-parameters {
     margin: 25px 0px 0px 0px;
+  }
+
+  .add-action-button {
+    color: var(--font-color-light);
+    background-color: var(--panel-background-color);
   }
 
 </style>

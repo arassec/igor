@@ -108,7 +108,7 @@ public class Task {
         }
 
         for (Action action : actions) {
-            action.complete();
+            action.complete(jobName, name);
         }
     }
 

@@ -12,6 +12,7 @@ import com.jcraft.jsch.SftpException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -120,8 +121,7 @@ public class SftpFileService extends BaseSshFileService {
                 sshConnectionData.setChannel(channel);
                 result.setSourceConnectionData(sshConnectionData);
 
-                channel.disconnect();
-                session.disconnect();
+                // No need to disconnect. finalizeStream() will handle that...
 
                 return result;
             } else {
@@ -141,7 +141,8 @@ public class SftpFileService extends BaseSshFileService {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
-            channel.put(fileStreamData.getData(), file);
+            OutputStream outputStream = channel.put(file);
+            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize());
             channel.disconnect();
             session.disconnect();
         } catch (SftpException | JSchException e) {

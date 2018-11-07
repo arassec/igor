@@ -1,16 +1,17 @@
 <template>
   <div class="button" v-on:click="$emit('clicked')">
-    <font-awesome-icon :icon="icon" :class="iconstyle" v-on:click="$emit('clicked')"/>
+    <font-awesome-icon :icon="icon" :class="iconstyle"/> {{label}}
   </div>
+
 </template>
 
 <script>
 export default {
-  name: 'input-button',
-  props: ['icon'],
+  name: 'label-button',
+  props: ['icon', 'label'],
   computed: {
     iconstyle: function () {
-      if (this.icon === 'eye' || this.icon === 'clock' || this.icon === 'cogs') {
+      if (this.icon === 'eye' || this.icon === 'clock' || this.icon === 'cogs' || this.icon === 'crosshairs') {
         return 'minus-four'
       }
       return ''
@@ -26,9 +27,9 @@ export default {
     background-color: Transparent;
     cursor: pointer;
     height: 25px;
-    width: 25px;
     display: inline-block;
     text-align: center;
+    padding: 2px 5px 5px 5px;
   }
 
   .button::-moz-focus-inner {
