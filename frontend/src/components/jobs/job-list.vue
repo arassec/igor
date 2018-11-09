@@ -60,10 +60,10 @@ export default {
         Array.from(response.data).forEach(function (item) {
           component.jobs.push(item)
         })
-        component.jobs.sort((a, b) => a.localeCompare(b))
+        component.jobs.sort((a, b) => a.name.localeCompare(b.name))
       }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
+        console.log(error)
+        component.$root.$data.store.setFeedback('Jobs could not be loaded!', true)
       })
     },
     filter: function (filterTextFromListHeader) {

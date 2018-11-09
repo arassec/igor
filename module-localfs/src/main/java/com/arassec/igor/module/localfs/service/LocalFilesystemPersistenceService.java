@@ -21,7 +21,7 @@ import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
 /**
- * TODO: Document class.
+ * Persistence-Service that uses the local filesystem of the igor server.
  */
 @Slf4j
 @IgorService(label = "Filesystem")

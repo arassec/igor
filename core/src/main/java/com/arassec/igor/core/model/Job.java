@@ -3,6 +3,7 @@ package com.arassec.igor.core.model;
 import com.arassec.igor.core.model.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.provider.IgorData;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import java.util.Map;
  * Defines an igor job.
  */
 @Data
+@Slf4j
 public class Job {
 
     /**
@@ -57,8 +59,12 @@ public class Job {
      */
     public void run() {
         LOG.debug("Running job: {} ({})", name, id);
-        for (Task task : tasks) {
-            task.run(name);
+        try {
+            for (Task task : tasks) {
+                task.run(name);
+            }
+        } catch (Exception e) {
+            log.error("Exception during job execution!", e);
         }
         LOG.debug("Finished job: {} ({})", name, id);
     }

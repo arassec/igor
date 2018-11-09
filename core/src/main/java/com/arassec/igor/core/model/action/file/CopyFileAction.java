@@ -3,7 +3,6 @@ package com.arassec.igor.core.model.action.file;
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.BaseAction;
-import com.arassec.igor.core.model.dryrun.DryRunActionResult;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.service.file.FileService;
 import com.arassec.igor.core.model.service.file.FileStreamData;
@@ -57,6 +56,12 @@ public class CopyFileAction extends BaseAction {
     private String directoryKey = "directory";
 
     /**
+     * Enables a ".igor" file suffix during file transfer. The suffix will be removed after the file has been copied completely.
+     */
+    @IgorParam
+    private boolean appendTransferSuffix = true;
+
+    /**
      * Creates a new CopyFileAction.
      */
     public CopyFileAction() {
@@ -86,11 +91,16 @@ public class CopyFileAction extends BaseAction {
             String sourceDirectory = (String) data.get(directoryKey);
             String targetFile = getTargetFile(sourceFile);
             if (!isDryRun) {
-                String targetFileInTransfer = targetFile + IN_TRANSFER_SUFFIX;
+                String targetFileInTransfer = targetFile;
+                if (appendTransferSuffix) {
+                    targetFileInTransfer += IN_TRANSFER_SUFFIX;
+                }
                 FileStreamData fileStreamData = sourceService.readStream(getSourceFileWithPath(sourceDirectory, sourceFile));
                 targetService.writeStream(targetFileInTransfer, fileStreamData);
                 sourceService.finalizeStream(fileStreamData);
-                targetService.move(targetFileInTransfer, targetFile);
+                if (appendTransferSuffix) {
+                    targetService.move(targetFileInTransfer, targetFile);
+                }
                 log.debug("{} copied to {}", getSourceFileWithPath(sourceDirectory, sourceFile), getTargetFile(sourceFile));
             }
             data.put(KEY_SOURCE_FILENAME, sourceFile);

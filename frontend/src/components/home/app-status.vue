@@ -1,6 +1,6 @@
 <template>
   <div>
-    TODO: Add home content!
+
   </div>
 </template>
 
