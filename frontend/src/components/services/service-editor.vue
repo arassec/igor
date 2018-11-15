@@ -57,10 +57,12 @@
 
         <button-row>
           <p slot="left">
-            <input-button v-on:clicked="cancel()" icon="times"/>
+            <router-link to="/services">
+              <input-button icon="times"/>
+            </router-link>
           </p>
           <p slot="right">
-            <input-button v-on:clicked="testConfiguration()" icon="plug"/>
+            <input-button v-on:clicked="testConfiguration()" icon="plug" class="button-margin-right"/>
             <input-button v-on:clicked="saveConfiguration()" icon="save"/>
           </p>
         </button-row>
@@ -239,9 +241,6 @@ export default {
       }
 
       return (nameValidationResult && parameterValidationResult)
-    },
-    cancel: function () {
-      this.$router.back()
     }
   },
   mounted () {

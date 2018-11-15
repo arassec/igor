@@ -3,16 +3,18 @@
 
     <p slot="header">Select Service</p>
 
-    <table slot="body">
-      <tr v-for="service in services" :key="service.id">
-        <td class="first">
-          {{ service.name }}
-        </td>
-        <td class="last">
-          <input-button icon="crosshairs" v-on:clicked="$emit('selected', service)"/>
-        </td>
-      </tr>
-    </table>
+    <div slot="body">
+        <table>
+          <tr v-for="service in services" :key="service.id">
+            <td class="first">
+              {{ service.name }}
+            </td>
+            <td class="last">
+              <input-button icon="crosshairs" v-on:clicked="$emit('selected', service)"/>
+            </td>
+          </tr>
+        </table>
+    </div>
 
     <button-row slot="footer">
       <input-button slot="left" icon="times" v-on:clicked="$emit('cancel')"/>
@@ -23,14 +25,12 @@
 
 <script>
 import ModalDialog from '../common/modal-dialog'
-import CorePanel from '../common/core-panel'
-import ServiceEditor from './service-editor'
 import ButtonRow from '../common/button-row'
 import InputButton from '../common/input-button'
 
 export default {
   name: 'service-picker',
-  components: {InputButton, ButtonRow, ServiceEditor, CorePanel, ModalDialog},
+  components: {InputButton, ButtonRow,  ModalDialog},
   props: ['services'],
   data: function () {
     return {

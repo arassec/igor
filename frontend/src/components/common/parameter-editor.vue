@@ -18,8 +18,8 @@
                    :type="parameterInputTypes[index]" v-model.trim="param.value"/>
 
             <input-button v-if="!isNumber(param.type) && !isBoolean(param.type) && param.secured"
-                          icon="eye" v-on:clicked="toggleCleartext(index)"/>
-            <input-button v-else-if="isService(param)" icon="cogs" v-on:clicked="openServicePicker(index, param.type)"/>
+                          icon="eye" v-on:clicked="toggleCleartext(index)" class="button-margin-left"/>
+            <input-button v-else-if="isService(param)" icon="cogs" v-on:clicked="openServicePicker(index, param.type)" class="button-margin-left"/>
 
           </td>
           <td>

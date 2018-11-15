@@ -7,11 +7,9 @@
 </template>
 
 <script>
-import InputButton from '../common/input-button'
 
 export default {
   name: 'test-result-marker',
-  components: {InputButton}
 }
 </script>
 

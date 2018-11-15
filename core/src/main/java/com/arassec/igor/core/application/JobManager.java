@@ -29,7 +29,7 @@ public class JobManager implements InitializingBean, DisposableBean {
     @Autowired
     private TaskScheduler taskScheduler;
 
-    private Map<Long, ScheduledFuture> scheduledJobs = new HashMap<>();
+    private Map<Long, ScheduledFuture> scheduledJobFutures = new HashMap<>();
 
     @Override
     public void afterPropertiesSet() {
@@ -38,7 +38,7 @@ public class JobManager implements InitializingBean, DisposableBean {
 
     @Override
     public void destroy() {
-        scheduledJobs.values().stream().forEach(scheduledFuture -> scheduledFuture.cancel(true));
+        scheduledJobFutures.values().stream().forEach(scheduledFuture -> scheduledFuture.cancel(true));
     }
 
     public void save(Job job) {
@@ -60,8 +60,12 @@ public class JobManager implements InitializingBean, DisposableBean {
 
     public void schedule(Job job) {
         cancel(job);
+        if (!job.isActive()) {
+            log.debug("Job '{}' is not active and will not be scheduled...", job.getName());
+            return;
+        }
         try {
-            scheduledJobs.put(job.getId(), taskScheduler.schedule(new Thread(() -> job.run()),
+            scheduledJobFutures.put(job.getId(), taskScheduler.schedule(new Thread(() -> job.run()),
                     new CronTrigger(job.getTrigger())));
             CronSequenceGenerator cronTrigger = new CronSequenceGenerator(job.getTrigger());
             Date nextRun = cronTrigger.next(Calendar.getInstance().getTime());
@@ -76,16 +80,16 @@ public class JobManager implements InitializingBean, DisposableBean {
         if (job != null) {
             cancel(job);
             jobRepository.deleteById(id);
-            scheduledJobs.remove(id);
+            scheduledJobFutures.remove(id);
         }
     }
 
     public void cancel(Job job) {
-        if (scheduledJobs.containsKey(job.getId())) {
-            if (!scheduledJobs.get(job.getId()).cancel(true)) {
+        if (scheduledJobFutures.containsKey(job.getId())) {
+            if (!scheduledJobFutures.get(job.getId()).cancel(true)) {
                 throw new ServiceException("Job " + job.getId() + " could not be cancelled!");
             }
-            scheduledJobs.remove(job.getId());
+            scheduledJobFutures.remove(job.getId());
             log.info("Canceled job: {} ({})", job.getName(), job.getId());
         }
     }

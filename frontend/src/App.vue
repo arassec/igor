@@ -83,4 +83,12 @@ export default {
     color: var(--font-color-light);
   }
 
+  .button-margin-right {
+    margin-right: 5px;
+  }
+
+  .button-margin-left {
+    margin-left: 5px;
+  }
+
 </style>

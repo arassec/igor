@@ -35,7 +35,9 @@
                                 <resource>
                                     <directory>${project.parent.basedir}/frontend/target/dist</directory>
                                     <includes>
-                                        <include>static/</include>
+                                        <include>css/</include>
+                                        <include>js/</include>
+                                        <include>favicon.ico</include>
                                         <include>index.html</include>
                                     </includes>
                                 </resource>

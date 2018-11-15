@@ -6,7 +6,7 @@
         {{ name }}
       </list-name>
       <p slot="right">
-        <input-button v-on:clicked="showDeleteDialog = !showDeleteDialog" icon="trash-alt"/>
+        <input-button v-on:clicked="showDeleteDialog = !showDeleteDialog" icon="trash-alt" class="button-margin-right"/>
         <input-button v-on:clicked="editService(id)" icon="cog"/>
       </p>
     </button-row>

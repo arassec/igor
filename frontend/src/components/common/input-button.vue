@@ -1,6 +1,6 @@
 <template>
   <div class="button" v-on:click="$emit('clicked')">
-    <font-awesome-icon :icon="icon" :class="iconstyle" v-on:click="$emit('clicked')"/>
+    <font-awesome-icon :icon="icon" :class="iconstyle"/>
   </div>
 </template>
 

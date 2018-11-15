@@ -6,7 +6,7 @@
         {{ name }} <span v-if="!active">(inactive)</span>
       </list-name>
       <p slot="right">
-        <input-button v-on:clicked="showDeleteDialog = !showDeleteDialog" icon="trash-alt"/>
+        <input-button v-on:clicked="showDeleteDialog = !showDeleteDialog" icon="trash-alt" class="button-margin-right"/>
         <input-button v-on:clicked="editJob(id)" icon="cog"/>
       </p>
     </button-row>

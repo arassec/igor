@@ -24,7 +24,7 @@
             <td>
               <input id="trigger-input" type="text" autocomplete="off"
                      v-model="jobConfiguration.trigger"/>
-              <input-button v-on:clicked="showCronTrigger = true" icon="clock"/>
+              <input-button v-on:clicked="showCronTrigger = true" icon="clock" class="button-margin-left"/>
             </td>
             <td>
               <validation-error v-if="triggerValidationError.length > 0">
@@ -75,11 +75,13 @@
 
         <button-row>
           <p slot="left">
-            <input-button v-on:clicked="cancel()" icon="times"/>
+            <router-link to="/jobs">
+              <input-button icon="times"/>
+            </router-link>
           </p>
 
           <p slot="right">
-            <input-button v-on:clicked="testConfiguration()" icon="plug"/>
+            <input-button v-on:clicked="testConfiguration()" icon="plug" class="button-margin-right"/>
             <input-button v-on:clicked="saveConfiguration()" icon="save"/>
           </p>
         </button-row>
@@ -250,9 +252,6 @@ export default {
       }
 
       return (nameValidationResult && triggerValidationResult && taskEditorsResult)
-    },
-    cancel: function () {
-      this.$router.back()
     },
     setCronTrigger: function (value) {
       this.jobConfiguration.trigger = value
