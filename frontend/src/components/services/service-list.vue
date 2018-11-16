@@ -27,20 +27,16 @@
 import SpacerItem from '../common/spacer-item'
 import ListHeader from '../common/list-header'
 import ServiceListEntry from './service-list-entry'
-import CorePanel from '../common/core-panel'
 import CoreContainer from '../common/core-container'
 import CoreContent from '../common/core-content'
-import FeedbackSnackbar from '../common/feedback-snackbar'
 import BackgroundIcon from '../common/background-icon'
 
 export default {
   name: 'service-list',
   components: {
     BackgroundIcon,
-    FeedbackSnackbar,
     CoreContent,
     CoreContainer,
-    CorePanel,
     ServiceListEntry,
     ListHeader,
     SpacerItem

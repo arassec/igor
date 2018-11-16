@@ -7,7 +7,7 @@
       <div class="filter" slot="left">
         <input id="filter-input" type="text" v-model="filterText" placeholder="filter list"/>
         <font-awesome-icon icon="search"/>
-        <input-button icon="times" v-if="filterText.length > 0" v-on:clicked="filterText = ''"/>
+        <input-button icon="times" v-if="filterText.length > 0" v-on:clicked="filterText = ''" class="button-margin-left"/>
       </div>
       <p slot="right">
         <router-link :to="addButtonTarget">
@@ -33,7 +33,7 @@ export default {
     }
   },
   watch: {
-    filterText: function (val, oldVal) {
+    filterText: function (val) {
       this.filter(val)
     }
   },

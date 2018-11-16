@@ -28,7 +28,7 @@ public class Task {
      */
     private static final int NUM_THREADS_INITIAL = -2;
 
-    private static final String CONCURRENCY_GROUP_ID_PATTERN = "%s-%s-%d";
+    private static final String CONCURRENCY_GROUP_ID_PATTERN = "%s_%s_%d";
 
     /**
      * The name of the task.

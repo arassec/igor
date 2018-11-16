@@ -29,13 +29,13 @@
 
 import ModalDialog from '../common/modal-dialog'
 import InputButton from '../common/input-button'
-import CorePanel from '../common/core-panel'
 import ListName from '../common/list-name'
 import ButtonRow from '../common/button-row'
+import CorePanel from "../common/core-panel";
 
 export default {
   name: 'job-list-entry',
-  components: {ButtonRow, ListName, CorePanel, InputButton, ModalDialog},
+  components: {CorePanel, ButtonRow, ListName, InputButton, ModalDialog},
   props: ['id', 'name', 'active'],
   data: function () {
     return {

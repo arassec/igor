@@ -25,9 +25,12 @@ public abstract class BaseFileService extends BaseService implements FileService
     /**
      * Copies the content of the input stream into the output stream.
      *
-     * @param in       The input stream.
-     * @param out      The output stream.
-     * @param fileSize The max number of bytes to copy.
+     * @param in
+     *         The input stream.
+     * @param out
+     *         The output stream.
+     * @param fileSize
+     *         The max number of bytes to copy.
      */
     protected void copyStream(InputStream in, OutputStream out, long fileSize) {
         try {
@@ -41,12 +44,13 @@ public abstract class BaseFileService extends BaseService implements FileService
                 }
                 foo = in.read(buf, 0, foo);
                 if (foo < 0) {
-                    // error
-                    break;
+                    break; // error
                 }
                 out.write(buf, 0, foo);
                 fileSize -= foo;
-                if (fileSize == 0L) break;
+                if (fileSize == 0L) {
+                    break;
+                }
             }
             out.flush();
         } catch (IOException e) {

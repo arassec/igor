@@ -29,7 +29,6 @@
 <script>
 import SpacerItem from '../common/spacer-item'
 import ListHeader from '../common/list-header'
-import CorePanel from '../common/core-panel'
 import JobListEntry from './job-list-entry'
 import CoreContainer from '../common/core-container'
 import CoreContent from '../common/core-content'
@@ -38,7 +37,7 @@ import BackgroundIcon from '../common/background-icon'
 
 export default {
   name: 'job-list',
-  components: {BackgroundIcon, CoreContent, CoreContainer, FeedbackBox, CorePanel, JobListEntry, ListHeader, SpacerItem},
+  components: {BackgroundIcon, CoreContent, CoreContainer, FeedbackBox, JobListEntry, ListHeader, SpacerItem},
   props: ['saveResult'],
   data: function () {
     return {

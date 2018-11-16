@@ -15,13 +15,12 @@
 </template>
 
 <script>
-import CorePanel from '../common/core-panel'
 import ButtonRow from '../common/button-row'
 import InputButton from '../common/input-button'
 
 export default {
   name: 'test-result-container',
-  components: {InputButton, ButtonRow, CorePanel},
+  components: {InputButton, ButtonRow},
   props: ['heading', 'selectedTestResults'],
   methods: {
     format: function (code) {
