@@ -27,13 +27,13 @@
 </template>
 
 <script>
-import SpacerItem from '../common/spacer-item'
-import ListHeader from '../common/list-header'
-import JobListEntry from './job-list-entry'
-import CoreContainer from '../common/core-container'
-import CoreContent from '../common/core-content'
-import FeedbackBox from '../common/feedback-box'
-import BackgroundIcon from '../common/background-icon'
+import SpacerItem from '../components/common/spacer-item'
+import ListHeader from '../components/common/list-header'
+import JobListEntry from '../components/jobs/job-list-entry'
+import CoreContainer from '../components/common/core-container'
+import CoreContent from '../components/common/core-content'
+import FeedbackBox from '../components/common/feedback-box'
+import BackgroundIcon from '../components/common/background-icon'
 
 export default {
   name: 'job-list',

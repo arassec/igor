@@ -76,15 +76,15 @@
 </template>
 
 <script>
-import SpacerItem from '../common/spacer-item'
-import ParameterEditor from '../common/parameter-editor'
-import InputButton from '../common/input-button'
-import CorePanel from '../common/core-panel'
-import CoreContainer from '../common/core-container'
-import CoreContent from '../common/core-content'
-import ButtonRow from '../common/button-row'
-import ValidationError from '../common/validation-error'
-import FeedbackPanel from '../common/feedback-panel'
+import SpacerItem from '../components/common/spacer-item'
+import ParameterEditor from '../components/common/parameter-editor'
+import InputButton from '../components/common/input-button'
+import CorePanel from '../components/common/core-panel'
+import CoreContainer from '../components/common/core-container'
+import CoreContent from '../components/common/core-content'
+import ButtonRow from '../components/common/button-row'
+import ValidationError from '../components/common/validation-error'
+import FeedbackPanel from '../components/common/feedback-panel'
 
 export default {
   name: 'service-editor',

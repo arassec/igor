@@ -4,7 +4,7 @@
 
       <test-result-marker v-if="showTestResultMarker()" v-on:clicked="$emit('show-task-test-results')"/>
 
-      <h1>{{ task.name.length > 0 ? 'Task: ' + task.name : 'New Task' }}</h1>
+      <h1><font-awesome-icon icon="tasks"/> {{ task.name.length > 0 ? task.name : 'New Task' }}</h1>
 
       <table>
         <tr>
@@ -47,18 +47,6 @@
         <input-button slot="right" v-on:clicked="showDeleteTaskDialog = true" icon="trash-alt"/>
       </button-row>
 
-      <modal-dialog v-if="showDeleteTaskDialog" @close="showDeleteTaskDialog = false">
-        <p slot="header">Delete Task?</p>
-        <p slot="body" v-if="task.name.length > 0">Do you really want to delete task '{{task.name}}'?</p>
-        <p slot="body" v-if="task.name.length == 0">Do you really want to delete this task?</p>
-        <div slot="footer">
-          <button-row>
-            <input-button slot="left" v-on:clicked="showDeleteTaskDialog = false" icon="times"/>
-            <input-button slot="right" v-on:clicked="deleteTask()" icon="check"/>
-          </button-row>
-        </div>
-      </modal-dialog>
-
       <modal-dialog v-if="showDeleteActionDialog" @close="showDeleteActionDialog = false">
         <p slot="header">Delete Action?</p>
         <p slot="body">Do you really want to delete this Action?</p>
@@ -86,12 +74,6 @@
                    v-on:delete-action="prepareDeleteAction(index)"
                    ref="actionEditors"/>
 
-    <core-panel>
-      <button-row>
-        <label-button slot="right" v-on:clicked="addAction()" icon="plus" label="Add Action"/>
-      </button-row>
-    </core-panel>
-
   </div>
 </template>
 
@@ -104,12 +86,10 @@ import ValidationError from '../common/validation-error'
 import ModalDialog from '../common/modal-dialog'
 import TestResultMarker from './test-result-marker'
 import ActionEditor from './action-editor'
-import LabelButton from '../common/label-button'
 
 export default {
   name: 'task-editor',
   components: {
-    LabelButton,
     ActionEditor,
     TestResultMarker,
     ModalDialog,
@@ -124,7 +104,6 @@ export default {
     return {
       feedback: '',
       feedbackOk: true,
-      showDeleteTaskDialog: false,
       showDeleteActionDialog: false,
       deleteActionIndex: 0,
       nameValidationError: '',

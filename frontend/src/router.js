@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './components/home/app-status'
-import ServiceList from './components/services/service-list'
-import ServiceEditor from './components/services/service-editor'
-import JobList from './components/jobs/job-list'
-import JobEditor from './components/jobs/job-editor'
+import AppStatus from './views/app-status'
+import ServiceList from './views/service-list'
+import ServiceEditor from './views/service-editor'
+import JobList from './views/job-list'
+import JobEditor from './views/job-editor'
 
 Vue.use(Router)
 
@@ -13,7 +13,7 @@ export default new Router({
         {
             path: '/',
             name: 'home',
-            component: Home
+            component: AppStatus
         },
         {
             path: '/services:saveResult?',

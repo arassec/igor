@@ -1,38 +1,43 @@
 <template>
-  <core-panel class="action-editor">
+    <core-panel class="action-editor">
 
-    <test-result-marker v-if="showTestResultMarker()" v-on:clicked="$emit('show-action-test-results')"/>
+        <test-result-marker v-if="showTestResultMarker()" v-on:clicked="$emit('show-action-test-results')"/>
 
-    <h2>Action: {{ action.label }}</h2>
+        <h1>
+            <font-awesome-icon icon="wrench"/>
+            {{ action.label }}
+        </h1>
 
-    <table>
-      <tr>
-        <td>Type</td>
-        <td>
-          <select v-model="action.type" v-on:change="loadTypeParameters(action)">
-            <option v-for="actionType in actionTypes" v-bind:value="actionType.type"
-                    v-bind:key="actionType.type">
-              {{actionType.label}}
-            </option>
-          </select>
-        </td>
-      </tr>
-    </table>
+        <table>
+            <tr>
+                <td>Type</td>
+                <td>
+                    <select v-model="action.type" v-on:change="loadTypeParameters(action)">
+                        <option v-for="actionType in actionTypes" v-bind:value="actionType.type"
+                                v-bind:key="actionType.type">
+                            {{actionType.label}}
+                        </option>
+                    </select>
+                </td>
+            </tr>
+        </table>
 
-    <div class="action-parameters">
-      <h3>Parameters</h3>
-      <parameter-editor :parameters="action.parameters" ref="parameterEditor"/>
-    </div>
+        <div class="action-parameters">
+            <h3>Parameters</h3>
+            <parameter-editor :parameters="action.parameters" ref="parameterEditor"/>
+        </div>
 
-    <button-row>
-      <p slot="right">
-        <input-button icon="arrow-up" v-if="actionIndex > 0" v-on:clicked="$emit('move-up')" class="button-margin-right"/>
-        <input-button icon="arrow-down" v-if="actionIndex < numActions -1" v-on:clicked="$emit('move-down')" class="button-margin-right"/>
-        <input-button icon="trash-alt" v-on:clicked="$emit('delete-action')"/>
-      </p>
-    </button-row>
+        <button-row>
+            <p slot="right">
+                <input-button icon="arrow-up" v-if="actionIndex > 0" v-on:clicked="$emit('move-up')"
+                              class="button-margin-right"/>
+                <input-button icon="arrow-down" v-if="actionIndex < numActions -1" v-on:clicked="$emit('move-down')"
+                              class="button-margin-right"/>
+                <input-button icon="trash-alt" v-on:clicked="$emit('delete-action')"/>
+            </p>
+        </button-row>
 
-  </core-panel>
+    </core-panel>
 </template>
 
 <script>
@@ -114,11 +119,11 @@ export default {
 
 <style scoped>
 
-  .action-parameters {
-    margin-top: 25px;
-  }
+    .action-parameters {
+        margin-top: 25px;
+    }
 
-  table tr td h1 {
-    margin-bottom: 0px;
-  }
+    table tr td h1 {
+        margin-bottom: 0px;
+    }
 </style>

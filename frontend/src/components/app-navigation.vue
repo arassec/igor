@@ -4,11 +4,11 @@
       <router-link to="/" v-bind:class="isActiveTab('home') ? activeClass : ''"
                    @click.native="setActiveTab('home')">Home
       </router-link>
-      <router-link to="/jobs" v-bind:class="isActiveTab('jobs') ? activeClass : ''"
-                   @click.native="setActiveTab('jobs')">Jobs
+      <router-link to="/jobs" v-bind:class="isActiveTab('job') ? activeClass : ''"
+                   @click.native="setActiveTab('job')">Jobs
       </router-link>
-      <router-link to="/services" v-bind:class="isActiveTab('services') ? activeClass : ''"
-                   @click.native="setActiveTab('services')">Services
+      <router-link to="/services" v-bind:class="isActiveTab('service') ? activeClass : ''"
+                   @click.native="setActiveTab('service')">Services
       </router-link>
     </nav>
 
@@ -31,7 +31,7 @@ export default {
       this.choice = val
     },
     isActiveTab: function (val) {
-      return this.choice === val
+      return this.choice.startsWith(val)
     }
   }
 }
