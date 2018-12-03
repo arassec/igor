@@ -1,5 +1,5 @@
 <template>
-  <core-container>
+  <core-container class="min-width">
 
     <spacer-item/>
 
@@ -255,6 +255,10 @@ export default {
 </script>
 
 <style scoped>
+
+  .min-width {
+    --content-width: 800px;
+  }
 
   .service-parameters {
     margin: 25px 0px 0px 0px;

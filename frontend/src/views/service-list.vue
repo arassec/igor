@@ -1,5 +1,5 @@
 <template>
-  <core-container>
+  <core-container class="min-width">
 
     <spacer-item/>
 
@@ -83,6 +83,10 @@ export default {
 </script>
 
 <style scoped>
+
+  .min-width {
+    --content-width: 800px;
+  }
 
   .background-icon {
     color: var(--nav-background-color);

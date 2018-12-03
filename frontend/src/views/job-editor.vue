@@ -55,13 +55,10 @@
 
         </core-content>
 
-        <spacer-item/>
-
     </core-container>
 </template>
 
 <script>
-import SpacerItem from '../components/common/spacer-item'
 import CoreContainer from '../components/common/core-container'
 import CoreContent from '../components/common/core-content'
 import FeedbackPanel from '../components/common/feedback-panel'
@@ -85,8 +82,7 @@ export default {
     JobTreeNavigation,
     FeedbackPanel,
     CoreContent,
-    CoreContainer,
-    SpacerItem
+    CoreContainer
   },
   props: ['jobId'],
   data: function () {

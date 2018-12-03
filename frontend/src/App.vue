@@ -52,7 +52,6 @@ export default {
     --element-background-color-focus: #ffffff;
     --info-background-color: #5BB6A7;
     --alert-background-color: #DF6A7C;
-    --content-width: 800px;
   }
 
   body {

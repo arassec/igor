@@ -121,8 +121,7 @@ export default {
 <style scoped>
 
     .container {
-        flex-grow: 1;
-        flex-basis: 0;
+        margin-right: 25px;
     }
 
     .job-buttons {

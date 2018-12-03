@@ -20,6 +20,9 @@ export default {
 
   .container {
     display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
 </style>
