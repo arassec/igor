@@ -2,7 +2,6 @@
     <core-container>
 
         <job-tree-navigation :job-configuration="jobConfiguration"
-                             :job-validation="jobValidation"
                              :job-selected="jobSelected"
                              :selected-task-index="selectedTaskIndex"
                              :selected-action-index="selectedActionIndex"
@@ -24,8 +23,7 @@
         </job-tree-navigation>
 
         <core-content>
-            <job-configurator v-if="jobSelected" :job-configuration="jobConfiguration"
-                              :job-validation="jobValidation"/>
+            <job-configurator v-if="jobSelected" :job-configuration="jobConfiguration"/>
 
             <task-configurator v-if="selectedTask != null" :task="selectedTask"/>
 
@@ -106,12 +104,6 @@ export default {
         trigger: '',
         description: '',
         active: true,
-        tasks: []
-      },
-      jobValidation: {
-        hasErrors: false,
-        name: '',
-        trigger: '',
         tasks: []
       }
     }
@@ -287,19 +279,16 @@ export default {
     validateInput: function () {
       this.feedback = ''
       this.feedbackOk = true
-      this.jobValidation.hasErrors = false
-      this.jobValidation.name = ''
-      this.jobValidation.trigger = ''
+
+
 
       let nameValidationResult = true
       if (this.jobConfiguration.name == null || this.jobConfiguration.name === '') {
-        this.jobValidation.name = 'Name must be set'
         nameValidationResult = false
       }
 
       let triggerValidationResult = true
       if (this.jobConfiguration.trigger == null || this.jobConfiguration.trigger === '') {
-        this.jobValidation.trigger = 'Trigger must be set'
         triggerValidationResult = false
       }
 
@@ -307,7 +296,6 @@ export default {
       if (!result) {
         this.feedback = 'Validation failed!'
         this.feedbackOk = false
-        this.jobValidation.hasErrors = true
       }
 
       return result

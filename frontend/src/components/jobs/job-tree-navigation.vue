@@ -21,7 +21,7 @@
             <div class="treeview">
                 <ul>
                     <li>
-                        <span class="item" v-bind:class="{ 'selected': jobSelected, 'validation-error': jobValidation.hasErrors }"
+                        <span class="item" v-bind:class="{ 'selected': jobSelected }"
                               v-on:click="$emit('job-is-selected')">
                             <font-awesome-icon icon="toolbox"/>
                             <span>
@@ -106,7 +106,7 @@ import InputButton from '../common/input-button'
 export default {
   name: 'job-tree-navigation',
   components: {InputButton, ButtonRow, CorePanel},
-  props: ['jobConfiguration', 'jobValidation', 'jobSelected', 'selectedTaskIndex', 'selectedActionIndex'],
+  props: ['jobConfiguration', 'jobSelected', 'selectedTaskIndex', 'selectedActionIndex'],
   methods: {
     isTaskSelected: function (index) {
       return (index == this.selectedTaskIndex && this.selectedActionIndex == -1)

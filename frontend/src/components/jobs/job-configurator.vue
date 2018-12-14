@@ -12,8 +12,8 @@
                     <input type="text" autocomplete="off" v-model="jobConfiguration.name"/>
                 </td>
                 <td>
-                    <validation-error v-if="jobValidation.name.length > 0">
-                        {{jobValidation.name}}
+                    <validation-error>
+
                     </validation-error>
                 </td>
             </tr>
@@ -25,8 +25,8 @@
                     <input-button v-on:clicked="showCronTrigger = true" icon="clock" class="button-margin-left"/>
                 </td>
                 <td>
-                    <validation-error v-if="jobValidation.trigger.length > 0">
-                        {{jobValidation.trigger}}
+                    <validation-error>
+
                     </validation-error>
                 </td>
             </tr>
@@ -62,7 +62,7 @@ import InputButton from '../common/input-button'
 export default {
   name: 'job-configurator',
   components: {InputButton, ValidationError, CorePanel, CronPicker},
-  props: ['jobConfiguration', 'jobValidation'],
+  props: ['jobConfiguration'],
   data: function () {
     return {
       showCronTrigger: false,
