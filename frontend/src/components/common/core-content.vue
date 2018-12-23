@@ -14,6 +14,8 @@ export default {
 
   .content {
     min-width: var(--content-width);
+    margin-right: 25px;
+    flex-shrink: 0;
   }
 
 </style>

@@ -22,7 +22,7 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    flex-wrap: wrap;
+    flex-wrap: nowrap ;
   }
 
 </style>

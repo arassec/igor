@@ -1,34 +1,63 @@
 <template>
     <core-container>
 
-        <job-tree-navigation :job-configuration="jobConfiguration"
-                             :job-selected="jobSelected"
-                             :selected-task-index="selectedTaskIndex"
-                             :selected-action-index="selectedActionIndex"
-                             v-on:job-is-selected="selectJob"
-                             v-on:task-is-selected="selectTask"
-                             v-on:action-is-selected="selectAction"
-                             v-on:add-task="addTask"
-                             v-on:delete-task="showDeleteTask"
-                             v-on:add-action="addAction"
-                             v-on:delete-action="showDeleteAction"
-                             v-on:move-task-up="moveTaskUp"
-                             v-on:move-task-down="moveTaskDown"
-                             v-on:move-action-up="moveActionUp"
-                             v-on:move-action-down="moveActionDown"
-                             v-on:test-job="testConfiguration"
-                             v-on:save-job="saveConfiguration">
+        <side-menu>
+            <p slot="title">Job Configuration</p>
+            <button-row slot="buttons" v-on:cancel-configuration="cancelConfiguration">
+                <p slot="left">
+                    <input-button icon="arrow-left" v-on:clicked="cancelConfiguration"
+                                  class="button-margin-right"/>
+                    <input-button icon="plug" v-on:clicked="testConfiguration" class="button-margin-right"/>
+                    <input-button icon="save" v-on:clicked="saveConfiguration"/>
+                </p>
+                <p slot="right">
+                    <input-button icon="times" v-on:clicked="$emit('cancel-job')" disabled="true"/>
+                    <input-button icon="sync" v-on:clicked="$emit('sync-job')" class="button-margin-left"
+                                  disabled="true"/>
+                    <input-button icon="play" v-on:clicked="$emit('run-job')" class="button-margin-left"/>
+                </p>
+            </button-row>
+            <job-tree-navigation slot="content"
+                                 :job-configuration="jobConfiguration"
+                                 :validation-errors="validationErrors"
+                                 :selected-task-index="selectedTaskIndex"
+                                 :selected-action-index="selectedActionIndex"
+                                 v-on:job-is-selected="selectJob"
+                                 v-on:task-is-selected="selectTask"
+                                 v-on:action-is-selected="selectAction"
+                                 v-on:add-task="addTask"
+                                 v-on:delete-task="showDeleteTask"
+                                 v-on:add-action="addAction"
+                                 v-on:delete-action="showDeleteAction"
+                                 v-on:move-task-up="moveTaskUp"
+                                 v-on:move-task-down="moveTaskDown"
+                                 v-on:move-action-up="moveActionUp"
+                                 v-on:move-action-down="moveActionDown">
+            </job-tree-navigation>
             <feedback-panel slot="feedback" :feedback="feedback" :alert="!feedbackOk"
                             :requestInProgress="requestInProgress"/>
-        </job-tree-navigation>
+        </side-menu>
 
         <core-content>
-            <job-configurator v-if="jobSelected" :job-configuration="jobConfiguration"/>
+            <job-configurator v-show="selectedTaskIndex == -1"
+                              :job-configuration="jobConfiguration"
+                              ref="jobConfigurator"/>
 
-            <task-configurator v-if="selectedTask != null" :task="selectedTask"/>
+            <task-configurator v-for="(task, taskIndex) in jobConfiguration.tasks"
+                               v-show="selectedTaskIndex == taskIndex && selectedActionIndex == -1"
+                               v-bind:key="taskIndex"
+                               v-bind:task="task"
+                               ref="taskConfigurators"/>
 
-            <action-configurator v-if="selectedAction != null" :action="selectedAction"
-                            :action-types="actionTypes"/>
+            <template v-for="(task, taskIndex) in jobConfiguration.tasks">
+                <action-configurator v-for="(action, actionIndex) in task.actions"
+                                     v-show="selectedTaskIndex == taskIndex && selectedActionIndex == actionIndex"
+                                     v-bind:key="taskIndex + '_' + actionIndex"
+                                     v-bind:action-key="taskIndex + '_' + actionIndex"
+                                     v-bind:action="action"
+                                     v-bind:action-types="actionTypes"
+                                     ref="actionConfigurators"/>
+            </template>
 
             <modal-dialog v-if="showDeleteTaskDialog" @close="showDeleteTaskDialog = false">
                 <p slot="header">Delete Task?</p>
@@ -40,6 +69,7 @@
                     </button-row>
                 </div>
             </modal-dialog>
+
             <modal-dialog v-if="showDeleteActionDialog" @close="showDeleteActionDialog = false">
                 <p slot="header">Delete Action?</p>
                 <p slot="body">Do you really want to delete this Action?</p>
@@ -52,6 +82,10 @@
             </modal-dialog>
 
         </core-content>
+
+        <test-result-container v-if="testResults != null && !(selectedTaskIndex == -1 && selectedActionIndex == -1)"
+                               v-on:close="testResults = null"
+                               v-bind:selected-test-results="selectedTestResults"/>
 
     </core-container>
 </template>
@@ -67,10 +101,14 @@ import ActionConfigurator from '../components/jobs/action-configurator'
 import ModalDialog from '../components/common/modal-dialog'
 import ButtonRow from '../components/common/button-row'
 import InputButton from '../components/common/input-button'
+import TestResultContainer from '../components/jobs/test-result-container'
+import SideMenu from '../components/common/side-menu'
 
 export default {
   name: 'job-editor',
   components: {
+    SideMenu,
+    TestResultContainer,
     InputButton,
     ButtonRow,
     ModalDialog,
@@ -88,9 +126,6 @@ export default {
       newJob: true,
       feedback: '',
       feedbackOk: true,
-      jobSelected: true,
-      selectedTask: null,
-      selectedAction: null,
       showDeleteTaskDialog: false,
       showDeleteActionDialog: false,
       selectedTaskIndex: -1,
@@ -100,12 +135,13 @@ export default {
       testResults: null,
       selectedTestResults: null,
       jobConfiguration: {
-        name: 'Job',
+        name: 'New Job',
         trigger: '',
         description: '',
         active: true,
         tasks: []
-      }
+      },
+      validationErrors: []
     }
   },
   methods: {
@@ -125,6 +161,8 @@ export default {
         return
       }
 
+      this.testResults = null
+
       this.feedback = 'Saving...'
       this.requestInProgress = true
 
@@ -132,8 +170,10 @@ export default {
 
       if (this.newJob) {
         this.$http.post('/api/job', this.jobConfiguration).then(function () {
+          component.feedback = ''
+          component.feedbackOk = true
+          component.requestInProgress = false
           component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' saved.', false)
-          component.$router.push({name: 'jobs'})
         }).catch(function (error) {
           component.feedback = 'Saving failed! (' + error.response.data.error + ')'
           component.feedbackOk = false
@@ -141,8 +181,10 @@ export default {
         })
       } else {
         this.$http.put('/api/job', this.jobConfiguration).then(function () {
+          component.feedback = ''
+          component.feedbackOk = true
+          component.requestInProgress = false
           component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' updated.', false)
-          component.$router.push({name: 'jobs'})
         }).catch(function (error) {
           component.feedback = 'Saving failed! (' + error.response.data.error + ')'
           component.feedbackOk = false
@@ -167,32 +209,33 @@ export default {
         component.feedback = 'OK'
         component.feedbackOk = true
         component.requestInProgress = false
+        component.updateSelectedTestResult()
       }).catch(function (error) {
         component.feedback = 'Testing failed! (' + error.response.data.error + ')'
         component.feedbackOk = false
         component.requestInProgress = false
       })
     },
+    cancelConfiguration: function () {
+      this.$router.push({name: 'jobs'})
+    },
     selectJob: function () {
-      this.jobSelected = true
-      this.selectedTask = null
-      this.selectedAction = null
       this.selectedTaskIndex = -1
       this.selectedActionIndex = -1
+      this.selectedTestResults = null;
+      this.validateInput()
     },
     selectTask: function (taskIndex) {
-      this.jobSelected = false
-      this.selectedTask = this.jobConfiguration.tasks[taskIndex]
-      this.selectedAction = null
       this.selectedTaskIndex = taskIndex
       this.selectedActionIndex = -1
+      this.updateSelectedTestResult()
+      this.validateInput()
     },
     selectAction: function (taskIndex, actionIndex) {
-      this.jobSelected = false
-      this.selectedTask = null
-      this.selectedAction = this.jobConfiguration.tasks[taskIndex].actions[actionIndex]
       this.selectedTaskIndex = taskIndex
       this.selectedActionIndex = actionIndex
+      this.updateSelectedTestResult()
+      this.validateInput()
     },
     addTask: function () {
       let task = {
@@ -205,19 +248,18 @@ export default {
         actions: []
       }
       this.jobConfiguration.tasks.push(task)
+      this.selectTask(this.jobConfiguration.tasks.length - 1)
     },
     showDeleteTask: function (taskIndex) {
       this.selectedTaskIndex = taskIndex
       this.showDeleteTaskDialog = true
     },
     deleteTask: function () {
+      this.validationErrors = []
       this.$delete(this.jobConfiguration.tasks, this.selectedTaskIndex)
       this.showDeleteTaskDialog = false
-      this.jobSelected = true
       this.selectedTaskIndex = -1
       this.selectedActionIndex = -1
-      this.selectedTask = null
-      this.selectedAction = null
     },
     addAction: function (taskIndex) {
       let action = {
@@ -226,6 +268,7 @@ export default {
         parameters: {}
       }
       this.jobConfiguration.tasks[taskIndex].actions.push(action)
+      this.selectAction(taskIndex, this.jobConfiguration.tasks[taskIndex].actions.length - 1)
     },
     showDeleteAction: function (taskIndex, actionIndex) {
       this.selectedTaskIndex = taskIndex
@@ -233,13 +276,11 @@ export default {
       this.showDeleteActionDialog = true
     },
     deleteAction: function () {
+      this.validationErrors = []
       this.jobConfiguration.tasks[this.selectedTaskIndex].actions.splice(this.selectedActionIndex, 1)
       this.showDeleteActionDialog = false
-      this.jobSelected = true
       this.selectedTaskIndex = -1
       this.selectedActionIndex = -1
-      this.selectedTask = null
-      this.selectedAction = null
     },
     moveTaskUp: function (taskIndex) {
       if (taskIndex === 0) {
@@ -279,47 +320,53 @@ export default {
     validateInput: function () {
       this.feedback = ''
       this.feedbackOk = true
+      this.validationErrors = []
 
-
-
-      let nameValidationResult = true
-      if (this.jobConfiguration.name == null || this.jobConfiguration.name === '') {
-        nameValidationResult = false
+      let jobConfiguratorResult = this.$refs.jobConfigurator.validateInput()
+      if (!jobConfiguratorResult) {
+        this.validationErrors.push('-1_-1')
       }
 
-      let triggerValidationResult = true
-      if (this.jobConfiguration.trigger == null || this.jobConfiguration.trigger === '') {
-        triggerValidationResult = false
+      let taskConfiguratorsResult = true
+      for (let i in this.$refs.taskConfigurators) {
+        let result = this.$refs.taskConfigurators[i].validateInput()
+        if (!result) {
+          this.validationErrors.push(i + '_-1')
+        }
+        taskConfiguratorsResult = (result && taskConfiguratorsResult)
       }
 
-      let result = (nameValidationResult && triggerValidationResult)
-      if (!result) {
-        this.feedback = 'Validation failed!'
+      let actionConfiguratorsResult = true
+      for (let i in this.$refs.actionConfigurators) {
+        let result = this.$refs.actionConfigurators[i].validateInput()
+        if (!result) {
+          this.validationErrors.push(this.$refs.actionConfigurators[i].actionKey)
+        }
+        actionConfiguratorsResult = (result && actionConfiguratorsResult)
+      }
+
+      if (!(jobConfiguratorResult && taskConfiguratorsResult && actionConfiguratorsResult)) {
+        this.feedback = 'Validation failed'
         this.feedbackOk = false
       }
 
-      return result
+      return this.feedbackOk
     },
-    validateTaskInput: function () {
-
-    },
-    validateActionInput: function () {
-
-    },
-    showTaskTestResult: function (index) {
-      if (this.testResults != null && this.testResults.taskResults != null) {
-        if (this.testResults.taskResults[index] != null) {
-          this.selectedTestResults = this.testResults.taskResults[index].providerResults
-        }
-      }
-    },
-    showActionTestResult: function (taskIndex, actionIndex) {
-      if (this.testResults != null && this.testResults.taskResults != null) {
-        let taskResults = this.testResults.taskResults
-        if (taskResults[taskIndex] != null && taskResults[taskIndex].actionResults != null) {
-          let actionResults = taskResults[taskIndex].actionResults
-          if (actionResults[actionIndex] != null) {
-            this.selectedTestResults = this.testResults.taskResults[taskIndex].actionResults[actionIndex].results
+    updateSelectedTestResult: function () {
+      if (this.testResults != null) {
+        let taskIndex = this.selectedTaskIndex
+        let actionIndex = this.selectedActionIndex
+        if (taskIndex != -1 && actionIndex != -1) {
+          let taskResults = this.testResults.taskResults
+          if (taskResults[taskIndex] != null && taskResults[taskIndex].actionResults != null) {
+            let actionResults = taskResults[taskIndex].actionResults
+            if (actionResults[actionIndex] != null) {
+              this.selectedTestResults = this.testResults.taskResults[taskIndex].actionResults[actionIndex].results
+            }
+          }
+        } else if (taskIndex != -1) {
+          if (this.testResults.taskResults[taskIndex] != null) {
+            this.selectedTestResults = this.testResults.taskResults[taskIndex].providerResults
           }
         }
       }
@@ -338,6 +385,12 @@ export default {
         component.feedbackOk = false
       })
     },
+    isTaskSelected: function (index) {
+      return (index == this.selectedTaskIndex && this.selectedActionIndex == -1)
+    },
+    isActionSelected: function (taskIndex, actionIndex) {
+      return taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex
+    }
   },
   mounted () {
     if (this.jobId != null) {

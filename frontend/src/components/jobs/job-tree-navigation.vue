@@ -1,47 +1,24 @@
 <template>
-    <div class="container">
-        <core-panel>
-            <h1>Job Configuration</h1>
-
-            <slot name="feedback"/>
-
-            <div class="job-buttons">
-                <button-row>
-                    <p slot="left">
-                        <input-button icon="plug" v-on:clicked="$emit('test-job')" class="button-margin-right"/>
-                        <input-button icon="save" v-on:clicked="$emit('save-job')"/>
-                    </p>
-                    <p slot="right">
-                        <input-button icon="times" v-on:clicked="$emit('cancel-job')" disabled="true"/>
-                        <input-button icon="play" v-on:clicked="$emit('run-job')" class="button-margin-left"/>
-                    </p>
-                </button-row>
-            </div>
-
-            <div class="treeview">
-                <ul>
-                    <li>
-                        <span class="item" v-bind:class="{ 'selected': jobSelected }"
+    <div class="treeview">
+        <ul>
+            <li>
+                        <span class="item"
+                              v-bind:class="{ 'selected': selectedTaskIndex == -1 && selectedActionIndex == -1, 'validation-error': hasValidationErrors(-1, -1) }"
                               v-on:click="$emit('job-is-selected')">
                             <font-awesome-icon icon="toolbox"/>
                             <span>
-                                {{jobConfiguration.name}}
+                                {{jobConfiguration.name.length > 0 ? formatName(jobConfiguration.name) : 'Unnamed Job'}}
                             </span>
                         </span>
-                        <ul class="tree">
-                            <li v-for="(task, taskIndex) in jobConfiguration.tasks"
-                                v-bind:key="taskIndex">
-                                <span class="item" v-bind:class="{ 'selected': isTaskSelected(taskIndex)}"
+                <ul class="tree">
+                    <li v-for="(task, taskIndex) in jobConfiguration.tasks"
+                        v-bind:key="taskIndex">
+                                <span class="item"
+                                      v-bind:class="{ 'selected': isTaskSelected(taskIndex), 'validation-error': hasValidationErrors(taskIndex, -1)}"
                                       v-on:click="$emit('task-is-selected', taskIndex)">
                                     <font-awesome-icon icon="tasks"/>
-                                    <!--
-                                    <font-awesome-layers>
-                                      <font-awesome-icon :icon="['far', 'circle']" transform="grow-4" />
-                                      <font-awesome-icon icon="tasks" transform="shrink-2" />
-                                    </font-awesome-layers>
-                                    -->
                                     <span>
-                                        {{task.name}}
+                                        {{task.name.length > 0 ? formatName(task.name) : 'Unnamed Task'}}
                                     </span>
                                     <font-awesome-icon icon="arrow-up" class="fa-xs"
                                                        v-if="taskIndex > 0"
@@ -52,15 +29,15 @@
                                     <font-awesome-icon icon="trash-alt" class="button-margin-left fa-xs"
                                                        v-on:click="$emit('delete-task', taskIndex)"/>
                                 </span>
-                                <ul>
-                                    <li v-for="(action, actionIndex) in task.actions"
-                                        v-bind:key="actionIndex">
+                        <ul>
+                            <li v-for="(action, actionIndex) in task.actions"
+                                v-bind:key="actionIndex">
                                         <span class="item"
-                                              v-bind:class="{ 'selected': isActionSelected(taskIndex, actionIndex)}"
+                                              v-bind:class="{ 'selected': isActionSelected(taskIndex, actionIndex), 'validation-error': hasValidationErrors(taskIndex, actionIndex)}"
                                               v-on:click="$emit('action-is-selected', taskIndex, actionIndex)">
-                                        <font-awesome-icon icon="wrench"/>
-                                            <span :class="isActionSelected(taskIndex, actionIndex) ? 'bold item' : 'item'">
-                                                {{action.label}}
+                                            <font-awesome-icon icon="wrench"/>
+                                            <span>
+                                                {{ formatName(action.label)}}
                                             </span>
                                             <font-awesome-icon icon="arrow-up" class="fa-xs"
                                                                v-if="actionIndex > 0"
@@ -71,64 +48,57 @@
                                             <font-awesome-icon icon="trash-alt" class="button-margin-left fa-xs"
                                                                v-on:click="$emit('delete-action', taskIndex, actionIndex)"/>
                                         </span>
-                                    </li>
-                                    <li>
+                            </li>
+                            <li>
                                         <span class="item" v-on:click="$emit('add-action', taskIndex)">
                                             <font-awesome-icon :icon="['fas', 'plus-circle']" class="font-18"/>
                                             <span>
                                                 Add Action
                                             </span>
                                         </span>
-                                    </li>
-                                </ul>
                             </li>
-                            <li>
+                        </ul>
+                    </li>
+                    <li>
                                 <span class="item" v-on:click="$emit('add-task')">
                                     <font-awesome-icon :icon="['fas', 'plus-circle']"/>
                                     <span>
                                         Add Task
                                     </span>
                                 </span>
-                            </li>
-                        </ul>
                     </li>
                 </ul>
-            </div>
-        </core-panel>
+            </li>
+        </ul>
     </div>
 </template>
 
 <script>
-import CorePanel from '../common/core-panel'
-import ButtonRow from '../common/button-row'
-import InputButton from '../common/input-button'
 
 export default {
   name: 'job-tree-navigation',
-  components: {InputButton, ButtonRow, CorePanel},
-  props: ['jobConfiguration', 'jobSelected', 'selectedTaskIndex', 'selectedActionIndex'],
+  props: ['jobConfiguration', 'validationErrors', 'selectedTaskIndex', 'selectedActionIndex'],
   methods: {
     isTaskSelected: function (index) {
       return (index == this.selectedTaskIndex && this.selectedActionIndex == -1)
     },
     isActionSelected: function (taskIndex, actionIndex) {
       return taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex
+    },
+    hasValidationErrors: function (taskIndex, actionIndex) {
+      return (this.validationErrors.indexOf(taskIndex + '_' + actionIndex) > -1)
+    },
+    formatName: function (name) {
+      if (name.length > 30) {
+        return name.substring(0, 30) + '...'
+      }
+      return name
     }
   }
 }
 </script>
 
 <style scoped>
-
-    .container {
-        margin-right: 25px;
-    }
-
-    .job-buttons {
-        padding-bottom: 10px;
-        border-bottom: 1px solid var(--font-color-light);
-        margin-bottom: 15px;
-    }
 
     .treeview {
         color: var(--font-color-light);

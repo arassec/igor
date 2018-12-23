@@ -2,7 +2,7 @@
     <core-panel>
         <h1>
             <font-awesome-icon icon="toolbox"/>
-            {{ jobConfiguration.name.length > 0 ? jobConfiguration.name : 'New Job' }}
+            {{ jobConfiguration.name.length > 0 ? jobConfiguration.name : 'Unnamed Job' }}
         </h1>
 
         <table>
@@ -12,8 +12,8 @@
                     <input type="text" autocomplete="off" v-model="jobConfiguration.name"/>
                 </td>
                 <td>
-                    <validation-error>
-
+                    <validation-error v-if="nameValidationError.length > 0">
+                        {{nameValidationError}}
                     </validation-error>
                 </td>
             </tr>
@@ -25,8 +25,8 @@
                     <input-button v-on:clicked="showCronTrigger = true" icon="clock" class="button-margin-left"/>
                 </td>
                 <td>
-                    <validation-error>
-
+                    <validation-error v-if="triggerValidationError.length > 0">
+                        {{triggerValidationError}}
                     </validation-error>
                 </td>
             </tr>
@@ -65,6 +65,8 @@ export default {
   props: ['jobConfiguration'],
   data: function () {
     return {
+      nameValidationError: '',
+      triggerValidationError: '',
       showCronTrigger: false,
     }
   },
@@ -72,6 +74,26 @@ export default {
     setCronTrigger: function (value) {
       this.jobConfiguration.trigger = value
       this.showCronTrigger = false
+    },
+    validateInput: function () {
+      this.nameValidationError = ''
+      this.triggerValidationError = ''
+
+      let nameValidationResult = true
+      if (this.jobConfiguration.name == null || this.jobConfiguration.name === '') {
+        nameValidationResult = false
+        this.nameValidationError  = 'Value required'
+      }
+
+      let triggerValidationResult = true
+      if (this.jobConfiguration.trigger == null || this.jobConfiguration.trigger === '') {
+        triggerValidationResult = false
+        this.triggerValidationError  = 'Value required'
+      }
+
+      this.$forceUpdate()
+
+      return (nameValidationResult && triggerValidationResult)
     }
   }
 }

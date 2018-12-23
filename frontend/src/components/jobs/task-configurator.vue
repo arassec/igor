@@ -1,11 +1,9 @@
 <template>
     <div>
         <core-panel>
-            <test-result-marker v-if="showTestResultMarker()" v-on:clicked="$emit('show-task-test-results')"/>
-
             <h1>
                 <font-awesome-icon icon="tasks"/>
-                {{ task.name.length > 0 ? task.name : 'New Task' }}
+                {{ task.name.length > 0 ? task.name : 'Unnamed Task' }}
             </h1>
 
             <table>
@@ -15,8 +13,8 @@
                         <input type="text" autocomplete="off" v-model="task.name"/>
                     </td>
                     <td>
-                        <validation-error v-if="true">
-                            TODO
+                        <validation-error v-if="nameValidationError.length > 0">
+                            {{nameValidationError}}
                         </validation-error>
                     </td>
                 </tr>
@@ -50,17 +48,17 @@
 </template>
 
 <script>
-import TestResultMarker from './test-result-marker'
 import ValidationError from '../common/validation-error'
 import ParameterEditor from '../common/parameter-editor'
 import CorePanel from '../common/core-panel'
 
 export default {
   name: 'task-configurator',
-  components: {CorePanel, ParameterEditor, ValidationError, TestResultMarker},
-  props: ['task', 'testResults'],
+  components: {CorePanel, ParameterEditor, ValidationError},
+  props: ['task'],
   data: function () {
     return {
+      nameValidationError: '',
       providerTypes: []
     }
   },
@@ -92,14 +90,23 @@ export default {
         component.feedbackOk = false
       })
     },
-    showTestResultMarker: function () {
-      if (this.testResults != null && this.testResults.taskResults != null) {
-        let taskResults = this.testResults.taskResults
-        if (taskResults[this.taskIndex] != null) {
-          return true
-        }
+    validateInput: function () {
+      this.nameValidationError = ''
+
+      let nameValidationResult = true
+      if (this.task.name == null || this.task.name === '') {
+        this.nameValidationError = 'Name must be set'
+        nameValidationResult = false
       }
-      return false
+
+      let parameterValidationResult = true
+      if (typeof this.$refs.parameterEditor !== 'undefined') {
+        parameterValidationResult = this.$refs.parameterEditor.validateInput()
+      }
+
+      this.$forceUpdate()
+
+      return (nameValidationResult && parameterValidationResult)
     }
   },
   mounted () {

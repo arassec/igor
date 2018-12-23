@@ -1,9 +1,6 @@
 <template>
     <div>
         <core-panel>
-
-            <test-result-marker v-if="showTestResultMarker()" v-on:clicked="$emit('show-action-test-results')"/>
-
             <h1>
                 <font-awesome-icon icon="wrench"/>
                 {{ action.label }}
@@ -13,7 +10,7 @@
                 <tr>
                     <td>Type</td>
                     <td>
-                        <select v-model="action.type" v-on:change="loadTypeParameters()">
+                        <select v-model="action.type" v-on:change="loadTypeParameters(true)">
                             <option v-for="actionType in actionTypes" v-bind:value="actionType.type"
                                     v-bind:key="actionType.type">
                                 {{actionType.label}}
@@ -26,7 +23,7 @@
 
         <core-panel>
             <h2>Action Parameters</h2>
-            <parameter-editor :parameters="action.parameters" ref="parameterEditor"/>
+            <parameter-editor v-bind:parameters="action.parameters" ref="parameterEditor"/>
         </core-panel>
     </div>
 </template>
@@ -38,42 +35,35 @@ import ParameterEditor from '../common/parameter-editor'
 export default {
   name: 'action-configurator',
   components: {ParameterEditor, CorePanel},
-  props: ['action', 'actionTypes'],
-  watch: {
-    action: function() {
-      this.loadTypeParameters()
-    }
-  },
+  props: ['action', 'actionTypes', 'actionKey'],
   methods: {
-    loadTypeParameters: function () {
+    loadTypeParameters: function (forceParameterReload) {
       for (let i = 0; i < this.actionTypes.length; i++) {
         if (this.actionTypes[i].type === this.action.type) {
           this.action.label = this.actionTypes[i].label
         }
       }
-      let component = this
-      this.$http.get('/api/actionparams/' + this.action.type).then(function (response) {
-        component.action.parameters = response.data
-      }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
-      })
-    },
-    showTestResultMarker: function () {
-      if (this.testResults != null && this.testResults.taskResults != null) {
-        let taskResults = this.testResults.taskResults
-        if (taskResults[this.taskIndex] != null && taskResults[this.taskIndex].actionResults != null) {
-          let actionResults = taskResults[this.taskIndex].actionResults
-          if (actionResults[this.actionIndex] != null) {
-            return true
-          }
-        }
+      if (Object.keys(this.action.parameters).length === 0 || forceParameterReload) {
+        let component = this
+        this.$http.get('/api/actionparams/' + this.action.type).then(function (response) {
+          component.action.parameters = response.data
+        }).catch(function (error) {
+          component.feedback = error
+          component.feedbackOk = false
+        })
       }
-      return false
+    },
+    validateInput: function () {
+      let parameterValidationResult = true
+      if (typeof this.$refs.parameterEditor !== 'undefined') {
+        parameterValidationResult = this.$refs.parameterEditor.validateInput()
+      }
+      this.$forceUpdate()
+      return parameterValidationResult
     }
   },
   mounted: function() {
-    this.loadTypeParameters()
+    this.loadTypeParameters(false)
   }
 }
 </script>

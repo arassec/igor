@@ -1,26 +1,27 @@
 <template>
-  <transition name="fade">
-    <div class="test-result-container">
-      <button-row>
-      <h1 slot="left">{{heading}}</h1>
-      <input-button slot="right" icon="times" v-on:clicked="$emit('close')"/>
-      </button-row>
-      <pre>
+    <core-content>
+        <div class="test-result-container">
+            <button-row>
+                <h1 slot="left">{{heading}}</h1>
+                <input-button slot="right" icon="times" v-on:clicked="$emit('close')"/>
+            </button-row>
+            <pre>
       <code>
 {{ format(selectedTestResults) }}
       </code>
     </pre>
-    </div>
-  </transition>
+        </div>
+    </core-content>
 </template>
 
 <script>
 import ButtonRow from '../common/button-row'
 import InputButton from '../common/input-button'
+import CoreContent from '../common/core-content'
 
 export default {
   name: 'test-result-container',
-  components: {InputButton, ButtonRow},
+  components: {CoreContent, InputButton, ButtonRow},
   props: ['heading', 'selectedTestResults'],
   methods: {
     format: function (code) {
@@ -32,20 +33,21 @@ export default {
 
 <style scoped>
 
-  .test-result-container {
-    margin-left: 45px;
-    color: var(--font-color-light);
-    background-color: var(--nav-background-color);
-    padding: 15px;
-  }
+    .content {
+        flex-shrink: 1;
+    }
 
-  .fade-enter-active, .fade-leave-active {
-    transition: max-width .2s linear;
-    max-width: var(--content-width);
-  }
+    .test-result-container {
+        color: var(--font-color-light);
+        background-color: var(--nav-background-color);
+        padding: 15px;
+        -webkit-box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
+        -moz-box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
+        box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
+    }
 
-  .fade-enter, .fade-leave-to {
-    max-width: 0px;
-  }
+    pre {
+        white-space: pre-wrap;
+    }
 
 </style>
