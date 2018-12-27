@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServiceFactory extends ModelFactory<Service> {
 
+    /**
+     * Creates a new {@link ServiceFactory}.
+     */
     public ServiceFactory() {
         super(Service.class, IgorService.class);
     }

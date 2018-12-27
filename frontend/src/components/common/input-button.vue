@@ -1,5 +1,5 @@
 <template>
-  <div :class="disabled ? 'disabled' : 'button'" v-on:click="$emit('clicked')">
+  <div :class="disabled ? 'disabled' : 'button'" v-on:click="fire()">
     <font-awesome-icon :icon="icon" :class="iconstyle"/>
   </div>
 </template>
@@ -8,6 +8,13 @@
 export default {
   name: 'input-button',
   props: ['icon', 'disabled'],
+  methods: {
+    fire: function () {
+      if (!this.disabled) {
+        this.$emit('clicked')
+      }
+    }
+  },
   computed: {
     iconstyle: function () {
       if (this.icon === 'eye' || this.icon === 'clock' || this.icon === 'cogs') {
@@ -49,13 +56,14 @@ export default {
   }
 
   .disabled {
-    border: 1px solid var(--element-background-color);
-    color: var(--element-background-color);
+    border: 1px solid var(--main-background-color);
+    color: var(--font-color-light);
     background-color: Transparent;
     height: 25px;
     width: 25px;
     display: inline-block;
     text-align: center;
+    opacity: 0.5;
   }
 
   .disabled::-moz-focus-inner {

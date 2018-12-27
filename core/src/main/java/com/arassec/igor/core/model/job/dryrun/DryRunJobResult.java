@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.dryrun;
+package com.arassec.igor.core.model.job.dryrun;
 
 import lombok.Data;
 

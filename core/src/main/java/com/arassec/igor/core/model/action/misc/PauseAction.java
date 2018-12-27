@@ -4,19 +4,14 @@ import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.provider.IgorData;
-import com.arassec.igor.core.model.service.persistence.PersistenceService;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * TODO: Document class.
- */
-@IgorAction(label = "Persist value")
-public class PersistValueAction extends BaseAction {
+@IgorAction(label = "Pause")
+@Slf4j
+public class PauseAction extends BaseAction {
 
-    /**
-     * The service to use for persisting values.
-     */
     @IgorParam
-    private PersistenceService service;
+    private long milliseconds;
 
     @Override
     public boolean process(IgorData data) {
@@ -29,13 +24,16 @@ public class PersistValueAction extends BaseAction {
     }
 
     private boolean processInternal(IgorData data, boolean isDryRun) {
-        if (isValid(data)) {
-            if (isDryRun) {
-                data.put("dryRunComment", "Saved: " + data.getJobId() + "/" + data.getTaskName() + "/" + data.get(dataKey));
-            } else {
-                service.save(data.getJobId(), data.getTaskName(), (String) data.get(dataKey));
+        if (isDryRun) {
+            data.put("dryRunComment", "Sleep for " + milliseconds + " milliseconds.");
+        } else {
+            try {
+                Thread.sleep(milliseconds);
+            } catch (InterruptedException e) {
+                log.debug("Interrupted during pause action!");
             }
         }
         return true;
     }
+
 }

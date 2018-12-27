@@ -1,6 +1,8 @@
 package com.arassec.igor.core.application;
 
-import com.arassec.igor.core.model.Job;
+import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.job.JobListener;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.repository.JobRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +15,9 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -21,7 +25,7 @@ import java.util.concurrent.ScheduledFuture;
  */
 @Slf4j
 @Component
-public class JobManager implements InitializingBean, DisposableBean {
+public class JobManager implements InitializingBean, DisposableBean, JobListener {
 
     @Autowired
     private JobRepository jobRepository;
@@ -30,6 +34,8 @@ public class JobManager implements InitializingBean, DisposableBean {
     private TaskScheduler taskScheduler;
 
     private Map<Long, ScheduledFuture> scheduledJobFutures = new HashMap<>();
+
+    private Map<Long, Job> runningJobs = new ConcurrentHashMap<>();
 
     @Override
     public void afterPropertiesSet() {
@@ -45,7 +51,7 @@ public class JobManager implements InitializingBean, DisposableBean {
         if (job.isActive()) {
             schedule(job);
         } else {
-            cancel(job);
+            unschedule(job);
         }
         jobRepository.upsert(job);
     }
@@ -58,8 +64,29 @@ public class JobManager implements InitializingBean, DisposableBean {
         return jobRepository.findAll();
     }
 
+    public void run(Job job) {
+        if (runningJobs.containsKey(job.getId())) {
+            log.debug("Job already running: {} ({})", job.getName(), job.getId());
+            return;
+        }
+        log.info("Manually running job: {} ({})", job.getName(), job.getId());
+        job.setJobListener(this);
+        unschedule(job);
+        // The job will be re-scheduled according to its trigger after its execution with the notify-finished-callback mechanism.
+        taskScheduler.schedule(new Thread(() -> job.run()), Instant.now());
+    }
+
+    public void cancel(Long id) {
+        if (runningJobs.containsKey(id)) {
+            Job job = runningJobs.get(id);
+            log.info("Manually cancelling job: {} ({})", job.getName(), job.getId());
+            job.getJobExecution().cancel();
+        }
+    }
+
     public void schedule(Job job) {
-        cancel(job);
+        job.setJobListener(this);
+        unschedule(job);
         if (!job.isActive()) {
             log.debug("Job '{}' is not active and will not be scheduled...", job.getName());
             return;
@@ -78,13 +105,13 @@ public class JobManager implements InitializingBean, DisposableBean {
     public void delete(Long id) {
         Job job = jobRepository.findById(id);
         if (job != null) {
-            cancel(job);
+            unschedule(job);
             jobRepository.deleteById(id);
             scheduledJobFutures.remove(id);
         }
     }
 
-    public void cancel(Job job) {
+    public void unschedule(Job job) {
         if (scheduledJobFutures.containsKey(job.getId())) {
             if (!scheduledJobFutures.get(job.getId()).cancel(true)) {
                 throw new ServiceException("Job " + job.getId() + " could not be cancelled!");
@@ -93,4 +120,47 @@ public class JobManager implements InitializingBean, DisposableBean {
             log.info("Canceled job: {} ({})", job.getName(), job.getId());
         }
     }
+
+    public JobExecution getJobExecution(Long id) {
+        if (runningJobs.containsKey(id)) {
+            return runningJobs.get(id).getJobExecution();
+        }
+        return null;
+    }
+
+    /**
+     * Saves the reference to the running job for state querying.
+     */
+    @Override
+    public void notifyStarted(Job job) {
+        if (job == null) {
+            return;
+        }
+
+        if (runningJobs.containsKey(job.getId())) {
+            log.warn("Parallel job execution detected: {} ({}).", job.getName(), job.getId());
+            return;
+        }
+
+        runningJobs.put(job.getId(), job);
+    }
+
+    /**
+     * Re-Schedules the finished job if necessary (e.g. because it was started manually).
+     */
+    @Override
+    public void notifyFinished(Job job) {
+        if (job == null) {
+            return;
+        }
+
+        if (!scheduledJobFutures.containsKey(job.getId()) && job.isActive()) {
+            schedule(job);
+        }
+
+        if (runningJobs.containsKey(job.getId())) {
+            runningJobs.remove(job.getId());
+        }
+    }
+
 }

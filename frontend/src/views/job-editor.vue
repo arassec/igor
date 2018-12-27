@@ -7,14 +7,13 @@
                 <p slot="left">
                     <input-button icon="arrow-left" v-on:clicked="cancelConfiguration"
                                   class="button-margin-right"/>
-                    <input-button icon="plug" v-on:clicked="testConfiguration" class="button-margin-right"/>
-                    <input-button icon="save" v-on:clicked="saveConfiguration"/>
+                    <input-button icon="plug" v-on:clicked="testConfiguration" class="button-margin-right"
+                                  :disabled="jobRunning"/>
+                    <input-button icon="save" v-on:clicked="saveConfiguration" :disabled="jobRunning"/>
                 </p>
                 <p slot="right">
-                    <input-button icon="times" v-on:clicked="$emit('cancel-job')" disabled="true"/>
-                    <input-button icon="sync" v-on:clicked="$emit('sync-job')" class="button-margin-left"
-                                  disabled="true"/>
-                    <input-button icon="play" v-on:clicked="$emit('run-job')" class="button-margin-left"/>
+                    <input-button icon="times" v-on:clicked="cancelJob" :disabled="!jobRunning"/>
+                    <input-button icon="play" v-on:clicked="runJob" class="button-margin-left" :disabled="jobRunning"/>
                 </p>
             </button-row>
             <job-tree-navigation slot="content"
@@ -34,8 +33,12 @@
                                  v-on:move-action-up="moveActionUp"
                                  v-on:move-action-down="moveActionDown">
             </job-tree-navigation>
-            <feedback-panel slot="feedback" :feedback="feedback" :alert="!feedbackOk"
-                            :requestInProgress="requestInProgress"/>
+            <p slot="feedback">
+                <feedback-panel :feedback="feedback" :alert="!feedbackOk"
+                                :requestInProgress="requestInProgress"/>
+                <feedback-panel v-if="jobRunning" :feedback="'Job is currently running!'" :alert="false"
+                                :request-in-progress="true"/>
+            </p>
         </side-menu>
 
         <core-content>
@@ -141,7 +144,17 @@ export default {
         active: true,
         tasks: []
       },
-      validationErrors: []
+      validationErrors: [],
+      jobExecution: null,
+      jobExecutionRefreshTimer: null
+    }
+  },
+  computed: {
+    jobRunning: function () {
+      if (this.jobExecution != null && this.jobExecution != '') {
+        return ('RUNNING' === this.jobExecution.executionState)
+      }
+      return false
     }
   },
   methods: {
@@ -151,6 +164,7 @@ export default {
       let component = this
       this.$http.get('/api/job/' + id).then(function (response) {
         component.jobConfiguration = response.data
+        component.updateJobExecution()
       }).catch(function (error) {
         component.feedback = error
         component.feedbackOk = false
@@ -222,7 +236,7 @@ export default {
     selectJob: function () {
       this.selectedTaskIndex = -1
       this.selectedActionIndex = -1
-      this.selectedTestResults = null;
+      this.selectedTestResults = null
       this.validateInput()
     },
     selectTask: function (taskIndex) {
@@ -390,16 +404,54 @@ export default {
     },
     isActionSelected: function (taskIndex, actionIndex) {
       return taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex
+    },
+    runJob: function () {
+      if (!this.validateInput()) {
+        return
+      }
+
+      let component = this
+
+      this.$http.post('/api/job/run', this.jobConfiguration).then(function () {
+        component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' started manually.', false)
+        component.updateJobExecution()
+      }).catch(function (error) {
+        component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' startup failed ('
+          + error + ').', true)
+      })
+    },
+    updateJobExecution: function () {
+      let component = this
+      this.$http.get('/api/job/' + this.jobConfiguration.id + '/execution', this.jobConfiguration).then(function (response) {
+        component.jobExecution = response.data
+      }).catch(function (error) {
+        component.feedback = 'Background sync failed! (' + error.response.data.error + ')'
+        component.feedbackOk = false
+        component.requestInProgress = false
+      })
+    },
+    cancelJob: function () {
+      let component = this
+      this.$http.post('/api/job/' + this.jobConfiguration.id + '/cancel', this.jobConfiguration).then(function () {
+        component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' cancelled.', false)
+        component.updateJobExecution()
+      }).catch(function (error) {
+        component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' cancellation failed ('
+          + error + ').', true)
+      })
     }
   },
   mounted () {
     if (this.jobId != null) {
       this.newJob = false
       this.loadJob(this.jobId)
+      this.jobExecutionRefreshTimer = setInterval(() => this.updateJobExecution(), 1000);
     }
     this.loadActionTypes()
+  },
+  destroyed () {
+    clearInterval(this.jobExecutionRefreshTimer)
   }
-
 }
 </script>
 

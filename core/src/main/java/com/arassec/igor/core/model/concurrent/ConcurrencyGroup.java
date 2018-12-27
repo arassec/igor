@@ -1,8 +1,11 @@
 package com.arassec.igor.core.model.concurrent;
 
 import com.arassec.igor.core.model.action.BaseAction;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.service.ServiceException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,11 +17,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Controls a concurrency group, i.e. a list of actions that should all be performed by threads in the same thread pool.
  */
-public class ConcurrencyGroup {
+@Slf4j
+public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
 
     private static final String THREAD_NAME_PATTERN = "%s-%d";
-
-    private static final Logger LOG = LoggerFactory.getLogger(ConcurrencyGroup.class);
 
     private BlockingQueue<IgorData> outputQueue = new LinkedBlockingDeque<>();
 
@@ -30,7 +32,9 @@ public class ConcurrencyGroup {
 
     List<ActionsExecutingRunnable> runnables = new LinkedList<>();
 
-    public ConcurrencyGroup(List<Action> actions, BlockingQueue<IgorData> inputQueue, String concurrencyGroupId) {
+    private JobExecution jobExecution;
+
+    public ConcurrencyGroup(List<Action> actions, BlockingQueue<IgorData> inputQueue, String concurrencyGroupId, JobExecution jobExecution) {
         this.inputQueue = inputQueue;
         this.concurrencyGroupId = concurrencyGroupId;
 
@@ -39,12 +43,16 @@ public class ConcurrencyGroup {
             numThreads = 1;
         }
 
+        this.jobExecution = jobExecution;
+
         executorService = Executors.newFixedThreadPool(numThreads, new ThreadFactory() {
             private final AtomicInteger counter = new AtomicInteger();
 
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, String.format(THREAD_NAME_PATTERN, concurrencyGroupId, counter.incrementAndGet()));
+                Thread t = new Thread(r, String.format(THREAD_NAME_PATTERN, concurrencyGroupId, counter.incrementAndGet()));
+                t.setUncaughtExceptionHandler(ConcurrencyGroup.this);
+                return t;
             }
         });
 
@@ -57,7 +65,11 @@ public class ConcurrencyGroup {
 
     public void shutdown() {
         while (!inputQueue.isEmpty()) {
-            LOG.trace("Waiting for threads to finish their work...");
+            if (jobExecution.cancelled()) {
+                log.debug("Job cancelled. Shutting down concurrency-group '{}' immediately!", concurrencyGroupId);
+                break;
+            }
+            log.trace("Waiting for threads to finish their work...");
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
@@ -68,7 +80,29 @@ public class ConcurrencyGroup {
         executorService.shutdown();
     }
 
+    public boolean awaitTermination() {
+        try {
+            if (jobExecution.cancelled()) {
+                executorService.shutdownNow();
+                return true;
+            }
+            return executorService.awaitTermination(100, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            log.error("Concurrency-Group interrupted during awaitTermination()!", e);
+            executorService.shutdownNow();
+            return true;
+        }
+    }
+
     public BlockingQueue<IgorData> getOutputQueue() {
         return outputQueue;
+    }
+
+    @Override
+    public void uncaughtException(Thread t, Throwable e) {
+        if (!jobExecution.cancelled()) {
+            jobExecution.fail(e);
+            log.error("Exception caught in ConcurrencyGroup!", e);
+        }
     }
 }

@@ -1,11 +1,9 @@
 package com.arassec.igor.core.model.action;
 
-import com.arassec.igor.core.model.dryrun.DryRunActionResult;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.IgorParam;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 

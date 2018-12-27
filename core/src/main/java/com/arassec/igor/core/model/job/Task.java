@@ -1,18 +1,19 @@
-package com.arassec.igor.core.model;
+package com.arassec.igor.core.model.job;
 
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.concurrent.ConcurrencyGroup;
-import com.arassec.igor.core.model.dryrun.DryRunActionResult;
-import com.arassec.igor.core.model.dryrun.DryRunJobResult;
-import com.arassec.igor.core.model.dryrun.DryRunTaskResult;
+import com.arassec.igor.core.model.job.dryrun.DryRunActionResult;
+import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
+import com.arassec.igor.core.model.job.dryrun.DryRunTaskResult;
+import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.provider.Provider;
 import com.rits.cloning.Cloner;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
  * A task is an encapsulated unit of work in a job. It is responsible for processing actions, either in the main thread of the
  * task or as multiple threads in their own thread pool.
  */
+@Slf4j
 public class Task {
 
     /**
@@ -53,7 +55,9 @@ public class Task {
     /**
      * Runs the task.
      */
-    public void run(String jobName) {
+    public void run(String jobName, JobExecution jobExecution) {
+
+        jobExecution.setCurrentTask(name);
 
         // Scan all actions to create lists of actions that belong to the same concurrency group (i.e. use the same number of
         // threads):
@@ -79,7 +83,7 @@ public class Task {
 
         for (List<Action> concurrencyList : concurrencyLists) {
             String concurrencyGroupId = String.format(CONCURRENCY_GROUP_ID_PATTERN, jobName, getName(), concurrencyLists.indexOf(concurrencyList));
-            ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueue, concurrencyGroupId);
+            ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueue, concurrencyGroupId, jobExecution);
             inputQueue = concurrencyGroup.getOutputQueue();
             concurrencyGroups.add(concurrencyGroup);
         }
@@ -88,7 +92,7 @@ public class Task {
 
         // Read the data from the provider and start working:
         provider.initialize(jobName, name);
-        while (provider.hasNext()) {
+        while (provider.hasNext() && !jobExecution.cancelled()) {
             IgorData data = provider.next();
             boolean added = false;
             while (!added) {
@@ -103,13 +107,16 @@ public class Task {
             }
         }
 
-        for (ConcurrencyGroup concurrencyGroup : concurrencyGroups) {
-            concurrencyGroup.shutdown();
+        concurrencyGroups.stream().forEach(ConcurrencyGroup::shutdown);
+
+        boolean allThreadsTerminated = false;
+        while (!allThreadsTerminated) {
+            for (ConcurrencyGroup concurrencyGroup : concurrencyGroups) {
+                allThreadsTerminated = concurrencyGroup.awaitTermination();
+            }
         }
 
-        for (Action action : actions) {
-            action.complete(jobName, name);
-        }
+        actions.stream().forEach(action -> action.complete(jobName, name));
     }
 
     /**
@@ -141,6 +148,7 @@ public class Task {
 
         result.getTaskResults().add(taskResult);
     }
+
 
     public String getName() {
         return name;

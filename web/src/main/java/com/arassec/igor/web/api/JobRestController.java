@@ -1,8 +1,9 @@
 package com.arassec.igor.web.api;
 
 import com.arassec.igor.core.application.JobManager;
-import com.arassec.igor.core.model.Job;
-import com.arassec.igor.core.model.dryrun.DryRunJobResult;
+import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.web.api.model.JobModel;
 import com.arassec.igor.web.api.model.converter.JobConverter;
 import com.github.openjson.JSONObject;
@@ -14,7 +15,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -71,6 +71,32 @@ public class JobRestController extends BaseRestController {
     @DeleteMapping("/job/{id}")
     public void deleteJob(@PathVariable("id") Long id) {
         jobManager.delete(id);
+    }
+
+    @PostMapping("/job/run")
+    public ResponseEntity<String> runJob(@RequestBody String jobProperties) {
+        JSONObject properties = new JSONObject(jobProperties);
+        Job job = jobConverter.convert(properties);
+        jobManager.run(job);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/job/{id}/execution")
+    public ResponseEntity<JobExecution> getExecution(@PathVariable("id") Long id) {
+        JobExecution jobExecution = jobManager.getJobExecution(id);
+        if (jobExecution != null) {
+            return new ResponseEntity<>(jobExecution, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/job/{id}/cancel")
+    public ResponseEntity<String> cancelJob(@PathVariable("id") Long id) {
+        if (id != null) {
+            jobManager.cancel(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 }

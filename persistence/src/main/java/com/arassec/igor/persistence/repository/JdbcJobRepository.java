@@ -1,6 +1,6 @@
 package com.arassec.igor.persistence.repository;
 
-import com.arassec.igor.core.model.Job;
+import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.persistence.converter.JobConverter;
 import com.arassec.igor.persistence.dao.JobDao;

@@ -1,6 +1,6 @@
 package com.arassec.igor.core.repository;
 
-import com.arassec.igor.core.model.Job;
+import com.arassec.igor.core.model.job.Job;
 
 import java.util.List;
 

@@ -17,6 +17,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ActionFactory extends ModelFactory<Action> {
 
+    /**
+     * Creates a new {@link ActionFactory}.
+     */
     public ActionFactory() {
         super(Action.class, IgorAction.class);
     }

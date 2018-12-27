@@ -17,6 +17,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProviderFactory extends ModelFactory<Provider> {
 
+    /**
+     * Creates a new {@link ProviderFactory}.
+     */
     public ProviderFactory() {
         super(Provider.class, IgorProvider.class);
     }

@@ -2,10 +2,8 @@ package com.arassec.igor.persistence.converter;
 
 import com.arassec.igor.core.application.factory.ActionFactory;
 import com.arassec.igor.core.application.factory.ProviderFactory;
-import com.arassec.igor.core.model.IgorAction;
-import com.arassec.igor.core.model.IgorProvider;
-import com.arassec.igor.core.model.Job;
-import com.arassec.igor.core.model.Task;
+import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.service.Service;

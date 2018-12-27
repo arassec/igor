@@ -1,6 +1,5 @@
 package com.arassec.igor.core.model.action;
 
-import com.arassec.igor.core.model.dryrun.DryRunActionResult;
 import com.arassec.igor.core.model.provider.IgorData;
 
 import java.util.Set;
