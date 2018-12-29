@@ -5,8 +5,6 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.LinkedList;
@@ -18,11 +16,6 @@ import java.util.List;
 @Data
 @Slf4j
 public class Job {
-
-    /**
-     * Logger.
-     */
-    private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
     /**
      * The job's ID.
@@ -68,19 +61,19 @@ public class Job {
      * Runs the job.
      */
     public void run() {
-        LOG.debug("Running job: {} ({})", name, id);
+        log.debug("Running job: {} ({})", name, id);
         jobListener.notifyStarted(this);
         jobExecution = new JobExecution();
         jobExecution.setStarted(Instant.now());
         jobExecution.setExecutionState(JobExecutionState.RUNNING);
         try {
             for (Task task : tasks) {
-                if (jobExecution.cancelled()) {
+                if (!jobExecution.isRunning()) {
                     break;
                 }
                 task.run(name, jobExecution);
             }
-            if (JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {
+            if (jobExecution.isRunning()) {
                 jobExecution.setExecutionState(JobExecutionState.FINISHED);
             }
         } catch (Exception e) {
@@ -89,7 +82,7 @@ public class Job {
         } finally {
             jobExecution.setFinished(Instant.now());
             jobListener.notifyFinished(this);
-            LOG.debug("Finished job: {} ({}): {}", name, id, jobExecution);
+            log.debug("Finished job: {} ({}): {}", name, id, jobExecution);
         }
     }
 
@@ -99,15 +92,15 @@ public class Job {
      * @return The result data created during job execution.
      */
     public DryRunJobResult dryRun() {
-        LOG.debug("Dry-running job: {}", name);
+        log.debug("Dry-isRunning job: {}", name);
         DryRunJobResult result = new DryRunJobResult();
         tasks.stream().forEach(task -> task.dryRun(result, name));
-        LOG.debug("Finished dry-run of job: {}", name);
+        log.debug("Finished dry-run of job: {}", name);
         return result;
     }
 
     /**
-     * Cancels the job if it is currently running.
+     * Cancels the job if it is currently isRunning.
      */
     public void cancel() {
         if (jobExecution != null && JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {

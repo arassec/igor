@@ -6,10 +6,10 @@ import com.arassec.igor.core.model.job.dryrun.DryRunActionResult;
 import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.job.dryrun.DryRunTaskResult;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.provider.Provider;
 import com.rits.cloning.Cloner;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedList;
@@ -22,14 +22,13 @@ import java.util.stream.Collectors;
  * A task is an encapsulated unit of work in a job. It is responsible for processing actions, either in the main thread of the
  * task or as multiple threads in their own thread pool.
  */
+@Data
 @Slf4j
 public class Task {
 
     /**
-     * Defines
+     * The name pattern for concurrency-group IDs.
      */
-    private static final int NUM_THREADS_INITIAL = -2;
-
     private static final String CONCURRENCY_GROUP_ID_PATTERN = "%s_%s_%d";
 
     /**
@@ -53,17 +52,24 @@ public class Task {
     private List<Action> actions = new LinkedList<>();
 
     /**
-     * Runs the task.
+     * Runs the task by first creating concurrency-groups for actions that should run with the same amount of threads
+     * and then requesting the provider for data to process.
+     * <p>
+     * The retrieved data is than processed by the configured actions in ther concurrency-groups.
+     *
+     * @param jobName      The name of the job.
+     * @param jobExecution The {@link JobExecution} that contains the state of the current job run.
      */
     public void run(String jobName, JobExecution jobExecution) {
 
         jobExecution.setCurrentTask(name);
 
-        // Scan all actions to create lists of actions that belong to the same concurrency group (i.e. use the same number of
-        // threads):
+        // Scan all actions to create lists of actions that belong to the same concurrency group (i.e. use the same
+        // number of threads):
         List<List<Action>> concurrencyLists = new LinkedList<>();
 
-        int lastNumThreads = NUM_THREADS_INITIAL;
+        // Initialized with -1 so that at least one concurrency-group is created.
+        int lastNumThreads = -1;
 
         for (Action action : actions) {
             if (action.getNumThreads() != lastNumThreads) {
@@ -92,7 +98,7 @@ public class Task {
 
         // Read the data from the provider and start working:
         provider.initialize(jobName, name);
-        while (provider.hasNext() && !jobExecution.cancelled()) {
+        while (provider.hasNext() && jobExecution.isRunning()) {
             IgorData data = provider.next();
             boolean added = false;
             while (!added) {
@@ -149,32 +155,4 @@ public class Task {
         result.getTaskResults().add(taskResult);
     }
 
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Provider getProvider() {
-        return provider;
-    }
-
-    public void setProvider(Provider provider) {
-        this.provider = provider;
-    }
-
-    public List<Action> getActions() {
-        return actions;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

@@ -5,9 +5,7 @@ import com.arassec.igor.core.model.provider.IgorData;
 import java.util.Set;
 
 /**
- * Defines an action, used by jobs.
- * <p>
- * Created by sensen on 3/26/17.
+ * Defines an action, used by jobs. Actions take a single piece of data and process it.
  */
 public interface Action {
 
@@ -24,7 +22,12 @@ public interface Action {
      */
     boolean process(IgorData data);
 
-
+    /**
+     * Performs a dry-run of the action for testing. I.e. no data should be modified irreversibly by this method.
+     *
+     * @param data The data the action will work with.
+     * @return {@code true}, if the data should further be processed, {@code false} otherwise.
+     */
     boolean dryRun(IgorData data);
 
     /**

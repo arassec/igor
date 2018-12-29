@@ -7,8 +7,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Starts the igor application.
- * <p>
- * Created by sensen on 3/26/17.
  */
 @SpringBootApplication
 @EnableScheduling

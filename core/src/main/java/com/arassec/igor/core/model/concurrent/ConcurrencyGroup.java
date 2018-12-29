@@ -4,10 +4,7 @@ import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.action.Action;
-import com.arassec.igor.core.model.service.ServiceException;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,31 +12,63 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Controls a concurrency group, i.e. a list of actions that should all be performed by threads in the same thread pool.
+ * Controls a concurrency group, i.e. a list of {@link Action}s that should all be performed with the same number of
+ * threads.
  */
 @Slf4j
 public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
 
+    /**
+     * Defines the name of the threads in the pool of this concurrency-group.
+     */
     private static final String THREAD_NAME_PATTERN = "%s-%d";
 
-    private BlockingQueue<IgorData> outputQueue = new LinkedBlockingDeque<>();
-
-    private ExecutorService executorService;
-
-    private String concurrencyGroupId;
-
+    /**
+     * Contains the incoming data for this concurrency-group. This is the output-queue of the previous concurrency-group.
+     */
     private BlockingQueue<IgorData> inputQueue;
 
-    List<ActionsExecutingRunnable> runnables = new LinkedList<>();
+    /**
+     * Contains the output of this concurrency-group, which models the input for the following concurrency-group.
+     */
+    private BlockingQueue<IgorData> outputQueue = new LinkedBlockingDeque<>();
 
+    /**
+     * The {@link ExecutorService} managing the threads.
+     */
+    private ExecutorService executorService;
+
+    /**
+     * The ID of this concurrency-group. Only used for logging purposes to identify this concureency-group.
+     */
+    private String concurrencyGroupId;
+
+    /**
+     * The runnables that invoke the actions.
+     */
+    private List<ActionsExecutingRunnable> runnables = new LinkedList<>();
+
+    /**
+     * The {@link JobExecution} contains information about the state of the current job run. Required here because an
+     * exception in a thread should stop the whole job, which runs in another thread.
+     */
     private JobExecution jobExecution;
 
+    /**
+     * Creates a new concurrency-group.
+     *
+     * @param actions            The list of {@link Action}s that are contained in this group.
+     * @param inputQueue         The input for this concurrency-group. Data is read from this queue and handed over to
+     *                           the actions. The output of the last action is put into the output queue.
+     * @param concurrencyGroupId The ID of this concurrency-group.
+     * @param jobExecution       The {@link JobExecution} containing the current state of the job run.
+     */
     public ConcurrencyGroup(List<Action> actions, BlockingQueue<IgorData> inputQueue, String concurrencyGroupId, JobExecution jobExecution) {
         this.inputQueue = inputQueue;
         this.concurrencyGroupId = concurrencyGroupId;
 
         int numThreads = actions.get(0).getNumThreads();
-        if (numThreads == BaseAction.NUM_THREADS_UNDEFINED) {
+        if (numThreads == BaseAction.DEFAULT_THREADS) {
             numThreads = 1;
         }
 
@@ -63,9 +92,16 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         }
     }
 
+    /**
+     * Shuts the thread pool down after all incoming data has been processed. Threads might still run after calling this
+     * method if e.g. a large file is copied in an action.
+     * <p>
+     * In case the job is cancelled, this method will not wait for all data to be processed, but shut the thread pool
+     * down immediately.
+     */
     public void shutdown() {
         while (!inputQueue.isEmpty()) {
-            if (jobExecution.cancelled()) {
+            if (!jobExecution.isRunning()) {
                 log.debug("Job cancelled. Shutting down concurrency-group '{}' immediately!", concurrencyGroupId);
                 break;
             }
@@ -80,9 +116,16 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         executorService.shutdown();
     }
 
+    /**
+     * Awaits the termination of the last threads in the thread pool.
+     * <p>
+     * If the job is cancelled, or in case of interruptions, all isRunning threads will be stopped immediately.
+     *
+     * @return
+     */
     public boolean awaitTermination() {
         try {
-            if (jobExecution.cancelled()) {
+            if (!jobExecution.isRunning()) {
                 executorService.shutdownNow();
                 return true;
             }
@@ -94,15 +137,28 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         }
     }
 
+    /**
+     * Returns the output queue for the following concurrency-group.
+     *
+     * @return The {@link BlockingQueue} with the output of this group's actions.
+     */
     public BlockingQueue<IgorData> getOutputQueue() {
         return outputQueue;
     }
 
+    /**
+     * Catches exceptions thrown by threads of this concurrency-group.
+     * <p>
+     * If the job is already cancelled, this method does nothing.
+     *
+     * @param thread    The thread that threw the exception.
+     * @param throwable The throwbale thrown by the thread.
+     */
     @Override
-    public void uncaughtException(Thread t, Throwable e) {
-        if (!jobExecution.cancelled()) {
-            jobExecution.fail(e);
-            log.error("Exception caught in ConcurrencyGroup!", e);
+    public void uncaughtException(Thread thread, Throwable throwable) {
+        if (jobExecution.isRunning()) {
+            jobExecution.fail(throwable);
+            log.error("Exception caught in ConcurrencyGroup!", throwable);
         }
     }
 }

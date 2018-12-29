@@ -7,11 +7,16 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
- * Created by Andreas Sensen on 06.05.2017.
+ * Configuration-Bean of the igor application.
  */
 @Configuration
 public class IgorApplicationConfiguration {
 
+    /**
+     * Creates a new {@link TaskScheduler} for igor's jobs.
+     *
+     * @return A newly created {@link TaskScheduler}.
+     */
     @Bean
     public TaskScheduler jobScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();

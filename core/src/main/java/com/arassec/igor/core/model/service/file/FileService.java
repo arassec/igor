@@ -8,8 +8,6 @@ import java.util.List;
 
 /**
  * Base interface for all file based services.
- * <p>
- * Created by sensen on 3/29/17.
  */
 @IgorServiceCategory(label = "File")
 public interface FileService extends Service {

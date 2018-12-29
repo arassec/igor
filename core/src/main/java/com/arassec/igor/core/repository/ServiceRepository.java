@@ -5,9 +5,7 @@ import com.arassec.igor.core.model.service.Service;
 import java.util.List;
 
 /**
- * Repository for Services.
- * <p>
- * Created by Andreas Sensen on 23.04.2017.
+ * Repository for {@link Service}s.
  */
 public interface ServiceRepository {
 
@@ -18,10 +16,26 @@ public interface ServiceRepository {
      */
     void upsert(Service service);
 
-    void deleteById(Long id);
+    /**
+     * Returns all services.
+     *
+     * @return The list of all available services.
+     */
+    List<Service> findAll();
 
+    /**
+     * Finds a service by its ID.
+     *
+     * @param id The service's ID.
+     * @return The {@link Service}.
+     */
     Service findById(Long id);
 
-    List<Service> findAll();
+    /**
+     * Deletes a service by its ID.
+     *
+     * @param id The ID of the service to delete.
+     */
+    void deleteById(Long id);
 
 }

@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Provides files from a specified directory.
+ * Provides file names from a specified directory.
  */
 @IgorProvider(label = "List Files")
 public class ListFilesProvider extends BaseProvider {

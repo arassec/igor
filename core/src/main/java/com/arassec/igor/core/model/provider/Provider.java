@@ -2,8 +2,6 @@ package com.arassec.igor.core.model.provider;
 
 /**
  * Provides data for a job to process.
- * <p>
- * Created by Andreas Sensen on 21.05.2017.
  */
 public interface Provider {
 

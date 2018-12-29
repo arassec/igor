@@ -60,7 +60,7 @@ public abstract class ModelFactory<T> implements InitializingBean {
         ClassPathScanningCandidateComponentProvider scanner =
                 new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(annotationClass));
-        // TODO: Get this from "Igorfile"...
+        // TODO: Get this from e.g. "Igorfile" or something else... Anything that doesn't scan the whole classpath.
         for (BeanDefinition beanDefinition : scanner.findCandidateComponents("com.arassec.igor")) {
             try {
                 Class<?> c = Class.forName(beanDefinition.getBeanClassName());

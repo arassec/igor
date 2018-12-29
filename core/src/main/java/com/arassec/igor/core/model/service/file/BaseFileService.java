@@ -9,8 +9,6 @@ import java.io.OutputStream;
 
 /**
  * Base for file services.
- * <p>
- * Created by Andreas Sensen on 17.04.2017.
  */
 public abstract class BaseFileService extends BaseService implements FileService {
 

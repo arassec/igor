@@ -9,7 +9,7 @@ import com.arassec.igor.core.model.service.persistence.PersistenceService;
 import java.util.List;
 
 /**
- * Action that filters data of which a value has already been persisted.
+ * Filters data of which a value has already been persisted before.
  */
 @IgorAction(label = "Filter persisted value")
 public class FilterPersistedValueAction extends BaseAction {

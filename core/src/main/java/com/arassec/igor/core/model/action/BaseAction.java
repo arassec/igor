@@ -9,15 +9,13 @@ import java.util.Set;
 
 /**
  * Base action that implements common functionality of an action. Specific actions should be derived from this class.
- * <p>
- * Created by Andreas Sensen on 01.04.2017.
  */
 public abstract class BaseAction implements Action {
 
     /**
-     * Contains the number which denotes that the number of threads this action should execute with is undefined.
+     * Contains the default number of threads this action should be executed with.
      */
-    public static final int NUM_THREADS_UNDEFINED = -1;
+    public static final int DEFAULT_THREADS = 1;
 
     /**
      * Key into the {@link IgorData} that identifies the property to process.
@@ -29,7 +27,7 @@ public abstract class BaseAction implements Action {
      * Defines the number of threads the action should be processed with.
      */
     @IgorParam
-    protected int numThreads = NUM_THREADS_UNDEFINED;
+    protected int numThreads = DEFAULT_THREADS;
 
     /**
      * Contains the provided data keys.

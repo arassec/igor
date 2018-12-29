@@ -3,7 +3,7 @@ package com.arassec.igor.core.model.service;
 /**
  * Defines a source of data that can be manipulated using actions, or a destination for data to store it in.
  * <p>
- * Created by sensen on 3/29/17.
+ * Service's are grouped in {@link com.arassec.igor.core.model.IgorServiceCategory}s in the UI.
  */
 public interface Service {
 

@@ -1,9 +1,7 @@
 package com.arassec.igor.core.model.service;
 
 /**
- * Base for services that contains persistence functionality.
- * <p>
- * Created by sensen on 3/29/17.
+ * Base class for services that provides a common set of functionality.
  */
 public abstract class BaseService implements Service {
 

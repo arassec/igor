@@ -12,6 +12,9 @@ import com.arassec.igor.core.model.service.file.FileService;
 @IgorAction(label = "Read file")
 public class ReadFileAction extends BaseAction {
 
+    /**
+     * The key in the data object where the content of the file should be placed.
+     */
     private static final String KEY_FILE_CONTENTS = "fileContents";
 
     /**

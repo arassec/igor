@@ -5,9 +5,7 @@ import com.arassec.igor.core.model.job.Job;
 import java.util.List;
 
 /**
- * Repository for jobs.
- * <p>
- * Created by Andreas Sensen on 15.04.2017.
+ * Repository for {@link Job}s.
  */
 public interface JobRepository {
 
@@ -33,6 +31,11 @@ public interface JobRepository {
      */
     Job findById(Long id);
 
+    /**
+     * Deletes a job by its ID.
+     *
+     * @param id The ID of the job to delete.
+     */
     void deleteById(Long id);
 
 }
