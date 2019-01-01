@@ -5,9 +5,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Defines access to the services in the database.
+ * Defines access to {@link com.arassec.igor.core.model.service.Service}s in the database.
  */
 @Repository
 public interface ServiceDao extends CrudRepository<ServiceEntity, Long> {
-
 }

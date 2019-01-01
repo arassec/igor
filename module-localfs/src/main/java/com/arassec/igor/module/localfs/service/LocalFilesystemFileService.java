@@ -15,7 +15,7 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 /**
- * Service to access files in the local file system.
+ * {@link com.arassec.igor.core.model.service.file.FileService} to access files in the local file system.
  */
 @IgorService(label = "Filesystem")
 public class LocalFilesystemFileService extends BaseFileService {
@@ -125,6 +125,12 @@ public class LocalFilesystemFileService extends BaseFileService {
         // Nothing to test here...
     }
 
+    /**
+     * Opens the supplied file for writing.
+     *
+     * @param file The file to open.
+     * @return A {@link BufferedWriter} to the file.
+     */
     public BufferedWriter openFileForWriting(String file) {
         try {
             return Files.newBufferedWriter(Paths.get(file), CREATE, TRUNCATE_EXISTING);

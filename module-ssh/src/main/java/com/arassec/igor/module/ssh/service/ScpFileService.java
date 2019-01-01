@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service for SCP file handling.
+ * {@link com.arassec.igor.core.model.service.file.FileService} for SCP file handling.
  */
 @IgorService(label = "SCP")
 public class ScpFileService extends BaseSshFileService {
@@ -223,6 +223,30 @@ public class ScpFileService extends BaseSshFileService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void delete(String file) {
+        execute("rm -f " + file);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void move(String source, String target) {
+        execute("mv " + source + " " + target);
+    }
+
+    /**
+     * Finalizes the supplied streams and closes the SSH session and channel.
+     *
+     * @param session         The SSH session.
+     * @param channel         The SSH channel.
+     * @param sshOutputStream The SSH output stream.
+     * @param sshInputStream  The SSH input stream.
+     */
     private void finalize(Session session, Channel channel, OutputStream sshOutputStream, InputStream sshInputStream) {
         try {
             // send '\0'
@@ -241,22 +265,6 @@ public class ScpFileService extends BaseSshFileService {
         } catch (IOException e) {
             throw new ServiceException("Could not complete SSH streams!", e);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void delete(String file) {
-        execute("rm -f " + file);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void move(String source, String target) {
-        execute("mv " + source + " " + target);
     }
 
     /**

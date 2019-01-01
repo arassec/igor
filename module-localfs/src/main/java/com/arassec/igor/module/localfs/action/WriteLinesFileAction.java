@@ -77,6 +77,9 @@ public class WriteLinesFileAction extends BaseAction {
 
     /**
      * Closes the output file.
+     *
+     * @param jobId    The job's ID.
+     * @param taskName The task's name.
      */
     @Override
     public void complete(String jobId, String taskName) {

@@ -7,9 +7,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 /**
- * Base for SSH based file services (like SFTP and SCP).
- * <p>
- * Created by Andreas Sensen on 17.04.2017.
+ * Base for SSH based {@link com.arassec.igor.core.model.service.file.FileService}s (like SFTP and SCP).
  */
 public abstract class BaseSshFileService extends BaseFileService {
 
@@ -23,7 +21,7 @@ public abstract class BaseSshFileService extends BaseFileService {
             JSch jsch = new JSch();
             Session session = jsch.getSession(username, host, port);
             session.setPassword(password);
-            // TODO: Config!
+            // TODO: Make these IgorParams.
             session.setConfig("StrictHostKeyChecking", "no");
             session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
             session.connect(30000);

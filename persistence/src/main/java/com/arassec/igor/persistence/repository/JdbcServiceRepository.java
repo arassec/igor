@@ -14,18 +14,29 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Created by Andreas Sensen on 01.05.2017.
+ * {@link ServiceRepository} implementation that uses JDBC to persist {@link Service}s.
  */
 @Component
 @Transactional
 public class JdbcServiceRepository implements ServiceRepository {
 
+    /**
+     * The DAO for services.
+     */
     @Autowired
     private ServiceDao serviceDao;
 
+    /**
+     * The converter for services.
+     */
     @Autowired
     private ServiceConverter serviceConverter;
 
+    /**
+     * Saves a {@link Service} to the database. Either creates a new service or updates an existing one.
+     *
+     * @param service The service to save.
+     */
     @Override
     public void upsert(Service service) {
         ServiceEntity serviceEntity;
@@ -43,6 +54,12 @@ public class JdbcServiceRepository implements ServiceRepository {
         serviceDao.save(serviceEntity);
     }
 
+    /**
+     * Finds a {@link Service} by its ID.
+     *
+     * @param id The service's ID.
+     * @return The service.
+     */
     @Override
     public Service findById(Long id) {
         Optional<ServiceEntity> serviceEntityOptional = serviceDao.findById(id);
@@ -54,6 +71,11 @@ public class JdbcServiceRepository implements ServiceRepository {
         return null;
     }
 
+    /**
+     * Finds all services in the database.
+     *
+     * @return List of services.
+     */
     @Override
     public List<Service> findAll() {
         List<Service> result = new LinkedList<>();
@@ -67,6 +89,11 @@ public class JdbcServiceRepository implements ServiceRepository {
         return result;
     }
 
+    /**
+     * Deletes a service by its ID.
+     *
+     * @param id The ID of the service to delete.
+     */
     @Override
     public void deleteById(Long id) {
         serviceDao.deleteById(id);

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Created by Andreas Sensen on 15.04.2017.
+ * {@link JobRepository} implementation that uses JDBC to persist {@link Job}s.
  */
 @Component
 @Transactional
@@ -26,11 +26,14 @@ public class JdbcJobRepository implements JobRepository {
     @Autowired
     private JobDao jobDao;
 
+    /**
+     * Converter for jobs.
+     */
     @Autowired
     private JobConverter jobConverter;
 
     /**
-     * Persists jobs using JDBC.
+     * Persists jobs using JDBC. Either creates a new entry in the database or updates an existing one.
      *
      * @param job The job to persist.
      */
@@ -52,17 +55,28 @@ public class JdbcJobRepository implements JobRepository {
         jobDao.save(jobEntity);
     }
 
+    /**
+     * Finds a job by its ID.
+     *
+     * @param id The job's ID.
+     * @return The {@link Job}.
+     */
     @Override
     public Job findById(Long id) {
         Optional<JobEntity> jobEntityOptional = jobDao.findById(id);
         if (jobEntityOptional.isPresent()) {
-            Job job =  jobConverter.convert(jobEntityOptional.get().getContent());
+            Job job = jobConverter.convert(jobEntityOptional.get().getContent());
             job.setId(id);
             return job;
         }
         return null;
     }
 
+    /**
+     * Finds all jobs in the database.
+     *
+     * @return List of all {@link Job}s.
+     */
     @Override
     public List<Job> findAll() {
         List<Job> result = new LinkedList<>();
@@ -76,6 +90,11 @@ public class JdbcJobRepository implements JobRepository {
         return result;
     }
 
+    /**
+     * Deletes a job by its ID.
+     *
+     * @param id The ID of the job to delete.
+     */
     @Override
     public void deleteById(Long id) {
         jobDao.deleteById(id);

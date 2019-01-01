@@ -18,7 +18,7 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 /**
- * Service for SFTP file handling.
+ * {@link com.arassec.igor.core.model.service.file.FileService} for SFTP file handling.
  */
 @IgorService(label = "SFTP")
 public class SftpFileService extends BaseSshFileService {

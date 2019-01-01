@@ -5,11 +5,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Defines access to the jobs in the database.
- * <p>
- * Created by Andreas Sensen on 14.04.2017.
+ * Defines access to {@link com.arassec.igor.core.model.job.Job}s in the database.
  */
 @Repository
 public interface JobDao extends CrudRepository<JobEntity, Long> {
-
 }

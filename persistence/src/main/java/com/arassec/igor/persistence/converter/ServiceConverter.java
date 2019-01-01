@@ -12,14 +12,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Converts {@link Service}s into their JSON representation and vice versa.
  */
 @Component
 public class ServiceConverter {
 
+    /**
+     * The service factory.
+     */
     @Autowired
     private ServiceFactory serviceFactory;
 
+    /**
+     * Converts a {@link Service} into a JSON-string.
+     *
+     * @param service The service to convert.
+     * @return The service as JSON-string.
+     */
     public String convert(Service service) {
         JSONObject serviceJson = new JSONObject();
         serviceJson.put(JsonKeys.NAME, service.getName());
@@ -41,6 +50,12 @@ public class ServiceConverter {
         return serviceJson.toString();
     }
 
+    /**
+     * Converts the provided JSON-string into a {@link Service} instance.
+     *
+     * @param serviceString The service JSON.
+     * @return A newly created service instance.
+     */
     public Service convert(String serviceString) {
         JSONObject jsonObject = new JSONObject(serviceString);
         String name = jsonObject.getString(JsonKeys.NAME);

@@ -27,9 +27,15 @@ import static java.nio.file.StandardOpenOption.CREATE;
 @IgorService(label = "Filesystem")
 public class LocalFilesystemPersistenceService extends BaseService implements PersistenceService {
 
+    /**
+     * The target directory to store persistence files in.
+     */
     @IgorParam
     private String targetDir;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void save(String jobId, String taskName, String value) {
         try {
@@ -39,6 +45,9 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> loadAll(String jobId, String taskName) {
         try {
@@ -51,6 +60,9 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isPersisted(String jobId, String taskName, String value) {
         try (Stream<String> stream = Files.lines(Paths.get(getFileName(jobId, taskName)))) {
@@ -62,8 +74,11 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void cleanup(String jobId, String taskName, int numEntriesToKeep)  {
+    public void cleanup(String jobId, String taskName, int numEntriesToKeep) {
         Path persistenceFile = Paths.get(getFileName(jobId, taskName));
         Path tempFile = Paths.get(getFileName(jobId, taskName) + "_TEMP");
         boolean cleanedUp = false;
@@ -88,6 +103,9 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void testConfiguration() throws ServiceException {
         Path targetPath = Paths.get(targetDir);
@@ -105,6 +123,13 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
         }
     }
 
+    /**
+     * Creates the persistence file's name based on the supplied data.
+     *
+     * @param jobId    The job's ID.
+     * @param taskName The task's name.
+     * @return The filename of the persistence file for this job and task.
+     */
     private String getFileName(String jobId, String taskName) {
         String result = targetDir;
         if (!result.endsWith(File.separator)) {
@@ -113,6 +138,12 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
         return result + clean(jobId) + "_" + clean(taskName) + ".igor.log";
     }
 
+    /**
+     * Replaces whitespaces in the provided input string with underscores.
+     *
+     * @param input The input to clean.
+     * @return The input with underscores instead of whitespaces.
+     */
     private String clean(String input) {
         if (input == null || input.isEmpty()) {
             return input;

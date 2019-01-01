@@ -1,0 +1,16 @@
+- JavaDocs
+- Compare and maybe combine job/service <-> JSON converters in persistence- and web-modules.
+    - Parameter conversion is already duplicate code in the persistence-module.
+- Unit-Tests
+- README.md
+- Warning when leaving job-editor and unsaved changes exist
+- Creating service from within job-editor
+- service-selector with specialized services like LocalFilesystemFileService
+- Job execution history in job-editor
+- Job schedule under home
+- Job status under home
+- Persistence-service editor
+- Configuration page
+- Initial setup with configuration on first start
+- Keep filters for jobs and services in the store
+- Tags for jobs + grouping/filtering jobs by tag

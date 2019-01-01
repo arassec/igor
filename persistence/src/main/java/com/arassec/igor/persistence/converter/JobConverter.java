@@ -10,6 +10,7 @@ import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,24 +22,41 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Converts jobs into their JSON representation and vice versa.
+ * Converts {@link Job}s into their JSON representation and vice versa.
  */
+@Slf4j
 @Component
 public class JobConverter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobConverter.class);
-
+    /**
+     * Suffix for services. TODO: There must be a better way to indicate an IgorService.
+     */
     private static final String SERVICE_SUFFIX = "_IgorService";
 
+    /**
+     * Factory for {@link Action}s.
+     */
     @Autowired
     private ActionFactory actionFactory;
 
+    /**
+     * Factory for {@link Provider}s.
+     */
     @Autowired
     private ProviderFactory providerFactory;
 
+    /**
+     * Factory for {@link Service}s.
+     */
     @Autowired
     private ServiceRepository serviceRepository;
 
+    /**
+     * Converts the supplied job into its JSON representation.
+     *
+     * @param job The job to convert.
+     * @return The job's JSON as string.
+     */
     public String convert(Job job) {
         JSONObject jobJson = new JSONObject();
         jobJson.put(JsonKeys.NAME, job.getName());
@@ -52,6 +70,12 @@ public class JobConverter {
         return jobJson.toString();
     }
 
+    /**
+     * Converts the JSON-string into a {@link Job} instance.
+     *
+     * @param jobString The job as JSON-string.
+     * @return The newly created Job.
+     */
     public Job convert(String jobString) {
         JSONObject jobJson = new JSONObject(jobString);
 
@@ -66,7 +90,7 @@ public class JobConverter {
             try {
                 job.getTasks().add(convertJsonToTask(tasksArray.getJSONObject(i)));
             } catch (ConversionException e) {
-                LOG.error("Error during conversion of job {}: {}", job.getId(), e.getMessage());
+                log.error("Error during conversion of job {}: {}", job.getId(), e.getMessage());
                 return null;
             }
         }
@@ -74,6 +98,13 @@ public class JobConverter {
         return job;
     }
 
+    /**
+     * Converts the provided JSON into a {@link Task}.
+     *
+     * @param taskJson The task in JSON form.
+     * @return A newly created Task instance.
+     * @throws ConversionException In case the JSONObject could not be converted.
+     */
     private Task convertJsonToTask(JSONObject taskJson) throws ConversionException {
         Task task = new Task();
         String taskName = taskJson.getString(JsonKeys.NAME);
@@ -97,16 +128,34 @@ public class JobConverter {
         return task;
     }
 
+    /**
+     * Converts the provided JSON into a {@link Provider}.
+     *
+     * @param providerJson The JSON with provider data.
+     * @return A newly created Provider instance.
+     */
     private Provider convertJsonToProvider(JSONObject providerJson) {
         Map<String, Object> parameters = convertJsonToParameters(providerJson.getJSONObject(JsonKeys.PARAMETERS));
         return providerFactory.createInstance(providerJson.getString(JsonKeys.TYPE), parameters);
     }
 
+    /**
+     * Converts the provided JSON into an {@link Action}.
+     *
+     * @param actionJson The JSON with action data.
+     * @return A newly created Action instance.
+     */
     private Action convertJsonToAction(JSONObject actionJson) {
         Map<String, Object> parameters = convertJsonToParameters(actionJson.getJSONObject(JsonKeys.PARAMETERS));
         return actionFactory.createInstance(actionJson.getString(JsonKeys.TYPE), parameters);
     }
 
+    /**
+     * Converts the provided JSON into a parameter map.
+     *
+     * @param parameters The parameters in JSON form.
+     * @return A map containing the parameter keys and values.
+     */
     private Map<String, Object> convertJsonToParameters(JSONObject parameters) {
         Map<String, Object> params = new HashMap<>();
         for (int i = 0; i < parameters.length(); i++) {
@@ -120,6 +169,12 @@ public class JobConverter {
         return params;
     }
 
+    /**
+     * Converts a {@link Task} into its JSON representation.
+     *
+     * @param task The task to convert.
+     * @return A {@link JSONObject} representing the task.
+     */
     private JSONObject convertTaskToJson(Task task) {
         JSONObject taskJson = new JSONObject();
         taskJson.put(JsonKeys.NAME, task.getName());
@@ -129,6 +184,12 @@ public class JobConverter {
         return taskJson;
     }
 
+    /**
+     * Converts a {@link Provider} into its JSON representation.
+     *
+     * @param provider The provider to convert.
+     * @return A {@link JSONObject} with the provider's data.
+     */
     private JSONObject convertProviderToJson(Provider provider) {
         JSONObject providerJson = new JSONObject();
         providerJson.put(JsonKeys.TYPE, provider.getClass().getName());
@@ -136,6 +197,12 @@ public class JobConverter {
         return providerJson;
     }
 
+    /**
+     * Converts an {@link Action} into a {@link JSONObject}.
+     *
+     * @param action The action to convert.
+     * @return A JSONObject with the action's data.
+     */
     private JSONObject convertActionToJson(Action action) {
         JSONObject actionJson = new JSONObject();
         actionJson.put(JsonKeys.TYPE, action.getClass().getName());
@@ -143,6 +210,12 @@ public class JobConverter {
         return actionJson;
     }
 
+    /**
+     * Converts a map with parameter keys and values into a {@link JSONObject}.
+     *
+     * @param parameters The parameters to convert.
+     * @return A JSON containing the parameters.
+     */
     private JSONObject convertParametersToJson(Map<String, Object> parameters) {
         JSONObject params = new JSONObject();
         for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
