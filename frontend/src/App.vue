@@ -43,14 +43,14 @@ export default {
 
   /* igor css */
   :root {
-    --main-background-color: #eeeeee;
-    --nav-background-color: #5BB6A7;
-    --panel-background-color: #3C99A0;
-    --font-color-light: #eeeeee;
-    --font-color-dark: #444444;
-    --element-background-color: #999999;
-    --element-background-color-focus: #ffffff;
-    --info-background-color: #5BB6A7;
+    --main-background-color: #FDFDFF;
+    --nav-background-color: #62929E;
+    --panel-background-color: #546A7B;
+    --font-color-light: #FDFDFF;
+    --font-color-dark: #546A7B;
+    --element-background-color: #62929E;
+    --element-background-color-focus: #FDFDFF;
+    --info-background-color: #62929E;
     --alert-background-color: #DF6A7C;
   }
 

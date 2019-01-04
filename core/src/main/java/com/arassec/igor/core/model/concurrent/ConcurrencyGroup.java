@@ -36,7 +36,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     /**
      * The {@link ExecutorService} managing the threads.
      */
-    private ExecutorService executorService;
+    private ThreadPoolExecutor executorService;
 
     /**
      * The ID of this concurrency-group. Only used for logging purposes to identify this concureency-group.
@@ -66,15 +66,11 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     public ConcurrencyGroup(List<Action> actions, BlockingQueue<IgorData> inputQueue, String concurrencyGroupId, JobExecution jobExecution) {
         this.inputQueue = inputQueue;
         this.concurrencyGroupId = concurrencyGroupId;
-
-        int numThreads = actions.get(0).getNumThreads();
-        if (numThreads == BaseAction.DEFAULT_THREADS) {
-            numThreads = 1;
-        }
-
         this.jobExecution = jobExecution;
 
-        executorService = Executors.newFixedThreadPool(numThreads, new ThreadFactory() {
+        int numThreads = actions.get(0).getNumThreads();
+
+        executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads, new ThreadFactory() {
             private final AtomicInteger counter = new AtomicInteger();
 
             @Override
@@ -119,17 +115,22 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     /**
      * Awaits the termination of the last threads in the thread pool.
      * <p>
-     * If the job is cancelled, or in case of interruptions, all isRunning threads will be stopped immediately.
+     * If the job is cancelled, or in case of interruptions, all running threads will be stopped immediately.
      *
      * @return
      */
     public boolean awaitTermination() {
+        log.debug("Total/Active/Completed Threads in '{}': {}/{}/{}", concurrencyGroupId,
+                executorService.getPoolSize(), executorService.getActiveCount(), executorService.getCompletedTaskCount());
         try {
             if (!jobExecution.isRunning()) {
                 executorService.shutdownNow();
                 return true;
             }
-            return executorService.awaitTermination(100, TimeUnit.MILLISECONDS);
+            boolean awaitTerminationResult = executorService.awaitTermination(1000, TimeUnit.MILLISECONDS);
+            log.debug("After awaitTermination: Total/Active/Completed Threads: {}/{}/{}",
+                    executorService.getPoolSize(), executorService.getActiveCount(), executorService.getCompletedTaskCount());
+            return awaitTerminationResult;
         } catch (InterruptedException e) {
             log.error("Concurrency-Group interrupted during awaitTermination()!", e);
             executorService.shutdownNow();
@@ -161,4 +162,5 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
             log.error("Exception caught in ConcurrencyGroup!", throwable);
         }
     }
+
 }

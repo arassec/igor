@@ -23,7 +23,7 @@
           <td>"0 */15 * * * *"</td>
           <td>Once every fifteen minutes.</td>
           <td class="last">
-            <input-button v-on:clicked="$emit('selected', '* */15 * * * *')" icon="crosshairs"/>
+            <input-button v-on:clicked="$emit('selected', '0 */15 * * * *')" icon="crosshairs"/>
           </td>
         </tr>
         <tr>

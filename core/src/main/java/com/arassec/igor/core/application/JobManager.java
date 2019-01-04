@@ -45,7 +45,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
     private Map<Long, ScheduledFuture> scheduledJobFutures = new HashMap<>();
 
     /**
-     * Keeps track of all isRunning jobs.
+     * Keeps track of all running jobs.
      */
     private Map<Long, Job> runningJobs = new ConcurrentHashMap<>();
 
@@ -58,7 +58,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
     }
 
     /**
-     * Cleans the manager up by unscheduling all scheduled jobs and cancelling all isRunning jobs.
+     * Cleans the manager up by unscheduling all scheduled jobs and cancelling all running jobs.
      */
     @Override
     public void destroy() {
@@ -100,7 +100,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
     }
 
     /**
-     * Runs the provided job if it is not already isRunning. The job is unscheduled during it's run and re-scheduled
+     * Runs the provided job if it is not already running. The job is unscheduled during it's run and re-scheduled
      * according to its trigger after it finishes.
      * <p>
      * This method should be called if the job should run immediately and only once. If the job should run regularly
@@ -110,10 +110,10 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      */
     public void run(Job job) {
         if (runningJobs.containsKey(job.getId())) {
-            log.debug("Job already isRunning: {} ({})", job.getName(), job.getId());
+            log.debug("Job already running: {} ({})", job.getName(), job.getId());
             return;
         }
-        log.info("Manually isRunning job: {} ({})", job.getName(), job.getId());
+        log.info("Manually running job: {} ({})", job.getName(), job.getId());
         job.setJobListener(this);
         unschedule(job);
         // The job will be re-scheduled according to its trigger after its execution with the notify-finished-callback mechanism.
@@ -121,7 +121,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
     }
 
     /**
-     * Cancels a isRunning job.
+     * Cancels a running job.
      *
      * @param id The ID of the job that should be cancelled.
      */
@@ -181,7 +181,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
                 throw new ServiceException("Job " + job.getId() + " could not be cancelled!");
             }
             scheduledJobFutures.remove(job.getId());
-            log.info("Canceled job: {} ({})", job.getName(), job.getId());
+            log.info("Cancelled job: {} ({})", job.getName(), job.getId());
         }
     }
 
@@ -189,7 +189,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      * Returns a job's execution state for the job with the given ID.
      *
      * @param id The job's ID.
-     * @return The current {@link JobExecution} of the job, if it is isRunning, or {@code null} otherwise.
+     * @return The current {@link JobExecution} of the job, if it is running, or {@code null} otherwise.
      */
     public JobExecution getJobExecution(Long id) {
         if (runningJobs.containsKey(id)) {
@@ -199,7 +199,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
     }
 
     /**
-     * Saves the reference to the isRunning job for state querying.
+     * Saves the reference to the running job for state querying.
      * <p>
      * This method is called by every {@link Job} during the beginning of its run. The {@link JobListener} interface
      * is used to provide this callback method to the job.

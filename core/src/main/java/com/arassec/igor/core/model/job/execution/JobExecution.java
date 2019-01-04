@@ -57,9 +57,9 @@ public class JobExecution {
     }
 
     /**
-     * Returns whether the job is currently isRunning or not.
+     * Returns whether the job is currently running or not.
      *
-     * @return {@code true} if the job is isRunning, {@code false} otherwise.
+     * @return {@code true} if the job is running, {@code false} otherwise.
      */
     public boolean isRunning() {
         return JobExecutionState.RUNNING.equals(executionState);

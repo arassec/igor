@@ -92,7 +92,7 @@ public class Job {
      * @return The result data created during job execution.
      */
     public DryRunJobResult dryRun() {
-        log.debug("Dry-isRunning job: {}", name);
+        log.debug("Dry-running job: {}", name);
         DryRunJobResult result = new DryRunJobResult();
         tasks.stream().forEach(task -> task.dryRun(result, name));
         log.debug("Finished dry-run of job: {}", name);
@@ -100,7 +100,7 @@ public class Job {
     }
 
     /**
-     * Cancels the job if it is currently isRunning.
+     * Cancels the job if it is currently running.
      */
     public void cancel() {
         if (jobExecution != null && JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {

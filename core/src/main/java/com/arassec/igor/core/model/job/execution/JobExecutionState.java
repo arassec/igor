@@ -6,7 +6,7 @@ package com.arassec.igor.core.model.job.execution;
 public enum JobExecutionState {
 
     /**
-     * The job is currently isRunning.
+     * The job is currently running.
      */
     RUNNING,
 

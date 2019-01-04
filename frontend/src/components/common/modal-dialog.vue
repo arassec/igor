@@ -77,6 +77,7 @@ export default {
     margin-bottom: 20px;
     overflow: hidden;
     width: 100%;
+    color: var(--font-color-light);
   }
 
   .modal-footer {

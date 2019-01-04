@@ -62,6 +62,8 @@ public class Task {
      */
     public void run(String jobName, JobExecution jobExecution) {
 
+        log.debug("Starting task '{}'", name);
+
         jobExecution.setCurrentTask(name);
 
         // Scan all actions to create lists of actions that belong to the same concurrency group (i.e. use the same
@@ -117,12 +119,16 @@ public class Task {
 
         boolean allThreadsTerminated = false;
         while (!allThreadsTerminated) {
+            allThreadsTerminated = true;
             for (ConcurrencyGroup concurrencyGroup : concurrencyGroups) {
-                allThreadsTerminated = concurrencyGroup.awaitTermination();
+                allThreadsTerminated = (allThreadsTerminated && concurrencyGroup.awaitTermination());
             }
+            log.debug("Threads terminated over all concurrency-groups: {}", allThreadsTerminated);
         }
 
         actions.stream().forEach(action -> action.complete(jobName, name));
+
+        log.debug("Task '{}' finished!", name);
     }
 
     /**
