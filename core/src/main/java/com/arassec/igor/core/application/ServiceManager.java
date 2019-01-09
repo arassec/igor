@@ -1,14 +1,14 @@
 package com.arassec.igor.core.application;
 
+import com.arassec.igor.core.application.factory.ModelDefinition;
 import com.arassec.igor.core.application.factory.ServiceFactory;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Manages {@link Service}s. Entry point from outside the core package to create and maintain services.
@@ -29,12 +29,24 @@ public class ServiceManager {
     private ServiceFactory serviceFactory;
 
     /**
-     * Returns all available types of services.
+     * Returns all available service categories.
      *
-     * @return The service types.
+     * @return The categories.
      */
-    public Set<String> getTypes() {
-        return serviceFactory.getTypes();
+    public Set<ModelDefinition> getCategories() {
+        return serviceFactory.getCategories();
+    }
+
+    /**
+     * Returns all available types of services of the specified category.
+     *
+     * @return The service types of the specified category.
+     */
+    public Set<ModelDefinition> getTypesOfCategory(String categoryType) {
+        if (serviceFactory.getTypesByCategory().containsKey(categoryType)) {
+            return serviceFactory.getTypesByCategory().get(categoryType);
+        }
+        return new HashSet<>();
     }
 
     /**
@@ -66,6 +78,21 @@ public class ServiceManager {
     }
 
     /**
+     * Loads all service of a given category.
+     *
+     * @param category The category to filter services with.
+     * @return List of services in the category.
+     */
+    public List<Service> loadAllOfCategory(String category) {
+        if (category == null) {
+            return new LinkedList<>();
+        }
+        List<Service> services = loadAll();
+        return services.stream().filter(service -> category.equals(serviceFactory.getCategory(service).getType()))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Creates a new service instance with the given parameters applied to it.
      *
      * @param type       The type of service to create.
@@ -73,7 +100,7 @@ public class ServiceManager {
      * @return A newly created {@link Service} instance with the provided configuration.
      */
     public Service createService(String type, Map<String, Object> parameters) {
-        return serviceFactory.createInstance(type, parameters, false);
+        return serviceFactory.createInstance(type, parameters);
     }
 
     /**

@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @IgorAction(label = "Pause")
 @Slf4j
-public class PauseAction extends BaseAction {
+public class PauseAction extends BaseMiscAction {
 
     /**
      * Amount of milliseconds the action should pause data processing.

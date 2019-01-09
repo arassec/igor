@@ -13,7 +13,7 @@
                 </p>
                 <p slot="right">
                     <input-button icon="times" v-on:clicked="cancelJob" :disabled="!jobRunning"/>
-                    <input-button icon="play" v-on:clicked="runJob" class="button-margin-left" :disabled="jobRunning"/>
+                    <input-button icon="play" v-on:clicked="runJob" class="button-margin-left" :disabled="jobRunning || jobConfiguration.id == null"/>
                 </p>
             </button-row>
             <job-tree-navigation slot="content"

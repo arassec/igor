@@ -47,8 +47,8 @@
                     <tr>
                         <td><label for="type-input">Type</label></td>
                         <td>
-                            <select id="type-input" v-model="serviceConfiguration.serviceType"
-                                    v-on:change="loadTypeParameters(serviceConfiguration.serviceType.type)"
+                            <select id="type-input" v-model="serviceConfiguration.type"
+                                    v-on:change="loadTypeParameters(serviceConfiguration.type.type)"
                                     :disabled="!newService">
                                 <option v-for="type in serviceTypes" v-bind:value="type" v-bind:key="type.type">
                                     {{type.label}}
@@ -107,8 +107,8 @@ export default {
       requestInProgress: false,
       serviceConfiguration: {
         name: '',
-        serviceCategory: {},
-        serviceType: {},
+        category: {},
+        type: {},
         parameters: {}
       }
     }
@@ -120,9 +120,9 @@ export default {
       let component = this
       this.$http.get('/api/service/' + id).then(function (response) {
         component.serviceConfiguration = response.data
-        component.serviceCategories.push(component.serviceConfiguration.serviceCategory)
-        component.selectedCategory = component.serviceConfiguration.serviceCategory.type
-        component.serviceTypes.push(component.serviceConfiguration.serviceType)
+        component.serviceCategories.push(component.serviceConfiguration.category)
+        component.selectedCategory = component.serviceConfiguration.category.type
+        component.serviceTypes.push(component.serviceConfiguration.type)
       }).catch(function (error) {
         component.feedback = error
         component.feedbackOk = false
@@ -153,8 +153,8 @@ export default {
         Array.from(response.data).forEach(function (item) {
           component.serviceTypes.push(item)
         })
-        component.serviceConfiguration.serviceType = component.serviceTypes[0]
-        component.loadTypeParameters(component.serviceConfiguration.serviceType.type)
+        component.serviceConfiguration.type = component.serviceTypes[0]
+        component.loadTypeParameters(component.serviceConfiguration.type.type)
       }).catch(function (error) {
         component.feedback = error
         component.feedbackOk = false

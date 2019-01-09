@@ -1,11 +1,13 @@
 package com.arassec.igor.core.application;
 
+import com.arassec.igor.core.application.factory.ModelDefinition;
 import com.arassec.igor.core.application.factory.ProviderFactory;
 import com.arassec.igor.core.model.provider.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,12 +25,24 @@ public class ProviderManager {
     private ProviderFactory providerFactory;
 
     /**
-     * Returns all available provider types.
+     * Returns all available service categories.
      *
-     * @return Set of provider types.
+     * @return The categories.
      */
-    public Set<String> getTypes() {
-        return providerFactory.getTypes();
+    public Set<ModelDefinition> getCategories() {
+        return providerFactory.getCategories();
+    }
+
+    /**
+     * Returns all available types of services of the specified category.
+     *
+     * @return The service types of the specified category.
+     */
+    public Set<ModelDefinition> getTypesOfCategory(String categoryType) {
+        if (providerFactory.getTypesByCategory().containsKey(categoryType)) {
+            return providerFactory.getTypesByCategory().get(categoryType);
+        }
+        return new HashSet<>();
     }
 
     /**
@@ -39,6 +53,6 @@ public class ProviderManager {
      * @return A newly created {@link Provider} with the given configuration.
      */
     public Provider createProvider(String type, Map<String, Object> parameters) {
-        return providerFactory.createInstance(type, parameters, false);
+        return providerFactory.createInstance(type, parameters);
     }
 }

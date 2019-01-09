@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.action.misc;
+package com.arassec.igor.core.model.action.persistence;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
@@ -12,7 +12,7 @@ import java.util.List;
  * Filters data of which a value has already been persisted before.
  */
 @IgorAction(label = "Filter persisted value")
-public class FilterPersistedValueAction extends BaseAction {
+public class FilterPersistedValueAction extends BasePersistenceAction {
 
     /**
      * The service to use for persisting values.

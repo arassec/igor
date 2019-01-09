@@ -1,37 +1,63 @@
 package com.arassec.igor.web.api;
 
 import com.arassec.igor.core.application.ActionManager;
-import com.arassec.igor.web.api.model.ActionModel;
-import com.arassec.igor.web.api.model.ParameterDefinition;
-import com.arassec.igor.web.api.util.ActionUtil;
-import com.arassec.igor.web.api.util.ParameterUtil;
+import com.arassec.igor.core.application.converter.JsonParameterConverter;
+import com.arassec.igor.core.application.factory.ModelDefinition;
+import com.github.openjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Set;
 
-@RestController
+/**
+ * REST-Controller for {@link com.arassec.igor.core.model.action.Action}s.
+ */
 public class ActionRestController extends BaseRestController {
 
-    @Autowired
-    private ActionUtil actionUtil;
-
+    /**
+     * Manager for actions.
+     */
     @Autowired
     private ActionManager actionManager;
 
+    /**
+     * Converter for parameters to and from JSON.
+     */
     @Autowired
-    private ParameterUtil parameterUtil;
+    private JsonParameterConverter jsonParameterConverter;
 
-    @GetMapping("/actiontype")
-    public List<ActionModel> getProviderTypes() {
-        return actionUtil.getActionModels();
+    /**
+     * Returns all action categories as {@link ModelDefinition}s.
+     *
+     * @return Set of all available action categories.
+     */
+    @GetMapping("/category/action")
+    public Set<ModelDefinition> getActionCategories() {
+        return actionManager.getCategories();
     }
 
-    @GetMapping("/actionparams/{type}")
-    public List<ParameterDefinition> getProviderParameters(@PathVariable("type") String type) {
-        return parameterUtil.getParameters(actionManager.createAction(type, null));
+    /**
+     * Returns all action types of a certain category as {@link ModelDefinition}s.
+     *
+     * @param category The action category to use.
+     * @return Set of action types.
+     */
+    @GetMapping("/type/action/{category}")
+    public Set<ModelDefinition> getActionTypes(@PathVariable("category") String category) {
+        return actionManager.getTypesOfCategory(category);
+    }
+
+    /**
+     * Returns all configuration parameters of an action type.
+     *
+     * @param type The type to get parameters for.
+     * @return List of parameters.
+     */
+    @GetMapping("/parameters/action/{type}")
+    public String getActionParameters(@PathVariable("type") String type) {
+        JSONArray parameters = jsonParameterConverter.convert(actionManager.createAction(type, null), false);
+        return parameters.toString();
     }
 
 }

@@ -1,37 +1,64 @@
 package com.arassec.igor.web.api;
 
 import com.arassec.igor.core.application.ProviderManager;
-import com.arassec.igor.web.api.model.ParameterDefinition;
-import com.arassec.igor.web.api.model.ProviderModel;
-import com.arassec.igor.web.api.util.ParameterUtil;
-import com.arassec.igor.web.api.util.ProviderUtil;
+import com.arassec.igor.core.application.converter.JsonParameterConverter;
+import com.arassec.igor.core.application.factory.ModelDefinition;
+import com.github.openjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
+import java.util.Set;
 
-@RestController
+/**
+ * REST controller for {@link com.arassec.igor.core.model.provider.Provider}s.
+ */
 public class ProviderRestController extends BaseRestController {
 
-    @Autowired
-    private ProviderUtil providerUtil;
-
+    /**
+     * Manager for providers.
+     */
     @Autowired
     private ProviderManager providerManager;
 
+    /**
+     * Converter for parameters to and from JSON.
+     */
     @Autowired
-    private ParameterUtil parameterUtil;
+    private JsonParameterConverter jsonParameterConverter;
 
-    @GetMapping("/providertype")
-    public List<ProviderModel> getProviderTypes() {
-        return providerUtil.getProviderModels();
+    /**
+     * Returns all action categories as {@link ModelDefinition}s.
+     *
+     * @return Set of all available action categories.
+     */
+    @GetMapping("/category/action")
+    public Set<ModelDefinition> getActionCategories() {
+        return providerManager.getCategories();
     }
 
-    @GetMapping("/providerparams/{type}")
-    public List<ParameterDefinition> getProviderParameters(@PathVariable("type") String type) {
-        return parameterUtil.getParameters(providerManager.createProvider(type, null));
+    /**
+     * Returns all action types of a certain category as {@link ModelDefinition}s.
+     *
+     * @param category The action category to use.
+     * @return Set of action types.
+     */
+    @GetMapping("/type/action/{category}")
+    public Set<ModelDefinition> getActionTypes(@PathVariable("category") String category) {
+        return providerManager.getTypesOfCategory(category);
+    }
+
+    /**
+     * Returns all configuration parameters of an action type.
+     *
+     * @param type The type to get parameters for.
+     * @return List of parameters.
+     */
+    @GetMapping("/parameters/action/{type}")
+    public String getActionParameters(@PathVariable("type") String type) {
+        JSONArray parameters = jsonParameterConverter.convert(providerManager.createProvider(type, null), false);
+        return parameters.toString();
     }
 
 }

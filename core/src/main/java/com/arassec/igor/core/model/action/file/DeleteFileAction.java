@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @IgorAction(label = "Delete file")
-public class DeleteFileAction extends BaseAction {
+public class DeleteFileAction extends BaseFileAction {
 
     /**
      * The service providing the file to delete.

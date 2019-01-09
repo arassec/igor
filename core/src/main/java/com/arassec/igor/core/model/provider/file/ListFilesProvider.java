@@ -13,7 +13,7 @@ import java.util.List;
  * Provides file names from a specified directory.
  */
 @IgorProvider(label = "List Files")
-public class ListFilesProvider extends BaseProvider {
+public class ListFilesProvider extends BaseProvider implements FileProvider {
 
     /**
      * The service to use for file listing.

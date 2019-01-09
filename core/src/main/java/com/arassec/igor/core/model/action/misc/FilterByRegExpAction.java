@@ -9,7 +9,7 @@ import com.arassec.igor.core.model.provider.IgorData;
  * Filters the supplied data by a regular expression.
  */
 @IgorAction(label = "Filter by regular expression")
-public class FilterByRegExpAction extends BaseAction {
+public class FilterByRegExpAction extends BaseMiscAction {
 
     /**
      * The Regular expression to filter the input with.

@@ -1,11 +1,13 @@
 package com.arassec.igor.core.application;
 
 import com.arassec.igor.core.application.factory.ActionFactory;
+import com.arassec.igor.core.application.factory.ModelDefinition;
 import com.arassec.igor.core.model.action.Action;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,12 +25,24 @@ public class ActionManager {
     private ActionFactory actionFactory;
 
     /**
-     * Returns all available action types.
+     * Returns all available service categories.
      *
-     * @return Set of action types.
+     * @return The categories.
      */
-    public Set<String> getTypes() {
-        return actionFactory.getTypes();
+    public Set<ModelDefinition> getCategories() {
+        return actionFactory.getCategories();
+    }
+
+    /**
+     * Returns all available types of services of the specified category.
+     *
+     * @return The service types of the specified category.
+     */
+    public Set<ModelDefinition> getTypesOfCategory(String categoryType) {
+        if (actionFactory.getTypesByCategory().containsKey(categoryType)) {
+            return actionFactory.getTypesByCategory().get(categoryType);
+        }
+        return new HashSet<>();
     }
 
     /**
@@ -39,7 +53,7 @@ public class ActionManager {
      * @return An {@link Action} with all properties set according to the parameters.
      */
     public Action createAction(String type, Map<String, Object> parameters) {
-        return actionFactory.createInstance(type, parameters, false);
+        return actionFactory.createInstance(type, parameters);
     }
 
 }

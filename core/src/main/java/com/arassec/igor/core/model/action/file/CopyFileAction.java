@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @IgorAction(label = "Copy file")
-public class CopyFileAction extends BaseAction {
+public class CopyFileAction extends BaseFileAction {
 
     /**
      * Key to the source file's name.

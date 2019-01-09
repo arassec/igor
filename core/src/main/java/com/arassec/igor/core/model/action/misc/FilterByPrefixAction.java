@@ -9,7 +9,7 @@ import com.arassec.igor.core.model.provider.IgorData;
  * Filters the supplied data by matching a configured prefix.
  */
 @IgorAction(label = "Filter by prefix")
-public class FilterByPrefixAction extends BaseAction {
+public class FilterByPrefixAction extends BaseMiscAction {
 
     /**
      * The prefix to filter the input for.

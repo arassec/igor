@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.action.misc;
+package com.arassec.igor.core.model.action.persistence;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
@@ -10,7 +10,7 @@ import com.arassec.igor.core.model.service.persistence.PersistenceService;
  * Persists a value from the supplied data to the persistence store.
  */
 @IgorAction(label = "Persist value")
-public class PersistValueAction extends BaseAction {
+public class PersistValueAction extends BasePersistenceAction {
 
     /**
      * The service to use for persisting values.

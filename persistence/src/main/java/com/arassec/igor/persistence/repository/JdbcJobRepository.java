@@ -1,10 +1,11 @@
 package com.arassec.igor.persistence.repository;
 
+import com.arassec.igor.core.application.converter.JsonJobConverter;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.repository.JobRepository;
-import com.arassec.igor.persistence.converter.JobConverter;
 import com.arassec.igor.persistence.dao.JobDao;
 import com.arassec.igor.persistence.entity.JobEntity;
+import com.github.openjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,7 @@ public class JdbcJobRepository implements JobRepository {
      * Converter for jobs.
      */
     @Autowired
-    private JobConverter jobConverter;
+    private JsonJobConverter jsonJobConverter;
 
     /**
      * Persists jobs using JDBC. Either creates a new entry in the database or updates an existing one.
@@ -39,19 +40,15 @@ public class JdbcJobRepository implements JobRepository {
      */
     @Override
     public void upsert(Job job) {
-
         JobEntity jobEntity;
         if (job.getId() == null) {
             jobEntity = new JobEntity();
         } else {
-            Optional<JobEntity> jobEntityOptional = jobDao.findById(job.getId());
-            if (!jobEntityOptional.isPresent()) {
-                throw new IllegalStateException("No job with ID " + job.getId() + " available!");
-            }
-            jobEntity = jobEntityOptional.get();
+            jobEntity = jobDao.findById(job.getId()).orElseThrow(
+                    () -> new IllegalStateException("No job with ID " + job.getId() + " available!"));
         }
         jobEntity.setName(job.getName());
-        jobEntity.setContent(jobConverter.convert(job));
+        jobEntity.setContent(jsonJobConverter.convert(job, true).toString());
         jobDao.save(jobEntity);
     }
 
@@ -65,7 +62,7 @@ public class JdbcJobRepository implements JobRepository {
     public Job findById(Long id) {
         Optional<JobEntity> jobEntityOptional = jobDao.findById(id);
         if (jobEntityOptional.isPresent()) {
-            Job job = jobConverter.convert(jobEntityOptional.get().getContent());
+            Job job = jsonJobConverter.convert(new JSONObject(jobEntityOptional.get().getContent()), true);
             job.setId(id);
             return job;
         }
@@ -81,7 +78,7 @@ public class JdbcJobRepository implements JobRepository {
     public List<Job> findAll() {
         List<Job> result = new LinkedList<>();
         for (JobEntity jobEntity : jobDao.findAll()) {
-            Job job = jobConverter.convert(jobEntity.getContent());
+            Job job = jsonJobConverter.convert(new JSONObject(jobEntity.getContent()), true);
             job.setId(jobEntity.getId());
             if (job != null) {
                 result.add(job);

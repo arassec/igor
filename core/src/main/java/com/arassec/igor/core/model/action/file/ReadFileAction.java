@@ -10,7 +10,7 @@ import com.arassec.igor.core.model.service.file.FileService;
  * Reads the content of a file.
  */
 @IgorAction(label = "Read file")
-public class ReadFileAction extends BaseAction {
+public class ReadFileAction extends BaseFileAction {
 
     /**
      * The key in the data object where the content of the file should be placed.

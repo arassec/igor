@@ -1,6 +1,7 @@
 package com.arassec.igor.core.application.factory;
 
 import com.arassec.igor.core.model.IgorProvider;
+import com.arassec.igor.core.model.IgorProviderCategory;
 import com.arassec.igor.core.model.provider.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ public class ProviderFactory extends ModelFactory<Provider> {
      * Creates a new {@link ProviderFactory}.
      */
     public ProviderFactory() {
-        super(Provider.class, IgorProvider.class);
+        super(Provider.class, IgorProviderCategory.class, IgorProvider.class);
     }
 
 }

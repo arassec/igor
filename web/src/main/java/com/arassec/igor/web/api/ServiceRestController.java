@@ -1,27 +1,26 @@
 package com.arassec.igor.web.api;
 
 import com.arassec.igor.core.application.ServiceManager;
-import com.arassec.igor.web.api.model.ParameterDefinition;
-import com.arassec.igor.web.api.model.ServiceCategory;
-import com.arassec.igor.web.api.model.ServiceType;
+import com.arassec.igor.core.application.converter.JsonParameterConverter;
+import com.arassec.igor.core.application.converter.JsonServiceConverter;
+import com.arassec.igor.core.application.factory.ModelDefinition;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
-import com.arassec.igor.web.api.model.ServiceModel;
-import com.arassec.igor.web.api.util.ParameterUtil;
-import com.arassec.igor.web.api.util.ServiceUtil;
+import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * REST controller for {@link Service}s.
  */
-@RestController
 public class ServiceRestController extends BaseRestController {
 
     /**
@@ -31,47 +30,48 @@ public class ServiceRestController extends BaseRestController {
     private ServiceManager serviceManager;
 
     /**
-     * Utility for service handling.
+     * Converter for services from and to JSON.
      */
     @Autowired
-    private ServiceUtil serviceUtil;
+    private JsonServiceConverter jsonServiceConverter;
 
     /**
-     * Utility for parameter handling.
+     * Converter for parameters to and from JSON.
      */
     @Autowired
-    private ParameterUtil parameterUtil;
+    private JsonParameterConverter jsonParameterConverter;
 
     /**
-     * Returns all {@link ServiceCategory}s.
+     * Returns all service categories as {@link ModelDefinition}s.
      *
      * @return Set of all available service categories.
      */
-    @GetMapping("/servicecategory")
-    public Set<ServiceCategory> getServiceCategories() {
-        return serviceUtil.getServiceCategories();
+    @GetMapping("/category/service")
+    public Set<ModelDefinition> getServiceCategories() {
+        return serviceManager.getCategories();
     }
 
     /**
-     * Returns all {@link ServiceType}s of a certain {@link ServiceCategory}.
+     * Returns all service types of a certain category as {@link ModelDefinition}s.
      *
-     * @param category The {@link ServiceCategory} to use.
+     * @param category The service category to use.
      * @return Set of service types.
      */
-    @GetMapping("/servicetype/{category}")
-    public ResponseEntity<Set<ServiceType>> getServiceTypes(@PathVariable("category") String category) {
-        return new ResponseEntity<>(serviceUtil.getTypesByCategory(category), HttpStatus.OK);
+    @GetMapping("/type/service/{category}")
+    public Set<ModelDefinition> getServiceTypes(@PathVariable("category") String category) {
+        return serviceManager.getTypesOfCategory(category);
     }
 
     /**
-     * Returns all configuration parameters of a {@link ServiceType}.
+     * Returns all configuration parameters of a service type.
      *
      * @param type The type to get parameters for.
      * @return List of parameters.
      */
-    @GetMapping("/serviceparams/{type}")
-    public List<ParameterDefinition> getServiceParameters(@PathVariable("type") String type) {
-        return parameterUtil.getParameters(serviceManager.createService(type, null));
+    @GetMapping("/parameters/service/{type}")
+    public String getServiceParameters(@PathVariable("type") String type) {
+        JSONArray parameters = jsonParameterConverter.convert(serviceManager.createService(type, null), false);
+        return parameters.toString();
     }
 
     /**
@@ -80,11 +80,9 @@ public class ServiceRestController extends BaseRestController {
      * @return List of available services.
      */
     @GetMapping("/service")
-    public List<ServiceModel> getServices() {
+    public List<String> getServices() {
         List<Service> services = serviceManager.loadAll();
-        return services.stream().map(service ->
-                new ServiceModel(service.getId(), service.getName(), serviceUtil.getCategory(service),
-                        serviceUtil.getType(service), parameterUtil.getParameters(service))).collect(Collectors.toList());
+        return services.stream().map(service -> jsonServiceConverter.convert(service, false).toString()).collect(Collectors.toList());
     }
 
     /**
@@ -94,12 +92,9 @@ public class ServiceRestController extends BaseRestController {
      * @return List of services in that category.
      */
     @GetMapping("/service/category/{category}")
-    public List<ServiceModel> getServicesInCategory(@PathVariable("category") String category) {
-        List<Service> services = serviceManager.loadAll();
-        return services.stream().map(service ->
-                new ServiceModel(service.getId(), service.getName(), serviceUtil.getCategory(service), serviceUtil.getType(service), parameterUtil.getParameters(service)))
-                .filter(serviceModel -> serviceModel.getServiceCategory().getType().equals(category))
-                .collect(Collectors.toList());
+    public List<String> getServicesInCategory(@PathVariable("category") String category) {
+        List<Service> services = serviceManager.loadAllOfCategory(category);
+        return services.stream().map(service -> jsonServiceConverter.convert(service, false).toString()).collect(Collectors.toList());
     }
 
     /**
@@ -109,18 +104,12 @@ public class ServiceRestController extends BaseRestController {
      * @return The service.
      */
     @GetMapping("/service/{id}")
-    public ResponseEntity<ServiceModel> getService(@PathVariable("id") Long id) {
+    public String getService(@PathVariable("id") Long id) {
         Service service = serviceManager.load(id);
         if (service != null) {
-            ServiceModel serviceModel = new ServiceModel();
-            serviceModel.setId(service.getId());
-            serviceModel.setName(service.getName());
-            serviceModel.setServiceCategory(serviceUtil.getCategory(service));
-            serviceModel.setServiceType(serviceUtil.getType(service));
-            serviceModel.setParameters(parameterUtil.getParameters(service));
-            return new ResponseEntity<>(serviceModel, HttpStatus.OK);
+            return jsonServiceConverter.convert(service, false).toString();
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return null;
     }
 
     /**
@@ -144,10 +133,10 @@ public class ServiceRestController extends BaseRestController {
         JSONObject properties = new JSONObject(serviceProperties);
         String name = properties.getString("name");
         String type = properties.getJSONObject("serviceType").getString("type");
-        Map<String, Object> parameters = parameterUtil.convertParameters(properties.getJSONArray("parameters"));
-        Service service = serviceManager.createService(type, parameters);
-        service.setName(name);
-        serviceManager.save(service);
+        //Map<String, Object> parameters = parameterUtil.convertParameters(properties.getJSONArray("parameters"));
+        //Service service = serviceManager.createService(type, parameters);
+        //service.setName(name);
+        //serviceManager.save(service);
         return new ResponseEntity<>("service created", HttpStatus.OK);
     }
 
@@ -163,11 +152,11 @@ public class ServiceRestController extends BaseRestController {
         Long id = properties.getLong("id");
         String name = properties.getString("name");
         String type = properties.getJSONObject("serviceType").getString("type");
-        Map<String, Object> parameters = parameterUtil.convertParameters(properties.getJSONArray("parameters"));
-        Service service = serviceManager.createService(type, parameters);
-        service.setId(id);
-        service.setName(name);
-        serviceManager.save(service);
+        //Map<String, Object> parameters = parameterUtil.convertParameters(properties.getJSONArray("parameters"));
+        //Service service = serviceManager.createService(type, parameters);
+        //service.setId(id);
+        //service.setName(name);
+        //serviceManager.save(service);
         return new ResponseEntity<>("service updated", HttpStatus.OK);
     }
 
@@ -181,10 +170,10 @@ public class ServiceRestController extends BaseRestController {
     public ResponseEntity<String> testService(@RequestBody String serviceProperties) {
         JSONObject properties = new JSONObject(serviceProperties);
         String type = properties.getJSONObject("serviceType").getString("type");
-        Map<String, Object> parameters = parameterUtil.convertParameters(properties.getJSONArray("parameters"));
-        Service service = serviceManager.createService(type, parameters);
+        //Map<String, Object> parameters = parameterUtil.convertParameters(properties.getJSONArray("parameters"));
+        //Service service = serviceManager.createService(type, parameters);
         try {
-            service.testConfiguration();
+            //  service.testConfiguration();
             return new ResponseEntity<>("OK", HttpStatus.OK);
         } catch (ServiceException e) {
             String result = e.getMessage();

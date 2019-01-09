@@ -1,21 +1,17 @@
-package com.arassec.igor.core.model.action.misc;
+package com.arassec.igor.core.model.action.persistence;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.service.persistence.PersistenceService;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Cleans up persisted values. This is used for housekeeping so that old, persisted values can be removed from the
  * persistence store if they are not needed any more.
  */
 @IgorAction(label = "Cleanup persisted values")
-public class CleanupPersistedValuesAction extends BaseAction {
+public class CleanupPersistedValuesAction extends BasePersistenceAction {
 
     /**
      * The persistence service to use.
