@@ -186,14 +186,16 @@ public class SftpFileService extends BaseSshFileService {
     @Override
     public void move(String source, String target) {
         try {
-            Session session = connect(host, port, username, password);
-            ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-            channel.connect();
-            channel.rename(source, target);
-            channel.disconnect();
-            session.disconnect();
+            moveInternal(source, target);
         } catch (SftpException | JSchException e) {
-            throw new ServiceException("Could not move file: " + source + " to " + target, e);
+            try {
+                // Workaround: sometimes there's an "SftpException: File not found" thrown and a retry a few seconds later works
+                // without problems...
+                Thread.sleep(30000);
+                moveInternal(source, target);
+            } catch (SftpException | JSchException | InterruptedException e1) {
+                throw new ServiceException("Could not move file: " + source + " to " + target, e);
+            }
         }
     }
 
@@ -205,4 +207,26 @@ public class SftpFileService extends BaseSshFileService {
         Session session = connect(host, port, username, password);
         session.disconnect();
     }
+
+    /**
+     * Moves the source file into the target file.
+     *
+     * @param source
+     *         The source file to move.
+     * @param target
+     *         The target file name.
+     * @throws JSchException
+     *         In case of SSH protocol errors.
+     * @throws SftpException
+     *         In case of SFTP errors.
+     */
+    private void moveInternal(String source, String target) throws JSchException, SftpException {
+        Session session = connect(host, port, username, password);
+        ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+        channel.connect();
+        channel.rename(source, target);
+        channel.disconnect();
+        session.disconnect();
+    }
+
 }
