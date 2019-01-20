@@ -1,6 +1,6 @@
 package com.arassec.igor.core.application;
 
-import com.arassec.igor.core.application.factory.ModelDefinition;
+import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import com.arassec.igor.core.application.factory.ProviderFactory;
 import com.arassec.igor.core.model.provider.Provider;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class ProviderManager {
      *
      * @return The categories.
      */
-    public Set<ModelDefinition> getCategories() {
+    public Set<KeyLabelStore> getCategories() {
         return providerFactory.getCategories();
     }
 
@@ -38,7 +38,7 @@ public class ProviderManager {
      *
      * @return The service types of the specified category.
      */
-    public Set<ModelDefinition> getTypesOfCategory(String categoryType) {
+    public Set<KeyLabelStore> getTypesOfCategory(String categoryType) {
         if (providerFactory.getTypesByCategory().containsKey(categoryType)) {
             return providerFactory.getTypesByCategory().get(categoryType);
         }

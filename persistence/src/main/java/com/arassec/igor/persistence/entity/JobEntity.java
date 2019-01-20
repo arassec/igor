@@ -7,9 +7,10 @@ import javax.persistence.*;
 /**
  * JPA Entity for {@link com.arassec.igor.core.model.job.Job}s.
  */
+@Data
 @Entity
 @Table(name = "job", schema = "igor")
-@Data
+@SequenceGenerator(name = "jobIdSequence", sequenceName = "JOB_ID_SEQUENCE", allocationSize=1)
 public class JobEntity {
 
     /**
@@ -17,7 +18,6 @@ public class JobEntity {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "jobIdSequence")
-    @SequenceGenerator(name = "jobIdSequence", sequenceName = "JOB_ID_SEQUENCE")
     private Long id;
 
     /**

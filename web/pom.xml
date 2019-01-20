@@ -12,8 +12,8 @@
     <artifactId>web</artifactId>
     <packaging>jar</packaging>
 
-    <name>web - the web-based api and user interface</name>
-    <description>igor web - provides a web-based GUI and API</description>
+    <name>web</name>
+    <description>Provides a REST-API and serves the fronted.</description>
 
     <build>
         <plugins>

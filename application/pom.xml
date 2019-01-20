@@ -12,8 +12,8 @@
     <artifactId>application</artifactId>
     <packaging>jar</packaging>
 
-    <name>application - the running igor application</name>
-    <description>igor application - combines all parts together to a running application</description>
+    <name>application</name>
+    <description>Combines all parts of igor together into a running application.</description>
 
     <dependencies>
 
@@ -51,6 +51,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>module-ssh</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <!-- Spring-Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <!-- JAXB-Dependencies for Spring-Boot to work with Java 10 -->

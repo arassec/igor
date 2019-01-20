@@ -12,8 +12,8 @@
     <artifactId>module-ssh</artifactId>
     <packaging>jar</packaging>
 
-    <name>module-ssh - service implementations using SSH</name>
-    <description>igor ssh module - enables igor to use SSH for various services</description>
+    <name>module-ssh</name>
+    <description>Eenables igor to use SSH for services</description>
 
     <dependencies>
 

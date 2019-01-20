@@ -1,9 +1,8 @@
 package com.arassec.igor.core.model.concurrent;
 
-import com.arassec.igor.core.model.action.BaseAction;
+import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.IgorData;
-import com.arassec.igor.core.model.action.Action;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedList;

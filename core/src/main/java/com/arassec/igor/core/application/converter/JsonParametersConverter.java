@@ -1,6 +1,6 @@
 package com.arassec.igor.core.application.converter;
 
-import com.arassec.igor.core.application.util.EncryptionUtil;
+import com.arassec.igor.core.application.converter.util.EncryptionUtil;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
@@ -8,7 +8,6 @@ import com.arassec.igor.core.repository.ServiceRepository;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
@@ -24,7 +23,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class JsonParameterConverter {
+public class JsonParametersConverter {
 
     /**
      * Repository for services. Required to get a service instance as a service parameter's value.
@@ -44,25 +43,31 @@ public class JsonParameterConverter {
      * @param instance      The model instance to get the parameters from.
      * @param applySecurity Set to {@code true} to encrypt secured properties. If set to {@code false}, secured
      *                      properties will be kept in cleartext form.
+     * @param addVolatile   Set to {@code true} to add properties that only exist through annotations or could otherwise
+     *                      be obtained, but can be added for convenience.
      * @param <T>           The instance type.
      * @return Map containing the parameters.
      */
-    public <T> JSONArray convert(T instance, boolean applySecurity) {
+    public <T> JSONArray convert(T instance, boolean applySecurity, boolean addVolatile) {
         JSONArray result = new JSONArray();
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
             if (field.isAnnotationPresent(IgorParam.class)) {
                 JSONObject parameter = new JSONObject();
                 parameter.put(JsonKeys.NAME, field.getName());
-                parameter.put(JsonKeys.TYPE, field.getType());
+                parameter.put(JsonKeys.TYPE, field.getType().getName());
                 Object value = getFieldValue(instance, field, applySecurity);
                 parameter.put(JsonKeys.VALUE, value);
                 parameter.put(JsonKeys.SECURED, field.getAnnotation(IgorParam.class).secured());
-                parameter.put(JsonKeys.OPTIONAL, field.getAnnotation(IgorParam.class).optional());
+                if (addVolatile) {
+                    parameter.put(JsonKeys.OPTIONAL, field.getAnnotation(IgorParam.class).optional());
+                }
                 boolean isService = Service.class.isAssignableFrom(field.getType());
                 parameter.put(JsonKeys.SERVICE, isService);
                 if (isService && value != null) {
                     Service service = (Service) value;
-                    parameter.put(JsonKeys.SERVICE_NAME, service.getName());
+                    if (addVolatile) {
+                        parameter.put(JsonKeys.SERVICE_NAME, service.getName());
+                    }
                     parameter.put(JsonKeys.VALUE, service.getId());
                 }
                 result.put(parameter);
@@ -75,8 +80,8 @@ public class JsonParameterConverter {
      * Returns the provided parameters as Map.
      *
      * @param parameters    The parameters in JSON form.
-     * @param applySecurity Set to {@code true} to encrypt secured properties. If set to {@code false}, secured
-     *                      properties will be kept in cleartext form.
+     * @param applySecurity Set to {@code true} to decrypt secured properties. If set to {@code false}, secured
+     *                      properties will be kept in encrypted form.
      * @return A map containing only parameter name and parameter value.
      */
     public Map<String, Object> convert(JSONArray parameters, boolean applySecurity) {

@@ -1,5 +1,5 @@
 <template>
-    <core-content>
+    <core-content class="side-menu">
         <core-panel>
             <h1>
                 <slot name="title"/>
@@ -50,4 +50,7 @@ export default {
 
     }
 
+    .side-menu {
+        min-width: 445px;
+    }
 </style>

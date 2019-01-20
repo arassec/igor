@@ -12,8 +12,8 @@
     <artifactId>module-localfs</artifactId>
     <packaging>jar</packaging>
 
-    <name>module-localfs - service implmentations using the local filesystem</name>
-    <description>igor localfs module - enables igor to use the local filesystem with services</description>
+    <name>module-localfs</name>
+    <description>Enables igor to use the local filesystem with services</description>
 
     <dependencies>
 

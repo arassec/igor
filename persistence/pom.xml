@@ -12,8 +12,8 @@
     <artifactId>persistence</artifactId>
     <packaging>jar</packaging>
 
-    <name>persistence - contains the igor persistence layer</name>
-    <description>igor persistence - provides ways to persist the data model</description>
+    <name>persistence</name>
+    <description>Provides ways to persist the data model.</description>
 
     <dependencies>
 

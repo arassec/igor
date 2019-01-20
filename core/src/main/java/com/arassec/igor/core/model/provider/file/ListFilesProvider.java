@@ -58,6 +58,9 @@ public class ListFilesProvider extends BaseProvider implements FileProvider {
         files.clear();
         files.addAll(sourceService.listFiles(directory));
         currentFile = 0;
+        if (!directory.endsWith("/")) {
+            directory += "/";
+        }
     }
 
     /**

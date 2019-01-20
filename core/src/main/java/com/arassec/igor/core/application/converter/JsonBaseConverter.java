@@ -1,6 +1,6 @@
 package com.arassec.igor.core.application.converter;
 
-import com.arassec.igor.core.application.factory.ModelDefinition;
+import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import com.github.openjson.JSONObject;
 
 /**
@@ -9,27 +9,27 @@ import com.github.openjson.JSONObject;
 public abstract class JsonBaseConverter {
 
     /**
-     * Converts a {@link ModelDefinition} to JSON.
+     * Converts a {@link KeyLabelStore} to JSON.
      *
-     * @param modelDefinition The model definition to convert.
+     * @param keyLabelStore The model definition to convert.
      * @return A {@link JSONObject} with the model definition's data.
      */
-    protected JSONObject convert(ModelDefinition modelDefinition) {
+    protected JSONObject convert(KeyLabelStore keyLabelStore) {
         JSONObject result = new JSONObject();
-        result.put(JsonKeys.TYPE, modelDefinition.getType());
-        result.put(JsonKeys.LABEL, modelDefinition.getLabel());
+        result.put(JsonKeys.KEY, keyLabelStore.getKey());
+        result.put(JsonKeys.LABEL, keyLabelStore.getLabel());
         return result;
     }
 
     /**
-     * Converts a {@link JSONObject} into a {@link ModelDefinition}.
+     * Converts a {@link JSONObject} into a {@link KeyLabelStore}.
      *
      * @param modelDefinition The model definition in JSON form.
-     * @return A newly created {@link ModelDefinition} containint the JSON's data.
+     * @return A newly created {@link KeyLabelStore} containint the JSON's data.
      */
-    protected ModelDefinition convert(JSONObject modelDefinition) {
-        ModelDefinition result = new ModelDefinition();
-        result.setType(modelDefinition.getString(JsonKeys.TYPE));
+    protected KeyLabelStore convert(JSONObject modelDefinition) {
+        KeyLabelStore result = new KeyLabelStore();
+        result.setKey(modelDefinition.getString(JsonKeys.KEY));
         result.setLabel(modelDefinition.getString(JsonKeys.LABEL));
         return result;
     }

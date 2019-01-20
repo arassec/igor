@@ -34,10 +34,11 @@
                     <tr>
                         <td><label for="category-input">Category</label></td>
                         <td>
-                            <select id="category-input" v-model="selectedCategory"
-                                    v-on:change="loadServiceTypes(selectedCategory)" :disabled="!newService">
-                                <option v-for="category in serviceCategories" v-bind:value="category.type"
-                                        v-bind:key="category.type">
+                            <select id="category-input" v-model="serviceConfiguration.category"
+                                    v-on:change="loadServiceTypes(serviceConfiguration.category.key)"
+                                    :disabled="!newService">
+                                <option v-for="category in serviceCategories" v-bind:value="category"
+                                        v-bind:key="category.key">
                                     {{category.label}}
                                 </option>
                             </select>
@@ -48,9 +49,9 @@
                         <td><label for="type-input">Type</label></td>
                         <td>
                             <select id="type-input" v-model="serviceConfiguration.type"
-                                    v-on:change="loadTypeParameters(serviceConfiguration.type.type)"
+                                    v-on:change="loadTypeParameters(serviceConfiguration.type.key)"
                                     :disabled="!newService">
-                                <option v-for="type in serviceTypes" v-bind:value="type" v-bind:key="type.type">
+                                <option v-for="type in serviceTypes" v-bind:value="type" v-bind:key="type.key">
                                     {{type.label}}
                                 </option>
                             </select>
@@ -99,7 +100,6 @@ export default {
     return {
       newService: true,
       serviceCategories: [],
-      selectedCategory: '',
       serviceTypes: [],
       nameValidationError: '',
       feedback: '',
@@ -121,7 +121,7 @@ export default {
       this.$http.get('/api/service/' + id).then(function (response) {
         component.serviceConfiguration = response.data
         component.serviceCategories.push(component.serviceConfiguration.category)
-        component.selectedCategory = component.serviceConfiguration.category.type
+        component.selectedCategory = component.serviceConfiguration.category.key
         component.serviceTypes.push(component.serviceConfiguration.type)
       }).catch(function (error) {
         component.feedback = error
@@ -130,15 +130,15 @@ export default {
     },
     loadServiceCategories: function () {
       let component = this
-      this.$http.get('/api/servicecategory').then(function (response) {
+      this.$http.get('/api/category/service').then(function (response) {
         for (let i = component.serviceCategories.length; i > 0; i--) {
           component.serviceCategories.pop()
         }
         Array.from(response.data).forEach(function (item) {
           component.serviceCategories.push(item)
         })
-        component.selectedCategory = component.serviceCategories[0].type
-        component.loadServiceTypes(component.selectedCategory)
+        component.serviceConfiguration.category = component.serviceCategories[0]
+        component.loadServiceTypes(component.serviceConfiguration.category.key)
       }).catch(function (error) {
         component.feedback = error
         component.feedbackOk = false
@@ -146,7 +146,7 @@ export default {
     },
     loadServiceTypes: function (category) {
       let component = this
-      this.$http.get('/api/servicetype/' + category).then(function (response) {
+      this.$http.get('/api/type/service/' + category).then(function (response) {
         for (let i = component.serviceTypes.length; i > 0; i--) {
           component.serviceTypes.pop()
         }
@@ -154,7 +154,7 @@ export default {
           component.serviceTypes.push(item)
         })
         component.serviceConfiguration.type = component.serviceTypes[0]
-        component.loadTypeParameters(component.serviceConfiguration.type.type)
+        component.loadTypeParameters(component.serviceConfiguration.type.key)
       }).catch(function (error) {
         component.feedback = error
         component.feedbackOk = false
@@ -162,7 +162,7 @@ export default {
     },
     loadTypeParameters: function (type) {
       let component = this
-      this.$http.get('/api/serviceparams/' + type).then(function (response) {
+      this.$http.get('/api/parameters/service/' + type).then(function (response) {
         component.serviceConfiguration.parameters = response.data
       }).catch(function (error) {
         component.feedback = error
@@ -199,7 +199,8 @@ export default {
       let component = this
 
       if (this.newService) {
-        this.$http.post('/api/service', this.serviceConfiguration).then(function () {
+        this.$http.post('/api/service', this.serviceConfiguration).then(function (response) {
+          component.serviceConfiguration = response.data;
           component.feedback = ''
           component.feedbackOk = true
           component.requestInProgress = false

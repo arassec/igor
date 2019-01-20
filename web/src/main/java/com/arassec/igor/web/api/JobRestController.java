@@ -3,15 +3,26 @@ package com.arassec.igor.web.api;
 import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.application.converter.JsonJobConverter;
 import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.web.api.model.JobListEntry;
+import com.github.openjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * REST-Controller for {@link Job}s.
  */
-public class JobRestController extends BaseRestController {
+@RestController
+@RequestMapping("/api/job")
+public class JobRestController {
 
     /**
      * Manager for Jobs.
@@ -30,11 +41,12 @@ public class JobRestController extends BaseRestController {
      *
      * @return List of Job-IDs.
      */
-//    @GetMapping("/job/id")
-//    public List<String> getJobIds() {
-//        List<Job> jobs = jobManager.loadAll();
-//        return jobs.stream().map(job -> new JobModel(job.getId(), job.getName(), job.isActive())).collect(Collectors.toList());
-//    }
+    @GetMapping
+    public List<JobListEntry> getJobIds() {
+        List<Job> jobs = jobManager.loadAll();
+        return jobs.stream().map(job -> new JobListEntry(job.getId(), job.getName(), job.isActive()))
+                .collect(Collectors.toList());
+    }
 
     /**
      * Returns the JSON-representation of the Job with the given ID.
@@ -42,65 +54,64 @@ public class JobRestController extends BaseRestController {
      * @param id The job's ID.
      * @return The job in JSON form.
      */
-//    @GetMapping("/job/{id}")
-//    public ResponseEntity<JobModel> getJob(@PathVariable("id") Long id) {
-//        if (StringUtils.isEmpty(id)) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        Job job = jobManager.load(id);
-//        if (job != null) {
-//            return new ResponseEntity<>(jobConverter.convert(job), HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
+    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getJob(@PathVariable("id") Long id) {
+        if (StringUtils.isEmpty(id)) {
+            throw new IllegalArgumentException("ID required");
+        }
+        Job job = jobManager.load(id);
+        if (job != null) {
+            return jsonJobConverter.convert(job, false, true).toString();
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found");
+    }
 
     /**
      * Saves a job.
      *
-     * @param jobProperties The job in JSON form.
+     * @param jobJson The job in JSON form.
      * @return 'OK' on success.
      */
-//    @PostMapping("/job")
-//    public ResponseEntity<String> saveJob(@RequestBody String jobProperties) {
-//        JSONObject properties = new JSONObject(jobProperties);
-//        Job job = jobConverter.convert(properties);
-//        job.setId(null);
-//        jobManager.save(job);
-//        return new ResponseEntity<>("OK", HttpStatus.OK);
-//    }
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public String saveJob(@RequestBody String jobJson) {
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
+        job.setId(null);
+        Job savedJob = jobManager.save(job);
+        return jsonJobConverter.convert(savedJob, false, true).toString();
+    }
 
     /**
      * Updates an existing job.
      *
-     * @param jobProperties The job in JSON form.
+     * @param jobJson The job in JSON form.
      * @return 'OK' on success.
      */
-//    @PutMapping("/job")
-//    public ResponseEntity<String> updateJob(@RequestBody String jobProperties) {
-//        JSONObject properties = new JSONObject(jobProperties);
-//        Job job = jobConverter.convert(properties);
-//        jobManager.save(job);
-//        return new ResponseEntity<>("OK", HttpStatus.OK);
-//    }
+    @PutMapping()
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateJob(@RequestBody String jobJson) {
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
+        jobManager.save(job);
+    }
 
     /**
      * Runs a dry-run of the supplied job.
      *
-     * @param jobProperties The job in JSON form.
+     * @param jobJson The job in JSON form.
      * @return Test results of the dry-run.
      */
-//    @PostMapping("/job/test")
-//    public DryRunJobResult testJob(@RequestBody String jobProperties) {
-//        Job job = jobConverter.convert(new JSONObject(jobProperties));
-//        return job.dryRun();
-//    }
+    @PostMapping("test")
+    public DryRunJobResult testJob(@RequestBody String jobJson) {
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
+        return job.dryRun();
+    }
 
     /**
      * Deletes the job with the given ID.
      *
      * @param id The job's ID.
      */
-    @DeleteMapping("/job/{id}")
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteJob(@PathVariable("id") Long id) {
         jobManager.delete(id);
     }
@@ -108,16 +119,15 @@ public class JobRestController extends BaseRestController {
     /**
      * Runs the supplied job.
      *
-     * @param jobProperties The job in JSON form.
+     * @param jobJson The job in JSON form.
      * @return 'OK' on success.
      */
-//    @PostMapping("/job/run")
-//    public ResponseEntity<String> runJob(@RequestBody String jobProperties) {
-//        JSONObject properties = new JSONObject(jobProperties);
-//        Job job = jobConverter.convert(properties);
-//        jobManager.run(job);
-//        return new ResponseEntity<>("OK", HttpStatus.OK);
-//    }
+    @PostMapping("run")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void runJob(@RequestBody String jobJson) {
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
+        jobManager.run(job);
+    }
 
     /**
      * Returns the execution state of a certain job.
@@ -126,14 +136,14 @@ public class JobRestController extends BaseRestController {
      * @return The current {@link JobExecution} with information about a running job or {@code null}, if the job is not
      * running.
      */
-//    @GetMapping("/job/{id}/execution")
-//    public ResponseEntity<JobExecution> getExecution(@PathVariable("id") Long id) {
-//        JobExecution jobExecution = jobManager.getJobExecution(id);
-//        if (jobExecution != null) {
-//            return new ResponseEntity<>(jobExecution, HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
+    @GetMapping("{id}/execution")
+    public JobExecution getExecution(@PathVariable("id") Long id) {
+        JobExecution jobExecution = jobManager.getJobExecution(id);
+        if (jobExecution != null) {
+            return jobExecution;
+        }
+        return new JobExecution();
+    }
 
     /**
      * Cancels a running job.
@@ -141,13 +151,13 @@ public class JobRestController extends BaseRestController {
      * @param id The job's ID.
      * @return 'OK' on success.
      */
-//    @PostMapping("/job/{id}/cancel")
-//    public ResponseEntity<String> cancelJob(@PathVariable("id") Long id) {
-//        if (id != null) {
-//            jobManager.cancel(id);
-//            return new ResponseEntity<>("OK", HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>("ERROR", HttpStatus.BAD_REQUEST);
-//    }
+    @PostMapping("{id}/cancel")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelJob(@PathVariable("id") Long id) {
+        if (StringUtils.isEmpty(id)) {
+            throw new IllegalArgumentException("ID required");
+        }
+        jobManager.cancel(id);
+    }
 
 }

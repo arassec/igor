@@ -39,7 +39,7 @@ public class JdbcServiceRepository implements ServiceRepository {
      * @param service The service to save.
      */
     @Override
-    public void upsert(Service service) {
+    public Service upsert(Service service) {
         ServiceEntity serviceEntity;
         if (service.getId() == null) {
             serviceEntity = new ServiceEntity();
@@ -48,8 +48,10 @@ public class JdbcServiceRepository implements ServiceRepository {
                     () -> new IllegalStateException("No service with ID " + service.getId() + " available!"));
         }
         serviceEntity.setName(service.getName());
-        serviceEntity.setContent(jsonServiceConverter.convert(service, true).toString());
-        serviceDao.save(serviceEntity);
+        serviceEntity.setContent(jsonServiceConverter.convert(service, true, false).toString());
+        ServiceEntity savedEntity = serviceDao.save(serviceEntity);
+        service.setId(savedEntity.getId());
+        return service;
     }
 
     /**

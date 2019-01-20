@@ -12,8 +12,8 @@
     <artifactId>module-ftp</artifactId>
     <packaging>jar</packaging>
 
-    <name>module-file - functionality for file handling</name>
-    <description>igor file module - enables file handling by igor</description>
+    <name>module-ftp</name>
+    <description>Enables FTP/FTPS service handling in igor.</description>
 
     <dependencies>
 

@@ -1,20 +1,24 @@
-- JavaDocs
-- Warning when leaving job-editor and unsaved changes exist
-- Compare and maybe combine job/service <-> JSON converters in persistence- and web-modules.
-    - Parameter conversion is already duplicate code in the persistence-module.
+- BUG: in UI, when moving an action, the type is lost in the dropdown-box
 - Unit-Tests (Apache Mina SSHD!)
+- Job state in DB ('running') and synchronized job-manager
+- Creating service from within job-editor
+- service-selector with specialized services like LocalFilesystemFileService
+- Warning when leaving job-editor and unsaved changes exist
 - README.md
 - ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
 - new: DeleteFileAction
 - CopyFileAction -> "overwrite"-property to overwrite target files
-- Creating service from within job-editor
-- service-selector with specialized services like LocalFilesystemFileService
 - Job execution history in job-editor
 - Job schedule under home
 - Job status under home
+- Home-View with last job runs and "next-to-run"-overview
+- Persistence-service in DB instead of files
 - Persistence-service editor
-- Configuration page
+- Configuration-View with system configurations
 - Initial setup with configuration on first start
 - Keep filters for jobs and services in the store
 - Tags for jobs + grouping/filtering jobs by tag
 - Job dry-runs without cloning Tasks?
+- Replace IgorData with JSONObject
+- Authentication + Authorization (Frontend + Backend)
+- Export + Import of jobs and services (via JSON)

@@ -1,27 +1,28 @@
 package com.arassec.igor.web.api;
 
 import com.arassec.igor.core.application.ServiceManager;
-import com.arassec.igor.core.application.converter.JsonParameterConverter;
 import com.arassec.igor.core.application.converter.JsonServiceConverter;
-import com.arassec.igor.core.application.factory.ModelDefinition;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.web.api.model.ServiceListEntry;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * REST controller for {@link Service}s.
  */
-public class ServiceRestController extends BaseRestController {
+@RestController
+@RequestMapping("/api/service")
+public class ServiceRestController {
 
     /**
      * The service manager.
@@ -36,53 +37,15 @@ public class ServiceRestController extends BaseRestController {
     private JsonServiceConverter jsonServiceConverter;
 
     /**
-     * Converter for parameters to and from JSON.
-     */
-    @Autowired
-    private JsonParameterConverter jsonParameterConverter;
-
-    /**
-     * Returns all service categories as {@link ModelDefinition}s.
-     *
-     * @return Set of all available service categories.
-     */
-    @GetMapping("/category/service")
-    public Set<ModelDefinition> getServiceCategories() {
-        return serviceManager.getCategories();
-    }
-
-    /**
-     * Returns all service types of a certain category as {@link ModelDefinition}s.
-     *
-     * @param category The service category to use.
-     * @return Set of service types.
-     */
-    @GetMapping("/type/service/{category}")
-    public Set<ModelDefinition> getServiceTypes(@PathVariable("category") String category) {
-        return serviceManager.getTypesOfCategory(category);
-    }
-
-    /**
-     * Returns all configuration parameters of a service type.
-     *
-     * @param type The type to get parameters for.
-     * @return List of parameters.
-     */
-    @GetMapping("/parameters/service/{type}")
-    public String getServiceParameters(@PathVariable("type") String type) {
-        JSONArray parameters = jsonParameterConverter.convert(serviceManager.createService(type, null), false);
-        return parameters.toString();
-    }
-
-    /**
      * Returns all available services.
      *
      * @return List of available services.
      */
-    @GetMapping("/service")
-    public List<String> getServices() {
+    @GetMapping
+    public List<ServiceListEntry> getServices() {
         List<Service> services = serviceManager.loadAll();
-        return services.stream().map(service -> jsonServiceConverter.convert(service, false).toString()).collect(Collectors.toList());
+        return services.stream().map(service -> new ServiceListEntry(service.getId(), service.getName()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -91,10 +54,12 @@ public class ServiceRestController extends BaseRestController {
      * @param category The target category.
      * @return List of services in that category.
      */
-    @GetMapping("/service/category/{category}")
-    public List<String> getServicesInCategory(@PathVariable("category") String category) {
-        List<Service> services = serviceManager.loadAllOfCategory(category);
-        return services.stream().map(service -> jsonServiceConverter.convert(service, false).toString()).collect(Collectors.toList());
+    @GetMapping(value = "category/{category}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getServicesInCategory(@PathVariable("category") String category) {
+        JSONArray result = new JSONArray();
+        serviceManager.loadAllOfCategory(category).stream().forEach(
+                service -> result.put(jsonServiceConverter.convert(service, false, true)));
+        return result.toString();
     }
 
     /**
@@ -103,13 +68,13 @@ public class ServiceRestController extends BaseRestController {
      * @param id The service's ID.
      * @return The service.
      */
-    @GetMapping("/service/{id}")
+    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getService(@PathVariable("id") Long id) {
         Service service = serviceManager.load(id);
         if (service != null) {
-            return jsonServiceConverter.convert(service, false).toString();
+            return jsonServiceConverter.convert(service, false, true).toString();
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Service not found");
     }
 
     /**
@@ -117,7 +82,8 @@ public class ServiceRestController extends BaseRestController {
      *
      * @param id The service's ID.
      */
-    @DeleteMapping("/service/{id}")
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteService(@PathVariable("id") Long id) {
         serviceManager.deleteService(id);
     }
@@ -125,55 +91,40 @@ public class ServiceRestController extends BaseRestController {
     /**
      * Creates a new service.
      *
-     * @param serviceProperties The service configuration in JSON form.
-     * @return The string 'service created' upon success.
+     * @param serviceJson The service configuration in JSON form.
+     * @return The service JSON on success.
      */
-    @PostMapping("/service")
-    public ResponseEntity<String> createService(@RequestBody String serviceProperties) {
-        JSONObject properties = new JSONObject(serviceProperties);
-        String name = properties.getString("name");
-        String type = properties.getJSONObject("serviceType").getString("type");
-        //Map<String, Object> parameters = parameterUtil.convertParameters(properties.getJSONArray("parameters"));
-        //Service service = serviceManager.createService(type, parameters);
-        //service.setName(name);
-        //serviceManager.save(service);
-        return new ResponseEntity<>("service created", HttpStatus.OK);
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public String createService(@RequestBody String serviceJson) {
+        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), false);
+        Service savedService = serviceManager.save(service);
+        return jsonServiceConverter.convert(savedService, false, true).toString();
     }
 
     /**
      * Updates an existing service.
      *
-     * @param serviceProperties The service configuration in JSON form.
+     * @param serviceJson The service configuration in JSON form.
      * @return The string 'service updated' upon success.
      */
-    @PutMapping("/service")
-    public ResponseEntity<String> updateService(@RequestBody String serviceProperties) {
-        JSONObject properties = new JSONObject(serviceProperties);
-        Long id = properties.getLong("id");
-        String name = properties.getString("name");
-        String type = properties.getJSONObject("serviceType").getString("type");
-        //Map<String, Object> parameters = parameterUtil.convertParameters(properties.getJSONArray("parameters"));
-        //Service service = serviceManager.createService(type, parameters);
-        //service.setId(id);
-        //service.setName(name);
-        //serviceManager.save(service);
-        return new ResponseEntity<>("service updated", HttpStatus.OK);
+    @PutMapping()
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateService(@RequestBody String serviceJson) {
+        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), false);
+        serviceManager.save(service);
     }
 
     /**
      * Tests the supplied service configuration.
      *
-     * @param serviceProperties The service configuration in JSON form.
+     * @param serviceJson The service configuration in JSON form.
      * @return The string 'OK' on success, an error message if the test was not successful.
      */
-    @PostMapping("/service/test")
-    public ResponseEntity<String> testService(@RequestBody String serviceProperties) {
-        JSONObject properties = new JSONObject(serviceProperties);
-        String type = properties.getJSONObject("serviceType").getString("type");
-        //Map<String, Object> parameters = parameterUtil.convertParameters(properties.getJSONArray("parameters"));
-        //Service service = serviceManager.createService(type, parameters);
+    @PostMapping("test")
+    public ResponseEntity<String> testService(@RequestBody String serviceJson) {
+        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), false);
         try {
-            //  service.testConfiguration();
+            service.testConfiguration();
             return new ResponseEntity<>("OK", HttpStatus.OK);
         } catch (ServiceException e) {
             String result = e.getMessage();

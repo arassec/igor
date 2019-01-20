@@ -37,7 +37,7 @@
                                               v-on:click="$emit('action-is-selected', taskIndex, actionIndex)">
                                             <font-awesome-icon icon="wrench"/>
                                             <span>
-                                                {{ formatName(action.label)}}
+                                                {{ formatName(action.type.label)}}
                                             </span>
                                             <font-awesome-icon icon="arrow-up" class="fa-xs"
                                                                v-if="actionIndex > 0"

@@ -3,6 +3,7 @@ package com.arassec.igor.module.localfs.action;
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.BaseAction;
+import com.arassec.igor.core.model.action.file.BaseFileAction;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.module.localfs.service.LocalFilesystemFileService;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
  * Writes all provided data into a file. Each {@link IgorData} is processed as one line of the target file.
  */
 @IgorAction(label = "Write lines to file")
-public class WriteLinesFileAction extends BaseAction {
+public class WriteLinesFileAction extends BaseFileAction {
 
     /**
      * The data key that points to the newly written file's name.

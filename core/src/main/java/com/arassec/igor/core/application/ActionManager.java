@@ -1,7 +1,7 @@
 package com.arassec.igor.core.application;
 
 import com.arassec.igor.core.application.factory.ActionFactory;
-import com.arassec.igor.core.application.factory.ModelDefinition;
+import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import com.arassec.igor.core.model.action.Action;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class ActionManager {
      *
      * @return The categories.
      */
-    public Set<ModelDefinition> getCategories() {
+    public Set<KeyLabelStore> getCategories() {
         return actionFactory.getCategories();
     }
 
@@ -38,7 +38,7 @@ public class ActionManager {
      *
      * @return The service types of the specified category.
      */
-    public Set<ModelDefinition> getTypesOfCategory(String categoryType) {
+    public Set<KeyLabelStore> getTypesOfCategory(String categoryType) {
         if (actionFactory.getTypesByCategory().containsKey(categoryType)) {
             return actionFactory.getTypesByCategory().get(categoryType);
         }

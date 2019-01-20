@@ -13,8 +13,9 @@ public interface ServiceRepository {
      * Saves a new service or updates an existing one.
      *
      * @param service The service to save.
+     * @return The saved service.
      */
-    void upsert(Service service);
+    Service upsert(Service service);
 
     /**
      * Returns all services.

@@ -13,7 +13,7 @@
                 </p>
                 <p slot="right">
                     <input-button icon="times" v-on:clicked="cancelJob" :disabled="!jobRunning"/>
-                    <input-button icon="play" v-on:clicked="runJob" class="button-margin-left" :disabled="jobRunning || jobConfiguration.id == null"/>
+                    <input-button icon="play" v-on:clicked="runJob" class="button-margin-left" :disabled="jobRunning || jobConfiguration.id == null || requestInProgress"/>
                 </p>
             </button-row>
             <job-tree-navigation slot="content"
@@ -58,7 +58,6 @@
                                      v-bind:key="taskIndex + '_' + actionIndex"
                                      v-bind:action-key="taskIndex + '_' + actionIndex"
                                      v-bind:action="action"
-                                     v-bind:action-types="actionTypes"
                                      ref="actionConfigurators"/>
             </template>
 
@@ -131,9 +130,12 @@ export default {
       feedbackOk: true,
       showDeleteTaskDialog: false,
       showDeleteActionDialog: false,
+      initialProviderCategory: {},
+      initialProviderType: {},
+      initialActionCategory: {},
+      initialActionType: {},
       selectedTaskIndex: -1,
       selectedActionIndex: -1,
-      actionTypes: [],
       requestInProgress: false,
       testResults: null,
       selectedTestResults: null,
@@ -183,7 +185,9 @@ export default {
       let component = this
 
       if (this.newJob) {
-        this.$http.post('/api/job', this.jobConfiguration).then(function () {
+        this.$http.post('/api/job', this.jobConfiguration).then(function (response) {
+          component.jobConfiguration = response.data
+          component.newJob = false;
           component.feedback = ''
           component.feedbackOk = true
           component.requestInProgress = false
@@ -225,7 +229,7 @@ export default {
         component.requestInProgress = false
         component.updateSelectedTestResult()
       }).catch(function (error) {
-        component.feedback = 'Testing failed! (' + error.response.data.error + ')'
+        component.feedback = 'Testing failed! (' + error.response.data + ')'
         component.feedbackOk = false
         component.requestInProgress = false
       })
@@ -256,8 +260,9 @@ export default {
         name: 'Task',
         description: '',
         provider: {
-          type: '',
-          parameters: {}
+          category: this.initialProviderCategory,
+          type: this.initialProviderType,
+          parameters: []
         },
         actions: []
       }
@@ -277,9 +282,9 @@ export default {
     },
     addAction: function (taskIndex) {
       let action = {
-        type: this.actionTypes[0].type,
-        label: this.actionTypes[0].label,
-        parameters: {}
+        category: this.initialActionCategory,
+        type: this.initialActionType,
+        parameters: []
       }
       this.jobConfiguration.tasks[taskIndex].actions.push(action)
       this.selectAction(taskIndex, this.jobConfiguration.tasks[taskIndex].actions.length - 1)
@@ -315,11 +320,17 @@ export default {
       }
       this.arrayMove(this.jobConfiguration.tasks[taskIndex].actions, actionIndex, actionIndex - 1)
       this.selectAction(taskIndex, (actionIndex - 1))
+      this.feedback = ''
+      this.feedbackOk = true
+      this.validationErrors = []
     },
     moveActionDown: function (taskIndex, actionIndex) {
       if (actionIndex < this.jobConfiguration.tasks[taskIndex].actions.length - 1) {
         this.arrayMove(this.jobConfiguration.tasks[taskIndex].actions, actionIndex, actionIndex + 1)
         this.selectAction(taskIndex, (actionIndex + 1))
+        this.feedback = ''
+        this.feedbackOk = true
+        this.validationErrors = []
       }
     },
     arrayMove: function (array, oldIndex, newIndex) {
@@ -385,20 +396,6 @@ export default {
         }
       }
     },
-    loadActionTypes: function () {
-      let component = this
-      this.$http.get('/api/actiontype').then(function (response) {
-        for (let i = component.actionTypes.length; i > 0; i--) {
-          component.actionTypes.pop()
-        }
-        Array.from(response.data).forEach(function (item) {
-          component.actionTypes.push(item)
-        })
-      }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
-      })
-    },
     isTaskSelected: function (index) {
       return (index == this.selectedTaskIndex && this.selectedActionIndex == -1)
     },
@@ -447,7 +444,30 @@ export default {
       this.loadJob(this.jobId)
       this.jobExecutionRefreshTimer = setInterval(() => this.updateJobExecution(), 1000);
     }
-    this.loadActionTypes()
+    let component = this
+    this.$http.get('/api/category/provider').then(function (response) {
+      component.initialProviderCategory = Array.from(response.data)[0]
+      component.$http.get('/api/type/provider/' + component.initialProviderCategory.type).then(function (response) {
+        component.initialProviderType = Array.from(response.data)[0]
+      }).catch(function (error) {
+        component.$root.$data.store.setFeedback('Could not load provider types: ' + error, true)
+      })
+    }).catch(function (error) {
+      console.log(error)
+      component.$root.$data.store.setFeedback('Could not load provider categories: ' + error, true)
+    })
+    this.$http.get('/api/category/action').then(function (response) {
+      component.initialActionCategory = Array.from(response.data)[0]
+      component.$http.get('/api/type/action/' + component.initialActionCategory.type).then(function (response) {
+        component.initialActionType = Array.from(response.data)[0]
+      }).catch(function (error) {
+        component.$root.$data.store.setFeedback('Could not load action types: ' + error, true)
+      })
+    }).catch(function (error) {
+      console.log(error)
+      component.$root.$data.store.setFeedback('Could not load action categories: ' + error, true)
+    })
+
   },
   destroyed () {
     clearInterval(this.jobExecutionRefreshTimer)

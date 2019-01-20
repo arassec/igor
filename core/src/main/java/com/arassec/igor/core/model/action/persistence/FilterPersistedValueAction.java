@@ -2,11 +2,8 @@ package com.arassec.igor.core.model.action.persistence;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.service.persistence.PersistenceService;
-
-import java.util.List;
 
 /**
  * Filters data of which a value has already been persisted before.

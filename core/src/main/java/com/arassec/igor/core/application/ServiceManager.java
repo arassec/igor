@@ -1,6 +1,6 @@
 package com.arassec.igor.core.application;
 
-import com.arassec.igor.core.application.factory.ModelDefinition;
+import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import com.arassec.igor.core.application.factory.ServiceFactory;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
@@ -33,7 +33,7 @@ public class ServiceManager {
      *
      * @return The categories.
      */
-    public Set<ModelDefinition> getCategories() {
+    public Set<KeyLabelStore> getCategories() {
         return serviceFactory.getCategories();
     }
 
@@ -42,7 +42,7 @@ public class ServiceManager {
      *
      * @return The service types of the specified category.
      */
-    public Set<ModelDefinition> getTypesOfCategory(String categoryType) {
+    public Set<KeyLabelStore> getTypesOfCategory(String categoryType) {
         if (serviceFactory.getTypesByCategory().containsKey(categoryType)) {
             return serviceFactory.getTypesByCategory().get(categoryType);
         }
@@ -53,9 +53,10 @@ public class ServiceManager {
      * Saves the provided service.
      *
      * @param service The service to save.
+     * @return The saved service.
      */
-    public void save(Service service) {
-        serviceRepository.upsert(service);
+    public Service save(Service service) {
+        return serviceRepository.upsert(service);
     }
 
     /**
@@ -88,7 +89,7 @@ public class ServiceManager {
             return new LinkedList<>();
         }
         List<Service> services = loadAll();
-        return services.stream().filter(service -> category.equals(serviceFactory.getCategory(service).getType()))
+        return services.stream().filter(service -> category.equals(serviceFactory.getCategory(service).getKey()))
                 .collect(Collectors.toList());
     }
 

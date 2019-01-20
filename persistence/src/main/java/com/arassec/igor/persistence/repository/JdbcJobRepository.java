@@ -39,7 +39,7 @@ public class JdbcJobRepository implements JobRepository {
      * @param job The job to persist.
      */
     @Override
-    public void upsert(Job job) {
+    public Job upsert(Job job) {
         JobEntity jobEntity;
         if (job.getId() == null) {
             jobEntity = new JobEntity();
@@ -48,8 +48,10 @@ public class JdbcJobRepository implements JobRepository {
                     () -> new IllegalStateException("No job with ID " + job.getId() + " available!"));
         }
         jobEntity.setName(job.getName());
-        jobEntity.setContent(jsonJobConverter.convert(job, true).toString());
-        jobDao.save(jobEntity);
+        jobEntity.setContent(jsonJobConverter.convert(job, true, false).toString());
+        JobEntity savedJob = jobDao.save(jobEntity);
+        job.setId(savedJob.getId());
+        return job;
     }
 
     /**

@@ -12,8 +12,8 @@
     <artifactId>core</artifactId>
     <packaging>jar</packaging>
 
-    <name>core - the core data model</name>
-    <description>igor core - contains the basic data model</description>
+    <name>core</name>
+    <description>Contains the basic data model and functionality of igor.</description>
 
     <dependencies>
 

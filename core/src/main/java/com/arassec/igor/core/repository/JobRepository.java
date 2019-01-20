@@ -13,8 +13,9 @@ public interface JobRepository {
      * Saves a new job or updates an existing one.
      *
      * @param job The job to save.
+     * @return The updated job.
      */
-    void upsert(Job job);
+    Job upsert(Job job);
 
     /**
      * Returns all jobs.

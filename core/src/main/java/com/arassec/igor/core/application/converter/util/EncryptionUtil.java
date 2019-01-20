@@ -1,4 +1,4 @@
-package com.arassec.igor.core.application.util;
+package com.arassec.igor.core.application.converter.util;
 
 import com.arassec.igor.core.model.IgorParam;
 import org.jasypt.util.text.StrongTextEncryptor;

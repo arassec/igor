@@ -1,6 +1,5 @@
 package com.arassec.igor.core.model;
 
-
 import java.lang.annotation.*;
 
 /**

@@ -12,8 +12,8 @@
     <artifactId>frontend</artifactId>
     <packaging>pom</packaging>
 
-    <name>frontend - the web frontend built with vue.js</name>
-    <description>igor frontend - the client side frontend built with vue.js</description>
+    <name>frontend</name>
+    <description>The client side frontend built with vue.js</description>
 
     <build>
       <plugins>

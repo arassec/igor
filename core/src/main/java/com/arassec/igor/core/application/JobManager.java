@@ -71,13 +71,13 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      *
      * @param job The job to save.
      */
-    public void save(Job job) {
+    public Job save(Job job) {
         if (job.isActive()) {
             schedule(job);
         } else {
             unschedule(job);
         }
-        jobRepository.upsert(job);
+        return jobRepository.upsert(job);
     }
 
     /**

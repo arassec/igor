@@ -52,7 +52,7 @@ export default {
       this.feedback = ''
       this.feedbackOk = true
       let component = this
-      this.$http.get('/api/job/id').then(function (response) {
+      this.$http.get('/api/job').then(function (response) {
         for (let i = component.jobs.length; i > 0; i--) {
           component.jobs.pop()
         }

@@ -1,5 +1,8 @@
 package com.arassec.igor.core.application.converter;
 
+/**
+ * JSON-Keys for conversion.
+ */
 public interface JsonKeys {
 
     /**
@@ -46,6 +49,11 @@ public interface JsonKeys {
      * The type key.
      */
     String TYPE = "type";
+
+    /**
+     * The key key. :)
+     */
+    String KEY = "key";
 
     /**
      * The label key.
