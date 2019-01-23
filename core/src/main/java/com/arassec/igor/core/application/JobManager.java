@@ -211,12 +211,10 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
         if (job == null) {
             return;
         }
-
         if (runningJobs.containsKey(job.getId())) {
             log.warn("Parallel job execution detected: {} ({}).", job.getName(), job.getId());
             return;
         }
-
         runningJobs.put(job.getId(), job);
     }
 
@@ -233,11 +231,9 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
         if (job == null) {
             return;
         }
-
         if (!scheduledJobFutures.containsKey(job.getId()) && job.isActive()) {
             schedule(job);
         }
-
         if (runningJobs.containsKey(job.getId())) {
             runningJobs.remove(job.getId());
         }

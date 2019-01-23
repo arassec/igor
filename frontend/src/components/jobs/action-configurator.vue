@@ -34,7 +34,8 @@
 
         <core-panel>
             <h2>Action Parameters</h2>
-            <parameter-editor :parameters="action.parameters" ref="parameterEditor"/>
+            <parameter-editor :parameters="action.parameters" ref="parameterEditor"
+                v-on:create-service="createService"/>
         </core-panel>
     </div>
 </template>
@@ -107,6 +108,9 @@ export default {
         parameterValidationResult = this.$refs.parameterEditor.validateInput()
       }
       return parameterValidationResult
+    },
+    createService: function (parameterIndex, serviceCategory) {
+      this.$emit('create-service', this.actionKey, parameterIndex, serviceCategory)
     }
   },
   watch: {

@@ -128,14 +128,20 @@ export default {
         component.feedbackOk = false
       })
     },
-    loadServiceCategories: function () {
+    loadServiceCategories: function (singleServiceCategory) {
       let component = this
       this.$http.get('/api/category/service').then(function (response) {
         for (let i = component.serviceCategories.length; i > 0; i--) {
           component.serviceCategories.pop()
         }
         Array.from(response.data).forEach(function (item) {
-          component.serviceCategories.push(item)
+          if (singleServiceCategory != null) {
+            if (item.key === singleServiceCategory) {
+              component.serviceCategories.push(item)
+            }
+          } else {
+            component.serviceCategories.push(item)
+          }
         })
         component.serviceConfiguration.category = component.serviceCategories[0]
         component.loadServiceTypes(component.serviceConfiguration.category.key)
@@ -205,8 +211,16 @@ export default {
           component.feedbackOk = true
           component.requestInProgress = false
           component.$root.$data.store.setFeedback('Service \'' + component.serviceConfiguration.name + '\' saved.', false)
+          let jobData = component.$root.$data.store.getJobData()
+          if (jobData.jobConfiguration != null) {
+            let serviceParameter = {
+              name: component.serviceConfiguration.name,
+              id: component.serviceConfiguration.id
+            }
+            jobData.serviceParameter = serviceParameter
+          }
         }).catch(function (error) {
-          component.feedback = 'Saving failed! (' + error.response.data.error + ')'
+          component.feedback = 'Saving failed! (' + error + ')'
           component.feedbackOk = false
           component.requestInProgress = false
         })
@@ -217,14 +231,19 @@ export default {
           component.feedbackOk = true
           component.requestInProgress = false
         }).catch(function (error) {
-          component.feedback = 'Saving failed! (' + error.response.data.error + ')'
+          component.feedback = 'Saving failed! (' + error + ')'
           component.feedbackOk = false
           component.requestInProgress = false
         })
       }
     },
     cancelConfiguration: function () {
-      this.$router.push({name: 'services'})
+      let jobData = this.$root.$data.store.getJobData()
+      if (jobData.jobConfiguration != null) {
+        this.$router.push({name: 'job-editor'})
+      } else {
+        this.$router.push({name: 'services'})
+      }
     },
     validateInput: function () {
       this.feedback = ''
@@ -251,7 +270,12 @@ export default {
       this.newService = false
       this.loadService(this.serviceId)
     } else {
-      this.loadServiceCategories()
+      let jobData = this.$root.$data.store.getJobData()
+      if (jobData.serviceCategory != null) {
+        this.loadServiceCategories(jobData.serviceCategory)
+      } else {
+        this.loadServiceCategories(null)
+      }
     }
   }
 }

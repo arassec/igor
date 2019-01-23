@@ -18,6 +18,7 @@
 
     <button-row slot="footer">
       <input-button slot="left" icon="times" v-on:clicked="$emit('cancel')"/>
+      <input-button slot="right" icon="plus" v-on:clicked="$emit('create')"/>
     </button-row>
 
   </modal-dialog>

@@ -60,7 +60,8 @@
 
         <core-panel>
             <h2>Provider Parameters</h2>
-            <parameter-editor v-bind:parameters="task.provider.parameters" ref="parameterEditor"/>
+            <parameter-editor v-bind:parameters="task.provider.parameters" ref="parameterEditor"
+                              v-on:create-service="createService"/>
         </core-panel>
 
     </div>
@@ -74,7 +75,7 @@ import CorePanel from '../common/core-panel'
 export default {
   name: 'task-configurator',
   components: {CorePanel, ParameterEditor, ValidationError},
-  props: ['task'],
+  props: ['task', 'taskKey'],
   data: function () {
     return {
       nameValidationError: '',
@@ -145,6 +146,9 @@ export default {
       }
 
       return (nameValidationResult && parameterValidationResult)
+    },
+    createService: function (parameterIndex, serviceCategory) {
+      this.$emit('create-service', this.taskKey, parameterIndex, serviceCategory)
     }
   },
   mounted () {

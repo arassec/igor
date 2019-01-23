@@ -86,11 +86,11 @@ public class JobRestController {
      * @param jobJson The job in JSON form.
      * @return 'OK' on success.
      */
-    @PutMapping()
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateJob(@RequestBody String jobJson) {
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public String updateJob(@RequestBody String jobJson) {
         Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
-        jobManager.save(job);
+        Job savedJob = jobManager.save(job);
+        return jsonJobConverter.convert(savedJob, false, true).toString();
     }
 
     /**

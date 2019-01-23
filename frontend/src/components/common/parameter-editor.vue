@@ -31,8 +31,8 @@
       </template>
     </table>
 
-    <service-picker v-show="showServicePicker" v-on:cancel="showServicePicker = false"
-                    v-on:selected="setSelectedService" :services="services"/>
+    <service-picker v-show="showServicePicker" :services="services"
+                    v-on:cancel="showServicePicker = false" v-on:create="createService" v-on:selected="setSelectedService"/>
 
   </div>
 </template>
@@ -51,6 +51,7 @@ export default {
       validationOk: true,
       showServicePicker: false,
       serviceParameterIndex: 0,
+      serviceParameterCategory: null,
       parameterValidationErrors: [],
       parameterInputTypes: [],
       services: []
@@ -130,6 +131,7 @@ export default {
     },
     openServicePicker: function (index, serviceCategory) {
       let component = this
+      component.serviceParameterCategory = serviceCategory
       this.$http.get('/api/service/category/' + serviceCategory).then(function (response) {
         for (let i = component.services.length; i > 0; i--) {
           component.services.pop()
@@ -148,6 +150,9 @@ export default {
       this.parameters[this.serviceParameterIndex].serviceName = service.name
       this.parameters[this.serviceParameterIndex].value = service.id
       this.showServicePicker = false
+    },
+    createService: function () {
+      this.$emit('create-service', this.serviceParameterIndex, this.serviceParameterCategory)
     }
   },
   created: function () {

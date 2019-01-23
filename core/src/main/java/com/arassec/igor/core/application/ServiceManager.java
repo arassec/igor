@@ -42,9 +42,9 @@ public class ServiceManager {
      *
      * @return The service types of the specified category.
      */
-    public Set<KeyLabelStore> getTypesOfCategory(String categoryType) {
-        if (serviceFactory.getTypesByCategory().containsKey(categoryType)) {
-            return serviceFactory.getTypesByCategory().get(categoryType);
+    public Set<KeyLabelStore> getTypesOfCategory(String categoryKey) {
+        if (serviceFactory.getTypesByCategory().containsKey(categoryKey)) {
+            return serviceFactory.getTypesByCategory().get(categoryKey);
         }
         return new HashSet<>();
     }

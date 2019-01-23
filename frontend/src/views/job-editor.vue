@@ -13,7 +13,8 @@
                 </p>
                 <p slot="right">
                     <input-button icon="times" v-on:clicked="cancelJob" :disabled="!jobRunning"/>
-                    <input-button icon="play" v-on:clicked="runJob" class="button-margin-left" :disabled="jobRunning || jobConfiguration.id == null || requestInProgress"/>
+                    <input-button icon="play" v-on:clicked="runJob" class="button-margin-left"
+                                  :disabled="jobRunning || jobConfiguration.id == null || requestInProgress"/>
                 </p>
             </button-row>
             <job-tree-navigation slot="content"
@@ -49,7 +50,9 @@
             <task-configurator v-for="(task, taskIndex) in jobConfiguration.tasks"
                                v-show="selectedTaskIndex == taskIndex && selectedActionIndex == -1"
                                v-bind:key="taskIndex"
+                               v-bind:task-key="taskIndex"
                                v-bind:task="task"
+                               v-on:create-service="createService"
                                ref="taskConfigurators"/>
 
             <template v-for="(task, taskIndex) in jobConfiguration.tasks">
@@ -58,6 +61,7 @@
                                      v-bind:key="taskIndex + '_' + actionIndex"
                                      v-bind:action-key="taskIndex + '_' + actionIndex"
                                      v-bind:action="action"
+                                     v-on:create-service="createService"
                                      ref="actionConfigurators"/>
             </template>
 
@@ -187,24 +191,25 @@ export default {
       if (this.newJob) {
         this.$http.post('/api/job', this.jobConfiguration).then(function (response) {
           component.jobConfiguration = response.data
-          component.newJob = false;
+          component.newJob = false
           component.feedback = ''
           component.feedbackOk = true
           component.requestInProgress = false
           component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' saved.', false)
         }).catch(function (error) {
-          component.feedback = 'Saving failed! (' + error.response.data.error + ')'
+          component.feedback = 'Saving failed! (' + error + ')'
           component.feedbackOk = false
           component.requestInProgress = false
         })
       } else {
-        this.$http.put('/api/job', this.jobConfiguration).then(function () {
+        this.$http.put('/api/job', this.jobConfiguration).then(function (response) {
+          component.jobConfiguration = response.data
           component.feedback = ''
           component.feedbackOk = true
           component.requestInProgress = false
           component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' updated.', false)
         }).catch(function (error) {
-          component.feedback = 'Saving failed! (' + error.response.data.error + ')'
+          component.feedback = 'Saving failed! (' + error + ')'
           component.feedbackOk = false
           component.requestInProgress = false
         })
@@ -241,19 +246,16 @@ export default {
       this.selectedTaskIndex = -1
       this.selectedActionIndex = -1
       this.selectedTestResults = null
-      this.validateInput()
     },
     selectTask: function (taskIndex) {
       this.selectedTaskIndex = taskIndex
       this.selectedActionIndex = -1
       this.updateSelectedTestResult()
-      this.validateInput()
     },
     selectAction: function (taskIndex, actionIndex) {
       this.selectedTaskIndex = taskIndex
       this.selectedActionIndex = actionIndex
       this.updateSelectedTestResult()
-      this.validateInput()
     },
     addTask: function () {
       let task = {
@@ -436,15 +438,59 @@ export default {
         component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' cancellation failed ('
           + error + ').', true)
       })
+    },
+    createService: function (selectionKey, parameterIndex, serviceCategory) {
+      this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, serviceCategory)
+      this.$router.push({name: 'service-editor'})
     }
   },
   mounted () {
-    if (this.jobId != null) {
+    let jobData = this.$root.$data.store.getJobData()
+    if (jobData.jobConfiguration != null) {
+      this.jobConfiguration = jobData.jobConfiguration
+      if (this.jobConfiguration.id != null) {
+        this.newJob = false
+        this.updateJobExecution()
+        this.jobExecutionRefreshTimer = setInterval(() => this.updateJobExecution(), 1000)
+      }
+
+      let selectionKey = jobData.selectionKey
+      if (selectionKey != null) {
+        let taskIndex = -1
+        let actionIndex = -1
+        if ((typeof selectionKey === 'string' || selectionKey instanceof String) && selectionKey.includes("_")) {
+          taskIndex = selectionKey.split("_")[0]
+          actionIndex = selectionKey.split("_")[1]
+        } else {
+          taskIndex = selectionKey
+        }
+
+        if (taskIndex > -1 && actionIndex > -1) {
+          if (jobData.serviceParameter != null && jobData.parameterIndex != null) {
+            let parameter = this.jobConfiguration.tasks[taskIndex].actions[actionIndex].parameters[jobData.parameterIndex]
+            parameter.serviceName = jobData.serviceParameter.name
+            parameter.value = jobData.serviceParameter.id
+          }
+          this.selectAction(taskIndex, actionIndex)
+        } else if (taskIndex > -1) {
+          if (jobData.serviceParameter != null && jobData.parameterIndex != null) {
+            let parameter = this.jobConfiguration.tasks[taskIndex].provider.parameters[jobData.parameterIndex]
+            parameter.serviceName = jobData.serviceParameter.name
+            parameter.value = jobData.serviceParameter.id
+          }
+          this.selectTask(taskIndex)
+        }
+      }
+
+      this.$root.$data.store.clearJobData()
+    } else if (this.jobId != null) {
       this.newJob = false
       this.loadJob(this.jobId)
-      this.jobExecutionRefreshTimer = setInterval(() => this.updateJobExecution(), 1000);
+      this.jobExecutionRefreshTimer = setInterval(() => this.updateJobExecution(), 1000)
     }
+
     let component = this
+
     this.$http.get('/api/category/provider').then(function (response) {
       component.initialProviderCategory = Array.from(response.data)[0]
       component.$http.get('/api/type/provider/' + component.initialProviderCategory.key).then(function (response) {
@@ -465,7 +511,6 @@ export default {
     }).catch(function (error) {
       component.$root.$data.store.setFeedback('Could not load action categories (' + error + ')', true)
     })
-
   },
   destroyed () {
     clearInterval(this.jobExecutionRefreshTimer)
