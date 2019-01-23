@@ -80,11 +80,11 @@ public class WriteLinesFileAction extends BaseFileAction {
      * Closes the output file.
      *
      * @param jobId    The job's ID.
-     * @param taskName The task's name.
+     * @param taskId The task's ID.
      */
     @Override
-    public void complete(String jobId, String taskName) {
-        super.complete(jobId, taskName);
+    public void complete(String jobId, String taskId) {
+        super.complete(jobId, taskId);
         try {
             bufferedWriter.flush();
             bufferedWriter.close();

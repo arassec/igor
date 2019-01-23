@@ -36,11 +36,11 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
      * {@inheritDoc}
      */
     @Override
-    public void save(String jobId, String taskName, String value) {
+    public void save(String jobId, String taskId, String value) {
         try {
-            Files.write(Paths.get(getFileName(jobId, taskName)), Arrays.asList(value), UTF_8, APPEND, CREATE);
+            Files.write(Paths.get(getFileName(jobId, taskId)), Arrays.asList(value), UTF_8, APPEND, CREATE);
         } catch (IOException e) {
-            throw new ServiceException("Could not save value " + value + " to file: " + getFileName(jobId, taskName), e);
+            throw new ServiceException("Could not save value " + value + " to file: " + getFileName(jobId, taskId), e);
         }
     }
 
@@ -48,14 +48,14 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
      * {@inheritDoc}
      */
     @Override
-    public List<String> loadAll(String jobId, String taskName) {
+    public List<String> loadAll(String jobId, String taskId) {
         try {
-            if (!Files.exists(Paths.get(getFileName(jobId, taskName)))) {
-                Files.createFile(Paths.get(getFileName(jobId, taskName)));
+            if (!Files.exists(Paths.get(getFileName(jobId, taskId)))) {
+                Files.createFile(Paths.get(getFileName(jobId, taskId)));
             }
-            return Files.readAllLines(Paths.get(getFileName(jobId, taskName)));
+            return Files.readAllLines(Paths.get(getFileName(jobId, taskId)));
         } catch (IOException e) {
-            throw new ServiceException("Could not load values from file: " + getFileName(jobId, taskName), e);
+            throw new ServiceException("Could not load values from file: " + getFileName(jobId, taskId), e);
         }
     }
 
@@ -63,13 +63,13 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
      * {@inheritDoc}
      */
     @Override
-    public boolean isPersisted(String jobId, String taskName, String value) {
-        try (Stream<String> stream = Files.lines(Paths.get(getFileName(jobId, taskName)))) {
+    public boolean isPersisted(String jobId, String taskId, String value) {
+        try (Stream<String> stream = Files.lines(Paths.get(getFileName(jobId, taskId)))) {
             return !stream.noneMatch(line -> value.equals(line));
         } catch (NoSuchFileException e) {
             return false;
         } catch (IOException e) {
-            throw new ServiceException("Could not read persisted values: " + getFileName(jobId, taskName), e);
+            throw new ServiceException("Could not read persisted values: " + getFileName(jobId, taskId), e);
         }
     }
 
@@ -77,9 +77,9 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
      * {@inheritDoc}
      */
     @Override
-    public void cleanup(String jobId, String taskName, int numEntriesToKeep) {
-        Path persistenceFile = Paths.get(getFileName(jobId, taskName));
-        Path tempFile = Paths.get(getFileName(jobId, taskName) + "_TEMP");
+    public void cleanup(String jobId, String taskId, int numEntriesToKeep) {
+        Path persistenceFile = Paths.get(getFileName(jobId, taskId));
+        Path tempFile = Paths.get(getFileName(jobId, taskId) + "_TEMP");
         boolean cleanedUp = false;
         try (Stream<String> streamOne = Files.lines(persistenceFile)) {
             long numLines = streamOne.count();
@@ -125,28 +125,16 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
     /**
      * Creates the persistence file's name based on the supplied data.
      *
-     * @param jobId    The job's ID.
-     * @param taskName The task's name.
+     * @param jobId  The job's ID.
+     * @param taskId The task's ID.
      * @return The filename of the persistence file for this job and task.
      */
-    private String getFileName(String jobId, String taskName) {
+    private String getFileName(String jobId, String taskId) {
         String result = targetDir;
         if (!result.endsWith(File.separator)) {
             result += File.separator;
         }
-        return result + clean(jobId) + "_" + clean(taskName) + ".igor.log";
+        return result + jobId + "_" + taskId + ".igor.log";
     }
 
-    /**
-     * Replaces whitespaces in the provided input string with underscores.
-     *
-     * @param input The input to clean.
-     * @return The input with underscores instead of whitespaces.
-     */
-    private String clean(String input) {
-        if (input == null || input.isEmpty()) {
-            return input;
-        }
-        return input.replaceAll("/", "_").replaceAll("\\\\", "_").replaceAll("\\s", "_");
-    }
 }

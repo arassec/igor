@@ -26,7 +26,7 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
     @Override
     public boolean process(IgorData data) {
         if (isValid(data)) {
-            return !service.isPersisted(data.getJobId(), data.getTaskName(), (String) data.get(dataKey));
+            return !service.isPersisted(data.getJobId(), data.getTaskId(), (String) data.get(dataKey));
         }
         return true;
     }

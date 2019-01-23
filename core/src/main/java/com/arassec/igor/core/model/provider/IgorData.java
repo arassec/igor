@@ -16,20 +16,20 @@ public class IgorData extends HashMap<String, Object> {
     private String jobId;
 
     /**
-     * The task's name.
+     * The task's ID.
      */
-    private String taskName;
+    private String taskId;
 
     /**
      * Creates a new IgorData.
      *
-     * @param jobId    The job's ID.
-     * @param taskName The task's name.
+     * @param jobId  The job's ID.
+     * @param taskId The task's ID.
      */
-    public IgorData(String jobId, String taskName) {
+    public IgorData(String jobId, String taskId) {
         super();
         this.jobId = jobId;
-        this.taskName = taskName;
+        this.taskId = taskId;
     }
 
     /**
@@ -55,11 +55,11 @@ public class IgorData extends HashMap<String, Object> {
     }
 
     /**
-     * Returns the task's name.
+     * Returns the task's ID.
      *
-     * @return The task's name.
+     * @return The task's ID.
      */
-    public String getTaskName() {
-        return taskName;
+    public String getTaskId() {
+        return taskId;
     }
 }

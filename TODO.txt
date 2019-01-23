@@ -1,6 +1,5 @@
-- Evaluate UUIDs as IDs, especially for TASKs
-- Unit-Tests (Apache Mina SSHD!)
 - Job state in DB ('running') and synchronized job-manager
+- Unit-Tests (Apache Mina SSHD!)
 - Creating service from within job-editor
 - service-selector with specialized services like LocalFilesystemFileService
 - Warning when leaving job-editor and unsaved changes exist

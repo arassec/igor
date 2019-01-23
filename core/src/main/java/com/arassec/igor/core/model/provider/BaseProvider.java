@@ -14,20 +14,20 @@ public abstract class BaseProvider implements Provider {
     private String jobId;
 
     /**
-     * The task's name.
+     * The task's ID.
      */
-    private String taskName;
+    private String taskId;
 
     /**
      * Saves the job's ID and the task's name for later use.
      *
      * @param jobId The job's ID.
-     * @param taskName The task's name.
+     * @param taskId The task's ID.
      */
     @Override
-    public void initialize(String jobId, String taskName) {
+    public void initialize(String jobId, String taskId) {
         this.jobId = jobId;
-        this.taskName = taskName;
+        this.taskId = taskId;
     }
 
 }

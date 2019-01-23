@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 /**
  * Converts {@link com.arassec.igor.core.model.job.Task}s into their JSON representation and vice versa.
  */
@@ -38,6 +40,10 @@ public class JsonTaskConverter {
      */
     public JSONObject convert(Task task, boolean applySecurity, boolean addVolatile) {
         JSONObject taskJson = new JSONObject();
+        if (task.getId() == null || task.getId().trim().isEmpty()) {
+            task.setId(UUID.randomUUID().toString());
+        }
+        taskJson.put(JsonKeys.ID, task.getId());
         taskJson.put(JsonKeys.NAME, task.getName());
         taskJson.put(JsonKeys.DESCRIPTION, task.getDescription());
         taskJson.put(JsonKeys.PROVIDER, jsonProviderConverter.convert(task.getProvider(), applySecurity, addVolatile));
@@ -56,7 +62,11 @@ public class JsonTaskConverter {
      * @return A newly created Task instance.
      */
     public Task convert(JSONObject taskJson, boolean applySecurity) {
-        Task result = new Task();
+        String id = taskJson.optString(JsonKeys.ID);
+        if (id == null || id.trim().isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+        Task result = new Task(id);
         result.setName(taskJson.getString(JsonKeys.NAME));
         result.setDescription(taskJson.optString(JsonKeys.DESCRIPTION));
         result.setProvider(jsonProviderConverter.convert(taskJson.getJSONObject(JsonKeys.PROVIDER), applySecurity));

@@ -51,9 +51,9 @@ public class PersistValueAction extends BasePersistenceAction {
     private boolean processInternal(IgorData data, boolean isDryRun) {
         if (isValid(data)) {
             if (isDryRun) {
-                data.put("dryRunComment", "Saved: " + data.getJobId() + "/" + data.getTaskName() + "/" + data.get(dataKey));
+                data.put("dryRunComment", "Saved: " + data.getJobId() + "/" + data.getTaskId() + "/" + data.get(dataKey));
             } else {
-                service.save(data.getJobId(), data.getTaskName(), (String) data.get(dataKey));
+                service.save(data.getJobId(), data.getTaskId(), (String) data.get(dataKey));
             }
         }
         return true;

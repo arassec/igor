@@ -71,7 +71,7 @@ public class Job {
                 if (!jobExecution.isRunning()) {
                     break;
                 }
-                task.run(name, jobExecution);
+                task.run(String.valueOf(id), jobExecution);
             }
             if (jobExecution.isRunning()) {
                 jobExecution.setExecutionState(JobExecutionState.FINISHED);
@@ -94,7 +94,7 @@ public class Job {
     public DryRunJobResult dryRun() {
         log.debug("Dry-running job: {}", name);
         DryRunJobResult result = new DryRunJobResult();
-        tasks.stream().forEach(task -> task.dryRun(result, name));
+        tasks.stream().forEach(task -> task.dryRun(result, String.valueOf(id)));
         log.debug("Finished dry-run of job: {}", name);
         return result;
     }

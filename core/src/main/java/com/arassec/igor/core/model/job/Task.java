@@ -27,6 +27,11 @@ import java.util.stream.Collectors;
 public class Task {
 
     /**
+     * The task's (UU)ID.
+     */
+    private String id;
+
+    /**
      * The name pattern for concurrency-group IDs.
      */
     private static final String CONCURRENCY_GROUP_ID_PATTERN = "%s_%s_%d";
@@ -52,15 +57,24 @@ public class Task {
     private List<Action> actions = new LinkedList<>();
 
     /**
+     * Creates a new Task.
+     *
+     * @param id The task's ID.
+     */
+    public Task(String id) {
+        this.id = id;
+    }
+
+    /**
      * Runs the task by first creating concurrency-groups for actions that should run with the same amount of threads
      * and then requesting the provider for data to process.
      * <p>
      * The retrieved data is than processed by the configured actions in ther concurrency-groups.
      *
-     * @param jobName      The name of the job.
+     * @param jobId        The ID of the job.
      * @param jobExecution The {@link JobExecution} that contains the state of the current job run.
      */
-    public void run(String jobName, JobExecution jobExecution) {
+    public void run(String jobId, JobExecution jobExecution) {
 
         log.debug("Starting task '{}'", name);
 
@@ -90,7 +104,7 @@ public class Task {
         BlockingQueue<IgorData> inputQueue = providerInputQueue;
 
         for (List<Action> concurrencyList : concurrencyLists) {
-            String concurrencyGroupId = String.format(CONCURRENCY_GROUP_ID_PATTERN, jobName, getName(), concurrencyLists.indexOf(concurrencyList));
+            String concurrencyGroupId = String.format(CONCURRENCY_GROUP_ID_PATTERN, jobId, getName(), concurrencyLists.indexOf(concurrencyList));
             ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueue, concurrencyGroupId, jobExecution);
             inputQueue = concurrencyGroup.getOutputQueue();
             concurrencyGroups.add(concurrencyGroup);
@@ -99,7 +113,7 @@ public class Task {
         actions.stream().forEach(Action::initialize);
 
         // Read the data from the provider and start working:
-        provider.initialize(jobName, name);
+        provider.initialize(jobId, id);
         while (provider.hasNext() && jobExecution.isRunning()) {
             IgorData data = provider.next();
             boolean added = false;
@@ -126,7 +140,7 @@ public class Task {
             log.debug("Threads terminated over all concurrency-groups: {}", allThreadsTerminated);
         }
 
-        actions.stream().forEach(action -> action.complete(jobName, name));
+        actions.stream().forEach(action -> action.complete(jobId, id));
 
         log.debug("Task '{}' finished!", name);
     }
@@ -134,11 +148,11 @@ public class Task {
     /**
      * Performs a dry-run of the task collecting data.
      *
-     * @param result  The target object to store results in.
-     * @param jobName The name of the job currently executing.
+     * @param result The target object to store results in.
+     * @param jobId  The ID of the job currently executing.
      */
-    public void dryRun(DryRunJobResult result, String jobName) {
-        provider.initialize(jobName, name);
+    public void dryRun(DryRunJobResult result, String jobId) {
+        provider.initialize(jobId, id);
         DryRunTaskResult taskResult = new DryRunTaskResult();
 
         Cloner cloner = new Cloner();

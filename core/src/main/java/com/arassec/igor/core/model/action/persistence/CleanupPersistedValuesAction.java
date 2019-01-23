@@ -36,12 +36,12 @@ public class CleanupPersistedValuesAction extends BasePersistenceAction {
      * Cleans up the persisted values and keepy only the {@link CleanupPersistedValuesAction#numValuesToKeep} most
      * recent values in the store.
      *
-     * @param jobId    The job's ID.
-     * @param taskName The task's name.
+     * @param jobId  The job's ID.
+     * @param taskId The task's ID.
      */
     @Override
-    public void complete(String jobId, String taskName) {
-        persistenceService.cleanup(jobId, taskName, numValuesToKeep);
+    public void complete(String jobId, String taskId) {
+        persistenceService.cleanup(jobId, taskId, numValuesToKeep);
     }
 
     /**

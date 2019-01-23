@@ -53,8 +53,8 @@ public class ListFilesProvider extends BaseProvider implements FileProvider {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, String taskName) {
-        super.initialize(jobId, taskName);
+    public void initialize(String jobId, String taskId) {
+        super.initialize(jobId, taskId);
         files.clear();
         files.addAll(sourceService.listFiles(directory));
         currentFile = 0;
@@ -80,7 +80,7 @@ public class ListFilesProvider extends BaseProvider implements FileProvider {
      */
     @Override
     public IgorData next() {
-        IgorData igorData = new IgorData(getJobId(), getTaskName());
+        IgorData igorData = new IgorData(getJobId(), getTaskId());
         igorData.put(directoryKey, directory);
         String file = files.get(currentFile);
         if (file.startsWith(directory)) {
