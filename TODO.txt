@@ -1,4 +1,4 @@
-- BUG: in UI, when moving an action, the type is lost in the dropdown-box
+- Evaluate UUIDs as IDs, especially for TASKs
 - Unit-Tests (Apache Mina SSHD!)
 - Job state in DB ('running') and synchronized job-manager
 - Creating service from within job-editor

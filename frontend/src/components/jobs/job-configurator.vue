@@ -91,8 +91,6 @@ export default {
         this.triggerValidationError  = 'Value required'
       }
 
-      this.$forceUpdate()
-
       return (nameValidationResult && triggerValidationResult)
     }
   }

@@ -110,7 +110,6 @@ export default {
         })
         // Skip the parameter loading if they already exist in the model:
         if (component.initializeTypeParameters) {
-          component.task.provider.type = component.providerTypes[0]
           component.loadTypeParameters(component.task.provider.type.key)
         } else {
           // After the first skip, always load parameters:
@@ -144,8 +143,6 @@ export default {
       if (typeof this.$refs.parameterEditor !== 'undefined') {
         parameterValidationResult = this.$refs.parameterEditor.validateInput()
       }
-
-      this.$forceUpdate()
 
       return (nameValidationResult && parameterValidationResult)
     }

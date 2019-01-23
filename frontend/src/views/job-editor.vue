@@ -447,25 +447,23 @@ export default {
     let component = this
     this.$http.get('/api/category/provider').then(function (response) {
       component.initialProviderCategory = Array.from(response.data)[0]
-      component.$http.get('/api/type/provider/' + component.initialProviderCategory.type).then(function (response) {
+      component.$http.get('/api/type/provider/' + component.initialProviderCategory.key).then(function (response) {
         component.initialProviderType = Array.from(response.data)[0]
       }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Could not load provider types: ' + error, true)
+        component.$root.$data.store.setFeedback('Could not load provider types (' + error + ')', true)
       })
     }).catch(function (error) {
-      console.log(error)
-      component.$root.$data.store.setFeedback('Could not load provider categories: ' + error, true)
+      component.$root.$data.store.setFeedback('Could not load provider categories (' + error + ')', true)
     })
     this.$http.get('/api/category/action').then(function (response) {
       component.initialActionCategory = Array.from(response.data)[0]
-      component.$http.get('/api/type/action/' + component.initialActionCategory.type).then(function (response) {
+      component.$http.get('/api/type/action/' + component.initialActionCategory.key).then(function (response) {
         component.initialActionType = Array.from(response.data)[0]
       }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Could not load action types: ' + error, true)
+        component.$root.$data.store.setFeedback('Could not load action types (' + error + ')', true)
       })
     }).catch(function (error) {
-      console.log(error)
-      component.$root.$data.store.setFeedback('Could not load action categories: ' + error, true)
+      component.$root.$data.store.setFeedback('Could not load action categories (' + error + ')', true)
     })
 
   },

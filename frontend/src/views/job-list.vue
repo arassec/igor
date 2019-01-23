@@ -21,7 +21,7 @@
 
     <spacer-item/>
 
-    <background-icon right="true" icon-one="flask" icon-two="flask"/>
+    <background-icon right="true" icon-one="toolbox"/>
 
   </core-container>
 </template>
@@ -61,8 +61,7 @@ export default {
         })
         component.jobs.sort((a, b) => a.name.localeCompare(b.name))
       }).catch(function (error) {
-        console.log(error)
-        component.$root.$data.store.setFeedback('Jobs could not be loaded!', true)
+        component.$root.$data.store.setFeedback('Jobs could not be loaded (' + error + ')', true)
       })
     },
     filter: function (filterTextFromListHeader) {

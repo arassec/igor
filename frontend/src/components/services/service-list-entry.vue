@@ -52,8 +52,7 @@ export default {
         component.$root.$data.store.setFeedback('Service \'' + component.name + '\' has been deleted.', false)
         component.$emit('actionPerformed')
       }).catch(function (error) {
-        console.log(error)
-        component.$root.$data.store.setFeedback('Service \'' + component.name + '\' could not be deleted!', true)
+        component.$root.$data.store.setFeedback('Service \'' + component.name + '\' could not be deleted (' + error + ')', true)
         component.$emit('actionPerformed')
       })
     }

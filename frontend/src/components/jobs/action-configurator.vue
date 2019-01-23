@@ -81,7 +81,6 @@ export default {
         })
         // Skip the parameter loading if they already exist in the model:
         if (component.initializeTypeParameters) {
-          component.action.type = component.types[0]
           component.loadTypeParameters(component.action.type.key)
         } else {
           // After the first skip, always load parameters:
@@ -107,8 +106,14 @@ export default {
       if (typeof this.$refs.parameterEditor !== 'undefined') {
         parameterValidationResult = this.$refs.parameterEditor.validateInput()
       }
-      this.$forceUpdate()
       return parameterValidationResult
+    }
+  },
+  watch: {
+    action: function() {
+      // When an action is moved in the tree-navigation, the model changes for the component!
+      this.initializeTypeParameters = false
+      this.loadCategories()
     }
   },
   mounted: function () {

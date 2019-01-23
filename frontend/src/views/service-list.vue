@@ -60,8 +60,7 @@ export default {
         })
         component.services.sort((a, b) => a.name.localeCompare(b.name))
       }).catch(function (error) {
-        console.log(error)
-        component.$root.$data.store.setFeedback('Services could not be loaded!', true)
+        component.$root.$data.store.setFeedback('Services could not be loaded (' + error + ')', true)
       })
     },
     filter: function (filterTextFromListHeader) {

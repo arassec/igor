@@ -27,8 +27,8 @@ export default {
     color: var(--nav-background-color);
     opacity: 0.3;
     position: fixed;
-    bottom: -20px;
-    right: -20px;
+    bottom: -30px;
+    right: 20px;
     z-index: -1;
   }
 
