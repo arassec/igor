@@ -21,3 +21,8 @@
 - Export + Import of jobs and services (via JSON)
 - Save Job-Service-References to warn about deleting a used service
 - Authentication + Authorization (Frontend + Backend)
+- I18N
+- Job-Parameter: cancel on task fail (true|false)
+- Job-Parameter: kill-switch with date to disable jobs
+- Limit for number of IgorData in dry-run-results.
+

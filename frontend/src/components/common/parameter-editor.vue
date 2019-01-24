@@ -3,7 +3,7 @@
 
     <table>
       <template v-for="(param, index) in parameters" v-bind:id="param.name" v-bind:index="index">
-        <tr v-bind:key="param.name">
+        <tr v-bind:key="param.name" v-show="(showAdvancedParameters && isAdvancedParameter(param.name)) || !isAdvancedParameter(param.name)">
           <td>
             <label v-if="param.optional">{{formatParameterName(param.name)}}</label>
             <label v-if="!param.optional">{{formatParameterName(param.name)}}*</label>
@@ -20,7 +20,6 @@
             <input-button v-if="!isNumber(param.type) && !isBoolean(param.type) && param.secured"
                           icon="eye" v-on:clicked="toggleCleartext(index)" class="button-margin-left"/>
             <input-button v-else-if="isService(param)" icon="cogs" v-on:clicked="openServicePicker(index, param.type)" class="button-margin-left"/>
-
           </td>
           <td>
             <validation-error v-if="checkValidationError(index)">
@@ -29,6 +28,12 @@
           </td>
         </tr>
       </template>
+      <tr>
+        <td colspan="2">
+          <font-awesome-icon class="arrow" v-bind:icon="showAdvancedParameters ? 'chevron-up' : 'chevron-down'"
+                             v-on:click="showAdvancedParameters = !showAdvancedParameters"/>
+        </td>
+      </tr>
     </table>
 
     <service-picker v-show="showServicePicker" :services="services"
@@ -50,6 +55,7 @@ export default {
     return {
       validationOk: true,
       showServicePicker: false,
+      showAdvancedParameters: false,
       serviceParameterIndex: 0,
       serviceParameterCategory: null,
       parameterValidationErrors: [],
@@ -153,6 +159,9 @@ export default {
     },
     createService: function () {
       this.$emit('create-service', this.serviceParameterIndex, this.serviceParameterCategory)
+    },
+    isAdvancedParameter: function (name) {
+      return (name === 'dataKey' || name === 'numThreads' || name === 'directoryKey')
     }
   },
   created: function () {
@@ -172,4 +181,9 @@ export default {
 </script>
 
 <style scoped>
+
+  .arrow:hover {
+    cursor: pointer;
+  }
+
 </style>
