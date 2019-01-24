@@ -4,7 +4,8 @@
     <spacer-item/>
 
     <core-content>
-      <list-header :addButtonTarget="'service-editor'" :addButtonText="'Add Service'" :filter="filter">
+      <list-header :addButtonTarget="'service-editor'" :addButtonText="'Add Service'" :filter="filter"
+                   :filter-key="'service-list-filter'">
         <p slot="title">Available Services</p>
       </list-header>
 

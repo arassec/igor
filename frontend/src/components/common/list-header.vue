@@ -26,7 +26,7 @@ import CorePanel from './core-panel'
 export default {
   name: 'list-header',
   components: {CorePanel, ButtonRow, InputButton},
-  props: ['filter', 'addButtonText', 'addButtonTarget'],
+  props: ['filter', 'filterKey', 'addButtonText', 'addButtonTarget'],
   data: function () {
     return {
       filterText: ''
@@ -34,6 +34,7 @@ export default {
   },
   watch: {
     filterText: function (val) {
+      this.$root.$data.store.setValue(this.filterKey, val)
       this.filter(val)
     }
   },
@@ -43,6 +44,9 @@ export default {
         this.filterText = ''
       }
     })
+    if (this.$root.$data.store.getValue(this.filterKey)) {
+      this.filterText = this.$root.$data.store.getValue(this.filterKey)
+    }
   }
 }
 </script>

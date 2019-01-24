@@ -1,7 +1,6 @@
 - Job state in DB ('running') and synchronized job-manager
-- Keep filters for jobs and services in the store
 - Unit-Tests (Apache Mina SSHD!)
-- Warning when leaving job-editor and unsaved changes exist
+- Warning when leaving *-editor and unsaved changes exist
 - README.md
 - ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
 - new: DeleteFileAction

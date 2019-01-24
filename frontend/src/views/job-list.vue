@@ -1,29 +1,30 @@
 <template>
-  <core-container class="min-width">
+    <core-container class="min-width">
 
-    <spacer-item/>
+        <spacer-item/>
 
-    <core-content>
-      <list-header :addButtonTarget="'job-editor'" :addButtonText="'Add Job'" :filter="filter">
-        <p slot="title">Available Jobs</p>
-        <p slot="feedback">
-          <feedback-box v-if="feedback.length > 0" :text="feedback" :alert="!feedbackOk"/>
-        </p>
-      </list-header>
+        <core-content>
+            <list-header :addButtonTarget="'job-editor'" :addButtonText="'Add Job'" :filter="filter"
+                    :filter-key="'job-list-filter'">
+                <p slot="title">Available Jobs</p>
+                <p slot="feedback">
+                    <feedback-box v-if="feedback.length > 0" :text="feedback" :alert="!feedbackOk"/>
+                </p>
+            </list-header>
 
-      <job-list-entry v-for="job in filteredJobs"
-                      v-bind:key="job.id"
-                      v-bind:id="job.id"
-                      v-bind:name="job.name"
-                      v-bind:active="job.active"
-                      v-on:job-deleted="loadJobs()"/>
-    </core-content>
+            <job-list-entry v-for="job in filteredJobs"
+                            v-bind:key="job.id"
+                            v-bind:id="job.id"
+                            v-bind:name="job.name"
+                            v-bind:active="job.active"
+                            v-on:job-deleted="loadJobs()"/>
+        </core-content>
 
-    <spacer-item/>
+        <spacer-item/>
 
-    <background-icon right="true" icon-one="toolbox"/>
+        <background-icon right="true" icon-one="toolbox"/>
 
-  </core-container>
+    </core-container>
 </template>
 
 <script>
@@ -66,6 +67,7 @@ export default {
     },
     filter: function (filterTextFromListHeader) {
       this.filterText = filterTextFromListHeader
+
     }
   },
   computed: {
@@ -84,26 +86,26 @@ export default {
 
 <style scoped>
 
-  .min-width {
-    --content-width: 800px;
-  }
+    .min-width {
+        --content-width: 800px;
+    }
 
-  .background-icon {
-    color: var(--nav-background-color);
-    opacity: 0.3;
-    position: fixed;
-    bottom: -20px;
-    right: -20px;
-    z-index: -1;
-  }
+    .background-icon {
+        color: var(--nav-background-color);
+        opacity: 0.3;
+        position: fixed;
+        bottom: -20px;
+        right: -20px;
+        z-index: -1;
+    }
 
-  .background-icon-left {
-    color: var(--nav-background-color);
-    opacity: 0.3;
-    position: fixed;
-    bottom: -20px;
-    right: 420px;
-    z-index: -1;
-  }
+    .background-icon-left {
+        color: var(--nav-background-color);
+        opacity: 0.3;
+        position: fixed;
+        bottom: -20px;
+        right: 420px;
+        z-index: -1;
+    }
 
 </style>

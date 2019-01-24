@@ -35,6 +35,7 @@ const store = {
     serviceCategory: null,
     serviceParameter: null
   },
+  valueStore: {},
   routeChanged: false,
   setFeedback (message, alert) {
     this.feedback.message = message
@@ -70,6 +71,15 @@ const store = {
     this.jobData.selectionKey = null
     this.jobData.parameterIndex = null
     this.jobData.serviceParameter = null
+  },
+  setValue (key, value) {
+    this.valueStore[key] = value
+  },
+  getValue (key) {
+    return this.valueStore[key]
+  },
+  clearValue (key) {
+    delete this.valueStore[key]
   }
 }
 
