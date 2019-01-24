@@ -8,6 +8,7 @@ import com.arassec.igor.core.model.service.file.FileStreamData;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -111,7 +112,7 @@ public class LocalFilesystemFileService extends BaseFileService {
     @Override
     public void move(String source, String target) {
         try {
-            Files.move(Paths.get(source), Paths.get(target));
+            Files.move(Paths.get(source), Paths.get(target), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new ServiceException("Could not move local file '" + source + "' to '" + target + "'!", e);
         }

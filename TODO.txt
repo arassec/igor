@@ -1,5 +1,3 @@
-- CopyFileAction -> "overwrite"-property to overwrite target files
-- "Run job" only for saved jobs instead of supplied JSON
 - Job state in DB ('running') and synchronized job-manager
 - Keep filters for jobs and services in the store
 - Unit-Tests (Apache Mina SSHD!)

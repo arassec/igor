@@ -16,4 +16,5 @@ target/
 *.ipr
 
 dbdata/
+appdata/
 src/test/resources/files/out

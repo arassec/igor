@@ -411,7 +411,8 @@ export default {
 
       let component = this
 
-      this.$http.post('/api/job/run', this.jobConfiguration).then(function () {
+      this.$http.post('/api/job/run', this.jobConfiguration).then(function (response) {
+        component.jobConfiguration = response.data
         component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' started manually.', false)
         component.updateJobExecution()
       }).catch(function (error) {

@@ -124,9 +124,11 @@ public class JobRestController {
      */
     @PostMapping("run")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void runJob(@RequestBody String jobJson) {
+    public String runJob(@RequestBody String jobJson) {
         Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
-        jobManager.run(job);
+        Job savedJob = jobManager.save(job);
+        jobManager.run(savedJob);
+        return jsonJobConverter.convert(savedJob, false, true).toString();
     }
 
     /**
