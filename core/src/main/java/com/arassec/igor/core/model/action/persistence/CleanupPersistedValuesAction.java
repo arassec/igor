@@ -25,6 +25,16 @@ public class CleanupPersistedValuesAction extends BasePersistenceAction {
     private int numValuesToKeep;
 
     /**
+     * Key into the {@link IgorData} that identifies the property to process.
+     */
+    private String dataKey = "data";
+
+    /**
+     * Defines the number of threads the action should be processed with.
+     */
+    private int numThreads = DEFAULT_THREADS;
+
+    /**
      * {@inheritDoc}
      */
     @Override

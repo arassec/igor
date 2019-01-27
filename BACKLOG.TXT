@@ -1,14 +1,12 @@
-- Job state in DB ('running') and synchronized job-manager
 - Unit-Tests (Apache Mina SSHD!)
-- Warning when leaving *-editor and unsaved changes exist
-- README.md
-- ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
-- new: DeleteFileAction
 - Job execution history in job-editor
 - Job schedule under home
 - Job status under home
+- Warning when leaving an editor and unsaved changes exist
+- README.md
+- ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
+- new: DeleteFileAction
 - Home-View with last job runs and "next-to-run"-overview
-- Persistence-service in DB instead of files
 - Persistence-service editor
 - Job dry-runs without cloning Tasks?
 - Replace IgorData with JSONObject

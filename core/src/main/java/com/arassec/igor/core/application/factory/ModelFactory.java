@@ -235,11 +235,4 @@ public abstract class ModelFactory<T> {
         return typesByCategory;
     }
 
-    /**
-     * Returns the category for every type.
-     */
-    public Map<String, KeyLabelStore> getCategoryByType() {
-        return categoryByType;
-    }
-
 }

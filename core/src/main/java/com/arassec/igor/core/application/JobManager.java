@@ -42,7 +42,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
     /**
      * Keeps track of all scheduled jobs.
      */
-    private Map<Long, ScheduledFuture> scheduledJobFutures = new HashMap<>();
+    private Map<Long, ScheduledFuture> scheduledJobFutures = new ConcurrentHashMap<>();
 
     /**
      * Keeps track of all running jobs.
@@ -72,6 +72,9 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      * @param job The job to save.
      */
     public Job save(Job job) {
+        if (job.getId() != null && runningJobs.containsKey(job.getId())) {
+            throw new IllegalStateException("Job currently running: " + job.getId() + " / " + job.getName());
+        }
         if (job.isActive()) {
             schedule(job);
         } else {
@@ -152,7 +155,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
             Date nextRun = cronTrigger.next(Calendar.getInstance().getTime());
             log.info("Scheduled job: {} ({}). Next run at: {}", job.getName(), job.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(nextRun));
         } catch (IllegalArgumentException e) {
-            log.warn("Illegal trigger configured!", e);
+            throw new IllegalStateException("Illegal trigger configured (" + e.getMessage() + ")");
         }
     }
 
@@ -181,7 +184,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
                 throw new ServiceException("Job " + job.getId() + " could not be cancelled!");
             }
             scheduledJobFutures.remove(job.getId());
-            log.info("Cancelled job: {} ({})", job.getName(), job.getId());
+            log.info("Unscheduled job: {} ({})", job.getName(), job.getId());
         }
     }
 

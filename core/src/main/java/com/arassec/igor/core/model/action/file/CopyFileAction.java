@@ -50,16 +50,16 @@ public class CopyFileAction extends BaseFileAction {
     private String targetDirectory;
 
     /**
-     * The key to the directory the source files are in.
-     */
-    @IgorParam
-    private String directoryKey = "directory";
-
-    /**
      * Enables a ".igor" file suffix during file transfer. The suffix will be removed after the file has been copied completely.
      */
     @IgorParam
     private boolean appendTransferSuffix = true;
+
+    /**
+     * The key to the directory the source files are in.
+     */
+    @IgorParam
+    private String directoryKey = "directory";
 
     /**
      * Creates a new CopyFileAction.

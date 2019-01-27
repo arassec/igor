@@ -28,7 +28,7 @@
           </td>
         </tr>
       </template>
-      <tr>
+      <tr v-if="advancedParametersExist()">
         <td colspan="2">
           <font-awesome-icon class="arrow" v-bind:icon="showAdvancedParameters ? 'chevron-up' : 'chevron-down'"
                              v-on:click="showAdvancedParameters = !showAdvancedParameters"/>
@@ -162,6 +162,14 @@ export default {
     },
     isAdvancedParameter: function (name) {
       return (name === 'dataKey' || name === 'numThreads' || name === 'directoryKey')
+    },
+    advancedParametersExist: function () {
+      for (let index = 0; index < this.parameters.length; index++) {
+        if (this.isAdvancedParameter(this.parameters[index].name)) {
+          return true
+        }
+      }
+      return false
     }
   },
   created: function () {
