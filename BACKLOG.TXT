@@ -1,4 +1,6 @@
 - Unit-Tests (Apache Mina SSHD!)
+- JobManager with synchronized/better job handling
+- Persistence-service in DB
 - Job execution history in job-editor
 - Job schedule under home
 - Job status under home

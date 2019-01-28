@@ -75,12 +75,13 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
         if (job.getId() != null && runningJobs.containsKey(job.getId())) {
             throw new IllegalStateException("Job currently running: " + job.getId() + " / " + job.getName());
         }
-        if (job.isActive()) {
-            schedule(job);
+        Job savedJob = jobRepository.upsert(job);
+        if (savedJob.isActive()) {
+            schedule(savedJob);
         } else {
-            unschedule(job);
+            unschedule(savedJob);
         }
-        return jobRepository.upsert(job);
+        return savedJob;
     }
 
     /**
@@ -112,7 +113,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      * @param job The job to run.
      */
     public void run(Job job) {
-        if (runningJobs.containsKey(job.getId())) {
+        if (job.getId() != null && runningJobs.containsKey(job.getId())) {
             log.debug("Job already running: {} ({})", job.getName(), job.getId());
             return;
         }
@@ -179,7 +180,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      * @param job The job to unschedule.
      */
     public void unschedule(Job job) {
-        if (scheduledJobFutures.containsKey(job.getId())) {
+        if (job.getId() != null && scheduledJobFutures.containsKey(job.getId())) {
             if (!scheduledJobFutures.get(job.getId()).cancel(true)) {
                 throw new ServiceException("Job " + job.getId() + " could not be cancelled!");
             }
