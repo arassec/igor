@@ -95,4 +95,29 @@ public interface JsonKeys {
      */
     String OPTIONAL = "optional";
 
+    /**
+     * The started key.
+     */
+    String STARTED = "started";
+
+    /**
+     * The finished key.
+     */
+    String FINISHED = "finished";
+
+    /**
+     * The state key.
+     */
+    String STATE = "state";
+
+    /**
+     * The error-caue key.
+     */
+    String ERROR_CAUSE = "errorCause";
+
+    /**
+     * The current-task key.
+     */
+    String CURRENT_TASK = "currentTask";
+
 }

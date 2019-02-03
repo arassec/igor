@@ -30,7 +30,7 @@ public class JobExecution {
     /**
      * Might contain an error cause if the job finished abnormally.
      */
-    private Throwable errorCause;
+    private String errorCause;
 
     /**
      * Contains the current task the job is in.
@@ -52,7 +52,7 @@ public class JobExecution {
      */
     public synchronized void fail(Throwable errorCause) {
         this.executionState = JobExecutionState.FAILED;
-        this.errorCause = errorCause;
+        this.errorCause = errorCause.getMessage();
         this.finished = Instant.now();
     }
 
