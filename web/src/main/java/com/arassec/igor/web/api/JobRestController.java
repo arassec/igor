@@ -10,11 +10,13 @@ import com.github.openjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -123,7 +125,7 @@ public class JobRestController {
      * @return 'OK' on success.
      */
     @PostMapping("run")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String runJob(@RequestBody String jobJson) {
         Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
         Job savedJob = jobManager.save(job);
@@ -160,6 +162,21 @@ public class JobRestController {
             throw new IllegalArgumentException("ID required");
         }
         jobManager.cancel(id);
+    }
+
+    @GetMapping("schedule")
+    public List<Map<String, Object>> getSchedule() {
+        List<Map<String, Object>> jobSchedule = new LinkedList<>();
+        jobManager.loadScheduled().stream().forEach(job -> {
+            CronSequenceGenerator cronTrigger = new CronSequenceGenerator(job.getTrigger());
+            Date nextRun = cronTrigger.next(Calendar.getInstance().getTime());
+            Map<String, Object> scheduleEntry = new HashMap<>();
+            scheduleEntry.put("id", job.getId());
+            scheduleEntry.put("name", job.getName());
+            scheduleEntry.put("date", new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(nextRun));
+            jobSchedule.add(scheduleEntry);
+        });
+        return jobSchedule;
     }
 
 }

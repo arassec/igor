@@ -10,7 +10,7 @@
         <input-button icon="times" v-if="filterText.length > 0" v-on:clicked="filterText = ''" class="button-margin-left"/>
       </div>
       <p slot="right">
-        <router-link :to="addButtonTarget">
+        <router-link :to="addButtonTarget" v-if="addButtonTarget != null">
           <input-button icon="plus"/>
         </router-link>
       </p>

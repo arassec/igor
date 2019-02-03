@@ -7,9 +7,6 @@
             <list-header :addButtonTarget="'job-editor'" :addButtonText="'Add Job'" :filter="filter"
                     :filter-key="'job-list-filter'">
                 <p slot="title">Available Jobs</p>
-                <p slot="feedback">
-                    <feedback-box v-if="feedback.length > 0" :text="feedback" :alert="!feedbackOk"/>
-                </p>
             </list-header>
 
             <job-list-entry v-for="job in filteredJobs"
@@ -33,25 +30,19 @@ import ListHeader from '../components/common/list-header'
 import JobListEntry from '../components/jobs/job-list-entry'
 import CoreContainer from '../components/common/core-container'
 import CoreContent from '../components/common/core-content'
-import FeedbackBox from '../components/common/feedback-box'
 import BackgroundIcon from '../components/common/background-icon'
 
 export default {
   name: 'job-list',
-  components: {BackgroundIcon, CoreContent, CoreContainer, FeedbackBox, JobListEntry, ListHeader, SpacerItem},
-  props: ['saveResult'],
+  components: {BackgroundIcon, CoreContent, CoreContainer, JobListEntry, ListHeader, SpacerItem},
   data: function () {
     return {
       jobs: [],
-      feedback: '',
-      feedbackOk: true,
       filterText: ''
     }
   },
   methods: {
     loadJobs: function () {
-      this.feedback = ''
-      this.feedbackOk = true
       let component = this
       this.$http.get('/api/job').then(function (response) {
         for (let i = component.jobs.length; i > 0; i--) {
