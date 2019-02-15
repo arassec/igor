@@ -43,6 +43,11 @@ public class Job {
     private boolean active;
 
     /**
+     * Number of job-execution entries to keep for this job.
+     */
+    private int numExecutionEntries = 5;
+
+    /**
      * The tasks this job will perform.
      */
     private List<Task> tasks = new LinkedList<>();
@@ -50,39 +55,36 @@ public class Job {
     /**
      * Contains information about a job run.
      */
-    private JobExecution jobExecution;
-
-    /**
-     * A listener that is notified when the job finishes.
-     */
-    private JobListener jobListener;
+    private JobExecution currentJobExecution;
 
     /**
      * Runs the job.
      */
-    public void run() {
+    public void run(JobExecution jobExecution) {
         log.debug("Running job: {} ({})", name, id);
-        jobListener.notifyStarted(this);
-        jobExecution = new JobExecution();
-        jobExecution.setStarted(Instant.now());
-        jobExecution.setExecutionState(JobExecutionState.RUNNING);
+        if (jobExecution == null) {
+            currentJobExecution = new JobExecution();
+        } else {
+            currentJobExecution = jobExecution;
+        }
+        currentJobExecution.setExecutionState(JobExecutionState.RUNNING);
+        currentJobExecution.setStarted(Instant.now());
         try {
             for (Task task : tasks) {
-                if (!jobExecution.isRunning()) {
+                if (!currentJobExecution.isRunning()) {
                     break;
                 }
-                task.run(String.valueOf(id), jobExecution);
+                task.run(String.valueOf(id), currentJobExecution);
             }
-            if (jobExecution.isRunning()) {
-                jobExecution.setExecutionState(JobExecutionState.FINISHED);
+            if (currentJobExecution.isRunning()) {
+                currentJobExecution.setExecutionState(JobExecutionState.FINISHED);
             }
         } catch (Exception e) {
             log.error("Exception during job execution!", e);
-            jobExecution.setExecutionState(JobExecutionState.FAILED);
+            currentJobExecution.setExecutionState(JobExecutionState.FAILED);
         } finally {
-            jobExecution.setFinished(Instant.now());
-            jobListener.notifyFinished(this);
-            log.debug("Finished job: {} ({}): {}", name, id, jobExecution);
+            currentJobExecution.setFinished(Instant.now());
+            log.debug("Finished job: {} ({}): {}", name, id, currentJobExecution);
         }
     }
 
@@ -103,9 +105,9 @@ public class Job {
      * Cancels the job if it is currently running.
      */
     public void cancel() {
-        if (jobExecution != null && JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {
-            jobExecution.setExecutionState(JobExecutionState.CANCELLED);
-            jobExecution.setFinished(Instant.now());
+        if (currentJobExecution != null && JobExecutionState.RUNNING.equals(currentJobExecution.getExecutionState())) {
+            currentJobExecution.setExecutionState(JobExecutionState.CANCELLED);
+            currentJobExecution.setFinished(Instant.now());
         }
     }
 }

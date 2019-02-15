@@ -18,6 +18,31 @@ public interface JobExecutionDao extends CrudRepository<JobExecutionEntity, Long
      * @param jobId The job's ID.
      * @return List of job-executions of that job.
      */
-    List<JobExecutionEntity> findByJobId(Long jobId);
+    List<JobExecutionEntity> findByJobIdOrderByIdDesc(Long jobId);
+
+    /**
+     * Returns all job-executions of a certain job in the given state with the newest entries first.
+     *
+     * @param jobId The job's ID.
+     * @param state The state the job-executions should be in.
+     * @return A List of job-executions that match the criteria.
+     */
+    List<JobExecutionEntity> findByJobIdAndStateOrderByIdDesc(Long jobId, String state);
+
+    /**
+     * Returns all job-executions in the specified state, oldest entries first.
+     *
+     * @param state The state the job-executions should be in.
+     * @return A list of job-executions in the desired state or null, if none exist.
+     */
+    List<JobExecutionEntity> findByStateOrderByIdAsc(String state);
+
+    /**
+     * Deletes all entries of the given job that are older than the specified execution.
+     *
+     * @param jobId       The job's ID.
+     * @param executionId The ID of the oldest job-execution to keep.
+     */
+    void deleteByJobIdAndIdBefore(Long jobId, Long executionId);
 
 }

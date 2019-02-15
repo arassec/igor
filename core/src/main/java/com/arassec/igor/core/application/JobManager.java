@@ -1,9 +1,11 @@
 package com.arassec.igor.core.application;
 
+import com.arassec.igor.core.application.execution.JobExecutor;
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.job.JobListener;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -14,9 +16,11 @@ import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
@@ -26,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class JobManager implements InitializingBean, DisposableBean, JobListener {
+public class JobManager implements InitializingBean, DisposableBean {
 
     /**
      * Repository for jobs.
@@ -35,20 +39,27 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
     private JobRepository jobRepository;
 
     /**
+     * Repository for job-executions.
+     */
+    @Autowired
+    private JobExecutionRepository jobExecutionRepository;
+
+    /**
      * The task scheduler that starts the jobs according to their trigger.
      */
     @Autowired
     private TaskScheduler taskScheduler;
 
     /**
-     * Keeps track of all scheduled jobs.
+     * The job executor actually running the scheduled jobs.
      */
-    private Map<Long, ScheduledFuture> scheduledJobFutures = new ConcurrentHashMap<>();
+    @Autowired
+    private JobExecutor jobExecutor;
 
     /**
-     * Keeps track of all running jobs.
+     * Keeps track of all scheduled jobs.
      */
-    private Map<Long, Job> runningJobs = new ConcurrentHashMap<>();
+    private Map<Long, ScheduledFuture> scheduledJobs = new ConcurrentHashMap<>();
 
     /**
      * Initializes the manager by scheduling all available jobs.
@@ -63,50 +74,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      */
     @Override
     public void destroy() {
-        scheduledJobFutures.values().stream().forEach(scheduledFuture -> scheduledFuture.cancel(true));
-        runningJobs.values().stream().forEach(job -> job.cancel());
-    }
-
-    /**
-     * Saves the reference to the running job for state querying.
-     * <p>
-     * This method is called by every {@link Job} during the beginning of its run. The {@link JobListener} interface
-     * is used to provide this callback method to the job.
-     *
-     * @param job The job that just started.
-     */
-    @Override
-    public void notifyStarted(Job job) {
-        if (job == null) {
-            return;
-        }
-        if (runningJobs.containsKey(job.getId())) {
-            log.error("Parallel job execution detected: {} ({}). Cancelling instance.", job.getName(), job.getId());
-            job.cancel();
-            return;
-        }
-        runningJobs.put(job.getId(), job);
-    }
-
-    /**
-     * Re-Schedules the finished job if necessary (e.g. because it was started manually).
-     * <p>
-     * Thie method is called by every {@link Job} after finishing its run. The {@link JobListener} interface is used
-     * to provide this callback method to the job.
-     *
-     * @param job The job that just finished.
-     */
-    @Override
-    public void notifyFinished(Job job) {
-        if (job == null || job.getId() == null) {
-            return;
-        }
-        if (!scheduledJobFutures.containsKey(job.getId()) && job.isActive()) {
-            schedule(job);
-        }
-        if (runningJobs.containsKey(job.getId())) {
-            runningJobs.remove(job.getId());
-        }
+        scheduledJobs.values().stream().forEach(scheduledFuture -> scheduledFuture.cancel(true));
     }
 
     /**
@@ -115,9 +83,6 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      * @param job The job to save.
      */
     public Job save(Job job) {
-        if (job.getId() != null && runningJobs.containsKey(job.getId())) {
-            throw new IllegalStateException("Job currently running: " + job.getId() + " / " + job.getName());
-        }
         Job savedJob = jobRepository.upsert(job);
         if (savedJob.isActive()) {
             // The cron trigger might have changed, so the job is unscheduled first and then re-scheduled according
@@ -140,32 +105,25 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
         if (job != null) {
             unschedule(job);
             jobRepository.deleteById(id);
-            scheduledJobFutures.remove(id);
+            scheduledJobs.remove(id);
         }
     }
 
     /**
-     * Runs the provided job if it is not already running. The job is unscheduled during it's run and re-scheduled
-     * according to its trigger after it finishes.
+     * Enqueues the provided job to the exeuction list. The job will be run as soon as an execution slot is availalbe
+     * and after previously enqueued executions are processed.
      * <p>
      * This method should be called if the job should run immediately and only once. If the job should run regularly
      * according to its trigger configuration, {@link JobManager#schedule(Job)} should be used.
      *
-     * @param job The job to run.
+     * @param job The job to run as soon as possible.
      */
-    public void run(Job job) {
+    public void enqueue(Job job) {
         if (job == null || job.getId() == null) {
             throw new IllegalArgumentException("Job with ID required for run!");
         }
-        if (runningJobs.containsKey(job.getId())) {
-            log.debug("Job already running: {} ({})", job.getName(), job.getId());
-            return;
-        }
-        log.info("Manually running job: {} ({})", job.getName(), job.getId());
-        job.setJobListener(this);
-        unschedule(job);
-        // The job will be re-scheduled according to its trigger after its execution with the notify-finished-callback mechanism.
-        taskScheduler.schedule(new Thread(() -> job.run()), Instant.now());
+        log.info("Trying to manually enqueue job: {} ({})", job.getName(), job.getId());
+        enqueueJob(job);
     }
 
     /**
@@ -177,11 +135,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
         if (id == null) {
             throw new IllegalArgumentException("ID required to cancel job!");
         }
-        if (runningJobs.containsKey(id)) {
-            Job job = runningJobs.get(id);
-            log.info("Manually cancelling job: {} ({})", job.getName(), job.getId());
-            job.getJobExecution().cancel();
-        }
+        jobExecutor.cancel(id);
     }
 
     /**
@@ -209,7 +163,7 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      * @return List of scheduled jobs.
      */
     public List<Job> loadScheduled() {
-        return jobRepository.findAll().stream().filter(job -> job.isActive()).filter(job -> !runningJobs.containsKey(job.getId())).sorted((o1, o2) -> {
+        return jobRepository.findAll().stream().filter(job -> job.isActive()).sorted((o1, o2) -> {
             CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(o1.getTrigger());
             Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
             CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(o2.getTrigger());
@@ -224,11 +178,8 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      * @param id The job's ID.
      * @return The current {@link JobExecution} of the job, if it is running, or {@code null} otherwise.
      */
-    public JobExecution getJobExecution(Long id) {
-        if (runningJobs.containsKey(id)) {
-            return runningJobs.get(id).getJobExecution();
-        }
-        return null;
+    public List<JobExecution> getJobExecution(Long id) {
+        return jobExecutionRepository.findAllOfJob(id);
     }
 
     /**
@@ -237,13 +188,19 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      * @param job The job to schedule.
      */
     private void schedule(Job job) {
-        job.setJobListener(this);
+        if (job.getId() == null) {
+            throw new IllegalArgumentException("Job with ID required for scheduling!");
+        }
         if (!job.isActive()) {
             log.debug("Job '{}' is not active and will not be scheduled...", job.getName());
             return;
         }
         try {
-            scheduledJobFutures.put(job.getId(), taskScheduler.schedule(new Thread(() -> job.run()),
+            scheduledJobs.put(job.getId(), taskScheduler.schedule(
+                    new Thread(() -> {
+                        log.info("Trying to automatically enqueue job: {} ({})", job.getName(), job.getId());
+                        enqueueJob(job);
+                    }),
                     new CronTrigger(job.getTrigger())));
             log.info("Scheduled job: {} ({}).", job.getName(), job.getId());
         } catch (IllegalArgumentException e) {
@@ -257,12 +214,31 @@ public class JobManager implements InitializingBean, DisposableBean, JobListener
      * @param job The job to unschedule.
      */
     private void unschedule(Job job) {
-        if (job.getId() != null && scheduledJobFutures.containsKey(job.getId())) {
-            if (!scheduledJobFutures.get(job.getId()).cancel(true)) {
+        if (job.getId() != null && scheduledJobs.containsKey(job.getId())) {
+            if (!scheduledJobs.get(job.getId()).cancel(true)) {
                 throw new ServiceException("Job " + job.getId() + " could not be cancelled!");
             }
-            scheduledJobFutures.remove(job.getId());
+            scheduledJobs.remove(job.getId());
             log.info("Unscheduled job: {} ({})", job.getName(), job.getId());
+        }
+    }
+
+    /**
+     * Enqueues the supplied job if there is no other execution of this job waiting for its run.
+     *
+     * @param job The Job to enqueue.
+     */
+    private void enqueueJob(Job job) {
+        List<JobExecution> waitingJobExecutions = jobExecutionRepository.findAllOfJobInState(job.getId(), JobExecutionState.WAITING);
+        if (waitingJobExecutions == null || waitingJobExecutions.isEmpty()) {
+            JobExecution jobExecution = new JobExecution();
+            jobExecution.setJobId(job.getId());
+            jobExecution.setCreated(Instant.now());
+            jobExecution.setExecutionState(JobExecutionState.WAITING);
+            jobExecutionRepository.upsert(jobExecution);
+            jobExecutionRepository.cleanup(job.getId(), job.getNumExecutionEntries());
+        } else {
+            log.info("Job '{}' ({}) already waiting for execution. Skipped execution until next time.", job.getName(), job.getId());
         }
     }
 

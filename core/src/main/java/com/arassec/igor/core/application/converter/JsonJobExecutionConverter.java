@@ -26,9 +26,18 @@ public class JsonJobExecutionConverter {
             return null;
         }
         JSONObject result = new JSONObject();
-        result.put(JsonKeys.STARTED, jobExecution.getStarted().toEpochMilli());
-        result.put(JsonKeys.FINISHED, jobExecution.getFinished().toEpochMilli());
+        if (jobExecution.getId() != null) {
+            result.put(JsonKeys.ID, jobExecution.getId());
+        }
+        result.put(JsonKeys.JOB_ID, jobExecution.getJobId());
+        result.put(JsonKeys.CREATED, jobExecution.getCreated().toEpochMilli());
         result.put(JsonKeys.STATE, jobExecution.getExecutionState().name());
+        if (jobExecution.getStarted() != null) {
+            result.put(JsonKeys.STARTED, jobExecution.getStarted().toEpochMilli());
+        }
+        if (jobExecution.getFinished() != null) {
+            result.put(JsonKeys.FINISHED, jobExecution.getFinished().toEpochMilli());
+        }
         if (jobExecution.getErrorCause() != null) {
             result.put(JsonKeys.ERROR_CAUSE, jobExecution.getErrorCause());
         }
@@ -49,8 +58,20 @@ public class JsonJobExecutionConverter {
             return null;
         }
         JobExecution result = new JobExecution();
-        result.setStarted(Instant.ofEpochMilli(jobExecutionJson.getLong(JsonKeys.STARTED)));
-        result.setFinished(Instant.ofEpochMilli(jobExecutionJson.getLong(JsonKeys.FINISHED)));
+        long id = jobExecutionJson.optLong(JsonKeys.ID, -1);
+        if (id >= 0) {
+            result.setId(id);
+        }
+        result.setJobId(jobExecutionJson.getLong(JsonKeys.JOB_ID));
+        result.setCreated(Instant.ofEpochMilli(jobExecutionJson.getLong(JsonKeys.CREATED)));
+        long started = jobExecutionJson.optLong(JsonKeys.STARTED, -1);
+        if (started > 0) {
+            result.setStarted(Instant.ofEpochMilli(jobExecutionJson.getLong(JsonKeys.STARTED)));
+        }
+        long finished = jobExecutionJson.optLong(JsonKeys.FINISHED, -1);
+        if (finished > 0) {
+            result.setFinished(Instant.ofEpochMilli(jobExecutionJson.getLong(JsonKeys.FINISHED)));
+        }
         result.setExecutionState(JobExecutionState.valueOf(jobExecutionJson.getString(JsonKeys.STATE)));
         result.setErrorCause(jobExecutionJson.optString(JsonKeys.ERROR_CAUSE));
         result.setCurrentTask(jobExecutionJson.optString(JsonKeys.CURRENT_TASK));

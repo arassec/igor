@@ -96,6 +96,11 @@ public interface JsonKeys {
     String OPTIONAL = "optional";
 
     /**
+     * The created key.
+     */
+    String CREATED = "created";
+
+    /**
      * The started key.
      */
     String STARTED = "started";
@@ -120,4 +125,8 @@ public interface JsonKeys {
      */
     String CURRENT_TASK = "currentTask";
 
+    /**
+     * The job-ID key.
+     */
+    String JOB_ID = "jobId";
 }

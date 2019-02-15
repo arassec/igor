@@ -129,24 +129,24 @@ public class JobRestController {
     public String runJob(@RequestBody String jobJson) {
         Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
         Job savedJob = jobManager.save(job);
-        jobManager.run(savedJob);
+        jobManager.enqueue(savedJob);
         return jsonJobConverter.convert(savedJob, false, true).toString();
     }
 
     /**
-     * Returns the execution state of a certain job.
+     * Returns the execution states of a certain job.
      *
      * @param id The job's ID.
-     * @return The current {@link JobExecution} with information about a running job or {@code null}, if the job is not
-     * running.
+     * @return The saved {@link JobExecution}s with information about their state or {@code null}, if the job has never
+     * been executed.
      */
-    @GetMapping("{id}/execution")
-    public JobExecution getExecution(@PathVariable("id") Long id) {
-        JobExecution jobExecution = jobManager.getJobExecution(id);
-        if (jobExecution != null) {
-            return jobExecution;
+    @GetMapping("{id}/executions")
+    public List<JobExecution> getExecution(@PathVariable("id") Long id) {
+        List<JobExecution> jobExecutions = jobManager.getJobExecution(id);
+        if (jobExecutions != null) {
+            return jobExecutions;
         }
-        return new JobExecution();
+        return new LinkedList<>();
     }
 
     /**

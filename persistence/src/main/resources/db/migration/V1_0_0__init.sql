@@ -20,7 +20,7 @@ CREATE TABLE igor.job_execution (
     id INTEGER PRIMARY KEY auto_increment,
     version INTEGER,
     job_id INTEGER NOT NULL,
+    state VARCHAR(64) NOT NULL,
     content TEXT
 );
 CREATE SEQUENCE JOB_EXECUTION_ID_SEQUENCE START WITH 1 INCREMENT BY 1;
-

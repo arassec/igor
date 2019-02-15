@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * Contains information about a single job run.
@@ -11,6 +12,21 @@ import java.time.Instant;
 @Data
 @ToString
 public class JobExecution {
+
+    /**
+     * The job-execution's ID.
+     */
+    private Long id;
+
+    /**
+     * The job's ID.
+     */
+    private Long jobId;
+
+    /**
+     * The timestamp of the creation of this job-execution.
+     */
+    private Instant created;
 
     /**
      * Contains the start time of the job.

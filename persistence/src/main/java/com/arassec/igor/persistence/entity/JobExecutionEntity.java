@@ -3,6 +3,7 @@ package com.arassec.igor.persistence.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.Instant;
 
 /**
  * JPA Entity for {@link com.arassec.igor.core.model.job.execution.JobExecution}s.
@@ -31,6 +32,11 @@ public class JobExecutionEntity {
      */
     @Column(name = "job_id")
     private Long jobId;
+
+    /**
+     * The job-execution's state.
+     */
+    private String state;
 
     /**
      * The job-execution as JSON-string.

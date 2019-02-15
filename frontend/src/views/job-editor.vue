@@ -35,10 +35,11 @@
                                  v-on:move-action-down="moveActionDown">
             </job-tree-navigation>
             <p slot="feedback">
-                <feedback-panel :feedback="feedback" :alert="!feedbackOk"
-                                :requestInProgress="requestInProgress"/>
-                <feedback-panel v-if="jobRunning" :feedback="'Job is currently running!'" :alert="false"
-                                :request-in-progress="true"/>
+                <feedback-panel v-for="(jobExecution, index) in jobExecutions"
+                                v-bind:key="index"
+                                :feedback="formatJobExecution(jobExecution)"
+                                :alert="'FAILED' === jobExecution.executionState"
+                                :request-in-progress="'RUNNING' === jobExecution.executionState"/>
             </p>
         </side-menu>
 
@@ -130,8 +131,6 @@ export default {
   data: function () {
     return {
       newJob: true,
-      feedback: '',
-      feedbackOk: true,
       showDeleteTaskDialog: false,
       showDeleteActionDialog: false,
       initialProviderCategory: {},
@@ -151,29 +150,45 @@ export default {
         tasks: []
       },
       validationErrors: [],
-      jobExecution: null,
-      jobExecutionRefreshTimer: null
+      jobExecutions: [],
+      jobExecutionsRefreshTimer: null
     }
   },
   computed: {
     jobRunning: function () {
-      if (this.jobExecution != null && this.jobExecution != '') {
-        return ('RUNNING' === this.jobExecution.executionState)
+      if (this.jobExecutions != null) {
+        for (let i = 0; i < this.jobExecutions.length; i++) {
+          if ('RUNNING' === this.jobExecutions[i].executionState) {
+            return true;
+          }
+        }
       }
       return false
     }
   },
   methods: {
+    formatJobExecution: function (jobExecution) {
+      if ('RUNNING' === jobExecution.executionState) {
+        return 'Running since: ' + jobExecution.started
+      } else if ('WAITING' === jobExecution.executionState) {
+        return 'Waiting since: ' + jobExecution.created
+      } else if ('FINISHED' === jobExecution.executionState) {
+        return 'Finished at: ' + jobExecution.finished
+      } else if ('CANCELLED' === jobExecution.executionState) {
+        return 'Cancelled at: ' + jobExecution.finished
+      } else if ('FAILED' === jobExecution.executionState) {
+        return 'Failed at: ' + jobExecution.finished
+      } else {
+        return jobExecution.executionState
+      }
+    },
     loadJob: function (id) {
-      this.feedback = ''
-      this.feedbackOk = true
       let component = this
       this.$http.get('/api/job/' + id).then(function (response) {
         component.jobConfiguration = response.data
-        component.updateJobExecution()
+        component.updateJobExecutions()
       }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
+        component.$root.$data.store.setFeedback('Loading failed! (' + error + ')', true)
       })
     },
     saveConfiguration: function () {
@@ -183,35 +198,23 @@ export default {
 
       this.testResults = null
 
-      this.feedback = 'Saving...'
-      this.requestInProgress = true
-
       let component = this
 
       if (this.newJob) {
         this.$http.post('/api/job', this.jobConfiguration).then(function (response) {
           component.jobConfiguration = response.data
           component.newJob = false
-          component.feedback = ''
-          component.feedbackOk = true
-          component.requestInProgress = false
           component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' saved.', false)
         }).catch(function (error) {
-          component.feedback = 'Saving failed! (' + error + ')'
-          component.feedbackOk = false
-          component.requestInProgress = false
+          component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true)
         })
       } else {
         this.$http.put('/api/job', this.jobConfiguration).then(function (response) {
           component.jobConfiguration = response.data
-          component.feedback = ''
-          component.feedbackOk = true
-          component.requestInProgress = false
           component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' updated.', false)
+
         }).catch(function (error) {
-          component.feedback = 'Saving failed! (' + error + ')'
-          component.feedbackOk = false
-          component.requestInProgress = false
+          component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true)
         })
       }
     },
@@ -222,21 +225,15 @@ export default {
 
       this.testResults = null
       this.selectedTestResults = null
-      this.feedback = 'Testing...'
-      this.requestInProgress = true
 
       let component = this
 
       this.$http.post('/api/job/test', this.jobConfiguration).then(function (response) {
         component.testResults = response.data
-        component.feedback = 'OK'
-        component.feedbackOk = true
-        component.requestInProgress = false
+        component.$root.$data.store.setFeedback('Test OK.', false)
         component.updateSelectedTestResult()
       }).catch(function (error) {
-        component.feedback = 'Testing failed! (' + error.response.data + ')'
-        component.feedbackOk = false
-        component.requestInProgress = false
+        component.$root.$data.store.setFeedback('Testing failed! (' + error + ')', true)
       })
     },
     cancelConfiguration: function () {
@@ -322,16 +319,12 @@ export default {
       }
       this.arrayMove(this.jobConfiguration.tasks[taskIndex].actions, actionIndex, actionIndex - 1)
       this.selectAction(taskIndex, (actionIndex - 1))
-      this.feedback = ''
-      this.feedbackOk = true
       this.validationErrors = []
     },
     moveActionDown: function (taskIndex, actionIndex) {
       if (actionIndex < this.jobConfiguration.tasks[taskIndex].actions.length - 1) {
         this.arrayMove(this.jobConfiguration.tasks[taskIndex].actions, actionIndex, actionIndex + 1)
         this.selectAction(taskIndex, (actionIndex + 1))
-        this.feedback = ''
-        this.feedbackOk = true
         this.validationErrors = []
       }
     },
@@ -345,8 +338,6 @@ export default {
       array.splice(newIndex, 0, array.splice(oldIndex, 1)[0])
     },
     validateInput: function () {
-      this.feedback = ''
-      this.feedbackOk = true
       this.validationErrors = []
 
       let jobConfiguratorResult = this.$refs.jobConfigurator.validateInput()
@@ -373,11 +364,11 @@ export default {
       }
 
       if (!(jobConfiguratorResult && taskConfiguratorsResult && actionConfiguratorsResult)) {
-        this.feedback = 'Validation failed'
-        this.feedbackOk = false
+        this.$root.$data.store.setFeedback('Validation failed!', true)
+        return false
       }
 
-      return this.feedbackOk
+      return true
     },
     updateSelectedTestResult: function () {
       if (this.testResults != null) {
@@ -411,33 +402,33 @@ export default {
 
       let component = this
 
-        console.log(JSON.stringify(this.jobConfiguration))
       this.$http.post('/api/job/run', this.jobConfiguration).then(function (response) {
-          console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-          console.log(JSON.stringify(response))
         component.jobConfiguration = response.data
         component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' started manually.', false)
-        component.updateJobExecution()
+        component.updateJobExecutions()
       }).catch(function (error) {
         component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' startup failed ('
           + error + ').', true)
       })
     },
-    updateJobExecution: function () {
+    updateJobExecutions: function () {
       let component = this
-      this.$http.get('/api/job/' + this.jobConfiguration.id + '/execution', this.jobConfiguration).then(function (response) {
-        component.jobExecution = response.data
+      this.$http.get('/api/job/' + this.jobConfiguration.id + '/executions', this.jobConfiguration).then(function (response) {
+        for (let i = component.jobExecutions.length; i > 0; i--) {
+          component.jobExecutions.pop()
+        }
+        Array.from(response.data).forEach(function (item) {
+          component.jobExecutions.push(item)
+        })
       }).catch(function (error) {
-        component.feedback = 'Background sync failed! (' + error.response.data.error + ')'
-        component.feedbackOk = false
-        component.requestInProgress = false
+        component.$root.$data.store.setFeedback('Background sync failed! (' + error.response.data.error + ')', true)
       })
     },
     cancelJob: function () {
       let component = this
       this.$http.post('/api/job/' + this.jobConfiguration.id + '/cancel', this.jobConfiguration).then(function () {
         component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' cancelled.', false)
-        component.updateJobExecution()
+        component.updateJobExecutions()
       }).catch(function (error) {
         component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' cancellation failed ('
           + error + ').', true)
@@ -454,8 +445,8 @@ export default {
       this.jobConfiguration = jobData.jobConfiguration
       if (this.jobConfiguration.id != null) {
         this.newJob = false
-        this.updateJobExecution()
-        this.jobExecutionRefreshTimer = setInterval(() => this.updateJobExecution(), 1000)
+        this.updateJobExecutions()
+        this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
       }
 
       let selectionKey = jobData.selectionKey
@@ -490,7 +481,7 @@ export default {
     } else if (this.jobId != null) {
       this.newJob = false
       this.loadJob(this.jobId)
-      this.jobExecutionRefreshTimer = setInterval(() => this.updateJobExecution(), 1000)
+      this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
     }
 
     let component = this
@@ -517,7 +508,7 @@ export default {
     })
   },
   destroyed () {
-    clearInterval(this.jobExecutionRefreshTimer)
+    clearInterval(this.jobExecutionsRefreshTimer)
   }
 }
 </script>

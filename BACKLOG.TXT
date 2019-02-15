@@ -21,4 +21,5 @@
 - Job-Parameter: cancel on task fail (true|false)
 - Job-Parameter: kill-switch with date to disable jobs
 - Limit for number of IgorData in dry-run-results.
+- CIFS-/Samba supporting FileService
 
