@@ -13,7 +13,7 @@ public class IgorData extends HashMap<String, Object> {
     /**
      * The job's ID.
      */
-    private String jobId;
+    private Long jobId;
 
     /**
      * The task's ID.
@@ -26,7 +26,7 @@ public class IgorData extends HashMap<String, Object> {
      * @param jobId  The job's ID.
      * @param taskId The task's ID.
      */
-    public IgorData(String jobId, String taskId) {
+    public IgorData(Long jobId, String taskId) {
         super();
         this.jobId = jobId;
         this.taskId = taskId;
@@ -50,7 +50,7 @@ public class IgorData extends HashMap<String, Object> {
      *
      * @return The job's ID.
      */
-    public String getJobId() {
+    public Long getJobId() {
         return jobId;
     }
 

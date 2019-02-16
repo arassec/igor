@@ -11,7 +11,7 @@ public abstract class BaseProvider implements Provider {
     /**
      * The job's ID.
      */
-    private String jobId;
+    private Long jobId;
 
     /**
      * The task's ID.
@@ -25,7 +25,7 @@ public abstract class BaseProvider implements Provider {
      * @param taskId The task's ID.
      */
     @Override
-    public void initialize(String jobId, String taskId) {
+    public void initialize(Long jobId, String taskId) {
         this.jobId = jobId;
         this.taskId = taskId;
     }

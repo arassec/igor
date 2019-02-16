@@ -1,14 +1,13 @@
 - Unit-Tests (Apache Mina SSHD!)
-- JobManager with synchronized/better job handling
 - Persistence-service in DB
-- Job execution history in job-editor
+- Persistence-service editor
+- Job execution history in job-editor (with execution details)
 - Job status under home
 - Warning when leaving an editor and unsaved changes exist
 - README.md
 - ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
 - new: DeleteFileAction
 - Home-View with last job runs and "next-to-run"-overview
-- Persistence-service editor
 - Job dry-runs without cloning Tasks?
 - Replace IgorData with JSONObject
 - Configuration-View with system configurations
@@ -22,4 +21,5 @@
 - Job-Parameter: kill-switch with date to disable jobs
 - Limit for number of IgorData in dry-run-results.
 - CIFS-/Samba supporting FileService
-
+- Bugs:
+  - Cancelling / deactivating a job that runs every second fails

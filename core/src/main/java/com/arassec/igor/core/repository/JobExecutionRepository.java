@@ -58,4 +58,10 @@ public interface JobExecutionRepository {
      */
     void cleanup(Long jobId, int numToKeep);
 
+    /**
+     * Deletes all job-executions of the specified job.
+     *
+     * @param jobId The job's ID.
+     */
+    void deleteByJobId(Long jobId);
 }

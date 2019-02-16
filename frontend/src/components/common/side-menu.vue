@@ -51,6 +51,6 @@ export default {
     }
 
     .side-menu {
-        min-width: 445px;
+        width: 450px;
     }
 </style>

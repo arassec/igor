@@ -43,9 +43,9 @@ public class Job {
     private boolean active;
 
     /**
-     * Number of job-execution entries to keep for this job.
+     * Max. number of job-execution entries to keep for this job.
      */
-    private int numExecutionEntries = 5;
+    private int executionHistoryLimit = 5;
 
     /**
      * The tasks this job will perform.
@@ -74,7 +74,7 @@ public class Job {
                 if (!currentJobExecution.isRunning()) {
                     break;
                 }
-                task.run(String.valueOf(id), currentJobExecution);
+                task.run(id, currentJobExecution);
             }
             if (currentJobExecution.isRunning()) {
                 currentJobExecution.setExecutionState(JobExecutionState.FINISHED);
@@ -96,7 +96,7 @@ public class Job {
     public DryRunJobResult dryRun() {
         log.debug("Dry-running job: {}", name);
         DryRunJobResult result = new DryRunJobResult();
-        tasks.stream().forEach(task -> task.dryRun(result, String.valueOf(id)));
+        tasks.stream().forEach(task -> task.dryRun(result, id));
         log.debug("Finished dry-run of job: {}", name);
         return result;
     }

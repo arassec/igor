@@ -59,7 +59,7 @@ public abstract class BaseAction implements Action {
      * {@inheritDoc}
      */
     @Override
-    public void complete(String jobId, String taskName) {
+    public void complete(Long jobId, String taskName) {
         // Nothing to do here...
     }
 

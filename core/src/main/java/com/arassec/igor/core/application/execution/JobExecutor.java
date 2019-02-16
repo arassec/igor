@@ -100,6 +100,7 @@ public class JobExecutor {
                 if (job != null) {
                     jobExecution.setExecutionState(JobExecutionState.RUNNING);
                     jobExecution.setStarted(Instant.now());
+                    runningJobs.put(job.getId(), job);
                     runningJobFutures.add(executorService.submit(new JobRunningCallable(job, jobExecution)));
                     jobExecutionRepository.upsert(jobExecution);
                     freeSlots--;

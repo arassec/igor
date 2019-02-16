@@ -45,4 +45,10 @@ public interface JobExecutionDao extends CrudRepository<JobExecutionEntity, Long
      */
     void deleteByJobIdAndIdBefore(Long jobId, Long executionId);
 
+    /**
+     * Deletes all entries of the specified job.
+     *
+     * @param jobId The job's ID.
+     */
+    void deleteByJobId(Long jobId);
 }

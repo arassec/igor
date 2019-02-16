@@ -24,3 +24,14 @@ CREATE TABLE igor.job_execution (
     content TEXT
 );
 CREATE SEQUENCE JOB_EXECUTION_ID_SEQUENCE START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE igor.persistent_value (
+    id INTEGER PRIMARY KEY auto_increment,
+    version INTEGER,
+    job_id INTEGER NOT NULL,
+    task_id VARCHAR NOT NULL,
+    created TIMESTAMP NOT NULL,
+    content VARCHAR NOT NULL
+);
+CREATE SEQUENCE PERSISTENT_VALUE_ID_SEQUENCE START WITH 1 INCREMENT BY 1;
+CREATE UNIQUE INDEX igor.unique_persistent_value ON igor.persistent_value (job_id, task_id, content);

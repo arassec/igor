@@ -74,7 +74,7 @@ public class Task {
      * @param jobId        The ID of the job.
      * @param jobExecution The {@link JobExecution} that contains the state of the current job run.
      */
-    public void run(String jobId, JobExecution jobExecution) {
+    public void run(Long jobId, JobExecution jobExecution) {
 
         log.debug("Starting task '{}'", name);
 
@@ -151,7 +151,7 @@ public class Task {
      * @param result The target object to store results in.
      * @param jobId  The ID of the job currently executing.
      */
-    public void dryRun(DryRunJobResult result, String jobId) {
+    public void dryRun(DryRunJobResult result, Long jobId) {
         provider.initialize(jobId, id);
         DryRunTaskResult taskResult = new DryRunTaskResult();
 

@@ -12,22 +12,13 @@ import java.util.List;
 public interface PersistenceService extends Service {
 
     /**
-     * Saves the provided value under the job's ID and task's name.
+     * Saves the provided value under the job's and task's ID.
      *
      * @param jobId  The job's ID.
      * @param taskId The task's ID.
      * @param value  The value to persist.
      */
-    void save(String jobId, String taskId, String value);
-
-    /**
-     * Loads all persisted values for the given job and task.
-     *
-     * @param jobId  The job's ID.
-     * @param taskId The task's ID.
-     * @return All persisted values for the given parameters.
-     */
-    List<String> loadAll(String jobId, String taskId);
+    void save(Long jobId, String taskId, String value);
 
     /**
      * Returns whether a value is already persisted or not.
@@ -37,7 +28,7 @@ public interface PersistenceService extends Service {
      * @param value  The value to test.
      * @return {@code true} if the value is already persisted, {@code false} otherwise.
      */
-    boolean isPersisted(String jobId, String taskId, String value);
+    boolean isPersisted(Long jobId, String taskId, String value);
 
     /**
      * Cleans up the persistence store by keeping only the provided number of values. Only the most recent values are
@@ -47,6 +38,6 @@ public interface PersistenceService extends Service {
      * @param taskId           The task's ID.
      * @param numEntriesToKeep Number of values that should be kept in the persistence store.
      */
-    void cleanup(String jobId, String taskId, int numEntriesToKeep);
+    void cleanup(Long jobId, String taskId, int numEntriesToKeep);
 
 }

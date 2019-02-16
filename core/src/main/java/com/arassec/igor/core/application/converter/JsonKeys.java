@@ -71,6 +71,11 @@ public interface JsonKeys {
     String DESCRIPTION = "description";
 
     /**
+     * The "execution history limit" key.
+     */
+    String EXECUTION_HISTORY_LIMIT = "executionHistoryLimit";
+
+    /**
      * The value key.
      */
     String VALUE = "value";

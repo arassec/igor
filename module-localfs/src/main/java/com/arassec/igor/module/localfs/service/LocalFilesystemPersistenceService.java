@@ -36,7 +36,7 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
      * {@inheritDoc}
      */
     @Override
-    public void save(String jobId, String taskId, String value) {
+    public void save(Long jobId, String taskId, String value) {
         try {
             Files.write(Paths.get(getFileName(jobId, taskId)), Arrays.asList(value), UTF_8, APPEND, CREATE);
         } catch (IOException e) {
@@ -48,22 +48,7 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
      * {@inheritDoc}
      */
     @Override
-    public List<String> loadAll(String jobId, String taskId) {
-        try {
-            if (!Files.exists(Paths.get(getFileName(jobId, taskId)))) {
-                Files.createFile(Paths.get(getFileName(jobId, taskId)));
-            }
-            return Files.readAllLines(Paths.get(getFileName(jobId, taskId)));
-        } catch (IOException e) {
-            throw new ServiceException("Could not load values from file: " + getFileName(jobId, taskId), e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isPersisted(String jobId, String taskId, String value) {
+    public boolean isPersisted(Long jobId, String taskId, String value) {
         try (Stream<String> stream = Files.lines(Paths.get(getFileName(jobId, taskId)))) {
             return !stream.noneMatch(line -> value.equals(line));
         } catch (NoSuchFileException e) {
@@ -77,7 +62,7 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
      * {@inheritDoc}
      */
     @Override
-    public void cleanup(String jobId, String taskId, int numEntriesToKeep) {
+    public void cleanup(Long jobId, String taskId, int numEntriesToKeep) {
         Path persistenceFile = Paths.get(getFileName(jobId, taskId));
         Path tempFile = Paths.get(getFileName(jobId, taskId) + "_TEMP");
         boolean cleanedUp = false;
@@ -129,12 +114,12 @@ public class LocalFilesystemPersistenceService extends BaseService implements Pe
      * @param taskId The task's ID.
      * @return The filename of the persistence file for this job and task.
      */
-    private String getFileName(String jobId, String taskId) {
+    private String getFileName(Long jobId, String taskId) {
         String result = targetDir;
         if (!result.endsWith(File.separator)) {
             result += File.separator;
         }
-        return result + jobId + "_" + taskId + ".igor.log";
+        return result + String.valueOf(jobId) + "_" + taskId + ".igor.log";
     }
 
 }

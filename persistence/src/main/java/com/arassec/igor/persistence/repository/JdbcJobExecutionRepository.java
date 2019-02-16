@@ -125,4 +125,13 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteByJobId(Long jobId) {
+        if (jobId != null) {
+            jobExecutionDao.deleteByJobId(jobId);
+        }
+    }
 }

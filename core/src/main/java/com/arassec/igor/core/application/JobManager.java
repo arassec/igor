@@ -105,6 +105,7 @@ public class JobManager implements InitializingBean, DisposableBean {
         if (job != null) {
             unschedule(job);
             jobRepository.deleteById(id);
+            jobExecutionRepository.deleteByJobId(id);
             scheduledJobs.remove(id);
         }
     }
@@ -236,7 +237,7 @@ public class JobManager implements InitializingBean, DisposableBean {
             jobExecution.setCreated(Instant.now());
             jobExecution.setExecutionState(JobExecutionState.WAITING);
             jobExecutionRepository.upsert(jobExecution);
-            jobExecutionRepository.cleanup(job.getId(), job.getNumExecutionEntries());
+            jobExecutionRepository.cleanup(job.getId(), job.getExecutionHistoryLimit());
         } else {
             log.info("Job '{}' ({}) already waiting for execution. Skipped execution until next time.", job.getName(), job.getId());
         }

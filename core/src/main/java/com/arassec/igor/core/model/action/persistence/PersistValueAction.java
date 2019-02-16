@@ -53,7 +53,7 @@ public class PersistValueAction extends BasePersistenceAction {
             if (isDryRun) {
                 data.put("dryRunComment", "Saved: " + data.getJobId() + "/" + data.getTaskId() + "/" + data.get(dataKey));
             } else {
-                service.save(data.getJobId(), data.getTaskId(), (String) data.get(dataKey));
+                service.save(Long.valueOf(data.getJobId()), data.getTaskId(), (String) data.get(dataKey));
             }
         }
         return true;

@@ -35,6 +35,7 @@ public class JsonJobConverter {
         jobJson.put(JsonKeys.NAME, job.getName());
         jobJson.put(JsonKeys.TRIGGER, job.getTrigger());
         jobJson.put(JsonKeys.DESCRIPTION, job.getDescription());
+        jobJson.put(JsonKeys.EXECUTION_HISTORY_LIMIT, job.getExecutionHistoryLimit());
         jobJson.put(JsonKeys.ACTIVE, job.isActive());
 
         JSONArray tasksJson = new JSONArray();
@@ -58,6 +59,7 @@ public class JsonJobConverter {
         job.setName(jobJson.getString(JsonKeys.NAME));
         job.setTrigger(jobJson.getString(JsonKeys.TRIGGER));
         job.setDescription(jobJson.optString(JsonKeys.DESCRIPTION));
+        job.setExecutionHistoryLimit(jobJson.optInt(JsonKeys.EXECUTION_HISTORY_LIMIT));
         job.setActive(jobJson.getBoolean(JsonKeys.ACTIVE));
 
         JSONArray taskJsons = jobJson.optJSONArray(JsonKeys.TASKS);

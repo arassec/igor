@@ -7,9 +7,8 @@
                 <p slot="left">
                     <input-button icon="arrow-left" v-on:clicked="cancelConfiguration"
                                   class="button-margin-right"/>
-                    <input-button icon="plug" v-on:clicked="testConfiguration" class="button-margin-right"
-                                  :disabled="jobRunning"/>
-                    <input-button icon="save" v-on:clicked="saveConfiguration" :disabled="jobRunning"/>
+                    <input-button icon="plug" v-on:clicked="testConfiguration" class="button-margin-right"/>
+                    <input-button icon="save" v-on:clicked="saveConfiguration" />
                 </p>
                 <p slot="right">
                     <input-button icon="times" v-on:clicked="cancelJob" :disabled="!jobRunning"/>
@@ -39,7 +38,8 @@
                                 v-bind:key="index"
                                 :feedback="formatJobExecution(jobExecution)"
                                 :alert="'FAILED' === jobExecution.executionState"
-                                :request-in-progress="'RUNNING' === jobExecution.executionState"/>
+                                :request-in-progress="'RUNNING' === jobExecution.executionState"
+                                class="jobExecutionFeedback"/>
             </p>
         </side-menu>
 
@@ -146,6 +146,7 @@ export default {
         name: 'New Job',
         trigger: '',
         description: '',
+        executionHistoryLimit: 5,
         active: true,
         tasks: []
       },
@@ -169,15 +170,20 @@ export default {
   methods: {
     formatJobExecution: function (jobExecution) {
       if ('RUNNING' === jobExecution.executionState) {
-        return 'Running since: ' + jobExecution.started
+        let date = new Date(jobExecution.started)
+        return 'Running since: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
       } else if ('WAITING' === jobExecution.executionState) {
-        return 'Waiting since: ' + jobExecution.created
+        let date = new Date(jobExecution.created)
+        return 'Waiting since: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
       } else if ('FINISHED' === jobExecution.executionState) {
-        return 'Finished at: ' + jobExecution.finished
+        let date = new Date(jobExecution.finished)
+        return 'Finished: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
       } else if ('CANCELLED' === jobExecution.executionState) {
-        return 'Cancelled at: ' + jobExecution.finished
+        let date = new Date(jobExecution.finished)
+        return 'Cancelled: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
       } else if ('FAILED' === jobExecution.executionState) {
-        return 'Failed at: ' + jobExecution.finished
+        let date = new Date(jobExecution.finished)
+        return 'Failed: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
       } else {
         return jobExecution.executionState
       }
@@ -523,6 +529,10 @@ export default {
         margin-top: 25px;
         color: var(--font-color-light);
         background-color: var(--panel-background-color);
+    }
+
+    .jobExecutionFeedback {
+        margin-bottom: 5px;
     }
 
 </style>

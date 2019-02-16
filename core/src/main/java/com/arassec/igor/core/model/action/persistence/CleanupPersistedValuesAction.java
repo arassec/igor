@@ -50,7 +50,7 @@ public class CleanupPersistedValuesAction extends BasePersistenceAction {
      * @param taskId The task's ID.
      */
     @Override
-    public void complete(String jobId, String taskId) {
+    public void complete(Long jobId, String taskId) {
         persistenceService.cleanup(jobId, taskId, numValuesToKeep);
     }
 

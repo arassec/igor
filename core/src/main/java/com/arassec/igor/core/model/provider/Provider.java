@@ -8,7 +8,7 @@ public interface Provider {
     /**
      * Initializes the provider.
      */
-    void initialize(String jobId, String taskName);
+    void initialize(Long jobId, String taskName);
 
     /**
      * Returns {@code true}, if there is further data to process.

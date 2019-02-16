@@ -39,6 +39,14 @@
                 <td/>
             </tr>
             <tr>
+                <td><label for="numexechistory-input">Execution-History Limit</label></td>
+                <td>
+                    <input id="numexechistory-input" type="text" autocomplete="off"
+                           v-model.number="jobConfiguration.executionHistoryLimit"/>
+                </td>
+                <td/>
+            </tr>
+            <tr>
                 <td><label>Active</label></td>
                 <td>
                     <font-awesome-icon :icon="jobConfiguration.active ? 'check-square' : 'square'"
