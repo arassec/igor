@@ -64,4 +64,13 @@ public interface JobExecutionRepository {
      * @param jobId The job's ID.
      */
     void deleteByJobId(Long jobId);
+
+    /**
+     * Sets the state of all job-executions to the target state if they are in the supplied 'from'-state.
+     *
+     * @param fromState The state an execution must be in to be affected.
+     * @param toState   The target state.
+     */
+    void updateState(JobExecutionState fromState, JobExecutionState toState);
+
 }

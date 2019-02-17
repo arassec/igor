@@ -118,7 +118,7 @@ public class CopyFileAction extends BaseFileAction {
             data.put(KEY_SOURCE_FILENAME, sourceFile);
             data.put(KEY_TARGET_FILENAME, targetFile);
             if (isDryRun) {
-                data.put("dryRunComment", getSourceFileWithPath(sourceDirectory, sourceFile)
+                data.put(DRY_RUN_COMMENT_KEY, getSourceFileWithPath(sourceDirectory, sourceFile)
                         + " copied to " + getTargetFile(sourceFile));
             }
         }

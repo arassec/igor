@@ -4,8 +4,13 @@ import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.provider.IgorData;
+import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.model.service.file.FileService;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Deletes a file.
@@ -62,7 +67,12 @@ public class DeleteFileAction extends BaseFileAction {
      */
     private boolean processInternal(IgorData data, boolean isDryRun) {
         if (isValid(data)) {
-            String sourceFile = (String) data.get(dataKey);
+            String file = (String) data.get(dataKey);
+            if (isDryRun) {
+                data.put(DRY_RUN_COMMENT_KEY, "Delete file " + file);
+            } else {
+                service.delete((String) data.get(dataKey));
+            }
         }
         return true;
     }

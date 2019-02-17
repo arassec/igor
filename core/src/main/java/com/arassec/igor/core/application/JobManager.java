@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
+import com.arassec.igor.core.repository.PersistentValueRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -45,6 +46,12 @@ public class JobManager implements InitializingBean, DisposableBean {
     private JobExecutionRepository jobExecutionRepository;
 
     /**
+     * Repository for persistent values.
+     */
+    @Autowired
+    private PersistentValueRepository persistentValueRepository;
+
+    /**
      * The task scheduler that starts the jobs according to their trigger.
      */
     @Autowired
@@ -66,6 +73,8 @@ public class JobManager implements InitializingBean, DisposableBean {
      */
     @Override
     public void afterPropertiesSet() {
+        // If jobs are already 'running' (e.g. after a server restart) the are updated here:
+        jobExecutionRepository.updateState(JobExecutionState.RUNNING, JobExecutionState.FAILED);
         jobRepository.findAll().stream().forEach(job -> schedule(job));
     }
 
@@ -106,6 +115,7 @@ public class JobManager implements InitializingBean, DisposableBean {
             unschedule(job);
             jobRepository.deleteById(id);
             jobExecutionRepository.deleteByJobId(id);
+            persistentValueRepository.deleteByJobId(id);
             scheduledJobs.remove(id);
         }
     }

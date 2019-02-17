@@ -1,6 +1,7 @@
 package com.arassec.igor.persistence.repository;
 
 import com.arassec.igor.core.application.converter.JsonJobExecutionConverter;
+import com.arassec.igor.core.application.converter.JsonKeys;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.repository.JobExecutionRepository;
@@ -50,12 +51,13 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
             entity.setJobId(jobExecution.getJobId());
         }
         entity.setState(jobExecution.getExecutionState().name());
-        entity.setContent(jobExecutionConverter.convert(jobExecution).toString());
+        JSONObject jobExecutionJson = jobExecutionConverter.convert(jobExecution);
+        // The next two attributes are stored in separate columns in the database:
+        jobExecutionJson.remove(JsonKeys.ID);
+        jobExecutionJson.remove(JsonKeys.STATE);
+        entity.setContent(jobExecutionJson.toString());
         JobExecutionEntity persistedEntity = jobExecutionDao.save(entity);
         jobExecution.setId(persistedEntity.getId());
-        // TODO: We have to save the ID in the JSON. Not nice...
-        persistedEntity.setContent(jobExecutionConverter.convert(jobExecution).toString());
-        jobExecutionDao.save(entity);
         return jobExecution;
     }
 
@@ -66,8 +68,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     public List<JobExecution> findAllOfJob(Long jobId) {
         List<JobExecutionEntity> jobExecutionEntities = jobExecutionDao.findByJobIdOrderByIdDesc(jobId);
         if (jobExecutionEntities != null) {
-            return jobExecutionEntities.stream().map(jobExecutionEntity ->
-                    jobExecutionConverter.convert(new JSONObject(jobExecutionEntity.getContent()))).collect(Collectors.toList());
+            return jobExecutionEntities.stream().map(jobExecutionEntity -> convert(jobExecutionEntity)).collect(Collectors.toList());
         }
         return new LinkedList<>();
     }
@@ -79,8 +80,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     public List<JobExecution> findAllOfJobInState(Long jobId, JobExecutionState state) {
         List<JobExecutionEntity> jobExecutionEntities = jobExecutionDao.findByJobIdAndStateOrderByIdDesc(jobId, state.name());
         if (jobExecutionEntities != null) {
-            return jobExecutionEntities.stream().map(jobExecutionEntity ->
-                    jobExecutionConverter.convert(new JSONObject(jobExecutionEntity.getContent()))).collect(Collectors.toList());
+            return jobExecutionEntities.stream().map(jobExecutionEntity -> convert(jobExecutionEntity)).collect(Collectors.toList());
         }
         return new LinkedList<>();
     }
@@ -95,7 +95,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
             if (jobExecutionEntities.size() > 1) {
                 throw new IllegalStateException("Multiple job-executions persisted for job: " + jobId);
             }
-            return jobExecutionConverter.convert(new JSONObject(jobExecutionEntities.get(0).getContent()));
+            return convert(jobExecutionEntities.get(0));
         }
         return null;
     }
@@ -108,8 +108,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
         List<JobExecutionEntity> waitingJobExecutions = jobExecutionDao.findByStateOrderByIdAsc(JobExecutionState.WAITING.name());
         if (waitingJobExecutions != null) {
             return waitingJobExecutions.stream().map(
-                    jobExecutionEntity -> jobExecutionConverter.convert(
-                            new JSONObject(jobExecutionEntity.getContent()))).collect(Collectors.toList());
+                    jobExecutionEntity -> convert(jobExecutionEntity)).collect(Collectors.toList());
         }
         return new LinkedList<>();
     }
@@ -121,7 +120,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     public void cleanup(Long jobId, int numToKeep) {
         List<JobExecutionEntity> jobExecutionEntities = jobExecutionDao.findByJobIdOrderByIdDesc(jobId);
         if (jobExecutionEntities != null && jobExecutionEntities.size() > numToKeep) {
-            jobExecutionDao.deleteByJobIdAndIdBefore(jobId, jobExecutionEntities.get(numToKeep -1).getId());
+            jobExecutionDao.deleteByJobIdAndIdBefore(jobId, jobExecutionEntities.get(numToKeep - 1).getId());
         }
     }
 
@@ -134,4 +133,28 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
             jobExecutionDao.deleteByJobId(jobId);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateState(JobExecutionState fromState, JobExecutionState toState) {
+        if (fromState != null && toState != null) {
+            jobExecutionDao.updateState(fromState.name(), toState.name());
+        }
+    }
+
+    /**
+     * Converts a job-execution database entity into a {@link JobExecution}.
+     *
+     * @param entity The entity.
+     * @return The newly created {@link JobExecution}.
+     */
+    private JobExecution convert(JobExecutionEntity entity) {
+        JobExecution result = jobExecutionConverter.convert(new JSONObject(entity.getContent()));
+        result.setId(entity.getId());
+        result.setExecutionState(JobExecutionState.valueOf(entity.getState()));
+        return result;
+    }
+
 }

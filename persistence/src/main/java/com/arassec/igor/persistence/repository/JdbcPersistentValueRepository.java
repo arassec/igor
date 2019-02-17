@@ -83,4 +83,14 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteByJobId(Long jobId) {
+        if (jobId != null) {
+            persistentValueDao.deleteByJobId(jobId);
+        }
+    }
+
 }

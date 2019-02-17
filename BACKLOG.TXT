@@ -1,20 +1,17 @@
 - Unit-Tests (Apache Mina SSHD!)
-- Persistence-service in DB
 - Persistence-service editor
 - Job execution history in job-editor (with execution details)
-- Job status under home
+- Save Job-Service-References to warn about deleting a used service
+- Home-View with last job runs, current job runs and "next-to-run"-overview
 - Warning when leaving an editor and unsaved changes exist
 - README.md
 - ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
-- new: DeleteFileAction
-- Home-View with last job runs and "next-to-run"-overview
 - Job dry-runs without cloning Tasks?
 - Replace IgorData with JSONObject
 - Configuration-View with system configurations
 - Initial setup with configuration on first start
 - Tags for jobs + grouping/filtering jobs by tag
 - Export + Import of jobs and services (via JSON)
-- Save Job-Service-References to warn about deleting a used service
 - Authentication + Authorization (Frontend + Backend)
 - I18N
 - Job-Parameter: cancel on task fail (true|false)

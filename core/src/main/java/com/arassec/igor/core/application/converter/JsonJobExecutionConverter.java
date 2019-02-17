@@ -72,7 +72,10 @@ public class JsonJobExecutionConverter {
         if (finished > 0) {
             result.setFinished(Instant.ofEpochMilli(jobExecutionJson.getLong(JsonKeys.FINISHED)));
         }
-        result.setExecutionState(JobExecutionState.valueOf(jobExecutionJson.getString(JsonKeys.STATE)));
+        String state = jobExecutionJson.optString(JsonKeys.STATE);
+        if (state != null && !state.isEmpty()) {
+            result.setExecutionState(JobExecutionState.valueOf(state));
+        }
         result.setErrorCause(jobExecutionJson.optString(JsonKeys.ERROR_CAUSE));
         result.setCurrentTask(jobExecutionJson.optString(JsonKeys.CURRENT_TASK));
         return result;

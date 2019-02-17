@@ -44,4 +44,10 @@ public interface PersistentValueDao extends CrudRepository<PersistentValueEntity
      */
     void deleteByJobIdAndTaskIdAndIdBefore(Long jobId, String taskId, Long executionId);
 
+    /**
+     * Deletes all values of the given job.
+     *
+     * @param jobId The job's ID.
+     */
+    void deleteByJobId(Long jobId);
 }

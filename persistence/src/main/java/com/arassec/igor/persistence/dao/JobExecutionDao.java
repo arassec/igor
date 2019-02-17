@@ -1,6 +1,9 @@
 package com.arassec.igor.persistence.dao;
 
+import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.persistence.entity.JobExecutionEntity;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -51,4 +54,14 @@ public interface JobExecutionDao extends CrudRepository<JobExecutionEntity, Long
      * @param jobId The job's ID.
      */
     void deleteByJobId(Long jobId);
+
+    /**
+     * Updates the status of all executions which are in a certain state.
+     *
+     * @param fromState The state to change.
+     * @param toState   The target state.
+     */
+    @Modifying
+    @Query(value = "UPDATE igor.job_execution SET state = :toState WHERE state = :fromState", nativeQuery = true)
+    void updateState(String fromState, String toState);
 }

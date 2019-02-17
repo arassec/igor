@@ -18,6 +18,11 @@ public abstract class BaseAction implements Action {
     public static final int DEFAULT_THREADS = 1;
 
     /**
+     * JSON-Key for dry-run comments.
+     */
+    protected static final String DRY_RUN_COMMENT_KEY = "dryRunComment";
+
+    /**
      * Key into the {@link IgorData} that identifies the property to process.
      */
     @IgorParam

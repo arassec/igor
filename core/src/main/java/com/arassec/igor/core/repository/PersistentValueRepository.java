@@ -36,4 +36,11 @@ public interface PersistentValueRepository {
      */
     void cleanup(Long jobId, String taskId, int numEntriesToKeep);
 
+    /**
+     * Deletes all values of the given job.
+     *
+     * @param jobId The job's ID.
+     */
+    void deleteByJobId(Long jobId);
+
 }

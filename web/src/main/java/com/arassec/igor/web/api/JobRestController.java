@@ -164,6 +164,11 @@ public class JobRestController {
         jobManager.cancel(id);
     }
 
+    /**
+     * Gets the schedule of all active jobs.
+     *
+     * @return List of schedules.
+     */
     @GetMapping("schedule")
     public List<Map<String, Object>> getSchedule() {
         List<Map<String, Object>> jobSchedule = new LinkedList<>();

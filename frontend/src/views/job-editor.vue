@@ -34,12 +34,19 @@
                                  v-on:move-action-down="moveActionDown">
             </job-tree-navigation>
             <p slot="feedback">
+                <!--
+                <job-execution-panel v-for="(jobExecution, index) in jobExecutions"
+                                     :key="index"
+                                     :job-execution="jobExecution"/>
+                -->
                 <feedback-panel v-for="(jobExecution, index) in jobExecutions"
                                 v-bind:key="index"
                                 :feedback="formatJobExecution(jobExecution)"
                                 :alert="'FAILED' === jobExecution.executionState"
-                                :request-in-progress="'RUNNING' === jobExecution.executionState"
-                                class="jobExecutionFeedback"/>
+                                :request-in-progress="('RUNNING' === jobExecution.executionState || 'WAITING' === jobExecution.executionState)"
+                                class="jobExecutionFeedback">
+                    <input-button icon="info"/>
+                </feedback-panel>
             </p>
         </side-menu>
 
@@ -110,10 +117,12 @@ import ButtonRow from '../components/common/button-row'
 import InputButton from '../components/common/input-button'
 import TestResultContainer from '../components/jobs/test-result-container'
 import SideMenu from '../components/common/side-menu'
+import JobExecutionPanel from '../components/jobs/job-execution-panel'
 
 export default {
   name: 'job-editor',
   components: {
+    JobExecutionPanel,
     SideMenu,
     TestResultContainer,
     InputButton,
@@ -211,6 +220,7 @@ export default {
           component.jobConfiguration = response.data
           component.newJob = false
           component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' saved.', false)
+          component.$router.push({name: 'job-editor', params: {jobId: component.jobConfiguration.id}})
         }).catch(function (error) {
           component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true)
         })

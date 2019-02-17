@@ -53,7 +53,7 @@ public class PauseAction extends BaseMiscAction {
      */
     private boolean processInternal(IgorData data, boolean isDryRun) {
         if (isDryRun) {
-            data.put("dryRunComment", "Sleep for " + milliseconds + " milliseconds.");
+            data.put(DRY_RUN_COMMENT_KEY, "Sleep for " + milliseconds + " milliseconds.");
         } else {
             try {
                 Thread.sleep(milliseconds);
