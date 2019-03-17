@@ -8,12 +8,12 @@
                     <input-button icon="arrow-left" v-on:clicked="cancelConfiguration"
                                   class="button-margin-right"/>
                     <input-button icon="plug" v-on:clicked="testConfiguration" class="button-margin-right"/>
-                    <input-button icon="save" v-on:clicked="saveConfiguration" />
+                    <input-button icon="save" v-on:clicked="saveConfiguration"/>
                 </p>
                 <p slot="right">
                     <input-button icon="times" v-on:clicked="cancelJob" :disabled="!jobRunning"/>
                     <input-button icon="play" v-on:clicked="runJob" class="button-margin-left"
-                                  :disabled="jobRunning || jobConfiguration.id == null || requestInProgress"/>
+                                  :disabled="jobRunning || jobConfiguration.id == null"/>
                 </p>
             </button-row>
             <job-tree-navigation slot="content"
@@ -34,19 +34,14 @@
                                  v-on:move-action-down="moveActionDown">
             </job-tree-navigation>
             <p slot="feedback">
-                <!--
-                <job-execution-panel v-for="(jobExecution, index) in jobExecutions"
-                                     :key="index"
-                                     :job-execution="jobExecution"/>
-                -->
-                <feedback-panel v-for="(jobExecution, index) in jobExecutions"
-                                v-bind:key="index"
-                                :feedback="formatJobExecution(jobExecution)"
-                                :alert="'FAILED' === jobExecution.executionState"
-                                :request-in-progress="('RUNNING' === jobExecution.executionState || 'WAITING' === jobExecution.executionState)"
-                                class="jobExecutionFeedback">
-                    <input-button icon="info"/>
-                </feedback-panel>
+                <feedback-box v-for="(jobExecution, index) in jobExecutions"
+                              :key="index" :alert="jobExecution.executionState === 'FAILED'">
+                    <label slot="feedback">{{formatJobExecution(jobExecution)}}</label>
+                    <font-awesome-icon slot="feedback" style="margin-right: 5px;"
+                                       v-if="(jobExecution.executionState === 'WAITING' || jobExecution.executionState === 'RUNNING')"
+                                       icon="spinner" class="fa-spin"/>
+                    <input-button slot="button" icon="info" v-on:clicked="selectedJobExecution = jobExecution"/>
+                </feedback-box>
             </p>
         </side-menu>
 
@@ -74,7 +69,7 @@
             </template>
 
             <modal-dialog v-if="showDeleteTaskDialog" @close="showDeleteTaskDialog = false">
-                <p slot="header">Delete Task?</p>
+                <h1 slot="header">Delete Task?</h1>
                 <p slot="body">Do you really want to delete this Task?</p>
                 <div slot="footer">
                     <button-row>
@@ -85,7 +80,7 @@
             </modal-dialog>
 
             <modal-dialog v-if="showDeleteActionDialog" @close="showDeleteActionDialog = false">
-                <p slot="header">Delete Action?</p>
+                <h1 slot="header">Delete Action?</h1>
                 <p slot="body">Do you really want to delete this Action?</p>
                 <div slot="footer">
                     <button-row>
@@ -94,6 +89,10 @@
                     </button-row>
                 </div>
             </modal-dialog>
+
+            <job-execution-details v-if="selectedJobExecution != null"
+                                   v-bind:job-execution="selectedJobExecution"
+                                   v-on:close="selectedJobExecution = null"/>
 
         </core-content>
 
@@ -107,7 +106,6 @@
 <script>
 import CoreContainer from '../components/common/core-container'
 import CoreContent from '../components/common/core-content'
-import FeedbackPanel from '../components/common/feedback-panel'
 import JobTreeNavigation from '../components/jobs/job-tree-navigation'
 import JobConfigurator from '../components/jobs/job-configurator'
 import TaskConfigurator from '../components/jobs/task-configurator'
@@ -117,12 +115,14 @@ import ButtonRow from '../components/common/button-row'
 import InputButton from '../components/common/input-button'
 import TestResultContainer from '../components/jobs/test-result-container'
 import SideMenu from '../components/common/side-menu'
-import JobExecutionPanel from '../components/jobs/job-execution-panel'
+import FeedbackBox from '../components/common/feedback-box'
+import JobExecutionDetails from '../components/jobs/job-execution-details'
 
 export default {
   name: 'job-editor',
   components: {
-    JobExecutionPanel,
+    JobExecutionDetails,
+    FeedbackBox,
     SideMenu,
     TestResultContainer,
     InputButton,
@@ -132,7 +132,6 @@ export default {
     TaskConfigurator,
     JobConfigurator,
     JobTreeNavigation,
-    FeedbackPanel,
     CoreContent,
     CoreContainer
   },
@@ -148,7 +147,7 @@ export default {
       initialActionType: {},
       selectedTaskIndex: -1,
       selectedActionIndex: -1,
-      requestInProgress: false,
+      selectedJobExecution: null,
       testResults: null,
       selectedTestResults: null,
       jobConfiguration: {
@@ -169,7 +168,7 @@ export default {
       if (this.jobExecutions != null) {
         for (let i = 0; i < this.jobExecutions.length; i++) {
           if ('RUNNING' === this.jobExecutions[i].executionState) {
-            return true;
+            return true
           }
         }
       }
@@ -178,21 +177,22 @@ export default {
   },
   methods: {
     formatJobExecution: function (jobExecution) {
+      let options = { year: 'numeric', month: '2-digit', day: '2-digit' };
       if ('RUNNING' === jobExecution.executionState) {
         let date = new Date(jobExecution.started)
-        return 'Running since: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+        return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString() + ' (running)'
       } else if ('WAITING' === jobExecution.executionState) {
         let date = new Date(jobExecution.created)
-        return 'Waiting since: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+        return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString() + ' (waiting)'
       } else if ('FINISHED' === jobExecution.executionState) {
         let date = new Date(jobExecution.finished)
-        return 'Finished: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+        return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString() + ' (finished)'
       } else if ('CANCELLED' === jobExecution.executionState) {
         let date = new Date(jobExecution.finished)
-        return 'Cancelled: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+        return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString() + ' (cancelled)'
       } else if ('FAILED' === jobExecution.executionState) {
         let date = new Date(jobExecution.finished)
-        return 'Failed: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+        return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString() + ' (failed)'
       } else {
         return jobExecution.executionState
       }
@@ -215,22 +215,27 @@ export default {
 
       let component = this
 
+      this.$root.$data.store.setWip('Saving job')
+
       if (this.newJob) {
         this.$http.post('/api/job', this.jobConfiguration).then(function (response) {
           component.jobConfiguration = response.data
           component.newJob = false
           component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' saved.', false)
+          component.$root.$data.store.clearWip()
           component.$router.push({name: 'job-editor', params: {jobId: component.jobConfiguration.id}})
         }).catch(function (error) {
           component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true)
+          component.$root.$data.store.clearWip()
         })
       } else {
         this.$http.put('/api/job', this.jobConfiguration).then(function (response) {
           component.jobConfiguration = response.data
           component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' updated.', false)
-
+          component.$root.$data.store.clearWip()
         }).catch(function (error) {
           component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true)
+          component.$root.$data.store.clearWip()
         })
       }
     },
@@ -244,12 +249,16 @@ export default {
 
       let component = this
 
+      this.$root.$data.store.setWip('Testing job')
+
       this.$http.post('/api/job/test', this.jobConfiguration).then(function (response) {
         component.testResults = response.data
         component.$root.$data.store.setFeedback('Test OK.', false)
+        component.$root.$data.store.clearWip()
         component.updateSelectedTestResult()
       }).catch(function (error) {
         component.$root.$data.store.setFeedback('Testing failed! (' + error + ')', true)
+        component.$root.$data.store.clearWip()
       })
     },
     cancelConfiguration: function () {
@@ -469,9 +478,9 @@ export default {
       if (selectionKey != null) {
         let taskIndex = -1
         let actionIndex = -1
-        if ((typeof selectionKey === 'string' || selectionKey instanceof String) && selectionKey.includes("_")) {
-          taskIndex = selectionKey.split("_")[0]
-          actionIndex = selectionKey.split("_")[1]
+        if ((typeof selectionKey === 'string' || selectionKey instanceof String) && selectionKey.includes('_')) {
+          taskIndex = selectionKey.split('_')[0]
+          actionIndex = selectionKey.split('_')[1]
         } else {
           taskIndex = selectionKey
         }

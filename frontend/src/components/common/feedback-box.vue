@@ -1,17 +1,16 @@
 <template>
-  <div :class="{info: !alert,  alert: alert}">
-    <span class="iconContainer">
-      <font-awesome-icon v-if="icon != null && iconClass != null" :icon="icon" :class="iconClass"/>
-      <font-awesome-icon v-if="icon != null && iconClass == null" :icon="icon"/>
-    </span>
-    <label>{{text}}</label>
-  </div>
+  <button-row :class="{info: !alert,  alert: alert}" class="margin-bottom">
+    <slot slot="left" name="feedback"/>
+    <slot slot="right" name="button"/>
+  </button-row>
 </template>
 
 <script>
+import ButtonRow from './button-row'
 export default {
   name: 'feedback-box',
-  props: ['text', 'alert', 'icon', 'iconClass']
+  components: {ButtonRow},
+  props: ['alert']
 }
 </script>
 
@@ -20,12 +19,11 @@ export default {
   div {
     color: var(--font-color-light);
     line-height: 25px;
-    max-width: calc(var(--content-width) - 30px);
-    padding: 5px 10px 5px 10px;
+    padding: 5px;
   }
 
-  .iconContainer {
-    margin-right: 5px;
+  .margin-bottom {
+    margin-bottom: 5px;
   }
 
   .info {

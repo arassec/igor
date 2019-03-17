@@ -10,8 +10,6 @@
                     <input-button v-on:clicked="saveConfiguration()" icon="save"/>
                 </p>
             </button-row>
-            <feedback-panel slot="feedback" :feedback="feedback" :alert="!feedbackOk"
-                            :requestInProgress="requestInProgress"/>
         </side-menu>
 
         <core-content>
@@ -79,14 +77,12 @@ import CoreContainer from '../components/common/core-container'
 import CoreContent from '../components/common/core-content'
 import ButtonRow from '../components/common/button-row'
 import ValidationError from '../components/common/validation-error'
-import FeedbackPanel from '../components/common/feedback-panel'
 import SideMenu from '../components/common/side-menu'
 
 export default {
   name: 'service-editor',
   components: {
     SideMenu,
-    FeedbackPanel,
     ValidationError,
     ButtonRow,
     CoreContent,
@@ -102,9 +98,6 @@ export default {
       serviceCategories: [],
       serviceTypes: [],
       nameValidationError: '',
-      feedback: '',
-      feedbackOk: true,
-      requestInProgress: false,
       serviceConfiguration: {
         name: '',
         category: {},
@@ -115,8 +108,6 @@ export default {
   },
   methods: {
     loadService: function (id) {
-      this.feedback = ''
-      this.feedbackOk = true
       let component = this
       this.$http.get('/api/service/' + id).then(function (response) {
         component.serviceConfiguration = response.data
@@ -124,8 +115,7 @@ export default {
         component.selectedCategory = component.serviceConfiguration.category.key
         component.serviceTypes.push(component.serviceConfiguration.type)
       }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
+        component.$root.$data.store.setFeedback('Loading service failed! (' + error + ')', true)
       })
     },
     loadServiceCategories: function (singleServiceCategory) {
@@ -146,8 +136,7 @@ export default {
         component.serviceConfiguration.category = component.serviceCategories[0]
         component.loadServiceTypes(component.serviceConfiguration.category.key)
       }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
+        component.$root.$data.store.setFeedback('Loading categories failed! (' + error + ')', true)
       })
     },
     loadServiceTypes: function (category) {
@@ -162,8 +151,7 @@ export default {
         component.serviceConfiguration.type = component.serviceTypes[0]
         component.loadTypeParameters(component.serviceConfiguration.type.key)
       }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
+        component.$root.$data.store.setFeedback('Loading types failed! (' + error + ')', true)
       })
     },
     loadTypeParameters: function (type) {
@@ -171,8 +159,7 @@ export default {
       this.$http.get('/api/parameters/service/' + type).then(function (response) {
         component.serviceConfiguration.parameters = response.data
       }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
+        component.$root.$data.store.setFeedback('Loading type parameters failed! (' + error + ')', true)
       })
     },
     testConfiguration: function () {
@@ -180,18 +167,15 @@ export default {
         return
       }
 
-      this.feedback = 'Testing...'
-      this.requestInProgress = true
+      this.$root.$data.store.setWip('Testing service')
 
       let component = this
-      this.$http.post('/api/service/test', this.serviceConfiguration).then(function (response) {
-        component.feedback = response.data
-        component.feedbackOk = true
-        component.requestInProgress = false
+      this.$http.post('/api/service/test', this.serviceConfiguration).then(function () {
+        component.$root.$data.store.setFeedback('Test OK.', false)
+        component.$root.$data.store.clearWip()
       }).catch(function (error) {
-        component.feedback = error.response.data
-        component.feedbackOk = false
-        component.requestInProgress = false
+        component.$root.$data.store.setFeedback('Testing failed! (' + error + ')', true)
+        component.$root.$data.store.clearWip()
       })
     },
     saveConfiguration: function () {
@@ -199,18 +183,14 @@ export default {
         return
       }
 
-      this.feedback = 'Saving...'
-      this.requestInProgress = true
+      this.$root.$data.store.setWip('Saving service')
 
       let component = this
-
       if (this.newService) {
         this.$http.post('/api/service', this.serviceConfiguration).then(function (response) {
           component.serviceConfiguration = response.data;
-          component.feedback = ''
-          component.feedbackOk = true
-          component.requestInProgress = false
           component.$root.$data.store.setFeedback('Service \'' + component.serviceConfiguration.name + '\' saved.', false)
+          component.$root.$data.store.clearWip()
           let jobData = component.$root.$data.store.getJobData()
           if (jobData.jobConfiguration != null) {
             let serviceParameter = {
@@ -220,20 +200,16 @@ export default {
             jobData.serviceParameter = serviceParameter
           }
         }).catch(function (error) {
-          component.feedback = 'Saving failed! (' + error + ')'
-          component.feedbackOk = false
-          component.requestInProgress = false
+          component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', false)
+          component.$root.$data.store.clearWip()
         })
       } else {
         this.$http.put('/api/service', this.serviceConfiguration).then(function () {
           component.$root.$data.store.setFeedback('Service \'' + component.serviceConfiguration.name + '\' updated.', false)
-          component.feedback = ''
-          component.feedbackOk = true
-          component.requestInProgress = false
+          component.$root.$data.store.clearWip()
         }).catch(function (error) {
-          component.feedback = 'Saving failed! (' + error + ')'
-          component.feedbackOk = false
-          component.requestInProgress = false
+          component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', false)
+          component.$root.$data.store.clearWip()
         })
       }
     },
@@ -246,8 +222,6 @@ export default {
       }
     },
     validateInput: function () {
-      this.feedback = ''
-      this.feedbackOk = true
       this.nameValidationError = ''
 
       let nameValidationResult = true

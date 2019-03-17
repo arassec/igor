@@ -12,7 +12,7 @@
     </button-row>
 
     <modal-dialog v-if="showDeleteDialog" @close="showDeleteDialog = false">
-      <p slot="header">Delete Service?</p>
+      <h1 slot="header">Delete Service?</h1>
       <p slot="body">Do you really want to delete service '{{name}}'?</p>
       <div slot="footer">
         <button-row>

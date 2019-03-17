@@ -6,6 +6,8 @@ import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,7 +83,7 @@ public class Job {
             }
         } catch (Exception e) {
             log.error("Exception during job execution!", e);
-            currentJobExecution.setExecutionState(JobExecutionState.FAILED);
+            currentJobExecution.fail(e);
         } finally {
             currentJobExecution.setFinished(Instant.now());
             log.debug("Finished job: {} ({}): {}", name, id, currentJobExecution);

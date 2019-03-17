@@ -17,7 +17,7 @@ export default {
   },
   computed: {
     iconstyle: function () {
-      if (this.icon === 'eye' || this.icon === 'clock' || this.icon === 'cogs') {
+      if (this.icon === 'eye' || this.icon === 'clock' || this.icon === 'cogs' || this.icon === 'info') {
         return 'minus-four'
       }
       return ''

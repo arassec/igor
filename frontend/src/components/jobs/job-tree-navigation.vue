@@ -100,6 +100,11 @@ export default {
 
 <style scoped>
 
+    .fa-xs:hover {
+        height: 15px;
+        width: 15px;
+    }
+
     .treeview {
         color: var(--font-color-light);
         line-height: 25px;

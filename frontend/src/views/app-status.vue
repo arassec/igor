@@ -20,6 +20,8 @@
 
     <spacer-item/>
 
+    <background-icon left="true" icon-one="clipboard-list"/>
+
   </core-container>
 </template>
 
@@ -30,10 +32,11 @@
     import ListEntry from "../components/common/list-entry";
     import ListName from "../components/common/list-name";
     import ListHeader from "../components/common/list-header";
+    import BackgroundIcon from '../components/common/background-icon'
 
     export default {
         name: 'app-status',
-        components: {ListHeader, ListName, ListEntry, CoreContent, CoreContainer, SpacerItem},
+        components: {BackgroundIcon, ListHeader, ListName, ListEntry, CoreContent, CoreContainer, SpacerItem},
         data: function () {
             return {
                 schedule: [],

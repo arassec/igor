@@ -4,15 +4,18 @@
 
     <feedback-snackbar/>
 
+    <wip-window/>
+
   </div>
 </template>
 
 <script>
 import FeedbackSnackbar from './feedback-snackbar'
+import WipWindow from './wip-window'
 
 export default {
   name: 'core-container',
-  components: {FeedbackSnackbar}
+  components: {WipWindow, FeedbackSnackbar}
 }
 </script>
 

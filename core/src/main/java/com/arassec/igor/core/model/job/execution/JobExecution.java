@@ -3,6 +3,8 @@ package com.arassec.igor.core.model.job.execution;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
@@ -68,7 +70,10 @@ public class JobExecution {
      */
     public synchronized void fail(Throwable errorCause) {
         this.executionState = JobExecutionState.FAILED;
-        this.errorCause = errorCause.getMessage();
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        errorCause.printStackTrace(pw);
+        this.errorCause = sw.toString();
         this.finished = Instant.now();
     }
 

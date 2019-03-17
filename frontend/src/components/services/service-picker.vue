@@ -1,7 +1,7 @@
 <template>
   <modal-dialog>
 
-    <p slot="header">Select Service</p>
+    <h1 slot="header">Select Service</h1>
 
     <div slot="body">
         <table>

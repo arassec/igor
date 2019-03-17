@@ -1,7 +1,7 @@
 <template>
   <modal-dialog>
 
-    <p slot="header">Example CRON Expressions</p>
+    <h1 slot="header">Example CRON Expressions</h1>
 
     <div slot="body">
       <table>

@@ -23,10 +23,14 @@ Vue.prototype.$http = window.axios
 
 const store = {
   debug: true,
-  timeout: undefined,
   feedback: {
+    timeout: undefined,
     message: '',
     alert: false
+  },
+  wip: {
+    timeout: undefined,
+    message: ''
   },
   jobData: {
     jobConfiguration: null,
@@ -42,10 +46,10 @@ const store = {
     this.feedback.alert = alert
     this.routeChanged = false
     let component = this
-    if (this.timeout !== undefined) {
-      clearTimeout(this.timeout)
+    if (this.feedback.timeout !== undefined) {
+      clearTimeout(this.feedback.timeout)
     }
-    this.timeout = setTimeout(function () {
+    this.feedback.timeout = setTimeout(function () {
       component.clearFeedback()
     }, 5000)
   },
@@ -56,6 +60,21 @@ const store = {
     this.feedback.message = ''
     this.feedback.alert = false
     this.routeChanged = false
+  },
+  setWip(message) {
+    let component = this
+    this.wip.timeout = setTimeout(function () {
+      component.wip.message = message
+    }, 250)
+  },
+  getWip() {
+    return this.wip
+  },
+  clearWip() {
+    if (this.wip.timeout !== undefined) {
+      clearTimeout(this.wip.timeout)
+    }
+    this.wip.message = ''
   },
   setJobData (jobConfiguration, selectionKey, parameterIndex, serviceCategory) {
     this.jobData.jobConfiguration = jobConfiguration

@@ -12,7 +12,7 @@
     </button-row>
 
     <modal-dialog v-if="showDeleteDialog">
-      <p slot="header">Delete Job?</p>
+      <h1 slot="header">Delete Job?</h1>
       <p slot="body">Do you really want to delete job '{{name}}'?</p>
       <div slot="footer">
         <button-row>

@@ -1,22 +1,20 @@
 - Unit-Tests (Apache Mina SSHD!)
-- Persistence-service editor
-- Job execution history in job-editor (with execution details)
 - Save Job-Service-References to warn about deleting a used service
-- Home-View with last job runs, current job runs and "next-to-run"-overview
 - Warning when leaving an editor and unsaved changes exist
 - README.md
 - ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
-- Job dry-runs without cloning Tasks?
 - Replace IgorData with JSONObject
-- Configuration-View with system configurations
-- Initial setup with configuration on first start
 - Tags for jobs + grouping/filtering jobs by tag
-- Export + Import of jobs and services (via JSON)
-- Authentication + Authorization (Frontend + Backend)
-- I18N
 - Job-Parameter: cancel on task fail (true|false)
 - Job-Parameter: kill-switch with date to disable jobs
 - Limit for number of IgorData in dry-run-results.
+- Job-Execution-History-Details with Task and progress information
+- Persistence-service editor
 - CIFS-/Samba supporting FileService
-- Bugs:
-  - Cancelling / deactivating a job that runs every second fails
+- Export + Import of jobs and services (via JSON)
+- Home-View with last job runs, current job runs and "next-to-run"-overview
+- Authentication + Authorization (Frontend + Backend)
+- I18N
+- Initial setup with configuration on first start
+- Configuration-View with system configurations
+- Job dry-runs without cloning Tasks?

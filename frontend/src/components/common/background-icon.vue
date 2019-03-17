@@ -27,7 +27,7 @@ export default {
     color: var(--nav-background-color);
     opacity: 0.3;
     position: fixed;
-    bottom: -30px;
+    bottom: -20px;
     right: 20px;
     z-index: -1;
   }
@@ -45,8 +45,8 @@ export default {
     color: var(--nav-background-color);
     opacity: 0.3;
     position: fixed;
-    bottom: -20px;
-    left: -20px;
+    bottom: 10px;
+    left: 20px;
     z-index: -1;
   }
 
