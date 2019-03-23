@@ -1,14 +1,28 @@
 <template>
   <transition name="snackbar" v-if="feedback.message.length > 0">
     <div class="snackbar" :class="{'alert': feedback.alert, 'feedback': !feedback.alert}">
-      {{ feedback.message }}
+      <button-row>
+        <p slot="left">
+        {{ feedback.message }}
+        </p>
+        <input-button slot="right" icon="times" v-on:clicked="clearFeedback"/>
+      </button-row>
+
     </div>
   </transition>
 </template>
 
 <script>
+import ButtonRow from './button-row'
+import InputButton from './input-button'
 export default {
   name: 'feedback-snackbar',
+  components: {InputButton, ButtonRow},
+  methods: {
+    clearFeedback: function() {
+      this.$root.$data.store.clearFeedback()
+    }
+  },
   computed: {
     feedback: function () {
       return this.$root.$data.store.getFeedback()
@@ -28,9 +42,6 @@ export default {
     z-index: 1;
     left: calc(100vw - 250px);
     top: 57px;
-    -webkit-box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
-    -moz-box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
-    box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
   }
 
   .feedback {

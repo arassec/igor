@@ -2,19 +2,20 @@
 - Save Job-Service-References to warn about deleting a used service
 - Warning when leaving an editor and unsaved changes exist
 - README.md
+- Limit for number of IgorData in dry-run-results.
 - ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
-- Replace IgorData with JSONObject
+- Home-View with combined job and service overview
+  - remove job-view
+  - remove service-view
 - Tags for jobs + grouping/filtering jobs by tag
 - Job-Parameter: cancel on task fail (true|false)
 - Job-Parameter: kill-switch with date to disable jobs
-- Limit for number of IgorData in dry-run-results.
 - Job-Execution-History-Details with Task and progress information
 - Persistence-service editor
 - CIFS-/Samba supporting FileService
 - Export + Import of jobs and services (via JSON)
-- Home-View with last job runs, current job runs and "next-to-run"-overview
-- Authentication + Authorization (Frontend + Backend)
-- I18N
 - Initial setup with configuration on first start
 - Configuration-View with system configurations
 - Job dry-runs without cloning Tasks?
+- Authentication + Authorization (Frontend + Backend)
+- I18N

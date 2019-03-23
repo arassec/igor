@@ -86,4 +86,14 @@ export default {
         margin-bottom: 30px;
     }
 
+    pre {
+        max-height: calc(100vh / 2);
+        height: auto;
+        overflow: auto;
+        word-break: normal !important;
+        word-wrap: normal !important;
+        white-space: pre !important;
+        background-color: var(--info-background-color)
+    }
+
 </style>

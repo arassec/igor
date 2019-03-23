@@ -98,6 +98,7 @@
 
         <test-result-container v-if="testResults != null && !(selectedTaskIndex == -1 && selectedActionIndex == -1)"
                                v-on:close="testResults = null"
+                               v-bind:heading="'Dry-run results'"
                                v-bind:selected-test-results="selectedTestResults"/>
 
     </core-container>

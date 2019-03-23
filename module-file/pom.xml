@@ -9,32 +9,30 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>core</artifactId>
+    <artifactId>module-file</artifactId>
     <packaging>jar</packaging>
 
-    <name>core</name>
-    <description>Contains the basic data model and functionality of igor.</description>
+    <name>module-file</name>
+    <description>Provides file handling for igor.</description>
 
     <dependencies>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
+        <!-- FTP/FTPS handling -->
         <dependency>
-            <groupId>org.jasypt</groupId>
-            <artifactId>jasypt</artifactId>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
         </dependency>
 
+        <!-- SSH/SCP/SFTP handling -->
         <dependency>
-            <groupId>com.github.openjson</groupId>
-            <artifactId>openjson</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>uk.com.robust-it</groupId>
-            <artifactId>cloning</artifactId>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
         </dependency>
 
     </dependencies>

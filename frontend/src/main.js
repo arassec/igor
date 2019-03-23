@@ -49,9 +49,15 @@ const store = {
     if (this.feedback.timeout !== undefined) {
       clearTimeout(this.feedback.timeout)
     }
-    this.feedback.timeout = setTimeout(function () {
-      component.clearFeedback()
-    }, 5000)
+    if (this.feedback.alert) {
+      this.feedback.timeout = setTimeout(function () {
+        component.clearFeedback()
+      }, 15000)
+    } else {
+      this.feedback.timeout = setTimeout(function () {
+        component.clearFeedback()
+      }, 5000)
+    }
   },
   getFeedback () {
     return this.feedback
@@ -61,16 +67,16 @@ const store = {
     this.feedback.alert = false
     this.routeChanged = false
   },
-  setWip(message) {
+  setWip (message) {
     let component = this
     this.wip.timeout = setTimeout(function () {
       component.wip.message = message
     }, 250)
   },
-  getWip() {
+  getWip () {
     return this.wip
   },
-  clearWip() {
+  clearWip () {
     if (this.wip.timeout !== undefined) {
       clearTimeout(this.wip.timeout)
     }
