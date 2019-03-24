@@ -68,12 +68,12 @@ export default {
       if (till != null) {
         end = new Date(till).getTime()
       }
-      let delta = Math.ceil((end - start) / 1000)
+      let delta = Math.floor((end - start) / 1000)
       let hours = Math.floor(delta / 3600) % 24
       delta -= hours * 3600
       let minutes = Math.floor(delta / 60) % 60
       delta -= minutes * 60
-      let seconds = delta % 60
+      let seconds = Math.floor(delta % 60)
       return hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0')
     }
   }

@@ -5,6 +5,9 @@
 
     <div slot="body">
         <table>
+          <tr v-if="services == null || services.length === 0">
+            <td>No service of the required category available. Please create a new service with the button below.</td>
+          </tr>
           <tr v-for="service in services" :key="service.id">
             <td class="first">
               {{ service.name }}

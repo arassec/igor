@@ -52,6 +52,8 @@ export default {
 
     pre {
         overflow: auto;
+        height: auto;
+        max-height: calc(100vh/1.5);
         word-break: normal !important;
         word-wrap: normal !important;
         white-space: pre !important;
@@ -63,11 +65,10 @@ export default {
     }
 
     .slide-fade-leave-active {
-        transition: all .5s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+        transition: all .5s ease;
     }
 
     .slide-fade-enter, .slide-fade-leave-to {
-        transform: translateX(10px);
         opacity: 0;
     }
 

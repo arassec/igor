@@ -16,7 +16,7 @@
     <packaging>pom</packaging>
 
     <name>igor</name>
-    <description>Continous workarounds...</description>
+    <description>Continuous workarounds...</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

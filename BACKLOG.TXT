@@ -12,6 +12,7 @@
 - Job-Parameter: kill-switch with date to disable jobs
 - Job-Execution-History-Details with Task and progress information
 - Persistence-service editor
+- HTTP supporting FileService
 - CIFS-/Samba supporting FileService
 - Export + Import of jobs and services (via JSON)
 - Initial setup with configuration on first start
@@ -19,3 +20,4 @@
 - Job dry-runs without cloning Tasks?
 - Authentication + Authorization (Frontend + Backend)
 - I18N
+- Directory-Browser for file services in the GUI

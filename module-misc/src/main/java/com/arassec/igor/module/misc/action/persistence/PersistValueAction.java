@@ -18,6 +18,12 @@ public class PersistValueAction extends BasePersistenceAction {
     private PersistenceService service;
 
     /**
+     * The number of values to keep in the persistence store.
+     */
+    @IgorParam
+    private int numValuesToKeep;
+
+    /**
      * Takes the value from the supplied data and saves it to the persistence store.
      *
      * @param data The data the action will work with.
@@ -42,6 +48,17 @@ public class PersistValueAction extends BasePersistenceAction {
     }
 
     /**
+     * Cleans up the persisted values and keep only the {@link #numValuesToKeep} most recent values in the store.
+     *
+     * @param jobId  The job's ID.
+     * @param taskId The task's ID.
+     */
+    @Override
+    public void complete(Long jobId, String taskId) {
+        service.cleanup(jobId, taskId, numValuesToKeep);
+    }
+
+    /**
      * Either saves a value to the persistence store or adds a comment to the data.
      *
      * @param data     The data the action will work with.
@@ -51,8 +68,8 @@ public class PersistValueAction extends BasePersistenceAction {
     private boolean processInternal(IgorData data, boolean isDryRun) {
         if (isValid(data)) {
             if (isDryRun) {
-                data.put(DRY_RUN_COMMENT_KEY, "Saved: " + data.getJobId() + "/" + data.getTaskId() + "/" + data.get(dataKey));
-            } else {
+                data.put(DRY_RUN_COMMENT_KEY, "Persisted: " + data.get(dataKey));
+            } else if (!service.isPersisted(Long.valueOf(data.getJobId()), data.getTaskId(), (String) data.get(dataKey))) {
                 service.save(Long.valueOf(data.getJobId()), data.getTaskId(), (String) data.get(dataKey));
             }
         }
