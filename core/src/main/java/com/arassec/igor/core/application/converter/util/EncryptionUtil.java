@@ -32,7 +32,6 @@ public class EncryptionUtil implements InitializingBean {
      */
     @Override
     public void afterPropertiesSet() {
-        Security.setProperty("crypto.policy", "unlimited");
         textEncryptor.setPassword(password);
     }
 
@@ -54,18 +53,6 @@ public class EncryptionUtil implements InitializingBean {
      */
     public String decrypt(String value) {
         return textEncryptor.decrypt(value);
-    }
-
-    /**
-     * Indicates whether a property is secured or not.
-     *
-     * @param field The property to check.
-     * @return {@code true}, if the property is secured, {@code false} otherwise.
-     */
-    public boolean isSecured(Field field) {
-        Annotation annotation = field.getAnnotation(IgorParam.class);
-        IgorParam igorParam = (IgorParam) annotation;
-        return igorParam.secured() && field.getType().isAssignableFrom(String.class);
     }
 
 }
