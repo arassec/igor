@@ -2,20 +2,14 @@ package com.arassec.igor.module.misc.action.persistence;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.job.persistence.PersistentValue;
 import com.arassec.igor.core.model.provider.IgorData;
-import com.arassec.igor.module.misc.service.persistence.PersistenceService;
 
 /**
  * Persists a value from the supplied data to the persistence store.
  */
 @IgorAction(label = "Persist value")
 public class PersistValueAction extends BasePersistenceAction {
-
-    /**
-     * The service to use for persisting values.
-     */
-    @IgorParam
-    private PersistenceService service;
 
     /**
      * The number of values to keep in the persistence store.
@@ -55,7 +49,7 @@ public class PersistValueAction extends BasePersistenceAction {
      */
     @Override
     public void complete(Long jobId, String taskId) {
-        service.cleanup(jobId, taskId, numValuesToKeep);
+        persistentValueRepository.cleanup(jobId, taskId, numValuesToKeep);
     }
 
     /**
@@ -69,8 +63,8 @@ public class PersistValueAction extends BasePersistenceAction {
         if (isValid(data)) {
             if (isDryRun) {
                 data.put(DRY_RUN_COMMENT_KEY, "Persisted: " + data.get(dataKey));
-            } else if (!service.isPersisted(Long.valueOf(data.getJobId()), data.getTaskId(), (String) data.get(dataKey))) {
-                service.save(Long.valueOf(data.getJobId()), data.getTaskId(), (String) data.get(dataKey));
+            } else if (!persistentValueRepository.isPersisted(Long.valueOf(data.getJobId()), data.getTaskId(), new PersistentValue((String) data.get(dataKey)))) {
+                persistentValueRepository.upsert(Long.valueOf(data.getJobId()), data.getTaskId(), new PersistentValue((String) data.get(dataKey)));
             }
         }
         return true;

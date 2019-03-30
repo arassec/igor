@@ -157,6 +157,8 @@ public class Task {
 
         Cloner cloner = new Cloner();
 
+        actions.forEach(action -> action.initialize());
+
         List<IgorData> providerResult = new LinkedList<>();
         while (provider.hasNext()) {
             IgorData igorData = provider.next();
