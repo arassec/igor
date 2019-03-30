@@ -8,6 +8,7 @@ import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.repository.PersistentValueRepository;
+import com.arassec.igor.core.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -18,10 +19,7 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
@@ -251,6 +249,16 @@ public class JobManager implements InitializingBean, DisposableBean {
         } else {
             log.info("Job '{}' ({}) already waiting for execution. Skipped execution until next time.", job.getName(), job.getId());
         }
+    }
+
+    /**
+     * Searches for services referencing the job with the given ID.
+     *
+     * @param id The job's ID.
+     * @return Set of services referencing this service.
+     */
+    public Set<Pair<Long, String>> getReferencedServices(Long id) {
+        return jobRepository.findReferencedServices(id);
     }
 
 }

@@ -4,6 +4,7 @@ import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import com.arassec.igor.core.application.factory.ServiceFactory;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -111,6 +112,16 @@ public class ServiceManager {
      */
     public void deleteService(Long id) {
         serviceRepository.deleteById(id);
+    }
+
+    /**
+     * Searches for jobs referencing the service with the given ID.
+     *
+     * @param id The service's ID.
+     * @return Set of jobs referencing this service.
+     */
+    public Set<Pair<Long, String>> getReferencingJobs(Long id) {
+        return serviceRepository.findReferencingJobs(id);
     }
 
 }

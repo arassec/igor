@@ -1,6 +1,7 @@
 package com.arassec.igor.persistence.dao;
 
 import com.arassec.igor.persistence.entity.JobEntity;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,14 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface JobDao extends CrudRepository<JobEntity, Long> {
+
+    /**
+     * Returns a job's name by its ID.
+     *
+     * @param id The job's ID.
+     * @return The job's name.
+     */
+    @Query(value = "SELECT name FROM igor.job WHERE id = :id", nativeQuery = true)
+    String findNameById(Long id);
+
 }

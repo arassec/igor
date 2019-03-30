@@ -3,16 +3,18 @@ package com.arassec.igor.persistence.repository;
 import com.arassec.igor.core.application.converter.JsonServiceConverter;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.util.Pair;
+import com.arassec.igor.persistence.dao.JobDao;
+import com.arassec.igor.persistence.dao.JobServiceReferenceDao;
 import com.arassec.igor.persistence.dao.ServiceDao;
+import com.arassec.igor.persistence.entity.JobServiceReferenceEntity;
 import com.arassec.igor.persistence.entity.ServiceEntity;
 import com.github.openjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * {@link ServiceRepository} implementation that uses JDBC to persist {@link Service}s.
@@ -26,6 +28,18 @@ public class JdbcServiceRepository implements ServiceRepository {
      */
     @Autowired
     private ServiceDao serviceDao;
+
+    /**
+     * The DAO for jobs.
+     */
+    @Autowired
+    private JobDao jobDao;
+
+    /**
+     * DAO for job-service-references.
+     */
+    @Autowired
+    private JobServiceReferenceDao jobServiceReferenceDao;
 
     /**
      * The converter for services.
@@ -97,6 +111,26 @@ public class JdbcServiceRepository implements ServiceRepository {
     @Override
     public void deleteById(Long id) {
         serviceDao.deleteById(id);
+        jobServiceReferenceDao.deleteByServiceId(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Pair<Long, String>> findReferencingJobs(Long id) {
+        Set<Pair<Long, String>> result = new HashSet<>();
+
+        List<JobServiceReferenceEntity> serviceReferences = jobServiceReferenceDao.findByServiceId(id);
+        if (serviceReferences != null) {
+            serviceReferences.forEach(serviceReference -> {
+                Long jobId = serviceReference.getJobServiceReferenceIdentity().getJobId();
+                String jobName = jobDao.findNameById(jobId);
+                result.add(new Pair<>(jobId, jobName));
+            });
+        }
+
+        return result;
     }
 
 }

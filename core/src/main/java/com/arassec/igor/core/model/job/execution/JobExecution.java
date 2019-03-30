@@ -1,5 +1,6 @@
 package com.arassec.igor.core.model.job.execution;
 
+import com.arassec.igor.core.util.StacktraceFormatter;
 import lombok.Data;
 import lombok.ToString;
 
@@ -70,10 +71,7 @@ public class JobExecution {
      */
     public synchronized void fail(Throwable errorCause) {
         this.executionState = JobExecutionState.FAILED;
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        errorCause.printStackTrace(pw);
-        this.errorCause = sw.toString();
+        this.errorCause = StacktraceFormatter.format(errorCause);
         this.finished = Instant.now();
     }
 

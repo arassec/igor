@@ -174,6 +174,7 @@ public class Task {
             taskResult.getActionResults().add(actionResult);
         }
 
+        actions.forEach(action -> action.complete(jobId, id));
         result.getTaskResults().add(taskResult);
     }
 

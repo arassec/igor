@@ -3,6 +3,7 @@ package com.arassec.igor.core.model.job;
 import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.util.StacktraceFormatter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -96,9 +97,13 @@ public class Job {
      * @return The result data created during job execution.
      */
     public DryRunJobResult dryRun() {
-        log.debug("Dry-running job: {}", name);
         DryRunJobResult result = new DryRunJobResult();
-        tasks.stream().forEach(task -> task.dryRun(result, id));
+        log.debug("Dry-running job: {}", name);
+        try {
+            tasks.stream().forEach(task -> task.dryRun(result, id));
+        } catch (Exception e) {
+            result.setErrorCause(StacktraceFormatter.format(e));
+        }
         log.debug("Finished dry-run of job: {}", name);
         return result;
     }

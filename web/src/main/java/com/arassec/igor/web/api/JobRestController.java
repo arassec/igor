@@ -1,10 +1,12 @@
 package com.arassec.igor.web.api;
 
 import com.arassec.igor.core.application.JobManager;
+import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.application.converter.JsonJobConverter;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.api.model.JobListEntry;
 import com.github.openjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,12 @@ public class JobRestController {
      */
     @Autowired
     private JobManager jobManager;
+
+    /**
+     * Manager for Services.
+     */
+    @Autowired
+    private ServiceManager serviceManager;
 
     /**
      * Converter for Jobs.
@@ -114,7 +122,13 @@ public class JobRestController {
      */
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJob(@PathVariable("id") Long id) {
+    public void deleteJob(@PathVariable("id") Long id, @RequestParam Boolean deleteExclusiveServices) {
+        if (deleteExclusiveServices) {
+            List<Pair<Long, String>> exclusiveServices = getExclusiveServices(id);
+            if (exclusiveServices != null && !exclusiveServices.isEmpty()) {
+                exclusiveServices.stream().forEach(exclusiveService -> serviceManager.deleteService(exclusiveService.getKey()));
+            }
+        }
         jobManager.delete(id);
     }
 
@@ -182,6 +196,30 @@ public class JobRestController {
             jobSchedule.add(scheduleEntry);
         });
         return jobSchedule;
+    }
+
+    /**
+     * Returns the services that are ONLY referenced by this job.
+     *
+     * @param id The job's ID.
+     * @return The services.
+     */
+    @GetMapping(value = "{id}/exclusive-service-references", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Pair<Long, String>> getExclusiveServices(@PathVariable("id") Long id) {
+        List<Pair<Long, String>> result = new LinkedList<>();
+
+        Set<Pair<Long, String>> referencedServices = jobManager.getReferencedServices(id);
+        if (referencedServices != null && !referencedServices.isEmpty()) {
+            referencedServices.stream().forEach(referencedService -> {
+                Set<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(referencedService.getKey());
+                if (referencingJobs != null && referencingJobs.size() == 1 && referencingJobs.iterator().next().getKey().equals(id)) {
+                    result.add(referencedService);
+                }
+            });
+            Collections.sort(result, Comparator.comparing(Pair::getValue));
+        }
+
+        return result;
     }
 
 }

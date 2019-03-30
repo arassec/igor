@@ -32,8 +32,11 @@ public interface Action {
 
     /**
      * Finalizes the action after all data has been processed.
+     *
+     * @param jobId The job's ID.
+     * @param taskId The task's ID.
      */
-    void complete(Long jobId, String taskName);
+    void complete(Long jobId, String taskId);
 
     /**
      * Returns the number of threads this action should be executed with.

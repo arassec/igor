@@ -1,6 +1,5 @@
 package com.arassec.igor.persistence.dao;
 
-import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.persistence.entity.JobExecutionEntity;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -1,9 +1,12 @@
 package com.arassec.igor.web.api;
 
+import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.application.converter.JsonServiceConverter;
+import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.api.model.ServiceListEntry;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
@@ -14,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +34,12 @@ public class ServiceRestController {
     private ServiceManager serviceManager;
 
     /**
+     * The job manager.
+     */
+    @Autowired
+    private JobManager jobManager;
+
+    /**
      * Converter for services from and to JSON.
      */
     @Autowired
@@ -44,8 +53,14 @@ public class ServiceRestController {
     @GetMapping
     public List<ServiceListEntry> getServices() {
         List<Service> services = serviceManager.loadAll();
-        return services.stream().map(service -> new ServiceListEntry(service.getId(), service.getName()))
-                .collect(Collectors.toList());
+        return services.stream().map(service -> {
+            ServiceListEntry result = new ServiceListEntry(service.getId(), service.getName());
+            Set<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(service.getId());
+            if (referencingJobs == null || referencingJobs.isEmpty()) {
+                result.setName(service.getName() + " (unused)");
+            }
+            return result;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -84,7 +99,19 @@ public class ServiceRestController {
      */
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteService(@PathVariable("id") Long id) {
+    public void deleteService(@PathVariable("id") Long id, @RequestParam Boolean deleteAffectedJobs) {
+        List<Pair<Long, String>> referencingJobs = getReferencingJobs(id);
+        if (deleteAffectedJobs) {
+            referencingJobs.stream().forEach(jobReference -> {
+                jobManager.delete(jobReference.getKey());
+            });
+        } else {
+            referencingJobs.stream().forEach(jobReference -> {
+                Job job = jobManager.load(jobReference.getKey());
+                job.setActive(false);
+                jobManager.save(job);
+            });
+        }
         serviceManager.deleteService(id);
     }
 
@@ -133,6 +160,25 @@ public class ServiceRestController {
             }
             return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    /**
+     * Returns the jobs that reference this service.
+     *
+     * @param id The service's ID.
+     * @return The jobs.
+     */
+    @GetMapping(value = "{id}/job-references", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Pair<Long, String>> getReferencingJobs(@PathVariable("id") Long id) {
+        List<Pair<Long, String>> result = new LinkedList<>();
+
+        Set<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(id);
+        if (referencingJobs != null && !referencingJobs.isEmpty()) {
+            result.addAll(referencingJobs);
+            Collections.sort(result, Comparator.comparing(Pair::getValue));
+        }
+
+        return result;
     }
 
 }

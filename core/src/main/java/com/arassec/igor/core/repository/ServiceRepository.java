@@ -1,8 +1,10 @@
 package com.arassec.igor.core.repository;
 
 import com.arassec.igor.core.model.service.Service;
+import com.arassec.igor.core.util.Pair;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Repository for {@link Service}s.
@@ -38,5 +40,13 @@ public interface ServiceRepository {
      * @param id The ID of the service to delete.
      */
     void deleteById(Long id);
+
+    /**
+     * Returns all jobs that use the given service.
+     *
+     * @param id The service's ID.
+     * @return List of job IDs and names that are using this service.
+     */
+    Set<Pair<Long, String>> findReferencingJobs(Long id);
 
 }

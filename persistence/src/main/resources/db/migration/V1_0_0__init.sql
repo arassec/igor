@@ -35,3 +35,9 @@ CREATE TABLE igor.persistent_value (
 );
 CREATE SEQUENCE PERSISTENT_VALUE_ID_SEQUENCE START WITH 1 INCREMENT BY 1;
 CREATE UNIQUE INDEX igor.unique_persistent_value ON igor.persistent_value (job_id, task_id, content);
+
+CREATE TABLE igor.job_service_reference (
+    job_id INTEGER NOT NULL,
+    service_id INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX igor.unique_job_service_reference ON igor.job_service_reference (job_id, service_id);

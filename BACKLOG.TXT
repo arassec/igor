@@ -1,9 +1,6 @@
 - Unit-Tests (Apache Mina SSHD!)
-- Persistence-Service refactoring
-  - only DB
-  - no display, no delete
-  - auto-wire into actions without IgorParam
-- Save Job-Service-References to warn about deleting a used service
+- Model CRON-Trigger as Trigger class, not simply as String
+- Failed dry-run should display error cause in test results
 - FilterFileByDate-Action
   - older/younger than x days/hours/minutes
   - With this: support enums in parameter editor
@@ -24,8 +21,8 @@
 - Tags for jobs + grouping/filtering jobs by tag
 - Job-Parameter: cancel on task fail (true|false)
 - Job-Parameter: kill-switch with date to disable jobs
-- Job-Execution-History-Details with 
-  - current Task 
+- Job-Execution-History-Details with
+  - current Task
   - Progress information
   - Concurrency-Group workload
 - Persistence-service editor
@@ -38,4 +35,5 @@
 - I18N
 - Directory-Browser for file services in the GUI
 - Healthchecks + Spring-Boot-Admin support via actuators
-
+- Cleanup Action: provides? requires?
+- Pagination for execution history

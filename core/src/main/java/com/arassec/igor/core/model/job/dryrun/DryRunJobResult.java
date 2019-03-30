@@ -16,4 +16,9 @@ public class DryRunJobResult {
      */
     private List<DryRunTaskResult> taskResults = new LinkedList<>();
 
+    /**
+     * Might contain an error cause if the job finished abnormally.
+     */
+    private String errorCause;
+
 }
