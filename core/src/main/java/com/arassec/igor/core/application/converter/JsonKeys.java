@@ -51,6 +51,11 @@ public interface JsonKeys {
     String TYPE = "type";
 
     /**
+     * The subtype key.
+     */
+    String SUBTYPE = "subtype";
+
+    /**
      * The key key. :)
      */
     String KEY = "key";

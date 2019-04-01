@@ -3,11 +3,11 @@
         <p slot="header">
             <button-row>
                 <h1 slot="left">Job Execution Details</h1>
-                <input-button slot="right" icon="times" v-on:clicked="$emit('close')"/>
+                <input-button slot="right" icon="times" v-on:clicked="$emit('close')" class="button-margin-right"/>
             </button-row>
         </p>
 
-        <div slot="body">
+        <div class="" slot="body">
             <h2>Time and state</h2>
             <table class="execution-core">
                 <tr>
@@ -93,7 +93,7 @@ export default {
         word-break: normal !important;
         word-wrap: normal !important;
         white-space: pre !important;
-        background-color: var(--info-background-color)
+        background-color: var(--alert-background-color)
     }
 
 </style>

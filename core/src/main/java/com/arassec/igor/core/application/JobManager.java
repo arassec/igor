@@ -172,10 +172,15 @@ public class JobManager implements InitializingBean, DisposableBean {
      * @return List of scheduled jobs.
      */
     public List<Job> loadScheduled() {
-        return jobRepository.findAll().stream().filter(job -> job.isActive()).sorted((o1, o2) -> {
-            CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(o1.getTrigger());
+        return jobRepository.findAll().stream()
+                .filter(job -> job.isActive())
+                .filter(job -> job.getTrigger() instanceof com.arassec.igor.core.model.trigger.CronTrigger)
+                .sorted((o1, o2) -> {
+                    String firstCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
+                    String secondCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
+            CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(firstCron);
             Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
-            CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(o2.getTrigger());
+            CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(secondCron);
             Date nextRunTwo = cronTriggerTwo.next(Calendar.getInstance().getTime());
             return nextRunOne.compareTo(nextRunTwo);
         }).collect(Collectors.toList());
@@ -204,16 +209,20 @@ public class JobManager implements InitializingBean, DisposableBean {
             log.debug("Job '{}' is not active and will not be scheduled...", job.getName());
             return;
         }
-        try {
-            scheduledJobs.put(job.getId(), taskScheduler.schedule(
-                    new Thread(() -> {
-                        log.info("Trying to automatically enqueue job: {} ({})", job.getName(), job.getId());
-                        enqueueJob(job);
-                    }),
-                    new CronTrigger(job.getTrigger())));
-            log.info("Scheduled job: {} ({}).", job.getName(), job.getId());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Illegal trigger configured (" + e.getMessage() + ")");
+
+        if (job.getTrigger() instanceof com.arassec.igor.core.model.trigger.CronTrigger) {
+            String cronExpression = ((com.arassec.igor.core.model.trigger.CronTrigger) job.getTrigger()).getCronExpression();
+            try {
+                scheduledJobs.put(job.getId(), taskScheduler.schedule(
+                        new Thread(() -> {
+                            log.info("Trying to automatically enqueue job: {} ({})", job.getName(), job.getId());
+                            enqueueJob(job);
+                        }),
+                        new CronTrigger(cronExpression)));
+                log.info("Scheduled job: {} ({}).", job.getName(), job.getId());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalStateException("Illegal trigger configured (" + e.getMessage() + ")");
+            }
         }
     }
 

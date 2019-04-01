@@ -15,12 +15,6 @@ import java.util.Map;
 public class JsonProviderConverter extends JsonBaseConverter {
 
     /**
-     * Converter for parameters.
-     */
-    @Autowired
-    private JsonParametersConverter parameterConverter;
-
-    /**
      * Factory for providers.
      */
     @Autowired
@@ -50,11 +44,7 @@ public class JsonProviderConverter extends JsonBaseConverter {
      * @return The provider in JSON form.
      */
     public JSONObject convert(Provider provider, boolean applySecurity, boolean addVolatile) {
-        JSONObject result = new JSONObject();
-        result.put(JsonKeys.CATEGORY, convert(providerFactory.getCategory(provider)));
-        result.put(JsonKeys.TYPE, convert(providerFactory.getType(provider)));
-        result.put(JsonKeys.PARAMETERS, parameterConverter.convert(provider, applySecurity, addVolatile));
-        return result;
+        return convertToStandardJson(providerFactory, provider, applySecurity, addVolatile);
     }
 
 }

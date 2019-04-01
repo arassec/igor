@@ -3,6 +3,7 @@ package com.arassec.igor.web.api;
 import com.arassec.igor.core.application.ActionManager;
 import com.arassec.igor.core.application.ProviderManager;
 import com.arassec.igor.core.application.ServiceManager;
+import com.arassec.igor.core.application.TriggerManager;
 import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,12 @@ public class TypeRestController {
     private ProviderManager providerManager;
 
     /**
+     * Manager for triggers.
+     */
+    @Autowired
+    private TriggerManager triggerManager;
+
+    /**
      * Returns all service types of a certain category as {@link KeyLabelStore}s.
      *
      * @param category The service category to use.
@@ -68,6 +75,17 @@ public class TypeRestController {
     @GetMapping("provider/{category}")
     public Set<KeyLabelStore> getProviderTypes(@PathVariable("category") String category) {
         return providerManager.getTypesOfCategory(category);
+    }
+
+    /**
+     * Returns all action types of a certain category as {@link KeyLabelStore}s.
+     *
+     * @param category The action category to use.
+     * @return Set of action types.
+     */
+    @GetMapping("trigger/{category}")
+    public Set<KeyLabelStore> getTriggerTypes(@PathVariable("category") String category) {
+        return triggerManager.getTypesOfCategory(category);
     }
 
 }

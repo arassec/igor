@@ -13,12 +13,6 @@ import org.springframework.stereotype.Component;
 public class JsonActionConverter extends JsonBaseConverter {
 
     /**
-     * Converter for parameters.
-     */
-    @Autowired
-    private JsonParametersConverter parameterConverter;
-
-    /**
      * Factory for actions.
      */
     @Autowired
@@ -46,11 +40,7 @@ public class JsonActionConverter extends JsonBaseConverter {
      * @return The action in JSON form.
      */
     public JSONObject convert(Action action, boolean applySecurity, boolean addVolatile) {
-        JSONObject result = new JSONObject();
-        result.put(JsonKeys.CATEGORY, convert(actionFactory.getCategory(action)));
-        result.put(JsonKeys.TYPE, convert(actionFactory.getType(action)));
-        result.put(JsonKeys.PARAMETERS, parameterConverter.convert(action, applySecurity, addVolatile));
-        return result;
+        return convertToStandardJson(actionFactory, action, applySecurity, addVolatile);
     }
 
 }

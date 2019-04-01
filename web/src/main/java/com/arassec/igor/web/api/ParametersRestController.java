@@ -3,6 +3,7 @@ package com.arassec.igor.web.api;
 import com.arassec.igor.core.application.ActionManager;
 import com.arassec.igor.core.application.ProviderManager;
 import com.arassec.igor.core.application.ServiceManager;
+import com.arassec.igor.core.application.TriggerManager;
 import com.arassec.igor.core.application.converter.JsonParametersConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -35,6 +36,12 @@ public class ParametersRestController {
      */
     @Autowired
     private ProviderManager providerManager;
+
+    /**
+     * Manager for triggers.
+     */
+    @Autowired
+    private TriggerManager triggerManager;
 
     /**
      * Converter for parameters to and from JSON.
@@ -76,6 +83,18 @@ public class ParametersRestController {
     public String getProviderParameters(@PathVariable("type") String type) {
         return jsonParametersConverter.convert(
                 providerManager.createProvider(type, null), false, true).toString();
+    }
+
+    /**
+     * Returns all configuration parameters of an action type.
+     *
+     * @param type The type to get parameters for.
+     * @return List of parameters.
+     */
+    @GetMapping(value = "trigger/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getTriggerParameters(@PathVariable("type") String type) {
+        return jsonParametersConverter.convert(
+                triggerManager.createTrigger(type, null), false, true).toString();
     }
 
 }

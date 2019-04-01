@@ -25,7 +25,7 @@ public abstract class ModelFactory<T> {
     /**
      * Base package for annotation scanning.
      * <p>
-     * TODO: This should be determined by e.g. an Igorfile and not hard-coded.
+     * TODO: This should be determined by e.g. an Igorfile or a list of configuration parameters.
      */
     private static final String BASE_PACKAGE = "com.arassec.igor";
 

@@ -3,34 +3,41 @@
         <core-content>
             <div class="test-result-container">
                 <button-row>
-                    <h1 slot="left">{{heading}}</h1>
+                    <div slot="left">
+                        <h1 v-if="!errorCause && !selectedTestResults">Dry run successful</h1>
+                        <h1 v-if="selectedTestResults && !errorCause && selectedTestResults.length > 0">Dry run
+                            details</h1>
+                        <h1 v-if="selectedTestResults && errorCause">Dry run failed</h1>
+                    </div>
                     <input-button slot="right" icon="times" v-on:clicked="$emit('close')"/>
                 </button-row>
-                <pre>
-      <code>
-{{ format(selectedTestResults) }}
-      </code>
-    </pre>
+                <p v-if="!errorCause && selectedTestResults.length == 0">
+                    Please select a <b>Task</b> or <b>Action</b> to see detailed dry-run results.
+                </p>
+                <pre v-if="!errorCause && selectedTestResults.length > 0" class="normal-bg">
+<code>{{ format(selectedTestResults) }}</code></pre>
+                <pre v-if="errorCause" class="error-bg">
+<code>{{ errorCause }}</code></pre>
             </div>
         </core-content>
     </transition>
 </template>
 
 <script>
-import ButtonRow from '../common/button-row'
-import InputButton from '../common/input-button'
-import CoreContent from '../common/core-content'
+  import ButtonRow from '../common/button-row'
+  import InputButton from '../common/input-button'
+  import CoreContent from '../common/core-content'
 
-export default {
-  name: 'test-result-container',
-  components: {CoreContent, InputButton, ButtonRow},
-  props: ['heading', 'selectedTestResults'],
-  methods: {
-    format: function (code) {
-      return JSON.stringify(code, null, 2)
+  export default {
+    name: 'test-result-container',
+    components: {CoreContent, InputButton, ButtonRow},
+    props: ['heading', 'selectedTestResults', 'errorCause'],
+    methods: {
+      format: function (code) {
+        return JSON.stringify(code, null, 2)
+      }
     }
   }
-}
 </script>
 
 <style scoped>
@@ -53,11 +60,18 @@ export default {
     pre {
         overflow: auto;
         height: auto;
-        max-height: calc(100vh/1.5);
+        max-height: calc(100vh / 1.5);
         word-break: normal !important;
         word-wrap: normal !important;
         white-space: pre !important;
+    }
+
+    .normal-bg {
         background-color: var(--info-background-color)
+    }
+
+    .error-bg {
+        background-color: var(--alert-background-color)
     }
 
     .slide-fade-enter-active {

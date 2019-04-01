@@ -21,6 +21,12 @@ public class JsonJobConverter {
     private JsonTaskConverter jsonTaskConverter;
 
     /**
+     * The JSON trigger converter.
+     */
+    @Autowired
+    private JsonTriggerConverter jsonTriggerConverter;
+
+    /**
      * Converts the supplied job into its JSON representation.
      *
      * @param job           The job to convert.
@@ -33,7 +39,7 @@ public class JsonJobConverter {
         JSONObject jobJson = new JSONObject();
         jobJson.put(JsonKeys.ID, job.getId());
         jobJson.put(JsonKeys.NAME, job.getName());
-        jobJson.put(JsonKeys.TRIGGER, job.getTrigger());
+        jobJson.put(JsonKeys.TRIGGER, jsonTriggerConverter.convert(job.getTrigger(), applySecurity, addVolatile));
         jobJson.put(JsonKeys.DESCRIPTION, job.getDescription());
         jobJson.put(JsonKeys.EXECUTION_HISTORY_LIMIT, job.getExecutionHistoryLimit());
         jobJson.put(JsonKeys.ACTIVE, job.isActive());
@@ -57,7 +63,7 @@ public class JsonJobConverter {
         Job job = new Job();
         job.setId(jobJson.optLong(JsonKeys.ID));
         job.setName(jobJson.getString(JsonKeys.NAME));
-        job.setTrigger(jobJson.getString(JsonKeys.TRIGGER));
+        job.setTrigger(jsonTriggerConverter.convert(jobJson.getJSONObject(JsonKeys.TRIGGER), applySecurity));
         job.setDescription(jobJson.optString(JsonKeys.DESCRIPTION));
         job.setExecutionHistoryLimit(jobJson.optInt(JsonKeys.EXECUTION_HISTORY_LIMIT));
         job.setActive(jobJson.getBoolean(JsonKeys.ACTIVE));

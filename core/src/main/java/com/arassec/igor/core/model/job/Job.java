@@ -3,6 +3,7 @@ package com.arassec.igor.core.model.job;
 import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.StacktraceFormatter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +37,9 @@ public class Job {
     private String description;
 
     /**
-     * The cron-expression that defines when the job is triggered.
+     * A trigger for the job.
      */
-    private String trigger;
+    private Trigger trigger;
 
     /**
      * Enables or disables the job.

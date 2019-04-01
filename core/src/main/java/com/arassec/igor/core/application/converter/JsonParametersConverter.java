@@ -60,6 +60,7 @@ public class JsonParametersConverter {
                 parameter.put(JsonKeys.SECURED, field.getAnnotation(IgorParam.class).secured());
                 if (addVolatile) {
                     parameter.put(JsonKeys.OPTIONAL, field.getAnnotation(IgorParam.class).optional());
+                    parameter.put(JsonKeys.SUBTYPE, field.getAnnotation(IgorParam.class).subtype().name());
                 }
                 boolean isService = Service.class.isAssignableFrom(field.getType());
                 parameter.put(JsonKeys.SERVICE, isService);

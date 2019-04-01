@@ -1,8 +1,9 @@
 package com.arassec.igor.core.application;
 
+import com.arassec.igor.core.application.factory.TriggerFactory;
 import com.arassec.igor.core.application.factory.util.KeyLabelStore;
-import com.arassec.igor.core.application.factory.ProviderFactory;
 import com.arassec.igor.core.model.provider.Provider;
+import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,35 +13,35 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Manages {@link Provider}s. Entry point from outside the core package to create and maintain providers.
+ * Manages {@link Trigger}s. Entry point from outside the core package to create and maintain triggers.
  */
 @Slf4j
 @Component
-public class ProviderManager {
+public class TriggerManager {
 
     /**
-     * The factory for providers.
+     * The factory for triggers.
      */
     @Autowired
-    private ProviderFactory providerFactory;
+    private TriggerFactory triggerFactory;
 
     /**
-     * Returns all available provider categories.
+     * Returns all available trigger categories.
      *
      * @return The categories.
      */
     public Set<KeyLabelStore> getCategories() {
-        return providerFactory.getCategories();
+        return triggerFactory.getCategories();
     }
 
     /**
-     * Returns all available types of providers of the specified category.
+     * Returns all available types of triggers of the specified category.
      *
-     * @return The provider types of the specified category.
+     * @return The trigger types of the specified category.
      */
     public Set<KeyLabelStore> getTypesOfCategory(String categoryType) {
-        if (providerFactory.getTypesByCategory().containsKey(categoryType)) {
-            return providerFactory.getTypesByCategory().get(categoryType);
+        if (triggerFactory.getTypesByCategory().containsKey(categoryType)) {
+            return triggerFactory.getTypesByCategory().get(categoryType);
         }
         return new HashSet<>();
     }
@@ -52,7 +53,8 @@ public class ProviderManager {
      * @param parameters The property values to set in the provider instance.
      * @return A newly created {@link Provider} with the given configuration.
      */
-    public Provider createProvider(String type, Map<String, Object> parameters) {
-        return providerFactory.createInstance(type, parameters);
+    public Trigger createTrigger(String type, Map<String, Object> parameters) {
+        return triggerFactory.createInstance(type, parameters);
     }
+
 }

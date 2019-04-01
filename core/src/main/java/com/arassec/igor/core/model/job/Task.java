@@ -1,7 +1,7 @@
 package com.arassec.igor.core.model.job;
 
 import com.arassec.igor.core.model.action.Action;
-import com.arassec.igor.core.model.concurrent.ConcurrencyGroup;
+import com.arassec.igor.core.model.misc.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.dryrun.DryRunActionResult;
 import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.job.dryrun.DryRunTaskResult;

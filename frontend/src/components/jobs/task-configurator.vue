@@ -32,7 +32,7 @@
         <core-panel>
             <h2>Provider</h2>
             <table>
-                <tr>
+                <tr v-if="providerCategories.length > 1">
                     <td><label>Category</label></td>
                     <td>
                         <select v-model="task.provider.category"
@@ -58,7 +58,7 @@
             </table>
         </core-panel>
 
-        <core-panel>
+        <core-panel v-if="task.provider.parameters.length">
             <h2>Provider Parameters</h2>
             <parameter-editor v-bind:parameters="task.provider.parameters" ref="parameterEditor"
                               v-on:create-service="createService"/>
@@ -96,8 +96,7 @@ export default {
         })
         component.loadTypes(component.task.provider.category.key)
       }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
+        component.$root.$data.store.setFeedback('Loading provider categories failed! (' + error + ')', true)
       })
     },
     loadTypes: function (categoryType) {
@@ -117,8 +116,7 @@ export default {
           component.initializeTypeParameters = true
         }
       }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
+        component.$root.$data.store.setFeedback('Loading provider types failed! (' + error + ')', true)
       })
     },
     loadTypeParameters: function (type) {
@@ -127,8 +125,7 @@ export default {
       this.$http.get('/api/parameters/provider/' + type).then(function (response) {
         component.task.provider.parameters = response.data
       }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
+        component.$root.$data.store.setFeedback('Loading provider parameters failed! (' + error + ')', true)
       })
     },
     validateInput: function () {

@@ -1,6 +1,6 @@
 - Unit-Tests (Apache Mina SSHD!)
-- Model CRON-Trigger as Trigger class, not simply as String
-- Failed dry-run should display error cause in test results
+- "A job with the same name already exists" error message
+- "A service with the same name already exists" error message
 - FilterFileByDate-Action
   - older/younger than x days/hours/minutes
   - With this: support enums in parameter editor

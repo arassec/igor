@@ -1,10 +1,8 @@
-package com.arassec.igor.core.model.concurrent;
+package com.arassec.igor.core.model.misc.concurrent;
 
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.action.Action;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;

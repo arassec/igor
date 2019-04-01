@@ -6,6 +6,7 @@ import com.arassec.igor.core.application.converter.JsonJobConverter;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.trigger.CronTrigger;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.api.model.JobListEntry;
 import com.github.openjson.JSONObject;
@@ -186,15 +187,18 @@ public class JobRestController {
     @GetMapping("schedule")
     public List<Map<String, Object>> getSchedule() {
         List<Map<String, Object>> jobSchedule = new LinkedList<>();
-        jobManager.loadScheduled().stream().forEach(job -> {
-            CronSequenceGenerator cronTrigger = new CronSequenceGenerator(job.getTrigger());
-            Date nextRun = cronTrigger.next(Calendar.getInstance().getTime());
-            Map<String, Object> scheduleEntry = new HashMap<>();
-            scheduleEntry.put("id", job.getId());
-            scheduleEntry.put("name", job.getName());
-            scheduleEntry.put("date", new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(nextRun));
-            jobSchedule.add(scheduleEntry);
-        });
+        jobManager.loadScheduled().stream()
+                .filter(job -> job.getTrigger() instanceof CronTrigger)
+                .forEach(job -> {
+                    String cronExpression = ((CronTrigger) job.getTrigger()).getCronExpression();
+                    CronSequenceGenerator cronTrigger = new CronSequenceGenerator(cronExpression);
+                    Date nextRun = cronTrigger.next(Calendar.getInstance().getTime());
+                    Map<String, Object> scheduleEntry = new HashMap<>();
+                    scheduleEntry.put("id", job.getId());
+                    scheduleEntry.put("name", job.getName());
+                    scheduleEntry.put("date", new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(nextRun));
+                    jobSchedule.add(scheduleEntry);
+                });
         return jobSchedule;
     }
 

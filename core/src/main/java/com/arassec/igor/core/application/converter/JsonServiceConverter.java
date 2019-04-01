@@ -17,12 +17,6 @@ import java.util.Map;
 public class JsonServiceConverter extends JsonBaseConverter {
 
     /**
-     * Converter for parameters.
-     */
-    @Autowired
-    private JsonParametersConverter parameterConverter;
-
-    /**
      * Factory for services.
      */
     @Autowired
@@ -41,8 +35,8 @@ public class JsonServiceConverter extends JsonBaseConverter {
         JSONObject serviceJson = new JSONObject();
         serviceJson.put(JsonKeys.ID, service.getId());
         serviceJson.put(JsonKeys.NAME, service.getName());
-        serviceJson.put(JsonKeys.CATEGORY, convert(serviceFactory.getCategory(service)));
-        serviceJson.put(JsonKeys.TYPE, convert(serviceFactory.getType(service)));
+        serviceJson.put(JsonKeys.CATEGORY, convertKeyLabelStore(serviceFactory.getCategory(service)));
+        serviceJson.put(JsonKeys.TYPE, convertKeyLabelStore(serviceFactory.getType(service)));
         serviceJson.put(JsonKeys.PARAMETERS, parameterConverter.convert(service, applySecurity, addVolatile));
         return serviceJson;
     }
@@ -55,7 +49,7 @@ public class JsonServiceConverter extends JsonBaseConverter {
      */
     public Service convert(JSONObject serviceJson, boolean applySecurity) {
         String name = serviceJson.getString(JsonKeys.NAME);
-        String type = convert(serviceJson.getJSONObject(JsonKeys.TYPE)).getKey();
+        String type = convertKeyLabelStore(serviceJson.getJSONObject(JsonKeys.TYPE)).getKey();
         Map<String, Object> parameters = parameterConverter.convert(serviceJson.optJSONArray(JsonKeys.PARAMETERS), applySecurity);
         Service result = serviceFactory.createInstance(type, parameters);
         if (result != null) {

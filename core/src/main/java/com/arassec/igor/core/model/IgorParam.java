@@ -1,5 +1,7 @@
 package com.arassec.igor.core.model;
 
+import com.arassec.igor.core.model.misc.ParameterSubtype;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -28,5 +30,12 @@ public @interface IgorParam {
      * class. {@code false}, if the parameter must be set.
      */
     boolean optional() default false;
+
+    /**
+     * Further specifies the type of parameter, additionally to the java data type.
+     *
+     * @return A value of {@link ParameterSubtype}.
+     */
+    ParameterSubtype subtype() default ParameterSubtype.NONE;
 
 }

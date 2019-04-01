@@ -3,6 +3,7 @@ package com.arassec.igor.web.api;
 import com.arassec.igor.core.application.ActionManager;
 import com.arassec.igor.core.application.ProviderManager;
 import com.arassec.igor.core.application.ServiceManager;
+import com.arassec.igor.core.application.TriggerManager;
 import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,12 @@ public class CategoryRestController {
     private ProviderManager providerManager;
 
     /**
+     * Manager for triggers.
+     */
+    @Autowired
+    private TriggerManager triggerManager;
+
+    /**
      * Returns all service categories as {@link KeyLabelStore}s.
      *
      * @return Set of all available service categories.
@@ -65,6 +72,16 @@ public class CategoryRestController {
     @GetMapping("action")
     public Set<KeyLabelStore> getActionCategories() {
         return actionManager.getCategories();
+    }
+
+    /**
+     * Returns all trigger categories as {@link KeyLabelStore}s.
+     *
+     * @return Set of all available trigger categories.
+     */
+    @GetMapping("trigger")
+    public Set<KeyLabelStore> getTriggerCategories() {
+        return triggerManager.getCategories();
     }
 
 }
