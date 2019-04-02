@@ -7,6 +7,8 @@ public enum ParameterSubtype {
 
     NONE,
 
-    CRON
+    CRON,
+
+    MULTI_LINE,
 
 }

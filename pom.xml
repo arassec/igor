@@ -31,6 +31,7 @@
         <module>persistence</module>
         <module>module-misc</module>
         <module>module-file</module>
+        <module>module-message</module>
         <module>frontend</module>
         <module>web</module>
         <module>application</module>

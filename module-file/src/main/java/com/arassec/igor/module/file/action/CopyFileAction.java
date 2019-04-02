@@ -69,10 +69,11 @@ public class CopyFileAction extends BaseFileAction {
     }
 
     /**
-     * Copies the supplied source file to the destination service. During transfer the file is saved with the suffix
-     * ".igor", which will be removed after successful transfer.
+     * Copies the supplied source file to the destination service. During transfer the file is saved with the suffix ".igor",
+     * which will be removed after successful transfer.
      *
-     * @param data The data to process.
+     * @param data
+     *         The data to process.
      */
     @Override
     public boolean process(IgorData data) {
@@ -88,12 +89,14 @@ public class CopyFileAction extends BaseFileAction {
     }
 
     /**
-     * Copies the supplied source file to the destination service. In case of a dry-run, the file isn't actually copied.
-     * Only a comment about what would happen during a normal run is added to the provided data.
+     * Copies the supplied source file to the destination service. In case of a dry-run, the file isn't actually copied. Only a
+     * comment about what would happen during a normal run is added to the provided data.
      *
-     * @param data     The data to process.
-     * @param isDryRun Set to {@code true}, if this is a dry-run and the file should not actually be copied. Set to
-     *                 {@code false} for an actual run.
+     * @param data
+     *         The data to process.
+     * @param isDryRun
+     *         Set to {@code true}, if this is a dry-run and the file should not actually be copied. Set to {@code false} for an
+     *         actual run.
      * @return {@code true} if the data should further be processed, {@code false} otherwise.
      */
     private boolean processInternal(IgorData data, boolean isDryRun) {
@@ -127,7 +130,8 @@ public class CopyFileAction extends BaseFileAction {
     /**
      * Appends the name of the source file to the destination path, thus creating the target file.
      *
-     * @param file The source file.
+     * @param file
+     *         The source file.
      * @return The filename with path of the target file.
      */
     private String getTargetFile(String file) {
@@ -140,8 +144,10 @@ public class CopyFileAction extends BaseFileAction {
     /**
      * Combines the provided directory with the provided file. Adds a separator if needed.
      *
-     * @param sourceDirectory The path to the source directory.
-     * @param file            The filename.
+     * @param sourceDirectory
+     *         The path to the source directory.
+     * @param file
+     *         The filename.
      * @return The path with the added filename.
      */
     private String getSourceFileWithPath(String sourceDirectory, String file) {
