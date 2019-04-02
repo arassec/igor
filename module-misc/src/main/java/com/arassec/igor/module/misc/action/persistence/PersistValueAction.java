@@ -49,7 +49,9 @@ public class PersistValueAction extends BasePersistenceAction {
      */
     @Override
     public void complete(Long jobId, String taskId) {
-        persistentValueRepository.cleanup(jobId, taskId, numValuesToKeep);
+        if (numValuesToKeep > 0) {
+            persistentValueRepository.cleanup(jobId, taskId, numValuesToKeep);
+        }
     }
 
     /**

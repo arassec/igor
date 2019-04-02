@@ -58,6 +58,7 @@ public class FtpFileService extends BaseFileService {
     protected FTPClient connect() {
         try {
             FTPClient ftpClient = new FTPClient();
+            ftpClient.setStrictReplyParsing(false);
             ftpClient.connect(host, port);
             if (passiveMode) {
                 ftpClient.enterLocalPassiveMode();

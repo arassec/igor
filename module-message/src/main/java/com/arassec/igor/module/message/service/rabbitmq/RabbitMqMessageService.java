@@ -39,7 +39,7 @@ public class RabbitMqMessageService extends BaseMessageService {
     /**
      * The RabbitMQ password.
      */
-    @IgorParam
+    @IgorParam(secured = true)
     private String password;
 
     /**
@@ -82,7 +82,7 @@ public class RabbitMqMessageService extends BaseMessageService {
      * Optional heartbeat for connections to the RabbitMQ server.
      */
     @IgorParam(optional = true)
-    private int heartBeat;
+    private int heartBeat = 30;
 
     /**
      * The RabbitMQ-Client to send messages.
