@@ -36,9 +36,12 @@ public class SendMessageAction extends BaseMessageAction {
     private Pattern pattern = Pattern.compile("\\$(.*?)\\$");
 
     /**
+     * Processes the supplied data and replaces variables from a message template with the values from the data. The resulting
+     * message is sent via a message service.
+     *
      * @param data
      *         The data the action will work with.
-     * @return
+     * @return {@code true} if the data should further be processed, {@code false} otherwise.
      */
     @Override
     public boolean process(IgorData data) {
@@ -73,7 +76,7 @@ public class SendMessageAction extends BaseMessageAction {
             // e.g. file.zip
             Object variableContent = data.get(variableName.replace("$", ""));
             if (variableContent != null) {
-                content.replace(variableName, String.valueOf(variableContent));
+                content = content.replace(variableName, String.valueOf(variableContent));
             }
         }
 

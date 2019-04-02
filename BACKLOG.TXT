@@ -9,8 +9,6 @@
 - HTTP supporting FileService
   - Follow redirects!
   - Add SSL-Certificate at runtime to jre cacerts
-- Send messages Action
-  - RabbitMQ support
 - Warning when leaving an editor and unsaved changes exist
 - README.md
 - Limit for number of IgorData in dry-run-results.
@@ -35,5 +33,5 @@
 - I18N
 - Directory-Browser for file services in the GUI
 - Healthchecks + Spring-Boot-Admin support via actuators
-- Cleanup Action: provides? requires?
+- Cleanup com.arassec.igor.core.model.action.Action: provides? requires?
 - Pagination for execution history

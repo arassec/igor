@@ -2,6 +2,7 @@ package com.arassec.igor.module.message.service.rabbitmq;
 
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
+import com.arassec.igor.core.model.misc.ParameterSubtype;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.message.service.BaseMessageService;
 import com.arassec.igor.module.message.service.Message;
@@ -27,7 +28,7 @@ public class RabbitMqMessageService extends BaseMessageService {
      * The RabbitMQ port.
      */
     @IgorParam
-    private int port;
+    private int port = 5672;
 
     /**
      * The RabbitMQ username.
@@ -74,7 +75,7 @@ public class RabbitMqMessageService extends BaseMessageService {
     /**
      * Optional message headers.
      */
-    @IgorParam(optional = true)
+    @IgorParam(optional = true, subtype = ParameterSubtype.MULTI_LINE)
     private String headers;
 
     /**
@@ -100,10 +101,13 @@ public class RabbitMqMessageService extends BaseMessageService {
         MessageProperties messageProperties = new MessageProperties();
         messageProperties.setContentEncoding(contentEncoding);
         messageProperties.setContentType(contentType);
-        if (headers != null && headers.contains("=")) {
-            String[] headerParts = headers.split("=");
-            if (headerParts.length == 2) {
-                messageProperties.getHeaders().put(headerParts[0], headerParts[1]);
+        if (headers != null) {
+            String[] seperatedHeaders = headers.split("\n");
+            for (String header : seperatedHeaders) {
+                String[] headerParts = header.split(":");
+                if (headerParts.length == 2) {
+                    messageProperties.getHeaders().put(headerParts[0], headerParts[1]);
+                }
             }
         }
 

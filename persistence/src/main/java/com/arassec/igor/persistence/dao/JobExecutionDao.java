@@ -4,6 +4,7 @@ import com.arassec.igor.persistence.entity.JobExecutionEntity;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -62,5 +63,5 @@ public interface JobExecutionDao extends CrudRepository<JobExecutionEntity, Long
      */
     @Modifying
     @Query(value = "UPDATE igor.job_execution SET state = :toState WHERE state = :fromState", nativeQuery = true)
-    void updateState(String fromState, String toState);
+    void updateState(@Param("fromState") String fromState, @Param("toState") String toState);
 }

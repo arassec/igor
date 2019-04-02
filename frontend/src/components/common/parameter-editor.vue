@@ -3,8 +3,8 @@
 
     <table>
       <template v-for="(param, index) in parameters" v-bind:id="param.name" v-bind:index="index">
-        <tr v-bind:key="param.name" v-show="(showAdvancedParameters && isAdvancedParameter(param.name)) || !isAdvancedParameter(param.name)">
-          <td>
+        <tr v-bind:key="param.name" v-show="(showAdvancedParameters && isAdvancedParameter(param)) || !isAdvancedParameter(param)">
+          <td class="text-top">
             <label v-if="param.optional">{{formatParameterName(param.name)}}</label>
             <label v-if="!param.optional">{{formatParameterName(param.name)}}*</label>
           </td>
@@ -14,6 +14,7 @@
             <font-awesome-icon v-else-if="isBoolean(param.type)" :icon="param.value ? 'check-square' : 'square'"
                                v-on:click="param.value = !param.value"/>
             <input v-else-if="isService(param)" :disabled="true" v-model="param.serviceName"/>
+            <textarea v-else-if="param.subtype === 'MULTI_LINE'" v-model="param.value" rows="8" cols="41" />
             <input v-else autocomplete="off"
                    :type="parameterInputTypes[index]" v-model.trim="param.value"/>
 
@@ -174,12 +175,15 @@ export default {
       this.parameters[this.cronParameterIndex].value = value
       this.showCronPicker = false
     },
-    isAdvancedParameter: function (name) {
-      return (name === 'dataKey' || name === 'numThreads' || name === 'directoryKey')
+    isAdvancedParameter: function (parameter) {
+      if (parameter.name === 'dataKey' || parameter.name === 'numThreads' || parameter.name === 'directoryKey') {
+          return true
+      }
+      return parameter.optional
     },
     advancedParametersExist: function () {
       for (let index = 0; index < this.parameters.length; index++) {
-        if (this.isAdvancedParameter(this.parameters[index].name)) {
+        if (this.isAdvancedParameter(this.parameters[index])) {
           return true
         }
       }
@@ -206,6 +210,16 @@ export default {
 
   .arrow:hover {
     cursor: pointer;
+  }
+
+  .text-top {
+    vertical-align: top;
+  }
+
+  textarea {
+    color: var(--font-color-light);
+    background-color: var(--element-background-color);
+    border: none;
   }
 
 </style>

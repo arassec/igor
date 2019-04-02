@@ -3,6 +3,7 @@ package com.arassec.igor.persistence.dao;
 import com.arassec.igor.persistence.entity.PersistentValueEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public interface PersistentValueDao extends CrudRepository<PersistentValueEntity
      */
     @Query(value = "SELECT id FROM igor.persistent_value WHERE job_id = :jobId AND task_id = :taskId ORDER BY id DESC LIMIT :limit",
             nativeQuery = true)
-    List<Integer> findMostRecentIds(Long jobId, String taskId, int limit);
+    List<Integer> findMostRecentIds(@Param("jobId") Long jobId, @Param("taskId") String taskId, @Param("limit") int limit);
 
     /**
      * Deletes all entries of the given job and task that are older than the specified persistent-value.
