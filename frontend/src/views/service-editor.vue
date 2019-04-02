@@ -70,189 +70,214 @@
 </template>
 
 <script>
-import ParameterEditor from '../components/common/parameter-editor'
-import InputButton from '../components/common/input-button'
-import CorePanel from '../components/common/core-panel'
-import CoreContainer from '../components/common/core-container'
-import CoreContent from '../components/common/core-content'
-import ButtonRow from '../components/common/button-row'
-import ValidationError from '../components/common/validation-error'
-import SideMenu from '../components/common/side-menu'
+  import ParameterEditor from '../components/common/parameter-editor'
+  import InputButton from '../components/common/input-button'
+  import CorePanel from '../components/common/core-panel'
+  import CoreContainer from '../components/common/core-container'
+  import CoreContent from '../components/common/core-content'
+  import ButtonRow from '../components/common/button-row'
+  import ValidationError from '../components/common/validation-error'
+  import SideMenu from '../components/common/side-menu'
 
-export default {
-  name: 'service-editor',
-  components: {
-    SideMenu,
-    ValidationError,
-    ButtonRow,
-    CoreContent,
-    CoreContainer,
-    CorePanel,
-    InputButton,
-    ParameterEditor
-  },
-  props: ['serviceId'],
-  data: function () {
-    return {
-      newService: true,
-      serviceCategories: [],
-      serviceTypes: [],
-      nameValidationError: '',
-      serviceConfiguration: {
-        name: '',
-        category: {},
-        type: {},
-        parameters: {}
-      }
-    }
-  },
-  methods: {
-    loadService: function (id) {
-      let component = this
-      this.$http.get('/api/service/' + id).then(function (response) {
-        component.serviceConfiguration = response.data
-        component.serviceCategories.push(component.serviceConfiguration.category)
-        component.selectedCategory = component.serviceConfiguration.category.key
-        component.serviceTypes.push(component.serviceConfiguration.type)
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Loading service failed! (' + error + ')', true)
-      })
+  export default {
+    name: 'service-editor',
+    components: {
+      SideMenu,
+      ValidationError,
+      ButtonRow,
+      CoreContent,
+      CoreContainer,
+      CorePanel,
+      InputButton,
+      ParameterEditor
     },
-    loadServiceCategories: function (singleServiceCategory) {
-      let component = this
-      this.$http.get('/api/category/service').then(function (response) {
-        for (let i = component.serviceCategories.length; i > 0; i--) {
-          component.serviceCategories.pop()
+    props: ['serviceId'],
+    data: function () {
+      return {
+        newService: true,
+        serviceCategories: [],
+        serviceTypes: [],
+        nameValidationError: '',
+        loadParameters: true,
+        serviceConfiguration: {
+          name: '',
+          category: {},
+          type: {},
+          parameters: {}
         }
-        Array.from(response.data).forEach(function (item) {
-          if (singleServiceCategory != null) {
-            if (item.key === singleServiceCategory) {
+      }
+    },
+    methods: {
+      loadService: function (id) {
+        let component = this
+        this.$http.get('/api/service/' + id).then(function (response) {
+          component.serviceConfiguration = response.data
+          component.serviceCategories.push(component.serviceConfiguration.category)
+          component.selectedCategory = component.serviceConfiguration.category.key
+          component.serviceTypes.push(component.serviceConfiguration.type)
+        }).catch(function (error) {
+          component.$root.$data.store.setFeedback('Loading service failed! (' + error + ')', true)
+        })
+      },
+      loadServiceCategories: function (singleServiceCategory) {
+        let component = this
+        this.$http.get('/api/category/service').then(function (response) {
+          for (let i = component.serviceCategories.length; i > 0; i--) {
+            component.serviceCategories.pop()
+          }
+          Array.from(response.data).forEach(function (item) {
+            if (singleServiceCategory) {
+              if (item.key === singleServiceCategory) {
+                component.serviceCategories.push(item)
+              }
+            } else {
               component.serviceCategories.push(item)
             }
-          } else {
-            component.serviceCategories.push(item)
+          })
+          if (!('key' in component.serviceConfiguration.category)) {
+            component.serviceConfiguration.category = component.serviceCategories[0]
           }
+          component.loadServiceTypes(component.serviceConfiguration.category.key)
+        }).catch(function (error) {
+          component.$root.$data.store.setFeedback('Loading categories failed! (' + error + ')', true)
         })
-        component.serviceConfiguration.category = component.serviceCategories[0]
-        component.loadServiceTypes(component.serviceConfiguration.category.key)
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Loading categories failed! (' + error + ')', true)
-      })
-    },
-    loadServiceTypes: function (category) {
-      let component = this
-      this.$http.get('/api/type/service/' + category).then(function (response) {
-        for (let i = component.serviceTypes.length; i > 0; i--) {
-          component.serviceTypes.pop()
+      },
+      loadServiceTypes: function (category) {
+        let component = this
+        this.$http.get('/api/type/service/' + category).then(function (response) {
+          for (let i = component.serviceTypes.length; i > 0; i--) {
+            component.serviceTypes.pop()
+          }
+          Array.from(response.data).forEach(function (item) {
+            component.serviceTypes.push(item)
+          })
+          if (!('key' in component.serviceConfiguration.type)) {
+            component.serviceConfiguration.type = component.serviceTypes[0]
+          }
+          component.loadTypeParameters(component.serviceConfiguration.type.key)
+        }).catch(function (error) {
+          component.$root.$data.store.setFeedback('Loading types failed! (' + error + ')', true)
+        })
+      },
+      loadTypeParameters: function (type) {
+        let component = this
+        if (component.loadParameters) {
+          this.$http.get('/api/parameters/service/' + type).then(function (response) {
+            component.serviceConfiguration.parameters = response.data
+          }).catch(function (error) {
+            component.$root.$data.store.setFeedback('Loading type parameters failed! (' + error + ')', true)
+          })
+        } else {
+          // after we skipped for the first time, always update parameters
+          component.loadParameters = true
         }
-        Array.from(response.data).forEach(function (item) {
-          component.serviceTypes.push(item)
-        })
-        component.serviceConfiguration.type = component.serviceTypes[0]
-        component.loadTypeParameters(component.serviceConfiguration.type.key)
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Loading types failed! (' + error + ')', true)
-      })
-    },
-    loadTypeParameters: function (type) {
-      let component = this
-      this.$http.get('/api/parameters/service/' + type).then(function (response) {
-        component.serviceConfiguration.parameters = response.data
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Loading type parameters failed! (' + error + ')', true)
-      })
-    },
-    testConfiguration: function () {
-      if (!this.validateInput()) {
-        return
-      }
+      },
+      testConfiguration: function () {
+        if (!this.validateInput()) {
+          return
+        }
 
-      this.$root.$data.store.setWip('Testing service')
+        this.$root.$data.store.setWip('Testing service')
 
-      let component = this
-      this.$http.post('/api/service/test', this.serviceConfiguration).then(function () {
-        component.$root.$data.store.setFeedback('Test OK.', false)
-        component.$root.$data.store.clearWip()
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Testing failed! (' + error + ')', true)
-        component.$root.$data.store.clearWip()
-      })
-    },
-    saveConfiguration: function () {
-      if (!this.validateInput()) {
-        return
-      }
-
-      this.$root.$data.store.setWip('Saving service')
-
-      let component = this
-      if (this.newService) {
-        this.$http.post('/api/service', this.serviceConfiguration).then(function (response) {
-          component.serviceConfiguration = response.data;
-          component.$root.$data.store.setFeedback('Service \'' + component.serviceConfiguration.name + '\' saved.', false)
+        let component = this
+        this.$http.post('/api/service/test', this.serviceConfiguration).then(function () {
+          component.$root.$data.store.setFeedback('Test OK.', false)
           component.$root.$data.store.clearWip()
-          let jobData = component.$root.$data.store.getJobData()
-          if (jobData.jobConfiguration != null) {
-            let serviceParameter = {
-              name: component.serviceConfiguration.name,
-              id: component.serviceConfiguration.id
+        }).catch(function (error) {
+          component.$root.$data.store.setFeedback('Testing failed! (' + error + ')', true)
+          component.$root.$data.store.clearWip()
+        })
+      },
+      saveConfiguration: function () {
+        if (!this.validateInput()) {
+          return
+        }
+
+        this.$root.$data.store.setWip('Saving service')
+
+        let component = this
+        if (this.newService) {
+          this.$http.post('/api/service', this.serviceConfiguration).then(function (response) {
+            component.serviceConfiguration = response.data;
+            component.$root.$data.store.setFeedback('Service \'' + component.serviceConfiguration.name + '\' saved.', false)
+            component.$root.$data.store.clearWip()
+            component.newService = false
+            component.$router.push({name: 'service-editor', params: {serviceId: component.serviceConfiguration.id}})
+            let jobData = component.$root.$data.store.getJobData()
+            if (jobData.jobConfiguration != null) {
+              let serviceParameter = {
+                name: component.serviceConfiguration.name,
+                id: component.serviceConfiguration.id
+              }
+              jobData.serviceParameter = serviceParameter
             }
-            jobData.serviceParameter = serviceParameter
-          }
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', false)
-          component.$root.$data.store.clearWip()
-        })
-      } else {
-        this.$http.put('/api/service', this.serviceConfiguration).then(function () {
-          component.$root.$data.store.setFeedback('Service \'' + component.serviceConfiguration.name + '\' updated.', false)
-          component.$root.$data.store.clearWip()
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', false)
-          component.$root.$data.store.clearWip()
-        })
+          }).catch(function (error) {
+            if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
+              component.nameValidationError = 'A service with this name already exists!'
+            }
+            component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true)
+            component.$root.$data.store.clearWip()
+          })
+        } else {
+          this.$http.put('/api/service', this.serviceConfiguration).then(function () {
+            component.$root.$data.store.setFeedback('Service \'' + component.serviceConfiguration.name + '\' updated.', false)
+            component.$root.$data.store.clearWip()
+          }).catch(function (error) {
+            if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
+              component.nameValidationError = 'A service with this name already exists!'
+            }
+            component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true);
+            component.$root.$data.store.clearWip()
+          })
+        }
+      },
+      cancelConfiguration: function () {
+        let jobData = this.$root.$data.store.getJobData()
+        if (jobData.jobConfiguration != null) {
+          this.$router.push({name: 'job-editor'})
+        } else {
+          this.$router.push({name: 'services'})
+        }
+      },
+      validateInput: function () {
+        this.nameValidationError = ''
+
+        let nameValidationResult = true
+
+        if (this.serviceConfiguration.name == null || this.serviceConfiguration.name === '') {
+          this.nameValidationError = 'Name must be set'
+          nameValidationResult = false
+        }
+
+        let parameterValidationResult = true
+        if (typeof this.$refs.parameterEditor !== 'undefined') {
+          parameterValidationResult = this.$refs.parameterEditor.validateInput()
+        }
+
+        return (nameValidationResult && parameterValidationResult)
       }
     },
-    cancelConfiguration: function () {
-      let jobData = this.$root.$data.store.getJobData()
-      if (jobData.jobConfiguration != null) {
-        this.$router.push({name: 'job-editor'})
-      } else {
-        this.$router.push({name: 'services'})
-      }
-    },
-    validateInput: function () {
-      this.nameValidationError = ''
-
-      let nameValidationResult = true
-
-      if (this.serviceConfiguration.name == null || this.serviceConfiguration.name === '') {
-        this.nameValidationError = 'Name must be set'
-        nameValidationResult = false
-      }
-
-      let parameterValidationResult = true
-      if (typeof this.$refs.parameterEditor !== 'undefined') {
-        parameterValidationResult = this.$refs.parameterEditor.validateInput()
-      }
-
-      return (nameValidationResult && parameterValidationResult)
-    }
-  },
-  mounted () {
-    if (this.serviceId != null) {
-      this.newService = false
-      this.loadService(this.serviceId)
-    } else {
-      let jobData = this.$root.$data.store.getJobData()
-      if (jobData.serviceCategory != null) {
-        this.loadServiceCategories(jobData.serviceCategory)
-      } else {
+    mounted() {
+      let serviceData = this.$root.$data.store.getServiceData()
+      if (serviceData.serviceConfiguration != null) {
+        this.serviceConfiguration = serviceData.serviceConfiguration
+        this.loadParameters = false
         this.loadServiceCategories(null)
+      } else {
+        if (this.serviceId != null) {
+          this.newService = false
+          this.loadService(this.serviceId)
+        } else {
+          let jobData = this.$root.$data.store.getJobData()
+          if (jobData.serviceCategory != null) {
+            this.loadServiceCategories(jobData.serviceCategory)
+          } else {
+            this.loadServiceCategories(null)
+          }
+        }
       }
     }
   }
-}
 </script>
 
 <style scoped>

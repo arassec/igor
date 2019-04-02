@@ -158,6 +158,16 @@ public class JobManager implements InitializingBean, DisposableBean {
     }
 
     /**
+     * Loads a job with the given name.
+     *
+     * @param name The job's name.
+     * @return The job with the given name or {@code null}, if none exists.
+     */
+    public Job loadByName(String name) {
+        return jobRepository.findByName(name);
+    }
+
+    /**
      * Loads all jobs.
      *
      * @return List of {@link Job}s.
@@ -178,12 +188,12 @@ public class JobManager implements InitializingBean, DisposableBean {
                 .sorted((o1, o2) -> {
                     String firstCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
                     String secondCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
-            CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(firstCron);
-            Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
-            CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(secondCron);
-            Date nextRunTwo = cronTriggerTwo.next(Calendar.getInstance().getTime());
-            return nextRunOne.compareTo(nextRunTwo);
-        }).collect(Collectors.toList());
+                    CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(firstCron);
+                    Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
+                    CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(secondCron);
+                    Date nextRunTwo = cronTriggerTwo.next(Calendar.getInstance().getTime());
+                    return nextRunOne.compareTo(nextRunTwo);
+                }).collect(Collectors.toList());
     }
 
     /**

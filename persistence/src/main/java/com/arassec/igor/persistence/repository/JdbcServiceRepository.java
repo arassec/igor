@@ -86,6 +86,23 @@ public class JdbcServiceRepository implements ServiceRepository {
     }
 
     /**
+     * Finds a {@link Service} by its name.
+     *
+     * @param name The service's name.
+     * @return The service.
+     */
+    @Override
+    public Service findByName(String name) {
+        ServiceEntity serviceEntity = serviceDao.findByName(name);
+        if (serviceEntity != null) {
+            Service service = jsonServiceConverter.convert(new JSONObject(serviceEntity.getContent()), true);
+            service.setId(serviceEntity.getId());
+            return service;
+        }
+        return null;
+    }
+
+    /**
      * Finds all services in the database.
      *
      * @return List of services.

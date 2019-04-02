@@ -5,12 +5,14 @@ import com.arassec.igor.core.application.ProviderManager;
 import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.application.TriggerManager;
 import com.arassec.igor.core.application.factory.util.KeyLabelStore;
+import com.arassec.igor.web.api.util.Sorter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -51,8 +53,8 @@ public class TypeRestController {
      * @return Set of service types.
      */
     @GetMapping("service/{category}")
-    public Set<KeyLabelStore> getServiceTypes(@PathVariable("category") String category) {
-        return serviceManager.getTypesOfCategory(category);
+    public List<KeyLabelStore> getServiceTypes(@PathVariable("category") String category) {
+        return Sorter.sortByLabel(serviceManager.getTypesOfCategory(category));
     }
 
     /**
@@ -62,8 +64,8 @@ public class TypeRestController {
      * @return Set of action types.
      */
     @GetMapping("action/{category}")
-    public Set<KeyLabelStore> getActionTypes(@PathVariable("category") String category) {
-        return actionManager.getTypesOfCategory(category);
+    public List<KeyLabelStore> getActionTypes(@PathVariable("category") String category) {
+        return Sorter.sortByLabel(actionManager.getTypesOfCategory(category));
     }
 
     /**
@@ -73,8 +75,8 @@ public class TypeRestController {
      * @return Set of action types.
      */
     @GetMapping("provider/{category}")
-    public Set<KeyLabelStore> getProviderTypes(@PathVariable("category") String category) {
-        return providerManager.getTypesOfCategory(category);
+    public List<KeyLabelStore> getProviderTypes(@PathVariable("category") String category) {
+        return Sorter.sortByLabel(providerManager.getTypesOfCategory(category));
     }
 
     /**
@@ -84,8 +86,8 @@ public class TypeRestController {
      * @return Set of action types.
      */
     @GetMapping("trigger/{category}")
-    public Set<KeyLabelStore> getTriggerTypes(@PathVariable("category") String category) {
-        return triggerManager.getTypesOfCategory(category);
+    public List<KeyLabelStore> getTriggerTypes(@PathVariable("category") String category) {
+        return Sorter.sortByLabel(triggerManager.getTypesOfCategory(category));
     }
 
 }

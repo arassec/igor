@@ -231,6 +231,10 @@
             component.$router.push({name: 'job-editor', params: {jobId: component.jobConfiguration.id}})
             component.jobExecutionsRefreshTimer = setInterval(() => component.updateJobExecutions(), 1000)
           }).catch(function (error) {
+            if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
+              component.validationErrors.push('-1_-1')
+              component.$refs.jobConfigurator.setNameValidationError('A job with this name already exists!')
+            }
             component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true)
             component.$root.$data.store.clearWip()
           })
@@ -240,6 +244,10 @@
             component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' updated.', false)
             component.$root.$data.store.clearWip()
           }).catch(function (error) {
+            if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
+              component.validationErrors.push('-1_-1')
+              component.$refs.jobConfigurator.setNameValidationError('A job with this name already exists!')
+            }
             component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true)
             component.$root.$data.store.clearWip()
           })

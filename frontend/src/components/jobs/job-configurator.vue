@@ -162,6 +162,9 @@
 
         return (nameValidationResult && parameterValidationResult)
       },
+      setNameValidationError: function (errorMessage) {
+        this.nameValidationError = errorMessage
+      },
       createService: function (parameterIndex, serviceCategory) {
         this.$emit('create-service', this.taskKey, parameterIndex, serviceCategory)
       }

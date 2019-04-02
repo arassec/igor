@@ -13,6 +13,14 @@ import org.springframework.stereotype.Repository;
 public interface ServiceDao extends CrudRepository<ServiceEntity, Long> {
 
     /**
+     * Finds a service entity by its name.
+     *
+     * @param name The service's name.
+     * @return The service.
+     */
+    ServiceEntity findByName(String name);
+
+    /**
      * Returns a service's name by its ID.
      *
      * @param id The service's ID.

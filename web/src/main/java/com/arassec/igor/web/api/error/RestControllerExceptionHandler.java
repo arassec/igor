@@ -16,6 +16,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
+     * Error indicating that a name for a service or job already exists.
+     */
+    public static final String NAME_ALREADY_EXISTS_ERROR = "NAME_ALREADY_EXISTS_ERROR";
+
+    /**
      * {@link ServiceException}s are converted into "INTERNAL_SERVER_ERROR", although it might not be an internal
      * error, but e.g. a failed service call.
      *

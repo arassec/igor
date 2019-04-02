@@ -35,6 +35,14 @@ public interface JobRepository {
     Job findById(Long id);
 
     /**
+     * Finds a job by its name.
+     *
+     * @param name The job's name.
+     * @return The {@link Job}.
+     */
+    Job findByName(String name);
+
+    /**
      * Deletes a job by its ID.
      *
      * @param id The ID of the job to delete.

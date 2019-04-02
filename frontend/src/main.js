@@ -32,6 +32,9 @@ const store = {
     timeout: undefined,
     message: ''
   },
+  serviceData: {
+    serviceConfiguration: null
+  },
   jobData: {
     jobConfiguration: null,
     selectionKey: null,
@@ -81,6 +84,15 @@ const store = {
       clearTimeout(this.wip.timeout)
     }
     this.wip.message = ''
+  },
+  setServiceData (serviceConfiguration) {
+    this.serviceData.serviceConfiguration = serviceConfiguration
+  },
+  getServiceData () {
+    return this.serviceData
+  },
+  clearServiceData () {
+    this.serviceData.serviceConfiguration = null
   },
   setJobData (jobConfiguration, selectionKey, parameterIndex, serviceCategory) {
     this.jobData.jobConfiguration = jobConfiguration

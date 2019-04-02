@@ -5,13 +5,14 @@ import com.arassec.igor.core.application.ProviderManager;
 import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.application.TriggerManager;
 import com.arassec.igor.core.application.factory.util.KeyLabelStore;
+import com.arassec.igor.web.api.util.Sorter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Set;
+import java.util.*;
 
 /**
  * REST-Controller for category requests.
@@ -50,8 +51,8 @@ public class CategoryRestController {
      * @return Set of all available service categories.
      */
     @GetMapping("service")
-    public Set<KeyLabelStore> getServiceCategories() {
-        return serviceManager.getCategories();
+    public List<KeyLabelStore> getServiceCategories() {
+        return Sorter.sortByLabel(serviceManager.getCategories());
     }
 
     /**
@@ -60,8 +61,8 @@ public class CategoryRestController {
      * @return Set of all available action categories.
      */
     @GetMapping("provider")
-    public Set<KeyLabelStore> getProviderCategories() {
-        return providerManager.getCategories();
+    public List<KeyLabelStore> getProviderCategories() {
+        return Sorter.sortByLabel(providerManager.getCategories());
     }
 
     /**
@@ -70,8 +71,8 @@ public class CategoryRestController {
      * @return Set of all available action categories.
      */
     @GetMapping("action")
-    public Set<KeyLabelStore> getActionCategories() {
-        return actionManager.getCategories();
+    public List<KeyLabelStore> getActionCategories() {
+        return Sorter.sortByLabel(actionManager.getCategories());
     }
 
     /**
@@ -80,8 +81,8 @@ public class CategoryRestController {
      * @return Set of all available trigger categories.
      */
     @GetMapping("trigger")
-    public Set<KeyLabelStore> getTriggerCategories() {
-        return triggerManager.getCategories();
+    public List<KeyLabelStore> getTriggerCategories() {
+        return Sorter.sortByLabel(triggerManager.getCategories());
     }
 
 }

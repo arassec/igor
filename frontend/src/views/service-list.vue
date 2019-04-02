@@ -78,6 +78,8 @@ export default {
   },
   mounted () {
     this.loadServices()
+    this.$root.$data.store.clearServiceData()
+    this.$root.$data.store.clearJobData()
   }
 }
 </script>

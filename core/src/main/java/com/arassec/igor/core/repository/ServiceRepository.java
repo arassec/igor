@@ -35,6 +35,14 @@ public interface ServiceRepository {
     Service findById(Long id);
 
     /**
+     * Finds a service by its name.
+     *
+     * @param name The service's name.
+     * @return The {@link Service} with this name.
+     */
+    Service findByName(String name);
+
+    /**
      * Deletes a service by its ID.
      *
      * @param id The ID of the service to delete.

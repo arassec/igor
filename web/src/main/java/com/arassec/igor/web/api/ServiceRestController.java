@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.util.Pair;
+import com.arassec.igor.web.api.error.RestControllerExceptionHandler;
 import com.arassec.igor.web.api.model.ServiceListEntry;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
@@ -124,8 +125,12 @@ public class ServiceRestController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String createService(@RequestBody String serviceJson) {
         Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), false);
-        Service savedService = serviceManager.save(service);
-        return jsonServiceConverter.convert(savedService, false, true).toString();
+        if (serviceManager.loadByName(service.getName()) == null) {
+            Service savedService = serviceManager.save(service);
+            return jsonServiceConverter.convert(savedService, false, true).toString();
+        } else {
+            throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
+        }
     }
 
     /**
@@ -138,7 +143,12 @@ public class ServiceRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateService(@RequestBody String serviceJson) {
         Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), false);
-        serviceManager.save(service);
+        Service existingServiceWithSameName = serviceManager.loadByName(service.getName());
+        if (existingServiceWithSameName == null || existingServiceWithSameName.getId().equals(service.getId())) {
+            serviceManager.save(service);
+        } else {
+            throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
+        }
     }
 
     /**

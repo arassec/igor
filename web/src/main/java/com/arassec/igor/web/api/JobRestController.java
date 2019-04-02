@@ -8,6 +8,7 @@ import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.CronTrigger;
 import com.arassec.igor.core.util.Pair;
+import com.arassec.igor.web.api.error.RestControllerExceptionHandler;
 import com.arassec.igor.web.api.model.JobListEntry;
 import com.github.openjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,17 +79,21 @@ public class JobRestController {
     }
 
     /**
-     * Saves a job.
+     * Creates a new job.
      *
      * @param jobJson The job in JSON form.
      * @return 'OK' on success.
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public String saveJob(@RequestBody String jobJson) {
+    public String createJob(@RequestBody String jobJson) {
         Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
-        job.setId(null);
-        Job savedJob = jobManager.save(job);
-        return jsonJobConverter.convert(savedJob, false, true).toString();
+        if (jobManager.loadByName(job.getName()) == null) {
+            job.setId(null);
+            Job savedJob = jobManager.save(job);
+            return jsonJobConverter.convert(savedJob, false, true).toString();
+        } else {
+            throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
+        }
     }
 
     /**
@@ -100,8 +105,13 @@ public class JobRestController {
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String updateJob(@RequestBody String jobJson) {
         Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
-        Job savedJob = jobManager.save(job);
-        return jsonJobConverter.convert(savedJob, false, true).toString();
+        Job existingJobWithSameName = jobManager.loadByName(job.getName());
+        if (existingJobWithSameName == null || existingJobWithSameName.getId().equals(job.getId())) {
+            Job savedJob = jobManager.save(job);
+            return jsonJobConverter.convert(savedJob, false, true).toString();
+        } else {
+            throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
+        }
     }
 
     /**

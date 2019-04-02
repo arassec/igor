@@ -101,6 +101,23 @@ public class JdbcJobRepository implements JobRepository {
     }
 
     /**
+     * Finds a job by its name.
+     *
+     * @param name The job's name.
+     * @return The {@link Job}.
+     */
+    @Override
+    public Job findByName(String name) {
+        JobEntity entity = jobDao.findByName(name);
+        if (entity != null) {
+            Job job = jsonJobConverter.convert(new JSONObject(entity.getContent()), true);
+            job.setId(entity.getId());
+            return job;
+        }
+        return null;
+    }
+
+    /**
      * Finds all jobs in the database.
      *
      * @return List of all {@link Job}s.

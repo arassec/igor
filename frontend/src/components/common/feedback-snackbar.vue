@@ -34,8 +34,8 @@ export default {
 <style scoped>
 
   .snackbar {
+    max-width: 250px;
     width: 250px;
-
     color: var(--font-color-light);
     padding: 15px;
     position: fixed;

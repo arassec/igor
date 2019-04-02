@@ -64,7 +64,7 @@ public class ServiceManager {
      * Loads the service with the given ID.
      *
      * @param id The service's ID.
-     * @return The {@link Service} with the given ID or {@code null} if none exists.
+     * @return The {@link Service} with the given ID or {@code null}, if none exists.
      */
     public Service load(Long id) {
         return serviceRepository.findById(id);
@@ -77,6 +77,16 @@ public class ServiceManager {
      */
     public List<Service> loadAll() {
         return serviceRepository.findAll();
+    }
+
+    /**
+     * Loads a service by its name.
+     *
+     * @param name The service's name.
+     * @return The {@link Service} with the given name or {@code null}, if none exists.
+     */
+    public Service loadByName(String name) {
+        return serviceRepository.findByName(name);
     }
 
     /**
