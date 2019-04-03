@@ -6,7 +6,9 @@ import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.BufferedOutputStream;
@@ -53,27 +55,70 @@ public class FtpFileService extends BaseFileService {
     protected boolean passiveMode = true;
 
     /**
+     * Buffer size for copying data.
+     */
+    @IgorParam(optional = true)
+    protected int bufferSize = 1024 * 1024;
+
+    /**
+     * Timeout for the data connection.
+     */
+    @IgorParam(optional = true)
+    protected int dataTimeout = 60 * 5 * 1000;
+
+    /**
+     * Keepalive timeout for the control connection.
+     */
+    @IgorParam(optional = true)
+    protected int keepAliveTimeout = 60 * 15;
+
+    /**
+     * Set to {@code true}, if it's a Windows FTP server.
+     */
+    @IgorParam(optional = true)
+    protected boolean windowsFtp = false;
+
+    /**
      * Initializes the FTP client.
      */
     protected FTPClient connect() {
         try {
             FTPClient ftpClient = new FTPClient();
             ftpClient.setStrictReplyParsing(false);
+
+            if (windowsFtp) {
+                ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYST_NT));
+            } else {
+                ftpClient.configure(new FTPClientConfig());
+            }
+
+            ftpClient.setBufferSize(bufferSize);
+
             ftpClient.connect(host, port);
+
             if (passiveMode) {
                 ftpClient.enterLocalPassiveMode();
             } else {
                 ftpClient.enterLocalActiveMode();
             }
+
             String user = username;
             String pass = password;
             if (user == null || pass == null) {
                 user = "anonymous";
                 pass = "igor";
             }
+
             if (!ftpClient.login(user, pass)) {
                 throw new ServiceException("Login to FTP server " + host + ":" + port + " failed for user: " + user);
             }
+
+            ftpClient.setDataTimeout(dataTimeout);
+            ftpClient.setControlKeepAliveTimeout(keepAliveTimeout);
+            ftpClient.setControlKeepAliveReplyTimeout(keepAliveTimeout);
+            ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
             return ftpClient;
         } catch (IOException e) {
             throw new ServiceException("Could not login to FTP server " + host + ":" + port, e);
@@ -119,7 +164,7 @@ public class FtpFileService extends BaseFileService {
      */
     @Override
     public String read(String file) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()){
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             FTPClient ftpClient = connect();
             ftpClient.retrieveFile(file, outputStream);
             String result = outputStream.toString();

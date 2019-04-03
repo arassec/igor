@@ -1,10 +1,10 @@
 - Unit-Tests (Apache Mina SSHD!)
 - ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
   - With this: support enums in parameter editor
-- HTTP supporting FileService
-  - Follow redirects!
-  - Add SSL-Certificate at runtime to jre cacerts
+- HTTP-GET provider (with follow redirects!)
 - Warning when leaving an editor and unsaved changes exist
+- SSH access with key
+- Local SSL-Keystore that can be modified via GUI
 - FilterFileByDate-Action
   - older/younger than x days/hours/minutes
 - Encryption-Cipher in database, randomly generated at first start
@@ -23,6 +23,7 @@
   - Concurrency-Group workload
 - Persistence-service editor
 - CIFS-/Samba supporting FileService
+- HTTP(S) supporting FileService
 - Export + Import of jobs and services (via JSON)
 - Initial setup with configuration on first start
 - Configuration-View with system configurations

@@ -32,7 +32,7 @@ public abstract class BaseFileService extends BaseService implements FileService
      */
     protected void copyStream(InputStream in, OutputStream out, long fileSize) {
         try {
-            byte[] buf = new byte[4096];
+            byte[] buf = new byte[1024 * 1024];
             int foo;
             while (true) {
                 if (buf.length < fileSize) {

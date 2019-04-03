@@ -72,7 +72,7 @@ export default {
     filteredServices: function () {
       let component = this
       return this.services.filter(function (service) {
-        return service.name.includes(component.filterText)
+        return service.name.toLowerCase().includes(component.filterText.toLowerCase())
       })
     }
   },

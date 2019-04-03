@@ -65,7 +65,7 @@ export default {
     filteredJobs: function () {
       let component = this
       return this.jobs.filter(function (job) {
-        return job.name.includes(component.filterText)
+        return job.name.toLowerCase().includes(component.filterText.toLowerCase())
       })
     }
   },
