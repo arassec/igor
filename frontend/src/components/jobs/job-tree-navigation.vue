@@ -33,7 +33,7 @@
                             <li v-for="(action, actionIndex) in task.actions"
                                 v-bind:key="actionIndex">
                                         <span class="item"
-                                              v-bind:class="{ 'selected': isActionSelected(taskIndex, actionIndex), 'validation-error': hasValidationErrors(taskIndex, actionIndex)}"
+                                              v-bind:class="getActionStyleClass(taskIndex, actionIndex, action)"
                                               v-on:click="$emit('action-is-selected', taskIndex, actionIndex)">
                                             <font-awesome-icon icon="wrench"/>
                                             <span>
@@ -82,11 +82,38 @@ export default {
     isTaskSelected: function (index) {
       return (index == this.selectedTaskIndex && this.selectedActionIndex == -1)
     },
+    getActionStyleClass: function (taskIndex, actionIndex, action) {
+      if (this.validationErrors.indexOf(taskIndex + '_' + actionIndex) > -1) {
+        return 'validation-error'
+      }
+      if (taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex) {
+        return "selected"
+      }
+      if (action.parameters) {
+        for (let i in action.parameters) {
+          console.log("PARAM: " + JSON.stringify(action.parameters[i]))
+          if (action.parameters[i].name === 'active' && action.parameters[i].value === false) {
+            return 'inactive'
+          }
+        }
+      }
+      return ''
+    },
     isActionSelected: function (taskIndex, actionIndex) {
       return taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex
     },
     hasValidationErrors: function (taskIndex, actionIndex) {
       return (this.validationErrors.indexOf(taskIndex + '_' + actionIndex) > -1)
+    },
+    isInactive: function (action) {
+      if (action.parameters) {
+        for (let parameter in action.parameters) {
+          if (parameter.name === 'active' && parameter.value === true) {
+            return true
+          }
+        }
+      }
+      return false
     },
     formatName: function (name) {
       if (name.length > 30) {
@@ -126,6 +153,10 @@ export default {
 
     .validation-error {
         background-color: var(--alert-background-color) !important;
+    }
+
+    .inactive {
+        opacity: 0.5;
     }
 
     .item-icon {

@@ -206,6 +206,7 @@
         let component = this
         this.$http.get('/api/job/' + id).then(function (response) {
           component.jobConfiguration = response.data
+          console.log(JSON.stringify(component.jobConfiguration))
           component.updateJobExecutions()
         }).catch(function (error) {
           component.$root.$data.store.setFeedback('Loading failed! (' + error + ')', true)

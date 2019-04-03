@@ -177,11 +177,16 @@ public class Task {
             if (!action.isActive()) {
                 IgorData igorData = new IgorData(jobId, id);
                 igorData.put(BaseAction.DRY_RUN_COMMENT_KEY, "Action is disabled.");
-                actionResult.setResults(Arrays.asList(igorData));
+                actionResult.getResults().add(igorData);
                 taskResult.getActionResults().add(actionResult);
             } else {
                 actionData = actionData.stream().filter(igorData -> action.dryRun(igorData)).collect(Collectors.toList());
                 actionData.stream().forEach(igorData -> actionResult.getResults().add(cloner.deepClone(igorData)));
+                if (actionResult.getResults().isEmpty()) {
+                    IgorData igorData = new IgorData(jobId, id);
+                    igorData.put(BaseAction.DRY_RUN_COMMENT_KEY, "No data to process.");
+                    actionResult.getResults().add(igorData);
+                }
                 taskResult.getActionResults().add(actionResult);
             }
         }
