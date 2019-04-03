@@ -17,7 +17,8 @@ public interface Action {
     /**
      * Executes the action.
      *
-     * @param data The data the action will work with.
+     * @param data
+     *         The data the action will work with.
      * @return {@code true}, if the data should further be processed, {@code false} otherwise.
      */
     boolean process(IgorData data);
@@ -25,7 +26,8 @@ public interface Action {
     /**
      * Performs a dry-run of the action for testing. I.e. no data should be modified irreversibly by this method.
      *
-     * @param data The data the action will work with.
+     * @param data
+     *         The data the action will work with.
      * @return {@code true}, if the data should further be processed, {@code false} otherwise.
      */
     boolean dryRun(IgorData data);
@@ -33,8 +35,10 @@ public interface Action {
     /**
      * Finalizes the action after all data has been processed.
      *
-     * @param jobId The job's ID.
-     * @param taskId The task's ID.
+     * @param jobId
+     *         The job's ID.
+     * @param taskId
+     *         The task's ID.
      */
     void complete(Long jobId, String taskId);
 
@@ -44,6 +48,14 @@ public interface Action {
      * @return The number of threads.
      */
     int getNumThreads();
+
+    /**
+     * Returns whether the action is active or not.
+     *
+     * @return {@code true} if the action is active and should be used, {@code false} if the action should be skipped during job
+     * runs.
+     */
+    boolean isActive();
 
     /**
      * Returns the data keys that this action provides to further actions by adding them to the processed {@link IgorData}.

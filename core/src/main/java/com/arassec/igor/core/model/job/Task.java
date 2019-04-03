@@ -1,6 +1,7 @@
 package com.arassec.igor.core.model.job;
 
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.misc.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.dryrun.DryRunActionResult;
 import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
@@ -12,6 +13,7 @@ import com.rits.cloning.Cloner;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -88,6 +90,9 @@ public class Task {
         int lastNumThreads = -1;
 
         for (Action action : actions) {
+            if (!action.isActive()) {
+                continue;
+            }
             if (action.getNumThreads() != lastNumThreads) {
                 List<Action> concurrencyList = new LinkedList<>();
                 concurrencyList.add(action);
@@ -169,9 +174,16 @@ public class Task {
         List<IgorData> actionData = providerResult;
         for (Action action : actions) {
             DryRunActionResult actionResult = new DryRunActionResult();
-            actionData = actionData.stream().filter(igorData -> action.dryRun(igorData)).collect(Collectors.toList());
-            actionData.stream().forEach(igorData -> actionResult.getResults().add(cloner.deepClone(igorData)));
-            taskResult.getActionResults().add(actionResult);
+            if (!action.isActive()) {
+                IgorData igorData = new IgorData(jobId, id);
+                igorData.put(BaseAction.DRY_RUN_COMMENT_KEY, "Action is disabled.");
+                actionResult.setResults(Arrays.asList(igorData));
+                taskResult.getActionResults().add(actionResult);
+            } else {
+                actionData = actionData.stream().filter(igorData -> action.dryRun(igorData)).collect(Collectors.toList());
+                actionData.stream().forEach(igorData -> actionResult.getResults().add(cloner.deepClone(igorData)));
+                taskResult.getActionResults().add(actionResult);
+            }
         }
 
         actions.forEach(action -> action.complete(jobId, id));
