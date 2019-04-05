@@ -1,5 +1,6 @@
 package com.arassec.igor.module.file.service.ssh;
 
+import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileService;
@@ -13,6 +14,24 @@ import com.jcraft.jsch.Session;
 public abstract class BaseSshFileService extends BaseFileService {
 
     /**
+     * Enables or disables strict host-key checking.
+     */
+    @IgorParam(optional = true)
+    private boolean strictHostkeyChecking = false;
+
+    /**
+     * Preferred authentications.
+     */
+    @IgorParam(optional = true)
+    private String preferredAuthentications = "publickey,keyboard-interactive,password";
+
+    /**
+     * Connection timeout.
+     */
+    @IgorParam(optional = true)
+    private int timeout = 30000;
+
+    /**
      * Initializes the SSH session.
      *
      * @return A new SSH session.
@@ -22,10 +41,9 @@ public abstract class BaseSshFileService extends BaseFileService {
             JSch jsch = new JSch();
             Session session = jsch.getSession(username, host, port);
             session.setPassword(password);
-            // TODO: Make these IgorParams.
-            session.setConfig("StrictHostKeyChecking", "no");
-            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
-            session.connect(30000);
+            session.setConfig("StrictHostKeyChecking", strictHostkeyChecking ? "yes" : "no");
+            session.setConfig("PreferredAuthentications", preferredAuthentications);
+            session.connect(timeout);
             return session;
         } catch (JSchException e) {
             throw new ServiceException("Could not connect to server " + host + ":" + port, e);

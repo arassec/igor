@@ -49,6 +49,7 @@ public abstract class BaseFileService extends BaseService implements FileService
                 if (fileSize == 0L) {
                     break;
                 }
+                out.flush();
             }
             out.flush();
         } catch (IOException e) {

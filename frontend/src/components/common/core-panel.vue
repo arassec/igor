@@ -1,5 +1,5 @@
 <template>
-  <div class="panel">
+  <div class="panel" v-on:click="$emit('clicked')">
     <slot/>
   </div>
 </template>

@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -152,6 +153,8 @@ public class FtpFileService extends BaseFileService {
         try {
             FTPClient ftpClient = connect();
             List<String> result = Arrays.asList(ftpClient.listNames(directory));
+            // TODO: Make this a parameter!
+            Collections.sort(result);
             disconnect(ftpClient);
             return result;
         } catch (IOException e) {

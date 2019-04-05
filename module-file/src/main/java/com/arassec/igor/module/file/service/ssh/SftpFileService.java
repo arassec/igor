@@ -3,17 +3,14 @@ package com.arassec.igor.module.file.service.ssh;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.service.ServiceException;
-import com.arassec.igor.module.file.service.FileStreamData;
 import com.arassec.igor.module.file.service.FileService;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
+import com.arassec.igor.module.file.service.FileStreamData;
+import com.jcraft.jsch.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -21,6 +18,7 @@ import java.util.stream.Collectors;
 /**
  * {@link FileService} for SFTP file handling.
  */
+@Slf4j
 @IgorService(label = "SFTP")
 public class SftpFileService extends BaseSshFileService {
 
@@ -142,8 +140,33 @@ public class SftpFileService extends BaseSshFileService {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
-            OutputStream outputStream = channel.put(file);
-            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize());
+            channel.put(fileStreamData.getData(), file, new SftpProgressMonitor() {
+                private long max = 0;
+                private long count = 0;
+                private long percent = 0;
+
+                @Override
+                public void init(int op, String src, String dest, long max) {
+                    this.max = max;
+                    log.debug("Starting SFTP upload!");
+                }
+
+                @Override
+                public boolean count(long count) {
+                    this.count += count;
+                    long percentNow = this.count*100/max;
+                    if(percentNow>this.percent){
+                        this.percent = percentNow;
+                        log.debug("SFTP upload progress: {} ({}/{})", this.percent, max, this.count);
+                    }
+                    return true;
+                }
+
+                @Override
+                public void end() {
+                    log.debug("SFTP upload finished!");
+                }
+            });
             channel.disconnect();
             session.disconnect();
         } catch (SftpException | JSchException e) {

@@ -1,5 +1,5 @@
 <template>
-    <core-panel>
+    <core-panel :class="'small-panel'">
 
         <button-row>
             <list-name slot="left">
@@ -70,5 +70,9 @@
 </script>
 
 <style scoped>
+
+    .small-panel {
+        padding: 5px 15px 5px 15px;
+    }
 
 </style>

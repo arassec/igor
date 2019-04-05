@@ -1,7 +1,10 @@
 - Unit-Tests (Apache Mina SSHD!)
+- Snackbar with long service/job names should shorten them
+- new property for tasks: active=true/false
 - ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
   - With this: support enums in parameter editor
-- HTTP-GET provider (with follow redirects!)
+- "Fixed Strings" provider with list of Strings
+- HTTP-File-Service provider (with follow redirects!)
 - Warning when leaving an editor and unsaved changes exist
 - SSH access with key
 - Local SSL-Keystore that can be modified via GUI

@@ -1,5 +1,5 @@
 <template>
-    <core-panel>
+    <core-panel :class="'small-panel'" v-on:click="editJob(id)">
 
         <button-row>
             <list-name slot="left">
@@ -74,5 +74,9 @@
 </script>
 
 <style scoped>
+
+    .small-panel {
+        padding: 5px 15px 5px 15px;
+    }
 
 </style>
