@@ -46,6 +46,7 @@ public class JsonTaskConverter {
         taskJson.put(JsonKeys.ID, task.getId());
         taskJson.put(JsonKeys.NAME, task.getName());
         taskJson.put(JsonKeys.DESCRIPTION, task.getDescription());
+        taskJson.put(JsonKeys.ACTIVE, task.isActive());
         taskJson.put(JsonKeys.PROVIDER, jsonProviderConverter.convert(task.getProvider(), applySecurity, addVolatile));
         JSONArray actionJsons = new JSONArray();
         task.getActions().stream().map(action -> jsonActionConverter.convert(action, applySecurity, addVolatile))
@@ -69,6 +70,7 @@ public class JsonTaskConverter {
         Task result = new Task(id);
         result.setName(taskJson.getString(JsonKeys.NAME));
         result.setDescription(taskJson.optString(JsonKeys.DESCRIPTION));
+        result.setActive(taskJson.optBoolean(JsonKeys.ACTIVE, true));
         result.setProvider(jsonProviderConverter.convert(taskJson.getJSONObject(JsonKeys.PROVIDER), applySecurity));
         JSONArray actionJsons = taskJson.optJSONArray(JsonKeys.ACTIONS);
         for (int i = 0; i < actionJsons.length(); i++) {

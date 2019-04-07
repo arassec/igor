@@ -27,7 +27,8 @@
   import CorePanel from '../common/core-panel'
   import ButtonRow from '../common/button-row'
   import ListName from '../common/list-name'
-  import DeleteServiceDialog from "./delete-service-dialog";
+  import DeleteServiceDialog from './delete-service-dialog'
+  import FormatUtils from '../../utils/format-utils.js'
 
   export default {
     name: 'service-list-entry',
@@ -46,10 +47,10 @@
         this.showDeleteDialog = false
         let component = this
         this.$http.delete('/api/service/' + id + '?deleteAffectedJobs=' + deleteAffectedJobs).then(function () {
-          component.$root.$data.store.setFeedback('Service \'' + component.name + '\' has been deleted.', false)
+          component.$root.$data.store.setFeedback('Service \'' + FormatUtils.formatNameForSnackbar(component.name) + '\' has been deleted.', false)
           component.$emit('actionPerformed')
         }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Service \'' + component.name + '\' could not be deleted (' + error + ')', true)
+          component.$root.$data.store.setFeedback('Service \'' + FormatUtils.formatNameForSnackbar(component.name) + '\' could not be deleted (' + error + ')', true)
           component.$emit('actionPerformed')
         })
       },
@@ -62,7 +63,7 @@
           component.$root.$data.store.setServiceData(serviceConfiguration)
           component.$router.push({name: 'service-editor'})
         }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Service \'' + component.name + '\' could not be cloned (' + error + ')', true)
+          component.$root.$data.store.setFeedback('Service \'' + FormatUtils.formatNameForSnackbar(component.name) + '\' could not be cloned (' + error + ')', true)
         })
       }
     }

@@ -8,6 +8,14 @@
 
             <table>
                 <tr>
+                    <td><label>Active</label></td>
+                    <td>
+                        <font-awesome-icon :icon="task.active ? 'check-square' : 'square'"
+                                           v-on:click="task.active = !task.active"/>
+                    </td>
+                    <td/>
+                </tr>
+                <tr>
                     <td><label>Name</label></td>
                     <td>
                         <input type="text" autocomplete="off" v-model="task.name"/>
@@ -25,7 +33,6 @@
                     </td>
                     <td/>
                 </tr>
-
             </table>
         </core-panel>
 

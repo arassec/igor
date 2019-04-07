@@ -49,6 +49,11 @@ public class Task {
     private String description;
 
     /**
+     * Enables or disables the complete task.
+     */
+    private boolean active;
+
+    /**
      * The data provider for the task.
      */
     private Provider provider;

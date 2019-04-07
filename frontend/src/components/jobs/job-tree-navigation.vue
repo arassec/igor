@@ -3,7 +3,7 @@
         <ul>
             <li>
                         <span class="item"
-                              v-bind:class="{ 'selected': selectedTaskIndex == -1 && selectedActionIndex == -1, 'validation-error': hasValidationErrors(-1, -1) }"
+                              v-bind:class="getJobStyleClass()"
                               v-on:click="$emit('job-is-selected')">
                             <font-awesome-icon icon="toolbox"/>
                             <span>
@@ -14,7 +14,7 @@
                     <li v-for="(task, taskIndex) in jobConfiguration.tasks"
                         v-bind:key="taskIndex">
                                 <span class="item"
-                                      v-bind:class="{ 'selected': isTaskSelected(taskIndex), 'validation-error': hasValidationErrors(taskIndex, -1)}"
+                                      v-bind:class="getTaskStyleClass(taskIndex, task)"
                                       v-on:click="$emit('task-is-selected', taskIndex)">
                                     <font-awesome-icon icon="tasks"/>
                                     <span>
@@ -33,7 +33,7 @@
                             <li v-for="(action, actionIndex) in task.actions"
                                 v-bind:key="actionIndex">
                                         <span class="item"
-                                              v-bind:class="getActionStyleClass(taskIndex, actionIndex, action)"
+                                              v-bind:class="getActionStyleClass(taskIndex, actionIndex, task, action)"
                                               v-on:click="$emit('action-is-selected', taskIndex, actionIndex)">
                                             <font-awesome-icon icon="wrench"/>
                                             <span>
@@ -50,7 +50,7 @@
                                         </span>
                             </li>
                             <li>
-                                        <span class="item" v-on:click="$emit('add-action', taskIndex)">
+                                        <span class="item" :class="getAddActionStyleClass(task)" v-on:click="$emit('add-action', taskIndex)">
                                             <font-awesome-icon :icon="['fas', 'plus-circle']" class="font-18"/>
                                             <span>
                                                 Add Action
@@ -60,7 +60,7 @@
                         </ul>
                     </li>
                     <li>
-                                <span class="item" v-on:click="$emit('add-task')">
+                                <span class="item" :class="getAddTaskStyleClass()" v-on:click="$emit('add-task')">
                                     <font-awesome-icon :icon="['fas', 'plus-circle']"/>
                                     <span>
                                         Add Task
@@ -75,54 +75,83 @@
 
 <script>
 
-export default {
-  name: 'job-tree-navigation',
-  props: ['jobConfiguration', 'validationErrors', 'selectedTaskIndex', 'selectedActionIndex'],
-  methods: {
-    isTaskSelected: function (index) {
-      return (index == this.selectedTaskIndex && this.selectedActionIndex == -1)
-    },
-    getActionStyleClass: function (taskIndex, actionIndex, action) {
-      if (this.validationErrors.indexOf(taskIndex + '_' + actionIndex) > -1) {
-        return 'validation-error'
-      }
-      if (taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex) {
-        return "selected"
-      }
-      if (action.parameters) {
-        for (let i in action.parameters) {
-          console.log("PARAM: " + JSON.stringify(action.parameters[i]))
-          if (action.parameters[i].name === 'active' && action.parameters[i].value === false) {
-            return 'inactive'
+  export default {
+    name: 'job-tree-navigation',
+    props: ['jobConfiguration', 'validationErrors', 'selectedTaskIndex', 'selectedActionIndex'],
+    methods: {
+      isTaskSelected: function (index) {
+        return (index == this.selectedTaskIndex && this.selectedActionIndex == -1)
+      },
+      getJobStyleClass: function () {
+        if (this.hasValidationErrors(-1, -1)) {
+          return 'validation-error'
+        }
+        if (this.selectedTaskIndex == -1 && this.selectedActionIndex == -1) {
+          return 'selected'
+        }
+        if (!this.jobConfiguration.active) {
+          return 'inactive'
+        }
+        return ''
+      },
+      getTaskStyleClass: function (taskIndex, task) {
+        if (this.hasValidationErrors(taskIndex, -1)) {
+          return 'validation-error'
+        }
+        if (this.selectedTaskIndex == taskIndex && this.selectedActionIndex == -1) {
+          return 'selected'
+        }
+        if (!this.jobConfiguration.active || !task.active) {
+          return 'inactive'
+        }
+        return ''
+      },
+      getActionStyleClass: function (taskIndex, actionIndex, task, action) {
+        if (this.validationErrors.indexOf(taskIndex + '_' + actionIndex) > -1) {
+          return 'validation-error'
+        }
+        if (taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex) {
+          return 'selected'
+        }
+        if (!this.jobConfiguration.active || !task.active) {
+          return 'inactive'
+        }
+        if (action.parameters) {
+          for (let i in action.parameters) {
+            if (action.parameters[i].name === 'active' && action.parameters[i].value === false) {
+              return 'inactive'
+            }
           }
         }
-      }
-      return ''
-    },
-    isActionSelected: function (taskIndex, actionIndex) {
-      return taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex
-    },
-    hasValidationErrors: function (taskIndex, actionIndex) {
-      return (this.validationErrors.indexOf(taskIndex + '_' + actionIndex) > -1)
-    },
-    isInactive: function (action) {
-      if (action.parameters) {
-        for (let parameter in action.parameters) {
-          if (parameter.name === 'active' && parameter.value === true) {
-            return true
-          }
+        return ''
+      },
+      getAddTaskStyleClass: function () {
+        if (!this.jobConfiguration.active) {
+          return 'inactive'
         }
+      },
+      getAddActionStyleClass: function (task) {
+        if (!this.jobConfiguration.active) {
+          return 'inactive'
+        }
+        if (!task.active) {
+          return 'inactive'
+        }
+      },
+      isActionSelected: function (taskIndex, actionIndex) {
+        return taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex
+      },
+      hasValidationErrors: function (taskIndex, actionIndex) {
+        return (this.validationErrors.indexOf(taskIndex + '_' + actionIndex) > -1)
+      },
+      formatName: function (name) {
+        if (name.length > 30) {
+          return name.substring(0, 30) + '...'
+        }
+        return name
       }
-      return false
-    },
-    formatName: function (name) {
-      if (name.length > 30) {
-        return name.substring(0, 30) + '...'
-      }
-      return name
     }
   }
-}
 </script>
 
 <style scoped>

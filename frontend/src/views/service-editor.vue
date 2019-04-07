@@ -78,6 +78,7 @@
   import ButtonRow from '../components/common/button-row'
   import ValidationError from '../components/common/validation-error'
   import SideMenu from '../components/common/side-menu'
+  import FormatUtils from '../utils/format-utils.js'
 
   export default {
     name: 'service-editor',
@@ -199,7 +200,7 @@
         if (this.newService) {
           this.$http.post('/api/service', this.serviceConfiguration).then(function (response) {
             component.serviceConfiguration = response.data;
-            component.$root.$data.store.setFeedback('Service \'' + component.serviceConfiguration.name + '\' saved.', false)
+            component.$root.$data.store.setFeedback('Service \'' + FormatUtils.formatNameForSnackbar(component.serviceConfiguration.name) + '\' saved.', false)
             component.$root.$data.store.clearWip()
             component.newService = false
             component.$router.push({name: 'service-editor', params: {serviceId: component.serviceConfiguration.id}})
@@ -220,7 +221,7 @@
           })
         } else {
           this.$http.put('/api/service', this.serviceConfiguration).then(function () {
-            component.$root.$data.store.setFeedback('Service \'' + component.serviceConfiguration.name + '\' updated.', false)
+            component.$root.$data.store.setFeedback('Service \'' + FormatUtils.formatNameForSnackbar(component.serviceConfiguration.name) + '\' updated.', false)
             component.$root.$data.store.clearWip()
           }).catch(function (error) {
             if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {

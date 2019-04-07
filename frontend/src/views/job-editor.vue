@@ -118,6 +118,7 @@
   import SideMenu from '../components/common/side-menu'
   import FeedbackBox from '../components/common/feedback-box'
   import JobExecutionDetails from '../components/jobs/job-execution-details'
+  import FormatUtils from '../utils/format-utils.js'
 
   export default {
     name: 'job-editor',
@@ -227,7 +228,7 @@
           this.$http.post('/api/job', this.jobConfiguration).then(function (response) {
             component.jobConfiguration = response.data
             component.newJob = false
-            component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' saved.', false)
+            component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' saved.', false)
             component.$root.$data.store.clearWip()
             component.$router.push({name: 'job-editor', params: {jobId: component.jobConfiguration.id}})
             component.jobExecutionsRefreshTimer = setInterval(() => component.updateJobExecutions(), 1000)
@@ -242,7 +243,7 @@
         } else {
           this.$http.put('/api/job', this.jobConfiguration).then(function (response) {
             component.jobConfiguration = response.data
-            component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' updated.', false)
+            component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' updated.', false)
             component.$root.$data.store.clearWip()
           }).catch(function (error) {
             if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
@@ -302,6 +303,7 @@
         let task = {
           name: 'Task',
           description: '',
+          active: true,
           provider: {
             category: this.initialProviderCategory,
             type: this.initialProviderType,
@@ -454,10 +456,10 @@
 
         this.$http.post('/api/job/run', this.jobConfiguration).then(function (response) {
           component.jobConfiguration = response.data
-          component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' started manually.', false)
+          component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' started manually.', false)
           component.updateJobExecutions()
         }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' startup failed ('
+          component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' startup failed ('
               + error + ').', true)
         })
       },
@@ -477,10 +479,10 @@
       cancelJob: function () {
         let component = this
         this.$http.post('/api/job/' + this.jobConfiguration.id + '/cancel', this.jobConfiguration).then(function () {
-          component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' cancelled.', false)
+          component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' cancelled.', false)
           component.updateJobExecutions()
         }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Job \'' + component.jobConfiguration.name + '\' cancellation failed ('
+          component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' cancellation failed ('
               + error + ').', true)
         })
       },

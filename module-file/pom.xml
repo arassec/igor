@@ -35,6 +35,12 @@
             <artifactId>jsch</artifactId>
         </dependency>
 
+        <!-- HTTP/HTTPS -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

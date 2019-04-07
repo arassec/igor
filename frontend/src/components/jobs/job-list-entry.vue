@@ -27,8 +27,9 @@
   import InputButton from '../common/input-button'
   import ListName from '../common/list-name'
   import ButtonRow from '../common/button-row'
-  import CorePanel from "../common/core-panel";
-  import DeleteJobDialog from "./delete-job-dialog";
+  import CorePanel from '../common/core-panel'
+  import DeleteJobDialog from './delete-job-dialog'
+  import FormatUtils from '../../utils/format-utils'
 
   export default {
     name: 'job-list-entry',
@@ -47,10 +48,10 @@
         this.showDeleteDialog = false
         let component = this
         this.$http.delete('/api/job/' + jobId + '?deleteExclusiveServices=' + deleteExclusiveServices).then(function () {
-          component.$root.$data.store.setFeedback('Job \'' + component.name + '\' has been deleted.', false)
+          component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.name) + '\' has been deleted.', false)
           component.$emit('job-deleted')
         }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Job \'' + component.name + '\' could not be deleted (' + error + ')', true)
+          component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.name) + '\' could not be deleted (' + error + ')', true)
           component.$emit('job-deleted')
         })
       },
@@ -66,7 +67,7 @@
           component.$root.$data.store.setJobData(jobConfiguration, '-1_-1', -1, '')
           component.$router.push({name: 'job-editor'})
         }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Service \'' + component.name + '\' could not be cloned (' + error + ')', true)
+          component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.name) + '\' could not be cloned (' + error + ')', true)
         })
       }
     }

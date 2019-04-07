@@ -78,7 +78,9 @@ public class Job {
                 if (!currentJobExecution.isRunning()) {
                     break;
                 }
-                task.run(id, currentJobExecution);
+                if (task.isActive()) {
+                    task.run(id, currentJobExecution);
+                }
             }
             if (currentJobExecution.isRunning()) {
                 currentJobExecution.setExecutionState(JobExecutionState.FINISHED);

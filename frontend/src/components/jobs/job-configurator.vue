@@ -7,6 +7,14 @@
             </h1>
             <table>
                 <tr>
+                    <td><label>Active</label></td>
+                    <td>
+                        <font-awesome-icon :icon="jobConfiguration.active ? 'check-square' : 'square'"
+                                           v-on:click="jobConfiguration.active = !jobConfiguration.active"/>
+                    </td>
+                    <td/>
+                </tr>
+                <tr>
                     <td><label>Name</label></td>
                     <td>
                         <input type="text" autocomplete="off" v-model="jobConfiguration.name"/>
@@ -30,14 +38,6 @@
                     <td>
                         <input id="numexechistory-input" type="text" autocomplete="off"
                                v-model.number="jobConfiguration.executionHistoryLimit"/>
-                    </td>
-                    <td/>
-                </tr>
-                <tr>
-                    <td><label>Active</label></td>
-                    <td>
-                        <font-awesome-icon :icon="jobConfiguration.active ? 'check-square' : 'square'"
-                                           v-on:click="jobConfiguration.active = !jobConfiguration.active"/>
                     </td>
                     <td/>
                 </tr>
