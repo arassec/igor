@@ -98,6 +98,7 @@ public class ScpFileService extends BaseSshFileService {
             // exec 'scp -f rfile' remotely
             String command = "scp -f " + file;
             Session session = connect(host, port, username, password);
+
             ChannelExec channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
 
@@ -148,14 +149,16 @@ public class ScpFileService extends BaseSshFileService {
             sshOutputStream.write(buf, 0, 1);
             sshOutputStream.flush();
 
-            result.setData(sshInputStream);
+            SshInputStreamWrapper sshInputStreamWrapper = new SshInputStreamWrapper(sshInputStream, fileSize);
+
+            result.setData(sshInputStreamWrapper);
             result.setFileSize(fileSize);
 
             SshConnectionData sshConnectionData = new SshConnectionData();
             sshConnectionData.setSession(session);
             sshConnectionData.setChannel(channel);
             sshConnectionData.setSshOutputStream(sshOutputStream);
-            sshConnectionData.setSshInputStream(sshInputStream);
+            sshConnectionData.setSshInputStream(sshInputStreamWrapper);
             result.setSourceConnectionData(sshConnectionData);
 
             return result;

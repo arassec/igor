@@ -140,33 +140,7 @@ public class SftpFileService extends BaseSshFileService {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
-            channel.put(fileStreamData.getData(), file, new SftpProgressMonitor() {
-                private long max = 0;
-                private long count = 0;
-                private long percent = 0;
-
-                @Override
-                public void init(int op, String src, String dest, long max) {
-                    this.max = max;
-                    log.debug("Starting SFTP upload!");
-                }
-
-                @Override
-                public boolean count(long count) {
-                    this.count += count;
-                    long percentNow = this.count*100/max;
-                    if(percentNow>this.percent){
-                        this.percent = percentNow;
-                        log.debug("SFTP upload progress: {} ({}/{})", this.percent, max, this.count);
-                    }
-                    return true;
-                }
-
-                @Override
-                public void end() {
-                    log.debug("SFTP upload finished!");
-                }
-            });
+            channel.put(fileStreamData.getData(), file, new IgorSftpProgressMonitor(fileStreamData.getFileSize()), ChannelSftp.OVERWRITE);
             channel.disconnect();
             session.disconnect();
         } catch (SftpException | JSchException e) {
@@ -235,14 +209,10 @@ public class SftpFileService extends BaseSshFileService {
     /**
      * Moves the source file into the target file.
      *
-     * @param source
-     *         The source file to move.
-     * @param target
-     *         The target file name.
-     * @throws JSchException
-     *         In case of SSH protocol errors.
-     * @throws SftpException
-     *         In case of SFTP errors.
+     * @param source The source file to move.
+     * @param target The target file name.
+     * @throws JSchException In case of SSH protocol errors.
+     * @throws SftpException In case of SFTP errors.
      */
     private void moveInternal(String source, String target) throws JSchException, SftpException {
         Session session = connect(host, port, username, password);
