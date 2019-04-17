@@ -23,6 +23,12 @@ public abstract class BaseAction implements Action {
     public static final String DRY_RUN_COMMENT_KEY = "dryRunComment";
 
     /**
+     * Activates or deactivates an action.
+     */
+    @IgorParam
+    protected boolean active = true;
+
+    /**
      * Key into the {@link IgorData} that identifies the property to process.
      */
     @IgorParam
@@ -33,12 +39,6 @@ public abstract class BaseAction implements Action {
      */
     @IgorParam
     protected int numThreads = DEFAULT_THREADS;
-
-    /**
-     * Activates or deactivates an action.
-     */
-    @IgorParam
-    protected boolean active = true;
 
     /**
      * Contains the provided data keys.

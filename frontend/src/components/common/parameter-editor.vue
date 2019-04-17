@@ -176,7 +176,7 @@ export default {
       this.showCronPicker = false
     },
     isAdvancedParameter: function (parameter) {
-      if (parameter.name === 'dataKey' || parameter.name === 'numThreads' || parameter.name === 'directoryKey' || parameter.name === 'active') {
+      if (parameter.name === 'dataKey' || parameter.name === 'numThreads' || parameter.name === 'directoryKey') {
           return true
       }
       return parameter.optional

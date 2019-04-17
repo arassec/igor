@@ -25,6 +25,7 @@
                                  v-on:task-is-selected="selectTask"
                                  v-on:action-is-selected="selectAction"
                                  v-on:add-task="addTask"
+                                 v-on:duplicate-task="duplicateTask"
                                  v-on:delete-task="showDeleteTask"
                                  v-on:add-action="addAction"
                                  v-on:delete-action="showDeleteAction"
@@ -207,7 +208,6 @@
         let component = this
         this.$http.get('/api/job/' + id).then(function (response) {
           component.jobConfiguration = response.data
-          console.log(JSON.stringify(component.jobConfiguration))
           component.updateJobExecutions()
         }).catch(function (error) {
           component.$root.$data.store.setFeedback('Loading failed! (' + error + ')', true)
@@ -312,6 +312,12 @@
           actions: []
         }
         this.jobConfiguration.tasks.push(task)
+        this.selectTask(this.jobConfiguration.tasks.length - 1)
+      },
+      duplicateTask: function (taskIndex) {
+        let copiedTask = JSON.parse(JSON.stringify(this.jobConfiguration.tasks[taskIndex]))
+        delete copiedTask.id
+        this.jobConfiguration.tasks.push(copiedTask)
         this.selectTask(this.jobConfiguration.tasks.length - 1)
       },
       showDeleteTask: function (taskIndex) {

@@ -61,8 +61,8 @@
           let jobConfiguration = result.data
           jobConfiguration.name = 'Copy of ' + jobConfiguration.name
           delete jobConfiguration.id
-          for (let task in jobConfiguration.tasks) {
-            delete task.id
+          for (let i = 0; i < jobConfiguration.tasks.length; i++) {
+            delete jobConfiguration.tasks[i].id
           }
           component.$root.$data.store.setJobData(jobConfiguration, '-1_-1', -1, '')
           component.$router.push({name: 'job-editor'})

@@ -26,8 +26,10 @@
                                     <font-awesome-icon icon="arrow-down" class="button-margin-left fa-xs"
                                                        v-if="taskIndex < jobConfiguration.tasks.length -1"
                                                        v-on:click.stop="$emit('move-task-down', taskIndex)"/>
+                                    <font-awesome-icon icon="clone" class="button-margin-left fa-xs"
+                                                       v-on:click.stop="$emit('duplicate-task', taskIndex)"/>
                                     <font-awesome-icon icon="trash-alt" class="button-margin-left fa-xs"
-                                                       v-on:click="$emit('delete-task', taskIndex)"/>
+                                                       v-on:click.stop="$emit('delete-task', taskIndex)"/>
                                 </span>
                         <ul>
                             <li v-for="(action, actionIndex) in task.actions"
@@ -46,7 +48,7 @@
                                                                v-if="actionIndex < jobConfiguration.tasks[taskIndex].actions.length - 1"
                                                                v-on:click.stop="$emit('move-action-down', taskIndex, actionIndex)"/>
                                             <font-awesome-icon icon="trash-alt" class="button-margin-left fa-xs"
-                                                               v-on:click="$emit('delete-action', taskIndex, actionIndex)"/>
+                                                               v-on:click.stop="$emit('delete-action', taskIndex, actionIndex)"/>
                                         </span>
                             </li>
                             <li>
