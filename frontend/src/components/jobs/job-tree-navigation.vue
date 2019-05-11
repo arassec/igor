@@ -186,10 +186,6 @@
         background-color: var(--alert-background-color) !important;
     }
 
-    .inactive {
-        opacity: 0.5;
-    }
-
     .item-icon {
         display: inline-block;
         border-radius: 50%;

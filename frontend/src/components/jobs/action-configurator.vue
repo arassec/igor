@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="sticky">
         <core-panel>
             <h1>
                 <font-awesome-icon icon="wrench"/>
@@ -10,8 +10,9 @@
                 <tr>
                     <td><label>Category</label></td>
                     <td>
-                        <select v-model="action.category" v-on:change="loadTypes(action.category.key)">
-                            <option v-for="category in categories" v-bind:value="category"
+                        <select v-model="action.category" v-on:change="loadTypesOfCategory(action.category.key, true).then(() => {
+                                        loadParametersOfType(action.type.key)})">
+                            <option v-for="category in actionCategories" v-bind:value="category"
                                     v-bind:key="category.key">
                                 {{category.label}}
                             </option>
@@ -21,8 +22,8 @@
                 <tr>
                     <td>Type</td>
                     <td>
-                        <select v-model="action.type" v-on:change="loadTypeParameters(action.type.key)">
-                            <option v-for="type in types" v-bind:value="type"
+                        <select v-model="action.type" v-on:change="loadParametersOfType(action.type.key)">
+                            <option v-for="type in actionTypes" v-bind:value="type"
                                     v-bind:key="type.key">
                                 {{type.label}}
                             </option>
@@ -43,6 +44,7 @@
 <script>
 import CorePanel from '../common/core-panel'
 import ParameterEditor from '../common/parameter-editor'
+import IgorBackend from '../../utils/igor-backend.js'
 
 export default {
   name: 'action-configurator',
@@ -50,56 +52,39 @@ export default {
   props: ['action', 'actionKey'],
   data: function () {
     return {
-      categories: [],
-      types: [],
-      initializeTypeParameters: true
+      actionCategories: [],
+      actionTypes: []
     }
   },
   methods: {
-    loadCategories: function () {
-      let component = this
-      this.$http.get('/api/category/action').then(function (response) {
-        for (let i = component.categories.length; i > 0; i--) {
-          component.categories.pop()
+    loadCategories: async function () {
+      await IgorBackend.getData('/api/category/action').then((categories) => {
+        for (let i = this.actionCategories.length; i > 0; i--) {
+          this.actionCategories.pop()
         }
-        Array.from(response.data).forEach(function (item) {
-          component.categories.push(item)
+        let component = this
+        Array.from(categories).forEach(function (item) {
+          component.actionCategories.push(item)
         })
-        component.loadTypes(component.action.category.key)
-      }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
       })
     },
-    loadTypes: function (categoryType) {
-      let component = this
-      this.$http.get('/api/type/action/' + categoryType).then(function (response) {
-        for (let i = component.types.length; i > 0; i--) {
-          component.types.pop()
+    loadTypesOfCategory: async function (categoryKey, selectFirst) {
+      await IgorBackend.getData('/api/type/action/' + categoryKey).then((types) => {
+        for (let i = this.actionTypes.length; i > 0; i--) {
+          this.actionTypes.pop()
         }
-        Array.from(response.data).forEach(function (item) {
-          component.types.push(item)
+        let component = this
+        Array.from(types).forEach(function (item) {
+          component.actionTypes.push(item)
         })
-        // Skip the parameter loading if they already exist in the model:
-        if (component.initializeTypeParameters) {
-          component.loadTypeParameters(component.action.type.key)
-        } else {
-          // After the first skip, always load parameters:
-          component.initializeTypeParameters = true
+        if (selectFirst) {
+          this.action.type = this.actionTypes[0]
         }
-      }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
       })
     },
-    loadTypeParameters: function (type) {
-      let component = this
-      component.initializeTypeParameters = true
-      this.$http.get('/api/parameters/action/' + type).then(function (response) {
-        component.action.parameters = response.data
-      }).catch(function (error) {
-        component.feedback = error
-        component.feedbackOk = false
+    loadParametersOfType: function (typeKey) {
+      IgorBackend.getData('/api/parameters/action/' + typeKey).then((parameters) => {
+        this.action.parameters = parameters
       })
     },
     validateInput: function () {
@@ -115,17 +100,21 @@ export default {
   },
   watch: {
     action: function() {
-      // When an action is moved in the tree-navigation, the model changes for the component!
-      this.initializeTypeParameters = false
-      this.loadCategories()
+      // When an action is moved in the tree-navigation, the vue-model changes for the component!
+      this.loadCategories().then(() => {
+        this.loadTypesOfCategory(this.action.category.key, false)
+      })
     }
   },
   mounted: function () {
-    // Don't load type parameters as they are already provided within the component's model:
-    if (Array.isArray(this.action.parameters) && this.action.parameters.length) {
-      this.initializeTypeParameters = false
-    }
-    this.loadCategories()
+    this.loadCategories().then(() => {
+      this.loadTypesOfCategory(this.action.category.key, false).then(() => {
+        // Don't load type parameters as they are already provided within the component's model:
+        if (!(Array.isArray(this.action.parameters) && this.action.parameters.length)) {
+          this.loadParametersOfType(this.action.type.key)
+        }
+      })
+    })
   }
 }
 </script>

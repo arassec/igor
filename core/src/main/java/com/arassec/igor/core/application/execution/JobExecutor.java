@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -37,6 +38,7 @@ public class JobExecutor {
     /**
      * Maximum number of jobs executed in parallel.s
      */
+    @Getter
     private int jobQueueSize = 5;
 
     /**
@@ -92,7 +94,7 @@ public class JobExecutor {
 
         // At this point we run the next jobs if necessary:
         int freeSlots = jobQueueSize - runningJobs.size();
-        List<JobExecution> waitingJobExecutions = jobExecutionRepository.findWaiting();
+        List<JobExecution> waitingJobExecutions = jobExecutionRepository.findInState(JobExecutionState.WAITING);
         for (int i = 0; i < waitingJobExecutions.size(); i++) {
             JobExecution jobExecution = waitingJobExecutions.get(i);
             if (!runningJobs.containsKey(jobExecution.getJobId())) {
@@ -122,7 +124,16 @@ public class JobExecutor {
             throw new IllegalStateException("Cannot cancel a job without a job ID!");
         }
         if (runningJobs.containsKey(jobId)) {
-            runningJobs.get(jobId).cancel();
+            Job job = runningJobs.get(jobId);
+            job.cancel();
+            while (job.isRunning()) {
+                log.trace("Job {} is still running: {}", job.getId(), job.getName());
+                try {
+                    Thread.sleep(100L);
+                } catch (InterruptedException e) {
+                    // Not important, just waiting for the job to finish in an endless loop...
+                }
+            }
         }
     }
 

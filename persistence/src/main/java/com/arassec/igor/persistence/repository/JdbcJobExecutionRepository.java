@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -44,8 +45,13 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     public JobExecution upsert(JobExecution jobExecution) {
         JobExecutionEntity entity;
         if (jobExecution.getId() != null) {
-            entity = jobExecutionDao.findById(jobExecution.getId()).orElseThrow(
-                    () -> new IllegalStateException("No job-execution with ID " + jobExecution.getId() + " available!"));
+            Optional<JobExecutionEntity> jobExecutionEntityOptional = jobExecutionDao.findById(jobExecution.getId());
+            if (jobExecutionEntityOptional.isPresent()) {
+                entity = jobExecutionEntityOptional.get();
+            } else {
+                // This can happen if a job is deleted while running.
+                return null;
+            }
         } else {
             entity = new JobExecutionEntity();
             entity.setJobId(jobExecution.getJobId());
@@ -59,6 +65,18 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
         JobExecutionEntity persistedEntity = jobExecutionDao.save(entity);
         jobExecution.setId(persistedEntity.getId());
         return jobExecution;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobExecution findById(Long id) {
+        JobExecutionEntity jobExecutionEntity = jobExecutionDao.findById(id).orElse(null);
+        if (jobExecutionEntity != null) {
+            return convert(jobExecutionEntity);
+        }
+        return null;
     }
 
     /**
@@ -89,23 +107,8 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      * {@inheritDoc}
      */
     @Override
-    public JobExecution findRunningOfJob(Long jobId) {
-        List<JobExecutionEntity> jobExecutionEntities = jobExecutionDao.findByJobIdAndStateOrderByIdDesc(jobId, JobExecutionState.RUNNING.name());
-        if (jobExecutionEntities != null) {
-            if (jobExecutionEntities.size() > 1) {
-                throw new IllegalStateException("Multiple job-executions persisted for job: " + jobId);
-            }
-            return convert(jobExecutionEntities.get(0));
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<JobExecution> findWaiting() {
-        List<JobExecutionEntity> waitingJobExecutions = jobExecutionDao.findByStateOrderByIdAsc(JobExecutionState.WAITING.name());
+    public List<JobExecution> findInState(JobExecutionState state) {
+        List<JobExecutionEntity> waitingJobExecutions = jobExecutionDao.findByStateOrderByIdAsc(state.name());
         if (waitingJobExecutions != null) {
             return waitingJobExecutions.stream().map(
                     jobExecutionEntity -> convert(jobExecutionEntity)).collect(Collectors.toList());

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="sticky" v-if="jobConfiguration">
         <core-panel>
             <h1>
                 <font-awesome-icon icon="toolbox"/>
@@ -51,7 +51,7 @@
                     <td><label>Category</label></td>
                     <td>
                         <select v-model="jobConfiguration.trigger.category"
-                                v-on:change="loadTypes(jobConfiguration.trigger.category.key, false)">
+                                v-on:change="loadTypesOfCategory(jobConfiguration.trigger.category.key)">
                             <option v-for="triggerCategory in triggerCategories" v-bind:value="triggerCategory"
                                     v-bind:key="triggerCategory.key">
                                 {{triggerCategory.label}}
@@ -63,7 +63,7 @@
                     <td><label>Type</label></td>
                     <td>
                         <select v-model="jobConfiguration.trigger.type"
-                                v-on:change="loadTypeParameters(jobConfiguration.trigger.type.key, false)">
+                                v-on:change="loadParametersOfType(jobConfiguration.trigger.type.key)">
                             <option v-for="triggerType in triggerTypes" v-bind:value="triggerType"
                                     v-bind:key="triggerType.key">
                                 {{triggerType.label}}
@@ -87,6 +87,7 @@
   import CorePanel from '../common/core-panel'
   import ValidationError from '../common/validation-error'
   import ParameterEditor from "../common/parameter-editor";
+  import IgorBackend from '../../utils/igor-backend.js'
 
   export default {
     name: 'job-configurator',
@@ -100,50 +101,37 @@
       }
     },
     methods: {
-      loadCategories: function (firstLoad) {
-        let component = this
-        this.$http.get('/api/category/trigger').then(function (response) {
-          for (let i = component.triggerCategories.length; i > 0; i--) {
-            component.triggerCategories.pop()
+      loadCategories: async function () {
+        await IgorBackend.getData('/api/category/trigger').then((categories) => {
+          for (let i = this.triggerCategories.length; i > 0; i--) {
+            this.triggerCategories.pop()
           }
-          Array.from(response.data).forEach(function (item) {
+          let component = this
+          Array.from(categories).forEach(function (item) {
             component.triggerCategories.push(item)
           })
-          if (component.jobConfiguration.trigger.category === null) {
-            component.jobConfiguration.trigger.category = component.triggerCategories[0]
+          if (this.jobConfiguration.trigger.category == null) {
+            this.jobConfiguration.trigger.category = this.triggerCategories[0]
           }
-          component.loadTypes(component.jobConfiguration.trigger.category.key, firstLoad)
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Loading trigger categories failed! (' + error + ')', true)
         })
       },
-      loadTypes: function (categoryType, firstLoad) {
-        let component = this
-        this.$http.get('/api/type/trigger/' + categoryType).then(function (response) {
-          for (let i = component.triggerTypes.length; i > 0; i--) {
-            component.triggerTypes.pop()
+      loadTypesOfCategory: async function (categoryKey) {
+        await IgorBackend.getData('/api/type/trigger/' + categoryKey).then((types) => {
+          for (let i = this.triggerTypes.length; i > 0; i--) {
+            this.triggerTypes.pop()
           }
-          Array.from(response.data).forEach(function (item) {
+          let component = this
+          Array.from(types).forEach(function (item) {
             component.triggerTypes.push(item)
           })
-          if (!component.jobConfiguration.trigger.type) {
-            component.jobConfiguration.trigger.type = component.triggerTypes[0]
+          if (this.jobConfiguration.trigger.type == null) {
+            this.jobConfiguration.trigger.type = component.triggerTypes[0]
           }
-          component.loadTypeParameters(component.jobConfiguration.trigger.type.key, firstLoad)
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Loading trigger types failed! (' + error + ')', true)
         })
       },
-      loadTypeParameters: function (type, firstLoad) {
-        let component = this
-        this.$http.get('/api/parameters/trigger/' + type).then(function (response) {
-          if (firstLoad && !(Array.isArray(component.jobConfiguration.trigger.parameters) && component.jobConfiguration.trigger.parameters.length)) {
-            component.jobConfiguration.trigger.parameters = response.data
-          } else if (!firstLoad) {
-            component.jobConfiguration.trigger.parameters = response.data
-          }
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Loading trigger parameters failed! (' + error + ')', true)
+      loadParametersOfType: function (typeKey) {
+        IgorBackend.getData('/api/parameters/trigger/' + typeKey).then((parameters) => {
+          this.jobConfiguration.trigger.parameters = parameters
         })
       },
       validateInput: function () {
@@ -170,7 +158,14 @@
       }
     },
     mounted() {
-      this.loadCategories(true)
+      let loadParameters = (this.jobConfiguration.trigger.type === null)
+      this.loadCategories().then(() => {
+        this.loadTypesOfCategory(this.jobConfiguration.trigger.category.key).then(() => {
+          if (loadParameters) {
+            this.loadParametersOfType(this.jobConfiguration.trigger.type.key)
+          }
+        })
+      })
     }
   }
 </script>

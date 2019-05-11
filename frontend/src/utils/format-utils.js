@@ -7,5 +7,11 @@ export default {
       }
     }
     return parts.join(' ');
+  },
+  formatNameForListEntry: function (name, maxLength) {
+    if (name.length > maxLength) {
+      return name.substring(0, maxLength) + '...'
+    }
+    return name
   }
 }

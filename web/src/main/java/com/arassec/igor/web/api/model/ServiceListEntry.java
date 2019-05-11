@@ -20,4 +20,9 @@ public class ServiceListEntry {
      */
     private String name;
 
+    /**
+     * Defines whether the service is used ({@code true}) or not ({@code false}).
+     */
+    private boolean used;
+
 }

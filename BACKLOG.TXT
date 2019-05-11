@@ -3,6 +3,7 @@
   - With this: support enums in parameter editor
 - HTTP-File-Service provider (with follow redirects!)
 - Warning when leaving an editor and unsaved changes exist
+- Persistence-service editor
 - SSH access with key
 - Local SSL-Keystore that can be modified via GUI
 - FilterFileByDate-Action
@@ -10,10 +11,6 @@
 - Encryption-Cipher in database, randomly generated at first start
 - README.md
 - Limit for number of IgorData in dry-run-results.
-- Home-View with combined job and service overview
-  - remove job-view
-  - remove service-view
-- Tags for jobs + grouping/filtering jobs by tag
 - Job-Parameter: cancel on task fail (true|false)
 - Job-Parameter: kill-switch with date to disable jobs
   - create date-picker component
@@ -21,7 +18,7 @@
   - current Task
   - Progress information
   - Concurrency-Group workload
-- Persistence-service editor
+- Tags for jobs + grouping/filtering jobs by tag
 - CIFS-/Samba supporting FileService
 - HTTP(S) supporting FileService
 - Export + Import of jobs and services (via JSON)

@@ -21,7 +21,7 @@ window.axios = require('axios')
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 Vue.prototype.$http = window.axios
 
-const store = {
+export const store = {
   debug: true,
   feedback: {
     timeout: undefined,

@@ -104,7 +104,7 @@ public abstract class ModelFactory<T> {
      * @param parameters The model's parameters, that should be applied to the model.
      * @return The model instance with cleartext properties
      */
-    public T createInstance(String type, Map<String, Object> parameters) {
+    public synchronized T createInstance(String type, Map<String, Object> parameters) {
         T instance = createInstance(type);
         if (instance == null) {
             return null;
@@ -117,6 +117,7 @@ public abstract class ModelFactory<T> {
                         field.set(instance, parameters.get(field.getName()));
                         field.setAccessible(false);
                     } catch (IllegalAccessException e) {
+                        log.error("Trying to create '{}' with parameter: {}", type, field.getName());
                         throw new IllegalStateException(e);
                     }
                 }

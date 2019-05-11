@@ -1,26 +1,33 @@
 <template>
-    <core-panel :class="'small-panel'">
-        <button-row>
-            <slot name="left" slot="left"/>
-            <slot name="right" slot="right"/>
-        </button-row>
-    </core-panel>
+    <div v-on:click.stop="$emit('clicked')">
+        <core-panel :small="true" class="list-entry">
+            <layout-row class="list-row">
+                <slot name="left" slot="left"/>
+                <slot name="right" slot="right"/>
+            </layout-row>
+        </core-panel>
+    </div>
 </template>
 
 <script>
-    import CorePanel from "./core-panel";
-    import ButtonRow from "./button-row";
+  import CorePanel from "./core-panel";
+  import LayoutRow from "./layout-row";
 
-    export default {
-        name: "list-entry",
-        components: {ButtonRow, CorePanel}
-    }
+  export default {
+    name: "list-entry",
+    components: {LayoutRow, CorePanel}
+  }
 </script>
 
 <style scoped>
 
-    .small-panel {
-        padding: 5px 15px 5px 15px;
+    .list-entry:hover {
+        cursor: pointer;
+        background-color: var(--nav-background-color);
+    }
+
+    .list-row {
+        height: 25px;
     }
 
 </style>

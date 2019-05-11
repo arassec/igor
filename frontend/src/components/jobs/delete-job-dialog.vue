@@ -20,21 +20,21 @@
         </div>
 
         <div slot="footer">
-            <button-row>
+            <layout-row>
                 <input-button slot="left" v-on:clicked="$emit('cancel')" icon="times"/>
                 <input-button slot="right" v-on:clicked="deleteServices ? $emit('delete-plus') : $emit('delete')" icon="check"/>
-            </button-row>
+            </layout-row>
         </div>
     </modal-dialog>
 </template>
 
 <script>
     import ModalDialog from "../common/modal-dialog";
-    import ButtonRow from "../common/button-row";
+    import LayoutRow from "../common/layout-row";
     import InputButton from "../common/input-button";
     export default {
         name: "delete-job-dialog",
-        components: {InputButton, ButtonRow, ModalDialog},
+        components: {InputButton, LayoutRow, ModalDialog},
         props: ['jobId', 'jobName'],
         data: function () {
             return {

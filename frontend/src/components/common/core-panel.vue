@@ -1,12 +1,13 @@
 <template>
-  <div class="panel" v-on:click="$emit('clicked')">
+  <div class="panel" :class="small ? 'core-panel-small' : 'core-panel-normal'">
     <slot/>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'core-panel'
+  name: 'core-panel',
+  props: ['small']
 }
 </script>
 
@@ -15,11 +16,18 @@ export default {
   .panel {
     color: var(--font-color-light);
     background-color: var(--panel-background-color);
-    padding: 15px;
     margin-bottom: 10px;
     -webkit-box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
     -moz-box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
     box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
+  }
+
+  .core-panel-small {
+    padding: 5px 15px 5px 15px;
+  }
+
+  .core-panel-normal {
+    padding: 15px;
   }
 
   .panel >>> table tr {

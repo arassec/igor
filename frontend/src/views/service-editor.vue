@@ -1,15 +1,15 @@
 <template>
     <core-container>
 
-        <side-menu>
+        <side-menu class="side-menu-small">
             <p slot="title">Service Configuration</p>
-            <button-row slot="buttons">
+            <layout-row slot="header">
                 <p slot="left">
                     <input-button v-on:clicked="cancelConfiguration()" icon="arrow-left" class="button-margin-right"/>
                     <input-button v-on:clicked="testConfiguration()" icon="plug" class="button-margin-right"/>
                     <input-button v-on:clicked="saveConfiguration()" icon="save"/>
                 </p>
-            </button-row>
+            </layout-row>
         </side-menu>
 
         <core-content>
@@ -33,8 +33,8 @@
                         <td><label for="category-input">Category</label></td>
                         <td>
                             <select id="category-input" v-model="serviceConfiguration.category"
-                                    v-on:change="loadServiceTypes(serviceConfiguration.category.key)"
-                                    :disabled="!newService">
+                                    v-on:change="loadTypesOfCategory(serviceConfiguration.category.key, true).then(() => {
+                                        loadParametersOfType(serviceConfiguration.type.key)})" :disabled="!newService">
                                 <option v-for="category in serviceCategories" v-bind:value="category"
                                         v-bind:key="category.key">
                                     {{category.label}}
@@ -47,7 +47,7 @@
                         <td><label for="type-input">Type</label></td>
                         <td>
                             <select id="type-input" v-model="serviceConfiguration.type"
-                                    v-on:change="loadTypeParameters(serviceConfiguration.type.key)"
+                                    v-on:change="loadParametersOfType(serviceConfiguration.type.key)"
                                     :disabled="!newService">
                                 <option v-for="type in serviceTypes" v-bind:value="type" v-bind:key="type.key">
                                     {{type.label}}
@@ -59,12 +59,18 @@
                 </table>
             </core-panel>
 
-            <core-panel v-if="Object.keys(serviceConfiguration.parameters).length > 0">
+            <core-panel>
                 <h2>Service Parameters</h2>
-                <parameter-editor :parameters="serviceConfiguration.parameters" ref="parameterEditor"/>
+                <parameter-editor v-if="Object.keys(serviceConfiguration.parameters).length > 0"
+                                  :parameters="serviceConfiguration.parameters" ref="parameterEditor"/>
+                <p v-if="Object.keys(serviceConfiguration.parameters).length == 0">
+                    This service has no parameters to configure.
+                </p>
             </core-panel>
 
         </core-content>
+
+        <background-icon right="true" icon-one="cogs"/>
 
     </core-container>
 </template>
@@ -75,17 +81,20 @@
   import CorePanel from '../components/common/core-panel'
   import CoreContainer from '../components/common/core-container'
   import CoreContent from '../components/common/core-content'
-  import ButtonRow from '../components/common/button-row'
+  import LayoutRow from '../components/common/layout-row'
   import ValidationError from '../components/common/validation-error'
   import SideMenu from '../components/common/side-menu'
   import FormatUtils from '../utils/format-utils.js'
+  import IgorBackend from '../utils/igor-backend.js'
+  import BackgroundIcon from "../components/common/background-icon";
 
   export default {
     name: 'service-editor',
     components: {
+      BackgroundIcon,
       SideMenu,
       ValidationError,
-      ButtonRow,
+      LayoutRow,
       CoreContent,
       CoreContainer,
       CorePanel,
@@ -110,126 +119,82 @@
     },
     methods: {
       loadService: function (id) {
-        let component = this
-        this.$http.get('/api/service/' + id).then(function (response) {
-          component.serviceConfiguration = response.data
-          component.serviceCategories.push(component.serviceConfiguration.category)
-          component.selectedCategory = component.serviceConfiguration.category.key
-          component.serviceTypes.push(component.serviceConfiguration.type)
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Loading service failed! (' + error + ')', true)
+        IgorBackend.getData('/api/service/' + id).then((serviceConfiguration) => {
+          this.serviceConfiguration = serviceConfiguration
+          this.serviceCategories.push(this.serviceConfiguration.category)
+          this.serviceTypes.push(this.serviceConfiguration.type)
+          this.newService = false
         })
       },
-      loadServiceCategories: function (singleServiceCategory) {
-        let component = this
-        this.$http.get('/api/category/service').then(function (response) {
-          for (let i = component.serviceCategories.length; i > 0; i--) {
-            component.serviceCategories.pop()
+      loadCategories: async function (fixedCategoryKey) {
+        await IgorBackend.getData('/api/category/service').then((categories) => {
+          for (let i = this.serviceCategories.length; i > 0; i--) {
+            this.serviceCategories.pop()
           }
-          Array.from(response.data).forEach(function (item) {
-            if (singleServiceCategory) {
-              if (item.key === singleServiceCategory) {
+          let component = this
+          Array.from(categories).forEach(function (item) {
+            if (fixedCategoryKey) {
+              if (item.key === fixedCategoryKey) {
                 component.serviceCategories.push(item)
               }
             } else {
               component.serviceCategories.push(item)
             }
           })
-          if (!('key' in component.serviceConfiguration.category)) {
-            component.serviceConfiguration.category = component.serviceCategories[0]
+          if (!('key' in this.serviceConfiguration.category)) {
+            this.serviceConfiguration.category = this.serviceCategories[0]
           }
-          component.loadServiceTypes(component.serviceConfiguration.category.key)
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Loading categories failed! (' + error + ')', true)
         })
       },
-      loadServiceTypes: function (category) {
-        let component = this
-        this.$http.get('/api/type/service/' + category).then(function (response) {
-          for (let i = component.serviceTypes.length; i > 0; i--) {
-            component.serviceTypes.pop()
+      loadTypesOfCategory: async function (categoryKey, selectFirst) {
+        await IgorBackend.getData('/api/type/service/' + categoryKey).then((types) => {
+          for (let i = this.serviceTypes.length; i > 0; i--) {
+            this.serviceTypes.pop()
           }
-          Array.from(response.data).forEach(function (item) {
+          let component = this
+          Array.from(types).forEach(function (item) {
             component.serviceTypes.push(item)
           })
-          if (!('key' in component.serviceConfiguration.type)) {
-            component.serviceConfiguration.type = component.serviceTypes[0]
+          if (selectFirst) {
+            this.serviceConfiguration.type = this.serviceTypes[0]
           }
-          component.loadTypeParameters(component.serviceConfiguration.type.key)
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Loading types failed! (' + error + ')', true)
         })
       },
-      loadTypeParameters: function (type) {
-        let component = this
-        if (component.loadParameters) {
-          this.$http.get('/api/parameters/service/' + type).then(function (response) {
-            component.serviceConfiguration.parameters = response.data
-          }).catch(function (error) {
-            component.$root.$data.store.setFeedback('Loading type parameters failed! (' + error + ')', true)
-          })
-        } else {
-          // after we skipped for the first time, always update parameters
-          component.loadParameters = true
-        }
-      },
-      testConfiguration: function () {
-        if (!this.validateInput()) {
-          return
-        }
-
-        this.$root.$data.store.setWip('Testing service')
-
-        let component = this
-        this.$http.post('/api/service/test', this.serviceConfiguration).then(function () {
-          component.$root.$data.store.setFeedback('Test OK.', false)
-          component.$root.$data.store.clearWip()
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Testing failed! (' + error + ')', true)
-          component.$root.$data.store.clearWip()
+      loadParametersOfType: function (typeKey) {
+        IgorBackend.getData('/api/parameters/service/' + typeKey).then((parameters) => {
+          this.serviceConfiguration.parameters = parameters
         })
       },
-      saveConfiguration: function () {
-        if (!this.validateInput()) {
+      testConfiguration: async function () {
+        if (!(await this.validateInput())) {
           return
         }
-
-        this.$root.$data.store.setWip('Saving service')
-
-        let component = this
+        IgorBackend.postData('/api/service/test', this.serviceConfiguration, 'Testing service', 'Test OK.', 'Testing Failed!')
+      },
+      saveConfiguration: async function () {
+        if (!(await this.validateInput())) {
+          return
+        }
         if (this.newService) {
-          this.$http.post('/api/service', this.serviceConfiguration).then(function (response) {
-            component.serviceConfiguration = response.data;
-            component.$root.$data.store.setFeedback('Service \'' + FormatUtils.formatNameForSnackbar(component.serviceConfiguration.name) + '\' saved.', false)
-            component.$root.$data.store.clearWip()
-            component.newService = false
-            component.$router.push({name: 'service-editor', params: {serviceId: component.serviceConfiguration.id}})
-            let jobData = component.$root.$data.store.getJobData()
+          IgorBackend.postData('/api/service', this.serviceConfiguration, 'Saving service',
+              'Service \'' + FormatUtils.formatNameForSnackbar(this.serviceConfiguration.name) + '\' saved.',
+              'Saving failed!').then((result) => {
+            this.serviceConfiguration = result;
+            this.newService = false
+            this.$router.push({name: 'service-editor', params: {serviceId: this.serviceConfiguration.id}})
+            let jobData = this.$root.$data.store.getJobData()
             if (jobData.jobConfiguration != null) {
               let serviceParameter = {
-                name: component.serviceConfiguration.name,
-                id: component.serviceConfiguration.id
+                name: this.serviceConfiguration.name,
+                id: this.serviceConfiguration.id
               }
               jobData.serviceParameter = serviceParameter
             }
-          }).catch(function (error) {
-            if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
-              component.nameValidationError = 'A service with this name already exists!'
-            }
-            component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true)
-            component.$root.$data.store.clearWip()
           })
         } else {
-          this.$http.put('/api/service', this.serviceConfiguration).then(function () {
-            component.$root.$data.store.setFeedback('Service \'' + FormatUtils.formatNameForSnackbar(component.serviceConfiguration.name) + '\' updated.', false)
-            component.$root.$data.store.clearWip()
-          }).catch(function (error) {
-            if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
-              component.nameValidationError = 'A service with this name already exists!'
-            }
-            component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true);
-            component.$root.$data.store.clearWip()
-          })
+          IgorBackend.putData('/api/service', this.serviceConfiguration, 'Saving service',
+              'Service \'' + FormatUtils.formatNameForSnackbar(this.serviceConfiguration.name) + '\' updated.',
+              'Saving failed!')
         }
       },
       cancelConfiguration: function () {
@@ -237,17 +202,20 @@
         if (jobData.jobConfiguration != null) {
           this.$router.push({name: 'job-editor'})
         } else {
-          this.$router.push({name: 'services'})
+          this.$router.push({name: 'app-status'})
         }
       },
-      validateInput: function () {
+      validateInput: async function () {
         this.nameValidationError = ''
-
-        let nameValidationResult = true
 
         if (this.serviceConfiguration.name == null || this.serviceConfiguration.name === '') {
           this.nameValidationError = 'Name must be set'
-          nameValidationResult = false
+        } else {
+          let nameAlreadyExists = await IgorBackend.getData('/api/service/check/'
+              + this.serviceConfiguration.name + '/' + (this.serviceConfiguration.id === undefined ? -1 : this.serviceConfiguration.id))
+          if (nameAlreadyExists === true) {
+            this.nameValidationError = 'A service with this name already exists!'
+          }
         }
 
         let parameterValidationResult = true
@@ -255,25 +223,37 @@
           parameterValidationResult = this.$refs.parameterEditor.validateInput()
         }
 
-        return (nameValidationResult && parameterValidationResult)
+        return ((this.nameValidationError.length === 0) && parameterValidationResult)
       }
     },
     mounted() {
       let serviceData = this.$root.$data.store.getServiceData()
+      // Service duplication: don't load type parameters because they are provided by the root service configuration
       if (serviceData.serviceConfiguration != null) {
         this.serviceConfiguration = serviceData.serviceConfiguration
-        this.loadParameters = false
-        this.loadServiceCategories(null)
+        this.loadCategories(null).then(() => {
+          this.loadTypesOfCategory(this.serviceConfiguration.category.key, false)
+        })
       } else {
+        // Load a service configuration from the backend
         if (this.serviceId != null) {
-          this.newService = false
           this.loadService(this.serviceId)
         } else {
+          // Create a new service from within a job configuration. The category is fixed since the job requires it.
           let jobData = this.$root.$data.store.getJobData()
           if (jobData.serviceCategory != null) {
-            this.loadServiceCategories(jobData.serviceCategory)
+            this.loadCategories(jobData.serviceCategory).then(() => {
+              this.loadTypesOfCategory(this.serviceConfiguration.category.key, true).then(() => {
+                this.loadParametersOfType(this.serviceConfiguration.type.key)
+              })
+            })
           } else {
-            this.loadServiceCategories(null)
+            // Create a new service without restrictions:
+            this.loadCategories(null).then(() => {
+              this.loadTypesOfCategory(this.serviceConfiguration.category.key, true).then(() => {
+                this.loadParametersOfType(this.serviceConfiguration.type.key)
+              })
+            })
           }
         }
       }
@@ -282,9 +262,5 @@
 </script>
 
 <style scoped>
-
-    .service-parameters {
-        margin: 25px 0px 0px 0px;
-    }
 
 </style>

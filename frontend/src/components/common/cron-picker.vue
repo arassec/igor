@@ -57,9 +57,9 @@
       </table>
     </div>
 
-    <button-row slot="footer">
+    <layout-row slot="footer">
       <input-button slot="left" icon="times" v-on:clicked="$emit('cancel')"/>
-    </button-row>
+    </layout-row>
 
   </modal-dialog>
 </template>
@@ -67,11 +67,11 @@
 <script>
 import ModalDialog from './modal-dialog'
 import InputButton from './input-button'
-import ButtonRow from './button-row'
+import LayoutRow from './layout-row'
 
 export default {
   name: 'cron-picker',
-  components: {ButtonRow, InputButton, ModalDialog}
+  components: {LayoutRow, InputButton, ModalDialog}
 }
 </script>
 

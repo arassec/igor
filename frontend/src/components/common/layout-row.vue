@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row" v-on:click="$emit('clicked')">
     <div class="left">
       <slot name="left"/>
     </div>
@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: 'button-row'
+  name: 'layout-row'
 }
 </script>
 

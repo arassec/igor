@@ -19,6 +19,13 @@ public interface JobExecutionRepository {
     JobExecution upsert(JobExecution jobExecution);
 
     /**
+     * Finds the job-execution with the given ID.
+     * @param id The job-execution's ID.
+     * @return The {@link JobExecution} or {@code null}, if none exists with the given ID.
+     */
+    JobExecution findById(Long id);
+
+    /**
      * Returns all executions of a certain job.
      *
      * @param jobId The job's ID.
@@ -36,19 +43,12 @@ public interface JobExecutionRepository {
     List<JobExecution> findAllOfJobInState(Long jobId, JobExecutionState state);
 
     /**
-     * Returns the execution state of a running job.
+     * Finds all job-executions in the specified state.
      *
-     * @param jobId The job's ID.
-     * @return A {@link JobExecution} if the job is currently running or {@code null} otherwise.
-     */
-    JobExecution findRunningOfJob(Long jobId);
-
-    /**
-     * Finds all job-executions in state 'waiting'.
-     *
+     * @param state The state of the job-exeuctions.
      * @return List of {@link JobExecution}s.
      */
-    List<JobExecution> findWaiting();
+    List<JobExecution> findInState(JobExecutionState state);
 
     /**
      * Deletes old job-executions of the specified job and keeps only 'numToKeep' of the most recent executions.

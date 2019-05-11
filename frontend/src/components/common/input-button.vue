@@ -1,5 +1,5 @@
 <template>
-  <div :class="disabled ? 'disabled' : 'button'" v-on:click="fire()">
+  <div :class="disabled ? 'disabled' : 'button'" v-on:click.stop="fire()">
     <font-awesome-icon :icon="icon" :class="iconstyle"/>
   </div>
 </template>

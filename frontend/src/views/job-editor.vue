@@ -1,9 +1,9 @@
 <template>
     <core-container>
 
-        <side-menu>
+        <side-menu class="side-menu-large" v-if="jobConfiguration">
             <p slot="title">Job Configuration</p>
-            <button-row slot="buttons" v-on:cancel-configuration="cancelConfiguration">
+            <layout-row slot="header" v-on:cancel-configuration="cancelConfiguration">
                 <p slot="left">
                     <input-button icon="arrow-left" v-on:clicked="cancelConfiguration"
                                   class="button-margin-right"/>
@@ -11,11 +11,10 @@
                     <input-button icon="save" v-on:clicked="saveConfiguration"/>
                 </p>
                 <p slot="right">
-                    <input-button icon="times" v-on:clicked="cancelJob" :disabled="!jobRunning"/>
-                    <input-button icon="play" v-on:clicked="runJob" class="button-margin-left"
+                    <input-button icon="play" v-on:clicked="showRunDialog = true" class="button-margin-left"
                                   :disabled="jobRunning || jobConfiguration.id == null"/>
                 </p>
-            </button-row>
+            </layout-row>
             <job-tree-navigation slot="content"
                                  :job-configuration="jobConfiguration"
                                  :validation-errors="validationErrors"
@@ -34,22 +33,24 @@
                                  v-on:move-action-up="moveActionUp"
                                  v-on:move-action-down="moveActionDown">
             </job-tree-navigation>
-            <p slot="feedback">
-                <feedback-box v-for="(jobExecution, index) in jobExecutions"
-                              :key="index" :alert="jobExecution.executionState === 'FAILED'">
-                    <label slot="feedback">{{formatJobExecution(jobExecution)}}</label>
-                    <font-awesome-icon slot="feedback" style="margin-right: 5px;"
-                                       v-if="(jobExecution.executionState === 'WAITING' || jobExecution.executionState === 'RUNNING')"
-                                       icon="spinner" class="fa-spin"/>
-                    <input-button slot="button" icon="info" v-on:clicked="selectedJobExecution = jobExecution"/>
+            <p slot="footer">
+                <feedback-box v-for="(jobExecution, index) in jobExecutions" class="list-entry"
+                              :key="index" :alert="jobExecution.state === 'FAILED'"
+                              v-on:feedback-clicked="openExecutionDetailsDialog(jobExecution)">
+                    <label slot="left">{{formatJobExecution(jobExecution)}}</label>
+                    <div slot="right">
+                        <input-button slot="right" icon="times" v-on:clicked="openCancelJobDialog(jobExecution)"
+                                      v-if="jobExecution.state === 'WAITING' || jobExecution.state === 'RUNNING'"/>
+                    </div>
                 </feedback-box>
             </p>
         </side-menu>
 
-        <core-content>
-            <job-configurator v-show="selectedTaskIndex == -1"
-                              :job-configuration="jobConfiguration"
-                              ref="jobConfigurator"/>
+        <core-content v-if="jobConfiguration">
+            <job-configurator
+                    v-show="selectedTaskIndex == -1"
+                    :job-configuration="jobConfiguration"
+                    ref="jobConfigurator"/>
 
             <task-configurator v-for="(task, taskIndex) in jobConfiguration.tasks"
                                v-show="selectedTaskIndex == taskIndex && selectedActionIndex == -1"
@@ -73,10 +74,10 @@
                 <h1 slot="header">Delete Task?</h1>
                 <p slot="body">Do you really want to delete this Task?</p>
                 <div slot="footer">
-                    <button-row>
+                    <layout-row>
                         <input-button slot="left" v-on:clicked="showDeleteTaskDialog = false" icon="times"/>
                         <input-button slot="right" v-on:clicked="deleteTask()" icon="check"/>
-                    </button-row>
+                    </layout-row>
                 </div>
             </modal-dialog>
 
@@ -84,16 +85,42 @@
                 <h1 slot="header">Delete Action?</h1>
                 <p slot="body">Do you really want to delete this Action?</p>
                 <div slot="footer">
-                    <button-row>
+                    <layout-row>
                         <input-button slot="left" v-on:clicked="showDeleteActionDialog = false" icon="times"/>
                         <input-button slot="right" v-on:clicked="deleteAction()" icon="check"/>
-                    </button-row>
+                    </layout-row>
                 </div>
             </modal-dialog>
 
-            <job-execution-details v-if="selectedJobExecution != null"
+            <modal-dialog v-if="showRunDialog"
+                          @close="showRunDialog = false"
+                          v-on:cancel="showRunDialog = false">
+                <h1 slot="header">Start job</h1>
+                <p slot="body">
+                    Manually start job now?
+                </p>
+                <layout-row slot="footer">
+                    <input-button slot="left" v-on:clicked="showRunDialog = false" icon="times"/>
+                    <input-button slot="right" v-on:clicked="runJob()" icon="check"/>
+                </layout-row>
+            </modal-dialog>
+
+            <modal-dialog v-if="showCancelJobDialog"
+                          @close="showCancelJobDialog = false"
+                          v-on:cancel="showCancelJobDialog = false">
+                <h1 slot="header">Cancel job execution</h1>
+                <p slot="body">
+                    Are you sure you want to cancel this execution?
+                </p>
+                <layout-row slot="footer">
+                    <input-button slot="left" v-on:clicked="showCancelJobDialog = false" icon="times"/>
+                    <input-button slot="right" v-on:clicked="cancelJobExecution()" icon="check"/>
+                </layout-row>
+            </modal-dialog>
+
+            <job-execution-details v-if="showExecutionDetailsDialog"
                                    v-bind:job-execution="selectedJobExecution"
-                                   v-on:close="selectedJobExecution = null"/>
+                                   v-on:close="closeExecutionDetailsDialog()"/>
 
         </core-content>
 
@@ -102,9 +129,10 @@
                                v-bind:error-cause="testResults.errorCause"
                                v-bind:selected-test-results="selectedTestResults"/>
 
+        <background-icon right="true" icon-one="toolbox"/>
+
     </core-container>
 </template>
-
 <script>
   import CoreContainer from '../components/common/core-container'
   import CoreContent from '../components/common/core-content'
@@ -113,23 +141,26 @@
   import TaskConfigurator from '../components/jobs/task-configurator'
   import ActionConfigurator from '../components/jobs/action-configurator'
   import ModalDialog from '../components/common/modal-dialog'
-  import ButtonRow from '../components/common/button-row'
+  import LayoutRow from '../components/common/layout-row'
   import InputButton from '../components/common/input-button'
   import TestResultContainer from '../components/jobs/test-result-container'
   import SideMenu from '../components/common/side-menu'
   import FeedbackBox from '../components/common/feedback-box'
   import JobExecutionDetails from '../components/jobs/job-execution-details'
   import FormatUtils from '../utils/format-utils.js'
+  import BackgroundIcon from "../components/common/background-icon";
+  import IgorBackend from '../utils/igor-backend.js'
 
   export default {
     name: 'job-editor',
     components: {
+      BackgroundIcon,
       JobExecutionDetails,
       FeedbackBox,
       SideMenu,
       TestResultContainer,
       InputButton,
-      ButtonRow,
+      LayoutRow,
       ModalDialog,
       ActionConfigurator,
       TaskConfigurator,
@@ -144,37 +175,31 @@
         newJob: true,
         showDeleteTaskDialog: false,
         showDeleteActionDialog: false,
+        showCancelJobDialog: false,
+        showExecutionDetailsDialog: false,
+        showRunDialog: false,
         initialProviderCategory: {},
         initialProviderType: {},
         initialActionCategory: {},
         initialActionType: {},
         selectedTaskIndex: -1,
         selectedActionIndex: -1,
-        selectedJobExecution: null,
         testResults: null,
         selectedTestResults: null,
-        jobConfiguration: {
-          name: 'New Job',
-          trigger: {
-            category: null,
-            type: null,
-            parameters: []
-          },
-          description: '',
-          executionHistoryLimit: 5,
-          active: true,
-          tasks: []
-        },
+        jobConfiguration: null,
         validationErrors: [],
         jobExecutions: [],
-        jobExecutionsRefreshTimer: null
+        jobExecutionsRefreshTimer: null,
+        selectedJobExecutionListEntry: null,
+        selectedJobExecution: null,
+        selectedJobExecutionId: null
       }
     },
     computed: {
       jobRunning: function () {
         if (this.jobExecutions != null) {
           for (let i = 0; i < this.jobExecutions.length; i++) {
-            if ('RUNNING' === this.jobExecutions[i].executionState) {
+            if ('RUNNING' === this.jobExecutions[i].state) {
               return true
             }
           }
@@ -185,33 +210,27 @@
     methods: {
       formatJobExecution: function (jobExecution) {
         let options = {year: 'numeric', month: '2-digit', day: '2-digit'};
-        if ('RUNNING' === jobExecution.executionState) {
-          let date = new Date(jobExecution.started)
-          return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString() + ' (running)'
-        } else if ('WAITING' === jobExecution.executionState) {
-          let date = new Date(jobExecution.created)
-          return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString() + ' (waiting)'
-        } else if ('FINISHED' === jobExecution.executionState) {
-          let date = new Date(jobExecution.finished)
-          return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString() + ' (finished)'
-        } else if ('CANCELLED' === jobExecution.executionState) {
-          let date = new Date(jobExecution.finished)
-          return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString() + ' (cancelled)'
-        } else if ('FAILED' === jobExecution.executionState) {
-          let date = new Date(jobExecution.finished)
-          return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString() + ' (failed)'
-        } else {
-          return jobExecution.executionState
+        let date = new Date(jobExecution.created)
+        return date.toLocaleTimeString(undefined, options)
+            + ' ' + jobExecution.duration + '(' + jobExecution.state.toLowerCase() + ')'
+      },
+      createJob: function () {
+        this.jobConfiguration = {
+          name: 'New Job',
+          trigger: {
+            category: null,
+            type: null,
+            parameters: []
+          },
+          description: '',
+          executionHistoryLimit: 5,
+          active: true,
+          tasks: []
         }
       },
-      loadJob: function (id) {
-        let component = this
-        this.$http.get('/api/job/' + id).then(function (response) {
-          component.jobConfiguration = response.data
-          component.updateJobExecutions()
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Loading failed! (' + error + ')', true)
-        })
+      loadJob: async function (id) {
+        this.jobConfiguration = await IgorBackend.getData('/api/job/' + id)
+        this.updateJobExecutions()
       },
       saveConfiguration: function () {
         if (!this.validateInput()) {
@@ -282,7 +301,7 @@
         })
       },
       cancelConfiguration: function () {
-        this.$router.push({name: 'jobs'})
+        this.$router.push({name: 'app-status'})
       },
       selectJob: function () {
         this.selectedTaskIndex = -1
@@ -454,12 +473,11 @@
         return taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex
       },
       runJob: function () {
+        this.showRunDialog = false
         if (!this.validateInput()) {
           return
         }
-
         let component = this
-
         this.$http.post('/api/job/run', this.jobConfiguration).then(function (response) {
           component.jobConfiguration = response.data
           component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' started manually.', false)
@@ -470,33 +488,60 @@
         })
       },
       updateJobExecutions: function () {
-        let component = this
-        this.$http.get('/api/job/' + this.jobConfiguration.id + '/executions', this.jobConfiguration).then(function (response) {
-          for (let i = component.jobExecutions.length; i > 0; i--) {
-            component.jobExecutions.pop()
+        IgorBackend.getData('/api/execution/job/' + this.jobConfiguration.id).then((result) => {
+          for (let i = this.jobExecutions.length; i > 0; i--) {
+            this.jobExecutions.pop()
           }
-          Array.from(response.data).forEach(function (item) {
+          let component = this
+          Array.from(result).forEach(function (item) {
             component.jobExecutions.push(item)
           })
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Background sync failed! (' + error.response.data.error + ')', true)
         })
       },
-      cancelJob: function () {
-        let component = this
-        this.$http.post('/api/job/' + this.jobConfiguration.id + '/cancel', this.jobConfiguration).then(function () {
-          component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' cancelled.', false)
-          component.updateJobExecutions()
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' cancellation failed ('
-              + error + ').', true)
+      openExecutionDetailsDialog: async function (selectedJobExecutionListEntry) {
+        this.selectedJobExecutionId = selectedJobExecutionListEntry.id
+        this.selectedJobExecution = await IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId)
+        this.showExecutionDetailsDialog = true
+        if (this.selectedJobExecution.executionState === 'WAITING' || this.selectedJobExecution.executionState === 'RUNNING') {
+          this.jobExecutionDetailsRefreshTimer = setInterval(() => {
+            this.updateJobExectuionDetails()
+          }, 1000)
+        }
+      },
+      closeExecutionDetailsDialog: function () {
+        if (this.jobExecutionDetailsRefreshTimer) {
+          clearTimeout(this.jobExecutionDetailsRefreshTimer)
+        }
+        this.showExecutionDetailsDialog = false
+      },
+      updateJobExectuionDetails: function () {
+        IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId).then((result) => {
+          this.selectedJobExecution = result
+        })
+      },
+      openCancelJobDialog: function (selectedJobExecutionListEntry) {
+        this.selectedJobExecutionListEntry = selectedJobExecutionListEntry
+        this.showCancelJobDialog = true
+      },
+      cancelJobExecution: function () {
+        this.showCancelJobDialog = false
+        clearTimeout(this.jobExecutionsRefreshTimer)
+        IgorBackend.postData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/cancel', null,
+            "Cancelling job", "Job cancelled.", "Job could not be cancelled!").then(() => {
+          for (let i = 0; i < this.jobExecutions.length; i++) {
+            if (this.jobExecutions[i].id === this.selectedJobExecutionListEntry.id){
+              this.jobExecutions[i].state = 'CANCELLED'
+            }
+          }
+          this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
         })
       },
       createService: function (selectionKey, parameterIndex, serviceCategory) {
         this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, serviceCategory)
         this.$router.push({name: 'service-editor'})
       }
-    },
+    }
+    ,
     mounted() {
       let jobData = this.$root.$data.store.getJobData()
       if (jobData.jobConfiguration != null) {
@@ -538,8 +583,11 @@
         this.$root.$data.store.clearJobData()
       } else if (this.jobId != null) {
         this.newJob = false
-        this.loadJob(this.jobId)
-        this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+        this.loadJob(this.jobId).then(() => {
+          this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+        })
+      } else {
+        this.createJob()
       }
 
       let component = this
@@ -564,12 +612,14 @@
       }).catch(function (error) {
         component.$root.$data.store.setFeedback('Could not load action categories (' + error + ')', true)
       })
-    },
+    }
+    ,
     destroyed() {
       clearInterval(this.jobExecutionsRefreshTimer)
     }
   }
 </script>
+
 
 <style scoped>
 
@@ -585,6 +635,23 @@
 
     .jobExecutionFeedback {
         margin-bottom: 5px;
+    }
+
+    .list-entry:hover {
+        cursor: pointer;
+        background-color: var(--main-background-color);
+    }
+
+    .list-entry:hover * {
+        cursor: pointer;
+        color: var(--panel-background-color);
+        border-color: var(--panel-background-color);
+    }
+
+    .list-entry:hover div[class='button']:hover {
+        cursor: pointer;
+        color: var(--font-color-light);
+        background-color: var(--panel-background-color);
     }
 
 </style>

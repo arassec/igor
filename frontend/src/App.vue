@@ -48,6 +48,7 @@ export default {
     --panel-background-color: #546A7B;
     --font-color-light: #FDFDFF;
     --font-color-dark: #546A7B;
+    --font-color-opaque: #FDFDFF80;
     --element-background-color: #62929E;
     --element-background-color-focus: #FDFDFF;
     --info-background-color: #62929E;
@@ -88,6 +89,31 @@ export default {
 
   .button-margin-left {
     margin-left: 5px;
+  }
+
+  .side-menu-small {
+    width: 350px;
+  }
+
+  .side-menu-normal {
+    width: 400px;
+  }
+
+  .side-menu-large {
+    width: 480px;
+  }
+
+  .core-content-normal {
+    --content-width: 500px;
+  }
+
+  .inactive {
+    opacity: 0.5;
+  }
+
+  .sticky {
+    position: sticky;
+    top: 15px;
   }
 
 </style>

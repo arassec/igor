@@ -59,9 +59,10 @@ public class ActionsExecutingRunnable implements Runnable {
             while (active) {
                 data = inputQueue.poll();
                 if (data != null && !data.isEmpty()) {
-                    log.debug("Processing: {}", data);
+                    log.trace("Processing: {}", data);
                     boolean continueProcessing = true;
                     for (Action action : actions) {
+                        log.debug("Processing Action: {}", action.getClass().getName());
                         continueProcessing = action.process(data);
                         if (!continueProcessing) {
                             break;

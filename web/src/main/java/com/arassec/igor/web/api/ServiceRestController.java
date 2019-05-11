@@ -55,11 +55,8 @@ public class ServiceRestController {
     public List<ServiceListEntry> getServices() {
         List<Service> services = serviceManager.loadAll();
         return services.stream().map(service -> {
-            ServiceListEntry result = new ServiceListEntry(service.getId(), service.getName());
             Set<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(service.getId());
-            if (referencingJobs == null || referencingJobs.isEmpty()) {
-                result.setName(service.getName() + " (unused)");
-            }
+            ServiceListEntry result = new ServiceListEntry(service.getId(), service.getName(), (referencingJobs != null && !referencingJobs.isEmpty()));
             return result;
         }).collect(Collectors.toList());
     }
@@ -170,6 +167,22 @@ public class ServiceRestController {
             }
             return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    /**
+     * Checks whether a service name has already been taken or not.
+     *
+     * @param name The service's name.
+     * @param id   The service's ID.
+     * @return {@code true} if a service with the provided name already exists, {@code false} otherwise.
+     */
+    @GetMapping("check/{name}/{id}")
+    public Boolean checkServiceName(@PathVariable("name") String name, @PathVariable("id") Long id) {
+        Service existingService = serviceManager.loadByName(name);
+        if (existingService != null && !(existingService.getId().equals(id))) {
+            return true;
+        }
+        return false;
     }
 
     /**

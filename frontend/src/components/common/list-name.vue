@@ -13,6 +13,5 @@ export default {
 <style scoped>
   .list-name {
     margin-top: 2px;
-    font-weight: bold;
   }
 </style>

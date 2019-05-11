@@ -19,22 +19,22 @@
         </table>
     </div>
 
-    <button-row slot="footer">
+    <layout-row slot="footer">
       <input-button slot="left" icon="times" v-on:clicked="$emit('cancel')"/>
       <input-button slot="right" icon="plus" v-on:clicked="$emit('create')"/>
-    </button-row>
+    </layout-row>
 
   </modal-dialog>
 </template>
 
 <script>
 import ModalDialog from '../common/modal-dialog'
-import ButtonRow from '../common/button-row'
+import LayoutRow from '../common/layout-row'
 import InputButton from '../common/input-button'
 
 export default {
   name: 'service-picker',
-  components: {InputButton, ButtonRow,  ModalDialog},
+  components: {InputButton, LayoutRow,  ModalDialog},
   props: ['services'],
   data: function () {
     return {

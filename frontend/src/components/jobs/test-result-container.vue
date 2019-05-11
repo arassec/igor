@@ -1,8 +1,8 @@
 <template>
     <transition name="slide-fade">
         <core-content>
-            <div class="test-result-container">
-                <button-row>
+            <div class="test-result-container sticky">
+                <layout-row>
                     <div slot="left">
                         <h1 v-if="!errorCause && !selectedTestResults">Dry run successful</h1>
                         <h1 v-if="selectedTestResults && !errorCause && selectedTestResults.length > 0">Dry run
@@ -10,7 +10,7 @@
                         <h1 v-if="selectedTestResults && errorCause">Dry run failed</h1>
                     </div>
                     <input-button slot="right" icon="times" v-on:clicked="$emit('close')"/>
-                </button-row>
+                </layout-row>
                 <p v-if="!errorCause && selectedTestResults.length == 0">
                     Please select a <b>Task</b> or <b>Action</b> to see detailed dry-run results.
                 </p>
@@ -24,13 +24,13 @@
 </template>
 
 <script>
-  import ButtonRow from '../common/button-row'
+  import LayoutRow from '../common/layout-row'
   import InputButton from '../common/input-button'
   import CoreContent from '../common/core-content'
 
   export default {
     name: 'test-result-container',
-    components: {CoreContent, InputButton, ButtonRow},
+    components: {CoreContent, InputButton, LayoutRow},
     props: ['heading', 'selectedTestResults', 'errorCause'],
     methods: {
       format: function (code) {
@@ -45,7 +45,6 @@
     .content {
         flex: 2;
         margin-right: 0px;
-        overflow: auto;
     }
 
     .test-result-container {

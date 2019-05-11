@@ -3,7 +3,7 @@
     <h1>
       <slot name="title">default title</slot>
     </h1>
-    <button-row>
+    <layout-row>
       <div class="filter" slot="left">
         <input id="filter-input" type="text" v-model="filterText" placeholder="filter list"/>
         <font-awesome-icon icon="search"/>
@@ -14,18 +14,18 @@
           <input-button icon="plus"/>
         </router-link>
       </p>
-    </button-row>
+    </layout-row>
   </core-panel>
 </template>
 
 <script>
 import InputButton from './input-button'
-import ButtonRow from './button-row'
+import LayoutRow from './layout-row'
 import CorePanel from './core-panel'
 
 export default {
   name: 'list-header',
-  components: {CorePanel, ButtonRow, InputButton},
+  components: {CorePanel, LayoutRow, InputButton},
   props: ['filter', 'filterKey', 'addButtonText', 'addButtonTarget'],
   data: function () {
     return {

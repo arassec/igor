@@ -62,6 +62,11 @@ public class Job {
     private JobExecution currentJobExecution;
 
     /**
+     * Indicates whether the job is running or not.
+     */
+    private boolean running = false;
+
+    /**
      * Runs the job.
      */
     public void run(JobExecution jobExecution) {
@@ -73,6 +78,7 @@ public class Job {
         }
         currentJobExecution.setExecutionState(JobExecutionState.RUNNING);
         currentJobExecution.setStarted(Instant.now());
+        running = true;
         try {
             for (Task task : tasks) {
                 if (!currentJobExecution.isRunning()) {
@@ -91,6 +97,7 @@ public class Job {
         } finally {
             currentJobExecution.setFinished(Instant.now());
             log.debug("Finished job: {} ({}): {}", name, id, currentJobExecution);
+            running = false;
         }
     }
 
@@ -117,7 +124,6 @@ public class Job {
     public void cancel() {
         if (currentJobExecution != null && JobExecutionState.RUNNING.equals(currentJobExecution.getExecutionState())) {
             currentJobExecution.setExecutionState(JobExecutionState.CANCELLED);
-            currentJobExecution.setFinished(Instant.now());
         }
     }
 }

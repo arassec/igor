@@ -1,15 +1,15 @@
 <template>
-  <button-row :class="{info: !alert,  alert: alert}" class="margin-bottom">
-    <slot slot="left" name="feedback"/>
-    <slot slot="right" name="button"/>
-  </button-row>
+  <layout-row :class="{info: !alert,  alert: alert}" class="margin-bottom" v-on:clicked="$emit('feedback-clicked')">
+    <slot slot="left" name="left"/>
+    <slot slot="right" name="right"/>
+  </layout-row>
 </template>
 
 <script>
-import ButtonRow from './button-row'
+import LayoutRow from './layout-row'
 export default {
   name: 'feedback-box',
-  components: {ButtonRow},
+  components: {LayoutRow},
   props: ['alert']
 }
 </script>

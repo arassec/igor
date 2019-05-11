@@ -4,14 +4,14 @@
             <h1>
                 <slot name="title"/>
             </h1>
-            <div class="buttons">
-                <slot name="buttons"/>
+            <div class="header">
+                <slot name="header"/>
             </div>
             <div class="content" v-if="hasContentSlot">
                 <slot name="content"/>
             </div>
-            <div class="feedback">
-                <slot name="feedback"/>
+            <div class="footer">
+                <slot name="footer"/>
             </div>
         </core-panel>
     </core-content>
@@ -34,7 +34,7 @@ export default {
 
 <style scoped>
 
-    .buttons {
+    .header {
         padding-bottom: 15px;
         border-bottom: 1px solid var(--font-color-light);
         margin-bottom: 15px;
@@ -46,11 +46,4 @@ export default {
         margin-bottom: 15px;
     }
 
-    .feedback {
-
-    }
-
-    .side-menu {
-        width: 480px;
-    }
 </style>

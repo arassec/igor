@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="sticky">
         <core-panel>
             <h1>
                 <font-awesome-icon icon="tasks"/>
@@ -43,7 +43,8 @@
                     <td><label>Category</label></td>
                     <td>
                         <select v-model="task.provider.category"
-                                v-on:change="loadTypes(task.provider.category.key)">
+                                v-on:change="loadTypesOfCategory(task.provider.category.key, true).then(() => {
+                                        loadParametersOfType(task.provider.type.key)})">
                             <option v-for="providerCategory in providerCategories" v-bind:value="providerCategory"
                                     v-bind:key="providerCategory.key">
                                 {{providerCategory.label}}
@@ -54,7 +55,7 @@
                 <tr>
                     <td><label>Type</label></td>
                     <td>
-                        <select v-model="task.provider.type" v-on:change="loadTypeParameters(task.provider.type.key)">
+                        <select v-model="task.provider.type" v-on:change="loadParametersOfType(task.provider.type.key)">
                             <option v-for="providerType in providerTypes" v-bind:value="providerType"
                                     v-bind:key="providerType.key">
                                 {{providerType.label}}
@@ -78,6 +79,7 @@
 import ValidationError from '../common/validation-error'
 import ParameterEditor from '../common/parameter-editor'
 import CorePanel from '../common/core-panel'
+import IgorBackend from '../../utils/igor-backend.js'
 
 export default {
   name: 'task-configurator',
@@ -87,52 +89,38 @@ export default {
     return {
       nameValidationError: '',
       providerCategories: [],
-      providerTypes: [],
-      initializeTypeParameters: true
+      providerTypes: []
     }
   },
   methods: {
-    loadCategories: function () {
-      let component = this
-      this.$http.get('/api/category/provider').then(function (response) {
-        for (let i = component.providerCategories.length; i > 0; i--) {
-          component.providerCategories.pop()
+    loadCategories: async function () {
+      await IgorBackend.getData('/api/category/provider').then((categories) => {
+        for (let i = this.providerCategories.length; i > 0; i--) {
+          this.providerCategories.pop()
         }
-        Array.from(response.data).forEach(function (item) {
+        let component = this
+        Array.from(categories).forEach(function (item) {
           component.providerCategories.push(item)
         })
-        component.loadTypes(component.task.provider.category.key)
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Loading provider categories failed! (' + error + ')', true)
       })
     },
-    loadTypes: function (categoryType) {
-      let component = this
-      this.$http.get('/api/type/provider/' + categoryType).then(function (response) {
-        for (let i = component.providerTypes.length; i > 0; i--) {
-          component.providerTypes.pop()
+    loadTypesOfCategory: async function (categoryKey, selectFirst) {
+      await IgorBackend.getData('/api/type/provider/' + categoryKey).then((types) => {
+        for (let i = this.providerTypes.length; i > 0; i--) {
+          this.providerTypes.pop()
         }
-        Array.from(response.data).forEach(function (item) {
+        let component = this
+        Array.from(types).forEach(function (item) {
           component.providerTypes.push(item)
         })
-        // Skip the parameter loading if they already exist in the model:
-        if (component.initializeTypeParameters) {
-          component.loadTypeParameters(component.task.provider.type.key)
-        } else {
-          // After the first skip, always load parameters:
-          component.initializeTypeParameters = true
+        if (selectFirst) {
+          this.task.provider.type = this.providerTypes[0]
         }
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Loading provider types failed! (' + error + ')', true)
       })
     },
-    loadTypeParameters: function (type) {
-      let component = this
-      component.initializeTypeParameters = true
-      this.$http.get('/api/parameters/provider/' + type).then(function (response) {
-        component.task.provider.parameters = response.data
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Loading provider parameters failed! (' + error + ')', true)
+    loadParametersOfType: function (typeKey) {
+      IgorBackend.getData('/api/parameters/provider/' + typeKey).then((parameters) => {
+        this.task.provider.parameters = parameters
       })
     },
     validateInput: function () {
@@ -155,12 +143,23 @@ export default {
       this.$emit('create-service', this.taskKey, parameterIndex, serviceCategory)
     }
   },
-  mounted () {
-    // Don't load type parameters as they are already provided within the component's model:
-    if (Array.isArray(this.task.provider.parameters) && this.task.provider.parameters.length) {
-      this.initializeTypeParameters = false
+  watch: {
+    task: function() {
+      // When an action is moved in the tree-navigation, the vue-model changes for the component!
+      this.loadCategories().then(() => {
+        this.loadTypesOfCategory(this.task.provider.category.key, false)
+      })
     }
-    this.loadCategories()
+  },
+  mounted () {
+    this.loadCategories().then(() => {
+      this.loadTypesOfCategory(this.task.provider.category.key, false).then(() => {
+        // Don't load type parameters if they are provided within the component's model:
+        if (!(Array.isArray(this.task.provider.parameters) && this.task.provider.parameters.length)) {
+          this.loadParametersOfType(this.task.provider.type.key)
+        }
+      })
+    })
   }
 }
 </script>

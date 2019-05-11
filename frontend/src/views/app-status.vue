@@ -1,86 +1,209 @@
 <template>
-  <core-container class="min-width">
+    <core-container>
 
-    <spacer-item/>
+        <side-menu class="side-menu-large">
+            <p slot="title">Job Slots</p>
+            <!--
+            <layout-row slot="header">
+                <p slot="left">
+                    <input-button :icon="'clipboard-list'"/>
+                </p>
+            </layout-row>
+            -->
+            <p slot="content" v-if="runningJobs.length">
+                <label class="list-label">Currently running jobs ({{this.runningJobs.length}}/{{this.numSlots}})</label>
+                <feedback-box v-for="(runningJob, index) in runningJobs" :key="index" class="list-entry"
+                              v-on:feedback-clicked="openExecutionDetailsDialog(runningJob)">
+                    <label slot="left">{{formatName(runningJob.jobName)}}</label>
+                    <div slot="right">
+                        <label>{{runningJob.duration}}</label>
+                        <input-button slot="right" icon="times" v-on:clicked="openCancelJobDialog(runningJob)"/>
+                    </div>
+                </feedback-box>
+            </p>
+            <label slot="content" v-if="runningJobs.length === 0">No jobs are currently running.</label>
+            <p slot="footer" v-if="waitingJobs.length">
+                <label class="list-label">Waiting jobs</label>
+                <feedback-box v-for="(waitingJob, index) in waitingJobs" :key="index" class="list-entry"
+                              v-on:feedback-clicked="openExecutionDetailsDialog(waitingJob)">
+                    <label slot="left">{{formatName(waitingJob.jobName)}}</label>
+                    <div slot="right">
+                        <label>{{waitingJob.duration}}</label>
+                        <input-button slot="right" icon="times" v-on:clicked="openCancelJobDialog(waitingJob)"/>
+                    </div>
+                </feedback-box>
+            </p>
+            <label slot="footer" v-if="waitingJobs.length === 0">No jobs are currently waiting.</label>
+        </side-menu>
 
-    <core-content>
+        <job-list class="core-content-normal"/>
 
-      <list-header :filter="filter" :filter-key="'job-schedule-list-filter'">
-        <p slot="title">Scheduled Jobs</p>
-      </list-header>
+        <service-list class="core-content-normal"/>
 
-      <list-entry v-for="scheduleEntry in filteredSchedule"
-                  v-bind:key="scheduleEntry.id"
-                  v-bind:id="scheduleEntry.id">
-        <list-name slot="left">{{scheduleEntry.name}}</list-name>
-        <list-name slot="right">{{scheduleEntry.date}}</list-name>
-      </list-entry>
+        <job-execution-details v-if="showExecutionDetailsDialog"
+                               v-bind:job-execution="selectedJobExecution"
+                               v-on:close="closeExecutionDetailsDialog()"/>
 
-    </core-content>
+        <modal-dialog v-if="showCancelJobDialog"
+                      @close="showCancelJobDialog = false"
+                      v-on:cancel="showCancelJobDialog = false">
+            <h1 slot="header">Cancel job execution</h1>
+            <p slot="body">
+                Are you sure you want to cancel this execution of job '{{selectedJobExecutionListEntry.jobName}}'?
+            </p>
+            <layout-row slot="footer">
+                <input-button slot="left" v-on:clicked="showCancelJobDialog = false" icon="times"/>
+                <input-button slot="right" v-on:clicked="cancelJobExecution()" icon="check"/>
+            </layout-row>
+        </modal-dialog>
 
-    <spacer-item/>
+        <background-icon right="true" icon-one="clipboard-list"/>
 
-    <background-icon left="true" icon-one="clipboard-list"/>
-
-  </core-container>
+    </core-container>
 </template>
 
 <script>
-    import SpacerItem from "../components/common/spacer-item";
-    import CoreContainer from "../components/common/core-container";
-    import CoreContent from "../components/common/core-content";
-    import ListEntry from "../components/common/list-entry";
-    import ListName from "../components/common/list-name";
-    import ListHeader from "../components/common/list-header";
-    import BackgroundIcon from '../components/common/background-icon'
+  import CoreContainer from "../components/common/core-container";
+  import SideMenu from "../components/common/side-menu";
+  import LayoutRow from "../components/common/layout-row";
+  import JobList from "../components/jobs/job-list";
+  import ServiceList from "../components/services/service-list";
+  import BackgroundIcon from "../components/common/background-icon";
+  import InputButton from "../components/common/input-button";
+  import FeedbackBox from "../components/common/feedback-box";
+  import IgorBackend from '../utils/igor-backend.js'
+  import FormatUtils from '../utils/format-utils.js'
+  import ModalDialog from "../components/common/modal-dialog";
+  import JobExecutionDetails from "../components/jobs/job-execution-details";
 
-    export default {
-        name: 'app-status',
-        components: {BackgroundIcon, ListHeader, ListName, ListEntry, CoreContent, CoreContainer, SpacerItem},
-        data: function () {
-            return {
-                schedule: [],
-                filterText: ''
+  export default {
+    name: 'app-status',
+    components: {
+      JobExecutionDetails,
+      ModalDialog,
+      FeedbackBox, InputButton, BackgroundIcon, ServiceList, JobList, LayoutRow, SideMenu, CoreContainer
+    },
+    data: function () {
+      return {
+        numSlots: 0,
+        runningJobs: [],
+        waitingJobs: [],
+        jobExecutionsListRefreshTimer: null,
+        jobExecutionDetailsRefreshTimer: null,
+        showCancelJobDialog: false,
+        showExecutionDetailsDialog: false,
+        selectedJobExecutionListEntry: null,
+        selectedJobExecution: null,
+        selectedJobExecutionId: null
+      }
+    },
+    methods: {
+      loadNumSlots: async function () {
+        this.numSlots = await IgorBackend.getData('/api/execution/numSlots')
+      },
+      loadRunningJobs: function () {
+        IgorBackend.getData('/api/execution/RUNNING').then((result) => {
+          for (let i = this.runningJobs.length; i > 0; i--) {
+            this.runningJobs.pop()
+          }
+          let component = this
+          Array.from(result).forEach(function (item) {
+            component.runningJobs.push(item)
+          })
+        })
+      },
+      loadWaitingJobs: function () {
+        IgorBackend.getData('/api/execution/WAITING').then((result) => {
+          for (let i = this.waitingJobs.length; i > 0; i--) {
+            this.waitingJobs.pop()
+          }
+          let component = this
+          Array.from(result).forEach(function (item) {
+            component.waitingJobs.push(item)
+          })
+        })
+      },
+      openExecutionDetailsDialog: async function (selectedJobExecutionListEntry) {
+        this.selectedJobExecutionId = selectedJobExecutionListEntry.id
+        this.selectedJobExecution = await IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId)
+        this.showExecutionDetailsDialog = true
+        this.jobExecutionDetailsRefreshTimer = setInterval(() => {
+          this.updateJobExectuionDetails()
+        }, 1000)
+      },
+      closeExecutionDetailsDialog: function () {
+        clearTimeout(this.jobExecutionDetailsRefreshTimer)
+        this.showExecutionDetailsDialog = false
+      },
+      updateJobExectuionDetails: function() {
+        IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId).then((result) => {
+          this.selectedJobExecution = result
+        })
+      },
+      openCancelJobDialog: function (selectedJobExecutionListEntry) {
+        this.selectedJobExecutionListEntry = selectedJobExecutionListEntry
+        this.showCancelJobDialog = true
+      },
+      cancelJobExecution: function () {
+        this.showCancelJobDialog = false
+        clearTimeout(this.jobExecutionsListRefreshTimer)
+        IgorBackend.postData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/cancel', null,
+            "Cancelling job", "Job cancelled.", "Job could not be cancelled!").then(() => {
+          for (let i = 0; i < this.runningJobs.length; i++) {
+            if (this.runningJobs[i].id === this.selectedJobExecutionListEntry.id){
+              this.$delete(this.runningJobs, i)
+              break
             }
-        },
-        methods: {
-            loadSchedule: function () {
-                let component = this
-                this.$http.get('/api/job/schedule').then(function (response) {
-                    for (let i = component.schedule.length; i > 0; i--) {
-                        component.schedule.pop()
-                    }
-                    Array.from(response.data).forEach(function (item) {
-                        component.schedule.push(item)
-                    })
-                }).catch(function (error) {
-                    component.$root.$data.store.setFeedback('Schedule could not be loaded (' + error + ')', true)
-                })
-            },
-            filter: function (filterTextFromListHeader) {
-                this.filterText = filterTextFromListHeader
-
-            }
-        },
-        computed: {
-            filteredSchedule: function () {
-                let component = this
-                return this.schedule.filter(function (scheduleEntry) {
-                    return scheduleEntry.name.includes(component.filterText)
-                })
-            }
-        },
-        mounted() {
-            this.loadSchedule()
-        }
-
+          }
+          this.jobExecutionsListRefreshTimer = setInterval(() => {
+            this.loadNumSlots()
+            this.loadRunningJobs()
+            this.loadWaitingJobs()
+          }, 1000)
+        })
+      },
+      formatName: function (name) {
+        return FormatUtils.formatNameForListEntry(name, 27)
+      }
+    },
+    mounted() {
+      this.$root.$data.store.clearServiceData()
+      this.$root.$data.store.clearJobData()
+      this.loadNumSlots().then(() => {
+        this.loadRunningJobs()
+        this.loadWaitingJobs()
+        this.jobExecutionsListRefreshTimer = setInterval(() => {
+          this.loadNumSlots()
+          this.loadRunningJobs()
+          this.loadWaitingJobs()
+        }, 1000)
+      })
     }
+  }
 </script>
 
 <style scoped>
 
-  .min-width {
-    --content-width: 800px;
-  }
+    .list-entry:hover {
+        cursor: pointer;
+        background-color: var(--main-background-color);
+    }
+
+    .list-entry:hover * {
+        cursor: pointer;
+        color: var(--panel-background-color);
+        border-color: var(--panel-background-color);
+    }
+
+    .list-entry:hover div[class='button']:hover {
+        cursor: pointer;
+        color: var(--font-color-light);
+        background-color: var(--panel-background-color);
+    }
+
+    .list-label {
+        margin-bottom: 5px;
+        display: inline-block;
+    }
 
 </style>

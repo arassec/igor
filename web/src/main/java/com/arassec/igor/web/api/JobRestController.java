@@ -149,8 +149,7 @@ public class JobRestController {
      * @param jobJson The job in JSON form.
      * @return 'OK' on success.
      */
-    @PostMapping("run")
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "run", produces = MediaType.APPLICATION_JSON_VALUE)
     public String runJob(@RequestBody String jobJson) {
         Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
         Job savedJob = jobManager.save(job);
@@ -159,34 +158,20 @@ public class JobRestController {
     }
 
     /**
-     * Returns the execution states of a certain job.
-     *
-     * @param id The job's ID.
-     * @return The saved {@link JobExecution}s with information about their state or {@code null}, if the job has never
-     * been executed.
-     */
-    @GetMapping("{id}/executions")
-    public List<JobExecution> getExecution(@PathVariable("id") Long id) {
-        List<JobExecution> jobExecutions = jobManager.getJobExecution(id);
-        if (jobExecutions != null) {
-            return jobExecutions;
-        }
-        return new LinkedList<>();
-    }
-
-    /**
-     * Cancels a running job.
+     * Runs the job with the given ID.
      *
      * @param id The job's ID.
      * @return 'OK' on success.
      */
-    @PostMapping("{id}/cancel")
+    @PostMapping("run/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancelJob(@PathVariable("id") Long id) {
-        if (StringUtils.isEmpty(id)) {
-            throw new IllegalArgumentException("ID required");
+    public void runJobFromId(@PathVariable("id") Long id) {
+        Job job = jobManager.load(id);
+        if (job != null) {
+            jobManager.enqueue(job);
+            return;
         }
-        jobManager.cancel(id);
+        throw new IllegalArgumentException("Invalid job ID");
     }
 
     /**

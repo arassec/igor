@@ -1,10 +1,10 @@
 <template>
     <modal-dialog>
         <p slot="header">
-            <button-row>
+            <layout-row>
                 <h1 slot="left">Job Execution Details</h1>
                 <input-button slot="right" icon="times" v-on:clicked="$emit('close')" class="button-margin-right"/>
-            </button-row>
+            </layout-row>
         </p>
 
         <div class="" slot="body">
@@ -49,13 +49,13 @@
 
 <script>
 import ModalDialog from '../common/modal-dialog'
-import ButtonRow from '../common/button-row'
+import LayoutRow from '../common/layout-row'
 import InputButton from '../common/input-button'
 
 export default {
   name: 'job-execution-details',
   props: ['jobExecution'],
-  components: {InputButton, ButtonRow, ModalDialog},
+  components: {InputButton, LayoutRow, ModalDialog},
   methods: {
     formatDate: function (unformattedDate) {
       let options = { year: 'numeric', month: '2-digit', day: '2-digit' };

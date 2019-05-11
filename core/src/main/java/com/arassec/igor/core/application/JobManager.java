@@ -136,15 +136,24 @@ public class JobManager implements InitializingBean, DisposableBean {
     }
 
     /**
-     * Cancels a running job.
+     * Cancels a running or waiting job-execution.
      *
-     * @param id The ID of the job that should be cancelled.
+     * @param jobExecutionId The ID of the job-execution that should be cancelled.
      */
-    public void cancel(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID required to cancel job!");
+    public void cancel(Long jobExecutionId) {
+        if (jobExecutionId == null) {
+            throw new IllegalArgumentException("ID required to cancel job-execution!");
         }
-        jobExecutor.cancel(id);
+        JobExecution jobExecution = jobExecutionRepository.findById(jobExecutionId);
+        if (jobExecution != null) {
+            if (JobExecutionState.WAITING.equals(jobExecution.getExecutionState())) {
+                jobExecution.setExecutionState(JobExecutionState.CANCELLED);
+                jobExecution.setFinished(Instant.now());
+                jobExecutionRepository.upsert(jobExecution);
+            } else if (JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {
+                jobExecutor.cancel(jobExecution.getJobId());
+            }
+        }
     }
 
     /**
@@ -202,8 +211,40 @@ public class JobManager implements InitializingBean, DisposableBean {
      * @param id The job's ID.
      * @return The current {@link JobExecution} of the job, if it is running, or {@code null} otherwise.
      */
-    public List<JobExecution> getJobExecution(Long id) {
+    public List<JobExecution> getJobExecutionsOfJob(Long id) {
         return jobExecutionRepository.findAllOfJob(id);
+    }
+
+    /**
+     * Returns the job-execution with the given ID.
+     *
+     * @param id The job-execution's ID.
+     * @return The {@link JobExecution}.
+     */
+    public JobExecution getJobExecution(Long id) {
+        return jobExecutionRepository.findById(id);
+    }
+
+    /**
+     * Returns all job executions which are in the desired state.
+     *
+     * @param state The state the job executions must be in to be listed.
+     * @return The list of job executions in that state.
+     */
+    public List<JobExecution> getJobExecutionsInState(JobExecutionState state) {
+        if (state == null) {
+            throw new IllegalArgumentException("JobExecutionState required!");
+        }
+        return jobExecutionRepository.findInState(state);
+    }
+
+    /**
+     * Returns the number of slots available for parallel job execution.
+     *
+     * @return The number of slots.
+     */
+    public int getNumSlots() {
+        return jobExecutor.getJobQueueSize();
     }
 
     /**
