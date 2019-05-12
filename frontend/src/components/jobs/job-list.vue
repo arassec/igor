@@ -15,7 +15,8 @@
             <p slot="right" :class="!job.active ? 'inactive' : ''">
                 <input-button v-on:clicked="duplicateJob(job.id)" icon="clone" class="button-margin-right"/>
                 <input-button v-on:clicked="openDeleteJobDialog(job.id, job.name)"  class="button-margin-right" icon="trash-alt"/>
-                <input-button v-on:clicked="openRunJobDialog(job.id, job.name)" icon="play"/>
+                <input-button v-on:clicked="openRunJobDialog(job.id, job.name)" icon="play"
+                    :disabled="jobRunningOrWaiting(job.id)"/>
             </p>
         </list-entry>
 
@@ -57,6 +58,7 @@
   export default {
     name: "job-list",
     components: {LayoutRow, ModalDialog, InputButton, DeleteJobDialog, ListName, ListEntry, ListHeader, CoreContent},
+    props: ['runningJobs', 'waitingJobs'],
     data: function () {
       return {
         jobs: [],
@@ -68,6 +70,23 @@
       }
     },
     methods: {
+      jobRunningOrWaiting: function (jobId) {
+        if (this.runningJobs != null) {
+          for (let i = 0; i < this.runningJobs.length; i++) {
+            if (jobId === this.runningJobs[i].jobId) {
+              return true
+            }
+          }
+        }
+        if (this.waitingJobs != null) {
+          for (let i = 0; i < this.waitingJobs.length; i++) {
+            if (jobId === this.waitingJobs[i].jobId) {
+              return true
+            }
+          }
+        }
+        return false
+      },
       loadJobs: function () {
         IgorBackend.getData('/api/job').then((result) => {
           for (let i = this.jobs.length; i > 0; i--) {

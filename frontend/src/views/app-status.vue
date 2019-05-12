@@ -36,7 +36,9 @@
             <label slot="footer" v-if="waitingJobs.length === 0">No jobs are currently waiting.</label>
         </side-menu>
 
-        <job-list class="core-content-normal"/>
+        <job-list class="core-content-normal"
+            :running-jobs="runningJobs"
+            :waiting-jobs="waitingJobs"/>
 
         <service-list class="core-content-normal"/>
 

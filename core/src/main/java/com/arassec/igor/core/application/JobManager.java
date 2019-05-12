@@ -108,6 +108,7 @@ public class JobManager implements InitializingBean, DisposableBean {
      * @param id The ID of the job that should be deleted.
      */
     public void delete(Long id) {
+        jobExecutor.cancel(id);
         Job job = jobRepository.findById(id);
         if (job != null) {
             unschedule(job);
