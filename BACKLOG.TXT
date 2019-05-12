@@ -1,8 +1,8 @@
+- Deleting a job doesn't cancel it if it's running
 - Unit-Tests (Apache Mina SSHD!)
 - ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
   - With this: support enums in parameter editor
 - HTTP-File-Service provider (with follow redirects!)
-- Warning when leaving an editor and unsaved changes exist
 - Persistence-service editor
 - SSH access with key
 - Local SSL-Keystore that can be modified via GUI

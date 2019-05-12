@@ -68,6 +68,17 @@
                 </p>
             </core-panel>
 
+            <modal-dialog v-if="showUnsavedValuesExistDialog" @close="showUnsavedValuesExistDialog = false">
+                <h1 slot="header">Unsaved configuration</h1>
+                <p slot="body">There are unsaved configuration changes.<br/><br/>Do you really want to leave?</p>
+                <div slot="footer">
+                    <layout-row>
+                        <input-button slot="left" v-on:clicked="showUnsavedValuesExistDialog = false" icon="times"/>
+                        <input-button slot="right" v-on:clicked="nextRoute()" icon="check"/>
+                    </layout-row>
+                </div>
+            </modal-dialog>
+
         </core-content>
 
         <background-icon right="true" icon-one="cogs"/>
@@ -87,10 +98,12 @@
   import FormatUtils from '../utils/format-utils.js'
   import IgorBackend from '../utils/igor-backend.js'
   import BackgroundIcon from "../components/common/background-icon";
+  import ModalDialog from "../components/common/modal-dialog";
 
   export default {
     name: 'service-editor',
     components: {
+      ModalDialog,
       BackgroundIcon,
       SideMenu,
       ValidationError,
@@ -109,17 +122,20 @@
         serviceTypes: [],
         nameValidationError: '',
         loadParameters: true,
+        originalServiceConfiguration: null,
         serviceConfiguration: {
           name: '',
           category: {},
           type: {},
           parameters: {}
-        }
+        },
+        showUnsavedValuesExistDialog: false,
+        nextRoute: null
       }
     },
     methods: {
-      loadService: function (id) {
-        IgorBackend.getData('/api/service/' + id).then((serviceConfiguration) => {
+      loadService: async function (id) {
+        await IgorBackend.getData('/api/service/' + id).then((serviceConfiguration) => {
           this.serviceConfiguration = serviceConfiguration
           this.serviceCategories.push(this.serviceConfiguration.category)
           this.serviceTypes.push(this.serviceConfiguration.type)
@@ -160,8 +176,8 @@
           }
         })
       },
-      loadParametersOfType: function (typeKey) {
-        IgorBackend.getData('/api/parameters/service/' + typeKey).then((parameters) => {
+      loadParametersOfType: async function (typeKey) {
+        await IgorBackend.getData('/api/parameters/service/' + typeKey).then((parameters) => {
           this.serviceConfiguration.parameters = parameters
         })
       },
@@ -179,22 +195,29 @@
           IgorBackend.postData('/api/service', this.serviceConfiguration, 'Saving service',
               'Service \'' + FormatUtils.formatNameForSnackbar(this.serviceConfiguration.name) + '\' saved.',
               'Saving failed!').then((result) => {
-            this.serviceConfiguration = result;
-            this.newService = false
-            this.$router.push({name: 'service-editor', params: {serviceId: this.serviceConfiguration.id}})
-            let jobData = this.$root.$data.store.getJobData()
-            if (jobData.jobConfiguration != null) {
-              let serviceParameter = {
-                name: this.serviceConfiguration.name,
-                id: this.serviceConfiguration.id
+            if (result === 'NAME_ALREADY_EXISTS_ERROR') {
+              this.nameValidationError = 'A service with this name already exists!'
+            } else {
+              this.serviceConfiguration = result;
+              this.newService = false
+              this.originalServiceConfiguration = JSON.stringify(this.serviceConfiguration)
+              this.$router.push({name: 'service-editor', params: {serviceId: this.serviceConfiguration.id}})
+              let jobData = this.$root.$data.store.getJobData()
+              if (jobData.jobConfiguration != null) {
+                let serviceParameter = {
+                  name: this.serviceConfiguration.name,
+                  id: this.serviceConfiguration.id
+                }
+                jobData.serviceParameter = serviceParameter
               }
-              jobData.serviceParameter = serviceParameter
             }
           })
         } else {
           IgorBackend.putData('/api/service', this.serviceConfiguration, 'Saving service',
               'Service \'' + FormatUtils.formatNameForSnackbar(this.serviceConfiguration.name) + '\' updated.',
-              'Saving failed!')
+              'Saving failed!').then(() => {
+            this.originalServiceConfiguration = JSON.stringify(this.serviceConfiguration)
+          })
         }
       },
       cancelConfiguration: function () {
@@ -234,29 +257,49 @@
         this.loadCategories(null).then(() => {
           this.loadTypesOfCategory(this.serviceConfiguration.category.key, false)
         })
+        this.originalServiceConfiguration = JSON.stringify(serviceData.serviceConfiguration)
       } else {
         // Load a service configuration from the backend
         if (this.serviceId != null) {
-          this.loadService(this.serviceId)
+          this.loadService(this.serviceId).then(() => {
+            this.originalServiceConfiguration = JSON.stringify(this.serviceConfiguration)
+          })
         } else {
           // Create a new service from within a job configuration. The category is fixed since the job requires it.
           let jobData = this.$root.$data.store.getJobData()
           if (jobData.serviceCategory != null) {
+            let component = this
             this.loadCategories(jobData.serviceCategory).then(() => {
-              this.loadTypesOfCategory(this.serviceConfiguration.category.key, true).then(() => {
-                this.loadParametersOfType(this.serviceConfiguration.type.key)
+              component.loadTypesOfCategory(component.serviceConfiguration.category.key, true).then(() => {
+                component.loadParametersOfType(component.serviceConfiguration.type.key).then(() => {
+                  component.originalServiceConfiguration = JSON.stringify(component.serviceConfiguration)
+                })
               })
             })
           } else {
             // Create a new service without restrictions:
+            let component = this
             this.loadCategories(null).then(() => {
-              this.loadTypesOfCategory(this.serviceConfiguration.category.key, true).then(() => {
-                this.loadParametersOfType(this.serviceConfiguration.type.key)
+              component.loadTypesOfCategory(component.serviceConfiguration.category.key, true).then(() => {
+                component.loadParametersOfType(component.serviceConfiguration.type.key).then(() => {
+                  component.originalServiceConfiguration = JSON.stringify(component.serviceConfiguration)
+                })
               })
             })
           }
         }
       }
+    },
+    beforeRouteLeave(to, from, next) {
+      if (this.originalServiceConfiguration) {
+        let newServiceConfiguration = JSON.stringify(this.serviceConfiguration)
+        if (!(this.originalServiceConfiguration === newServiceConfiguration)) {
+          this.nextRoute = next
+          this.showUnsavedValuesExistDialog = true
+          return
+        }
+      }
+      next();
     }
   }
 </script>

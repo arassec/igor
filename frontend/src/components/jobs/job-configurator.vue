@@ -129,8 +129,8 @@
           }
         })
       },
-      loadParametersOfType: function (typeKey) {
-        IgorBackend.getData('/api/parameters/trigger/' + typeKey).then((parameters) => {
+      loadParametersOfType: async function (typeKey) {
+        await IgorBackend.getData('/api/parameters/trigger/' + typeKey).then((parameters) => {
           this.jobConfiguration.trigger.parameters = parameters
         })
       },
@@ -162,7 +162,9 @@
       this.loadCategories().then(() => {
         this.loadTypesOfCategory(this.jobConfiguration.trigger.category.key).then(() => {
           if (loadParameters) {
-            this.loadParametersOfType(this.jobConfiguration.trigger.type.key)
+            this.loadParametersOfType(this.jobConfiguration.trigger.type.key).then(() => {
+              this.$emit('update-original-job-configuration')
+            })
           }
         })
       })

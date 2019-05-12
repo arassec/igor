@@ -50,6 +50,7 @@
             <job-configurator
                     v-show="selectedTaskIndex == -1"
                     :job-configuration="jobConfiguration"
+                    v-on:update-original-job-configuration="updateOriginalJobConfiguration()"
                     ref="jobConfigurator"/>
 
             <task-configurator v-for="(task, taskIndex) in jobConfiguration.tasks"
@@ -70,54 +71,6 @@
                                      ref="actionConfigurators"/>
             </template>
 
-            <modal-dialog v-if="showDeleteTaskDialog" @close="showDeleteTaskDialog = false">
-                <h1 slot="header">Delete Task?</h1>
-                <p slot="body">Do you really want to delete this Task?</p>
-                <div slot="footer">
-                    <layout-row>
-                        <input-button slot="left" v-on:clicked="showDeleteTaskDialog = false" icon="times"/>
-                        <input-button slot="right" v-on:clicked="deleteTask()" icon="check"/>
-                    </layout-row>
-                </div>
-            </modal-dialog>
-
-            <modal-dialog v-if="showDeleteActionDialog" @close="showDeleteActionDialog = false">
-                <h1 slot="header">Delete Action?</h1>
-                <p slot="body">Do you really want to delete this Action?</p>
-                <div slot="footer">
-                    <layout-row>
-                        <input-button slot="left" v-on:clicked="showDeleteActionDialog = false" icon="times"/>
-                        <input-button slot="right" v-on:clicked="deleteAction()" icon="check"/>
-                    </layout-row>
-                </div>
-            </modal-dialog>
-
-            <modal-dialog v-if="showRunDialog"
-                          @close="showRunDialog = false"
-                          v-on:cancel="showRunDialog = false">
-                <h1 slot="header">Start job</h1>
-                <p slot="body">
-                    Manually start job now?
-                </p>
-                <layout-row slot="footer">
-                    <input-button slot="left" v-on:clicked="showRunDialog = false" icon="times"/>
-                    <input-button slot="right" v-on:clicked="runJob()" icon="check"/>
-                </layout-row>
-            </modal-dialog>
-
-            <modal-dialog v-if="showCancelJobDialog"
-                          @close="showCancelJobDialog = false"
-                          v-on:cancel="showCancelJobDialog = false">
-                <h1 slot="header">Cancel job execution</h1>
-                <p slot="body">
-                    Are you sure you want to cancel this execution?
-                </p>
-                <layout-row slot="footer">
-                    <input-button slot="left" v-on:clicked="showCancelJobDialog = false" icon="times"/>
-                    <input-button slot="right" v-on:clicked="cancelJobExecution()" icon="check"/>
-                </layout-row>
-            </modal-dialog>
-
             <job-execution-details v-if="showExecutionDetailsDialog"
                                    v-bind:job-execution="selectedJobExecution"
                                    v-on:close="closeExecutionDetailsDialog()"/>
@@ -128,6 +81,65 @@
                                v-on:close="testResults = null"
                                v-bind:error-cause="testResults.errorCause"
                                v-bind:selected-test-results="selectedTestResults"/>
+
+        <modal-dialog v-if="showDeleteTaskDialog" @close="showDeleteTaskDialog = false">
+            <h1 slot="header">Delete Task?</h1>
+            <p slot="body">Do you really want to delete this Task?</p>
+            <div slot="footer">
+                <layout-row>
+                    <input-button slot="left" v-on:clicked="showDeleteTaskDialog = false" icon="times"/>
+                    <input-button slot="right" v-on:clicked="deleteTask()" icon="check"/>
+                </layout-row>
+            </div>
+        </modal-dialog>
+
+        <modal-dialog v-if="showDeleteActionDialog" @close="showDeleteActionDialog = false">
+            <h1 slot="header">Delete Action?</h1>
+            <p slot="body">Do you really want to delete this Action?</p>
+            <div slot="footer">
+                <layout-row>
+                    <input-button slot="left" v-on:clicked="showDeleteActionDialog = false" icon="times"/>
+                    <input-button slot="right" v-on:clicked="deleteAction()" icon="check"/>
+                </layout-row>
+            </div>
+        </modal-dialog>
+
+        <modal-dialog v-if="showRunDialog"
+                      @close="showRunDialog = false"
+                      v-on:cancel="showRunDialog = false">
+            <h1 slot="header">Start job</h1>
+            <p slot="body">
+                Manually start job now?
+            </p>
+            <layout-row slot="footer">
+                <input-button slot="left" v-on:clicked="showRunDialog = false" icon="times"/>
+                <input-button slot="right" v-on:clicked="runJob()" icon="check"/>
+            </layout-row>
+        </modal-dialog>
+
+        <modal-dialog v-if="showCancelJobDialog"
+                      @close="showCancelJobDialog = false"
+                      v-on:cancel="showCancelJobDialog = false">
+            <h1 slot="header">Cancel job execution</h1>
+            <p slot="body">
+                Are you sure you want to cancel this execution?
+            </p>
+            <layout-row slot="footer">
+                <input-button slot="left" v-on:clicked="showCancelJobDialog = false" icon="times"/>
+                <input-button slot="right" v-on:clicked="cancelJobExecution()" icon="check"/>
+            </layout-row>
+        </modal-dialog>
+
+        <modal-dialog v-if="showUnsavedValuesExistDialog" @close="showUnsavedValuesExistDialog = false">
+            <h1 slot="header">Unsaved configuration</h1>
+            <p slot="body">There are unsaved configuration changes.<br/><br/>Do you really want to leave?</p>
+            <div slot="footer">
+                <layout-row>
+                    <input-button slot="left" v-on:clicked="showUnsavedValuesExistDialog = false" icon="times"/>
+                    <input-button slot="right" v-on:clicked="nextRoute()" icon="check"/>
+                </layout-row>
+            </div>
+        </modal-dialog>
 
         <background-icon right="true" icon-one="toolbox"/>
 
@@ -186,13 +198,16 @@
         selectedActionIndex: -1,
         testResults: null,
         selectedTestResults: null,
+        originalJobConfiguration: null,
         jobConfiguration: null,
         validationErrors: [],
         jobExecutions: [],
         jobExecutionsRefreshTimer: null,
         selectedJobExecutionListEntry: null,
         selectedJobExecution: null,
-        selectedJobExecutionId: null
+        selectedJobExecutionId: null,
+        showUnsavedValuesExistDialog: false,
+        nextRoute: null
       }
     },
     computed: {
@@ -232,45 +247,32 @@
         this.jobConfiguration = await IgorBackend.getData('/api/job/' + id)
         this.updateJobExecutions()
       },
-      saveConfiguration: function () {
+      saveConfiguration: async function () {
         if (!this.validateInput()) {
           return
         }
-
         this.testResults = null
-
-        let component = this
-
-        this.$root.$data.store.setWip('Saving job')
-
         if (this.newJob) {
-          this.$http.post('/api/job', this.jobConfiguration).then(function (response) {
-            component.jobConfiguration = response.data
-            component.newJob = false
-            component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' saved.', false)
-            component.$root.$data.store.clearWip()
-            component.$router.push({name: 'job-editor', params: {jobId: component.jobConfiguration.id}})
-            component.jobExecutionsRefreshTimer = setInterval(() => component.updateJobExecutions(), 1000)
-          }).catch(function (error) {
-            if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
-              component.validationErrors.push('-1_-1')
-              component.$refs.jobConfigurator.setNameValidationError('A job with this name already exists!')
+          IgorBackend.postData('/api/job', this.jobConfiguration, 'Saving job',
+              'Job \'' + FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' saved.',
+              'Saving failed!').then((result) => {
+            if (result === 'NAME_ALREADY_EXISTS_ERROR') {
+              this.validationErrors.push('-1_-1')
+              this.$refs.jobConfigurator.setNameValidationError('A job with this name already exists!')
+            } else {
+              this.jobConfiguration = result
+              this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
+              this.newJob = false
+              this.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' saved.', false)
+              this.$router.push({name: 'job-editor', params: {jobId: this.jobConfiguration.id}})
+              this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
             }
-            component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true)
-            component.$root.$data.store.clearWip()
           })
         } else {
-          this.$http.put('/api/job', this.jobConfiguration).then(function (response) {
-            component.jobConfiguration = response.data
-            component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' updated.', false)
-            component.$root.$data.store.clearWip()
-          }).catch(function (error) {
-            if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
-              component.validationErrors.push('-1_-1')
-              component.$refs.jobConfigurator.setNameValidationError('A job with this name already exists!')
-            }
-            component.$root.$data.store.setFeedback('Saving failed! (' + error + ')', true)
-            component.$root.$data.store.clearWip()
+          IgorBackend.putData('/api/job', this.jobConfiguration, 'Saving job',
+              'Job \'' + FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' updated.',
+              'Saving failed!').then(() => {
+            this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
           })
         }
       },
@@ -529,7 +531,7 @@
         IgorBackend.postData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/cancel', null,
             "Cancelling job", "Job cancelled.", "Job could not be cancelled!").then(() => {
           for (let i = 0; i < this.jobExecutions.length; i++) {
-            if (this.jobExecutions[i].id === this.selectedJobExecutionListEntry.id){
+            if (this.jobExecutions[i].id === this.selectedJobExecutionListEntry.id) {
               this.jobExecutions[i].state = 'CANCELLED'
             }
           }
@@ -539,11 +541,14 @@
       createService: function (selectionKey, parameterIndex, serviceCategory) {
         this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, serviceCategory)
         this.$router.push({name: 'service-editor'})
+      },
+      updateOriginalJobConfiguration: function () {
+        this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
       }
-    }
-    ,
+    },
     mounted() {
       let jobData = this.$root.$data.store.getJobData()
+      // Returning from a service configuration within a job configuration
       if (jobData.jobConfiguration != null) {
         this.jobConfiguration = jobData.jobConfiguration
         if (this.jobConfiguration.id != null) {
@@ -579,63 +584,59 @@
             this.selectTask(taskIndex)
           }
         }
-
+        this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
         this.$root.$data.store.clearJobData()
       } else if (this.jobId != null) {
         this.newJob = false
         this.loadJob(this.jobId).then(() => {
+          this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
           this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
         })
       } else {
+        // The job-configurator loads trigger data and modifies the initial jobConfiguration. So the 'originalJobConfiguration' property is set there...
         this.createJob()
       }
 
       let component = this
-
-      this.$http.get('/api/category/provider').then(function (response) {
-        component.initialProviderCategory = Array.from(response.data)[0]
-        component.$http.get('/api/type/provider/' + component.initialProviderCategory.key).then(function (response) {
-          component.initialProviderType = Array.from(response.data)[0]
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Could not load provider types (' + error + ')', true)
+      IgorBackend.getData('/api/category/provider').then((categoryResult) => {
+        this.initialProviderCategory = Array.from(categoryResult)[0]
+        IgorBackend.getData('/api/type/provider/' + component.initialProviderCategory.key).then((typeResult) => {
+          component.initialProviderType = Array.from(typeResult)[0]
         })
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Could not load provider categories (' + error + ')', true)
       })
-      this.$http.get('/api/category/action').then(function (response) {
-        component.initialActionCategory = Array.from(response.data)[0]
-        component.$http.get('/api/type/action/' + component.initialActionCategory.key).then(function (response) {
-          component.initialActionType = Array.from(response.data)[0]
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Could not load action types (' + error + ')', true)
+      IgorBackend.getData('/api/category/action').then((categoryResult) => {
+        this.initialActionCategory = Array.from(categoryResult)[0]
+        IgorBackend.getData('/api/type/action/' + component.initialActionCategory.key).then((typeResult) => {
+          component.initialActionType = Array.from(typeResult)[0]
         })
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Could not load action categories (' + error + ')', true)
       })
-    }
-    ,
+    },
     destroyed() {
       clearInterval(this.jobExecutionsRefreshTimer)
+      clearInterval(this.jobExecutionDetailsRefreshTimer)
+    },
+    beforeRouteLeave(to, from, next) {
+      // We leave the job editor to create a new service. No unsaved-values-check required!
+      let jobData = this.$root.$data.store.getJobData()
+      if (jobData.jobConfiguration) {
+        next()
+      } else {
+        if (this.originalJobConfiguration) {
+          let newJobConfiguration = JSON.stringify(this.jobConfiguration)
+          if (!(this.originalJobConfiguration === newJobConfiguration)) {
+            this.nextRoute = next
+            this.showUnsavedValuesExistDialog = true
+            return
+          }
+        }
+        next();
+      }
     }
   }
 </script>
 
 
 <style scoped>
-
-    .button-panel {
-        margin-top: 25px;
-    }
-
-    .add-task-button {
-        margin-top: 25px;
-        color: var(--font-color-light);
-        background-color: var(--panel-background-color);
-    }
-
-    .jobExecutionFeedback {
-        margin-bottom: 5px;
-    }
 
     .list-entry:hover {
         cursor: pointer;

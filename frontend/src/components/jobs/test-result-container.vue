@@ -48,6 +48,7 @@
     }
 
     .test-result-container {
+        z-index: -1;
         color: var(--font-color-light);
         background-color: var(--panel-background-color);
         padding: 15px;

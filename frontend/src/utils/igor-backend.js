@@ -17,6 +17,9 @@ export default {
       return response.data
     } catch (error) {
       store.setFeedback(errorMessage + '(' + error + ')', true)
+      if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
+        return error.response.data
+      }
     } finally {
       store.clearWip()
     }
