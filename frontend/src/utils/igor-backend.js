@@ -6,7 +6,11 @@ export default {
       let response = await window.axios.get(url)
       return response.data
     } catch (error) {
-      store.setFeedback('Backend request failed! (' + error + ')', true)
+      if (error.response.data) {
+        store.setFeedback('Backend request failed! (' + error.response.data + ')', true)
+      } else {
+        store.setFeedback('Backend request failed! (' + error + ')', true)
+      }
     }
   },
   postData: async function (url, payload, wipMessage, successMessage, errorMessage) {
@@ -16,7 +20,11 @@ export default {
       store.setFeedback(successMessage, false)
       return response.data
     } catch (error) {
-      store.setFeedback(errorMessage + '(' + error + ')', true)
+      if (error.response.data) {
+        store.setFeedback(errorMessage + '(' + error.response.data + ')', true)
+      } else {
+        store.setFeedback(errorMessage + '(' + error + ')', true)
+      }
       if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
         return error.response.data
       }
@@ -31,7 +39,11 @@ export default {
       store.setFeedback(successMessage, false)
       return response.data
     } catch (error) {
-      store.setFeedback(errorMessage + '(' + error + ')', true)
+      if (error.response.data) {
+        store.setFeedback(errorMessage + '(' + error.response.data + ')', true)
+      } else {
+        store.setFeedback(errorMessage + '(' + error + ')', true)
+      }
     } finally {
       store.clearWip()
     }
@@ -41,7 +53,11 @@ export default {
     await window.axios.delete(url).then(() => {
       store.setFeedback(successMessage, false)
     }).catch((error) => {
-      store.setFeedback(errorMessage + '(' + error + ')', true)
+      if (error.response.data) {
+        store.setFeedback(errorMessage + '(' + error.response.data + ')', true)
+      } else {
+        store.setFeedback(errorMessage + '(' + error + ')', true)
+      }
     }).finally(() => {
       store.clearWip()
     })

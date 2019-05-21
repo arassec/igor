@@ -5,7 +5,6 @@ import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.application.converter.JsonJobConverter;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
-import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.CronTrigger;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.api.error.RestControllerExceptionHandler;
@@ -153,7 +152,9 @@ public class JobRestController {
     public String runJob(@RequestBody String jobJson) {
         Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
         Job savedJob = jobManager.save(job);
-        jobManager.enqueue(savedJob);
+        if (job.isActive()) {
+            jobManager.enqueue(savedJob);
+        }
         return jsonJobConverter.convert(savedJob, false, true).toString();
     }
 
@@ -168,7 +169,9 @@ public class JobRestController {
     public void runJobFromId(@PathVariable("id") Long id) {
         Job job = jobManager.load(id);
         if (job != null) {
-            jobManager.enqueue(job);
+            if (job.isActive()) {
+                jobManager.enqueue(job);
+            }
             return;
         }
         throw new IllegalArgumentException("Invalid job ID");

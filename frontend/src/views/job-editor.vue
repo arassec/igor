@@ -12,7 +12,7 @@
                 </p>
                 <p slot="right">
                     <input-button icon="play" v-on:clicked="showRunDialog = true" class="button-margin-left"
-                                  :disabled="jobRunning || jobConfiguration.id == null"/>
+                                  :disabled="jobRunning || jobConfiguration.id == null || !jobConfiguration.active"/>
                 </p>
             </layout-row>
             <job-tree-navigation slot="content"

@@ -5,9 +5,9 @@
 </template>
 
 <script>
-import Navigation from './components/app-navigation'
+  import Navigation from './components/app-navigation'
 
-export default {
+  export default {
   name: 'app',
   components: {
     Navigation
@@ -112,8 +112,9 @@ export default {
   }
 
   .sticky {
+      z-index: 5;
     position: sticky;
-    top: 15px;
+      top: 0;
   }
 
 </style>

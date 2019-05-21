@@ -16,7 +16,7 @@
                 <input-button v-on:clicked="duplicateJob(job.id)" icon="clone" class="button-margin-right"/>
                 <input-button v-on:clicked="openDeleteJobDialog(job.id, job.name)"  class="button-margin-right" icon="trash-alt"/>
                 <input-button v-on:clicked="openRunJobDialog(job.id, job.name)" icon="play"
-                    :disabled="jobRunningOrWaiting(job.id)"/>
+                              :disabled="jobRunningOrWaiting(job.id) || !job.active"/>
             </p>
         </list-entry>
 

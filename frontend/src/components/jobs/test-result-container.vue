@@ -1,26 +1,24 @@
 <template>
-    <transition name="slide-fade">
-        <core-content>
-            <div class="test-result-container sticky">
-                <layout-row>
-                    <div slot="left">
-                        <h1 v-if="!errorCause && !selectedTestResults">Dry run successful</h1>
-                        <h1 v-if="selectedTestResults && !errorCause && selectedTestResults.length > 0">Dry run
-                            details</h1>
-                        <h1 v-if="selectedTestResults && errorCause">Dry run failed</h1>
-                    </div>
-                    <input-button slot="right" icon="times" v-on:clicked="$emit('close')"/>
-                </layout-row>
-                <p v-if="!errorCause && selectedTestResults.length == 0">
-                    Please select a <b>Task</b> or <b>Action</b> to see detailed dry-run results.
-                </p>
-                <pre v-if="!errorCause && selectedTestResults.length > 0" class="normal-bg">
+    <core-content class="sticky">
+        <div class="test-result-container">
+            <layout-row>
+                <div slot="left">
+                    <h1 v-if="!errorCause && !selectedTestResults">Dry run successful</h1>
+                    <h1 v-if="selectedTestResults && !errorCause && selectedTestResults.length > 0">Dry run
+                        details</h1>
+                    <h1 v-if="selectedTestResults && errorCause">Dry run failed</h1>
+                </div>
+                <input-button slot="right" icon="times" v-on:clicked="$emit('close')"/>
+            </layout-row>
+            <p v-if="!errorCause && selectedTestResults.length == 0">
+                Please select a <b>Task</b> or <b>Action</b> to see detailed dry-run results.
+            </p>
+            <pre v-if="!errorCause && selectedTestResults.length > 0" class="normal-bg">
 <code>{{ format(selectedTestResults) }}</code></pre>
-                <pre v-if="errorCause" class="error-bg">
+            <pre v-if="errorCause" class="error-bg">
 <code>{{ errorCause }}</code></pre>
-            </div>
-        </core-content>
-    </transition>
+        </div>
+    </core-content>
 </template>
 
 <script>
@@ -43,12 +41,14 @@
 <style scoped>
 
     .content {
+        z-index: 2;
         flex: 2;
         margin-right: 0px;
+        overflow: hidden;
+        max-height: calc(100vh - 20px);
     }
 
     .test-result-container {
-        z-index: -1;
         color: var(--font-color-light);
         background-color: var(--panel-background-color);
         padding: 15px;
