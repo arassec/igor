@@ -134,13 +134,17 @@
           this.jobConfiguration.trigger.parameters = parameters
         })
       },
-      validateInput: function () {
+      validateInput: async function () {
         this.nameValidationError = ''
 
-        let nameValidationResult = true
         if (this.jobConfiguration.name == null || this.jobConfiguration.name === '') {
-          nameValidationResult = false
-          this.nameValidationError = 'Value required'
+          this.nameValidationError = 'Name must be set'
+        } else {
+          let nameAlreadyExists = await IgorBackend.getData('/api/job/check/'
+              + btoa(this.jobConfiguration.name) + '/' + (this.jobConfiguration.id === undefined ? -1 : this.jobConfiguration.id))
+          if (nameAlreadyExists === true) {
+            this.nameValidationError = 'A job with this name already exists!'
+          }
         }
 
         let parameterValidationResult = true
@@ -148,7 +152,7 @@
           parameterValidationResult = this.$refs.parameterEditor.validateInput()
         }
 
-        return (nameValidationResult && parameterValidationResult)
+        return ((this.nameValidationError.length === 0) && parameterValidationResult)
       },
       setNameValidationError: function (errorMessage) {
         this.nameValidationError = errorMessage

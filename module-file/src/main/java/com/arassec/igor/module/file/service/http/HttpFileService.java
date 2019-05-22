@@ -287,7 +287,10 @@ public class HttpFileService extends BaseFileService {
         HttpClient client = connect();
         HttpRequest request = getRequestBuilder("").GET().build();
         try {
-            client.send(request, HttpResponse.BodyHandlers.discarding());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new ServiceException("GET failed for URL with HTTP status: " + response.statusCode() + " (" + request.uri().toASCIIString() + ")");
+            }
         } catch (IOException | InterruptedException e) {
             throw new ServiceException("GET failed for URL: " + request.uri().toASCIIString(), e);
         }

@@ -47,12 +47,12 @@
 </template>
 
 <script>
-import ValidationError from './validation-error'
-import InputButton from './input-button'
-import ServicePicker from '../services/service-picker'
-import CronPicker from "./cron-picker";
+  import ValidationError from './validation-error'
+  import InputButton from './input-button'
+  import ServicePicker from '../services/service-picker'
+  import CronPicker from "./cron-picker";
 
-export default {
+  export default {
   name: 'parameter-editor',
   components: {CronPicker, ServicePicker, InputButton, ValidationError},
   props: ['parameters'],
@@ -111,9 +111,6 @@ export default {
       })
 
       this.parameters.forEach(function (param, index) {
-        if (param.optional && param.value == null) {
-          param.value = ''
-        }
         if (!param.optional && (param.value == null || param.value === '')) {
           component.parameterValidationErrors[index] = 'Value required'
           component.validationOk = false

@@ -235,7 +235,7 @@
           this.nameValidationError = 'Name must be set'
         } else {
           let nameAlreadyExists = await IgorBackend.getData('/api/service/check/'
-              + this.serviceConfiguration.name + '/' + (this.serviceConfiguration.id === undefined ? -1 : this.serviceConfiguration.id))
+              + btoa(this.serviceConfiguration.name) + '/' + (this.serviceConfiguration.id === undefined ? -1 : this.serviceConfiguration.id))
           if (nameAlreadyExists === true) {
             this.nameValidationError = 'A service with this name already exists!'
           }

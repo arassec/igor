@@ -126,6 +126,23 @@ public class JobRestController {
     }
 
     /**
+     * Checks whether a job name has already been taken or not.
+     *
+     * @param encodedName The job's Base64 encoded name.
+     * @param id          The job's ID.
+     * @return {@code true} if a job with the provided name already exists, {@code false} otherwise.
+     */
+    @GetMapping("check/{name}/{id}")
+    public Boolean checkJobName(@PathVariable("name") String encodedName, @PathVariable("id") Long id) {
+        String name = new String(Base64.getDecoder().decode(encodedName));
+        Job existingJob = jobManager.loadByName(name);
+        if (existingJob != null && !(existingJob.getId().equals(id))) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Deletes the job with the given ID.
      *
      * @param id The job's ID.

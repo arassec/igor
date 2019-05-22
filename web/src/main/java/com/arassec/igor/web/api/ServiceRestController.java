@@ -172,12 +172,13 @@ public class ServiceRestController {
     /**
      * Checks whether a service name has already been taken or not.
      *
-     * @param name The service's name.
-     * @param id   The service's ID.
+     * @param encodedName The service's Base64 encoded name.
+     * @param id          The service's ID.
      * @return {@code true} if a service with the provided name already exists, {@code false} otherwise.
      */
     @GetMapping("check/{name}/{id}")
-    public Boolean checkServiceName(@PathVariable("name") String name, @PathVariable("id") Long id) {
+    public Boolean checkServiceName(@PathVariable("name") String encodedName, @PathVariable("id") Long id) {
+        String name = new String(Base64.getDecoder().decode(encodedName));
         Service existingService = serviceManager.loadByName(name);
         if (existingService != null && !(existingService.getId().equals(id))) {
             return true;

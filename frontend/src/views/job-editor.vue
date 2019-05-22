@@ -248,9 +248,10 @@
         this.updateJobExecutions()
       },
       saveConfiguration: async function () {
-        if (!this.validateInput()) {
+        if (!(await this.validateInput())) {
           return
         }
+
         this.testResults = null
         if (this.newJob) {
           IgorBackend.postData('/api/job', this.jobConfiguration, 'Saving job',
@@ -276,8 +277,8 @@
           })
         }
       },
-      testConfiguration: function () {
-        if (!this.validateInput()) {
+      testConfiguration: async function () {
+        if (!(await this.validateInput())) {
           return
         }
 
@@ -410,10 +411,10 @@
         }
         array.splice(newIndex, 0, array.splice(oldIndex, 1)[0])
       },
-      validateInput: function () {
+      validateInput: async function () {
         this.validationErrors = []
 
-        let jobConfiguratorResult = this.$refs.jobConfigurator.validateInput()
+        let jobConfiguratorResult = await this.$refs.jobConfigurator.validateInput()
         if (!jobConfiguratorResult) {
           this.validationErrors.push('-1_-1')
         }
