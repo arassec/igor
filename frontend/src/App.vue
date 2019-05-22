@@ -112,9 +112,9 @@
   }
 
   .sticky {
-      z-index: 5;
+    z-index: 5;
     position: sticky;
-      top: 0;
+    top: 15px;
   }
 
 </style>

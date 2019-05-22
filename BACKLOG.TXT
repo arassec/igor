@@ -1,7 +1,6 @@
 - Unit-Tests (Apache Mina SSHD!)
 - ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
   - With this: support enums in parameter editor
-- HTTP-File-Service provider (with follow redirects!)
 - Persistence-service editor
 - SSH access with key
 - Local SSL-Keystore that can be modified via GUI

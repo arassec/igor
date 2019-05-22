@@ -53,4 +53,10 @@
         margin-bottom: 15px;
     }
 
+    .sticky {
+        z-index: 5;
+        position: sticky;
+        top: 0px;
+    }
+
 </style>

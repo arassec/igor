@@ -1,7 +1,7 @@
 <template>
     <transition name="snackbar" v-if="feedback.message.length > 0">
         <div class="snackbar" :class="{'alert': feedback.alert, 'feedback': !feedback.alert}">
-            <layout-row>
+            <layout-row :scroll-left="true">
                 <p slot="left">
                     {{ feedback.message }}
                 </p>
@@ -35,8 +35,9 @@
 <style scoped>
 
     .snackbar {
-        max-width: 300px;
-        width: 300px;
+        overflow: hidden;
+        max-width: 400px;
+        width: 400px;
         color: var(--font-color-light);
         padding: 15px;
         display: block;
@@ -44,7 +45,7 @@
         z-index: 1;
         right: 25%;
         left: 50%;
-        margin-left: -150px;
+        margin-left: -200px;
         bottom: 0px;
     }
 

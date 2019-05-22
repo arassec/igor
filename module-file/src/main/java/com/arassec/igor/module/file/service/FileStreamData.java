@@ -26,4 +26,9 @@ public class FileStreamData {
      */
     private InputStream data;
 
+    /**
+     * An optional suffix for the target filename.
+     */
+    private String filenameSuffix;
+
 }

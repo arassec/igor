@@ -1,6 +1,6 @@
 <template>
   <div class="row" v-on:click="$emit('clicked')">
-    <div class="left">
+    <div :class="scrollLeft ? 'scroll' : ''">
       <slot name="left"/>
     </div>
     <div class="right">
@@ -11,7 +11,8 @@
 
 <script>
 export default {
-  name: 'layout-row'
+  name: 'layout-row',
+  props: ['scrollLeft']
 }
 </script>
 
@@ -22,8 +23,9 @@ export default {
     flex-direction: row;
   }
 
-  .left {
-
+  .scroll {
+    overflow-x: auto;
+    margin-right: 15px;
   }
 
   .right {

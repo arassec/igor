@@ -2,18 +2,17 @@ package com.arassec.igor.core.model.job;
 
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.action.BaseAction;
-import com.arassec.igor.core.model.misc.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.dryrun.DryRunActionResult;
 import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.job.dryrun.DryRunTaskResult;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.misc.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.provider.Provider;
 import com.rits.cloning.Cloner;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -162,8 +161,9 @@ public class Task {
      * @param jobId  The ID of the job currently executing.
      */
     public void dryRun(DryRunJobResult result, Long jobId) {
-        provider.initialize(jobId, id);
         DryRunTaskResult taskResult = new DryRunTaskResult();
+
+        provider.initialize(jobId, id);
 
         Cloner cloner = new Cloner();
 

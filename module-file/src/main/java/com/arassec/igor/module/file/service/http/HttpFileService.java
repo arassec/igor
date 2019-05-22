@@ -6,25 +6,22 @@ import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
-import jdk.jshell.spi.ExecutionControl;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringBufferInputStream;
-import java.net.Authenticator;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -37,13 +34,42 @@ public class HttpFileService extends BaseFileService {
      * The server's hostname.
      */
     @IgorParam
-    private String host;
+    protected String host;
 
     /**
      * The server's port.
      */
     @IgorParam
-    private int port = 80;
+    protected int port = 80;
+
+    /**
+     * Enables or disables following redirects.
+     */
+    @IgorParam
+    protected boolean followRedirects = true;
+
+    /**
+     * A username for authentication.
+     */
+    @IgorParam(optional = true)
+    protected String username;
+
+    /**
+     * The password for authentication.
+     */
+    @IgorParam(optional = true)
+    protected String password;
+
+    /**
+     * A timeout for the HTTP operations.
+     */
+    @IgorParam(optional = true)
+    protected long timeout = 3600;
+
+    /**
+     * The protocol to use.
+     */
+    protected String protocol = "http";
 
     /**
      * Creates a new HTTP-Client.
@@ -51,15 +77,26 @@ public class HttpFileService extends BaseFileService {
      * @return A newly created {@link HttpClient}.
      */
     protected HttpClient connect() {
+        HttpClient.Redirect redirectPolicy = HttpClient.Redirect.ALWAYS;
+        if (!followRedirects) {
+            redirectPolicy = HttpClient.Redirect.NEVER;
+        }
+
         HttpClient client = HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_2)
-                .followRedirects(HttpClient.Redirect.NORMAL)
+                .followRedirects(redirectPolicy)
                 .build();
+
         return client;
     }
 
+    /**
+     * Creates the URI to the service.
+     *
+     * @param suffix The suffix to append after host and port.
+     * @return The base URI to the service.
+     */
     protected String buildUri(String suffix) {
-        String result = "https://";
+        String result = protocol + "://";
         result += host;
         result += ":" + port;
         if (!suffix.startsWith("/")) {
@@ -70,16 +107,29 @@ public class HttpFileService extends BaseFileService {
     }
 
     /**
+     * Creates the HTTP-Request.
+     *
+     * @param uriPart The variable part of the URI.
+     * @return The {@link HttpRequest}.
+     */
+    protected HttpRequest.Builder getRequestBuilder(String uriPart) {
+        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
+                .uri(URI.create(buildUri(uriPart)))
+                .timeout(Duration.ofSeconds(timeout));
+        String authorizationHeader = createBasicAuthHeader();
+        if (!StringUtils.isEmpty(authorizationHeader)) {
+            httpRequestBuilder.headers(authorizationHeader);
+        }
+        return httpRequestBuilder;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public List<String> listFiles(String directory) {
         HttpClient client = connect();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(buildUri(directory)))
-                .timeout(Duration.ofMinutes(1))
-                .GET()
-                .build();
+        HttpRequest request = getRequestBuilder(directory).GET().build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
@@ -89,11 +139,27 @@ public class HttpFileService extends BaseFileService {
             Elements elements = document.select("a");
             List<String> result = new LinkedList<>();
             for (Element element : elements) {
-                result.add(element.absUrl("href"));
+                Attributes attributes = element.attributes();
+                String href = attributes.get("href");
+                if (href != null && !StringUtils.isEmpty(href)) {
+                    if (href.contains("#")) {
+                        href = href.substring(0, href.indexOf("#"));
+                    }
+                    if (href.contains("?")) {
+                        href = href.substring(0, href.indexOf("?"));
+                    }
+                    result.add(href);
+                }
             }
-            return result.stream().filter(file -> !"..".equals(file)).filter(file -> !".".equals(file)).collect(Collectors.toList());
+            return result.stream().filter(file -> file != null)
+                    .filter(file -> !StringUtils.isEmpty(file))
+                    .filter(file -> !"..".equals(file))
+                    .filter(file -> !".".equals(file))
+                    .filter(file -> !directory.startsWith(file))
+                    .filter(file -> !directory.equals(file))
+                    .collect(Collectors.toList());
         } catch (IOException | InterruptedException e) {
-            throw new ServiceException("HTTP request failed: " + e.getMessage());
+            throw new ServiceException("HTTP request failed: " + e.getMessage() + " (" + request.uri().toString() + ")");
         }
     }
 
@@ -103,19 +169,15 @@ public class HttpFileService extends BaseFileService {
     @Override
     public String read(String file) {
         HttpClient client = connect();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(buildUri(file)))
-                .timeout(Duration.ofMinutes(1))
-                .GET()
-                .build();
+        HttpRequest request = getRequestBuilder(file).GET().build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                throw new ServiceException("HTTP request failed with status: " + response.statusCode());
+                throw new ServiceException("HTTP request failed with status: " + response.statusCode() + " (" + request.uri().toString() + ")");
             }
             return response.body();
         } catch (IOException | InterruptedException e) {
-            throw new ServiceException("HTTP request failed: " + e.getMessage());
+            throw new ServiceException("HTTP request failed: " + e.getMessage() + " (" + request.uri().toString() + ")");
         }
     }
 
@@ -124,7 +186,8 @@ public class HttpFileService extends BaseFileService {
      */
     @Override
     public void write(String file, String data) {
-        throw new ServiceException("Not yet implemented...");
+        HttpRequest request = getRequestBuilder(file).PUT(HttpRequest.BodyPublishers.ofString(data)).build();
+        sendRequest(connect(), request);
     }
 
     /**
@@ -132,39 +195,45 @@ public class HttpFileService extends BaseFileService {
      */
     @Override
     public FileStreamData readStream(String file) {
-        String result = read(file);
-        FileStreamData fsd = new FileStreamData();
-        fsd.setFileSize(result.getBytes().length);
-        fsd.setData(new ByteArrayInputStream(result.getBytes()));
-        return fsd;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeStream(String file, FileStreamData fileStreamData) {
-        throw new ServiceException("Not yet implemented...");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void delete(String file) {
         HttpClient client = connect();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(buildUri(file)))
-                .timeout(Duration.ofMinutes(1))
-                .DELETE()
-                .build();
+        HttpRequest request = getRequestBuilder(file).GET().build();
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
             if (response.statusCode() != 200) {
-                throw new ServiceException("HTTP request failed with status: " + response.statusCode());
+                throw new ServiceException("HTTP request failed with status: " + response.statusCode() + " (" + request.uri().toString() + ")");
+            }
+
+            String filenameSuffix = null;
+            Optional<String> optionalContentType = response.headers().firstValue("Content-Type");
+            if (optionalContentType.isPresent()) {
+                String[] contentTypeParts = optionalContentType.get().split(" ");
+                if (contentTypeParts.length > 0) {
+                    String[] mimeTypeParts = contentTypeParts[0].split("/");
+                    if (mimeTypeParts.length > 1) {
+                        filenameSuffix = mimeTypeParts[1].substring(0, mimeTypeParts[1].length() - 1);
+                    }
+                }
+            }
+
+            OptionalLong optionalContentLength = response.headers().firstValueAsLong("content-length");
+            if (optionalContentLength.isPresent()) {
+                FileStreamData fsd = new FileStreamData();
+                fsd.setFileSize(optionalContentLength.getAsLong());
+                fsd.setData(response.body());
+                fsd.setFilenameSuffix(filenameSuffix);
+                return fsd;
+            } else {
+                // Fallback if no content-length header is available!
+                response.body().close();
+                String fileContent = read(file);
+                FileStreamData fsd = new FileStreamData();
+                fsd.setFileSize(fileContent.getBytes().length);
+                fsd.setData(new ByteArrayInputStream(fileContent.getBytes()));
+                fsd.setFilenameSuffix(filenameSuffix);
+                return fsd;
             }
         } catch (IOException | InterruptedException e) {
-            throw new ServiceException("HTTP request failed: " + e.getMessage());
+            throw new ServiceException("HTTP request failed: " + e.getMessage() + " (" + request.uri().toString() + ")");
         }
     }
 
@@ -172,8 +241,42 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
+    public void writeStream(String file, FileStreamData fileStreamData) {
+        HttpRequest request = getRequestBuilder(file).PUT(HttpRequest.BodyPublishers.ofInputStream(() -> fileStreamData.getData())).build();
+        sendRequest(connect(), request);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void delete(String file) {
+        sendRequest(connect(), getRequestBuilder(file).DELETE().build());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void move(String source, String target) {
-        throw new ServiceException("Not yet implemented...");
+        FileStreamData fileStreamData = readStream(source);
+        writeStream(target, fileStreamData);
+        finalizeStream(fileStreamData);
+        delete(source);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void finalizeStream(FileStreamData fileStreamData) {
+        if (fileStreamData != null && fileStreamData.getData() != null) {
+            try {
+                fileStreamData.getData().close();
+            } catch (IOException e) {
+                throw new ServiceException("Could not finalize HTTP stream!", e);
+            }
+        }
     }
 
     /**
@@ -181,7 +284,41 @@ public class HttpFileService extends BaseFileService {
      */
     @Override
     public void testConfiguration() throws ServiceException {
-        throw new ServiceException("Not yet implemented...");
+        HttpClient client = connect();
+        HttpRequest request = getRequestBuilder("").GET().build();
+        try {
+            client.send(request, HttpResponse.BodyHandlers.discarding());
+        } catch (IOException | InterruptedException e) {
+            throw new ServiceException("GET failed for URL: " + request.uri().toASCIIString(), e);
+        }
     }
 
+    /**
+     * Creates an authorization header with the configured username and password.
+     *
+     * @return The header or {@code null}, if username and password are not configured.
+     */
+    protected String createBasicAuthHeader() {
+        if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+            return "Authorization: Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+        }
+        return null;
+    }
+
+    /**
+     * Sends an HTTP request and handles errors by throwing a {@link ServiceException}.
+     *
+     * @param client  The HTTP-Client.
+     * @param request The request to send.
+     */
+    private void sendRequest(HttpClient client, HttpRequest request) {
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new ServiceException("HTTP request failed with status: " + response.statusCode());
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new ServiceException("HTTP request failed: " + e.getMessage() + " (" + request.uri().toString() + ")");
+        }
+    }
 }

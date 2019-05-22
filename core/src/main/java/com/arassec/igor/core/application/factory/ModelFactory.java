@@ -93,8 +93,9 @@ public abstract class ModelFactory<T> {
         try {
             return (T) Class.forName(type).getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
-            throw new IllegalStateException(e);
+            log.error("Could not instantiate type: " + type, e);
         }
+        return null;
     }
 
     /**

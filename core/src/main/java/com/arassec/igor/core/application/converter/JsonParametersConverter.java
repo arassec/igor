@@ -16,6 +16,8 @@ import org.springframework.util.StringUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,6 +52,7 @@ public class JsonParametersConverter {
      */
     public <T> JSONArray convert(T instance, boolean applySecurity, boolean addVolatile) {
         JSONArray result = new JSONArray();
+        List<JSONObject> parameterList = new LinkedList<>();
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
             if (field.isAnnotationPresent(IgorParam.class)) {
                 JSONObject parameter = new JSONObject();
@@ -71,9 +74,23 @@ public class JsonParametersConverter {
                     }
                     parameter.put(JsonKeys.VALUE, service.getId());
                 }
-                result.put(parameter);
+                parameterList.add(parameter);
             }
         });
+
+        parameterList.sort((o1, o2) -> {
+            boolean firstOptional = o1.optBoolean(JsonKeys.OPTIONAL);
+            boolean secondOptional = o2.optBoolean(JsonKeys.OPTIONAL);
+            if (firstOptional && !secondOptional) {
+                return 1;
+            } else if (!firstOptional && secondOptional) {
+                return -1;
+            }
+            return 0;
+        });
+
+        parameterList.stream().forEach(parameter -> result.put(parameter));
+
         return result;
     }
 
