@@ -17,5 +17,5 @@ target/
 
 dbdata/
 appdata/
-src/test/resources/files/out
 frontend/package-lock.json
+web/src/main/resources/static
