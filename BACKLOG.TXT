@@ -1,5 +1,4 @@
 - Unit-Tests (Apache Mina SSHD!)
-- "Sort by pattern"-Action
 - FilterFileByDate-Action
   - older/younger than x days/hours/minutes
   - With this: support enums in parameter editor

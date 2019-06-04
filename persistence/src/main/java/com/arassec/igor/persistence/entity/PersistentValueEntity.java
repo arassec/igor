@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.time.Instant;
 
 /**
- * JPA entity for TODO
+ * JPA entity for persistent values.
  */
 @Data
 @Entity

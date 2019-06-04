@@ -112,7 +112,7 @@ public class Task {
         BlockingQueue<Map<String, Object>> inputQueue = providerInputQueue;
 
         for (List<Action> concurrencyList : concurrencyLists) {
-            String concurrencyGroupId = String.format(CONCURRENCY_GROUP_ID_PATTERN, jobId, getName(),
+            String concurrencyGroupId = String.format(CONCURRENCY_GROUP_ID_PATTERN, jobId, getId(),
                     concurrencyLists.indexOf(concurrencyList));
             ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueue, concurrencyGroupId,
                     jobExecution);
