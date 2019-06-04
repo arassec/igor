@@ -3,11 +3,12 @@ package com.arassec.igor.module.message.action;
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.misc.ParameterSubtype;
-import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.module.message.service.Message;
 import com.arassec.igor.module.message.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,28 +45,7 @@ public class SendMessageAction extends BaseMessageAction {
      * @return {@code true} if the data should further be processed, {@code false} otherwise.
      */
     @Override
-    public boolean process(IgorData data) {
-        return processInternal(data, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean dryRun(IgorData data) {
-        return processInternal(data, true);
-    }
-
-    /**
-     * Sends a message by using the configured template and replacing variables with content from the supplied IgorData.
-     *
-     * @param data
-     *         The data.
-     * @param isDryRun
-     *         Set to {@code true} if the message should not actually be sent, {@code false} otherwise.
-     * @return {@code true} if the data should further be processed, {@code false} otherwise.
-     */
-    private boolean processInternal(IgorData data, boolean isDryRun) {
+    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun) {
 
         String content = messageTemplate;
 
@@ -88,7 +68,7 @@ public class SendMessageAction extends BaseMessageAction {
             messageService.sendMessage(message);
         }
 
-        return true;
+        return List.of(data);
     }
 
 }

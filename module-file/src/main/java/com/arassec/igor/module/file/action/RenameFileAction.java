@@ -3,8 +3,10 @@ package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.module.file.service.FileService;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Renames a file.
@@ -28,23 +30,16 @@ public class RenameFileAction extends BaseFileAction {
      * {@inheritDoc}
      */
     @Override
-    public boolean process(IgorData data) {
+    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun) {
         if (isValid(data)) {
-            sourceService.move((String) data.get(dataKey), targetFilename);
-            return true;
+            if (isDryRun) {
+                data.put(DRY_RUN_COMMENT_KEY, "Renamed file " + data.get(dataKey) + " to " + targetFilename);
+            } else {
+                sourceService.move((String) data.get(dataKey), targetFilename);
+            }
+            return List.of(data);
         }
-        return false;
+        return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean dryRun(IgorData data) {
-        if (isValid(data)) {
-            data.put(DRY_RUN_COMMENT_KEY, "Renamed file " + data.get(dataKey) + " to " + targetFilename);
-            return true;
-        }
-        return false;
-    }
 }

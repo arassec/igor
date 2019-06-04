@@ -1,11 +1,9 @@
 package com.arassec.igor.core.model.action;
 
-import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.IgorParam;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Base action that implements common functionality of an action. Specific actions should be derived from this class.
@@ -18,18 +16,13 @@ public abstract class BaseAction implements Action {
     public static final int DEFAULT_THREADS = 1;
 
     /**
-     * JSON-Key for dry-run comments.
-     */
-    public static final String DRY_RUN_COMMENT_KEY = "dryRunComment";
-
-    /**
      * Activates or deactivates an action.
      */
     @IgorParam
     protected boolean active = true;
 
     /**
-     * Key into the {@link IgorData} that identifies the property to process.
+     * Key into the data map that identifies the property to process.
      */
     @IgorParam
     protected String dataKey = "data";
@@ -39,16 +32,6 @@ public abstract class BaseAction implements Action {
      */
     @IgorParam
     protected int numThreads = DEFAULT_THREADS;
-
-    /**
-     * Contains the provided data keys.
-     */
-    private Set<String> providedDataKeys = new HashSet<>();
-
-    /**
-     * Contains the required data keys.
-     */
-    private Set<String> requiredDataKeys = new HashSet<>();
 
     /**
      * {@inheritDoc}
@@ -62,15 +45,16 @@ public abstract class BaseAction implements Action {
      * {@inheritDoc}
      */
     @Override
-    public boolean dryRun(IgorData data) {
-        return process(data);
+    public List<Map<String, Object>> complete() {
+        // Nothing to do here...
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void complete(Long jobId, String taskName) {
+    public void shutdown(Long jobId, String taskName) {
         // Nothing to do here...
     }
 
@@ -91,50 +75,50 @@ public abstract class BaseAction implements Action {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<String> provides() {
-        return providedDataKeys;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<String> requires() {
-        return requiredDataKeys;
-    }
-
-    /**
-     * Adds all supplied keys to the set of provided data keys.
-     *
-     * @param keys The keys to add.
-     */
-    protected void addProvidedDataKeys(String... keys) {
-        providedDataKeys.addAll(Arrays.asList(keys));
-    }
-
-    /**
-     * Adds all supplied keys to the set of required data keys.
-     *
-     * @param keys The keys to add.
-     */
-    protected void addRequiredDataKeys(String... keys) {
-        requiredDataKeys.addAll(Arrays.asList(keys));
-    }
-
-    /**
-     * Returns whether the supplied {@link IgorData} is valid or not.
+     * Returns whether the supplied data is valid or not.
      *
      * @param data The data to validate.
      * @return {@code true} if the data is valid for processing, {@code false} otherwise.
      */
-    protected boolean isValid(IgorData data) {
-        if (!data.containsKey(dataKey) || !(data.get(dataKey) instanceof String)) {
+    protected boolean isValid(Map<String, Object> data) {
+        if (getLong(data, JOB_ID_KEY) == null) {
+            return false;
+        }
+        if (getString(data, TASK_ID_KEY) == null) {
+            return false;
+        }
+        if (getString(data, dataKey) == null) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns the value of the specified key as String.
+     *
+     * @param data The data.
+     * @param key  The key to get the value for.
+     * @return The key's value as String or {@code null}, if no value exists.
+     */
+    protected String getString(Map<String, Object> data, String key) {
+        if (data.containsKey(key) && data.get(key) instanceof String) {
+            return (String) data.get(key);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the value of the specified key as Long.
+     *
+     * @param data The data.
+     * @param key  The key to get the value for.
+     * @return The key's value as Long or {@code null}, if no value exists.
+     */
+    protected Long getLong(Map<String, Object> data, String key) {
+        if (data.containsKey(key) && data.get(key) instanceof Long) {
+            return (Long) data.get(key);
+        }
+        return null;
     }
 
 }

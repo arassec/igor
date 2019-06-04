@@ -105,6 +105,7 @@
 
   .core-content-normal {
     --content-width: 500px;
+      flex-grow: 1;
   }
 
   .inactive {

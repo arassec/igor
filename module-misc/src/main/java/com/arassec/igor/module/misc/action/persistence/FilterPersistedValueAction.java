@@ -2,7 +2,9 @@ package com.arassec.igor.module.misc.action.persistence;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.job.persistence.PersistentValue;
-import com.arassec.igor.core.model.provider.IgorData;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Filters data of which a value has already been persisted before.
@@ -17,11 +19,16 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
      * @param data The data the action will work with.
      */
     @Override
-    public boolean process(IgorData data) {
+    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun) {
         if (isValid(data)) {
-            return !persistentValueRepository.isPersisted(data.getJobId(), data.getTaskId(), new PersistentValue((String) data.get(dataKey)));
+            Long jobId = getLong(data, JOB_ID_KEY);
+            String taskId = getString(data, TASK_ID_KEY);
+            PersistentValue value = new PersistentValue(getString(data, dataKey));
+            if (persistentValueRepository.isPersisted(jobId, taskId, value)) {
+                return null;
+            }
         }
-        return true;
+        return List.of(data);
     }
 
 }

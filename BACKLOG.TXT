@@ -1,13 +1,13 @@
 - Unit-Tests (Apache Mina SSHD!)
-- ListFilesProvider -> SortCriteria (None, Timestamp, Filename)
-  - With this: support enums in parameter editor
-- Persistence-service editor
-- SSH access with key
-- Local SSL-Keystore that can be modified via GUI
+- "Sort by pattern"-Action
 - FilterFileByDate-Action
   - older/younger than x days/hours/minutes
-- Encryption-Cipher in database, randomly generated at first start
+  - With this: support enums in parameter editor
+- Pagination for execution history, job list, service list, etc.
+- Persistence-service editor
+- SSH access with key
 - README.md
+- Encryption-Cipher in database, randomly generated at first start
 - Limit for number of IgorData in dry-run-results.
 - Job-Parameter: cancel on task fail (true|false)
 - Job-Parameter: kill-switch with date to disable jobs
@@ -16,17 +16,14 @@
   - current Task
   - Progress information
   - Concurrency-Group workload
-- Tags for jobs + grouping/filtering jobs by tag
 - CIFS-/Samba supporting FileService
-- HTTP(S) supporting FileService
 - Export + Import of jobs and services (via JSON)
 - Initial setup with configuration on first start
-- Configuration-View with system configurations
+- Configuration-View with system configuration
 - Job dry-runs without cloning Tasks?
 - Authentication + Authorization (Frontend + Backend)
 - I18N
 - Directory-Browser for file services in the GUI
 - Healthchecks + Spring-Boot-Admin support via actuators
-- Cleanup com.arassec.igor.core.model.action.Action: provides? requires?
-- Pagination for execution history
 - Different, configurable color-schemes for different environments
+- Tags for jobs + grouping/filtering jobs by tag

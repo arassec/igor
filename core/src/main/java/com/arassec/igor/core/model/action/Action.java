@@ -1,13 +1,27 @@
 package com.arassec.igor.core.model.action;
 
-import com.arassec.igor.core.model.provider.IgorData;
-
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Defines an action, used by jobs. Actions take a single piece of data and process it.
  */
 public interface Action {
+
+    /**
+     * JSON-Key for the job's ID.
+     */
+    String JOB_ID_KEY = "jobId";
+
+    /**
+     * JSON-Key for the Task's ID.
+     */
+    String TASK_ID_KEY = "taskId";
+
+    /**
+     * JSON-Key for dry-run comments.
+     */
+    String DRY_RUN_COMMENT_KEY = "dryRunComment";
 
     /**
      * Initializes the action before data processing.
@@ -17,30 +31,28 @@ public interface Action {
     /**
      * Executes the action.
      *
-     * @param data
-     *         The data the action will work with.
+     * @param data     The data the action will work with.
+     * @param isDryRun {@code true} if the data should be processed in an idempotent way, i.e. the data should not be
+     *                 changed irreversably. Set to {@code false} to process the data regularly according to the actions
+     *                 purpose.
      * @return {@code true}, if the data should further be processed, {@code false} otherwise.
      */
-    boolean process(IgorData data);
+    List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun);
 
     /**
-     * Performs a dry-run of the action for testing. I.e. no data should be modified irreversibly by this method.
+     * Finalizes the action after all input data from the provider has been processed.
      *
-     * @param data
-     *         The data the action will work with.
-     * @return {@code true}, if the data should further be processed, {@code false} otherwise.
+     * @return List of final data that should be processed by later actions.
      */
-    boolean dryRun(IgorData data);
+    List<Map<String, Object>> complete();
 
     /**
-     * Finalizes the action after all data has been processed.
+     * Shuts the action down after all data has been processed. This method is called at the end of the job execution.
      *
-     * @param jobId
-     *         The job's ID.
-     * @param taskId
-     *         The task's ID.
+     * @param jobId  The job's ID.
+     * @param taskId The task's ID.
      */
-    void complete(Long jobId, String taskId);
+    void shutdown(Long jobId, String taskId);
 
     /**
      * Returns the number of threads this action should be executed with.
@@ -56,19 +68,5 @@ public interface Action {
      * runs.
      */
     boolean isActive();
-
-    /**
-     * Returns the data keys that this action provides to further actions by adding them to the processed {@link IgorData}.
-     *
-     * @return The data keys this action provides.
-     */
-    Set<String> provides();
-
-    /**
-     * Returns the data keys that this action requires to process the supplied {@link IgorData}.
-     *
-     * @return The data keys this action requires.
-     */
-    Set<String> requires();
 
 }

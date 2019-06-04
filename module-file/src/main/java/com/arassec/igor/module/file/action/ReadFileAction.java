@@ -2,8 +2,10 @@ package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.module.file.service.FileService;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Reads the content of a file.
@@ -23,24 +25,18 @@ public class ReadFileAction extends BaseFileAction {
     private FileService sourceService;
 
     /**
-     * Creates a new ReadFileAction.
-     */
-    public ReadFileAction() {
-        addProvidedDataKeys(KEY_FILE_CONTENTS);
-    }
-
-    /**
      * Reads the content of a file and returns it as string.
      *
      * @param data The data to processData.
      * @return The file content as string.
      */
     @Override
-    public boolean process(IgorData data) {
+    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun) {
         if (isValid(data)) {
             data.put(KEY_FILE_CONTENTS, sourceService.read((String) data.get(dataKey)));
+            return List.of(data);
         }
-        return true;
+        return null;
     }
 
 }

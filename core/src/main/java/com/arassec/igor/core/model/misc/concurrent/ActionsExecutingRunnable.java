@@ -1,14 +1,16 @@
 package com.arassec.igor.core.model.misc.concurrent;
 
-import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.service.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * Runnable that uses {@link Action}s to process {@link IgorData} in a separate thread.
+ * Runnable that uses {@link Action}s to process data in a separate thread.
  */
 @Slf4j
 public class ActionsExecutingRunnable implements Runnable {
@@ -21,12 +23,12 @@ public class ActionsExecutingRunnable implements Runnable {
     /**
      * The queue with incoming data objects.
      */
-    private BlockingQueue<IgorData> inputQueue;
+    private BlockingQueue<Map<String, Object>> inputQueue;
 
     /**
      * The queue where processed data objects are put in.
      */
-    private BlockingQueue<IgorData> outputQueue;
+    private BlockingQueue<Map<String, Object>> outputQueue;
 
     /**
      * Indicates whether this thread should keep working or cancel its work.
@@ -40,7 +42,8 @@ public class ActionsExecutingRunnable implements Runnable {
      * @param inputQueue  The input queue with incoming data.
      * @param outputQueue The output queue for the processed data.
      */
-    public ActionsExecutingRunnable(List<Action> actions, BlockingQueue<IgorData> inputQueue, BlockingQueue<IgorData> outputQueue) {
+    public ActionsExecutingRunnable(List<Action> actions, BlockingQueue<Map<String, Object>> inputQueue,
+                                    BlockingQueue<Map<String, Object>> outputQueue) {
         this.actions = actions;
         this.inputQueue = inputQueue;
         this.outputQueue = outputQueue;
@@ -54,29 +57,103 @@ public class ActionsExecutingRunnable implements Runnable {
      */
     @Override
     public void run() {
-        try {
-            IgorData data;
-            while (active) {
-                data = inputQueue.poll();
-                if (data != null && !data.isEmpty()) {
-                    log.trace("Processing: {}", data);
-                    boolean continueProcessing = true;
-                    for (Action action : actions) {
-                        log.debug("Processing Action: {}", action.getClass().getName());
-                        continueProcessing = action.process(data);
-                        if (!continueProcessing) {
-                            break;
-                        }
-                    }
-                    if (continueProcessing) {
-                        outputQueue.put(data);
-                    }
-                } else {
+        while (active) {
+            Map<String, Object> nextInputItem = inputQueue.poll();
+            if (nextInputItem != null && !nextInputItem.isEmpty()) {
+
+                List<Map<String, Object>> items = new LinkedList<>();
+                items.add(nextInputItem);
+
+                process(actions, items);
+            } else {
+                try {
                     Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    // Doesn't matter, we just waited for the next piece of work...
                 }
             }
-        } catch (InterruptedException e) {
-            throw new IllegalStateException("Interrupted during action execution!", e);
+        }
+    }
+
+    /**
+     * Completes all actions and processes final data, if any.
+     */
+    public void complete() {
+        for (int i = 0; i < actions.size(); i++) {
+            Action action = actions.get(i);
+            List<Map<String, Object>> items = action.complete();
+            if (items != null && !items.isEmpty()) {
+                if ((i + 1) < actions.size()) {
+                    process(actions.subList(i + 1, actions.size()), items);
+                } else {
+                    // The last action. Output goes directly to the output queue:
+                    putToOutputQueue(items);
+                }
+            }
+        }
+    }
+
+    /**
+     * Processes the data with the supplied actions.
+     *
+     * @param actions The actions to apply to the data.
+     * @param items   The data to process.
+     */
+    private void process(List<Action> actions, List<Map<String, Object>> items) {
+        if (actions == null || items == null) {
+            return;
+        }
+
+        for (Action action : actions) {
+
+            if (!active) {
+                return;
+            }
+
+            log.debug("Running Action: {}", action.getClass().getName());
+            List<Map<String, Object>> actionResult = new LinkedList<>();
+
+            for (Map<String, Object> item : items) {
+                if (!active) {
+                    return;
+                }
+
+                log.trace("Processing: {}", item);
+                List<Map<String, Object>> partialActionResult = action.process(item, false);
+                if (partialActionResult != null && !partialActionResult.isEmpty()) {
+                    actionResult.addAll(partialActionResult);
+                }
+            }
+
+            items.clear();
+
+            if (actionResult == null || actionResult.isEmpty()) {
+                break;
+            } else {
+                items.addAll(actionResult);
+            }
+        }
+
+        putToOutputQueue(items);
+    }
+
+    /**
+     * Puts all supplied items in the output queue.
+     *
+     * @param items The items to output.
+     */
+    private void putToOutputQueue(List<Map<String, Object>> items) {
+        if (!items.isEmpty()) {
+            for (Map<String, Object> outputItem : items) {
+                if (!active) {
+                    return;
+                }
+                try {
+                    outputQueue.put(outputItem);
+                } catch (InterruptedException e) {
+                    throw new ServiceException("Interrupted while putting data to the output queue!", e);
+                }
+            }
         }
     }
 
@@ -86,4 +163,5 @@ public class ActionsExecutingRunnable implements Runnable {
     public void shutdown() {
         active = false;
     }
+
 }

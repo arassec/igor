@@ -2,11 +2,11 @@ package com.arassec.igor.core.model.misc.concurrent;
 
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.provider.IgorData;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,12 +25,12 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     /**
      * Contains the incoming data for this concurrency-group. This is the output-queue of the previous concurrency-group.
      */
-    private BlockingQueue<IgorData> inputQueue;
+    private BlockingQueue<Map<String, Object>> inputQueue;
 
     /**
      * Contains the output of this concurrency-group, which models the input for the following concurrency-group.
      */
-    private BlockingQueue<IgorData> outputQueue = new LinkedBlockingDeque<>();
+    private BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingDeque<>();
 
     /**
      * The {@link ExecutorService} managing the threads.
@@ -62,7 +62,8 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      * @param concurrencyGroupId The ID of this concurrency-group.
      * @param jobExecution       The {@link JobExecution} containing the current state of the job run.
      */
-    public ConcurrencyGroup(List<Action> actions, BlockingQueue<IgorData> inputQueue, String concurrencyGroupId, JobExecution jobExecution) {
+    public ConcurrencyGroup(List<Action> actions, BlockingQueue<Map<String, Object>> inputQueue, String concurrencyGroupId,
+                            JobExecution jobExecution) {
         this.inputQueue = inputQueue;
         this.concurrencyGroupId = concurrencyGroupId;
         this.jobExecution = jobExecution;
@@ -88,6 +89,14 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     }
 
     /**
+     * Calls {@link Action#complete()} on all actions of this concurrency group.
+     */
+    public void complete() {
+        waitForEmptyInputQueue();
+        runnables.forEach(ActionsExecutingRunnable::complete);
+    }
+
+    /**
      * Shuts the thread pool down after all incoming data has been processed. Threads might still run after calling this
      * method if e.g. a large file is copied in an action.
      * <p>
@@ -95,19 +104,8 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      * down immediately.
      */
     public void shutdown() {
-        while (!inputQueue.isEmpty()) {
-            if (!jobExecution.isRunning()) {
-                log.debug("Job cancelled. Shutting down concurrency-group '{}' immediately!", concurrencyGroupId);
-                break;
-            }
-            log.trace("Waiting for threads to finish their work...");
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // doesn't matter, just waiting for the threads to finish their jobs.
-            }
-        }
-        runnables.stream().forEach(ActionsExecutingRunnable::shutdown);
+        waitForEmptyInputQueue();
+        runnables.forEach(ActionsExecutingRunnable::shutdown);
         executorService.shutdown();
     }
 
@@ -116,19 +114,19 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      * <p>
      * If the job is cancelled, or in case of interruptions, all running threads will be stopped immediately.
      *
-     * @return
+     * @return {@code true}, if all threads in the group have been terminated. {@code false} otherwise.
      */
     public boolean awaitTermination() {
-        log.debug("Total/Active/Completed Threads in '{}': {}/{}/{}", concurrencyGroupId,
-                executorService.getPoolSize(), executorService.getActiveCount(), executorService.getCompletedTaskCount());
+        log.debug("Total/Active/Completed Threads in '{}': {}/{}/{}", concurrencyGroupId, executorService.getPoolSize(),
+                executorService.getActiveCount(), executorService.getCompletedTaskCount());
         try {
             if (!jobExecution.isRunning()) {
                 executorService.shutdownNow();
                 return true;
             }
             boolean awaitTerminationResult = executorService.awaitTermination(1000, TimeUnit.MILLISECONDS);
-            log.debug("After awaitTermination: Total/Active/Completed Threads: {}/{}/{}",
-                    executorService.getPoolSize(), executorService.getActiveCount(), executorService.getCompletedTaskCount());
+            log.debug("After awaitTermination: Total/Active/Completed Threads: {}/{}/{}", executorService.getPoolSize(),
+                    executorService.getActiveCount(), executorService.getCompletedTaskCount());
             return awaitTerminationResult;
         } catch (InterruptedException e) {
             log.error("Concurrency-Group interrupted during awaitTermination()!", e);
@@ -142,7 +140,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      *
      * @return The {@link BlockingQueue} with the output of this group's actions.
      */
-    public BlockingQueue<IgorData> getOutputQueue() {
+    public BlockingQueue<Map<String, Object>> getOutputQueue() {
         return outputQueue;
     }
 
@@ -159,6 +157,24 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         if (jobExecution.isRunning()) {
             jobExecution.fail(throwable);
             log.error("Exception caught in ConcurrencyGroup!", throwable);
+        }
+    }
+
+    /**
+     * Waits until the input queue has been emptied by the worker threads.
+     */
+    private void waitForEmptyInputQueue() {
+        while (!inputQueue.isEmpty()) {
+            if (!jobExecution.isRunning()) {
+                log.debug("Job cancelled. Not waiting for empty input queue in concurrency group: {}", concurrencyGroupId);
+                break;
+            }
+            log.trace("Waiting for threads to finish their work to complete concurrency-group: {}", concurrencyGroupId);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // doesn't matter, just waiting for the threads to finish their jobs.
+            }
         }
     }
 

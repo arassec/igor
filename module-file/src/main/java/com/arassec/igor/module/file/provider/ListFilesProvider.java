@@ -2,13 +2,14 @@ package com.arassec.igor.module.file.provider;
 
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorProvider;
+import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.provider.BaseProvider;
-import com.arassec.igor.core.model.provider.IgorData;
 import com.arassec.igor.module.file.service.FileService;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * Provides file names from a specified directory.
@@ -68,27 +69,25 @@ public class ListFilesProvider extends BaseProvider implements FileProvider {
      */
     @Override
     public boolean hasNext() {
-        if (currentFile < files.size()) {
-            return true;
-        } else {
-            return false;
-        }
+        return currentFile < files.size();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public IgorData next() {
-        IgorData igorData = new IgorData(getJobId(), getTaskId());
-        igorData.put(directoryKey, directory);
+    public Map<String, Object> next() {
+        Map<String, Object> item = new HashMap<>();
+        item.put(Action.JOB_ID_KEY, getJobId());
+        item.put(Action.TASK_ID_KEY, getTaskId());
+        item.put(directoryKey, directory);
         String file = files.get(currentFile);
         if (file.startsWith(directory)) {
             file = file.replace(directory, "");
         }
-        igorData.put(dataKey, file);
+        item.put(dataKey, file);
         currentFile++;
-        return igorData;
+        return item;
     }
 
 }

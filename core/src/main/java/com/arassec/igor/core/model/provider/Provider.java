@@ -1,5 +1,7 @@
 package com.arassec.igor.core.model.provider;
 
+import java.util.Map;
+
 /**
  * Provides data for a job to process.
  */
@@ -20,8 +22,8 @@ public interface Provider {
     /**
      * Returns the next data-piece to process.
      *
-     * @return An {@code IgorData}-Object that contains the data to process.
+     * @return A JSON-Object that contains the data to process.
      */
-    IgorData next();
+    Map<String, Object> next();
 
 }

@@ -8,11 +8,10 @@ import com.arassec.igor.core.util.StacktraceFormatter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Defines an igor job.
@@ -71,11 +70,7 @@ public class Job {
      */
     public void run(JobExecution jobExecution) {
         log.debug("Running job: {} ({})", name, id);
-        if (jobExecution == null) {
-            currentJobExecution = new JobExecution();
-        } else {
-            currentJobExecution = jobExecution;
-        }
+        currentJobExecution = Objects.requireNonNullElseGet(jobExecution, JobExecution::new);
         currentJobExecution.setExecutionState(JobExecutionState.RUNNING);
         currentJobExecution.setStarted(Instant.now());
         running = true;
@@ -110,7 +105,7 @@ public class Job {
         DryRunJobResult result = new DryRunJobResult();
         log.debug("Dry-running job: {}", name);
         try {
-            tasks.stream().forEach(task -> task.dryRun(result, id));
+            tasks.forEach(task -> task.dryRun(result, id));
         } catch (Exception e) {
             result.setErrorCause(StacktraceFormatter.format(e));
         }

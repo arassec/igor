@@ -2,7 +2,9 @@ package com.arassec.igor.module.misc.action.util;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.provider.IgorData;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Filters the supplied data by matching a configured prefix.
@@ -23,13 +25,13 @@ public class FilterByPrefixAction extends BaseUtilAction {
      * @return The original data, if it matches the configured prefix.
      */
     @Override
-    public boolean process(IgorData data) {
+    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun) {
         if (isValid(data)) {
             if (!((String) data.get(dataKey)).startsWith(prefix)) {
-                return false;
+                return null;
             }
         }
-        return true;
+        return List.of(data);
     }
 
 }

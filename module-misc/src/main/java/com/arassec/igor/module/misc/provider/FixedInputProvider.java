@@ -1,15 +1,12 @@
 package com.arassec.igor.module.misc.provider;
 
-
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorProvider;
+import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.misc.ParameterSubtype;
 import com.arassec.igor.core.model.provider.BaseProvider;
-import com.arassec.igor.core.model.provider.IgorData;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Provides fixed input to tasks.
@@ -73,11 +70,13 @@ public class FixedInputProvider  extends BaseProvider implements UtilProvider {
      * {@inheritDoc}
      */
     @Override
-    public IgorData next() {
-        IgorData igorData = new IgorData(getJobId(), getTaskId());
-        igorData.put(dataKey, inputParts.get(index));
+    public Map<String, Object> next() {
+        Map<String, Object> item = new HashMap<>();
+        item.put(Action.JOB_ID_KEY, getJobId());
+        item.put(Action.TASK_ID_KEY, getTaskId());
+        item.put(dataKey, inputParts.get(index));
         index++;
-        return igorData;
+        return item;
     }
 
 }
