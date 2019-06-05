@@ -1,8 +1,5 @@
 - Unit-Tests (Apache Mina SSHD!)
-- FilterFileByDate-Action
-  - older/younger than x days/hours/minutes
-  - With this: support enums in parameter editor
-- Pagination for execution history, job list, service list, etc.
+- Pagination for execution history, job list, service list, service-picker, etc.
 - Persistence-service editor
 - SSH access with key
 - README.md

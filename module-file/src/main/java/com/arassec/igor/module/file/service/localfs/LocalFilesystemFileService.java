@@ -3,13 +3,20 @@ package com.arassec.igor.module.file.service.localfs;
 import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
-import com.arassec.igor.module.file.service.FileStreamData;
+import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.service.FileStreamData;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +26,7 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 /**
  * {@link FileService} to access files in the local file system.
  */
+@Slf4j
 @IgorService(label = "Filesystem")
 public class LocalFilesystemFileService extends BaseFileService {
 
@@ -26,9 +34,18 @@ public class LocalFilesystemFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> listFiles(String directory) {
+    public List<FileInfo> listFiles(String directory) {
         try {
-            return Files.list(Paths.get(directory)).map(path -> path.toString()).collect(Collectors.toList());
+            return Files.list(Paths.get(directory)).map(path -> {
+                FileTime lastModifiedTime = null;
+                try {
+                    lastModifiedTime = Files.getLastModifiedTime(path);
+                } catch (IOException e) {
+                    log.warn("Could not get last modified time from path: {},", path);
+                }
+                return new FileInfo(path.toString(), lastModifiedTime != null ?
+                        formatInstant(lastModifiedTime.toInstant().truncatedTo(ChronoUnit.SECONDS)) : null);
+            }).collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Could not list files in local directory: " + directory, e);
         }

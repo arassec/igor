@@ -18,7 +18,7 @@ public interface FileService extends Service {
      * @param directory The directory to search for files.
      * @return The file names as List.
      */
-    List<String> listFiles(String directory);
+    List<FileInfo> listFiles(String directory);
 
     /**
      * Reads the content of the specified file an returns it as string.

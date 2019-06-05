@@ -3,8 +3,9 @@ package com.arassec.igor.module.file.service.ssh;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.service.ServiceException;
-import com.arassec.igor.module.file.service.FileStreamData;
+import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.service.FileStreamData;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
@@ -49,10 +50,51 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> listFiles(String directory) {
+    public List<FileInfo> listFiles(String directory) {
         final String dir = directory.endsWith("/") ? directory : directory + "/";
-        StringBuffer result = execute("cd " + dir + " && ls");
-        return Arrays.stream(result.toString().split("\n")).map(s -> dir + s).collect(Collectors.toList());
+        StringBuffer result = execute("cd " + dir + " && ls -Al --time-style=full-iso");
+        return Arrays.stream(result.toString().split("\n")).skip(1).map(lsResult -> new FileInfo(extractFilename(dir, lsResult)
+                , extractLastModified(lsResult))).collect(Collectors.toList());
+    }
+
+    private String extractFilename(String dir, String input) {
+        String[] split = input.split("\\s");
+        if (split.length >= 3) {
+            if (split[split.length - 2].equals("->")) {
+                return dir + split[split.length - 3];
+            }
+        }
+        return dir + split[split.length - 1];
+    }
+
+    /**
+     * drwxr-xr-x  10 root root 3760 2019-06-04 13:14:23.965495985 +0200 text.txt
+     *
+     * @param input
+     * @return
+     */
+    private String extractLastModified(String input) {
+        String yearPart = null;
+        String timePart = null;
+        String timezonePart = null;
+
+        String[] split = input.split("\\s");
+        for (int i = 0; i < split.length; i++) {
+            String part = split[i];
+            if (part.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) { // 2019-06-04
+                yearPart = part;
+            } else if (part.matches("[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{9}")) { // 13:14:23
+                timePart = part;
+            } else if (part.matches("\\+[0-9]{4}")) { // +0200
+                timezonePart = part;
+            }
+        }
+
+        if (yearPart != null && timePart != null && timezonePart != null) {
+            return yearPart + "T" + timePart.substring(0, 8) + "+" + timezonePart.substring(1, 3) + ":" + timezonePart.substring(3, 5);
+        }
+
+        return null;
     }
 
     /**
@@ -219,11 +261,10 @@ public class ScpFileService extends BaseSshFileService {
      */
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
-        if (fileStreamData.getSourceConnectionData() != null
-                && fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
+        if (fileStreamData.getSourceConnectionData() != null && fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
             SshConnectionData sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
-            finalize(sshConnectionData.getSession(), sshConnectionData.getChannel(),
-                    sshConnectionData.getSshOutputStream(), sshConnectionData.getSshInputStream());
+            finalize(sshConnectionData.getSession(), sshConnectionData.getChannel(), sshConnectionData.getSshOutputStream(),
+                    sshConnectionData.getSshInputStream());
         }
     }
 
@@ -323,7 +364,8 @@ public class ScpFileService extends BaseSshFileService {
             while (true) {
                 while (in.available() > 0) {
                     int i = in.read(tmp, 0, 1024);
-                    if (i < 0) break;
+                    if (i < 0)
+                        break;
                     result.append(new String(tmp, 0, i));
                 }
                 if (channel.isClosed()) {

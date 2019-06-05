@@ -4,14 +4,16 @@
             <layout-row>
                 <div slot="left">
                     <h1 v-if="!errorCause && !selectedTestResults">Dry run successful</h1>
-                    <h1 v-if="selectedTestResults && !errorCause && selectedTestResults.length > 0">Dry run
-                        details</h1>
+                    <h1 v-if="!errorCause && selectedTestResults">Dry run details</h1>
                     <h1 v-if="selectedTestResults && errorCause">Dry run failed</h1>
                 </div>
                 <input-button slot="right" icon="times" v-on:clicked="$emit('close')"/>
             </layout-row>
-            <p v-if="!errorCause && selectedTestResults.length == 0">
+            <p v-if="!errorCause && !selectedTestResults">
                 Please select a <b>Task</b> or <b>Action</b> to see detailed dry-run results.
+            </p>
+            <p v-if="!errorCause && selectedTestResults.length == 0">
+                No test data available.
             </p>
             <pre v-if="!errorCause && selectedTestResults.length > 0" class="normal-bg">
 <code>{{ format(selectedTestResults) }}</code></pre>

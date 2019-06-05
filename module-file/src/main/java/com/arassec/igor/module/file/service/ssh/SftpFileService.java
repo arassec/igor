@@ -3,14 +3,19 @@ package com.arassec.igor.module.file.service.ssh;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -50,7 +55,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> listFiles(String directory) {
+    public List<FileInfo> listFiles(String directory) {
         try {
             final String dir = directory.endsWith("/") ? directory : directory + "/";
             Session session = connect(host, port, username, password);
@@ -59,7 +64,8 @@ public class SftpFileService extends BaseSshFileService {
             Vector<ChannelSftp.LsEntry> lsEntries = channel.ls(directory);
             channel.disconnect();
             session.disconnect();
-            return lsEntries.stream().map(ChannelSftp.LsEntry::getFilename).map(s -> dir + s).collect(Collectors.toList());
+            return lsEntries.stream().map(lsEntry -> new FileInfo(dir + lsEntry.getFilename(),
+                    formatInstant(Instant.ofEpochMilli(lsEntry.getAttrs().getMTime() * 1000L)))).collect(Collectors.toList());
         } catch (JSchException | SftpException e) {
             throw new ServiceException("Could not list files via SFTP!", e);
         }
@@ -140,7 +146,8 @@ public class SftpFileService extends BaseSshFileService {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
-            channel.put(fileStreamData.getData(), file, new IgorSftpProgressMonitor(fileStreamData.getFileSize()), ChannelSftp.OVERWRITE);
+            channel.put(fileStreamData.getData(), file, new IgorSftpProgressMonitor(fileStreamData.getFileSize()),
+                    ChannelSftp.OVERWRITE);
             channel.disconnect();
             session.disconnect();
         } catch (SftpException | JSchException e) {
@@ -153,8 +160,7 @@ public class SftpFileService extends BaseSshFileService {
      */
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
-        if (fileStreamData.getSourceConnectionData() != null
-                && fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
+        if (fileStreamData.getSourceConnectionData() != null && fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
             SshConnectionData sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
             sshConnectionData.getChannel().disconnect();
             sshConnectionData.getSession().disconnect();

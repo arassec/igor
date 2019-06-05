@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
+import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
 import org.apache.commons.net.ftp.FTP;
@@ -15,9 +16,11 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
+import java.time.Instant;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * {@link FileService} that uses FTP as protocol.
@@ -134,14 +137,9 @@ public class FtpFileService extends BaseFileService {
             if (!ftpClient.logout()) {
                 throw new ServiceException("Could not logout from FTP server " + host + ":" + port);
             }
+            ftpClient.disconnect();
         } catch (IOException e) {
             throw new ServiceException("Error during logout from FTP server " + host + ":" + port, e);
-        } finally {
-            try {
-                ftpClient.disconnect();
-            } catch (IOException e) {
-                throw new ServiceException("Could not disconnect from FTP server " + host + ":" + port, e);
-            }
         }
     }
 
@@ -149,13 +147,24 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> listFiles(String directory) {
+    public List<FileInfo> listFiles(String directory) {
         try {
             FTPClient ftpClient = connect();
-            List<String> result = Arrays.asList(ftpClient.listNames(directory));
-            // TODO: Make this a parameter!
-            Collections.sort(result);
+
+            List<FileInfo> result;
+
+            FTPFile[] ftpFiles = ftpClient.listFiles(directory);
+            if (ftpFiles != null && ftpFiles.length > 0) {
+                result = Stream.of(ftpFiles).map(ftpFile -> {
+                    Instant mTime = Instant.ofEpochMilli(ftpFile.getTimestamp().getTime().getTime());
+                    return new FileInfo(ftpFile.getName(), formatInstant(mTime));
+                }).collect(Collectors.toList());
+            } else {
+                result = new LinkedList<>();
+            }
+
             disconnect(ftpClient);
+
             return result;
         } catch (IOException e) {
             throw new ServiceException("Could not list files in directory: " + directory, e);

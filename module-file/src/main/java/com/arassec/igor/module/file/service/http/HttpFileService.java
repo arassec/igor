@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
+import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
 import org.jsoup.Jsoup;
@@ -82,9 +83,7 @@ public class HttpFileService extends BaseFileService {
             redirectPolicy = HttpClient.Redirect.NEVER;
         }
 
-        HttpClient client = HttpClient.newBuilder()
-                .followRedirects(redirectPolicy)
-                .build();
+        HttpClient client = HttpClient.newBuilder().followRedirects(redirectPolicy).build();
 
         return client;
     }
@@ -113,9 +112,8 @@ public class HttpFileService extends BaseFileService {
      * @return The {@link HttpRequest}.
      */
     protected HttpRequest.Builder getRequestBuilder(String uriPart) {
-        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
-                .uri(URI.create(buildUri(uriPart)))
-                .timeout(Duration.ofSeconds(timeout));
+        HttpRequest.Builder httpRequestBuilder =
+                HttpRequest.newBuilder().uri(URI.create(buildUri(uriPart))).timeout(Duration.ofSeconds(timeout));
         String authorizationHeader = createBasicAuthHeader();
         if (!StringUtils.isEmpty(authorizationHeader)) {
             httpRequestBuilder.headers(authorizationHeader);
@@ -127,7 +125,7 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> listFiles(String directory) {
+    public List<FileInfo> listFiles(String directory) {
         HttpClient client = connect();
         HttpRequest request = getRequestBuilder(directory).GET().build();
         try {
@@ -151,13 +149,18 @@ public class HttpFileService extends BaseFileService {
                     result.add(href);
                 }
             }
+
+            // @formatter:off
             return result.stream().filter(file -> file != null)
                     .filter(file -> !StringUtils.isEmpty(file))
                     .filter(file -> !"..".equals(file))
                     .filter(file -> !".".equals(file))
                     .filter(file -> !directory.startsWith(file))
                     .filter(file -> !directory.equals(file))
+                    .map(file -> new FileInfo(file, null))
                     .collect(Collectors.toList());
+            // @formatter:on
+
         } catch (IOException | InterruptedException e) {
             throw new ServiceException("HTTP request failed: " + e.getMessage() + " (" + request.uri().toString() + ")");
         }
@@ -242,7 +245,8 @@ public class HttpFileService extends BaseFileService {
      */
     @Override
     public void writeStream(String file, FileStreamData fileStreamData) {
-        HttpRequest request = getRequestBuilder(file).PUT(HttpRequest.BodyPublishers.ofInputStream(() -> fileStreamData.getData())).build();
+        HttpRequest request =
+                getRequestBuilder(file).PUT(HttpRequest.BodyPublishers.ofInputStream(() -> fileStreamData.getData())).build();
         sendRequest(connect(), request);
     }
 

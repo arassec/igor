@@ -7,12 +7,8 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPSClient;
-import org.apache.commons.net.util.TrustManagerUtils;
 
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
 
 /**
  * {@link FileService} for FTPS servers.

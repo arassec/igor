@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorProvider;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.provider.BaseProvider;
+import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
 
 import java.util.HashMap;
@@ -44,7 +45,7 @@ public class ListFilesProvider extends BaseProvider implements FileProvider {
     /**
      * The files in the configured directory.
      */
-    private List<String> files = new LinkedList<>();
+    private List<FileInfo> files = new LinkedList<>();
 
     /**
      * The index into the listed files, pointing to the next file to serve.
@@ -81,11 +82,15 @@ public class ListFilesProvider extends BaseProvider implements FileProvider {
         item.put(Action.JOB_ID_KEY, getJobId());
         item.put(Action.TASK_ID_KEY, getTaskId());
         item.put(directoryKey, directory);
-        String file = files.get(currentFile);
+        FileInfo fileInfo = files.get(currentFile);
+        String file = fileInfo.getFileName();
         if (file.startsWith(directory)) {
             file = file.replace(directory, "");
         }
         item.put(dataKey, file);
+        if (fileInfo.getLastModified() != null) {
+            item.put("lastModified", fileInfo.getLastModified());
+        }
         currentFile++;
         return item;
     }

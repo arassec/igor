@@ -147,8 +147,8 @@
         return (this.validationErrors.indexOf(taskIndex + '_' + actionIndex) > -1)
       },
       formatName: function (name) {
-        if (name.length > 30) {
-          return name.substring(0, 30) + '...'
+        if (name.length > 29) {
+          return name.substring(0, 29) + '...'
         }
         return name
       }

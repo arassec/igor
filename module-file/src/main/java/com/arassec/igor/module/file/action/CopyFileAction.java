@@ -29,6 +29,16 @@ public class CopyFileAction extends BaseFileAction {
     private static final String KEY_TARGET_FILENAME = "targetFilename";
 
     /**
+     * Key to the target file's path.
+     */
+    private static final String KEY_TARGET_FILEPATH = "targetFilepath";
+
+    /**
+     * Key to the target directory.
+     */
+    private static final String KEY_TARGET_DIRECTORY = "targetDirectory";
+
+    /**
      * File-suffix appended to files during transfer.
      */
     private static final String IN_TRANSFER_SUFFIX = ".igor";
@@ -58,18 +68,24 @@ public class CopyFileAction extends BaseFileAction {
     private boolean appendTransferSuffix = true;
 
     /**
+     * If set to {@code true}, igor appends a filetype suffix if avaliable (e.g. '.html' or '.jpeg').
+     */
+    @IgorParam
+    private boolean appendFiletypeSuffix = false;
+
+    /**
      * The key to the directory the source files are in.
      */
     @IgorParam
     private String directoryKey = "directory";
 
     /**
-     * Copies the supplied source file to the destination service. During transfer the file is saved with the suffix ".igor",
-     * which will be removed after successful transfer.
+     * Copies the supplied source file to the destination service. During transfer the file is optionally saved with the suffix "
+     * .igor", which will be removed after successful transfer.
      *
      * @param data     The data to process.
      * @param isDryRun Set to {@code true}, if this is a dry-run and the file should not actually be copied. Set to {@code
-     * false} for an
+     *                 false} for an
      *                 actual run.
      * @return
      */
@@ -79,27 +95,37 @@ public class CopyFileAction extends BaseFileAction {
             String sourceFile = (String) data.get(dataKey);
             String sourceDirectory = (String) data.get(directoryKey);
 
+            if (!targetDirectory.endsWith("/")) {
+                targetDirectory += "/";
+            }
+
             if (!isDryRun) {
                 FileStreamData fileStreamData = sourceService.readStream(getSourceFileWithPath(sourceDirectory, sourceFile));
                 String targetFile = getTargetFile(sourceFile, fileStreamData.getFilenameSuffix());
-                String targetFileInTransfer = targetFile;
+                String targetFilePath = targetDirectory + targetFile;
+                String targetFileInTransfer = targetFilePath;
                 if (appendTransferSuffix) {
                     targetFileInTransfer += IN_TRANSFER_SUFFIX;
                 }
                 targetService.writeStream(targetFileInTransfer, fileStreamData);
                 sourceService.finalizeStream(fileStreamData);
                 if (appendTransferSuffix) {
-                    targetService.move(targetFileInTransfer, targetFile);
+                    targetService.move(targetFileInTransfer, targetFilePath);
                 }
-                log.debug("{} copied to {}", getSourceFileWithPath(sourceDirectory, sourceFile), targetFile);
+                log.debug("{} copied to {}", getSourceFileWithPath(sourceDirectory, sourceFile), targetFilePath);
                 data.put(KEY_TARGET_FILENAME, targetFile);
+                data.put(KEY_TARGET_FILEPATH, targetFilePath);
+                data.put(KEY_TARGET_DIRECTORY, targetDirectory);
             }
             data.put(KEY_SOURCE_FILENAME, sourceFile);
             if (isDryRun) {
                 String targetFile = getTargetFile(sourceFile, "dryRun");
-                data.put(DRY_RUN_COMMENT_KEY, getSourceFileWithPath(sourceDirectory, sourceFile)
-                        + " copied to " + targetFile);
+                String targetFilePath = targetDirectory + targetFile;
+                data.put(DRY_RUN_COMMENT_KEY,
+                        getSourceFileWithPath(sourceDirectory, sourceFile) + " copied to " + targetFilePath);
                 data.put(KEY_TARGET_FILENAME, targetFile);
+                data.put(KEY_TARGET_FILEPATH, targetFilePath);
+                data.put(KEY_TARGET_DIRECTORY, targetDirectory);
             }
             return List.of(data);
         }
@@ -126,18 +152,14 @@ public class CopyFileAction extends BaseFileAction {
             }
         }
 
-        if (!StringUtils.isEmpty(suffix) && !targetFile.contains(".")) {
+        if (!StringUtils.isEmpty(suffix) && !targetFile.contains(".") && appendFiletypeSuffix) {
             if (!suffix.startsWith("\\.")) {
                 suffix = "." + suffix;
             }
             targetFile += suffix;
         }
 
-        if (!targetDirectory.endsWith("/")) {
-            targetDirectory += "/";
-        }
-
-        return targetDirectory + targetFile;
+        return targetFile;
     }
 
     /**

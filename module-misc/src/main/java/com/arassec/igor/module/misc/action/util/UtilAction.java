@@ -7,4 +7,9 @@ import com.arassec.igor.core.model.IgorActionCategory;
  */
 @IgorActionCategory(label = "Util")
 public interface UtilAction {
+
+    /**
+     * The (default) time format to use for parsing data timestamps.
+     */
+    String TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
 }
