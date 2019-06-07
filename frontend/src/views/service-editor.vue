@@ -10,6 +10,21 @@
                     <input-button v-on:clicked="saveConfiguration()" icon="save"/>
                 </p>
             </layout-row>
+            <p slot="footer" v-if="referencingJobsPage && referencingJobsPage.items && referencingJobsPage.items.length > 0">
+                <label class="list-label">Used by the following jobs:</label>
+                <feedback-box v-for="(referencingJob, index) in referencingJobsPage.items" :key="index" class="list-entry"
+                              :clickable="true"
+                              v-on:feedback-clicked="editJob(referencingJob.key)">
+                    <div slot="left">{{formatJobName(referencingJob.value)}}</div>
+                </feedback-box>
+                <list-pager :page="referencingJobsPage" v-if="referencingJobsPage.totalPages > 1"
+                            v-on:first="loadReferencingJobs(0)"
+                            v-on:previous="loadReferencingJobs(referencingJobsPage.number - 1)"
+                            v-on:next="loadReferencingJobs(referencingJobsPage.number + 1)"
+                            v-on:last="loadReferencingJobs(referencingJobsPage.totalPages -1)"/>
+            </p>
+            <label slot="footer" v-if="!referencingJobsPage || !referencingJobsPage.items || referencingJobsPage.items.length
+             === 0">No jobs are using this service.</label>
         </side-menu>
 
         <core-content>
@@ -100,10 +115,14 @@
   import IgorBackend from '../utils/igor-backend.js'
   import BackgroundIcon from "../components/common/background-icon";
   import ModalDialog from "../components/common/modal-dialog";
+  import FeedbackBox from "../components/common/feedback-box";
+  import ListPager from "../components/common/list-pager";
 
   export default {
     name: 'service-editor',
     components: {
+      ListPager,
+      FeedbackBox,
       ModalDialog,
       BackgroundIcon,
       SideMenu,
@@ -129,6 +148,12 @@
           category: {},
           type: {},
           parameters: {}
+        },
+        referencingJobsPage: {
+          number: 0,
+          size: 10,
+          totalPages: 0,
+          items: []
         },
         showUnsavedValuesExistDialog: false,
         nextRoute: null
@@ -181,6 +206,12 @@
         await IgorBackend.getData('/api/parameters/service/' + typeKey).then((parameters) => {
           this.serviceConfiguration.parameters = parameters
         })
+      },
+      loadReferencingJobs: async function (page) {
+        if (this.serviceConfiguration && this.serviceConfiguration.id) {
+          this.referencingJobsPage = await IgorBackend.getData('/api/service/' + this.serviceConfiguration.id +
+              '/job-references?pageNumber=' + page + '&pageSize=' + this.referencingJobsPage.size)
+        }
       },
       testConfiguration: async function () {
         if (!(await this.validateInput())) {
@@ -251,7 +282,13 @@
       },
       formatName: function (name) {
         return FormatUtils.shorten(name, 40)
-      }
+      },
+      formatJobName: function (name) {
+        return FormatUtils.shorten(name, 27)
+      },
+      editJob: function (jobId) {
+        this.$router.push({name: 'job-editor', params: {jobId: jobId}})
+      },
     },
     mounted() {
       let serviceData = this.$root.$data.store.getServiceData()
@@ -267,6 +304,7 @@
         if (this.serviceId != null) {
           this.loadService(this.serviceId).then(() => {
             this.originalServiceConfiguration = JSON.stringify(this.serviceConfiguration)
+            this.loadReferencingJobs(0)
           })
         } else {
           // Create a new service from within a job configuration. The category is fixed since the job requires it.
@@ -309,5 +347,10 @@
 </script>
 
 <style scoped>
+
+    .list-label {
+        margin-bottom: 5px;
+        display: inline-block;
+    }
 
 </style>

@@ -12,7 +12,7 @@
                 </p>
                 <p slot="right">
                     <input-button icon="play" v-on:clicked="showRunDialog = true" class="button-margin-left"
-                                  :disabled="jobRunning || jobConfiguration.id == null || !jobConfiguration.active"/>
+                                  :disabled="jobRunningOrWaiting || jobConfiguration.id == null || !jobConfiguration.active"/>
                 </p>
             </layout-row>
             <job-tree-navigation slot="content"
@@ -224,10 +224,10 @@
       }
     },
     computed: {
-      jobRunning: function () {
+      jobRunningOrWaiting: function () {
         if (this.jobExecutionsPage) {
           for (let i = 0; i < this.jobExecutionsPage.items.length; i++) {
-            if ('RUNNING' === this.jobExecutionsPage.items[i].state) {
+            if ('RUNNING' === this.jobExecutionsPage.items[i].state || 'WAITING' === this.jobExecutionsPage.items[i].state) {
               return true
             }
           }

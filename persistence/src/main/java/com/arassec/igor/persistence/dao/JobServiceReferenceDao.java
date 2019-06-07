@@ -2,6 +2,8 @@ package com.arassec.igor.persistence.dao;
 
 import com.arassec.igor.persistence.entity.JobServiceReferenceEntity;
 import com.arassec.igor.persistence.entity.JobServiceReferenceIdentity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -42,7 +44,7 @@ public interface JobServiceReferenceDao extends PagingAndSortingRepository<JobSe
      * @return List of job-service-references.
      */
     @Query(value = "SELECT * FROM igor.job_service_reference WHERE service_id = :serviceId", nativeQuery = true)
-    List<JobServiceReferenceEntity> findByServiceId(@Param("serviceId") Long serviceId);
+    Page<JobServiceReferenceEntity> findByServiceId(@Param("serviceId") Long serviceId, Pageable pageable);
 
     /**
      * Deletes all entities for the given service ID.

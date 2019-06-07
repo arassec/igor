@@ -32,6 +32,7 @@
   import LayoutRow from "../common/layout-row";
   import InputButton from "../common/input-button";
   import FormatUtils from "../../utils/format-utils.js";
+  import IgorBackend from "../../utils/igor-backend.js";
 
   export default {
     name: "delete-service-dialog",
@@ -49,11 +50,8 @@
       }
     },
     mounted: function () {
-      let component = this
-      this.$http.get('/api/service/' + component.serviceId + "/job-references").then(function (response) {
-        component.affectedJobs = Array.from(response.data)
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Could not load affected jobs (' + error + ')', true)
+      IgorBackend.getData('/api/service/' + this.serviceId + '/job-references?pageNumber=0&pageSize=666').then((data) => {
+        this.affectedJobs = Array.from(data.items)
       })
     }
   }

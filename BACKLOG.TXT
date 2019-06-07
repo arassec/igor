@@ -1,6 +1,6 @@
 - Unit-Tests (Apache Mina SSHD!)
 - Dashboard -> job-slots -> "recently failed jobs"-section
-- service-editor -> referencing jobs list
+- Add job-schedule on app-status page
 - Persistence-service editor
 - SSH access with key
 - README.md

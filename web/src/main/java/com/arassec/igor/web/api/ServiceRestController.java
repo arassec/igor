@@ -19,7 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -54,17 +55,17 @@ public class ServiceRestController {
      */
     @GetMapping
     public ModelPage<ServiceListEntry> getServices(@RequestParam("pageNumber") int pageNumber,
-                                                   @RequestParam("pageSize") int pageSize, @RequestParam(value = "nameFilter",
-            required = false) String nameFilter) {
+                                                   @RequestParam("pageSize") int pageSize,
+                                                   @RequestParam(value = "nameFilter", required = false) String nameFilter) {
 
         ModelPage<Service> servicesPage = serviceManager.loadPage(pageNumber, pageSize, nameFilter);
         if (servicesPage != null && !servicesPage.getItems().isEmpty()) {
             ModelPage<ServiceListEntry> result = new ModelPage<>(pageNumber, pageSize, servicesPage.getTotalPages(), null);
 
             result.setItems(servicesPage.getItems().stream().map(service -> {
-                Set<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(service.getId());
+                ModelPage<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(service.getId(), 0, 1);
                 return new ServiceListEntry(service.getId(), service.getName(),
-                        (referencingJobs != null && !referencingJobs.isEmpty()));
+                        (referencingJobs != null && !referencingJobs.getItems().isEmpty()));
             }).collect(Collectors.toList()));
 
             return result;
@@ -86,8 +87,7 @@ public class ServiceRestController {
 
         if (serviceModelPage.getItems() != null) {
             JSONArray items = new JSONArray();
-            serviceModelPage.getItems().stream().forEach(service -> items.put(jsonServiceConverter.convert(service, false,
-                    true)));
+            serviceModelPage.getItems().forEach(service -> items.put(jsonServiceConverter.convert(service, false, true)));
 
             JSONObject result = new JSONObject();
             result.put("number", pageNumber);
@@ -124,13 +124,11 @@ public class ServiceRestController {
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteService(@PathVariable("id") Long id, @RequestParam Boolean deleteAffectedJobs) {
-        List<Pair<Long, String>> referencingJobs = getReferencingJobs(id);
-        if (deleteAffectedJobs) {
-            referencingJobs.stream().forEach(jobReference -> {
-                jobManager.delete(jobReference.getKey());
-            });
-        } else {
-            referencingJobs.stream().forEach(jobReference -> {
+        ModelPage<Pair<Long, String>> referencingJobs = getReferencingJobs(id, 0, Integer.MAX_VALUE);
+        if (referencingJobs.getItems() != null && deleteAffectedJobs) {
+            referencingJobs.getItems().forEach(jobReference -> jobManager.delete(jobReference.getKey()));
+        } else if (referencingJobs.getItems() != null) {
+            referencingJobs.getItems().forEach(jobReference -> {
                 Job job = jobManager.load(jobReference.getKey());
                 job.setActive(false);
                 jobManager.save(job);
@@ -160,7 +158,6 @@ public class ServiceRestController {
      * Updates an existing service.
      *
      * @param serviceJson The service configuration in JSON form.
-     * @return The string 'service updated' upon success.
      */
     @PutMapping()
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -206,10 +203,7 @@ public class ServiceRestController {
     public Boolean checkServiceName(@PathVariable("name") String encodedName, @PathVariable("id") Long id) {
         String name = new String(Base64.getDecoder().decode(encodedName));
         Service existingService = serviceManager.loadByName(name);
-        if (existingService != null && !(existingService.getId().equals(id))) {
-            return true;
-        }
-        return false;
+        return (existingService != null && !(existingService.getId().equals(id)));
     }
 
     /**
@@ -219,16 +213,14 @@ public class ServiceRestController {
      * @return The jobs.
      */
     @GetMapping(value = "{id}/job-references", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Pair<Long, String>> getReferencingJobs(@PathVariable("id") Long id) {
-        List<Pair<Long, String>> result = new LinkedList<>();
-
-        Set<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(id);
-        if (referencingJobs != null && !referencingJobs.isEmpty()) {
-            result.addAll(referencingJobs);
-            Collections.sort(result, Comparator.comparing(Pair::getValue));
+    public ModelPage<Pair<Long, String>> getReferencingJobs(@PathVariable("id") Long id,
+                                                            @RequestParam("pageNumber") int pageNumber,
+                                                            @RequestParam("pageSize") int pageSize) {
+        ModelPage<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(id, pageNumber, pageSize);
+        if (referencingJobs != null) {
+            return referencingJobs;
         }
-
-        return result;
+        return new ModelPage<>(pageNumber, pageSize, 0, List.of());
     }
 
 }

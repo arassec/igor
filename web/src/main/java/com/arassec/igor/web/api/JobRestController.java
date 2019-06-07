@@ -61,8 +61,8 @@ public class JobRestController {
         if (jobsPage != null && !jobsPage.getItems().isEmpty()) {
             ModelPage<JobListEntry> result = new ModelPage<>(pageNumber, pageSize, jobsPage.getTotalPages(), null);
 
-            result.setItems(jobsPage.getItems().stream().map(job -> new JobListEntry(job.getId(), job.getName(),
-                    job.isActive())).collect(Collectors.toList()));
+            result.setItems(jobsPage.getItems().stream().map(job -> new JobListEntry(job.getId(), job.getName(), job.isActive()))
+                    .collect(Collectors.toList()));
 
             return result;
         }
@@ -239,8 +239,10 @@ public class JobRestController {
         Set<Pair<Long, String>> referencedServices = jobManager.getReferencedServices(id);
         if (referencedServices != null && !referencedServices.isEmpty()) {
             referencedServices.stream().forEach(referencedService -> {
-                Set<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(referencedService.getKey());
-                if (referencingJobs != null && referencingJobs.size() == 1 && referencingJobs.iterator().next().getKey().equals(id)) {
+                ModelPage<Pair<Long, String>> referencingJobs = serviceManager
+                        .getReferencingJobs(referencedService.getKey(), 0, Integer.MAX_VALUE);
+                if (referencingJobs != null && referencingJobs.getItems().size() == 1 && referencingJobs.getItems().iterator()
+                        .next().getKey().equals(id)) {
                     result.add(referencedService);
                 }
             });

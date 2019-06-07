@@ -105,7 +105,9 @@ public class ServiceManager {
     /**
      * Loads all service of a given category.
      *
-     * @param category The category to filter services with.
+     * @param category   The category to filter services with.
+     * @param pageNumber The page to load.
+     * @param pageSize   The size of the page.
      * @return List of services in the category.
      */
     public ModelPage<Service> loadAllOfCategory(String category, int pageNumber, int pageSize) {
@@ -159,11 +161,13 @@ public class ServiceManager {
     /**
      * Searches for jobs referencing the service with the given ID.
      *
-     * @param id The service's ID.
+     * @param id         The service's ID.
+     * @param pageNumber The page to load.
+     * @param pageSize   The size of the page.
      * @return Set of jobs referencing this service.
      */
-    public Set<Pair<Long, String>> getReferencingJobs(Long id) {
-        return serviceRepository.findReferencingJobs(id);
+    public ModelPage<Pair<Long, String>> getReferencingJobs(Long id, int pageNumber, int pageSize) {
+        return serviceRepository.findReferencingJobs(id, pageNumber, pageSize);
     }
 
 }

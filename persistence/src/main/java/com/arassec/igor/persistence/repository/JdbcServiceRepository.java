@@ -19,7 +19,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -64,8 +66,8 @@ public class JdbcServiceRepository implements ServiceRepository {
         if (service.getId() == null) {
             serviceEntity = new ServiceEntity();
         } else {
-            serviceEntity =
-                    serviceDao.findById(service.getId()).orElseThrow(() -> new IllegalStateException("No service with " + "ID " + service.getId() + " available!"));
+            serviceEntity = serviceDao.findById(service.getId())
+                    .orElseThrow(() -> new IllegalStateException("No service with " + "ID " + service.getId() + " available!"));
         }
         serviceEntity.setName(service.getName());
         serviceEntity.setContent(jsonServiceConverter.convert(service, true, false).toString());
@@ -101,8 +103,8 @@ public class JdbcServiceRepository implements ServiceRepository {
     public Service findByName(String name) {
         ServiceEntity serviceEntity = serviceDao.findByName(name);
         if (serviceEntity != null) {
-            Service service = jsonServiceConverter.convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(),
-                    true);
+            Service service = jsonServiceConverter
+                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), true);
             service.setId(serviceEntity.getId());
             return service;
         }
@@ -118,8 +120,8 @@ public class JdbcServiceRepository implements ServiceRepository {
     public List<Service> findAll() {
         List<Service> result = new LinkedList<>();
         for (ServiceEntity serviceEntity : serviceDao.findAll()) {
-            Service service = jsonServiceConverter.convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(),
-                    true);
+            Service service = jsonServiceConverter
+                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), true);
             service.setId(serviceEntity.getId());
             if (service != null) {
                 result.add(service);
@@ -150,7 +152,9 @@ public class JdbcServiceRepository implements ServiceRepository {
 
         if (page != null && page.hasContent()) {
             ModelPage<Service> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
-            result.setItems(page.getContent().stream().map(serviceEntity -> jsonServiceConverter.convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), true)).collect(Collectors.toList()));
+            result.setItems(page.getContent().stream().map(serviceEntity -> jsonServiceConverter
+                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), true))
+                    .collect(Collectors.toList()));
             return result;
         }
 
@@ -172,19 +176,18 @@ public class JdbcServiceRepository implements ServiceRepository {
      * {@inheritDoc}
      */
     @Override
-    public Set<Pair<Long, String>> findReferencingJobs(Long id) {
-        Set<Pair<Long, String>> result = new HashSet<>();
-
-        List<JobServiceReferenceEntity> serviceReferences = jobServiceReferenceDao.findByServiceId(id);
-        if (serviceReferences != null) {
-            serviceReferences.forEach(serviceReference -> {
-                Long jobId = serviceReference.getJobServiceReferenceIdentity().getJobId();
-                String jobName = jobDao.findNameById(jobId);
-                result.add(new Pair<>(jobId, jobName));
-            });
+    public ModelPage<Pair<Long, String>> findReferencingJobs(Long id, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<JobServiceReferenceEntity> serviceReferences = jobServiceReferenceDao.findByServiceId(id, pageable);
+        if (serviceReferences != null && serviceReferences.hasContent()) {
+            ModelPage<Pair<Long, String>> result = new ModelPage<>(pageNumber, pageSize, serviceReferences.getTotalPages(), null);
+            result.setItems(serviceReferences.get()
+                    .map(reference -> new Pair<>(reference.getJobServiceReferenceIdentity().getJobId(),
+                            jobDao.findNameById(reference.getJobServiceReferenceIdentity().getJobId())))
+                    .collect(Collectors.toList()));
+            return result;
         }
-
-        return result;
+        return new ModelPage<>(pageNumber, pageSize, 0, List.of());
     }
 
 }

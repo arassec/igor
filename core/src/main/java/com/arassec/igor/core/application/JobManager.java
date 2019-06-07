@@ -309,9 +309,12 @@ public class JobManager implements InitializingBean, DisposableBean {
      * @param job The Job to enqueue.
      */
     private void enqueueJob(Job job) {
+        List<JobExecution> runningJobExecutions = jobExecutionRepository
+                .findAllOfJobInState(job.getId(), JobExecutionState.RUNNING);
         List<JobExecution> waitingJobExecutions = jobExecutionRepository.findAllOfJobInState(job.getId(),
                 JobExecutionState.WAITING);
-        if (waitingJobExecutions == null || waitingJobExecutions.isEmpty()) {
+        if ((runningJobExecutions == null || runningJobExecutions
+                .isEmpty()) && (waitingJobExecutions == null || waitingJobExecutions.isEmpty())) {
             JobExecution jobExecution = new JobExecution();
             jobExecution.setJobId(job.getId());
             jobExecution.setCreated(Instant.now());

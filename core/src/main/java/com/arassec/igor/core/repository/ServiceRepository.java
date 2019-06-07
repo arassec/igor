@@ -5,7 +5,6 @@ import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Repository for {@link Service}s.
@@ -63,9 +62,11 @@ public interface ServiceRepository {
     /**
      * Returns all jobs that use the given service.
      *
-     * @param id The service's ID.
+     * @param id         The service's ID.
+     * @param pageNumber The page to load.
+     * @param pageSize   The size of the page.
      * @return List of job IDs and names that are using this service.
      */
-    Set<Pair<Long, String>> findReferencingJobs(Long id);
+    ModelPage<Pair<Long, String>> findReferencingJobs(Long id, int pageNumber, int pageSize);
 
 }
