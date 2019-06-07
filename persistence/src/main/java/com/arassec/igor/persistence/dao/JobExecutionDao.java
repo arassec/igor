@@ -1,9 +1,11 @@
 package com.arassec.igor.persistence.dao;
 
 import com.arassec.igor.persistence.entity.JobExecutionEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -13,15 +15,16 @@ import java.util.List;
  * Defines access to {@link com.arassec.igor.core.model.job.execution.JobExecution}s in the database.
  */
 @Repository
-public interface JobExecutionDao extends CrudRepository<JobExecutionEntity, Long> {
+public interface JobExecutionDao extends PagingAndSortingRepository<JobExecutionEntity, Long> {
 
     /**
      * Returns all persisted job-executions of the job with the provided ID.
      *
      * @param jobId The job's ID.
+     * @param pageable The page parameters to use.
      * @return List of job-executions of that job.
      */
-    List<JobExecutionEntity> findByJobIdOrderByIdDesc(Long jobId);
+    Page<JobExecutionEntity> findByJobId(Long jobId, Pageable pageable);
 
     /**
      * Returns all job-executions of a certain job in the given state with the newest entries first.

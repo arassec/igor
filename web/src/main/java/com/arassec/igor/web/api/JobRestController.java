@@ -6,6 +6,7 @@ import com.arassec.igor.core.application.converter.JsonJobConverter;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.trigger.CronTrigger;
+import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.api.error.RestControllerExceptionHandler;
 import com.arassec.igor.web.api.model.JobListEntry;
@@ -53,10 +54,20 @@ public class JobRestController {
      * @return List of Job-IDs.
      */
     @GetMapping
-    public List<JobListEntry> getJobIds() {
-        List<Job> jobs = jobManager.loadAll();
-        return jobs.stream().map(job -> new JobListEntry(job.getId(), job.getName(), job.isActive()))
-                .collect(Collectors.toList());
+    public ModelPage<JobListEntry> getJobs(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize,
+                                           @RequestParam(value = "nameFilter", required = false) String nameFilter) {
+
+        ModelPage<Job> jobsPage = jobManager.loadPage(pageNumber, pageSize, nameFilter);
+        if (jobsPage != null && !jobsPage.getItems().isEmpty()) {
+            ModelPage<JobListEntry> result = new ModelPage<>(pageNumber, pageSize, jobsPage.getTotalPages(), null);
+
+            result.setItems(jobsPage.getItems().stream().map(job -> new JobListEntry(job.getId(), job.getName(),
+                    job.isActive())).collect(Collectors.toList()));
+
+            return result;
+        }
+
+        return new ModelPage<>(pageNumber, pageSize, 0, List.of());
     }
 
     /**
@@ -85,7 +96,7 @@ public class JobRestController {
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String createJob(@RequestBody String jobJson) {
-        Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, false);
         if (jobManager.loadByName(job.getName()) == null) {
             job.setId(null);
             Job savedJob = jobManager.save(job);
@@ -103,7 +114,7 @@ public class JobRestController {
      */
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String updateJob(@RequestBody String jobJson) {
-        Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, false);
         Job existingJobWithSameName = jobManager.loadByName(job.getName());
         if (existingJobWithSameName == null || existingJobWithSameName.getId().equals(job.getId())) {
             Job savedJob = jobManager.save(job);
@@ -121,7 +132,7 @@ public class JobRestController {
      */
     @PostMapping("test")
     public DryRunJobResult testJob(@RequestBody String jobJson) {
-        Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, false);
         return job.dryRun();
     }
 
@@ -167,7 +178,7 @@ public class JobRestController {
      */
     @PostMapping(value = "run", produces = MediaType.APPLICATION_JSON_VALUE)
     public String runJob(@RequestBody String jobJson) {
-        Job job = jsonJobConverter.convert(new JSONObject(jobJson), false);
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, false);
         Job savedJob = jobManager.save(job);
         if (job.isActive()) {
             jobManager.enqueue(savedJob);
@@ -202,18 +213,16 @@ public class JobRestController {
     @GetMapping("schedule")
     public List<Map<String, Object>> getSchedule() {
         List<Map<String, Object>> jobSchedule = new LinkedList<>();
-        jobManager.loadScheduled().stream()
-                .filter(job -> job.getTrigger() instanceof CronTrigger)
-                .forEach(job -> {
-                    String cronExpression = ((CronTrigger) job.getTrigger()).getCronExpression();
-                    CronSequenceGenerator cronTrigger = new CronSequenceGenerator(cronExpression);
-                    Date nextRun = cronTrigger.next(Calendar.getInstance().getTime());
-                    Map<String, Object> scheduleEntry = new HashMap<>();
-                    scheduleEntry.put("id", job.getId());
-                    scheduleEntry.put("name", job.getName());
-                    scheduleEntry.put("date", new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(nextRun));
-                    jobSchedule.add(scheduleEntry);
-                });
+        jobManager.loadScheduled().stream().filter(job -> job.getTrigger() instanceof CronTrigger).forEach(job -> {
+            String cronExpression = ((CronTrigger) job.getTrigger()).getCronExpression();
+            CronSequenceGenerator cronTrigger = new CronSequenceGenerator(cronExpression);
+            Date nextRun = cronTrigger.next(Calendar.getInstance().getTime());
+            Map<String, Object> scheduleEntry = new HashMap<>();
+            scheduleEntry.put("id", job.getId());
+            scheduleEntry.put("name", job.getName());
+            scheduleEntry.put("date", new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(nextRun));
+            jobSchedule.add(scheduleEntry);
+        });
         return jobSchedule;
     }
 

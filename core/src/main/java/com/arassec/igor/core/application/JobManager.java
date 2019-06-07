@@ -8,6 +8,7 @@ import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.repository.PersistentValueRepository;
+import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -187,33 +188,44 @@ public class JobManager implements InitializingBean, DisposableBean {
     }
 
     /**
+     * Loads a page of jobs matching the supplied criteria.
+     *
+     * @param pageNumber The page number.
+     * @param pageSize   The page size.
+     * @param nameFilter An optional name filter for the jobs.
+     * @return The page with jobs matching the criteria.
+     */
+    public ModelPage<Job> loadPage(int pageNumber, int pageSize, String nameFilter) {
+        return jobRepository.findPage(pageNumber, pageSize, nameFilter);
+    }
+
+    /**
      * Loads all scheduled jobs, sorted by their next run date.
      *
      * @return List of scheduled jobs.
      */
     public List<Job> loadScheduled() {
-        return jobRepository.findAll().stream()
-                .filter(job -> job.isActive())
-                .filter(job -> job.getTrigger() instanceof com.arassec.igor.core.model.trigger.CronTrigger)
-                .sorted((o1, o2) -> {
-                    String firstCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
-                    String secondCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
-                    CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(firstCron);
-                    Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
-                    CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(secondCron);
-                    Date nextRunTwo = cronTriggerTwo.next(Calendar.getInstance().getTime());
-                    return nextRunOne.compareTo(nextRunTwo);
-                }).collect(Collectors.toList());
+        return jobRepository.findAll().stream().filter(job -> job.isActive()).filter(job -> job.getTrigger() instanceof com.arassec.igor.core.model.trigger.CronTrigger).sorted((o1, o2) -> {
+            String firstCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
+            String secondCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
+            CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(firstCron);
+            Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
+            CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(secondCron);
+            Date nextRunTwo = cronTriggerTwo.next(Calendar.getInstance().getTime());
+            return nextRunOne.compareTo(nextRunTwo);
+        }).collect(Collectors.toList());
     }
 
     /**
      * Returns a job's execution state for the job with the given ID.
      *
-     * @param id The job's ID.
-     * @return The current {@link JobExecution} of the job, if it is running, or {@code null} otherwise.
+     * @param jobId      The job's ID.
+     * @param pageNumber The page to load.
+     * @param pageSize   The number of items on the page.
+     * @return A page with {@link JobExecution}s of the job.
      */
-    public List<JobExecution> getJobExecutionsOfJob(Long id) {
-        return jobExecutionRepository.findAllOfJob(id);
+    public ModelPage<JobExecution> getJobExecutionsOfJob(Long jobId, int pageNumber, int pageSize) {
+        return jobExecutionRepository.findAllOfJob(jobId, pageNumber, pageSize);
     }
 
     /**
@@ -265,12 +277,10 @@ public class JobManager implements InitializingBean, DisposableBean {
         if (job.getTrigger() instanceof com.arassec.igor.core.model.trigger.CronTrigger) {
             String cronExpression = ((com.arassec.igor.core.model.trigger.CronTrigger) job.getTrigger()).getCronExpression();
             try {
-                scheduledJobs.put(job.getId(), taskScheduler.schedule(
-                        new Thread(() -> {
-                            log.info("Trying to automatically enqueue job: {} ({})", job.getName(), job.getId());
-                            enqueueJob(job);
-                        }),
-                        new CronTrigger(cronExpression)));
+                scheduledJobs.put(job.getId(), taskScheduler.schedule(new Thread(() -> {
+                    log.info("Trying to automatically enqueue job: {} ({})", job.getName(), job.getId());
+                    enqueueJob(job);
+                }), new CronTrigger(cronExpression)));
                 log.info("Scheduled job: {} ({}).", job.getName(), job.getId());
             } catch (IllegalArgumentException e) {
                 throw new IllegalStateException("Illegal trigger configured (" + e.getMessage() + ")");
@@ -299,7 +309,8 @@ public class JobManager implements InitializingBean, DisposableBean {
      * @param job The Job to enqueue.
      */
     private void enqueueJob(Job job) {
-        List<JobExecution> waitingJobExecutions = jobExecutionRepository.findAllOfJobInState(job.getId(), JobExecutionState.WAITING);
+        List<JobExecution> waitingJobExecutions = jobExecutionRepository.findAllOfJobInState(job.getId(),
+                JobExecutionState.WAITING);
         if (waitingJobExecutions == null || waitingJobExecutions.isEmpty()) {
             JobExecution jobExecution = new JobExecution();
             jobExecution.setJobId(job.getId());
@@ -308,7 +319,8 @@ public class JobManager implements InitializingBean, DisposableBean {
             jobExecutionRepository.upsert(jobExecution);
             jobExecutionRepository.cleanup(job.getId(), job.getExecutionHistoryLimit());
         } else {
-            log.info("Job '{}' ({}) already waiting for execution. Skipped execution until next time.", job.getName(), job.getId());
+            log.info("Job '{}' ({}) already waiting for execution. Skipped execution until next time.", job.getName(),
+                    job.getId());
         }
     }
 

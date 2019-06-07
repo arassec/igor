@@ -14,7 +14,9 @@ export default {
     }
   },
   postData: async function (url, payload, wipMessage, successMessage, errorMessage) {
-    store.setWip(wipMessage)
+    if (wipMessage) {
+      store.setWip(wipMessage)
+    }
     try {
       let response = await window.axios.post(url, payload)
       store.setFeedback(successMessage, false)
@@ -29,7 +31,9 @@ export default {
         return error.response.data
       }
     } finally {
-      store.clearWip()
+      if (wipMessage) {
+        store.clearWip()
+      }
     }
   },
   putData: async function (url, payload, wipMessage, successMessage, errorMessage) {

@@ -4,7 +4,7 @@ import com.arassec.igor.persistence.entity.JobServiceReferenceEntity;
 import com.arassec.igor.persistence.entity.JobServiceReferenceIdentity;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +14,8 @@ import java.util.List;
  * Defines access to job-service-references in the database.
  */
 @Repository
-public interface JobServiceReferenceDao extends CrudRepository<JobServiceReferenceEntity, JobServiceReferenceIdentity> {
+public interface JobServiceReferenceDao extends PagingAndSortingRepository<JobServiceReferenceEntity,
+        JobServiceReferenceIdentity> {
 
     /**
      * Finds all job-service-references for the given job ID.

@@ -1,9 +1,9 @@
 <template>
-  <div class="row" v-on:click="$emit('clicked')">
+    <div class="row" v-on:click="clickable ? $emit('clicked') : false" :class="clickable ? 'clickable' : ''">
     <div :class="scrollLeft ? 'scroll' : ''">
       <slot name="left"/>
     </div>
-    <div class="right">
+        <div :class="alignLeft ? '' : 'right'">
       <slot name="right"/>
     </div>
   </div>
@@ -12,7 +12,7 @@
 <script>
 export default {
   name: 'layout-row',
-  props: ['scrollLeft']
+  props: ['scrollLeft', 'alignLeft', 'clickable']
 }
 </script>
 
@@ -31,5 +31,30 @@ export default {
   .right {
     margin-left: auto;
   }
+
+  .clickable:hover {
+      cursor: pointer;
+      background-color: var(--main-background-color);
+      color: var(--panel-background-color);
+  }
+
+  .clickable:hover * {
+      cursor: pointer;
+      color: var(--panel-background-color);
+      border-color: var(--panel-background-color);
+  }
+
+  .clickable:hover * .button {
+      cursor: pointer;
+      color: var(--panel-background-color);
+      border-color: var(--panel-background-color);
+  }
+
+  .clickable:hover * .button:hover {
+      cursor: pointer;
+      color: var(--font-color-light);
+      background-color: var(--panel-background-color);
+  }
+
 
 </style>

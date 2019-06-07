@@ -9,13 +9,14 @@
                 The following services are only used by this job:
                 <ul class="a">
                     <li v-for="exclusiveService in exclusiveServices" :key="exclusiveService.key">
-                        {{exclusiveService.value}}
+                        {{formatName(exclusiveService.value)}}
                     </li>
                 </ul>
             </div>
             <div class="paragraph" v-if="exclusiveServices.length > 0">
                 Delete unused services, too:
-                <font-awesome-icon :icon="deleteServices ? 'check-square' : 'square'" v-on:click="deleteServices = !deleteServices"/>
+                <font-awesome-icon :icon="deleteServices ? 'check-square' : 'square'"
+                                   v-on:click="deleteServices = !deleteServices"/>
             </div>
         </div>
 
@@ -29,28 +30,35 @@
 </template>
 
 <script>
-    import ModalDialog from "../common/modal-dialog";
-    import LayoutRow from "../common/layout-row";
-    import InputButton from "../common/input-button";
-    export default {
-        name: "delete-job-dialog",
-        components: {InputButton, LayoutRow, ModalDialog},
-        props: ['jobId', 'jobName'],
-        data: function () {
-            return {
-                exclusiveServices: [],
-                deleteServices: false
-            }
-        },
-        mounted: function () {
-            let component = this
-            this.$http.get('/api/job/' + component.jobId + "/exclusive-service-references").then(function (response) {
-                component.exclusiveServices = Array.from(response.data)
-            }).catch(function (error) {
-                component.$root.$data.store.setFeedback('Could not load unused services (' + error + ')', true)
-            })
-        }
+  import ModalDialog from "../common/modal-dialog";
+  import LayoutRow from "../common/layout-row";
+  import InputButton from "../common/input-button";
+  import FormatUtils from "../../utils/format-utils.js";
+
+  export default {
+    name: "delete-job-dialog",
+    components: {InputButton, LayoutRow, ModalDialog},
+    props: ['jobId', 'jobName'],
+    data: function () {
+      return {
+        exclusiveServices: [],
+        deleteServices: false
+      }
+    },
+    methods: {
+      formatName: function (name) {
+        return FormatUtils.shorten(name, 40);
+      }
+    },
+    mounted: function () {
+      let component = this
+      this.$http.get('/api/job/' + component.jobId + "/exclusive-service-references").then(function (response) {
+        component.exclusiveServices = Array.from(response.data)
+      }).catch(function (error) {
+        component.$root.$data.store.setFeedback('Could not load unused services (' + error + ')', true)
+      })
     }
+  }
 </script>
 
 <style scoped>

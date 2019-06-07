@@ -25,7 +25,7 @@ public class JsonServiceConverter extends JsonBaseConverter {
     /**
      * Converts a {@link Service} into a JSON-string.
      *
-     * @param service The service to convert.
+     * @param service       The service to convert.
      * @param applySecurity Set to {@code true} to decrypt secured properties.
      * @param addVolatile   Set to {@code true} to add properties that only exist through annotations or could otherwise
      *                      be obtained, but can be added for convenience.
@@ -45,9 +45,10 @@ public class JsonServiceConverter extends JsonBaseConverter {
      * Converts the provided JSON-string into a {@link Service} instance.
      *
      * @param serviceJson The service in JSON form.
+     * @param id          Optional ID of the service. Used, if the service's JSON doesn't contain an ID.
      * @return A newly created service instance.
      */
-    public Service convert(JSONObject serviceJson, boolean applySecurity) {
+    public Service convert(JSONObject serviceJson, Long id, boolean applySecurity) {
         String name = serviceJson.getString(JsonKeys.NAME);
         String type = convertKeyLabelStore(serviceJson.getJSONObject(JsonKeys.TYPE)).getKey();
         Map<String, Object> parameters = parameterConverter.convert(serviceJson.optJSONArray(JsonKeys.PARAMETERS), applySecurity);
@@ -55,7 +56,11 @@ public class JsonServiceConverter extends JsonBaseConverter {
         if (result != null) {
             result.setId(serviceJson.optLong(JsonKeys.ID, -1));
             if (result.getId() == -1) {
-                result.setId(null);
+                if (id != null) {
+                    result.setId(id);
+                } else {
+                    result.setId(null);
+                }
             }
             result.setName(name);
         }

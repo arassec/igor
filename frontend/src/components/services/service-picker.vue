@@ -1,62 +1,78 @@
 <template>
-  <modal-dialog>
+    <modal-dialog>
 
-    <h1 slot="header">Select Service</h1>
+        <layout-row slot="header">
+            <h1 slot="left">Select Service</h1>
+            <input-button slot="right" icon="times" v-on:clicked="$emit('cancel')"/>
+        </layout-row>
 
-    <div slot="body">
-        <table>
-          <tr v-if="services == null || services.length === 0">
-            <td>No service of the required category is available. Please create a new service with the button on the right below.</td>
-          </tr>
-          <tr v-for="service in services" :key="service.id">
-            <td class="first">
-              {{ service.name }}
-            </td>
-            <td class="last">
-              <input-button icon="crosshairs" v-on:clicked="$emit('selected', service)"/>
-            </td>
-          </tr>
-        </table>
-    </div>
+        <div slot="body">
+            <label v-if="services == null || services.length === 0">
+                No service of the required category is available. Please create a new service with the button on the right below.
+            </label>
 
-    <layout-row slot="footer">
-      <input-button slot="left" icon="times" v-on:clicked="$emit('cancel')"/>
-      <input-button slot="right" icon="plus" v-on:clicked="$emit('create')"/>
-    </layout-row>
+            <div class="services-container">
+                <feedback-box v-for="service in services" :key="service.id" :clickable="true"
+                              v-on:feedback-clicked="$emit('selected', service)">
+                    <div slot="left">{{formatName(service.name)}}</div>
+                </feedback-box>
+                <layout-row slot="footer">
+                    <input-button slot="right" icon="plus" v-on:clicked="$emit('create')"/>
+                </layout-row>
+            </div>
+        </div>
 
-  </modal-dialog>
+        <list-pager slot="footer" :page="page"
+                    v-on:first="$emit('first-page')"
+                    v-on:previous="$emit('previous-page')"
+                    v-on:next="$emit('next-page')"
+                    v-on:last="$emit('last-page')"/>
+
+    </modal-dialog>
 </template>
 
 <script>
-import ModalDialog from '../common/modal-dialog'
-import LayoutRow from '../common/layout-row'
-import InputButton from '../common/input-button'
+  import ModalDialog from '../common/modal-dialog'
+  import LayoutRow from '../common/layout-row'
+  import InputButton from '../common/input-button'
+  import ListPager from "../common/list-pager";
+  import FeedbackBox from "../common/feedback-box";
+  import FormatUtils from '../../utils/format-utils.js'
 
-export default {
-  name: 'service-picker',
-  components: {InputButton, LayoutRow,  ModalDialog},
-  props: ['services'],
-  data: function () {
-    return {
-      feedback: '',
-      feedbackOk: true
+  export default {
+    name: 'service-picker',
+    components: {FeedbackBox, ListPager, InputButton, LayoutRow, ModalDialog},
+    props: ['services', 'page'],
+    data: function () {
+      return {
+        feedback: '',
+        feedbackOk: true
+      }
+    },
+    methods: {
+      formatName: function (name) {
+        return FormatUtils.shorten(name, 40)
+      }
     }
   }
-}
 </script>
 
 <style scoped>
 
-  table {
-    width: 100%;
-  }
+    table {
+        width: 100%;
+    }
 
-  .first {
-    width: 100%;
-  }
+    .first {
+        width: 100%;
+    }
 
-  .last {
-    padding-right: 0px !important;
-  }
+    .last {
+        padding-right: 0px !important;
+    }
+
+    .services-container {
+        min-height: 425px;
+    }
 
 </style>

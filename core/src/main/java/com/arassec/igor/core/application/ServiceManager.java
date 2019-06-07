@@ -1,9 +1,10 @@
 package com.arassec.igor.core.application;
 
-import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import com.arassec.igor.core.application.factory.ServiceFactory;
+import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -80,6 +81,18 @@ public class ServiceManager {
     }
 
     /**
+     * Loads a page of services matching the supplied criteria.
+     *
+     * @param pageNumber The page number.
+     * @param pageSize   The page size.
+     * @param nameFilter An optional name filter for the services.
+     * @return The page with services matching the criteria.
+     */
+    public ModelPage<Service> loadPage(int pageNumber, int pageSize, String nameFilter) {
+        return serviceRepository.findPage(pageNumber, pageSize, nameFilter);
+    }
+
+    /**
      * Loads a service by its name.
      *
      * @param name The service's name.
@@ -95,13 +108,32 @@ public class ServiceManager {
      * @param category The category to filter services with.
      * @return List of services in the category.
      */
-    public List<Service> loadAllOfCategory(String category) {
+    public ModelPage<Service> loadAllOfCategory(String category, int pageNumber, int pageSize) {
         if (category == null) {
-            return new LinkedList<>();
+            return new ModelPage<>(0, 0, 0, List.of());
         }
-        List<Service> services = loadAll();
-        return services.stream().filter(service -> category.equals(serviceFactory.getCategory(service).getKey()))
-                .collect(Collectors.toList());
+        List<Service> services = serviceRepository.findAll();
+        List<Service> allOfType =
+                services.stream().filter(service -> category.equals(serviceFactory.getCategory(service).getKey())).collect(Collectors.toList());
+
+        Collections.sort(allOfType, Comparator.comparing(Service::getName));
+
+        if (allOfType != null && !allOfType.isEmpty()) {
+            long totalPages = allOfType.size() / pageSize;
+            if (allOfType.size() % pageSize > 0) {
+                totalPages++;
+            }
+            if (totalPages > 0 && totalPages > pageNumber) {
+                int startIndex = pageNumber * pageSize;
+                int endIndex = startIndex + pageSize;
+                if (endIndex >= allOfType.size()) {
+                    endIndex = allOfType.size();
+                }
+                return new ModelPage<>(pageNumber, pageSize, totalPages, allOfType.subList(startIndex, endIndex));
+            }
+        }
+
+        return new ModelPage<>(pageNumber, 0, 0, List.of());
     }
 
     /**

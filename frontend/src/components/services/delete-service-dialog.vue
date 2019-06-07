@@ -9,7 +9,7 @@
                 The following jobs are using this service and will not be working any more:
                 <ul class="a">
                     <li v-for="affectedJob in affectedJobs" :key="affectedJob.key">
-                        {{affectedJob.value}}
+                        {{formatName(affectedJob.value)}}
                     </li>
                 </ul>
             </div>
@@ -28,29 +28,35 @@
 </template>
 
 <script>
-    import ModalDialog from "../common/modal-dialog";
-    import LayoutRow from "../common/layout-row";
-    import InputButton from "../common/input-button";
+  import ModalDialog from "../common/modal-dialog";
+  import LayoutRow from "../common/layout-row";
+  import InputButton from "../common/input-button";
+  import FormatUtils from "../../utils/format-utils.js";
 
-    export default {
-        name: "delete-service-dialog",
-        components: {InputButton, LayoutRow, ModalDialog},
-        props: ['serviceId', 'serviceName'],
-        data: function () {
-            return {
-                affectedJobs: [],
-                deleteJobs: false
-            }
-        },
-        mounted: function () {
-            let component = this
-            this.$http.get('/api/service/' + component.serviceId + "/job-references").then(function (response) {
-                component.affectedJobs = Array.from(response.data)
-            }).catch(function (error) {
-                component.$root.$data.store.setFeedback('Could not load affected jobs (' + error + ')', true)
-            })
-        }
+  export default {
+    name: "delete-service-dialog",
+    components: {InputButton, LayoutRow, ModalDialog},
+    props: ['serviceId', 'serviceName'],
+    data: function () {
+      return {
+        affectedJobs: [],
+        deleteJobs: false
+      }
+    },
+    methods: {
+      formatName: function (name) {
+        return FormatUtils.shorten(name, 40);
+      }
+    },
+    mounted: function () {
+      let component = this
+      this.$http.get('/api/service/' + component.serviceId + "/job-references").then(function (response) {
+        component.affectedJobs = Array.from(response.data)
+      }).catch(function (error) {
+        component.$root.$data.store.setFeedback('Could not load affected jobs (' + error + ')', true)
+      })
     }
+  }
 </script>
 
 <style scoped>

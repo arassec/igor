@@ -8,17 +8,26 @@
             </p>
         </list-header>
 
-        <list-entry v-for="job in filteredJobs" :key="job.id" v-on:clicked="editJob(job.id)">
-            <list-name slot="left" :class="!job.active ? 'inactive' : ''">
-                {{ formatName(job.name) }}
-            </list-name>
-            <p slot="right" :class="!job.active ? 'inactive' : ''">
-                <input-button v-on:clicked="duplicateJob(job.id)" icon="clone" class="button-margin-right"/>
-                <input-button v-on:clicked="openDeleteJobDialog(job.id, job.name)"  class="button-margin-right" icon="trash-alt"/>
-                <input-button v-on:clicked="openRunJobDialog(job.id, job.name)" icon="play"
-                              :disabled="jobRunningOrWaiting(job.id) || !job.active"/>
-            </p>
-        </list-entry>
+        <div v-if="jobsPage">
+            <list-entry v-for="job in jobsPage.items" :key="job.id" v-on:clicked="editJob(job.id)">
+                <list-name slot="left" :class="!job.active ? 'inactive' : ''">
+                    {{ formatName(job.name) }}
+                </list-name>
+                <p slot="right" :class="!job.active ? 'inactive' : ''">
+                    <input-button v-on:clicked="duplicateJob(job.id)" icon="clone" class="button-margin-right"/>
+                    <input-button v-on:clicked="openDeleteJobDialog(job.id, job.name)" class="button-margin-right"
+                                  icon="trash-alt"/>
+                    <input-button v-on:clicked="openRunJobDialog(job.id, job.name)" icon="play"
+                                  :disabled="jobRunningOrWaiting(job.id) || !job.active"/>
+                </p>
+            </list-entry>
+
+            <list-pager :page="jobsPage" v-if="jobsPage && jobsPage.totalPages > 1" :dark="true"
+                        v-on:first="loadJobs(0)"
+                        v-on:previous="loadJobs(jobsPage.number - 1)"
+                        v-on:next="loadJobs(jobsPage.number + 1)"
+                        v-on:last="loadJobs(jobsPage.totalPages -1)"/>
+        </div>
 
         <delete-job-dialog v-if="showDeleteDialog"
                            v-bind:job-id="selectedJobId"
@@ -54,14 +63,20 @@
   import InputButton from "../common/input-button";
   import ModalDialog from "../common/modal-dialog";
   import LayoutRow from "../common/layout-row";
+  import ListPager from "../common/list-pager";
 
   export default {
     name: "job-list",
-    components: {LayoutRow, ModalDialog, InputButton, DeleteJobDialog, ListName, ListEntry, ListHeader, CoreContent},
+    components: {ListPager, LayoutRow, ModalDialog, InputButton, DeleteJobDialog, ListName, ListEntry, ListHeader, CoreContent},
     props: ['runningJobs', 'waitingJobs'],
     data: function () {
       return {
-        jobs: [],
+        jobsPage: {
+          number: 0,
+          size: 12,
+          totalPages: 666,
+          items: []
+        },
         filterText: '',
         showDeleteDialog: false,
         showRunDialog: false,
@@ -87,20 +102,15 @@
         }
         return false
       },
-      loadJobs: function () {
-        IgorBackend.getData('/api/job').then((result) => {
-          for (let i = this.jobs.length; i > 0; i--) {
-            this.jobs.pop()
-          }
-          let component = this
-          Array.from(result).forEach(function (item) {
-            component.jobs.push(item)
-          })
-          this.jobs.sort((a, b) => a.name.localeCompare(b.name))
-        })
+      loadJobs: async function (page) {
+        if (this.jobsPage) {
+          this.jobsPage = await IgorBackend.getData('/api/job?pageNumber=' + page + '&pageSize=' + this.jobsPage.size +
+              "&nameFilter=" + this.filterText);
+        }
       },
       filter: function (filterTextFromListHeader) {
         this.filterText = filterTextFromListHeader
+        this.loadJobs(0)
       },
       editJob: function (jobId) {
         this.$router.push({name: 'job-editor', params: {jobId: jobId}})
@@ -120,7 +130,7 @@
         IgorBackend.deleteData('/api/job/' + this.selectedJobId + '?deleteExclusiveServices=' + deleteExclusiveServices,
             'Deleting job', 'Job \'' + FormatUtils.formatNameForSnackbar(this.selectedJobName) + '\' has been deleted.',
             'Job \'' + FormatUtils.formatNameForSnackbar(this.selectedJobName) + '\' could not be deleted!').then(() => {
-          this.loadJobs()
+          this.loadJobs(0)
           if (deleteExclusiveServices) {
             this.$root.$emit('reload-services')
           }
@@ -145,7 +155,7 @@
         })
       },
       formatName: function (name) {
-        return FormatUtils.formatNameForListEntry(name, 36)
+        return FormatUtils.shorten(name, 36)
       }
     },
     computed: {
@@ -157,9 +167,9 @@
       }
     },
     mounted() {
-      this.loadJobs()
+      this.loadJobs(0)
       this.$root.$on('reload-jobs', () => {
-        this.loadJobs();
+        this.loadJobs(0);
       });
     }
   }

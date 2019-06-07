@@ -45,8 +45,7 @@ public class JsonJobConverter {
         jobJson.put(JsonKeys.ACTIVE, job.isActive());
 
         JSONArray tasksJson = new JSONArray();
-        job.getTasks().stream().map(task -> jsonTaskConverter.convert(task, applySecurity, addVolatile))
-                .forEach(jsonObject -> tasksJson.put(jsonObject));
+        job.getTasks().stream().map(task -> jsonTaskConverter.convert(task, applySecurity, addVolatile)).forEach(jsonObject -> tasksJson.put(jsonObject));
         jobJson.put(JsonKeys.TASKS, tasksJson);
 
         return jobJson;
@@ -56,12 +55,20 @@ public class JsonJobConverter {
      * Converts jobs from their JSON representation.
      *
      * @param jobJson       The job in JSON form.
+     * @param id            Optional ID of the job. Used, if the job's JSON doesn't contain an ID.
      * @param applySecurity Set to {@code true}, to decrypt secured parameters.
      * @return A newly created {@link Job} instance.
      */
-    public Job convert(JSONObject jobJson, boolean applySecurity) {
+    public Job convert(JSONObject jobJson, Long id, boolean applySecurity) {
         Job job = new Job();
-        job.setId(jobJson.optLong(JsonKeys.ID));
+        job.setId(jobJson.optLong(JsonKeys.ID, -1));
+        if (job.getId() == -1) {
+            if (id != null) {
+                job.setId(id);
+            } else {
+                job.setId(null);
+            }
+        }
         job.setName(jobJson.getString(JsonKeys.NAME));
         job.setTrigger(jsonTriggerConverter.convert(jobJson.getJSONObject(JsonKeys.TRIGGER), applySecurity));
         job.setDescription(jobJson.optString(JsonKeys.DESCRIPTION));

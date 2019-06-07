@@ -5,15 +5,18 @@ import com.arassec.igor.core.application.converter.JsonKeys;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.repository.JobExecutionRepository;
+import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.persistence.dao.JobExecutionDao;
 import com.arassec.igor.persistence.entity.JobExecutionEntity;
 import com.github.openjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -83,12 +86,15 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      * {@inheritDoc}
      */
     @Override
-    public List<JobExecution> findAllOfJob(Long jobId) {
-        List<JobExecutionEntity> jobExecutionEntities = jobExecutionDao.findByJobIdOrderByIdDesc(jobId);
-        if (jobExecutionEntities != null) {
-            return jobExecutionEntities.stream().map(jobExecutionEntity -> convert(jobExecutionEntity)).collect(Collectors.toList());
+    public ModelPage<JobExecution> findAllOfJob(Long jobId, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id").descending());
+        Page<JobExecutionEntity> page = jobExecutionDao.findByJobId(jobId, pageable);
+        if (page != null && page.hasContent()) {
+            ModelPage<JobExecution> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
+            result.setItems(page.getContent().stream().map(this::convert).collect(Collectors.toList()));
+            return result;
         }
-        return new LinkedList<>();
+        return new ModelPage<>(pageNumber, 0, 0, List.of());
     }
 
     /**
@@ -98,7 +104,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     public List<JobExecution> findAllOfJobInState(Long jobId, JobExecutionState state) {
         List<JobExecutionEntity> jobExecutionEntities = jobExecutionDao.findByJobIdAndStateOrderByIdDesc(jobId, state.name());
         if (jobExecutionEntities != null) {
-            return jobExecutionEntities.stream().map(jobExecutionEntity -> convert(jobExecutionEntity)).collect(Collectors.toList());
+            return jobExecutionEntities.stream().map(this::convert).collect(Collectors.toList());
         }
         return new LinkedList<>();
     }
@@ -110,8 +116,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     public List<JobExecution> findInState(JobExecutionState state) {
         List<JobExecutionEntity> waitingJobExecutions = jobExecutionDao.findByStateOrderByIdAsc(state.name());
         if (waitingJobExecutions != null) {
-            return waitingJobExecutions.stream().map(
-                    jobExecutionEntity -> convert(jobExecutionEntity)).collect(Collectors.toList());
+            return waitingJobExecutions.stream().map(this::convert).collect(Collectors.toList());
         }
         return new LinkedList<>();
     }
@@ -121,9 +126,10 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      */
     @Override
     public void cleanup(Long jobId, int numToKeep) {
-        List<JobExecutionEntity> jobExecutionEntities = jobExecutionDao.findByJobIdOrderByIdDesc(jobId);
-        if (jobExecutionEntities != null && jobExecutionEntities.size() > numToKeep) {
-            jobExecutionDao.deleteByJobIdAndIdBefore(jobId, jobExecutionEntities.get(numToKeep - 1).getId());
+        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("id").descending());
+        Page<JobExecutionEntity> page = jobExecutionDao.findByJobId(jobId, pageable);
+        if (page != null && page.hasContent() && page.getTotalElements() > numToKeep) {
+            jobExecutionDao.deleteByJobIdAndIdBefore(jobId, page.getContent().get(numToKeep - 1).getId());
         }
     }
 

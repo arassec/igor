@@ -3,15 +3,15 @@ export default {
     let parts = name.split(' ');
     for (let i = 0; i < parts.length; i++) {
       if (parts[i].length > 16) {
-        parts[i] = name.substring(0, 16) + '...'
+        parts[i] = parts[i].substring(0, 16) + '...'
       }
     }
     return parts.join(' ');
   },
-  formatNameForListEntry: function (name, maxLength) {
-    if (name.length > maxLength) {
-      return name.substring(0, maxLength) + '...'
+  shorten: function (input, maxLength) {
+    if (input.length > maxLength) {
+      return input.substring(0, maxLength) + '...'
     }
-    return name
+    return input
   }
 }

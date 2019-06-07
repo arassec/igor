@@ -1,16 +1,19 @@
 <template>
-  <layout-row :class="{info: !alert,  alert: alert}" class="margin-bottom" v-on:clicked="$emit('feedback-clicked')">
+    <layout-row :class="{info: !alert,  alert: alert}" class="margin-bottom"
+                v-on:clicked="clickable ? $emit('feedback-clicked') : false"
+                :clickable="clickable" :align-left="alignLeft">
     <slot slot="left" name="left"/>
     <slot slot="right" name="right"/>
   </layout-row>
 </template>
 
 <script>
-import LayoutRow from './layout-row'
-export default {
+  import LayoutRow from './layout-row'
+
+  export default {
   name: 'feedback-box',
   components: {LayoutRow},
-  props: ['alert']
+    props: ['alert', 'clickable', 'alignLeft']
 }
 </script>
 

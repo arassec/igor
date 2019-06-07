@@ -33,17 +33,23 @@
                                  v-on:move-action-up="moveActionUp"
                                  v-on:move-action-down="moveActionDown">
             </job-tree-navigation>
-            <p slot="footer">
-                <feedback-box v-for="(jobExecution, index) in jobExecutions" class="list-entry"
-                              :key="index" :alert="jobExecution.state === 'FAILED'"
-                              v-on:feedback-clicked="openExecutionDetailsDialog(jobExecution)">
-                    <label slot="left">{{formatJobExecution(jobExecution)}}</label>
+            <div slot="footer" v-if="jobExecutionsPage && jobExecutionsPage.items">
+                <feedback-box
+                        v-for="(jobExecution, index) in jobExecutionsPage.items"
+                        :key="index" :alert="jobExecution.state === 'FAILED'" :clickable="true"
+                        v-on:feedback-clicked="openExecutionDetailsDialog(jobExecution)">
+                    <div slot="left">{{formatJobExecution(jobExecution)}}</div>
                     <div slot="right">
                         <input-button slot="right" icon="times" v-on:clicked="openCancelJobDialog(jobExecution)"
                                       v-if="jobExecution.state === 'WAITING' || jobExecution.state === 'RUNNING'"/>
                     </div>
                 </feedback-box>
-            </p>
+                <list-pager :page="jobExecutionsPage" v-if="jobExecutionsPage.totalPages > 1"
+                            v-on:first="manualUpdateJobExecutions(0)"
+                            v-on:previous="manualUpdateJobExecutions(jobExecutionsPage.number -1)"
+                            v-on:next="manualUpdateJobExecutions(jobExecutionsPage.number + 1)"
+                            v-on:last="manualUpdateJobExecutions(jobExecutionsPage.totalPages - 1)"/>
+            </div>
         </side-menu>
 
         <core-content v-if="jobConfiguration">
@@ -162,10 +168,12 @@
   import FormatUtils from '../utils/format-utils.js'
   import BackgroundIcon from "../components/common/background-icon";
   import IgorBackend from '../utils/igor-backend.js'
+  import ListPager from "../components/common/list-pager";
 
   export default {
     name: 'job-editor',
     components: {
+      ListPager,
       BackgroundIcon,
       JobExecutionDetails,
       FeedbackBox,
@@ -201,7 +209,12 @@
         originalJobConfiguration: null,
         jobConfiguration: null,
         validationErrors: [],
-        jobExecutions: [],
+        jobExecutionsPage: {
+          number: 0,
+          size: 10,
+          totalPages: 666,
+          items: []
+        },
         jobExecutionsRefreshTimer: null,
         selectedJobExecutionListEntry: null,
         selectedJobExecution: null,
@@ -212,9 +225,9 @@
     },
     computed: {
       jobRunning: function () {
-        if (this.jobExecutions != null) {
-          for (let i = 0; i < this.jobExecutions.length; i++) {
-            if ('RUNNING' === this.jobExecutions[i].state) {
+        if (this.jobExecutionsPage) {
+          for (let i = 0; i < this.jobExecutionsPage.items.length; i++) {
+            if ('RUNNING' === this.jobExecutionsPage.items[i].state) {
               return true
             }
           }
@@ -245,7 +258,6 @@
       },
       loadJob: async function (id) {
         this.jobConfiguration = await IgorBackend.getData('/api/job/' + id)
-        this.updateJobExecutions()
       },
       saveConfiguration: async function () {
         if (!(await this.validateInput())) {
@@ -266,7 +278,6 @@
               this.newJob = false
               this.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' saved.', false)
               this.$router.push({name: 'job-editor', params: {jobId: this.jobConfiguration.id}})
-              this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
             }
           })
         } else {
@@ -475,31 +486,28 @@
       isActionSelected: function (taskIndex, actionIndex) {
         return taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex
       },
-      runJob: function () {
+      runJob: async function () {
         this.showRunDialog = false
         if (!this.validateInput()) {
           return
         }
-        let component = this
-        this.$http.post('/api/job/run', this.jobConfiguration).then(function (response) {
-          component.jobConfiguration = response.data
-          component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' started manually.', false)
-          component.updateJobExecutions()
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(component.jobConfiguration.name) + '\' startup failed ('
-              + error + ').', true)
-        })
+        this.jobConfiguration = await IgorBackend.postData('/api/job/run', this.jobConfiguration, 'Starting job', 'Job \'' +
+            FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' started manually.', 'Job \'' +
+            FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' startup failed!')
       },
-      updateJobExecutions: function () {
-        IgorBackend.getData('/api/execution/job/' + this.jobConfiguration.id).then((result) => {
-          for (let i = this.jobExecutions.length; i > 0; i--) {
-            this.jobExecutions.pop()
-          }
-          let component = this
-          Array.from(result).forEach(function (item) {
-            component.jobExecutions.push(item)
-          })
-        })
+      updateJobExecutions: async function () {
+        if (this.jobConfiguration.id) {
+          this.jobExecutionsPage = await IgorBackend.getData('/api/execution/job/' + this.jobConfiguration.id + '?pageNumber=' +
+              this.jobExecutionsPage.number + '&pageSize=' + this.jobExecutionsPage.size)
+        }
+      },
+      manualUpdateJobExecutions: async function (page) {
+        if (this.jobConfiguration.id) {
+          clearInterval(this.jobExecutionsRefreshTimer)
+          this.jobExecutionsPage = await IgorBackend.getData('/api/execution/job/' + this.jobConfiguration.id + '?pageNumber=' +
+              page + '&pageSize=' + this.jobExecutionsPage.size)
+          this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+        }
       },
       openExecutionDetailsDialog: async function (selectedJobExecutionListEntry) {
         this.selectedJobExecutionId = selectedJobExecutionListEntry.id
@@ -517,26 +525,21 @@
         }
         this.showExecutionDetailsDialog = false
       },
-      updateJobExectuionDetails: function () {
-        IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId).then((result) => {
-          this.selectedJobExecution = result
-        })
+      updateJobExectuionDetails: async function () {
+        this.selectedJobExecution = await IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId)
       },
       openCancelJobDialog: function (selectedJobExecutionListEntry) {
         this.selectedJobExecutionListEntry = selectedJobExecutionListEntry
         this.showCancelJobDialog = true
       },
       cancelJobExecution: function () {
+        clearInterval(this.jobExecutionsRefreshTimer)
         this.showCancelJobDialog = false
-        clearTimeout(this.jobExecutionsRefreshTimer)
         IgorBackend.postData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/cancel', null,
             "Cancelling job", "Job cancelled.", "Job could not be cancelled!").then(() => {
-          for (let i = 0; i < this.jobExecutions.length; i++) {
-            if (this.jobExecutions[i].id === this.selectedJobExecutionListEntry.id) {
-              this.jobExecutions[i].state = 'CANCELLED'
-            }
-          }
-          this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+          this.updateJobExecutions().then(() => {
+            this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+          })
         })
       },
       createService: function (selectionKey, parameterIndex, serviceCategory) {
@@ -554,8 +557,6 @@
         this.jobConfiguration = jobData.jobConfiguration
         if (this.jobConfiguration.id != null) {
           this.newJob = false
-          this.updateJobExecutions()
-          this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
         }
 
         let selectionKey = jobData.selectionKey
@@ -585,17 +586,23 @@
             this.selectTask(taskIndex)
           }
         }
+        this.updateJobExecutions().then(() => {
+          this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+        })
         this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
         this.$root.$data.store.clearJobData()
       } else if (this.jobId != null) {
         this.newJob = false
         this.loadJob(this.jobId).then(() => {
+          this.updateJobExecutions().then(() => {
+            this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+          })
           this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
-          this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
         })
       } else {
         // The job-configurator loads trigger data and modifies the initial jobConfiguration. So the 'originalJobConfiguration' property is set there...
         this.createJob()
+        this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
       }
 
       let component = this
@@ -638,22 +645,5 @@
 
 
 <style scoped>
-
-    .list-entry:hover {
-        cursor: pointer;
-        background-color: var(--main-background-color);
-    }
-
-    .list-entry:hover * {
-        cursor: pointer;
-        color: var(--panel-background-color);
-        border-color: var(--panel-background-color);
-    }
-
-    .list-entry:hover div[class='button']:hover {
-        cursor: pointer;
-        color: var(--font-color-light);
-        background-color: var(--panel-background-color);
-    }
 
 </style>

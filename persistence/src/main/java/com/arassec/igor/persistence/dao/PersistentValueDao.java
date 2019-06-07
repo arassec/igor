@@ -2,7 +2,7 @@ package com.arassec.igor.persistence.dao;
 
 import com.arassec.igor.persistence.entity.PersistentValueEntity;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * Defines access to {@link PersistentValueEntity}s in the database.
  */
 @Repository
-public interface PersistentValueDao extends CrudRepository<PersistentValueEntity, Long> {
+public interface PersistentValueDao extends PagingAndSortingRepository<PersistentValueEntity, Long> {
 
     /**
      * Returns a persisted value if it exists.

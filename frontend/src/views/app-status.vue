@@ -12,11 +12,11 @@
             -->
             <p slot="content" v-if="runningJobs.length">
                 <label class="list-label">Currently running jobs ({{this.runningJobs.length}}/{{this.numSlots}})</label>
-                <feedback-box v-for="(runningJob, index) in runningJobs" :key="index" class="list-entry"
+                <feedback-box v-for="(runningJob, index) in runningJobs" :key="index" class="list-entry" :clickable="true"
                               v-on:feedback-clicked="openExecutionDetailsDialog(runningJob)">
-                    <label slot="left">{{formatName(runningJob.jobName)}}</label>
+                    <div slot="left">{{formatName(runningJob.jobName)}}</div>
                     <div slot="right">
-                        <label>{{runningJob.duration}}</label>
+                        {{runningJob.duration}}
                         <input-button slot="right" icon="times" v-on:clicked="openCancelJobDialog(runningJob)"/>
                     </div>
                 </feedback-box>
@@ -24,11 +24,11 @@
             <label slot="content" v-if="runningJobs.length === 0">No jobs are currently running.</label>
             <p slot="footer" v-if="waitingJobs.length">
                 <label class="list-label">Waiting jobs</label>
-                <feedback-box v-for="(waitingJob, index) in waitingJobs" :key="index" class="list-entry"
+                <feedback-box v-for="(waitingJob, index) in waitingJobs" :key="index" class="list-entry" :clickable="true"
                               v-on:feedback-clicked="openExecutionDetailsDialog(waitingJob)">
-                    <label slot="left">{{formatName(waitingJob.jobName)}}</label>
+                    <div slot="left">{{formatName(waitingJob.jobName)}}</div>
                     <div slot="right">
-                        <label>{{waitingJob.duration}}</label>
+                        {{waitingJob.duration}}
                         <input-button slot="right" icon="times" v-on:clicked="openCancelJobDialog(waitingJob)"/>
                     </div>
                 </feedback-box>
@@ -36,11 +36,17 @@
             <label slot="footer" v-if="waitingJobs.length === 0">No jobs are currently waiting.</label>
         </side-menu>
 
-        <job-list class="core-content-normal"
-            :running-jobs="runningJobs"
-            :waiting-jobs="waitingJobs"/>
+        <div class="column-container" style="display: flex; flex-grow: 1;">
+            <div class="column" style="width: 50%;">
+                <job-list class="core-content-normal"
+                          :running-jobs="runningJobs"
+                          :waiting-jobs="waitingJobs"/>
+            </div>
 
-        <service-list class="core-content-normal"/>
+            <div class="column" style="width: 50%">
+                <service-list class="core-content-normal"/>
+            </div>
+        </div>
 
         <job-execution-details v-if="showExecutionDetailsDialog"
                                v-bind:job-execution="selectedJobExecution"
@@ -137,7 +143,7 @@
         clearTimeout(this.jobExecutionDetailsRefreshTimer)
         this.showExecutionDetailsDialog = false
       },
-      updateJobExectuionDetails: function() {
+      updateJobExectuionDetails: function () {
         IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId).then((result) => {
           this.selectedJobExecution = result
         })
@@ -152,7 +158,7 @@
         IgorBackend.postData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/cancel', null,
             "Cancelling job", "Job cancelled.", "Job could not be cancelled!").then(() => {
           for (let i = 0; i < this.runningJobs.length; i++) {
-            if (this.runningJobs[i].id === this.selectedJobExecutionListEntry.id){
+            if (this.runningJobs[i].id === this.selectedJobExecutionListEntry.id) {
               this.$delete(this.runningJobs, i)
               break
             }
@@ -165,7 +171,7 @@
         })
       },
       formatName: function (name) {
-        return FormatUtils.formatNameForListEntry(name, 27)
+        return FormatUtils.shorten(name, 27)
       }
     },
     mounted() {
@@ -186,26 +192,18 @@
 
 <style scoped>
 
-    .list-entry:hover {
-        cursor: pointer;
-        background-color: var(--main-background-color);
-    }
-
-    .list-entry:hover * {
-        cursor: pointer;
-        color: var(--panel-background-color);
-        border-color: var(--panel-background-color);
-    }
-
-    .list-entry:hover div[class='button']:hover {
-        cursor: pointer;
-        color: var(--font-color-light);
-        background-color: var(--panel-background-color);
-    }
-
     .list-label {
         margin-bottom: 5px;
         display: inline-block;
+    }
+
+    .column-container {
+        display: flex;
+        flex-grow: 1;
+    }
+
+    .column {
+        width: 50%;
     }
 
 </style>

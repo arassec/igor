@@ -16,7 +16,8 @@
             <core-panel>
                 <h1>
                     <font-awesome-icon icon="cogs"/>
-                    {{ serviceConfiguration.name.length > 0 ? serviceConfiguration.name : 'Unnamed Service' }}
+                    {{ serviceConfiguration.name.length > 0 ? formatName(serviceConfiguration.name, 40) :
+                    'Unnamed Service' }}
                 </h1>
                 <table>
                     <tr>
@@ -247,6 +248,9 @@
         }
 
         return ((this.nameValidationError.length === 0) && parameterValidationResult)
+      },
+      formatName: function (name) {
+        return FormatUtils.shorten(name, 40)
       }
     },
     mounted() {

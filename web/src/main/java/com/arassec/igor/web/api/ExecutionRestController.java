@@ -4,6 +4,7 @@ import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.web.api.model.JobExecutionListEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,15 +39,22 @@ public class ExecutionRestController {
      * been executed.
      */
     @GetMapping("job/{jobId}")
-    public List<JobExecutionListEntry> getExecutionsOfJob(@PathVariable("jobId") Long jobId) {
-        List<JobExecutionListEntry> result = List.of();
-        Job job = jobManager.load(jobId);
-        List<JobExecution> jobExecutions = jobManager.getJobExecutionsOfJob(jobId);
+    public ModelPage<JobExecutionListEntry> getExecutionsOfJob(@PathVariable("jobId") Long jobId,
+                                                               @RequestParam("pageNumber") int pageNumber, @RequestParam(
+                                                                       "pageSize") int pageSize) {
+        ModelPage<JobExecution> jobExecutions = jobManager.getJobExecutionsOfJob(jobId, pageNumber, pageSize);
+
         if (jobExecutions != null) {
-            result = jobExecutions.stream().map(jobExecution -> convert(jobExecution, job.getName())).collect(Collectors.toList());
-            result.sort(Comparator.comparing(JobExecutionListEntry::getId).reversed());
+            Job job = jobManager.load(jobId);
+
+            ModelPage<JobExecutionListEntry> result = new ModelPage<>(pageNumber, pageSize, jobExecutions.getTotalPages(), null);
+            result.setItems(jobExecutions.getItems().stream().map(jobExecution -> convert(jobExecution, job.getName())).collect(Collectors.toList()));
+            result.getItems().sort(Comparator.comparing(JobExecutionListEntry::getId).reversed());
+
+            return result;
         }
-        return result;
+
+        return new ModelPage<>(pageNumber, pageSize, 0, List.of());
     }
 
     /**
@@ -128,7 +135,7 @@ public class ExecutionRestController {
             listEntry.setDuration(formatDuration(Duration.between(jobExecution.getStarted(), Instant.now()).toSeconds()));
         } else if (JobExecutionState.WAITING.equals(jobExecution.getExecutionState())) {
             listEntry.setDuration(formatDuration(Duration.between(jobExecution.getCreated(), Instant.now()).toSeconds()));
-        } else if (jobExecution.getStarted() != null && jobExecution.getFinished() != null){
+        } else if (jobExecution.getStarted() != null && jobExecution.getFinished() != null) {
             listEntry.setDuration(formatDuration(Duration.between(jobExecution.getStarted(), jobExecution.getFinished()).toSeconds()));
         } else {
             listEntry.setDuration("");

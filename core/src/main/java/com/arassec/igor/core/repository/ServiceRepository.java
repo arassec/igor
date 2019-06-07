@@ -1,6 +1,7 @@
 package com.arassec.igor.core.repository;
 
 import com.arassec.igor.core.model.service.Service;
+import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 
 import java.util.List;
@@ -25,6 +26,16 @@ public interface ServiceRepository {
      * @return The list of all available services.
      */
     List<Service> findAll();
+
+    /**
+     * Returns a subset of all services matching the supplied criteria.
+     *
+     * @param pageNumber The page number to load.
+     * @param pageSize   The page size.
+     * @param nameFilter An optional filter for the service's name.
+     * @return The page with services.
+     */
+    ModelPage<Service> findPage(int pageNumber, int pageSize, String nameFilter);
 
     /**
      * Finds a service by its ID.

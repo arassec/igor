@@ -2,6 +2,7 @@ package com.arassec.igor.core.repository;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.util.ModelPage;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public interface JobExecutionRepository {
 
     /**
      * Finds the job-execution with the given ID.
+     *
      * @param id The job-execution's ID.
      * @return The {@link JobExecution} or {@code null}, if none exists with the given ID.
      */
@@ -28,10 +30,12 @@ public interface JobExecutionRepository {
     /**
      * Returns all executions of a certain job.
      *
-     * @param jobId The job's ID.
+     * @param jobId      The job's ID.
+     * @param pageNumber The page number.
+     * @param pageSize   The size of the page.
      * @return List of executions of this job.
      */
-    List<JobExecution> findAllOfJob(Long jobId);
+    ModelPage findAllOfJob(Long jobId, int pageNumber, int pageSize);
 
     /**
      * Returns all job-executions of a certain job in the specified state.

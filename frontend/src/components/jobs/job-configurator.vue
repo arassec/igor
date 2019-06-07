@@ -3,7 +3,7 @@
         <core-panel>
             <h1>
                 <font-awesome-icon icon="toolbox"/>
-                {{ jobConfiguration.name.length > 0 ? jobConfiguration.name : 'Unnamed Job' }}
+                {{ jobConfiguration.name.length > 0 ? formatName(jobConfiguration.name) : 'Unnamed Job' }}
             </h1>
             <table>
                 <tr>
@@ -86,8 +86,9 @@
 <script>
   import CorePanel from '../common/core-panel'
   import ValidationError from '../common/validation-error'
-  import ParameterEditor from "../common/parameter-editor";
+  import ParameterEditor from '../common/parameter-editor'
   import IgorBackend from '../../utils/igor-backend.js'
+  import FormatUtils from '../../utils/format-utils.js'
 
   export default {
     name: 'job-configurator',
@@ -159,6 +160,9 @@
       },
       createService: function (parameterIndex, serviceCategory) {
         this.$emit('create-service', this.taskKey, parameterIndex, serviceCategory)
+      },
+      formatName: function (name) {
+        return FormatUtils.shorten(name, 40)
       }
     },
     mounted() {

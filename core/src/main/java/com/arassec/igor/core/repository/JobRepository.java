@@ -1,6 +1,7 @@
 package com.arassec.igor.core.repository;
 
 import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 
 import java.util.List;
@@ -25,6 +26,16 @@ public interface JobRepository {
      * @return The list of all available jobs.
      */
     List<Job> findAll();
+
+    /**
+     * Returns a subset of all jobs matching the supplied criteria.
+     *
+     * @param pageNumber The page number to load.
+     * @param pageSize   The page size.
+     * @param nameFilter An optional filter for the job's name.
+     * @return The page with jobs.
+     */
+    ModelPage<Job> findPage(int pageNumber, int pageSize, String nameFilter);
 
     /**
      * Finds a job by its ID.
