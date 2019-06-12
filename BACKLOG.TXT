@@ -1,22 +1,17 @@
 - Unit-Tests (Apache Mina SSHD!)
+- README.md
+- Limit for number of dry-run-results.
 - Persistence-service editor
 - Job-Execution-History-Details with
   - current Task
   - Progress information
   - Concurrency-Group workload
-  previous results
 - SSH access with key
-- README.md
-- Encryption-Cipher in database, randomly generated at first start
-- Limit for number of dry-run-results.
-- Job-Parameter: cancel on task fail (true|false)
-- Job-Parameter: kill-switch with date to disable jobs
-  - create date-picker component
 - CIFS-/Samba supporting FileService
 - Export + Import of jobs and services (via JSON)
-- Initial setup with configuration on first start
 - Configuration-View with system configuration
-- Job dry-runs without cloning Tasks?
+  - Initial setup with configuration on first start
+  - Encryption-Cipher in database, randomly generated at first start
 - Optional authentication + authorization (Frontend + Backend)
 - Directory-Browser for file services in the GUI
 - Healthchecks + Spring-Boot-Admin support via actuators

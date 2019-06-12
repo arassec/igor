@@ -8,7 +8,8 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.misc.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.util.StacktraceFormatter;
-import com.rits.cloning.Cloner;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.openjson.JSONObject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -113,8 +114,8 @@ public class Task {
         BlockingQueue<Map<String, Object>> inputQueue = providerInputQueue;
 
         for (List<Action> concurrencyList : concurrencyLists) {
-            String concurrencyGroupId = String.format(CONCURRENCY_GROUP_ID_PATTERN, jobId, getId(),
-                    concurrencyLists.indexOf(concurrencyList));
+            String concurrencyGroupId = String
+                    .format(CONCURRENCY_GROUP_ID_PATTERN, jobId, getId(), concurrencyLists.indexOf(concurrencyList));
             ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueue, concurrencyGroupId,
                     jobExecution);
             inputQueue = concurrencyGroup.getOutputQueue();
@@ -171,11 +172,11 @@ public class Task {
         DryRunTaskResult taskResult = new DryRunTaskResult();
 
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
             JobExecution jobExecution = new JobExecution();
 
             provider.initialize(jobId, id, jobExecution);
-
-            Cloner cloner = new Cloner();
 
             actions.forEach(Action::initialize);
 
@@ -184,7 +185,7 @@ public class Task {
             while (provider.hasNext()) {
                 Map<String, Object> item = provider.next();
                 providerResult.add(item);
-                taskResult.getResults().add(cloner.deepClone(item));
+                taskResult.getResults().add(objectMapper.readValue(new JSONObject(item).toString(), HashMap.class));
             }
 
             for (Action action : actions) {
@@ -221,7 +222,10 @@ public class Task {
                             providerResult.clear();
 
                             if (!actionItems.isEmpty()) {
-                                actionItems.forEach(item -> actionResult.getResults().add(cloner.deepClone(item)));
+                                for (Map<String, Object> item : actionItems) {
+                                    actionResult.getResults()
+                                            .add(objectMapper.readValue(new JSONObject(item).toString(), HashMap.class));
+                                }
                                 providerResult.addAll(actionItems);
                             }
                         }
