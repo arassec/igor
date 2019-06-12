@@ -1,6 +1,7 @@
 package com.arassec.igor.module.file.service;
 
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.service.BaseService;
 import com.arassec.igor.core.model.service.ServiceException;
 
@@ -37,12 +38,16 @@ public abstract class BaseFileService extends BaseService implements FileService
      * @param in       The input stream.
      * @param out      The output stream.
      * @param fileSize The max number of bytes to copy.
+     * @param jobExecution The job execution log.
      */
-    protected void copyStream(InputStream in, OutputStream out, long fileSize) {
+    protected void copyStream(InputStream in, OutputStream out, long fileSize, JobExecution jobExecution) {
         try {
             byte[] buf = new byte[1024 * 1024];
             int foo;
             while (true) {
+                if (!jobExecution.isRunning()) {
+                    break;
+                }
                 if (buf.length < fileSize) {
                     foo = buf.length;
                 } else {

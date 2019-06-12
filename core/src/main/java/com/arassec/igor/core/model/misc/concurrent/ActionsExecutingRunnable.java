@@ -1,6 +1,7 @@
 package com.arassec.igor.core.model.misc.concurrent;
 
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.service.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,6 +37,11 @@ public class ActionsExecutingRunnable implements Runnable {
     private boolean active = true;
 
     /**
+     * The job execution.
+     */
+    private JobExecution jobExecution;
+
+    /**
      * Creates a new ActionsExecutingRunnable.
      *
      * @param actions     The actions of this thread.
@@ -43,10 +49,11 @@ public class ActionsExecutingRunnable implements Runnable {
      * @param outputQueue The output queue for the processed data.
      */
     public ActionsExecutingRunnable(List<Action> actions, BlockingQueue<Map<String, Object>> inputQueue,
-                                    BlockingQueue<Map<String, Object>> outputQueue) {
+                                    BlockingQueue<Map<String, Object>> outputQueue, JobExecution jobExecution) {
         this.actions = actions;
         this.inputQueue = inputQueue;
         this.outputQueue = outputQueue;
+        this.jobExecution = jobExecution;
     }
 
     /**
@@ -119,7 +126,7 @@ public class ActionsExecutingRunnable implements Runnable {
                 }
 
                 log.trace("Processing: {}", item);
-                List<Map<String, Object>> partialActionResult = action.process(item, false);
+                List<Map<String, Object>> partialActionResult = action.process(item, false, jobExecution);
                 if (partialActionResult != null && !partialActionResult.isEmpty()) {
                     actionResult.addAll(partialActionResult);
                 }

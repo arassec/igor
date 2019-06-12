@@ -3,7 +3,7 @@
         <h1 slot="header">Delete Service?</h1>
         <div slot="body">
             <div class="paragraph">
-                Do you really want to delete service '{{serviceName.replace(' (unused)', '')}}'?
+                Do you really want to delete service '{{formatName(serviceName)}}'?
             </div>
             <div class="paragraph" v-if="affectedJobs.length > 0">
                 The following jobs are using this service and will not be working any more:

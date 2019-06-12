@@ -3,6 +3,7 @@ package com.arassec.igor.module.file.provider;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorProvider;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.BaseProvider;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
@@ -56,9 +57,9 @@ public class ListFilesProvider extends BaseProvider implements FileProvider {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(Long jobId, String taskId) {
-        super.initialize(jobId, taskId);
-        files = sourceService.listFiles(directory);
+    public void initialize(Long jobId, String taskId, JobExecution jobExecution) {
+        super.initialize(jobId, taskId, jobExecution);
+        files = sourceService.listFiles(directory, jobExecution);
         currentFile = 0;
         if (!directory.endsWith("/")) {
             directory += "/";

@@ -2,6 +2,7 @@ package com.arassec.igor.module.file.service.ftp;
 
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
@@ -147,7 +148,7 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory) {
+    public List<FileInfo> listFiles(String directory, JobExecution jobExecution) {
         try {
             FTPClient ftpClient = connect();
 
@@ -175,7 +176,7 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file) {
+    public String read(String file, JobExecution jobExecution) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             FTPClient ftpClient = connect();
             ftpClient.retrieveFile(file, outputStream);
@@ -191,7 +192,7 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void write(String file, String data) {
+    public void write(String file, String data, JobExecution jobExecution) {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(file.getBytes())) {
             FTPClient ftpClient = connect();
             if (!ftpClient.storeFile(file, inputStream)) {
@@ -207,7 +208,7 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public FileStreamData readStream(String file) {
+    public FileStreamData readStream(String file, JobExecution jobExecution) {
         try {
             FTPClient ftpClient = connect();
             FileStreamData result = new FileStreamData();
@@ -225,10 +226,10 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData) {
+    public void writeStream(String file, FileStreamData fileStreamData, JobExecution jobExecution) {
         FTPClient ftpClient = connect();
         try (BufferedOutputStream outputStream = new BufferedOutputStream(ftpClient.storeFileStream(file))) {
-            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize());
+            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), jobExecution);
             disconnect(ftpClient);
         } catch (IOException e) {
             throw new ServiceException("Could not store file: " + file, e);
@@ -260,7 +261,7 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file) {
+    public void delete(String file, JobExecution jobExecution) {
         try {
             FTPClient ftpClient = connect();
             if (!ftpClient.deleteFile(file)) {
@@ -276,7 +277,7 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target) {
+    public void move(String source, String target, JobExecution jobExecution) {
         try {
             FTPClient ftpClient = connect();
             ftpClient.rename(source, target);

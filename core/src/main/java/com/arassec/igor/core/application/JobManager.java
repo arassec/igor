@@ -73,7 +73,15 @@ public class JobManager implements InitializingBean, DisposableBean {
     @Override
     public void afterPropertiesSet() {
         // If jobs are already 'running' (e.g. after a server restart) the are updated here:
-        jobExecutionRepository.updateState(JobExecutionState.RUNNING, JobExecutionState.FAILED);
+        ModelPage<JobExecution> jobExecutions = jobExecutionRepository
+                .findInState(JobExecutionState.RUNNING, 0, Integer.MAX_VALUE);
+        if (jobExecutions != null && jobExecutions.getItems() != null) {
+            jobExecutions.getItems().forEach(jobExecution -> {
+                jobExecution.setErrorCause("Job interrupted due to application restart!");
+                jobExecution.setExecutionState(JobExecutionState.FAILED);
+                jobExecutionRepository.upsert(jobExecution);
+            });
+        }
         jobRepository.findAll().stream().forEach(job -> schedule(job));
     }
 
@@ -205,15 +213,16 @@ public class JobManager implements InitializingBean, DisposableBean {
      * @return List of scheduled jobs.
      */
     public List<Job> loadScheduled() {
-        return jobRepository.findAll().stream().filter(job -> job.isActive()).filter(job -> job.getTrigger() instanceof com.arassec.igor.core.model.trigger.CronTrigger).sorted((o1, o2) -> {
-            String firstCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
-            String secondCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
-            CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(firstCron);
-            Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
-            CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(secondCron);
-            Date nextRunTwo = cronTriggerTwo.next(Calendar.getInstance().getTime());
-            return nextRunOne.compareTo(nextRunTwo);
-        }).collect(Collectors.toList());
+        return jobRepository.findAll().stream().filter(job -> job.isActive())
+                .filter(job -> job.getTrigger() instanceof com.arassec.igor.core.model.trigger.CronTrigger).sorted((o1, o2) -> {
+                    String firstCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
+                    String secondCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
+                    CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(firstCron);
+                    Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
+                    CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(secondCron);
+                    Date nextRunTwo = cronTriggerTwo.next(Calendar.getInstance().getTime());
+                    return nextRunOne.compareTo(nextRunTwo);
+                }).collect(Collectors.toList());
     }
 
     /**
@@ -241,14 +250,37 @@ public class JobManager implements InitializingBean, DisposableBean {
     /**
      * Returns all job executions which are in the desired state.
      *
-     * @param state The state the job executions must be in to be listed.
+     * @param state      The state the job executions must be in to be listed.
+     * @param pageNumber The page to load.
+     * @param pageSize   The number of items on the page.
      * @return The list of job executions in that state.
      */
-    public List<JobExecution> getJobExecutionsInState(JobExecutionState state) {
+    public ModelPage<JobExecution> getJobExecutionsInState(JobExecutionState state, int pageNumber, int pageSize) {
         if (state == null) {
             throw new IllegalArgumentException("JobExecutionState required!");
         }
-        return jobExecutionRepository.findInState(state);
+        return jobExecutionRepository.findInState(state, pageNumber, pageSize);
+    }
+
+    /**
+     * Sets a new state to a job execution with the given ID.
+     *
+     * @param id       The job execution's ID.
+     * @param newState The new state to set.
+     */
+    public void updateJobExecutionState(Long id, JobExecutionState newState) {
+        jobExecutionRepository.updateJobExecutionState(id, newState);
+    }
+
+    /**
+     * Sets the new state to all job executions of the given job in the supplied state.
+     *
+     * @param jobId    The job's ID.
+     * @param oldState The old state to change.
+     * @param newState The new state to set.
+     */
+    public void updateAllJobExecutionsOfJob(Long jobId, JobExecutionState oldState, JobExecutionState newState) {
+        jobExecutionRepository.updateAllJobExecutionsOfJob(jobId, oldState, newState);
     }
 
     /**
@@ -311,8 +343,8 @@ public class JobManager implements InitializingBean, DisposableBean {
     private void enqueueJob(Job job) {
         List<JobExecution> runningJobExecutions = jobExecutionRepository
                 .findAllOfJobInState(job.getId(), JobExecutionState.RUNNING);
-        List<JobExecution> waitingJobExecutions = jobExecutionRepository.findAllOfJobInState(job.getId(),
-                JobExecutionState.WAITING);
+        List<JobExecution> waitingJobExecutions = jobExecutionRepository
+                .findAllOfJobInState(job.getId(), JobExecutionState.WAITING);
         if ((runningJobExecutions == null || runningJobExecutions
                 .isEmpty()) && (waitingJobExecutions == null || waitingJobExecutions.isEmpty())) {
             JobExecution jobExecution = new JobExecution();
@@ -322,8 +354,8 @@ public class JobManager implements InitializingBean, DisposableBean {
             jobExecutionRepository.upsert(jobExecution);
             jobExecutionRepository.cleanup(job.getId(), job.getExecutionHistoryLimit());
         } else {
-            log.info("Job '{}' ({}) already waiting for execution. Skipped execution until next time.", job.getName(),
-                    job.getId());
+            log.info("Job '{}' ({}) already executing or waiting for execution. Skipped execution until next time.",
+                    job.getName(), job.getId());
         }
     }
 

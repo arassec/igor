@@ -2,6 +2,7 @@ package com.arassec.igor.module.misc.action.persistence;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.persistence.PersistentValue;
 
 import java.util.List;
@@ -22,11 +23,13 @@ public class PersistValueAction extends BasePersistenceAction {
     /**
      * Takes the value from the supplied data and saves it to the persistence store.
      *
-     * @param data The data the action will work with.
+     * @param data         The data the action will work with.
+     * @param isDryRun     If set to {@code true}, the values are not actually persisted.
+     * @param jobExecution The job execution log.
      * @return Always {@code true}.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun) {
+    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
         if (isValid(data)) {
             Long jobId = getLong(data, JOB_ID_KEY);
             String taskId = getString(data, TASK_ID_KEY);

@@ -113,12 +113,15 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      * {@inheritDoc}
      */
     @Override
-    public List<JobExecution> findInState(JobExecutionState state) {
-        List<JobExecutionEntity> waitingJobExecutions = jobExecutionDao.findByStateOrderByIdAsc(state.name());
-        if (waitingJobExecutions != null) {
-            return waitingJobExecutions.stream().map(this::convert).collect(Collectors.toList());
+    public ModelPage<JobExecution> findInState(JobExecutionState state, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id").descending());
+        Page<JobExecutionEntity> page = jobExecutionDao.findByState(state.name(), pageable);
+        if (page != null && page.hasContent()) {
+            ModelPage<JobExecution> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
+            result.setItems(page.getContent().stream().map(this::convert).collect(Collectors.toList()));
+            return result;
         }
-        return new LinkedList<>();
+        return new ModelPage<>(pageNumber, 0, 0, List.of());
     }
 
     /**
@@ -129,7 +132,17 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
         Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("id").descending());
         Page<JobExecutionEntity> page = jobExecutionDao.findByJobId(jobId, pageable);
         if (page != null && page.hasContent() && page.getTotalElements() > numToKeep) {
-            jobExecutionDao.deleteByJobIdAndIdBefore(jobId, page.getContent().get(numToKeep - 1).getId());
+
+            int i = 0;
+            for (JobExecutionEntity entity : page.getContent()) {
+                if (!JobExecutionState.FAILED.equals(entity.getState())) {
+                    i++;
+                }
+                if (i == numToKeep) {
+                    jobExecutionDao.deleteByJobIdAndStateNotAndIdBefore(jobId, JobExecutionState.FAILED.name(), entity.getId());
+                    break;
+                }
+            }
         }
     }
 
@@ -146,10 +159,21 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void updateState(JobExecutionState fromState, JobExecutionState toState) {
-        if (fromState != null && toState != null) {
-            jobExecutionDao.updateState(fromState.name(), toState.name());
+    public void updateJobExecutionState(Long id, JobExecutionState newState) {
+        if (id != null && newState != null) {
+            jobExecutionDao.findById(id).ifPresent(jobExecutionEntity -> jobExecutionEntity.setState(newState.name()));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void updateAllJobExecutionsOfJob(Long jobId, JobExecutionState oldState, JobExecutionState newState) {
+        if (jobId != null && oldState != null && newState != null) {
+            List<JobExecutionEntity> executionEntities = jobExecutionDao.findByJobIdAndStateOrderByIdDesc(jobId, oldState.name());
+            if (executionEntities != null) {
+                executionEntities.forEach(executionEntity -> executionEntity.setState(newState.name()));
+            }
         }
     }
 

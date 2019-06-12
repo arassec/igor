@@ -2,6 +2,7 @@ package com.arassec.igor.module.file.service.http;
 
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
@@ -94,7 +95,7 @@ public class HttpFileService extends BaseFileService {
      * @param suffix The suffix to append after host and port.
      * @return The base URI to the service.
      */
-    protected String buildUri(String suffix) {
+    private String buildUri(String suffix) {
         String result = protocol + "://";
         result += host;
         result += ":" + port;
@@ -111,7 +112,7 @@ public class HttpFileService extends BaseFileService {
      * @param uriPart The variable part of the URI.
      * @return The {@link HttpRequest}.
      */
-    protected HttpRequest.Builder getRequestBuilder(String uriPart) {
+    private HttpRequest.Builder getRequestBuilder(String uriPart) {
         HttpRequest.Builder httpRequestBuilder =
                 HttpRequest.newBuilder().uri(URI.create(buildUri(uriPart))).timeout(Duration.ofSeconds(timeout));
         String authorizationHeader = createBasicAuthHeader();
@@ -125,7 +126,7 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory) {
+    public List<FileInfo> listFiles(String directory, JobExecution jobExecution) {
         HttpClient client = connect();
         HttpRequest request = getRequestBuilder(directory).GET().build();
         try {
@@ -151,7 +152,7 @@ public class HttpFileService extends BaseFileService {
             }
 
             // @formatter:off
-            return result.stream().filter(file -> file != null)
+            return result.stream().filter(Objects::nonNull)
                     .filter(file -> !StringUtils.isEmpty(file))
                     .filter(file -> !"..".equals(file))
                     .filter(file -> !".".equals(file))
@@ -170,7 +171,7 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file) {
+    public String read(String file, JobExecution jobExecution) {
         HttpClient client = connect();
         HttpRequest request = getRequestBuilder(file).GET().build();
         try {
@@ -188,7 +189,7 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void write(String file, String data) {
+    public void write(String file, String data, JobExecution jobExecution) {
         HttpRequest request = getRequestBuilder(file).PUT(HttpRequest.BodyPublishers.ofString(data)).build();
         sendRequest(connect(), request);
     }
@@ -197,7 +198,7 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public FileStreamData readStream(String file) {
+    public FileStreamData readStream(String file, JobExecution jobExecution) {
         HttpClient client = connect();
         HttpRequest request = getRequestBuilder(file).GET().build();
         try {
@@ -228,7 +229,7 @@ public class HttpFileService extends BaseFileService {
             } else {
                 // Fallback if no content-length header is available!
                 response.body().close();
-                String fileContent = read(file);
+                String fileContent = read(file, jobExecution);
                 FileStreamData fsd = new FileStreamData();
                 fsd.setFileSize(fileContent.getBytes().length);
                 fsd.setData(new ByteArrayInputStream(fileContent.getBytes()));
@@ -244,9 +245,9 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData) {
-        HttpRequest request =
-                getRequestBuilder(file).PUT(HttpRequest.BodyPublishers.ofInputStream(() -> fileStreamData.getData())).build();
+    public void writeStream(String file, FileStreamData fileStreamData, JobExecution jobExecution) {
+        HttpRequest request = getRequestBuilder(file).PUT(HttpRequest.BodyPublishers.ofInputStream(fileStreamData::getData))
+                .build();
         sendRequest(connect(), request);
     }
 
@@ -254,7 +255,7 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file) {
+    public void delete(String file, JobExecution jobExecution) {
         sendRequest(connect(), getRequestBuilder(file).DELETE().build());
     }
 
@@ -262,11 +263,11 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target) {
-        FileStreamData fileStreamData = readStream(source);
-        writeStream(target, fileStreamData);
+    public void move(String source, String target, JobExecution jobExecution) {
+        FileStreamData fileStreamData = readStream(source, jobExecution);
+        writeStream(target, fileStreamData, jobExecution);
         finalizeStream(fileStreamData);
-        delete(source);
+        delete(source, jobExecution);
     }
 
     /**
@@ -305,7 +306,7 @@ public class HttpFileService extends BaseFileService {
      *
      * @return The header or {@code null}, if username and password are not configured.
      */
-    protected String createBasicAuthHeader() {
+    private String createBasicAuthHeader() {
         if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
             return "Authorization: Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
         }

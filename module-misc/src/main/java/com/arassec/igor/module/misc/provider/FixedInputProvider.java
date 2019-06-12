@@ -3,6 +3,7 @@ package com.arassec.igor.module.misc.provider;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorProvider;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.misc.ParameterSubtype;
 import com.arassec.igor.core.model.provider.BaseProvider;
 
@@ -46,8 +47,8 @@ public class FixedInputProvider  extends BaseProvider implements UtilProvider {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(Long jobId, String taskId) {
-        super.initialize(jobId, taskId);
+    public void initialize(Long jobId, String taskId, JobExecution jobExecution) {
+        super.initialize(jobId, taskId, jobExecution);
         index = 0;
         if (input != null && !input.isEmpty()) {
             if (separateLines) {

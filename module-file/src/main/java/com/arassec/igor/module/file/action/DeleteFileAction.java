@@ -2,6 +2,7 @@ package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,19 +32,20 @@ public class DeleteFileAction extends BaseFileAction {
      * Copies the supplied source file to the destination service. During transfer the file is saved with the suffix
      * ".igor", which will be removed after successful transfer.
      *
-     * @param data     The data to process.
-     * @param isDryRun Set to {@code true}, if this is a dry-run and the file should not actually be copied. Set to
-     *                 {@code false} for an actual run.
-     * @return
+     * @param data         The data to process.
+     * @param isDryRun     Set to {@code true}, if this is a dry-run and the file should not actually be deleted. Set to
+     *                     {@code false} for an actual run.
+     * @param jobExecution The job execution log.
+     * @return The manipulated data.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun) {
+    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
         if (isValid(data)) {
             String file = (String) data.get(dataKey);
             if (isDryRun) {
                 data.put(DRY_RUN_COMMENT_KEY, "Delete file " + file);
             } else {
-                service.delete((String) data.get(dataKey));
+                service.delete((String) data.get(dataKey), jobExecution);
             }
             return List.of(data);
         }

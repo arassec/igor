@@ -65,7 +65,7 @@
         servicesPage: {
           number: 0,
           size: 12,
-          totalPages: 666,
+          totalPages: 0,
           items: []
         },
         filterText: '',
@@ -116,6 +116,9 @@
       }
     },
     mounted() {
+      if (this.$root.$data.store.getValue('service-list-filter')) {
+        this.filterText = this.$root.$data.store.getValue('service-list-filter')
+      }
       this.loadServices(0)
       this.$root.$on('reload-services', () => {
         this.loadServices(0);

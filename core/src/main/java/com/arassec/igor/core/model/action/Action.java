@@ -1,5 +1,7 @@
 package com.arassec.igor.core.model.action;
 
+import com.arassec.igor.core.model.job.execution.JobExecution;
+
 import java.util.List;
 import java.util.Map;
 
@@ -31,13 +33,14 @@ public interface Action {
     /**
      * Executes the action.
      *
-     * @param data     The data the action will work with.
-     * @param isDryRun {@code true} if the data should be processed in an idempotent way, i.e. the data should not be
-     *                 changed irreversably. Set to {@code false} to process the data regularly according to the actions
-     *                 purpose.
+     * @param data         The data the action will work with.
+     * @param isDryRun     {@code true} if the data should be processed in an idempotent way, i.e. the data should not be
+     *                     changed irreversably. Set to {@code false} to process the data regularly according to the actions
+     *                     purpose.
+     * @param jobExecution The job's execution log.
      * @return {@code true}, if the data should further be processed, {@code false} otherwise.
      */
-    List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun);
+    List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution);
 
     /**
      * Finalizes the action after all input data from the provider has been processed.

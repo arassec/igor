@@ -28,6 +28,11 @@ public enum JobExecutionState {
     /**
      * The job finished abnormally with errors.
      */
-    FAILED
+    FAILED,
+
+    /**
+     * The job finished abnormally but the error has been manually resolved.
+     */
+    RESOLVED
 
 }

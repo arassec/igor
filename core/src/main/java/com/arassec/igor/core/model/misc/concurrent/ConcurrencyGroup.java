@@ -82,7 +82,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         });
 
         for (int i = 0; i < numThreads; i++) {
-            ActionsExecutingRunnable runnable = new ActionsExecutingRunnable(actions, inputQueue, outputQueue);
+            ActionsExecutingRunnable runnable = new ActionsExecutingRunnable(actions, inputQueue, outputQueue, jobExecution);
             runnables.add(runnable);
             executorService.execute(runnable);
         }

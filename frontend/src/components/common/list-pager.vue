@@ -35,17 +35,18 @@
 
     .dark .pager-button {
         border: 1px solid var(--panel-background-color);
-        color: var(--panel-background-color);
-    }
-
-    .dark .pager-button:hover {
         background-color: var(--panel-background-color);
         color: var(--main-background-color);
     }
 
+    .dark .pager-button:hover {
+        border: 1px solid var(--info-background-color);
+        background-color: var(--info-background-color);
+    }
+
     .dark .disabled:hover {
-        background-color: var(--main-background-color);
-        color: var(--panel-background-color);
+        border: 1px solid var(--panel-background-color);
+        background-color: var(--panel-background-color);
     }
 
 </style>

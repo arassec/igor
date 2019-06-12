@@ -81,7 +81,8 @@
         servicePage: {
           page: -1,
           size: 10,
-          totalPages: 666
+          totalPages: 0,
+          items: []
         }
       }
     },

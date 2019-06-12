@@ -2,6 +2,7 @@ package com.arassec.igor.module.message.action;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.misc.ParameterSubtype;
 import com.arassec.igor.module.message.service.Message;
 import com.arassec.igor.module.message.service.MessageService;
@@ -40,12 +41,13 @@ public class SendMessageAction extends BaseMessageAction {
      * Processes the supplied data and replaces variables from a message template with the values from the data. The resulting
      * message is sent via a message service.
      *
-     * @param data
-     *         The data the action will work with.
-     * @return {@code true} if the data should further be processed, {@code false} otherwise.
+     * @param data         The data the action will work with.
+     * @param isDryRun     Only sends messages if set to {@code false}.
+     * @param jobExecution The job execution log.
+     * @return The manipulated data.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun) {
+    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
 
         String content = messageTemplate;
 

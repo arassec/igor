@@ -3,7 +3,7 @@
         <h1 slot="header">Delete Job?</h1>
         <div slot="body">
             <div class="paragraph">
-                Do you really want to delete job '{{jobName}}'?
+                Do you really want to delete job '{{formatName(jobName)}}'?
             </div>
             <div class="paragraph" v-if="exclusiveServices.length > 0">
                 The following services are only used by this job:

@@ -68,13 +68,13 @@
   export default {
     name: "job-list",
     components: {ListPager, LayoutRow, ModalDialog, InputButton, DeleteJobDialog, ListName, ListEntry, ListHeader, CoreContent},
-    props: ['runningJobs', 'waitingJobs'],
+    props: ['runningOrWaitingJobs'],
     data: function () {
       return {
         jobsPage: {
           number: 0,
           size: 12,
-          totalPages: 666,
+          totalPages: 0,
           items: []
         },
         filterText: '',
@@ -86,16 +86,9 @@
     },
     methods: {
       jobRunningOrWaiting: function (jobId) {
-        if (this.runningJobs != null) {
-          for (let i = 0; i < this.runningJobs.length; i++) {
-            if (jobId === this.runningJobs[i].jobId) {
-              return true
-            }
-          }
-        }
-        if (this.waitingJobs != null) {
-          for (let i = 0; i < this.waitingJobs.length; i++) {
-            if (jobId === this.waitingJobs[i].jobId) {
+        if (this.runningOrWaitingJobs != null) {
+          for (let i = 0; i < this.runningOrWaitingJobs.length; i++) {
+            if (jobId === this.runningOrWaitingJobs[i]) {
               return true
             }
           }
@@ -158,15 +151,10 @@
         return FormatUtils.shorten(name, 36)
       }
     },
-    computed: {
-      filteredJobs: function () {
-        let component = this
-        return this.jobs.filter(function (job) {
-          return job.name.toLowerCase().includes(component.filterText.toLowerCase())
-        })
-      }
-    },
     mounted() {
+      if (this.$root.$data.store.getValue('job-list-filter')) {
+        this.filterText = this.$root.$data.store.getValue('job-list-filter')
+      }
       this.loadJobs(0)
       this.$root.$on('reload-jobs', () => {
         this.loadJobs(0);

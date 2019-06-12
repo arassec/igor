@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
+import com.arassec.igor.core.util.ModelPage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Executes jobs and keeps track of their state. Prevents parallel execution and limits the number of jobs running in
@@ -94,22 +98,25 @@ public class JobExecutor {
 
         // At this point we run the next jobs if necessary:
         int freeSlots = jobQueueSize - runningJobs.size();
-        List<JobExecution> waitingJobExecutions = jobExecutionRepository.findInState(JobExecutionState.WAITING);
-        for (int i = 0; i < waitingJobExecutions.size(); i++) {
-            JobExecution jobExecution = waitingJobExecutions.get(i);
-            if (!runningJobs.containsKey(jobExecution.getJobId())) {
-                Job job = jobRepository.findById(jobExecution.getJobId());
-                if (job != null) {
-                    jobExecution.setExecutionState(JobExecutionState.RUNNING);
-                    jobExecution.setStarted(Instant.now());
-                    runningJobs.put(job.getId(), job);
-                    runningJobFutures.add(executorService.submit(new JobRunningCallable(job, jobExecution)));
-                    jobExecutionRepository.upsert(jobExecution);
-                    freeSlots--;
+        ModelPage<JobExecution> waitingJobExecutions = jobExecutionRepository
+                .findInState(JobExecutionState.WAITING, 0, Integer.MAX_VALUE);
+        if (waitingJobExecutions != null && waitingJobExecutions.getItems() != null) {
+            for (int i = 0; i < waitingJobExecutions.getItems().size(); i++) {
+                JobExecution jobExecution = waitingJobExecutions.getItems().get(i);
+                if (!runningJobs.containsKey(jobExecution.getJobId())) {
+                    Job job = jobRepository.findById(jobExecution.getJobId());
+                    if (job != null) {
+                        jobExecution.setExecutionState(JobExecutionState.RUNNING);
+                        jobExecution.setStarted(Instant.now());
+                        runningJobs.put(job.getId(), job);
+                        runningJobFutures.add(executorService.submit(new JobRunningCallable(job, jobExecution)));
+                        jobExecutionRepository.upsert(jobExecution);
+                        freeSlots--;
+                    }
                 }
-            }
-            if (freeSlots == 0) {
-                break;
+                if (freeSlots == 0) {
+                    break;
+                }
             }
         }
     }

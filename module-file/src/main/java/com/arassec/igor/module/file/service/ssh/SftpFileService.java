@@ -2,6 +2,7 @@ package com.arassec.igor.module.file.service.ssh;
 
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
@@ -55,7 +56,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory) {
+    public List<FileInfo> listFiles(String directory, JobExecution jobExecution) {
         try {
             final String dir = directory.endsWith("/") ? directory : directory + "/";
             Session session = connect(host, port, username, password);
@@ -75,7 +76,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file) {
+    public String read(String file, JobExecution jobExecution) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
@@ -93,7 +94,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void write(String file, String data) {
+    public void write(String file, String data, JobExecution jobExecution) {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(data.getBytes())) {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
@@ -110,7 +111,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public FileStreamData readStream(String file) {
+    public FileStreamData readStream(String file, JobExecution jobExecution) {
         try {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
@@ -141,7 +142,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData) {
+    public void writeStream(String file, FileStreamData fileStreamData, JobExecution jobExecution) {
         try {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
@@ -160,7 +161,8 @@ public class SftpFileService extends BaseSshFileService {
      */
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
-        if (fileStreamData.getSourceConnectionData() != null && fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
+        if (fileStreamData.getSourceConnectionData() != null && fileStreamData
+                .getSourceConnectionData() instanceof SshConnectionData) {
             SshConnectionData sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
             sshConnectionData.getChannel().disconnect();
             sshConnectionData.getSession().disconnect();
@@ -171,7 +173,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file) {
+    public void delete(String file, JobExecution jobExecution) {
         try {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
@@ -188,7 +190,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target) {
+    public void move(String source, String target, JobExecution jobExecution) {
         try {
             moveInternal(source, target);
         } catch (SftpException | JSchException e) {

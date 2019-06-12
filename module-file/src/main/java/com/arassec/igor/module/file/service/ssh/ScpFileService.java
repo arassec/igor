@@ -2,6 +2,7 @@ package com.arassec.igor.module.file.service.ssh;
 
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
@@ -47,16 +48,55 @@ public class ScpFileService extends BaseSshFileService {
     protected String password;
 
     /**
+     * Reads from the provided InputStream to check the return value of the last SSH command sent to the server.
+     *
+     * @param in  The InputStream to read.
+     * @param log Will be filled with an error message from the server if the command was not successful.
+     * @return The result of the last SSH command.
+     * @throws IOException In case of errors.
+     */
+    private static int checkAck(InputStream in, StringBuffer log) throws IOException {
+        int b = in.read();
+        // b may be 0 for success, 1 for error, 2 for fatal error, -1 (e.g. for closed input stream)
+        if (b == 0) {
+            return b;
+        } else if (b == -1) {
+            return b;
+        }
+
+        if (b == 1 || b == 2) {
+            StringBuilder sb = new StringBuilder();
+            int c;
+            do {
+                c = in.read();
+                sb.append((char) c);
+            } while (c != '\n');
+            log.append(sb.toString());
+        }
+
+        return b;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory) {
+    public List<FileInfo> listFiles(String directory, JobExecution jobExecution) {
         final String dir = directory.endsWith("/") ? directory : directory + "/";
         StringBuffer result = execute("cd " + dir + " && ls -Al --time-style=full-iso");
-        return Arrays.stream(result.toString().split("\n")).skip(1).map(lsResult -> new FileInfo(extractFilename(dir, lsResult)
-                , extractLastModified(lsResult))).collect(Collectors.toList());
+        return Arrays.stream(result.toString().split("\n")).skip(1)
+                .map(lsResult -> new FileInfo(extractFilename(dir, lsResult), extractLastModified(lsResult)))
+                .collect(Collectors.toList());
     }
 
+    /**
+     * Creates the filename from the given input. The 'ls' command e.g. returns symlinks in the form of 'tmp -> /home/tmp', which
+     * is not desired for igor.
+     *
+     * @param dir   The directory.
+     * @param input The file name from the 'ls' command.
+     * @return The sanitized file name.
+     */
     private String extractFilename(String dir, String input) {
         String[] split = input.split("\\s");
         if (split.length >= 3) {
@@ -68,10 +108,14 @@ public class ScpFileService extends BaseSshFileService {
     }
 
     /**
+     * Extracts the last modified timestamp from the 'ls' command's output. Example output looks like:
+     * <p>
      * drwxr-xr-x  10 root root 3760 2019-06-04 13:14:23.965495985 +0200 text.txt
+     * </p>
+     * This method extracts the timestamp relevant fields from the string and returns the formatted result.
      *
-     * @param input
-     * @return
+     * @param input One output line from the 'ls' command.
+     * @return The extracted timestamp or {@code null}, if none could be extracted.
      */
     private String extractLastModified(String input) {
         String yearPart = null;
@@ -91,7 +135,8 @@ public class ScpFileService extends BaseSshFileService {
         }
 
         if (yearPart != null && timePart != null && timezonePart != null) {
-            return yearPart + "T" + timePart.substring(0, 8) + "+" + timezonePart.substring(1, 3) + ":" + timezonePart.substring(3, 5);
+            return yearPart + "T" + timePart.substring(0, 8) + "+" + timezonePart.substring(1, 3) + ":" + timezonePart
+                    .substring(3, 5);
         }
 
         return null;
@@ -101,10 +146,10 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file) {
-        FileStreamData fileStreamData = readStream(file);
+    public String read(String file, JobExecution jobExecution) {
+        FileStreamData fileStreamData = readStream(file, jobExecution);
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize());
+            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), jobExecution);
             outputStream.flush();
             return outputStream.toString();
         } catch (IOException e) {
@@ -118,12 +163,12 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void write(String file, String data) {
+    public void write(String file, String data, JobExecution jobExecution) {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(data.getBytes())) {
             FileStreamData fileStreamData = new FileStreamData();
             fileStreamData.setFileSize(data.getBytes().length);
             fileStreamData.setData(inputStream);
-            writeStream(file, fileStreamData);
+            writeStream(file, fileStreamData, jobExecution);
         } catch (IOException e) {
             throw new ServiceException("Could not write file: " + file, e);
         }
@@ -133,7 +178,7 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public FileStreamData readStream(String file) {
+    public FileStreamData readStream(String file, JobExecution jobExecution) {
         try {
             FileStreamData result = new FileStreamData();
 
@@ -214,7 +259,7 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData) {
+    public void writeStream(String file, FileStreamData fileStreamData, JobExecution jobExecution) {
         try {
             String command = "scp -t " + file;
             Session session = connect(host, port, username, password);
@@ -248,7 +293,7 @@ public class ScpFileService extends BaseSshFileService {
                 throw new ServiceException("Error during SCP file transfer (" + sshReturnCode + "): " + log);
             }
 
-            copyStream(fileStreamData.getData(), sshOutputStream, fileStreamData.getFileSize());
+            copyStream(fileStreamData.getData(), sshOutputStream, fileStreamData.getFileSize(), jobExecution);
 
             finalize(session, channel, sshOutputStream, sshInputStream);
         } catch (IOException | JSchException e) {
@@ -261,7 +306,8 @@ public class ScpFileService extends BaseSshFileService {
      */
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
-        if (fileStreamData.getSourceConnectionData() != null && fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
+        if (fileStreamData.getSourceConnectionData() != null && fileStreamData
+                .getSourceConnectionData() instanceof SshConnectionData) {
             SshConnectionData sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
             finalize(sshConnectionData.getSession(), sshConnectionData.getChannel(), sshConnectionData.getSshOutputStream(),
                     sshConnectionData.getSshInputStream());
@@ -272,16 +318,8 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file) {
+    public void delete(String file, JobExecution jobExecution) {
         execute("rm -f " + file);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void move(String source, String target) {
-        execute("mv " + source + " " + target);
     }
 
     /**
@@ -313,33 +351,11 @@ public class ScpFileService extends BaseSshFileService {
     }
 
     /**
-     * Reads from the provided InputStream to check the return value of the last SSH command sent to the server.
-     *
-     * @param in  The InputStream to read.
-     * @param log Will be filled with an error message from the server if the command was not successful.
-     * @return The result of the last SSH command.
-     * @throws IOException In case of errors.
+     * {@inheritDoc}
      */
-    private static int checkAck(InputStream in, StringBuffer log) throws IOException {
-        int b = in.read();
-        // b may be 0 for success, 1 for error, 2 for fatal error, -1 (e.g. for closed input stream)
-        if (b == 0) {
-            return b;
-        } else if (b == -1) {
-            return b;
-        }
-
-        if (b == 1 || b == 2) {
-            StringBuffer sb = new StringBuffer();
-            int c;
-            do {
-                c = in.read();
-                sb.append((char) c);
-            } while (c != '\n');
-            log.append(sb.toString());
-        }
-
-        return b;
+    @Override
+    public void move(String source, String target, JobExecution jobExecution) {
+        execute("mv " + source + " " + target);
     }
 
     /**
@@ -364,8 +380,9 @@ public class ScpFileService extends BaseSshFileService {
             while (true) {
                 while (in.available() > 0) {
                     int i = in.read(tmp, 0, 1024);
-                    if (i < 0)
+                    if (i < 0) {
                         break;
+                    }
                     result.append(new String(tmp, 0, i));
                 }
                 if (channel.isClosed()) {

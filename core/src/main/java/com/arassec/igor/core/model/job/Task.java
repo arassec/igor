@@ -123,7 +123,7 @@ public class Task {
         actions.forEach(Action::initialize);
 
         // Read the data from the provider and start working:
-        provider.initialize(jobId, id);
+        provider.initialize(jobId, id, jobExecution);
         while (provider.hasNext() && jobExecution.isRunning()) {
             Map<String, Object> data = provider.next();
             boolean added = false;
@@ -169,7 +169,9 @@ public class Task {
 
         DryRunTaskResult taskResult = new DryRunTaskResult();
 
-        provider.initialize(jobId, id);
+        JobExecution jobExecution = new JobExecution();
+
+        provider.initialize(jobId, id, jobExecution);
 
         Cloner cloner = new Cloner();
 
@@ -182,7 +184,6 @@ public class Task {
             taskResult.getProviderResults().add(cloner.deepClone(item));
         }
 
-        List<Map<String, Object>> actionData = providerResult;
         for (Action action : actions) {
             DryRunActionResult actionResult = new DryRunActionResult();
 
@@ -193,7 +194,7 @@ public class Task {
                 item.put(Action.DRY_RUN_COMMENT_KEY, "Action is disabled.");
                 actionResult.getResults().add(item);
             } else {
-                if (actionData.isEmpty()) {
+                if (providerResult.isEmpty()) {
                     Map<String, Object> item = new HashMap<>();
                     item.put(Action.JOB_ID_KEY, jobId);
                     item.put(Action.TASK_ID_KEY, getId());
@@ -201,8 +202,8 @@ public class Task {
                     actionResult.getResults().add(item);
                 } else {
                     List<Map<String, Object>> actionItems = new LinkedList<>();
-                    for (Map<String, Object> item : actionData) {
-                        List<Map<String, Object>> items = action.process(item, true);
+                    for (Map<String, Object> item : providerResult) {
+                        List<Map<String, Object>> items = action.process(item, true, jobExecution);
                         if (items != null && !items.isEmpty()) {
                             actionItems.addAll(items);
                         }
@@ -213,11 +214,11 @@ public class Task {
                         actionItems.addAll(items);
                     }
 
-                    actionData.clear();
+                    providerResult.clear();
 
                     if (!actionItems.isEmpty()) {
-                        actionItems.stream().forEach(item -> actionResult.getResults().add(cloner.deepClone(item)));
-                        actionData.addAll(actionItems);
+                        actionItems.forEach(item -> actionResult.getResults().add(cloner.deepClone(item)));
+                        providerResult.addAll(actionItems);
                     }
                 }
             }

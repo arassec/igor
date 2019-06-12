@@ -2,6 +2,7 @@ package com.arassec.igor.module.misc.action.util;
 
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -49,14 +50,15 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     /**
      * Collects all data in memory for later sorting.
      *
-     * @param data     The data the action will work with.
-     * @param isDryRun {@code true} if the data should be processed in an idempotent way, i.e. the data should not be
-     *                 changed irreversably. Set to {@code false} to process the data regularly according to the actions
-     *                 purpose.
+     * @param data         The data the action will work with.
+     * @param isDryRun     {@code true} if the data should be processed in an idempotent way, i.e. the data should not be
+     *                     changed irreversably. Set to {@code false} to process the data regularly according to the actions
+     *                     purpose.
+     * @param jobExecution The job execution log.
      * @return Always {@code null}.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun) {
+    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
         if (isValid(data)) {
             collectedData.add(data);
         }
@@ -72,12 +74,13 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     public List<Map<String, Object>> complete() {
         Pattern p = Pattern.compile(pattern);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timestampFormat);
-        final boolean applyDefaultTimezone =
-                (!pattern.contains("V") && !pattern.contains("z") && !pattern.contains("O") && !pattern.contains("X") && !pattern.contains("x") && !pattern.contains("Z"));
+        final boolean applyDefaultTimezone = (!pattern.contains("V") && !pattern.contains("z") && !pattern
+                .contains("O") && !pattern.contains("X") && !pattern.contains("x") && !pattern.contains("Z"));
 
         if (!collectedData.isEmpty()) {
-            List<Map<String, Object>> result = collectedData.stream().filter(data -> extractDateTime(data, p, formatter,
-                    applyDefaultTimezone) != null).collect(Collectors.toList());
+            List<Map<String, Object>> result = collectedData.stream()
+                    .filter(data -> extractDateTime(data, p, formatter, applyDefaultTimezone) != null)
+                    .collect(Collectors.toList());
             Collections.sort(result, (o1, o2) -> {
                 ZonedDateTime firstDateTime = extractDateTime(o1, p, formatter, applyDefaultTimezone);
                 ZonedDateTime secondDateTime = extractDateTime(o2, p, formatter, applyDefaultTimezone);

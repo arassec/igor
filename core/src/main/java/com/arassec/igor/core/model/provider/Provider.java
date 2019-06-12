@@ -1,5 +1,7 @@
 package com.arassec.igor.core.model.provider;
 
+import com.arassec.igor.core.model.job.execution.JobExecution;
+
 import java.util.Map;
 
 /**
@@ -9,8 +11,12 @@ public interface Provider {
 
     /**
      * Initializes the provider.
+     *
+     * @param jobId        The job's ID.
+     * @param taskId       The task's ID.
+     * @param jobExecution The job execution log.
      */
-    void initialize(Long jobId, String taskName);
+    void initialize(Long jobId, String taskId, JobExecution jobExecution);
 
     /**
      * Returns {@code true}, if there is further data to process.

@@ -1,5 +1,6 @@
 package com.arassec.igor.core.model.provider;
 
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.Getter;
 
 /**
@@ -19,15 +20,18 @@ public abstract class BaseProvider implements Provider {
     private String taskId;
 
     /**
-     * Saves the job's ID and the task's name for later use.
-     *
-     * @param jobId The job's ID.
-     * @param taskId The task's ID.
+     * The job execution.
+     */
+    private JobExecution jobExecution;
+
+    /**
+     * {@inheritDoc}
      */
     @Override
-    public void initialize(Long jobId, String taskId) {
+    public void initialize(Long jobId, String taskId, JobExecution jobExecution) {
         this.jobId = jobId;
         this.taskId = taskId;
+        this.jobExecution = jobExecution;
     }
 
 }

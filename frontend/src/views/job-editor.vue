@@ -42,6 +42,8 @@
                     <div slot="right">
                         <input-button slot="right" icon="times" v-on:clicked="openCancelJobDialog(jobExecution)"
                                       v-if="jobExecution.state === 'WAITING' || jobExecution.state === 'RUNNING'"/>
+                        <input-button slot="right" icon="check" v-on:clicked="openMarkJobExecutionResolvedDialog(jobExecution)"
+                                      v-if="jobExecution.state == 'FAILED'"/>
                     </div>
                 </feedback-box>
                 <list-pager :page="jobExecutionsPage" v-if="jobExecutionsPage.totalPages > 1"
@@ -147,6 +149,26 @@
             </div>
         </modal-dialog>
 
+        <modal-dialog v-if="showMarkJobExecutionResolvedDialog"
+                      @close="showMarkJobExecutionResolvedDialog = false"
+                      v-on:cancel="showMarkJobExecutionResolvedDialog = false">
+            <h1 slot="header">Mark job execution as resolved</h1>
+            <div slot="body">
+                <div class="paragraph">
+                    Mark this failed execution as resolved?
+                </div>
+                <div class="paragraph" v-if="numFailedExecutionsForSelectedJob > 1">
+                    Mark <b>all {{numFailedExecutionsForSelectedJob}}</b> executions of this job as resolved:
+                    <font-awesome-icon :icon="resolveAllFailedExecutionsOfJob ? 'check-square' : 'square'"
+                                       v-on:click="resolveAllFailedExecutionsOfJob = !resolveAllFailedExecutionsOfJob"/>
+                </div>
+            </div>
+            <layout-row slot="footer">
+                <input-button slot="left" v-on:clicked="showMarkJobExecutionResolvedDialog = false" icon="times"/>
+                <input-button slot="right" v-on:clicked="markJobExecutionResolved()" icon="check"/>
+            </layout-row>
+        </modal-dialog>
+
         <background-icon right="true" icon-one="toolbox"/>
 
     </core-container>
@@ -212,7 +234,7 @@
         jobExecutionsPage: {
           number: 0,
           size: 10,
-          totalPages: 666,
+          totalPages: 0,
           items: []
         },
         jobExecutionsRefreshTimer: null,
@@ -220,7 +242,10 @@
         selectedJobExecution: null,
         selectedJobExecutionId: null,
         showUnsavedValuesExistDialog: false,
-        nextRoute: null
+        showMarkJobExecutionResolvedDialog: false,
+        nextRoute: null,
+        resolveAllFailedExecutionsOfJob: false,
+        numFailedExecutionsForSelectedJob: 0
       }
     },
     computed: {
@@ -548,6 +573,24 @@
       },
       updateOriginalJobConfiguration: function () {
         this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
+      },
+      openMarkJobExecutionResolvedDialog: async function (selectedJobExecutionListEntry) {
+        this.selectedJobExecutionListEntry = selectedJobExecutionListEntry
+        this.$root.$data.store.setWip('Loading job execution details...')
+        this.numFailedExecutionsForSelectedJob = await IgorBackend.getData('/api/execution/job/' +
+            this.selectedJobExecutionListEntry.jobId + '/FAILED/count')
+        this.$root.$data.store.clearWip()
+        this.showMarkJobExecutionResolvedDialog = true
+      },
+      markJobExecutionResolved: async function () {
+        clearTimeout(this.jobExecutionsRefreshTimer)
+        await IgorBackend.putData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/' +
+            this.selectedJobExecutionListEntry.jobId + '/FAILED/RESOLVED?updateAllOfJob=' + this.resolveAllFailedExecutionsOfJob, null,
+            'Updating executions', 'Executions updated', 'Executions could not be updated!')
+        await this.manualUpdateJobExecutions(0)
+        this.resolveAllFailedExecutionsOfJob = false
+        this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+        this.showMarkJobExecutionResolvedDialog = false
       }
     },
     mounted() {
@@ -645,5 +688,9 @@
 
 
 <style scoped>
+
+    .paragraph {
+        margin-bottom: 20px;
+    }
 
 </style>
