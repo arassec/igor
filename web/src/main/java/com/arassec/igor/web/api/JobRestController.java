@@ -7,9 +7,11 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
 import com.arassec.igor.core.model.trigger.CronTrigger;
 import com.arassec.igor.core.util.ModelPage;
+import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.api.error.RestControllerExceptionHandler;
 import com.arassec.igor.web.api.model.JobListEntry;
+import com.arassec.igor.web.api.model.ScheduleEntry;
 import com.github.openjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,8 +56,10 @@ public class JobRestController {
      * @return List of Job-IDs.
      */
     @GetMapping
-    public ModelPage<JobListEntry> getJobs(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize,
-                                           @RequestParam(value = "nameFilter", required = false) String nameFilter) {
+    public ModelPage<JobListEntry> getJobs(
+            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize,
+            @RequestParam(value = "nameFilter", required = false) String nameFilter) {
 
         ModelPage<Job> jobsPage = jobManager.loadPage(pageNumber, pageSize, nameFilter);
         if (jobsPage != null && !jobsPage.getItems().isEmpty()) {
@@ -211,19 +215,18 @@ public class JobRestController {
      * @return List of schedules.
      */
     @GetMapping("schedule")
-    public List<Map<String, Object>> getSchedule() {
-        List<Map<String, Object>> jobSchedule = new LinkedList<>();
+    public ModelPage<ScheduleEntry> getSchedule(
+            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize) {
+        List<ScheduleEntry> jobSchedule = new LinkedList<>();
         jobManager.loadScheduled().stream().filter(job -> job.getTrigger() instanceof CronTrigger).forEach(job -> {
             String cronExpression = ((CronTrigger) job.getTrigger()).getCronExpression();
             CronSequenceGenerator cronTrigger = new CronSequenceGenerator(cronExpression);
             Date nextRun = cronTrigger.next(Calendar.getInstance().getTime());
-            Map<String, Object> scheduleEntry = new HashMap<>();
-            scheduleEntry.put("id", job.getId());
-            scheduleEntry.put("name", job.getName());
-            scheduleEntry.put("date", new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(nextRun));
-            jobSchedule.add(scheduleEntry);
+            jobSchedule.add(new ScheduleEntry(job.getId(), job.getName(), Instant.ofEpochMilli(nextRun.getTime())));
         });
-        return jobSchedule;
+        jobSchedule.sort(Comparator.comparing(ScheduleEntry::getNextRun));
+        return ModelPageHelper.getModelPage(jobSchedule, pageNumber, pageSize);
     }
 
     /**

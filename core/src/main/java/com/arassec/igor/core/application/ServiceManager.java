@@ -5,6 +5,7 @@ import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.core.util.ModelPage;
+import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -120,22 +121,7 @@ public class ServiceManager {
 
         Collections.sort(allOfType, Comparator.comparing(Service::getName));
 
-        if (allOfType != null && !allOfType.isEmpty()) {
-            long totalPages = allOfType.size() / pageSize;
-            if (allOfType.size() % pageSize > 0) {
-                totalPages++;
-            }
-            if (totalPages > 0 && totalPages > pageNumber) {
-                int startIndex = pageNumber * pageSize;
-                int endIndex = startIndex + pageSize;
-                if (endIndex >= allOfType.size()) {
-                    endIndex = allOfType.size();
-                }
-                return new ModelPage<>(pageNumber, pageSize, totalPages, allOfType.subList(startIndex, endIndex));
-            }
-        }
-
-        return new ModelPage<>(pageNumber, 0, 0, List.of());
+        return ModelPageHelper.getModelPage(allOfType, pageNumber, pageSize);
     }
 
     /**

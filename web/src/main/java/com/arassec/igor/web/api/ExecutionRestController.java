@@ -43,8 +43,10 @@ public class ExecutionRestController {
      */
     @GetMapping("job/{jobId}")
     public ModelPage<JobExecutionListEntry> getExecutionsOfJob(@PathVariable("jobId") Long jobId,
-                                                               @RequestParam("pageNumber") int pageNumber,
-                                                               @RequestParam("pageSize") int pageSize) {
+                                                               @RequestParam(value = "pageNumber", required = false,
+                                                                       defaultValue = "0") int pageNumber,
+                                                               @RequestParam(value = "pageSize", required = false,
+                                                                       defaultValue = "2147483647") int pageSize) {
         ModelPage<JobExecution> jobExecutions = jobManager.getJobExecutionsOfJob(jobId, pageNumber, pageSize);
 
         if (jobExecutions != null) {
@@ -134,8 +136,10 @@ public class ExecutionRestController {
      */
     @GetMapping(value = "{state}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ModelPage<JobExecutionListEntry> getExecutionsByState(@PathVariable("state") JobExecutionState state,
-                                                                 @RequestParam("pageNumber") int pageNumber,
-                                                                 @RequestParam("pageSize") int pageSize) {
+                                                                 @RequestParam(value = "pageNumber", required = false,
+                                                                         defaultValue = "0") int pageNumber,
+                                                                 @RequestParam(value = "pageSize", required = false,
+                                                                         defaultValue = "2147483647") int pageSize) {
         ModelPage<JobExecution> jobExecutions = jobManager.getJobExecutionsInState(state, pageNumber, pageSize);
 
         if (jobExecutions != null && jobExecutions.getItems() != null && !jobExecutions.getItems().isEmpty()) {

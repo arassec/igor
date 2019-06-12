@@ -1,12 +1,11 @@
 - Unit-Tests (Apache Mina SSHD!)
-- Add job-schedule on app-status page
 - Persistence-service editor
 - Job-Execution-History-Details with
   - current Task
   - Progress information
   - Concurrency-Group workload
 - Assign exception during dry-run to failed action/task and keep
-  other results
+  previous results
 - SSH access with key
 - README.md
 - Encryption-Cipher in database, randomly generated at first start

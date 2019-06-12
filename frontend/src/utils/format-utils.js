@@ -13,5 +13,10 @@ export default {
       return input.substring(0, maxLength) + '...'
     }
     return input
+  },
+  formatInstant: function (instant) {
+    let options = {year: 'numeric', month: '2-digit', day: '2-digit'};
+    let date = new Date(instant)
+    return date.toLocaleTimeString(undefined, options)
   }
 }

@@ -262,9 +262,7 @@
     },
     methods: {
       formatJobExecution: function (jobExecution) {
-        let options = {year: 'numeric', month: '2-digit', day: '2-digit'};
-        let date = new Date(jobExecution.created)
-        return date.toLocaleTimeString(undefined, options)
+        return FormatUtils.formatInstant(jobExecution.created)
             + ' ' + jobExecution.duration + '(' + jobExecution.state.toLowerCase() + ')'
       },
       createJob: function () {

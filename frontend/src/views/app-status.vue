@@ -2,10 +2,12 @@
     <core-container>
 
         <side-menu class="side-menu-large">
-            <p slot="title">
-                <font-awesome-icon icon="clipboard-list"/>
+            <div slot="title">
+                <div class="schedule-icon">
+                    <font-awesome-icon icon="clipboard-list" v-on:click.stop="openScheduleDialog"/>
+                </div>
                 Job Slots
-            </p>
+            </div>
             <p slot="header" v-if="runningJobsPage && runningJobsPage.items.length">
                 <label class="list-label">Currently running jobs ({{this.runningOrWaitingJobs.length > this.numSlots ?
                     this.numSlots : this.runningOrWaitingJobs.length}}/{{this.numSlots}})</label>
@@ -115,6 +117,30 @@
             </layout-row>
         </modal-dialog>
 
+        <modal-dialog v-if="showScheduleDialog" @close="showScheduleDialog = false"
+                      v-on:cancel="showScheduleDialog = false">
+            <layout-row slot="header">
+                <h1 slot="left">Scheduled jobs</h1>
+                <input-button slot="right" icon="times" v-on:clicked="showScheduleDialog = false"/>
+            </layout-row>
+
+            <label slot="body" v-if="!schedulePage || !schedulePage.items || schedulePage.items.length === 0">
+                There are currently no scheduled jobs.
+            </label>
+
+            <feedback-box slot="body" v-for="scheduledJob in schedulePage.items" :key="scheduledJob.jobId" :clickable="true"
+                          v-on:feedback-clicked="editJob(scheduledJob.jobId)">
+                <div slot="left">{{formatName(scheduledJob.jobName)}}</div>
+                <div slot="right">{{formatTimestamp(scheduledJob.nextRun)}}</div>
+            </feedback-box>
+
+            <list-pager slot="footer" :page="schedulePage" v-if="schedulePage.totalPages > 1"
+                        v-on:first="loadSchedule(0)"
+                        v-on:previous="loadSchedule(schedulePage.number -1)"
+                        v-on:next="loadSchedule(schedulePage.number + 1)"
+                        v-on:last="loadSchedule(schedulePage.totalPages -1)"/>
+        </modal-dialog>
+
     </core-container>
 </template>
 
@@ -124,7 +150,6 @@
   import LayoutRow from "../components/common/layout-row";
   import JobList from "../components/jobs/job-list";
   import ServiceList from "../components/services/service-list";
-  import BackgroundIcon from "../components/common/background-icon";
   import InputButton from "../components/common/input-button";
   import FeedbackBox from "../components/common/feedback-box";
   import IgorBackend from '../utils/igor-backend.js'
@@ -139,7 +164,7 @@
       ListPager,
       JobExecutionDetails,
       ModalDialog,
-      FeedbackBox, InputButton, BackgroundIcon, ServiceList, JobList, LayoutRow, SideMenu, CoreContainer
+      FeedbackBox, InputButton, ServiceList, JobList, LayoutRow, SideMenu, CoreContainer
     },
     data: function () {
       return {
@@ -163,11 +188,18 @@
           totalPages: 0,
           items: []
         },
+        schedulePage: {
+          number: 0,
+          size: 10,
+          totalPages: 0,
+          items: []
+        },
         jobExecutionsListRefreshTimer: null,
         jobExecutionDetailsRefreshTimer: null,
         showCancelJobDialog: false,
         showExecutionDetailsDialog: false,
         showMarkJobExecutionResolvedDialog: false,
+        showScheduleDialog: false,
         selectedJobExecutionListEntry: null,
         selectedJobExecution: null,
         selectedJobExecutionId: null,
@@ -297,6 +329,21 @@
           this.loadWaitingJobs()
           this.loadFailedJobs()
         }, 1000)
+      },
+      openScheduleDialog: async function () {
+        await this.loadSchedule(0)
+        console.log("ASDASD: " + JSON.stringify(this.schedulePage))
+        this.showScheduleDialog = true
+      },
+      loadSchedule: async function (page) {
+        this.schedulePage = await IgorBackend.getData('/api/job/schedule?pageNumber=' + page + '&pageSize=' +
+            this.schedulePage.size)
+      },
+      editJob: function (jobId) {
+        this.$router.push({name: 'job-editor', params: {jobId: jobId}})
+      },
+      formatTimestamp: function (timestamp) {
+        return FormatUtils.formatInstant(timestamp)
       }
     },
     mounted() {
@@ -331,6 +378,16 @@
 
     .paragraph {
         margin-bottom: 20px;
+    }
+
+    .schedule-icon {
+        width: 35px;
+        float: left;
+    }
+
+    .schedule-icon:hover {
+        font-size: 110%;
+        cursor: pointer;
     }
 
 </style>

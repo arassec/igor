@@ -54,9 +54,10 @@ public class ServiceRestController {
      * @return List of available services.
      */
     @GetMapping
-    public ModelPage<ServiceListEntry> getServices(@RequestParam("pageNumber") int pageNumber,
-                                                   @RequestParam("pageSize") int pageSize,
-                                                   @RequestParam(value = "nameFilter", required = false) String nameFilter) {
+    public ModelPage<ServiceListEntry> getServices(
+            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize,
+            @RequestParam(value = "nameFilter", required = false) String nameFilter) {
 
         ModelPage<Service> servicesPage = serviceManager.loadPage(pageNumber, pageSize, nameFilter);
         if (servicesPage != null && !servicesPage.getItems().isEmpty()) {
@@ -81,8 +82,9 @@ public class ServiceRestController {
      * @return List of services in that category.
      */
     @GetMapping(value = "category/{category}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getServicesInCategory(@PathVariable("category") String category, @RequestParam("pageNumber") int pageNumber,
-                                        @RequestParam("pageSize") int pageSize) {
+    public String getServicesInCategory(@PathVariable("category") String category,
+                                        @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+                                        @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize) {
         ModelPage<Service> serviceModelPage = serviceManager.loadAllOfCategory(category, pageNumber, pageSize);
 
         if (serviceModelPage.getItems() != null) {
@@ -214,8 +216,10 @@ public class ServiceRestController {
      */
     @GetMapping(value = "{id}/job-references", produces = MediaType.APPLICATION_JSON_VALUE)
     public ModelPage<Pair<Long, String>> getReferencingJobs(@PathVariable("id") Long id,
-                                                            @RequestParam("pageNumber") int pageNumber,
-                                                            @RequestParam("pageSize") int pageSize) {
+                                                            @RequestParam(value = "pageNumber", required = false, defaultValue
+                                                                    = "0") int pageNumber,
+                                                            @RequestParam(value = "pageSize", required = false, defaultValue =
+                                                                    "2147483647") int pageSize) {
         ModelPage<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(id, pageNumber, pageSize);
         if (referencingJobs != null) {
             return referencingJobs;
