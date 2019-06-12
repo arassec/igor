@@ -4,7 +4,6 @@
   - current Task
   - Progress information
   - Concurrency-Group workload
-- Assign exception during dry-run to failed action/task and keep
   previous results
 - SSH access with key
 - README.md

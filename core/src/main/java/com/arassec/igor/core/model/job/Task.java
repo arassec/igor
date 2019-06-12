@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.job.dryrun.DryRunTaskResult;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.misc.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.provider.Provider;
+import com.arassec.igor.core.util.StacktraceFormatter;
 import com.rits.cloning.Cloner;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -169,64 +170,75 @@ public class Task {
 
         DryRunTaskResult taskResult = new DryRunTaskResult();
 
-        JobExecution jobExecution = new JobExecution();
+        try {
+            JobExecution jobExecution = new JobExecution();
 
-        provider.initialize(jobId, id, jobExecution);
+            provider.initialize(jobId, id, jobExecution);
 
-        Cloner cloner = new Cloner();
+            Cloner cloner = new Cloner();
 
-        actions.forEach(Action::initialize);
+            actions.forEach(Action::initialize);
 
-        List<Map<String, Object>> providerResult = new LinkedList<>();
-        while (provider.hasNext()) {
-            Map<String, Object> item = provider.next();
-            providerResult.add(item);
-            taskResult.getProviderResults().add(cloner.deepClone(item));
-        }
+            List<Map<String, Object>> providerResult = new LinkedList<>();
 
-        for (Action action : actions) {
-            DryRunActionResult actionResult = new DryRunActionResult();
-
-            if (!action.isActive()) {
-                Map<String, Object> item = new HashMap<>();
-                item.put(Action.JOB_ID_KEY, jobId);
-                item.put(Action.TASK_ID_KEY, getId());
-                item.put(Action.DRY_RUN_COMMENT_KEY, "Action is disabled.");
-                actionResult.getResults().add(item);
-            } else {
-                if (providerResult.isEmpty()) {
-                    Map<String, Object> item = new HashMap<>();
-                    item.put(Action.JOB_ID_KEY, jobId);
-                    item.put(Action.TASK_ID_KEY, getId());
-                    item.put(Action.DRY_RUN_COMMENT_KEY, "No data to process.");
-                    actionResult.getResults().add(item);
-                } else {
-                    List<Map<String, Object>> actionItems = new LinkedList<>();
-                    for (Map<String, Object> item : providerResult) {
-                        List<Map<String, Object>> items = action.process(item, true, jobExecution);
-                        if (items != null && !items.isEmpty()) {
-                            actionItems.addAll(items);
-                        }
-                    }
-
-                    List<Map<String, Object>> items = action.complete();
-                    if (items != null && !items.isEmpty()) {
-                        actionItems.addAll(items);
-                    }
-
-                    providerResult.clear();
-
-                    if (!actionItems.isEmpty()) {
-                        actionItems.forEach(item -> actionResult.getResults().add(cloner.deepClone(item)));
-                        providerResult.addAll(actionItems);
-                    }
-                }
+            while (provider.hasNext()) {
+                Map<String, Object> item = provider.next();
+                providerResult.add(item);
+                taskResult.getResults().add(cloner.deepClone(item));
             }
 
-            taskResult.getActionResults().add(actionResult);
+            for (Action action : actions) {
+                DryRunActionResult actionResult = new DryRunActionResult();
+
+                try {
+                    if (!action.isActive()) {
+                        Map<String, Object> item = new HashMap<>();
+                        item.put(Action.JOB_ID_KEY, jobId);
+                        item.put(Action.TASK_ID_KEY, getId());
+                        item.put(Action.DRY_RUN_COMMENT_KEY, "Action is disabled.");
+                        actionResult.getResults().add(item);
+                    } else {
+                        if (providerResult.isEmpty()) {
+                            Map<String, Object> item = new HashMap<>();
+                            item.put(Action.JOB_ID_KEY, jobId);
+                            item.put(Action.TASK_ID_KEY, getId());
+                            item.put(Action.DRY_RUN_COMMENT_KEY, "No data to process.");
+                            actionResult.getResults().add(item);
+                        } else {
+                            List<Map<String, Object>> actionItems = new LinkedList<>();
+                            for (Map<String, Object> item : providerResult) {
+                                List<Map<String, Object>> items = action.process(item, true, jobExecution);
+                                if (items != null && !items.isEmpty()) {
+                                    actionItems.addAll(items);
+                                }
+                            }
+
+                            List<Map<String, Object>> items = action.complete();
+                            if (items != null && !items.isEmpty()) {
+                                actionItems.addAll(items);
+                            }
+
+                            providerResult.clear();
+
+                            if (!actionItems.isEmpty()) {
+                                actionItems.forEach(item -> actionResult.getResults().add(cloner.deepClone(item)));
+                                providerResult.addAll(actionItems);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    actionResult.setErrorCause(StacktraceFormatter.format(e));
+                }
+
+                taskResult.getActionResults().add(actionResult);
+            }
+
+            actions.forEach(action -> action.shutdown(jobId, id));
+
+        } catch (Exception e) {
+            taskResult.setErrorCause(StacktraceFormatter.format(e));
         }
 
-        actions.forEach(action -> action.shutdown(jobId, id));
         result.getTaskResults().add(taskResult);
     }
 

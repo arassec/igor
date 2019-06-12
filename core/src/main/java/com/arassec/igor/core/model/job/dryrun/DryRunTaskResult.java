@@ -15,11 +15,17 @@ public class DryRunTaskResult {
     /**
      * Contains the provider's data.
      */
-    private List<Map<String, Object>> providerResults = new LinkedList<>();
+    private List<Map<String, Object>> results = new LinkedList<>();
+
+    /**
+     * Might contain an error cause if the task finished abnormally.
+     */
+    private String errorCause;
 
     /**
      * Contains the dry-run results of the task's actions.
      */
     private List<DryRunActionResult> actionResults = new LinkedList<>();
+
 
 }

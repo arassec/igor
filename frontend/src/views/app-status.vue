@@ -332,7 +332,6 @@
       },
       openScheduleDialog: async function () {
         await this.loadSchedule(0)
-        console.log("ASDASD: " + JSON.stringify(this.schedulePage))
         this.showScheduleDialog = true
       },
       loadSchedule: async function (page) {

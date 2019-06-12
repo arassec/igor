@@ -1,24 +1,25 @@
 <template>
     <core-content class="sticky">
         <div class="test-result-container">
+
             <layout-row>
                 <div slot="left">
-                    <h1 v-if="!errorCause && !selectedTestResults">Dry run successful</h1>
-                    <h1 v-if="!errorCause && selectedTestResults">Dry run details</h1>
-                    <h1 v-if="selectedTestResults && errorCause">Dry run failed</h1>
+                    <h1>Dry run results</h1>
                 </div>
                 <input-button slot="right" icon="times" v-on:clicked="$emit('close')"/>
             </layout-row>
-            <p v-if="!errorCause && !selectedTestResults">
+
+            <p v-if="!selectedTestResults">
                 Please select a <b>Task</b> or <b>Action</b> to see detailed dry-run results.
             </p>
-            <p v-if="!errorCause && selectedTestResults.length == 0">
+            <p v-else-if="selectedTestResults.results.length == 0 && !selectedTestResults.errorCause">
                 No test data available.
             </p>
-            <pre v-if="!errorCause && selectedTestResults.length > 0" class="normal-bg">
-<code>{{ format(selectedTestResults) }}</code></pre>
-            <pre v-if="errorCause" class="error-bg">
-<code>{{ errorCause }}</code></pre>
+            <pre v-else-if="selectedTestResults.results.length > 0 && !selectedTestResults.errorCause" class="normal-bg">
+<code>{{ format(selectedTestResults.results) }}</code></pre>
+            <pre v-else-if="selectedTestResults.errorCause" class="error-bg">
+<code>{{ selectedTestResults.errorCause }}</code></pre>
+
         </div>
     </core-content>
 </template>
@@ -31,7 +32,7 @@
   export default {
     name: 'test-result-container',
     components: {CoreContent, InputButton, LayoutRow},
-    props: ['heading', 'selectedTestResults', 'errorCause'],
+    props: ['selectedTestResults'],
     methods: {
       format: function (code) {
         return JSON.stringify(code, null, 2)

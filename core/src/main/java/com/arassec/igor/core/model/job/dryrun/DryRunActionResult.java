@@ -17,4 +17,9 @@ public class DryRunActionResult {
      */
     private List<Map<String, Object>> results = new LinkedList<>();
 
+    /**
+     * Might contain an error cause if the action finished abnormally.
+     */
+    private String errorCause;
+
 }

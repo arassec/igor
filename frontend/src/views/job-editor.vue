@@ -87,7 +87,6 @@
 
         <test-result-container v-if="testResults != null"
                                v-on:close="testResults = null"
-                               v-bind:error-cause="testResults.errorCause"
                                v-bind:selected-test-results="selectedTestResults"/>
 
         <modal-dialog v-if="showDeleteTaskDialog" @close="showDeleteTaskDialog = false">
@@ -319,23 +318,9 @@
         this.testResults = null
         this.selectedTestResults = null
 
-        let component = this
-
-        this.$root.$data.store.setWip('Testing job')
-
-        this.$http.post('/api/job/test', this.jobConfiguration).then(function (response) {
-          component.testResults = response.data
-          if (component.testResults && component.testResults.errorCause) {
-            component.$root.$data.store.setFeedback('Test Failed!', true)
-          } else {
-            component.$root.$data.store.setFeedback('Test OK.', false)
-          }
-          component.$root.$data.store.clearWip()
-          component.updateSelectedTestResult()
-        }).catch(function (error) {
-          component.$root.$data.store.setFeedback('Testing failed! (' + error + ')', true)
-          component.$root.$data.store.clearWip()
-        })
+        this.testResults = await IgorBackend.postData('/api/job/test', this.jobConfiguration, 'Testing job', 'Test OK.',
+            'Test Failed!')
+        this.updateSelectedTestResult()
       },
       cancelConfiguration: function () {
         this.$router.push({name: 'app-status'})
@@ -480,24 +465,33 @@
       },
       updateSelectedTestResult: function () {
         if (this.testResults != null) {
-          if (this.testResults.errorCause) {
-            this.selectedTestResults = this.testResults
-          } else if (this.selectedTaskIndex == -1 && this.selectedActionIndex == -1) {
-            this.selectedTestResults = ''
-          } else {
-            let taskIndex = this.selectedTaskIndex
-            let actionIndex = this.selectedActionIndex
-            if (taskIndex != -1 && actionIndex != -1) {
-              let taskResults = this.testResults.taskResults
-              if (taskResults[taskIndex] != null && taskResults[taskIndex].actionResults != null) {
-                let actionResults = taskResults[taskIndex].actionResults
-                if (actionResults[actionIndex] != null) {
-                  this.selectedTestResults = this.testResults.taskResults[taskIndex].actionResults[actionIndex].results
-                }
-              }
-            } else if (taskIndex != -1) {
-              if (this.testResults.taskResults[taskIndex] != null) {
-                this.selectedTestResults = this.testResults.taskResults[taskIndex].providerResults
+          let taskIndex = this.selectedTaskIndex
+          let actionIndex = this.selectedActionIndex
+
+          // The job has been selected:
+          if (taskIndex == -1 && actionIndex == -1) {
+            if (this.testResults.errorCause) {
+              this.selectedTestResults = this.testResults
+            } else {
+              this.selectedTestResults = null
+            }
+            return
+          }
+
+          // A Task has been selected:
+          if (taskIndex != -1 && actionIndex == -1) {
+            if (this.testResults.taskResults[taskIndex] != null) {
+              this.selectedTestResults = this.testResults.taskResults[taskIndex]
+            }
+          }
+
+          // An action has been selected:
+          if (taskIndex != -1 && actionIndex != -1) {
+            let taskResults = this.testResults.taskResults
+            if (taskResults[taskIndex] != null && taskResults[taskIndex].actionResults != null) {
+              let actionResults = taskResults[taskIndex].actionResults
+              if (actionResults[actionIndex] != null) {
+                this.selectedTestResults = this.testResults.taskResults[taskIndex].actionResults[actionIndex]
               }
             }
           }
