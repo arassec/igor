@@ -15,10 +15,7 @@ import org.springframework.util.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Converts parameters from and to their JSON representation.
@@ -53,28 +50,40 @@ public class JsonParametersConverter {
     public <T> JSONArray convert(T instance, boolean applySecurity, boolean addVolatile) {
         JSONArray result = new JSONArray();
         List<JSONObject> parameterList = new LinkedList<>();
+        Set<String> invisibleFields = new HashSet<>();
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
             if (field.isAnnotationPresent(IgorParam.class)) {
-                JSONObject parameter = new JSONObject();
-                parameter.put(JsonKeys.NAME, field.getName());
-                parameter.put(JsonKeys.TYPE, field.getType().getName());
-                Object value = getFieldValue(instance, field, applySecurity);
-                parameter.put(JsonKeys.VALUE, value);
-                parameter.put(JsonKeys.SECURED, field.getAnnotation(IgorParam.class).secured());
-                if (addVolatile) {
-                    parameter.put(JsonKeys.OPTIONAL, field.getAnnotation(IgorParam.class).optional());
-                    parameter.put(JsonKeys.SUBTYPE, field.getAnnotation(IgorParam.class).subtype().name());
-                }
-                boolean isService = Service.class.isAssignableFrom(field.getType());
-                parameter.put(JsonKeys.SERVICE, isService);
-                if (isService && value != null) {
-                    Service service = (Service) value;
+                if (field.getAnnotation(IgorParam.class).visible()) {
+                    JSONObject parameter = new JSONObject();
+                    parameter.put(JsonKeys.NAME, field.getName());
+                    parameter.put(JsonKeys.TYPE, field.getType().getName());
+                    Object value = getFieldValue(instance, field, applySecurity);
+                    parameter.put(JsonKeys.VALUE, value);
+                    parameter.put(JsonKeys.SECURED, field.getAnnotation(IgorParam.class).secured());
                     if (addVolatile) {
-                        parameter.put(JsonKeys.SERVICE_NAME, service.getName());
+                        parameter.put(JsonKeys.OPTIONAL, field.getAnnotation(IgorParam.class).optional());
+                        parameter.put(JsonKeys.SUBTYPE, field.getAnnotation(IgorParam.class).subtype().name());
+                        parameter.put(JsonKeys.VISIBLE, true);
                     }
-                    parameter.put(JsonKeys.VALUE, service.getId());
+                    boolean isService = Service.class.isAssignableFrom(field.getType());
+                    parameter.put(JsonKeys.SERVICE, isService);
+                    if (isService && value != null) {
+                        Service service = (Service) value;
+                        if (addVolatile) {
+                            parameter.put(JsonKeys.SERVICE_NAME, service.getName());
+                        }
+                        parameter.put(JsonKeys.VALUE, service.getId());
+                    }
+                    parameterList.add(parameter);
+                } else {
+                    invisibleFields.add(field.getName());
                 }
-                parameterList.add(parameter);
+            }
+        });
+
+        parameterList.forEach(parameter -> {
+            if (invisibleFields.contains(parameter.getString(JsonKeys.NAME))) {
+                parameter.put(JsonKeys.VISIBLE, false);
             }
         });
 

@@ -43,6 +43,12 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     private boolean sortAscending = true;
 
     /**
+     * Unused by this action and thus made invisible in the UI.
+     */
+    @IgorParam(visible = false)
+    protected int numThreads;
+
+    /**
      * Contains all data that should have been processed by the action.
      */
     private List<Map<String, Object>> collectedData = new LinkedList<>();

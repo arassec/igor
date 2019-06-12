@@ -38,4 +38,11 @@ public @interface IgorParam {
      */
     ParameterSubtype subtype() default ParameterSubtype.NONE;
 
+    /**
+     * Enables or disables display of an igor parameter in the UI.
+     *
+     * @return {@code true}, if the parameter should be visible in the UI, {@code false} otherwise.
+     */
+    boolean visible() default true;
+
 }
