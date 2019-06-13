@@ -33,6 +33,13 @@
                     </td>
                     <td/>
                 </tr>
+                <tr>
+                    <td><label>Dry-Run limit</label></td>
+                    <td>
+                        <input type="text" autocomplete="off" v-model.number="task.dryrunLimit"/>
+                    </td>
+                    <td/>
+                </tr>
             </table>
         </core-panel>
 
@@ -76,12 +83,12 @@
 </template>
 
 <script>
-import ValidationError from '../common/validation-error'
-import ParameterEditor from '../common/parameter-editor'
-import CorePanel from '../common/core-panel'
-import IgorBackend from '../../utils/igor-backend.js'
+  import ValidationError from '../common/validation-error'
+  import ParameterEditor from '../common/parameter-editor'
+  import CorePanel from '../common/core-panel'
+  import IgorBackend from '../../utils/igor-backend.js'
 
-export default {
+  export default {
   name: 'task-configurator',
   components: {CorePanel, ParameterEditor, ValidationError},
   props: ['task', 'taskKey'],

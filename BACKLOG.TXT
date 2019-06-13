@@ -1,6 +1,5 @@
 - Unit-Tests (Apache Mina SSHD!)
 - README.md
-- Limit for number of dry-run-results.
 - Persistence-service editor
 - Job-Execution-History-Details with
   - current Task

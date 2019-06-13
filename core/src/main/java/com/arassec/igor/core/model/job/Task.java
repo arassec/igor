@@ -64,6 +64,11 @@ public class Task {
     private List<Action> actions = new LinkedList<>();
 
     /**
+     * Limits the results in a dry-run.
+     */
+    private int dryrunLimit = 25;
+
+    /**
      * Creates a new Task.
      *
      * @param id The task's ID.
@@ -182,10 +187,12 @@ public class Task {
 
             List<Map<String, Object>> providerResult = new LinkedList<>();
 
-            while (provider.hasNext()) {
+            int counter = 0;
+            while (provider.hasNext() && counter < dryrunLimit) {
                 Map<String, Object> item = provider.next();
                 providerResult.add(item);
                 taskResult.getResults().add(objectMapper.readValue(new JSONObject(item).toString(), HashMap.class));
+                counter++;
             }
 
             for (Action action : actions) {

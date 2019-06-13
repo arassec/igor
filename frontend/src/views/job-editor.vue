@@ -345,6 +345,7 @@
           name: 'Task',
           description: '',
           active: true,
+          dryrunLimit: 25,
           provider: {
             category: this.initialProviderCategory,
             type: this.initialProviderType,

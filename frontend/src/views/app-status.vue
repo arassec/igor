@@ -134,8 +134,7 @@
                 <div slot="right">{{formatTimestamp(scheduledJob.nextRun)}}</div>
             </feedback-box>
 
-            <list-pager slot="footer" :page="schedulePage" v-if="schedulePage.totalPages > 1"
-                        v-on:first="loadSchedule(0)"
+            <list-pager slot="footer" :page="schedulePage" v-on:first="loadSchedule(0)"
                         v-on:previous="loadSchedule(schedulePage.number -1)"
                         v-on:next="loadSchedule(schedulePage.number + 1)"
                         v-on:last="loadSchedule(schedulePage.totalPages -1)"/>

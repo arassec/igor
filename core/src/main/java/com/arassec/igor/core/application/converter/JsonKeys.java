@@ -21,6 +21,11 @@ public interface JsonKeys {
     String ACTIVE = "active";
 
     /**
+     * The dry-run limit key.
+     */
+    String DRYRUN_LIMIT = "dryrunLimit";
+
+    /**
      * The tasks of a job.
      */
     String TASKS = "tasks";
