@@ -16,11 +16,11 @@ the moment, the main focus of work lies on testing and documentation.
 In the future, databases, messaging systems or other interfaces could be added to extract, transform and load the data. 
 
 # Installation
-The application uses Spring-Boot 2 and is currently as delivered standalone (fat) JAR. In order to compile igor at least Java 11
- is required. As datastore an embedded h2 database ist used. It will automatically be generated upon first start in the current 
-working directory in a directory named 'dbdata'. 
+The application uses Spring-Boot 2 and is currently delivered as standalone (fat) JAR. In order to compile igor, at least Java 11
+ is required. An embedded h2 database is used as database. It will automatically be generated upon first start in the current 
+working directory, in a directory named 'dbdata'. 
 
-In order to use igor perform the following steps after cloning the repository:
+In order to use igor, perform the following steps after cloning the repository:
 
 ```
 ./mvnw clean install
