@@ -12,7 +12,7 @@ import com.arassec.igor.web.api.error.RestControllerExceptionHandler;
 import com.arassec.igor.web.api.model.ServiceListEntry;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,25 +28,23 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/service")
+@RequiredArgsConstructor
 public class ServiceRestController {
 
     /**
      * The service manager.
      */
-    @Autowired
-    private ServiceManager serviceManager;
+    private final ServiceManager serviceManager;
 
     /**
      * The job manager.
      */
-    @Autowired
-    private JobManager jobManager;
+    private final JobManager jobManager;
 
     /**
      * Converter for services from and to JSON.
      */
-    @Autowired
-    private JsonServiceConverter jsonServiceConverter;
+    private final JsonServiceConverter jsonServiceConverter;
 
     /**
      * Returns all available services.

@@ -1,3 +1,5 @@
+- fileExtension parameter for ListFilesProvider
+- BaseFileService.copyStream(): abort after X minutes of inactivity
 - Unit-Tests (Apache Mina SSHD!)
 - Persistence-service editor
 - Job-Execution-History-Details with

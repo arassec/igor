@@ -4,10 +4,7 @@ import com.arassec.igor.core.util.StacktraceFormatter;
 import lombok.Data;
 import lombok.ToString;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 /**
  * Contains information about a single job run.

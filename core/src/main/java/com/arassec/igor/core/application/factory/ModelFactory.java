@@ -25,7 +25,7 @@ public abstract class ModelFactory<T> {
     /**
      * Base package for annotation scanning.
      * <p>
-     * TODO: This should be determined by e.g. an Igorfile or a list of configuration parameters.
+     * TODO: This should be determined by e.g. an Igorfile or a list of configuration parameters or something else.
      */
     private static final String BASE_PACKAGE = "com.arassec.igor";
 
@@ -61,14 +61,15 @@ public abstract class ModelFactory<T> {
      * @param categoryAnnotationClass The annotation that defines categories for the models of this factory, e.g. 'IgorServiceCategory'.
      * @param typeAnnotationClass     The annotation that marks a class as type for this factory, e.g. 'IgorService'.
      */
-    public ModelFactory(Class<T> modelClass, Class<? extends Annotation> categoryAnnotationClass, Class<? extends Annotation> typeAnnotationClass) {
+    ModelFactory(Class<T> modelClass, Class<? extends Annotation> categoryAnnotationClass,
+                 Class<? extends Annotation> typeAnnotationClass) {
         log.info("Registering categories using: {}", categoryAnnotationClass.getName());
         categories = findModelDefinitions(modelClass, categoryAnnotationClass, true);
 
         log.info("Registering types using: {}", typeAnnotationClass.getName());
         types = findModelDefinitions(modelClass, typeAnnotationClass, false);
 
-        types.stream().forEach(type -> {
+        types.forEach(type -> {
             KeyLabelStore category;
             try {
                 category = findModelDefintion(Class.forName(type.getKey()), categories);

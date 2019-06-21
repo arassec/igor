@@ -8,7 +8,6 @@ import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.util.ModelPage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -30,14 +29,12 @@ public class JobExecutor {
     /**
      * Repository for jobs.
      */
-    @Autowired
-    private JobRepository jobRepository;
+    private final JobRepository jobRepository;
 
     /**
      * Repository for job-executions.
      */
-    @Autowired
-    private JobExecutionRepository jobExecutionRepository;
+    private final JobExecutionRepository jobExecutionRepository;
 
     /**
      * Maximum number of jobs executed in parallel.s
@@ -63,7 +60,9 @@ public class JobExecutor {
     /**
      * Creates a new JobExecutor instance.
      */
-    public JobExecutor() {
+    public JobExecutor(JobRepository jobRepository, JobExecutionRepository jobExecutionRepository) {
+        this.jobRepository = jobRepository;
+        this.jobExecutionRepository = jobExecutionRepository;
         executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(jobQueueSize,
                 runnable -> new Thread(runnable, "job-executor-thread"));
     }

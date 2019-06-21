@@ -9,7 +9,7 @@ import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.persistence.dao.JobExecutionDao;
 import com.arassec.igor.persistence.entity.JobExecutionEntity;
 import com.github.openjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,19 +27,18 @@ import java.util.stream.Collectors;
  */
 @Component
 @Transactional
+@RequiredArgsConstructor
 public class JdbcJobExecutionRepository implements JobExecutionRepository {
 
     /**
      * DAO for job-execution entities.
      */
-    @Autowired
-    private JobExecutionDao jobExecutionDao;
+    private final JobExecutionDao jobExecutionDao;
 
     /**
      * Converter for job-executions.
      */
-    @Autowired
-    private JsonJobExecutionConverter jobExecutionConverter;
+    private final JsonJobExecutionConverter jobExecutionConverter;
 
     /**
      * {@inheritDoc}
@@ -135,7 +134,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
 
             int i = 0;
             for (JobExecutionEntity entity : page.getContent()) {
-                if (!JobExecutionState.FAILED.equals(entity.getState())) {
+                if (!JobExecutionState.FAILED.name().equals(entity.getState())) {
                     i++;
                 }
                 if (i == numToKeep) {

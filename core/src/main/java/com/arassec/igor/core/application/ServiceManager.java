@@ -7,7 +7,7 @@ import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -17,19 +17,18 @@ import java.util.stream.Collectors;
  * Manages {@link Service}s. Entry point from outside the core package to create and maintain services.
  */
 @Component
+@RequiredArgsConstructor
 public class ServiceManager {
 
     /**
      * Repository for services.
      */
-    @Autowired
-    private ServiceRepository serviceRepository;
+    private final ServiceRepository serviceRepository;
 
     /**
      * Factory for services.
      */
-    @Autowired
-    private ServiceFactory serviceFactory;
+    private final ServiceFactory serviceFactory;
 
     /**
      * Returns all available service categories.
@@ -73,15 +72,6 @@ public class ServiceManager {
     }
 
     /**
-     * Loads all available services.
-     *
-     * @return List of all services.
-     */
-    public List<Service> loadAll() {
-        return serviceRepository.findAll();
-    }
-
-    /**
      * Loads a page of services matching the supplied criteria.
      *
      * @param pageNumber The page number.
@@ -116,11 +106,9 @@ public class ServiceManager {
             return new ModelPage<>(0, 0, 0, List.of());
         }
         List<Service> services = serviceRepository.findAll();
-        List<Service> allOfType =
-                services.stream().filter(service -> category.equals(serviceFactory.getCategory(service).getKey())).collect(Collectors.toList());
-
-        Collections.sort(allOfType, Comparator.comparing(Service::getName));
-
+        List<Service> allOfType = services.stream()
+                .filter(service -> category.equals(serviceFactory.getCategory(service).getKey()))
+                .sorted(Comparator.comparing(Service::getName)).collect(Collectors.toList());
         return ModelPageHelper.getModelPage(allOfType, pageNumber, pageSize);
     }
 

@@ -4,16 +4,14 @@ import com.arassec.igor.core.application.converter.util.EncryptionUtil;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
-import com.arassec.igor.core.repository.ServiceRepository;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -21,20 +19,14 @@ import java.util.*;
  * Converts parameters from and to their JSON representation.
  */
 @Slf4j
-@Component
+@Component("jsonParametersConverter")
+@RequiredArgsConstructor
 public class JsonParametersConverter {
-
-    /**
-     * Repository for services. Required to get a service instance as a service parameter's value.
-     */
-    @Autowired
-    private ServiceRepository serviceRepository;
 
     /**
      * Utlity for encryption/decryption.
      */
-    @Autowired
-    private EncryptionUtil encryptionUtil;
+    private final EncryptionUtil encryptionUtil;
 
     /**
      * Returns the instance's paremters as {@link JSONArray}.
@@ -48,6 +40,7 @@ public class JsonParametersConverter {
      * @return Map containing the parameters.
      */
     public <T> JSONArray convert(T instance, boolean applySecurity, boolean addVolatile) {
+
         JSONArray result = new JSONArray();
         List<JSONObject> parameterList = new LinkedList<>();
         Set<String> invisibleFields = new HashSet<>();
@@ -98,7 +91,7 @@ public class JsonParametersConverter {
             return 0;
         });
 
-        parameterList.stream().forEach(parameter -> result.put(parameter));
+        parameterList.forEach(result::put);
 
         return result;
     }
@@ -114,25 +107,30 @@ public class JsonParametersConverter {
     public Map<String, Object> convert(JSONArray parameters, boolean applySecurity) {
         Map<String, Object> result = new HashMap<>();
         for (int i = 0; i < parameters.length(); i++) {
-            JSONObject parameter = parameters.getJSONObject(i);
-            Object value = parameter.opt(JsonKeys.VALUE);
-            boolean isService = parameter.getBoolean(JsonKeys.SERVICE);
-            if (value != null) {
-                if (value instanceof String && StringUtils.isEmpty(value)) {
-                    continue;
-                }
-                if (isService && value instanceof Integer) {
-                    result.put(parameter.getString(JsonKeys.NAME), serviceRepository.findById(Long.valueOf((Integer) value)));
-                } else {
-                    if (parameter.getBoolean(JsonKeys.SECURED) && applySecurity) {
-                        result.put(parameter.getString(JsonKeys.NAME), encryptionUtil.decrypt((String) value));
-                    } else {
-                        result.put(parameter.getString(JsonKeys.NAME), value);
-                    }
-                }
-            }
+            convertParameter(parameters.getJSONObject(i), applySecurity, result);
         }
         return result;
+    }
+
+    /**
+     * Converts a single parameter from JSON to Map.
+     *
+     * @param parameter     The parameter in JSON form.
+     * @param applySecurity Set to {@code true} to decrypt secured properties. If set to {@code false}, secured
+     *                      properties will be kept in encrypted form.
+     * @param target        The target map where the converted parameter should be stored in.
+     */
+    protected void convertParameter(JSONObject parameter, boolean applySecurity, Map<String, Object> target) {
+        Object value = parameter.opt(JsonKeys.VALUE);
+        if (value != null) {
+            if (value instanceof String && StringUtils.isEmpty(value)) {
+                return;
+            } else if (parameter.getBoolean(JsonKeys.SECURED) && applySecurity) {
+                target.put(parameter.getString(JsonKeys.NAME), encryptionUtil.decrypt((String) value));
+            } else {
+                target.put(parameter.getString(JsonKeys.NAME), value);
+            }
+        }
     }
 
     /**
@@ -171,8 +169,7 @@ public class JsonParametersConverter {
      * @return {@code true}, if the property is secured, {@code false} otherwise.
      */
     private boolean isSecured(Field field) {
-        Annotation annotation = field.getAnnotation(IgorParam.class);
-        IgorParam igorParam = (IgorParam) annotation;
+        IgorParam igorParam = field.getAnnotation(IgorParam.class);
         return igorParam.secured() && field.getType().isAssignableFrom(String.class);
     }
 

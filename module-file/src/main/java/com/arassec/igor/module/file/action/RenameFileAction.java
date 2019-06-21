@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Map;
 /**
  * Renames a file.
  */
+@Slf4j
 @IgorAction(label = "Rename file")
 public class RenameFileAction extends BaseFileAction {
 
@@ -36,7 +38,10 @@ public class RenameFileAction extends BaseFileAction {
             if (isDryRun) {
                 data.put(DRY_RUN_COMMENT_KEY, "Renamed file " + data.get(dataKey) + " to " + targetFilename);
             } else {
-                sourceService.move((String) data.get(dataKey), targetFilename, jobExecution);
+                String file = getString(data, dataKey);
+                log.debug("Renaming file '{}' to '{}'", file, targetFilename);
+                sourceService.move(file, targetFilename, jobExecution);
+                log.debug("File '{}' renamed", file, targetFilename);
             }
             return List.of(data);
         }

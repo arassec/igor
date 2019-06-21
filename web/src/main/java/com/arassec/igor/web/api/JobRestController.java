@@ -13,7 +13,7 @@ import com.arassec.igor.web.api.error.RestControllerExceptionHandler;
 import com.arassec.igor.web.api.model.JobListEntry;
 import com.arassec.igor.web.api.model.ScheduleEntry;
 import com.github.openjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.support.CronSequenceGenerator;
@@ -30,25 +30,23 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/job")
+@RequiredArgsConstructor
 public class JobRestController {
 
     /**
      * Manager for Jobs.
      */
-    @Autowired
-    private JobManager jobManager;
+    private final JobManager jobManager;
 
     /**
      * Manager for Services.
      */
-    @Autowired
-    private ServiceManager serviceManager;
+    private final ServiceManager serviceManager;
 
     /**
      * Converter for Jobs.
      */
-    @Autowired
-    private JsonJobConverter jsonJobConverter;
+    private final JsonJobConverter jsonJobConverter;
 
     /**
      * Returns the IDs of all available jobs.

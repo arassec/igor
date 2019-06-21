@@ -3,8 +3,8 @@ package com.arassec.igor.core.application.converter;
 import com.arassec.igor.core.model.job.Task;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -14,19 +14,18 @@ import java.util.UUID;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JsonTaskConverter {
 
     /**
      * Converter for providers.
      */
-    @Autowired
-    private JsonProviderConverter jsonProviderConverter;
+    private final JsonProviderConverter jsonProviderConverter;
 
     /**
      * Converter for actions.
      */
-    @Autowired
-    private JsonActionConverter jsonActionConverter;
+    private final JsonActionConverter jsonActionConverter;
 
     /**
      * Converts a {@link Task} into its JSON representation.
@@ -51,7 +50,7 @@ public class JsonTaskConverter {
         taskJson.put(JsonKeys.PROVIDER, jsonProviderConverter.convert(task.getProvider(), applySecurity, addVolatile));
         JSONArray actionJsons = new JSONArray();
         task.getActions().stream().map(action -> jsonActionConverter.convert(action, applySecurity, addVolatile))
-                .forEach(actionJson -> actionJsons.put(actionJson));
+                .forEach(actionJsons::put);
         taskJson.put(JsonKeys.ACTIONS, actionJsons);
         return taskJson;
     }

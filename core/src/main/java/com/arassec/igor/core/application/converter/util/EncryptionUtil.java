@@ -1,14 +1,9 @@
 package com.arassec.igor.core.application.converter.util;
 
-import com.arassec.igor.core.model.IgorParam;
 import org.jasypt.util.text.StrongTextEncryptor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.security.Security;
 
 /**
  * Utility class for encryption.

@@ -4,7 +4,7 @@ import com.arassec.igor.core.model.job.persistence.PersistentValue;
 import com.arassec.igor.core.repository.PersistentValueRepository;
 import com.arassec.igor.persistence.dao.PersistentValueDao;
 import com.arassec.igor.persistence.entity.PersistentValueEntity;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,13 +16,13 @@ import java.util.List;
  */
 @Component
 @Transactional
+@RequiredArgsConstructor
 public class JdbcPersistentValueRepository implements PersistentValueRepository {
 
     /**
      * DAO for Access to persistent values.
      */
-    @Autowired
-    private PersistentValueDao persistentValueDao;
+    private final PersistentValueDao persistentValueDao;
 
     /**
      * Saves the supplied value in igor's own database.

@@ -48,11 +48,11 @@
 </template>
 
 <script>
-import ModalDialog from '../common/modal-dialog'
-import LayoutRow from '../common/layout-row'
-import InputButton from '../common/input-button'
+  import ModalDialog from '../common/modal-dialog'
+  import LayoutRow from '../common/layout-row'
+  import InputButton from '../common/input-button'
 
-export default {
+  export default {
   name: 'job-execution-details',
   props: ['jobExecution'],
   components: {InputButton, LayoutRow, ModalDialog},

@@ -11,7 +11,7 @@ import com.arassec.igor.persistence.dao.ServiceDao;
 import com.arassec.igor.persistence.entity.JobServiceReferenceEntity;
 import com.arassec.igor.persistence.entity.ServiceEntity;
 import com.github.openjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,31 +29,28 @@ import java.util.stream.Collectors;
  */
 @Component
 @Transactional
+@RequiredArgsConstructor
 public class JdbcServiceRepository implements ServiceRepository {
 
     /**
      * The DAO for services.
      */
-    @Autowired
-    private ServiceDao serviceDao;
+    private final ServiceDao serviceDao;
 
     /**
      * The DAO for jobs.
      */
-    @Autowired
-    private JobDao jobDao;
+    private final JobDao jobDao;
 
     /**
      * DAO for job-service-references.
      */
-    @Autowired
-    private JobServiceReferenceDao jobServiceReferenceDao;
+    private final JobServiceReferenceDao jobServiceReferenceDao;
 
     /**
      * The converter for services.
      */
-    @Autowired
-    private JsonServiceConverter jsonServiceConverter;
+    private final JsonServiceConverter jsonServiceConverter;
 
     /**
      * Saves a {@link Service} to the database. Either creates a new service or updates an existing one.
@@ -123,9 +120,7 @@ public class JdbcServiceRepository implements ServiceRepository {
             Service service = jsonServiceConverter
                     .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), true);
             service.setId(serviceEntity.getId());
-            if (service != null) {
-                result.add(service);
-            }
+            result.add(service);
         }
         return result;
     }

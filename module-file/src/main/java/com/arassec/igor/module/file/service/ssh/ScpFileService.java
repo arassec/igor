@@ -373,6 +373,8 @@ public class ScpFileService extends BaseSshFileService {
             ChannelExec channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
             channel.setInputStream(null);
+            ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+            channel.setErrStream(errorStream);
             in = channel.getInputStream();
             channel.connect();
 
@@ -390,7 +392,9 @@ public class ScpFileService extends BaseSshFileService {
                         continue;
                     }
                     if (!(channel.getExitStatus() == 0)) {
-                        throw new ServiceException("Exit status != 0 received: " + channel.getExitStatus());
+                        throw new ServiceException(
+                                "Exit status != 0 received: " + channel.getExitStatus() + "\n(" + errorStream.toString()
+                                        .replace("\n", "") + ")");
                     }
                     break;
                 }

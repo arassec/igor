@@ -3,7 +3,7 @@ package com.arassec.igor.core.application.converter;
 import com.arassec.igor.core.application.factory.ProviderFactory;
 import com.arassec.igor.core.model.provider.Provider;
 import com.github.openjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -12,13 +12,18 @@ import java.util.Map;
  * JSON converter for {@link Provider}s.
  */
 @Component
+@RequiredArgsConstructor
 public class JsonProviderConverter extends JsonBaseConverter {
 
     /**
      * Factory for providers.
      */
-    @Autowired
-    private ProviderFactory providerFactory;
+    private final ProviderFactory providerFactory;
+
+    /**
+     * Converter for parameters.
+     */
+    private final JsonServiceAwareParametersConverter parametersConverter;
 
     /**
      * Converts the provided JSON into a {@link Provider}.
@@ -29,7 +34,7 @@ public class JsonProviderConverter extends JsonBaseConverter {
      * @return A newly created Provider instance.
      */
     public Provider convert(JSONObject providerJson, boolean applySecurity) {
-        Map<String, Object> parameters = parameterConverter.convert(
+        Map<String, Object> parameters = parametersConverter.convert(
                 providerJson.getJSONArray(JsonKeys.PARAMETERS), applySecurity);
         return providerFactory.createInstance(providerJson.getJSONObject(JsonKeys.TYPE).getString(JsonKeys.KEY), parameters);
     }
@@ -44,7 +49,7 @@ public class JsonProviderConverter extends JsonBaseConverter {
      * @return The provider in JSON form.
      */
     public JSONObject convert(Provider provider, boolean applySecurity, boolean addVolatile) {
-        return convertToStandardJson(providerFactory, provider, applySecurity, addVolatile);
+        return convertToStandardJson(providerFactory, provider, applySecurity, addVolatile, parametersConverter);
     }
 
 }

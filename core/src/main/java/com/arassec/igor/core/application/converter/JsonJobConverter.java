@@ -3,8 +3,8 @@ package com.arassec.igor.core.application.converter;
 import com.arassec.igor.core.model.job.Job;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,19 +12,18 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JsonJobConverter {
 
     /**
      * The JSON task converter.
      */
-    @Autowired
-    private JsonTaskConverter jsonTaskConverter;
+    private final JsonTaskConverter jsonTaskConverter;
 
     /**
      * The JSON trigger converter.
      */
-    @Autowired
-    private JsonTriggerConverter jsonTriggerConverter;
+    private final JsonTriggerConverter jsonTriggerConverter;
 
     /**
      * Converts the supplied job into its JSON representation.
@@ -45,7 +44,7 @@ public class JsonJobConverter {
         jobJson.put(JsonKeys.ACTIVE, job.isActive());
 
         JSONArray tasksJson = new JSONArray();
-        job.getTasks().stream().map(task -> jsonTaskConverter.convert(task, applySecurity, addVolatile)).forEach(jsonObject -> tasksJson.put(jsonObject));
+        job.getTasks().stream().map(task -> jsonTaskConverter.convert(task, applySecurity, addVolatile)).forEach(tasksJson::put);
         jobJson.put(JsonKeys.TASKS, tasksJson);
 
         return jobJson;

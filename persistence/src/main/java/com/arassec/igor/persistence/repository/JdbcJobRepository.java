@@ -12,7 +12,7 @@ import com.arassec.igor.persistence.entity.JobEntity;
 import com.arassec.igor.persistence.entity.JobServiceReferenceEntity;
 import com.arassec.igor.persistence.util.ServiceIdExtractor;
 import com.github.openjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,31 +28,28 @@ import java.util.stream.Collectors;
  */
 @Component
 @Transactional
+@RequiredArgsConstructor
 public class JdbcJobRepository implements JobRepository {
 
     /**
      * DAO for job entities.
      */
-    @Autowired
-    private JobDao jobDao;
+    private final JobDao jobDao;
 
     /**
      * DAO for service entities.
      */
-    @Autowired
-    private ServiceDao serviceDao;
+    private final ServiceDao serviceDao;
 
     /**
      * DAO for job-service-references.
      */
-    @Autowired
-    private JobServiceReferenceDao jobServiceReferenceDao;
+    private final JobServiceReferenceDao jobServiceReferenceDao;
 
     /**
      * Converter for jobs.
      */
-    @Autowired
-    private JsonJobConverter jsonJobConverter;
+    private final JsonJobConverter jsonJobConverter;
 
     /**
      * Persists jobs using JDBC. Either creates a new entry in the database or updates an existing one.
@@ -134,9 +131,7 @@ public class JdbcJobRepository implements JobRepository {
         for (JobEntity jobEntity : jobDao.findAll()) {
             Job job = jsonJobConverter.convert(new JSONObject(jobEntity.getContent()), jobEntity.getId(), true);
             job.setId(jobEntity.getId());
-            if (job != null) {
-                result.add(job);
-            }
+            result.add(job);
         }
         return result;
     }

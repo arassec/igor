@@ -10,10 +10,10 @@ import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.repository.PersistentValueRepository;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
@@ -30,37 +30,33 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JobManager implements InitializingBean, DisposableBean {
 
     /**
      * Repository for jobs.
      */
-    @Autowired
-    private JobRepository jobRepository;
+    private final JobRepository jobRepository;
 
     /**
      * Repository for job-executions.
      */
-    @Autowired
-    private JobExecutionRepository jobExecutionRepository;
+    private final JobExecutionRepository jobExecutionRepository;
 
     /**
      * Repository for persistent values.
      */
-    @Autowired
-    private PersistentValueRepository persistentValueRepository;
+    private final PersistentValueRepository persistentValueRepository;
 
     /**
      * The task scheduler that starts the jobs according to their trigger.
      */
-    @Autowired
-    private TaskScheduler taskScheduler;
+    private final TaskScheduler taskScheduler;
 
     /**
      * The job executor actually running the scheduled jobs.
      */
-    @Autowired
-    private JobExecutor jobExecutor;
+    private final JobExecutor jobExecutor;
 
     /**
      * Keeps track of all scheduled jobs.
@@ -79,10 +75,11 @@ public class JobManager implements InitializingBean, DisposableBean {
             jobExecutions.getItems().forEach(jobExecution -> {
                 jobExecution.setErrorCause("Job interrupted due to application restart!");
                 jobExecution.setExecutionState(JobExecutionState.FAILED);
+                jobExecution.setFinished(Instant.now());
                 jobExecutionRepository.upsert(jobExecution);
             });
         }
-        jobRepository.findAll().stream().forEach(job -> schedule(job));
+        jobRepository.findAll().forEach(this::schedule);
     }
 
     /**
@@ -90,7 +87,7 @@ public class JobManager implements InitializingBean, DisposableBean {
      */
     @Override
     public void destroy() {
-        scheduledJobs.values().stream().forEach(scheduledFuture -> scheduledFuture.cancel(true));
+        scheduledJobs.values().forEach(scheduledFuture -> scheduledFuture.cancel(true));
     }
 
     /**
@@ -187,15 +184,6 @@ public class JobManager implements InitializingBean, DisposableBean {
     }
 
     /**
-     * Loads all jobs.
-     *
-     * @return List of {@link Job}s.
-     */
-    public List<Job> loadAll() {
-        return jobRepository.findAll();
-    }
-
-    /**
      * Loads a page of jobs matching the supplied criteria.
      *
      * @param pageNumber The page number.
@@ -213,10 +201,10 @@ public class JobManager implements InitializingBean, DisposableBean {
      * @return List of scheduled jobs.
      */
     public List<Job> loadScheduled() {
-        return jobRepository.findAll().stream().filter(job -> job.isActive())
+        return jobRepository.findAll().stream().filter(Job::isActive)
                 .filter(job -> job.getTrigger() instanceof com.arassec.igor.core.model.trigger.CronTrigger).sorted((o1, o2) -> {
                     String firstCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
-                    String secondCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
+                    String secondCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o2.getTrigger()).getCronExpression();
                     CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(firstCron);
                     Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
                     CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(secondCron);

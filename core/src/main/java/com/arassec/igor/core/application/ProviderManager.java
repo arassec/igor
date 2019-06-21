@@ -1,10 +1,10 @@
 package com.arassec.igor.core.application;
 
-import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import com.arassec.igor.core.application.factory.ProviderFactory;
+import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import com.arassec.igor.core.model.provider.Provider;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -16,13 +16,13 @@ import java.util.Set;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ProviderManager {
 
     /**
      * The factory for providers.
      */
-    @Autowired
-    private ProviderFactory providerFactory;
+    private final ProviderFactory providerFactory;
 
     /**
      * Returns all available provider categories.

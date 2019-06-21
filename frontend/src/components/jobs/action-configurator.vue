@@ -42,11 +42,11 @@
 </template>
 
 <script>
-import CorePanel from '../common/core-panel'
-import ParameterEditor from '../common/parameter-editor'
-import IgorBackend from '../../utils/igor-backend.js'
+  import CorePanel from '../common/core-panel'
+  import ParameterEditor from '../common/parameter-editor'
+  import IgorBackend from '../../utils/igor-backend.js'
 
-export default {
+  export default {
   name: 'action-configurator',
   components: {CorePanel, ParameterEditor},
   props: ['action', 'actionKey'],

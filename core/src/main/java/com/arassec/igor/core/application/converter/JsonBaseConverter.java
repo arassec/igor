@@ -2,20 +2,12 @@ package com.arassec.igor.core.application.converter;
 
 import com.arassec.igor.core.application.factory.ModelFactory;
 import com.arassec.igor.core.application.factory.util.KeyLabelStore;
-import com.arassec.igor.core.model.trigger.Trigger;
 import com.github.openjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Base class for JSON converters.
  */
 public abstract class JsonBaseConverter {
-
-    /**
-     * Converter for parameters.
-     */
-    @Autowired
-    protected JsonParametersConverter parameterConverter;
 
     /**
      * Converts a {@link KeyLabelStore} to JSON.
@@ -53,11 +45,12 @@ public abstract class JsonBaseConverter {
      * @param <T>           The model's type.
      * @return A JSONObject representing the model.
      */
-    protected <T> JSONObject convertToStandardJson(ModelFactory<T> factory, T instance, boolean applySecurity, boolean addVolatile) {
+    protected <T> JSONObject convertToStandardJson(ModelFactory<T> factory, T instance, boolean applySecurity,
+                                                   boolean addVolatile, JsonServiceAwareParametersConverter parametersConverter) {
         JSONObject result = new JSONObject();
         result.put(JsonKeys.CATEGORY, convertKeyLabelStore(factory.getCategory(instance)));
         result.put(JsonKeys.TYPE, convertKeyLabelStore(factory.getType(instance)));
-        result.put(JsonKeys.PARAMETERS, parameterConverter.convert(instance, applySecurity, addVolatile));
+        result.put(JsonKeys.PARAMETERS, parametersConverter.convert(instance, applySecurity, addVolatile));
         return result;
     }
 }

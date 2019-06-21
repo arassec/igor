@@ -134,13 +134,15 @@ public class FtpFileService extends BaseFileService {
      * Shuts the FTP client down.
      */
     private void disconnect(FTPClient ftpClient) {
-        try {
-            if (!ftpClient.logout()) {
-                throw new ServiceException("Could not logout from FTP server " + host + ":" + port);
+        if (ftpClient.isConnected()) {
+            try {
+                if (!ftpClient.logout()) {
+                    throw new ServiceException("Could not logout from FTP server " + host + ":" + port);
+                }
+                ftpClient.disconnect();
+            } catch (IOException e) {
+                throw new ServiceException("Error during logout from FTP server " + host + ":" + port, e);
             }
-            ftpClient.disconnect();
-        } catch (IOException e) {
-            throw new ServiceException("Error during logout from FTP server " + host + ":" + port, e);
         }
     }
 
@@ -177,14 +179,15 @@ public class FtpFileService extends BaseFileService {
      */
     @Override
     public String read(String file, JobExecution jobExecution) {
+        FTPClient ftpClient = connect();
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            FTPClient ftpClient = connect();
             ftpClient.retrieveFile(file, outputStream);
             String result = outputStream.toString();
-            disconnect(ftpClient);
             return result;
         } catch (IOException e) {
             throw new ServiceException("Could not read FTP file!", e);
+        } finally {
+            disconnect(ftpClient);
         }
     }
 
@@ -193,14 +196,15 @@ public class FtpFileService extends BaseFileService {
      */
     @Override
     public void write(String file, String data, JobExecution jobExecution) {
+        FTPClient ftpClient = connect();
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(file.getBytes())) {
-            FTPClient ftpClient = connect();
             if (!ftpClient.storeFile(file, inputStream)) {
                 throw new ServiceException("Could not write FTP file!");
             }
-            disconnect(ftpClient);
         } catch (IOException e) {
             throw new ServiceException("Could not store file: " + file, e);
+        } finally {
+            disconnect(ftpClient);
         }
     }
 
@@ -230,9 +234,10 @@ public class FtpFileService extends BaseFileService {
         FTPClient ftpClient = connect();
         try (BufferedOutputStream outputStream = new BufferedOutputStream(ftpClient.storeFileStream(file))) {
             copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), jobExecution);
-            disconnect(ftpClient);
         } catch (IOException e) {
             throw new ServiceException("Could not store file: " + file, e);
+        } finally {
+            disconnect(ftpClient);
         }
     }
 

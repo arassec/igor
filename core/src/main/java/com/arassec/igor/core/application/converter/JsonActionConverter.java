@@ -3,20 +3,25 @@ package com.arassec.igor.core.application.converter;
 import com.arassec.igor.core.application.factory.ActionFactory;
 import com.arassec.igor.core.model.action.Action;
 import com.github.openjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * Converter for {@link Action}s.
  */
 @Component
+@RequiredArgsConstructor
 public class JsonActionConverter extends JsonBaseConverter {
 
     /**
      * Factory for actions.
      */
-    @Autowired
-    private ActionFactory actionFactory;
+    private final ActionFactory actionFactory;
+
+    /**
+     * Converter for parameters.
+     */
+    private final JsonServiceAwareParametersConverter parametersConverter;
 
     /**
      * Converts actions in JSON form to their object instance.
@@ -27,7 +32,7 @@ public class JsonActionConverter extends JsonBaseConverter {
      */
     public Action convert(JSONObject actionJson, boolean applySecurity) {
         return actionFactory.createInstance(actionJson.getJSONObject(JsonKeys.TYPE).getString(JsonKeys.KEY),
-                parameterConverter.convert(actionJson.getJSONArray(JsonKeys.PARAMETERS), applySecurity));
+                parametersConverter.convert(actionJson.getJSONArray(JsonKeys.PARAMETERS), applySecurity));
     }
 
     /**
@@ -40,7 +45,7 @@ public class JsonActionConverter extends JsonBaseConverter {
      * @return The action in JSON form.
      */
     public JSONObject convert(Action action, boolean applySecurity, boolean addVolatile) {
-        return convertToStandardJson(actionFactory, action, applySecurity, addVolatile);
+        return convertToStandardJson(actionFactory, action, applySecurity, addVolatile, parametersConverter);
     }
 
 }

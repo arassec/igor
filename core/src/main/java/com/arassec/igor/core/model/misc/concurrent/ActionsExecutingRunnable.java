@@ -117,7 +117,6 @@ public class ActionsExecutingRunnable implements Runnable {
                 return;
             }
 
-            log.debug("Running Action: {}", action.getClass().getName());
             List<Map<String, Object>> actionResult = new LinkedList<>();
 
             for (Map<String, Object> item : items) {

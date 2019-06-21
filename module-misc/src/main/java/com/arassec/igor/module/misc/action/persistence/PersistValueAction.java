@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.persistence.PersistentValue;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
 /**
  * Persists a value from the supplied data to the persistence store.
  */
+@Slf4j
 @IgorAction(label = "Persist value")
 public class PersistValueAction extends BasePersistenceAction {
 
@@ -38,14 +40,17 @@ public class PersistValueAction extends BasePersistenceAction {
                 if (isDryRun) {
                     data.put(DRY_RUN_COMMENT_KEY, "Persisted: " + data.get(dataKey));
                 } else {
+                    log.debug("Persisted: '{}'", value);
                     persistentValueRepository.upsert(jobId, taskId, value);
                 }
-                return List.of(data);
             } else {
                 if (isDryRun) {
                     data.put(DRY_RUN_COMMENT_KEY, data.get(dataKey) + " already persisted!");
+                } else {
+                    log.debug("Already persisted: '{}'", value);
                 }
             }
+            return List.of(data);
         }
         return null;
     }

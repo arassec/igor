@@ -44,7 +44,7 @@ public class LocalFilesystemFileService extends BaseFileService {
                 } catch (IOException e) {
                     log.warn("Could not get last modified time from path: {},", path);
                 }
-                return new FileInfo(path.toString(), lastModifiedTime != null ?
+                return new FileInfo(path.getFileName().toString(), lastModifiedTime != null ?
                         formatInstant(lastModifiedTime.toInstant().truncatedTo(ChronoUnit.SECONDS)) : null);
             }).collect(Collectors.toList());
         } catch (IOException e) {

@@ -6,44 +6,40 @@ import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.application.TriggerManager;
 import com.arassec.igor.core.application.factory.util.KeyLabelStore;
 import com.arassec.igor.web.api.util.Sorter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * REST-Controller for category requests.
  */
 @RestController()
 @RequestMapping("/api/category")
+@RequiredArgsConstructor
 public class CategoryRestController {
 
     /**
      * Manager for services.
      */
-    @Autowired
-    private ServiceManager serviceManager;
+    private final ServiceManager serviceManager;
 
     /**
      * Manager for actions.
      */
-    @Autowired
-    private ActionManager actionManager;
+    private final ActionManager actionManager;
 
     /**
      * Manager for providers.
      */
-    @Autowired
-    private ProviderManager providerManager;
+    private final ProviderManager providerManager;
 
     /**
      * Manager for triggers.
      */
-    @Autowired
-    private TriggerManager triggerManager;
+    private final TriggerManager triggerManager;
 
     /**
      * Returns all service categories as {@link KeyLabelStore}s.

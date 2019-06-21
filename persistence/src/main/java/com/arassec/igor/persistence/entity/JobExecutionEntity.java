@@ -3,7 +3,6 @@ package com.arassec.igor.persistence.entity;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 /**
  * JPA Entity for {@link com.arassec.igor.core.model.job.execution.JobExecution}s.

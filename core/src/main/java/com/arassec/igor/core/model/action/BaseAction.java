@@ -87,10 +87,7 @@ public abstract class BaseAction implements Action {
         if (getString(data, TASK_ID_KEY) == null) {
             return false;
         }
-        if (getString(data, dataKey) == null) {
-            return false;
-        }
-        return true;
+        return getString(data, dataKey) != null;
     }
 
     /**

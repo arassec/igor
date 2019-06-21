@@ -3,7 +3,7 @@ package com.arassec.igor.core.application.converter;
 import com.arassec.igor.core.application.factory.TriggerFactory;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.github.openjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -12,19 +12,18 @@ import java.util.Map;
  * JSON converter for {@link Trigger}s.
  */
 @Component
+@RequiredArgsConstructor
 public class JsonTriggerConverter extends JsonBaseConverter {
-
-    /**
-     * Converter for parameters.
-     */
-    @Autowired
-    private JsonParametersConverter parameterConverter;
 
     /**
      * Factory for triggers.
      */
-    @Autowired
-    private TriggerFactory triggerFactory;
+    private final TriggerFactory triggerFactory;
+
+    /**
+     * Converter for parameters.
+     */
+    private final JsonServiceAwareParametersConverter parametersConverter;
 
     /**
      * Converts the trigger JSON into a {@link Trigger}.
@@ -35,7 +34,7 @@ public class JsonTriggerConverter extends JsonBaseConverter {
      * @return A newly created Trigger instance.
      */
     public Trigger convert(JSONObject triggerJson, boolean applySecurity) {
-        Map<String, Object> parameters = parameterConverter.convert(
+        Map<String, Object> parameters = parametersConverter.convert(
                 triggerJson.getJSONArray(JsonKeys.PARAMETERS), applySecurity);
         return triggerFactory.createInstance(triggerJson.getJSONObject(JsonKeys.TYPE).getString(JsonKeys.KEY), parameters);
     }
@@ -50,7 +49,7 @@ public class JsonTriggerConverter extends JsonBaseConverter {
      * @return The trigger in JSON form.
      */
     public JSONObject convert(Trigger trigger, boolean applySecurity, boolean addVolatile) {
-        return convertToStandardJson(triggerFactory, trigger, applySecurity, addVolatile);
+        return convertToStandardJson(triggerFactory, trigger, applySecurity, addVolatile, parametersConverter);
     }
 
 }

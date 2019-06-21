@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
 /**
  * Reads the content of a file.
  */
+@Slf4j
 @IgorAction(label = "Read file")
 public class ReadFileAction extends BaseFileAction {
 
@@ -36,7 +38,10 @@ public class ReadFileAction extends BaseFileAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
         if (isValid(data)) {
-            data.put(KEY_FILE_CONTENTS, sourceService.read((String) data.get(dataKey), jobExecution));
+            String file = getString(data, dataKey);
+            log.debug("Reading file: '{}'", file);
+            data.put(KEY_FILE_CONTENTS, sourceService.read(file, jobExecution));
+            log.debug("File '{}' read", file);
             return List.of(data);
         }
         return null;

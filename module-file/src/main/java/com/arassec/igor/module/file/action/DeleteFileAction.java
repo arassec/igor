@@ -41,11 +41,18 @@ public class DeleteFileAction extends BaseFileAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
         if (isValid(data)) {
-            String file = (String) data.get(dataKey);
+            String file = getString(data, dataKey);
+            String directory = getString(data, directoryKey);
+            if (!directory.endsWith("/")) {
+                directory += "/";
+            }
+            String path = directory + file;
             if (isDryRun) {
-                data.put(DRY_RUN_COMMENT_KEY, "Delete file " + file);
+                data.put(DRY_RUN_COMMENT_KEY, "Delete file: " + path);
             } else {
-                service.delete((String) data.get(dataKey), jobExecution);
+                log.debug("Deleting file: '{}'", path);
+                service.delete(path, jobExecution);
+                log.debug("File '{}' deleted", path);
             }
             return List.of(data);
         }

@@ -1,8 +1,8 @@
 package com.arassec.igor.core.application.factory;
 
 import com.arassec.igor.core.model.IgorAction;
-import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.IgorActionCategory;
+import com.arassec.igor.core.model.action.Action;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

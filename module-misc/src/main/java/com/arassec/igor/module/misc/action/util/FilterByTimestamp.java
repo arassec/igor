@@ -3,6 +3,7 @@ package com.arassec.igor.module.misc.action.util;
 import com.arassec.igor.core.model.IgorAction;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -14,6 +15,7 @@ import java.util.Map;
 /**
  * Filters the supplied data by a regular expression.
  */
+@Slf4j
 @IgorAction(label = "Filter by timestamp")
 public class FilterByTimestamp extends BaseUtilAction {
 
@@ -71,16 +73,20 @@ public class FilterByTimestamp extends BaseUtilAction {
             LocalDateTime actual = LocalDateTime.parse(getString(data, dataKey), DateTimeFormatter.ofPattern(timestampFormat));
 
             if (olderThan) {
-                if (actual.isBefore(target)) {
+                if (actual.isAfter(target)) {
+                    log.debug("Filtered '{}' which is older than {} {}", actual, amount, timeUnit);
                     return null;
                 }
             } else {
-                if (actual.isAfter(target)) {
+                if (actual.isBefore(target)) {
+                    log.debug("Filtered '{}' which is younger than {} {}", actual, amount, timeUnit);
                     return null;
                 }
             }
+            log.debug("Passed '{}' against older={}, {}, {}", actual, olderThan, amount, timeUnit);
+            return List.of(data);
         }
-        return List.of(data);
+        return null;
     }
 
 }

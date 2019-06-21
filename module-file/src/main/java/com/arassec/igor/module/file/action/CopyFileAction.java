@@ -101,10 +101,11 @@ public class CopyFileAction extends BaseFileAction {
             }
 
             if (!isDryRun) {
-                FileStreamData fileStreamData = sourceService
-                        .readStream(getSourceFileWithPath(sourceDirectory, sourceFile), jobExecution);
+                String sourceFileWithPath = getSourceFileWithPath(sourceDirectory, sourceFile);
+                FileStreamData fileStreamData = sourceService.readStream(sourceFileWithPath, jobExecution);
                 String targetFile = getTargetFile(sourceFile, fileStreamData.getFilenameSuffix());
                 String targetFilePath = targetDirectory + targetFile;
+                log.debug("Copying file '{}' to '{}'", sourceFileWithPath, targetFilePath);
                 String targetFileInTransfer = targetFilePath;
                 if (appendTransferSuffix) {
                     targetFileInTransfer += IN_TRANSFER_SUFFIX;
@@ -114,7 +115,7 @@ public class CopyFileAction extends BaseFileAction {
                 if (appendTransferSuffix) {
                     targetService.move(targetFileInTransfer, targetFilePath, jobExecution);
                 }
-                log.debug("{} copied to {}", getSourceFileWithPath(sourceDirectory, sourceFile), targetFilePath);
+                log.debug("File '{}' copied to '{}'", sourceFileWithPath, targetFilePath);
                 data.put(KEY_TARGET_FILENAME, targetFile);
                 data.put(KEY_TARGET_FILEPATH, targetFilePath);
                 data.put(KEY_TARGET_DIRECTORY, targetDirectory);

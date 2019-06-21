@@ -4,8 +4,8 @@ import com.arassec.igor.core.application.ActionManager;
 import com.arassec.igor.core.application.ProviderManager;
 import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.application.TriggerManager;
-import com.arassec.igor.core.application.converter.JsonParametersConverter;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.arassec.igor.core.application.converter.JsonServiceAwareParametersConverter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,37 +17,33 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController()
 @RequestMapping("/api/parameters")
+@RequiredArgsConstructor
 public class ParametersRestController {
 
     /**
      * The service manager.
      */
-    @Autowired
-    private ServiceManager serviceManager;
+    private final ServiceManager serviceManager;
 
     /**
      * Manager for actions.
      */
-    @Autowired
-    private ActionManager actionManager;
+    private final ActionManager actionManager;
 
     /**
      * Manager for providers.
      */
-    @Autowired
-    private ProviderManager providerManager;
+    private final ProviderManager providerManager;
 
     /**
      * Manager for triggers.
      */
-    @Autowired
-    private TriggerManager triggerManager;
+    private final TriggerManager triggerManager;
 
     /**
      * Converter for parameters to and from JSON.
      */
-    @Autowired
-    private JsonParametersConverter jsonParametersConverter;
+    private final JsonServiceAwareParametersConverter parametersConverter;
 
     /**
      * Returns all configuration parameters of a service type.
@@ -57,7 +53,7 @@ public class ParametersRestController {
      */
     @GetMapping(value = "service/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getServiceParameters(@PathVariable("type") String type) {
-        return jsonParametersConverter.convert(
+        return parametersConverter.convert(
                 serviceManager.createService(type, null), false, true).toString();
     }
 
@@ -69,7 +65,7 @@ public class ParametersRestController {
      */
     @GetMapping(value = "action/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getActionParameters(@PathVariable("type") String type) {
-        return jsonParametersConverter.convert(
+        return parametersConverter.convert(
                 actionManager.createAction(type, null), false, true).toString();
     }
 
@@ -81,7 +77,7 @@ public class ParametersRestController {
      */
     @GetMapping(value = "provider/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getProviderParameters(@PathVariable("type") String type) {
-        return jsonParametersConverter.convert(
+        return parametersConverter.convert(
                 providerManager.createProvider(type, null), false, true).toString();
     }
 
@@ -93,7 +89,7 @@ public class ParametersRestController {
      */
     @GetMapping(value = "trigger/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTriggerParameters(@PathVariable("type") String type) {
-        return jsonParametersConverter.convert(
+        return parametersConverter.convert(
                 triggerManager.createTrigger(type, null), false, true).toString();
     }
 

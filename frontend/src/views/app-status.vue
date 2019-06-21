@@ -128,11 +128,13 @@
                 There are currently no scheduled jobs.
             </label>
 
-            <feedback-box slot="body" v-for="scheduledJob in schedulePage.items" :key="scheduledJob.jobId" :clickable="true"
-                          v-on:feedback-clicked="editJob(scheduledJob.jobId)">
-                <div slot="left">{{formatName(scheduledJob.jobName)}}</div>
-                <div slot="right">{{formatTimestamp(scheduledJob.nextRun)}}</div>
-            </feedback-box>
+            <div class="schedule-box" slot="body">
+                <feedback-box slot="body" v-for="scheduledJob in schedulePage.items" :key="scheduledJob.jobId" :clickable="true"
+                              v-on:feedback-clicked="editJob(scheduledJob.jobId)">
+                    <div slot="left" class="margin-right">{{formatName(scheduledJob.jobName, 27)}}</div>
+                    <div slot="right">{{formatTimestamp(scheduledJob.nextRun)}}</div>
+                </feedback-box>
+            </div>
 
             <list-pager slot="footer" :page="schedulePage" v-on:first="loadSchedule(0)"
                         v-on:previous="loadSchedule(schedulePage.number -1)"
@@ -386,6 +388,15 @@
     .schedule-icon:hover {
         font-size: 110%;
         cursor: pointer;
+    }
+
+    .schedule-box {
+        min-height: 400px;
+        min-width: 520px;
+    }
+
+    .margin-right {
+        margin-right: 25px;
     }
 
 </style>

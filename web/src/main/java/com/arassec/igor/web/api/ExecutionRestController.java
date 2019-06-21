@@ -6,7 +6,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.web.api.model.JobExecutionListEntry;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -24,13 +24,13 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/execution")
+@RequiredArgsConstructor
 public class ExecutionRestController {
 
     /**
      * Manager for Jobs.
      */
-    @Autowired
-    private JobManager jobManager;
+    private final JobManager jobManager;
 
     /**
      * Returns the execution states of a certain job.
@@ -149,7 +149,6 @@ public class ExecutionRestController {
                 Job job = jobManager.load(jobExecution.getJobId());
                 return convert(jobExecution, job.getName());
             }).collect(Collectors.toList()));
-            result.getItems().sort(Comparator.comparing(JobExecutionListEntry::getDuration).reversed());
 
             return result;
         }

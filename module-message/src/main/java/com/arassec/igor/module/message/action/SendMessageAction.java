@@ -68,6 +68,7 @@ public class SendMessageAction extends BaseMessageAction {
             Message message = new Message();
             message.setContent(content);
             messageService.sendMessage(message);
+            log.debug("Message sent: '{}'", content);
         }
 
         return List.of(data);
