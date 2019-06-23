@@ -8,14 +8,13 @@ import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -35,9 +34,15 @@ public class LocalFilesystemFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory, JobExecution jobExecution) {
+    public List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution) {
         try {
-            return Files.list(Paths.get(directory)).map(path -> {
+            final PathMatcher matcher;
+            if (StringUtils.isEmpty(fileEnding)) {
+                matcher = FileSystems.getDefault().getPathMatcher("glob:*");
+            } else {
+                matcher = FileSystems.getDefault().getPathMatcher("glob:*." + fileEnding);
+            }
+            return Files.list(Paths.get(directory)).filter(path -> matcher.matches(path)).map(path -> {
                 FileTime lastModifiedTime = null;
                 try {
                     lastModifiedTime = Files.getLastModifiedTime(path);

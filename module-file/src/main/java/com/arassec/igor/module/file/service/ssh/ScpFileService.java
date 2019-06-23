@@ -11,6 +11,7 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.Arrays;
@@ -27,25 +28,25 @@ public class ScpFileService extends BaseSshFileService {
      * The host of the remote server.
      */
     @IgorParam
-    protected String host;
+    private String host;
 
     /**
      * The port of the remote server.
      */
     @IgorParam
-    protected int port = 22;
+    private int port = 22;
 
     /**
      * The username to login with.
      */
     @IgorParam
-    protected String username;
+    private String username;
 
     /**
      * The password used for authentication.
      */
     @IgorParam(secured = true)
-    protected String password;
+    private String password;
 
     /**
      * Reads from the provided InputStream to check the return value of the last SSH command sent to the server.
@@ -81,10 +82,16 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory, JobExecution jobExecution) {
+    public List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution) {
         final String dir = directory.endsWith("/") ? directory : directory + "/";
-        StringBuffer result = execute("cd " + dir + " && ls -Al --time-style=full-iso");
-        return Arrays.stream(result.toString().split("\n")).skip(1)
+        int numResultsToSkip = 1; // Without filter the total number of files is the first line of the result
+        String command = "cd " + dir + " && ls -Al --time-style=full-iso";
+        if (!StringUtils.isEmpty(fileEnding)) {
+            numResultsToSkip = 0;
+            command += " *." + fileEnding;
+        }
+        StringBuffer result = execute(command);
+        return Arrays.stream(result.toString().split("\n")).skip(numResultsToSkip)
                 .map(lsResult -> new FileInfo(extractFilename(dir, lsResult), extractLastModified(lsResult)))
                 .collect(Collectors.toList());
     }
@@ -123,8 +130,7 @@ public class ScpFileService extends BaseSshFileService {
         String timezonePart = null;
 
         String[] split = input.split("\\s");
-        for (int i = 0; i < split.length; i++) {
-            String part = split[i];
+        for (String part : split) {
             if (part.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) { // 2019-06-04
                 yearPart = part;
             } else if (part.matches("[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{9}")) { // 13:14:23

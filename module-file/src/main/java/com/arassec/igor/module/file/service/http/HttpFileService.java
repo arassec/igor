@@ -126,7 +126,7 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory, JobExecution jobExecution) {
+    public List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution) {
         HttpClient client = connect();
         HttpRequest request = getRequestBuilder(directory).GET().build();
         try {
@@ -147,7 +147,11 @@ public class HttpFileService extends BaseFileService {
                     if (href.contains("?")) {
                         href = href.substring(0, href.indexOf("?"));
                     }
-                    result.add(href);
+                    if (StringUtils.isEmpty(fileEnding)) {
+                        result.add(href);
+                    } else if (href.endsWith(fileEnding)) {
+                        result.add(href);
+                    }
                 }
             }
 

@@ -16,10 +16,11 @@ public interface FileService extends Service {
     /**
      * Returns the names of all files in the specified directory, including the supplied directory in the name.
      *
-     * @param directory The directory to search for files.
+     * @param directory  The directory to search for files.
+     * @param fileEnding An optional file ending to filter unwanted files.
      * @return The file names as List.
      */
-    List<FileInfo> listFiles(String directory, JobExecution jobExecution);
+    List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution);
 
     /**
      * Reads the content of the specified file an returns it as string.

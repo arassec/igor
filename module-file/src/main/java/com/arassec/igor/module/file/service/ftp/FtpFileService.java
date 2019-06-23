@@ -12,6 +12,7 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -150,13 +151,18 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory, JobExecution jobExecution) {
+    public List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution) {
         try {
             FTPClient ftpClient = connect();
 
             List<FileInfo> result;
 
-            FTPFile[] ftpFiles = ftpClient.listFiles(directory);
+            FTPFile[] ftpFiles = ftpClient.listFiles(directory, ftpFile -> {
+                if (!StringUtils.isEmpty(fileEnding) && !ftpFile.getName().endsWith(fileEnding)) {
+                    return false;
+                }
+                return true;
+            });
             if (ftpFiles != null && ftpFiles.length > 0) {
                 result = Stream.of(ftpFiles).map(ftpFile -> {
                     Instant mTime = Instant.ofEpochMilli(ftpFile.getTimestamp().getTime().getTime());

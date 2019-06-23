@@ -12,11 +12,13 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -32,40 +34,48 @@ public class SftpFileService extends BaseSshFileService {
      * The host of the remote server.
      */
     @IgorParam
-    protected String host;
+    private String host;
 
     /**
      * The port of the remote server.
      */
     @IgorParam
-    protected int port = 22;
+    private int port = 22;
 
     /**
      * The username to login with.
      */
     @IgorParam
-    protected String username;
+    private String username;
 
     /**
      * The password used for authentication.
      */
     @IgorParam(secured = true)
-    protected String password;
+    private String password;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory, JobExecution jobExecution) {
+    public List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution) {
         try {
             final String dir = directory.endsWith("/") ? directory : directory + "/";
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
-            Vector<ChannelSftp.LsEntry> lsEntries = channel.ls(directory);
+            List<ChannelSftp.LsEntry> files = new LinkedList<>();
+            channel.ls(directory, entry -> {
+                if (fileEnding == null || StringUtils.isEmpty(fileEnding)) {
+                    files.add(entry);
+                } else if (entry.getFilename().endsWith(fileEnding)) {
+                    files.add(entry);
+                }
+                return ChannelSftp.LsEntrySelector.CONTINUE;
+            });
             channel.disconnect();
             session.disconnect();
-            return lsEntries.stream().map(lsEntry -> new FileInfo(dir + lsEntry.getFilename(),
+            return files.stream().map(lsEntry -> new FileInfo(dir + lsEntry.getFilename(),
                     formatInstant(Instant.ofEpochMilli(lsEntry.getAttrs().getMTime() * 1000L)))).collect(Collectors.toList());
         } catch (JSchException | SftpException e) {
             throw new ServiceException("Could not list files via SFTP!", e);

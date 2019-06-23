@@ -44,6 +44,12 @@ public class ListFilesProvider extends BaseProvider implements FileProvider {
     private String directoryKey = "directory";
 
     /**
+     * An optional file ending to filter provided files by their extension.
+     */
+    @IgorParam(optional = true)
+    private String fileEnding;
+
+    /**
      * The files in the configured directory.
      */
     private List<FileInfo> files = new LinkedList<>();
@@ -59,7 +65,7 @@ public class ListFilesProvider extends BaseProvider implements FileProvider {
     @Override
     public void initialize(Long jobId, String taskId, JobExecution jobExecution) {
         super.initialize(jobId, taskId, jobExecution);
-        files = sourceService.listFiles(directory, jobExecution);
+        files = sourceService.listFiles(directory, fileEnding, jobExecution);
         currentFile = 0;
         if (!directory.endsWith("/")) {
             directory += "/";
