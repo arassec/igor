@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.service.ftp;
 
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
-import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
@@ -15,7 +15,6 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.springframework.util.StringUtils;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -151,7 +150,7 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution) {
+    public List<FileInfo> listFiles(String directory, String fileEnding) {
         try {
             FTPClient ftpClient = connect();
 
@@ -184,7 +183,7 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file, JobExecution jobExecution) {
+    public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
         FTPClient ftpClient = connect();
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             ftpClient.retrieveFile(file, outputStream);
@@ -201,24 +200,7 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void write(String file, String data, JobExecution jobExecution) {
-        FTPClient ftpClient = connect();
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(file.getBytes())) {
-            if (!ftpClient.storeFile(file, inputStream)) {
-                throw new ServiceException("Could not write FTP file!");
-            }
-        } catch (IOException e) {
-            throw new ServiceException("Could not store file: " + file, e);
-        } finally {
-            disconnect(ftpClient);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FileStreamData readStream(String file, JobExecution jobExecution) {
+    public FileStreamData readStream(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
             FTPClient ftpClient = connect();
             FileStreamData result = new FileStreamData();
@@ -236,10 +218,10 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData, JobExecution jobExecution) {
+    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
         FTPClient ftpClient = connect();
         try (BufferedOutputStream outputStream = new BufferedOutputStream(ftpClient.storeFileStream(file))) {
-            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), jobExecution);
+            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), workInProgressMonitor);
         } catch (IOException e) {
             throw new ServiceException("Could not store file: " + file, e);
         } finally {
@@ -272,7 +254,7 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file, JobExecution jobExecution) {
+    public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
             FTPClient ftpClient = connect();
             if (!ftpClient.deleteFile(file)) {
@@ -288,7 +270,7 @@ public class FtpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target, JobExecution jobExecution) {
+    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
         try {
             FTPClient ftpClient = connect();
             ftpClient.rename(source, target);

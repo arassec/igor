@@ -1,5 +1,7 @@
 package com.arassec.igor.module.file.service.ssh;
 
+import com.arassec.igor.core.model.service.ServiceException;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -7,7 +9,7 @@ import java.io.InputStream;
  * This is a wrapper for an JSch-MyPipedInputStream returned from a ChannelExec. This is required for file transfer
  * since the JSch-InputStream provides not only the file data in the stream, but also SSH commands. When used as
  * input into a JSch ChannelSftp's put() method, this method won't return, because the read() call never returns a value
- * smaller or equals to zero.
+ * smaller or equal to zero.
  * <p>
  * This wrapper counts the bytes of the file that have been transferred and signals the completion of the file transfer
  * eventually.
@@ -59,15 +61,24 @@ public class SshInputStreamWrapper extends InputStream {
         int n;
         if ((fileSize - len) > 0) {
             n = inputStream.read(b, off, len);
+            if (n < 0) {
+                throw new ServiceException("Error during SSH Stream read: " + n);
+            }
             fileSize -= n;
         } else if ((fileSize - len) == 0) {
             n = inputStream.read(b, off, len);
+            if (n < 0) {
+                throw new ServiceException("Error during SSH Stream read: " + n);
+            }
             fileSize -= n;
             if (fileSize == 0) {
                 allRead = true;
             }
         } else {
             n = inputStream.read(b, off, (int) fileSize);
+            if (n < 0) {
+                throw new ServiceException("Error during SSH Stream read: " + n);
+            }
             fileSize -= n;
             if (fileSize == 0) {
                 allRead = true;
@@ -81,7 +92,22 @@ public class SshInputStreamWrapper extends InputStream {
      */
     @Override
     public int read() throws IOException {
-        return inputStream.read();
+        if (allRead) {
+            return -1;
+        }
+
+        int result = inputStream.read();
+
+        if (result == -1) {
+            return result;
+        } else {
+            fileSize--;
+            if (fileSize == 0) {
+                allRead = true;
+            }
+
+            return result;
+        }
     }
 
 }

@@ -232,7 +232,15 @@ public class JobManager implements InitializingBean, DisposableBean {
      * @return The {@link JobExecution}.
      */
     public JobExecution getJobExecution(Long id) {
-        return jobExecutionRepository.findById(id);
+        JobExecution jobExecution = jobExecutionRepository.findById(id);
+        if (JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {
+            JobExecution runningJobExecution = jobExecutor.getJobExecution(jobExecution.getJobId());
+            if (runningJobExecution != null) {
+                jobExecution.setCurrentTask(runningJobExecution.getCurrentTask());
+                jobExecution.setWorkInProgress(runningJobExecution.getWorkInProgress());
+            }
+        }
+        return jobExecution;
     }
 
     /**

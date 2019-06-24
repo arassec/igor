@@ -40,7 +40,7 @@ public class ReadFileAction extends BaseFileAction {
         if (isValid(data)) {
             String file = getString(data, dataKey);
             log.debug("Reading file: '{}'", file);
-            data.put(KEY_FILE_CONTENTS, sourceService.read(file, jobExecution));
+            data.put(KEY_FILE_CONTENTS, sourceService.read(file, VOID_WORK_IN_PROGRESS_MONITOR));
             log.debug("File '{}' read", file);
             return List.of(data);
         }

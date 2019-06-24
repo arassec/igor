@@ -1,6 +1,7 @@
 package com.arassec.igor.core.model.action;
 
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,11 @@ public abstract class BaseAction implements Action {
      * Contains the default number of threads this action should be executed with.
      */
     public static final int DEFAULT_THREADS = 1;
+
+    /**
+     * Dummy work-in-progress monitor that can be used, if progress shouldn't be monitored.
+     */
+    protected static final WorkInProgressMonitor VOID_WORK_IN_PROGRESS_MONITOR = new WorkInProgressMonitor("", 0);
 
     /**
      * Activates or deactivates an action.

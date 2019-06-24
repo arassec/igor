@@ -1,8 +1,7 @@
 package com.arassec.igor.module.file.service.ssh;
 
+import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.jcraft.jsch.SftpProgressMonitor;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,17 +23,22 @@ public class IgorSftpProgressMonitor implements SftpProgressMonitor {
     /**
      * The total size of the transferred file.
      */
-    @Getter
-    @Setter
     private long fileSize;
+
+    /**
+     * Contains the progress.
+     */
+    private WorkInProgressMonitor workInProgressMonitor;
 
     /**
      * Creates a new instance.
      *
-     * @param fileSize The total file size.
+     * @param fileSize       The total file size.
+     * @param workInProgressMonitor The work-in-progress monitor.
      */
-    public IgorSftpProgressMonitor(long fileSize) {
+    public IgorSftpProgressMonitor(long fileSize, WorkInProgressMonitor workInProgressMonitor) {
         this.fileSize = fileSize;
+        this.workInProgressMonitor = workInProgressMonitor;
     }
 
     /**
@@ -55,6 +59,7 @@ public class IgorSftpProgressMonitor implements SftpProgressMonitor {
         if (count >= fileSize) {
             return false;
         }
+        workInProgressMonitor.setProgressInPercent((double) count * 100 / (double) fileSize);
         return true;
     }
 

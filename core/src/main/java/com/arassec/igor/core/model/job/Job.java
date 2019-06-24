@@ -79,6 +79,7 @@ public class Job {
                 if (!currentJobExecution.isRunning()) {
                     break;
                 }
+                jobExecution.setCurrentTask(task.getName());
                 if (task.isActive()) {
                     task.run(id, currentJobExecution);
                 }

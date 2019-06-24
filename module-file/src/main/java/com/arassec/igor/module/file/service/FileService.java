@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service;
 
 import com.arassec.igor.core.model.IgorServiceCategory;
-import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.Service;
 
 import java.io.InputStream;
@@ -20,53 +20,51 @@ public interface FileService extends Service {
      * @param fileEnding An optional file ending to filter unwanted files.
      * @return The file names as List.
      */
-    List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution);
+    List<FileInfo> listFiles(String directory, String fileEnding);
 
     /**
      * Reads the content of the specified file an returns it as string.
      *
-     * @param file The file to read.
+     * @param file           The file to read.
+     * @param workInProgress The work in progress container.
      * @return The content of the file.
      */
-    String read(String file, JobExecution jobExecution);
-
-    /**
-     * Writes the supplied data into the specified file.
-     *
-     * @param file The file to write.
-     * @param data The data to write.
-     */
-    void write(String file, String data, JobExecution jobExecution);
+    String read(String file, WorkInProgressMonitor workInProgress);
 
     /**
      * Reads the content of the specified file into the returned {@link InputStream}.
      *
      * @param file The name of the file to read.
+     * @param workInProgress The work in progress container.
      * @return The content of the file as stream of data.
      */
-    FileStreamData readStream(String file, JobExecution jobExecution);
+    FileStreamData readStream(String file, WorkInProgressMonitor workInProgress);
 
     /**
      * Writes the data from the supplied {@link FileStreamData} into the provided file.
      *
+     * @param file           The file to write into.
      * @param fileStreamData Information about the file like the name or the length.
+     * @param workInProgress The work in progress container.
      */
-    void writeStream(String file, FileStreamData fileStreamData, JobExecution jobExecution);
+    void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgress);
 
     /**
      * Moves a file from source to target.
      *
-     * @param source The source file.
-     * @param target The target file.
+     * @param source         The source file.
+     * @param target         The target file.
+     * @param workInProgress The work in progress container.
      */
-    void move(String source, String target, JobExecution jobExecution);
+    void move(String source, String target, WorkInProgressMonitor workInProgress);
 
     /**
      * Deletes the specified file.
      *
-     * @param file The file to delete.
+     * @param file           The file to delete.
+     * @param workInProgress The work in progress container.
      */
-    void delete(String file, JobExecution jobExecution);
+    void delete(String file, WorkInProgressMonitor workInProgress);
 
     /**
      * Must be called after working with streams.

@@ -65,7 +65,7 @@ public class ListFilesProvider extends BaseProvider implements FileProvider {
     @Override
     public void initialize(Long jobId, String taskId, JobExecution jobExecution) {
         super.initialize(jobId, taskId, jobExecution);
-        files = sourceService.listFiles(directory, fileEnding, jobExecution);
+        files = sourceService.listFiles(directory, fileEnding);
         currentFile = 0;
         if (!directory.endsWith("/")) {
             directory += "/";

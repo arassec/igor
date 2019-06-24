@@ -40,7 +40,7 @@ public class RenameFileAction extends BaseFileAction {
             } else {
                 String file = getString(data, dataKey);
                 log.debug("Renaming file '{}' to '{}'", file, targetFilename);
-                sourceService.move(file, targetFilename, jobExecution);
+                sourceService.move(file, targetFilename, VOID_WORK_IN_PROGRESS_MONITOR);
                 log.debug("File '{}' renamed", file, targetFilename);
             }
             return List.of(data);

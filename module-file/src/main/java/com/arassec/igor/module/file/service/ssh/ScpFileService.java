@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.service.ssh;
 
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
-import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
@@ -13,7 +13,10 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import org.springframework.util.StringUtils;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,7 +85,7 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution) {
+    public List<FileInfo> listFiles(String directory, String fileEnding) {
         final String dir = directory.endsWith("/") ? directory : directory + "/";
         int numResultsToSkip = 1; // Without filter the total number of files is the first line of the result
         String command = "cd " + dir + " && ls -Al --time-style=full-iso";
@@ -152,10 +155,10 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file, JobExecution jobExecution) {
-        FileStreamData fileStreamData = readStream(file, jobExecution);
+    public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
+        FileStreamData fileStreamData = readStream(file, workInProgressMonitor);
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), jobExecution);
+            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), workInProgressMonitor);
             outputStream.flush();
             return outputStream.toString();
         } catch (IOException e) {
@@ -169,22 +172,7 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void write(String file, String data, JobExecution jobExecution) {
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(data.getBytes())) {
-            FileStreamData fileStreamData = new FileStreamData();
-            fileStreamData.setFileSize(data.getBytes().length);
-            fileStreamData.setData(inputStream);
-            writeStream(file, fileStreamData, jobExecution);
-        } catch (IOException e) {
-            throw new ServiceException("Could not write file: " + file, e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FileStreamData readStream(String file, JobExecution jobExecution) {
+    public FileStreamData readStream(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
             FileStreamData result = new FileStreamData();
 
@@ -265,7 +253,7 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData, JobExecution jobExecution) {
+    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
         try {
             String command = "scp -t " + file;
             Session session = connect(host, port, username, password);
@@ -299,7 +287,7 @@ public class ScpFileService extends BaseSshFileService {
                 throw new ServiceException("Error during SCP file transfer (" + sshReturnCode + "): " + log);
             }
 
-            copyStream(fileStreamData.getData(), sshOutputStream, fileStreamData.getFileSize(), jobExecution);
+            copyStream(fileStreamData.getData(), sshOutputStream, fileStreamData.getFileSize(), workInProgressMonitor);
 
             finalize(session, channel, sshOutputStream, sshInputStream);
         } catch (IOException | JSchException e) {
@@ -324,7 +312,7 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file, JobExecution jobExecution) {
+    public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
         execute("rm -f " + file);
     }
 
@@ -360,7 +348,7 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target, JobExecution jobExecution) {
+    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
         execute("mv " + source + " " + target);
     }
 

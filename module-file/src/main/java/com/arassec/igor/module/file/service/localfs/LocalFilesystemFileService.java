@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service.localfs;
 
 import com.arassec.igor.core.model.IgorService;
-import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
@@ -34,7 +34,7 @@ public class LocalFilesystemFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution) {
+    public List<FileInfo> listFiles(String directory, String fileEnding) {
         try {
             final PathMatcher matcher;
             if (StringUtils.isEmpty(fileEnding)) {
@@ -49,8 +49,8 @@ public class LocalFilesystemFileService extends BaseFileService {
                 } catch (IOException e) {
                     log.warn("Could not get last modified time from path: {},", path);
                 }
-                return new FileInfo(path.getFileName().toString(), lastModifiedTime != null ?
-                        formatInstant(lastModifiedTime.toInstant().truncatedTo(ChronoUnit.SECONDS)) : null);
+                return new FileInfo(path.getFileName().toString(), lastModifiedTime != null ? formatInstant(
+                        lastModifiedTime.toInstant().truncatedTo(ChronoUnit.SECONDS)) : null);
             }).collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Could not list files in local directory: " + directory, e);
@@ -61,7 +61,7 @@ public class LocalFilesystemFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file, JobExecution jobExecution) {
+    public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
             return new String(Files.readAllBytes(Paths.get(file)));
         } catch (IOException e) {
@@ -73,19 +73,7 @@ public class LocalFilesystemFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void write(String file, String data, JobExecution jobExecution) {
-        try {
-            Files.write(Paths.get(file), data.getBytes());
-        } catch (IOException e) {
-            throw new ServiceException("Could not write file: " + file, e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FileStreamData readStream(String file, JobExecution jobExecution) {
+    public FileStreamData readStream(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
             FileStreamData result = new FileStreamData();
             result.setFileSize(Files.size(Paths.get(file)));
@@ -100,11 +88,11 @@ public class LocalFilesystemFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData, JobExecution jobExecution) {
+    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
         FileOutputStream fileOutputStream = null;
         try {
             fileOutputStream = new FileOutputStream(file);
-            copyStream(fileStreamData.getData(), fileOutputStream, fileStreamData.getFileSize(), jobExecution);
+            copyStream(fileStreamData.getData(), fileOutputStream, fileStreamData.getFileSize(), workInProgressMonitor);
         } catch (IOException e) {
             throw new ServiceException("Could not write file (stream): " + file, e);
         } finally {
@@ -122,7 +110,7 @@ public class LocalFilesystemFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file, JobExecution jobExecution) {
+    public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
             Files.delete(Paths.get(file));
         } catch (IOException e) {
@@ -134,7 +122,7 @@ public class LocalFilesystemFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target, JobExecution jobExecution) {
+    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
         try {
             Files.move(Paths.get(source), Paths.get(target), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {

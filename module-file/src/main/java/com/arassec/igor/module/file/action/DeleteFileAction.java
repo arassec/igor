@@ -51,7 +51,7 @@ public class DeleteFileAction extends BaseFileAction {
                 data.put(DRY_RUN_COMMENT_KEY, "Delete file: " + path);
             } else {
                 log.debug("Deleting file: '{}'", path);
-                service.delete(path, jobExecution);
+                service.delete(path, VOID_WORK_IN_PROGRESS_MONITOR);
                 log.debug("File '{}' deleted", path);
             }
             return List.of(data);

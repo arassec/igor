@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.service.ssh;
 
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
-import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
@@ -14,7 +14,6 @@ import com.jcraft.jsch.SftpException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -58,7 +57,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution) {
+    public List<FileInfo> listFiles(String directory, String fileEnding) {
         try {
             final String dir = directory.endsWith("/") ? directory : directory + "/";
             Session session = connect(host, port, username, password);
@@ -86,7 +85,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file, JobExecution jobExecution) {
+    public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
@@ -104,24 +103,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void write(String file, String data, JobExecution jobExecution) {
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(data.getBytes())) {
-            Session session = connect(host, port, username, password);
-            ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-            channel.connect();
-            channel.put(inputStream, file);
-            channel.disconnect();
-            session.disconnect();
-        } catch (IOException | SftpException | JSchException e) {
-            throw new ServiceException("Could not write file via SFTP!", e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FileStreamData readStream(String file, JobExecution jobExecution) {
+    public FileStreamData readStream(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
@@ -152,13 +134,13 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData, JobExecution jobExecution) {
+    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
         try {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
-            channel.put(fileStreamData.getData(), file, new IgorSftpProgressMonitor(fileStreamData.getFileSize()),
-                    ChannelSftp.OVERWRITE);
+            channel.put(fileStreamData.getData(), file,
+                    new IgorSftpProgressMonitor(fileStreamData.getFileSize(), workInProgressMonitor), ChannelSftp.OVERWRITE);
             channel.disconnect();
             session.disconnect();
         } catch (SftpException | JSchException e) {
@@ -183,7 +165,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file, JobExecution jobExecution) {
+    public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
             Session session = connect(host, port, username, password);
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
@@ -200,7 +182,7 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target, JobExecution jobExecution) {
+    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
         try {
             moveInternal(source, target);
         } catch (SftpException | JSchException e) {

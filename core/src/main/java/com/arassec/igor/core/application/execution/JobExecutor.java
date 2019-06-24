@@ -63,8 +63,8 @@ public class JobExecutor {
     public JobExecutor(JobRepository jobRepository, JobExecutionRepository jobExecutionRepository) {
         this.jobRepository = jobRepository;
         this.jobExecutionRepository = jobExecutionRepository;
-        executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(jobQueueSize,
-                runnable -> new Thread(runnable, "job-executor-thread"));
+        executorService = (ThreadPoolExecutor) Executors
+                .newFixedThreadPool(jobQueueSize, runnable -> new Thread(runnable, "job-executor-thread"));
     }
 
     /**
@@ -141,6 +141,19 @@ public class JobExecutor {
                 }
             }
         }
+    }
+
+    /**
+     * Returns the job execution of a currently running job.
+     *
+     * @param jobId The job's ID.
+     * @return The {@link JobExecution} or {@code null}, if none could be found.
+     */
+    public JobExecution getJobExecution(Long jobId) {
+        if (runningJobs.containsKey(jobId)) {
+            return runningJobs.get(jobId).getCurrentJobExecution();
+        }
+        return null;
     }
 
 }

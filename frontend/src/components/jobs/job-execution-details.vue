@@ -36,8 +36,17 @@
                 </tr>
             </table>
 
+            <div v-if="jobExecution.executionState === 'RUNNING'">
+                <h2>Task: {{formatName(jobExecution.currentTask, 30)}}</h2>
+
+                <feedback-box v-for="(wip, index) in jobExecution.workInProgress" :key="index" :clickable="false">
+                    <div slot="left" class="margin-right">{{formatName(wip.name, 64)}}</div>
+                    <div slot="right">{{formatPercent(wip.progressInPercent)}}</div>
+                </feedback-box>
+            </div>
+
             <div v-if="jobExecution.errorCause != ''">
-            <h2>Error cause</h2>
+                <h2>Error cause</h2>
                 <pre><code>{{ jobExecution.errorCause }}
       </code>
     </pre>
@@ -51,33 +60,41 @@
   import ModalDialog from '../common/modal-dialog'
   import LayoutRow from '../common/layout-row'
   import InputButton from '../common/input-button'
+  import FeedbackBox from '../common/feedback-box'
+  import FormatUtils from '../../utils/format-utils.js'
 
   export default {
-  name: 'job-execution-details',
-  props: ['jobExecution'],
-  components: {InputButton, LayoutRow, ModalDialog},
-  methods: {
-    formatDate: function (unformattedDate) {
-      let options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-      let date = new Date(unformattedDate)
-      return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString()
-    },
-    calculateDuration: function (from, till) {
-      let start = new Date(from).getTime()
-      let end = Date.now()
-      if (till != null) {
-        end = new Date(till).getTime()
+    name: 'job-execution-details',
+    props: ['jobExecution'],
+    components: {FeedbackBox, InputButton, LayoutRow, ModalDialog},
+    methods: {
+      formatDate: function (unformattedDate) {
+        let options = {year: 'numeric', month: '2-digit', day: '2-digit'};
+        let date = new Date(unformattedDate)
+        return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString()
+      },
+      formatName: function (input, length) {
+        return FormatUtils.shorten(input, length)
+      },
+      formatPercent: function (input) {
+        return input.toFixed(2) + '%'
+      },
+      calculateDuration: function (from, till) {
+        let start = new Date(from).getTime()
+        let end = Date.now()
+        if (till != null) {
+          end = new Date(till).getTime()
+        }
+        let delta = Math.floor((end - start) / 1000)
+        let hours = Math.floor(delta / 3600) % 24
+        delta -= hours * 3600
+        let minutes = Math.floor(delta / 60) % 60
+        delta -= minutes * 60
+        let seconds = Math.floor(delta % 60)
+        return hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0')
       }
-      let delta = Math.floor((end - start) / 1000)
-      let hours = Math.floor(delta / 3600) % 24
-      delta -= hours * 3600
-      let minutes = Math.floor(delta / 60) % 60
-      delta -= minutes * 60
-      let seconds = Math.floor(delta % 60)
-      return hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0')
     }
   }
-}
 </script>
 
 <style scoped>
@@ -94,6 +111,10 @@
         word-wrap: normal !important;
         white-space: pre !important;
         background-color: var(--alert-background-color)
+    }
+
+    .margin-right {
+        margin-right: 25px;
     }
 
 </style>

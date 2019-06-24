@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Contains information about a single job run.
@@ -54,6 +57,11 @@ public class JobExecution {
     private String currentTask;
 
     /**
+     * List with current work in progress, that should be visible in the UI for the user.
+     */
+    private List<WorkInProgressMonitor> workInProgress = Collections.synchronizedList(new LinkedList<>());
+
+    /**
      * Cancels the job by setting the state accordingly.
      */
     public synchronized void cancel() {
@@ -79,6 +87,35 @@ public class JobExecution {
      */
     public boolean isRunning() {
         return JobExecutionState.RUNNING.equals(executionState);
+    }
+
+    /**
+     * Adds a {@link WorkInProgressMonitor} to the current list of work-in-progress.
+     *
+     * @param workInProgressMonitor The new monitor to add.
+     */
+    public void addWorkInProgress(WorkInProgressMonitor workInProgressMonitor) {
+        this.workInProgress.add(workInProgressMonitor);
+    }
+
+    /**
+     * Removes a {@link WorkInProgressMonitor} from the current list of work-in-progress.
+     *
+     * @param workInProgressMonitor The monitor to remove.
+     */
+    public void removeWorkInProgress(WorkInProgressMonitor workInProgressMonitor) {
+        this.workInProgress.remove(workInProgressMonitor);
+    }
+
+    /**
+     * Returns the current work-in-progress.
+     *
+     * @return List of {@link WorkInProgressMonitor} items.
+     */
+    public List<WorkInProgressMonitor> getWorkInProgress() {
+        synchronized (workInProgress) {
+            return new LinkedList<>(workInProgress);
+        }
     }
 
 }

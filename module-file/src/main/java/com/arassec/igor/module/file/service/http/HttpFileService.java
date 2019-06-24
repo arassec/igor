@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.service.http;
 
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.IgorService;
-import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
@@ -113,8 +113,8 @@ public class HttpFileService extends BaseFileService {
      * @return The {@link HttpRequest}.
      */
     private HttpRequest.Builder getRequestBuilder(String uriPart) {
-        HttpRequest.Builder httpRequestBuilder =
-                HttpRequest.newBuilder().uri(URI.create(buildUri(uriPart))).timeout(Duration.ofSeconds(timeout));
+        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder().uri(URI.create(buildUri(uriPart)))
+                .timeout(Duration.ofSeconds(timeout));
         String authorizationHeader = createBasicAuthHeader();
         if (!StringUtils.isEmpty(authorizationHeader)) {
             httpRequestBuilder.headers(authorizationHeader);
@@ -126,7 +126,7 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public List<FileInfo> listFiles(String directory, String fileEnding, JobExecution jobExecution) {
+    public List<FileInfo> listFiles(String directory, String fileEnding) {
         HttpClient client = connect();
         HttpRequest request = getRequestBuilder(directory).GET().build();
         try {
@@ -175,13 +175,14 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file, JobExecution jobExecution) {
+    public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
         HttpClient client = connect();
         HttpRequest request = getRequestBuilder(file).GET().build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                throw new ServiceException("HTTP request failed with status: " + response.statusCode() + " (" + request.uri().toString() + ")");
+                throw new ServiceException(
+                        "HTTP request failed with status: " + response.statusCode() + " (" + request.uri().toString() + ")");
             }
             return response.body();
         } catch (IOException | InterruptedException e) {
@@ -193,22 +194,14 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void write(String file, String data, JobExecution jobExecution) {
-        HttpRequest request = getRequestBuilder(file).PUT(HttpRequest.BodyPublishers.ofString(data)).build();
-        sendRequest(connect(), request);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FileStreamData readStream(String file, JobExecution jobExecution) {
+    public FileStreamData readStream(String file, WorkInProgressMonitor workInProgressMonitor) {
         HttpClient client = connect();
         HttpRequest request = getRequestBuilder(file).GET().build();
         try {
             HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
             if (response.statusCode() != 200) {
-                throw new ServiceException("HTTP request failed with status: " + response.statusCode() + " (" + request.uri().toString() + ")");
+                throw new ServiceException(
+                        "HTTP request failed with status: " + response.statusCode() + " (" + request.uri().toString() + ")");
             }
 
             String filenameSuffix = null;
@@ -233,7 +226,7 @@ public class HttpFileService extends BaseFileService {
             } else {
                 // Fallback if no content-length header is available!
                 response.body().close();
-                String fileContent = read(file, jobExecution);
+                String fileContent = read(file, workInProgressMonitor);
                 FileStreamData fsd = new FileStreamData();
                 fsd.setFileSize(fileContent.getBytes().length);
                 fsd.setData(new ByteArrayInputStream(fileContent.getBytes()));
@@ -249,7 +242,7 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData, JobExecution jobExecution) {
+    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
         HttpRequest request = getRequestBuilder(file).PUT(HttpRequest.BodyPublishers.ofInputStream(fileStreamData::getData))
                 .build();
         sendRequest(connect(), request);
@@ -259,7 +252,7 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file, JobExecution jobExecution) {
+    public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
         sendRequest(connect(), getRequestBuilder(file).DELETE().build());
     }
 
@@ -267,11 +260,11 @@ public class HttpFileService extends BaseFileService {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target, JobExecution jobExecution) {
-        FileStreamData fileStreamData = readStream(source, jobExecution);
-        writeStream(target, fileStreamData, jobExecution);
+    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
+        FileStreamData fileStreamData = readStream(source, workInProgressMonitor);
+        writeStream(target, fileStreamData, workInProgressMonitor);
         finalizeStream(fileStreamData);
-        delete(source, jobExecution);
+        delete(source, workInProgressMonitor);
     }
 
     /**
@@ -298,7 +291,8 @@ public class HttpFileService extends BaseFileService {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                throw new ServiceException("GET failed for URL with HTTP status: " + response.statusCode() + " (" + request.uri().toASCIIString() + ")");
+                throw new ServiceException("GET failed for URL with HTTP status: " + response.statusCode() + " (" + request.uri()
+                        .toASCIIString() + ")");
             }
         } catch (IOException | InterruptedException e) {
             throw new ServiceException("GET failed for URL: " + request.uri().toASCIIString(), e);
