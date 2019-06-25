@@ -113,17 +113,9 @@ public class ActionsExecutingRunnable implements Runnable {
 
         for (Action action : actions) {
 
-            if (!active) {
-                return;
-            }
-
             List<Map<String, Object>> actionResult = new LinkedList<>();
 
             for (Map<String, Object> item : items) {
-                if (!active) {
-                    return;
-                }
-
                 log.trace("Processing: {}", item);
                 List<Map<String, Object>> partialActionResult = action.process(item, false, jobExecution);
                 if (partialActionResult != null && !partialActionResult.isEmpty()) {
@@ -151,9 +143,6 @@ public class ActionsExecutingRunnable implements Runnable {
     private void putToOutputQueue(List<Map<String, Object>> items) {
         if (!items.isEmpty()) {
             for (Map<String, Object> outputItem : items) {
-                if (!active) {
-                    return;
-                }
                 try {
                     outputQueue.put(outputItem);
                 } catch (InterruptedException e) {

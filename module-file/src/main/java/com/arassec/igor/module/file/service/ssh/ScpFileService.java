@@ -11,6 +11,7 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -18,12 +19,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * {@link FileService} for SCP file handling.
  */
+@Slf4j
 @IgorService(label = "SCP")
 public class ScpFileService extends BaseSshFileService {
 
@@ -93,10 +96,18 @@ public class ScpFileService extends BaseSshFileService {
             numResultsToSkip = 0;
             command += " *." + fileEnding;
         }
-        StringBuffer result = execute(command);
-        return Arrays.stream(result.toString().split("\n")).skip(numResultsToSkip)
-                .map(lsResult -> new FileInfo(extractFilename(dir, lsResult), extractLastModified(lsResult)))
-                .collect(Collectors.toList());
+        try {
+            StringBuffer result = execute(command);
+            return Arrays.stream(result.toString().split("\n")).skip(numResultsToSkip)
+                    .map(lsResult -> new FileInfo(extractFilename(dir, lsResult), extractLastModified(lsResult)))
+                    .collect(Collectors.toList());
+        } catch (ServiceException e) {
+            if (!StringUtils.isEmpty(fileEnding) && e.getMessage().contains("No such file or directory")) {
+                return new LinkedList<>();
+            } else {
+                throw e;
+            }
+        }
     }
 
     /**
