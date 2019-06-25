@@ -92,22 +92,7 @@ public class SshInputStreamWrapper extends InputStream {
      */
     @Override
     public int read() throws IOException {
-        if (allRead) {
-            return -1;
-        }
-
-        int result = inputStream.read();
-
-        if (result == -1) {
-            return result;
-        } else {
-            fileSize--;
-            if (fileSize == 0) {
-                allRead = true;
-            }
-
-            return result;
-        }
+        return inputStream.read();
     }
 
 }
