@@ -85,34 +85,38 @@ public class RabbitMqMessageService extends BaseMessageService {
     private int heartBeat = 30;
 
     /**
-     * The RabbitMQ-Client to send messages.
-     */
-    private RabbitTemplate rabbitTemplate;
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void sendMessage(Message message) {
-        if (rabbitTemplate == null) {
-            initialize();
-        }
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host, port);
+        connectionFactory.setUsername(username);
+        connectionFactory.setPassword(password);
+        connectionFactory.setRequestedHeartBeat(heartBeat);
+        connectionFactory.setVirtualHost(virtualHost);
 
-        MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setContentEncoding(contentEncoding);
-        messageProperties.setContentType(contentType);
-        if (headers != null) {
-            String[] seperatedHeaders = headers.split("\n");
-            for (String header : seperatedHeaders) {
-                String[] headerParts = header.split(":");
-                if (headerParts.length == 2) {
-                    messageProperties.getHeaders().put(headerParts[0], headerParts[1]);
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+
+        try {
+            MessageProperties messageProperties = new MessageProperties();
+            messageProperties.setContentEncoding(contentEncoding);
+            messageProperties.setContentType(contentType);
+            if (headers != null) {
+                String[] seperatedHeaders = headers.split("\n");
+                for (String header : seperatedHeaders) {
+                    String[] headerParts = header.split(":");
+                    if (headerParts.length == 2) {
+                        messageProperties.getHeaders().put(headerParts[0], headerParts[1]);
+                    }
                 }
             }
-        }
 
-        org.springframework.amqp.core.Message rabbitMessage = new org.springframework.amqp.core.Message(message.getContent().getBytes(), messageProperties);
-        rabbitTemplate.send(exchange, routingKey, rabbitMessage);
+            org.springframework.amqp.core.Message rabbitMessage = new org.springframework.amqp.core.Message(message.getContent().getBytes(), messageProperties);
+            rabbitTemplate.send(exchange, routingKey, rabbitMessage);
+        } finally {
+            rabbitTemplate.stop();
+            connectionFactory.destroy();
+        }
     }
 
     /**
@@ -130,19 +134,6 @@ public class RabbitMqMessageService extends BaseMessageService {
         if (connection != null) {
             connection.close();
         }
-    }
-
-    /**
-     * Initializes the RabbitMQ-Client with the provided configuration data.
-     */
-    private void initialize() {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host, port);
-        connectionFactory.setUsername(username);
-        connectionFactory.setPassword(password);
-        connectionFactory.setRequestedHeartBeat(heartBeat);
-        connectionFactory.setVirtualHost(virtualHost);
-
-        rabbitTemplate = new RabbitTemplate(connectionFactory);
     }
 
 }
