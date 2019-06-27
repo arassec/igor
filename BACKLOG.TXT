@@ -1,6 +1,13 @@
+- Refactor dry-runs to use dummy-services instead of extra logic per action
+  - add 'IgorServiceAdaptor' to pass only idempotent methods to the real
+    service, and return default values for all other methods
+  - all subsequent actions use dummy-services
+  - remove extra logic from all actions
 - Unit-Tests (Apache Mina SSHD!)
 - Persistence-service editor
 - Add Skip- and Limit-Actions
+- Add variables for parameters, e.g. $data$ as parameter value which
+  will be replaced by the actual json value
 - SSH access with key
 - CIFS-/Samba supporting FileService
 - Export + Import of jobs and services (via JSON)
