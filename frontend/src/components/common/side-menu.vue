@@ -18,21 +18,26 @@
 </template>
 
 <script>
-  import CoreContent from './core-content'
-  import CorePanel from './core-panel'
+    import CoreContent from './core-content'
+    import CorePanel from './core-panel'
 
-  export default {
-  name: 'side-menu',
-  components: {CorePanel, CoreContent},
-  computed: {
-    hasContentSlot: function () {
-      return !!this.$slots['content']
+    export default {
+        name: 'side-menu',
+        components: {CorePanel, CoreContent},
+        computed: {
+            hasContentSlot: function () {
+                return !!this.$slots['content']
+            }
+        }
     }
-  }
-}
 </script>
 
 <style scoped>
+
+    .side-menu {
+        min-width: 450px;
+        flex-shrink: 0;
+    }
 
     .no-margin {
         margin-bottom: 0px;

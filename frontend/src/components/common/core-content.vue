@@ -1,21 +1,21 @@
 <template>
-  <div class="content">
-    <slot/>
-  </div>
+    <div class="content">
+        <slot/>
+    </div>
 </template>
 
 <script>
-export default {
-  name: 'core-content'
-}
+    export default {
+        name: 'core-content'
+    }
 </script>
 
 <style scoped>
 
-  .content {
-    min-width: var(--content-width);
-    margin-right: 25px;
-    flex-shrink: 0;
-  }
+    .content {
+        margin-right: 25px;
+        flex-shrink: 1;
+        overflow: hidden;
+    }
 
 </style>

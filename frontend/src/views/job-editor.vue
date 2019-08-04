@@ -1,7 +1,7 @@
 <template>
     <core-container>
 
-        <side-menu class="side-menu-large" v-if="jobConfiguration">
+        <side-menu v-if="jobConfiguration">
             <p slot="title">Job Configuration</p>
             <layout-row slot="header" v-on:cancel-configuration="cancelConfiguration">
                 <p slot="left">
@@ -42,7 +42,8 @@
                     <div slot="right">
                         <input-button slot="right" icon="times" v-on:clicked="openCancelJobDialog(jobExecution)"
                                       v-if="jobExecution.state === 'WAITING' || jobExecution.state === 'RUNNING'"/>
-                        <input-button slot="right" icon="check" v-on:clicked="openMarkJobExecutionResolvedDialog(jobExecution)"
+                        <input-button slot="right" icon="check"
+                                      v-on:clicked="openMarkJobExecutionResolvedDialog(jobExecution)"
                                       v-if="jobExecution.state == 'FAILED'"/>
                     </div>
                 </feedback-box>
@@ -173,510 +174,510 @@
     </core-container>
 </template>
 <script>
-  import CoreContainer from '../components/common/core-container'
-  import CoreContent from '../components/common/core-content'
-  import JobTreeNavigation from '../components/jobs/job-tree-navigation'
-  import JobConfigurator from '../components/jobs/job-configurator'
-  import TaskConfigurator from '../components/jobs/task-configurator'
-  import ActionConfigurator from '../components/jobs/action-configurator'
-  import ModalDialog from '../components/common/modal-dialog'
-  import LayoutRow from '../components/common/layout-row'
-  import InputButton from '../components/common/input-button'
-  import TestResultContainer from '../components/jobs/test-result-container'
-  import SideMenu from '../components/common/side-menu'
-  import FeedbackBox from '../components/common/feedback-box'
-  import JobExecutionDetails from '../components/jobs/job-execution-details'
-  import FormatUtils from '../utils/format-utils.js'
-  import BackgroundIcon from "../components/common/background-icon";
-  import IgorBackend from '../utils/igor-backend.js'
-  import ListPager from "../components/common/list-pager";
+    import CoreContainer from '../components/common/core-container'
+    import CoreContent from '../components/common/core-content'
+    import JobTreeNavigation from '../components/jobs/job-tree-navigation'
+    import JobConfigurator from '../components/jobs/job-configurator'
+    import TaskConfigurator from '../components/jobs/task-configurator'
+    import ActionConfigurator from '../components/jobs/action-configurator'
+    import ModalDialog from '../components/common/modal-dialog'
+    import LayoutRow from '../components/common/layout-row'
+    import InputButton from '../components/common/input-button'
+    import TestResultContainer from '../components/jobs/test-result-container'
+    import SideMenu from '../components/common/side-menu'
+    import FeedbackBox from '../components/common/feedback-box'
+    import JobExecutionDetails from '../components/jobs/job-execution-details'
+    import FormatUtils from '../utils/format-utils.js'
+    import BackgroundIcon from '../components/common/background-icon';
+    import IgorBackend from '../utils/igor-backend.js'
+    import ListPager from "../components/common/list-pager";
 
-  export default {
-    name: 'job-editor',
-    components: {
-      ListPager,
-      BackgroundIcon,
-      JobExecutionDetails,
-      FeedbackBox,
-      SideMenu,
-      TestResultContainer,
-      InputButton,
-      LayoutRow,
-      ModalDialog,
-      ActionConfigurator,
-      TaskConfigurator,
-      JobConfigurator,
-      JobTreeNavigation,
-      CoreContent,
-      CoreContainer
-    },
-    props: ['jobId'],
-    data: function () {
-      return {
-        newJob: true,
-        showDeleteTaskDialog: false,
-        showDeleteActionDialog: false,
-        showCancelJobDialog: false,
-        showExecutionDetailsDialog: false,
-        showRunDialog: false,
-        initialProviderCategory: {},
-        initialProviderType: {},
-        initialActionCategory: {},
-        initialActionType: {},
-        selectedTaskIndex: -1,
-        selectedActionIndex: -1,
-        testResults: null,
-        selectedTestResults: null,
-        originalJobConfiguration: null,
-        jobConfiguration: null,
-        validationErrors: [],
-        jobExecutionsPage: {
-          number: 0,
-          size: 10,
-          totalPages: 0,
-          items: []
+    export default {
+        name: 'job-editor',
+        components: {
+            ListPager,
+            BackgroundIcon,
+            JobExecutionDetails,
+            FeedbackBox,
+            SideMenu,
+            TestResultContainer,
+            InputButton,
+            LayoutRow,
+            ModalDialog,
+            ActionConfigurator,
+            TaskConfigurator,
+            JobConfigurator,
+            JobTreeNavigation,
+            CoreContent,
+            CoreContainer
         },
-        jobExecutionsRefreshTimer: null,
-        selectedJobExecutionListEntry: null,
-        selectedJobExecution: null,
-        selectedJobExecutionId: null,
-        showUnsavedValuesExistDialog: false,
-        showMarkJobExecutionResolvedDialog: false,
-        nextRoute: null,
-        resolveAllFailedExecutionsOfJob: false,
-        numFailedExecutionsForSelectedJob: 0
-      }
-    },
-    computed: {
-      jobRunningOrWaiting: function () {
-        if (this.jobExecutionsPage) {
-          for (let i = 0; i < this.jobExecutionsPage.items.length; i++) {
-            if ('RUNNING' === this.jobExecutionsPage.items[i].state || 'WAITING' === this.jobExecutionsPage.items[i].state) {
-              return true
+        props: ['jobId'],
+        data: function () {
+            return {
+                newJob: true,
+                showDeleteTaskDialog: false,
+                showDeleteActionDialog: false,
+                showCancelJobDialog: false,
+                showExecutionDetailsDialog: false,
+                showRunDialog: false,
+                initialProviderCategory: {},
+                initialProviderType: {},
+                initialActionCategory: {},
+                initialActionType: {},
+                selectedTaskIndex: -1,
+                selectedActionIndex: -1,
+                testResults: null,
+                selectedTestResults: null,
+                originalJobConfiguration: null,
+                jobConfiguration: null,
+                validationErrors: [],
+                jobExecutionsPage: {
+                    number: 0,
+                    size: 10,
+                    totalPages: 0,
+                    items: []
+                },
+                jobExecutionsRefreshTimer: null,
+                selectedJobExecutionListEntry: null,
+                selectedJobExecution: null,
+                selectedJobExecutionId: null,
+                showUnsavedValuesExistDialog: false,
+                showMarkJobExecutionResolvedDialog: false,
+                nextRoute: null,
+                resolveAllFailedExecutionsOfJob: false,
+                numFailedExecutionsForSelectedJob: 0
             }
-          }
-        }
-        return false
-      }
-    },
-    methods: {
-      formatJobExecution: function (jobExecution) {
-        return FormatUtils.formatInstant(jobExecution.created)
-            + ' ' + jobExecution.duration + '(' + jobExecution.state.toLowerCase() + ')'
-      },
-      createJob: function () {
-        this.jobConfiguration = {
-          name: 'New Job',
-          trigger: {
-            category: null,
-            type: null,
-            parameters: []
-          },
-          description: '',
-          executionHistoryLimit: 5,
-          active: true,
-          tasks: []
-        }
-      },
-      loadJob: async function (id) {
-        this.jobConfiguration = await IgorBackend.getData('/api/job/' + id)
-      },
-      saveConfiguration: async function () {
-        if (!(await this.validateInput())) {
-          return
-        }
+        },
+        computed: {
+            jobRunningOrWaiting: function () {
+                if (this.jobExecutionsPage) {
+                    for (let i = 0; i < this.jobExecutionsPage.items.length; i++) {
+                        if ('RUNNING' === this.jobExecutionsPage.items[i].state || 'WAITING' === this.jobExecutionsPage.items[i].state) {
+                            return true
+                        }
+                    }
+                }
+                return false
+            }
+        },
+        methods: {
+            formatJobExecution: function (jobExecution) {
+                return FormatUtils.formatInstant(jobExecution.created)
+                    + ' ' + jobExecution.duration + '(' + jobExecution.state.toLowerCase() + ')'
+            },
+            createJob: function () {
+                this.jobConfiguration = {
+                    name: 'New Job',
+                    trigger: {
+                        category: null,
+                        type: null,
+                        parameters: []
+                    },
+                    description: '',
+                    executionHistoryLimit: 5,
+                    active: true,
+                    tasks: []
+                }
+            },
+            loadJob: async function (id) {
+                this.jobConfiguration = await IgorBackend.getData('/api/job/' + id)
+            },
+            saveConfiguration: async function () {
+                if (!(await this.validateInput())) {
+                    return
+                }
 
-        this.testResults = null
-        if (this.newJob) {
-          IgorBackend.postData('/api/job', this.jobConfiguration, 'Saving job',
-              'Job \'' + FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' saved.',
-              'Saving failed!').then((result) => {
-            if (result === 'NAME_ALREADY_EXISTS_ERROR') {
-              this.validationErrors.push('-1_-1')
-              this.$refs.jobConfigurator.setNameValidationError('A job with this name already exists!')
+                this.testResults = null
+                if (this.newJob) {
+                    IgorBackend.postData('/api/job', this.jobConfiguration, 'Saving job',
+                        'Job \'' + FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' saved.',
+                        'Saving failed!').then((result) => {
+                        if (result === 'NAME_ALREADY_EXISTS_ERROR') {
+                            this.validationErrors.push('-1_-1')
+                            this.$refs.jobConfigurator.setNameValidationError('A job with this name already exists!')
+                        } else {
+                            this.jobConfiguration = result
+                            this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
+                            this.newJob = false
+                            this.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' saved.', false)
+                            this.$router.push({name: 'job-editor', params: {jobId: this.jobConfiguration.id}})
+                        }
+                    })
+                } else {
+                    IgorBackend.putData('/api/job', this.jobConfiguration, 'Saving job',
+                        'Job \'' + FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' updated.',
+                        'Saving failed!').then(() => {
+                        this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
+                    })
+                }
+            },
+            testConfiguration: async function () {
+                if (!(await this.validateInput())) {
+                    return
+                }
+
+                this.testResults = null
+                this.selectedTestResults = null
+
+                this.testResults = await IgorBackend.postData('/api/job/test', this.jobConfiguration, 'Testing job', 'Test OK.',
+                    'Test Failed!')
+                this.updateSelectedTestResult()
+            },
+            cancelConfiguration: function () {
+                this.$router.push({name: 'app-status'})
+            },
+            selectJob: function () {
+                this.selectedTaskIndex = -1
+                this.selectedActionIndex = -1
+                this.updateSelectedTestResult()
+            },
+            selectTask: function (taskIndex) {
+                this.selectedTaskIndex = taskIndex
+                this.selectedActionIndex = -1
+                this.updateSelectedTestResult()
+            },
+            selectAction: function (taskIndex, actionIndex) {
+                this.selectedTaskIndex = taskIndex
+                this.selectedActionIndex = actionIndex
+                this.updateSelectedTestResult()
+            },
+            addTask: function () {
+                let task = {
+                    name: 'Task',
+                    description: '',
+                    active: true,
+                    dryrunLimit: 25,
+                    provider: {
+                        category: this.initialProviderCategory,
+                        type: this.initialProviderType,
+                        parameters: []
+                    },
+                    actions: []
+                }
+                this.jobConfiguration.tasks.push(task)
+                this.selectTask(this.jobConfiguration.tasks.length - 1)
+            },
+            duplicateTask: function (taskIndex) {
+                let copiedTask = JSON.parse(JSON.stringify(this.jobConfiguration.tasks[taskIndex]))
+                delete copiedTask.id
+                this.jobConfiguration.tasks.push(copiedTask)
+                this.selectTask(this.jobConfiguration.tasks.length - 1)
+            },
+            showDeleteTask: function (taskIndex) {
+                this.selectedTaskIndex = taskIndex
+                this.showDeleteTaskDialog = true
+            },
+            deleteTask: function () {
+                this.validationErrors = []
+                this.$delete(this.jobConfiguration.tasks, this.selectedTaskIndex)
+                this.showDeleteTaskDialog = false
+                this.selectedTaskIndex = -1
+                this.selectedActionIndex = -1
+            },
+            addAction: function (taskIndex) {
+                let action = {
+                    category: this.initialActionCategory,
+                    type: this.initialActionType,
+                    parameters: []
+                }
+                this.jobConfiguration.tasks[taskIndex].actions.push(action)
+                this.selectAction(taskIndex, this.jobConfiguration.tasks[taskIndex].actions.length - 1)
+            },
+            showDeleteAction: function (taskIndex, actionIndex) {
+                this.selectedTaskIndex = taskIndex
+                this.selectedActionIndex = actionIndex
+                this.showDeleteActionDialog = true
+            },
+            deleteAction: function () {
+                this.validationErrors = []
+                this.jobConfiguration.tasks[this.selectedTaskIndex].actions.splice(this.selectedActionIndex, 1)
+                this.showDeleteActionDialog = false
+                this.selectedTaskIndex = -1
+                this.selectedActionIndex = -1
+            },
+            moveTaskUp: function (taskIndex) {
+                if (taskIndex === 0) {
+                    return
+                }
+                this.arrayMove(this.jobConfiguration.tasks, taskIndex, taskIndex - 1)
+                this.selectTask((taskIndex - 1))
+            },
+            moveTaskDown: function (taskIndex) {
+                if (taskIndex < this.jobConfiguration.tasks.length - 1) {
+                    this.arrayMove(this.jobConfiguration.tasks, taskIndex, taskIndex + 1)
+                    this.selectTask((taskIndex + 1))
+                }
+            },
+            moveActionUp: function (taskIndex, actionIndex) {
+                if (actionIndex === 0) {
+                    return
+                }
+                this.arrayMove(this.jobConfiguration.tasks[taskIndex].actions, actionIndex, actionIndex - 1)
+                this.selectAction(taskIndex, (actionIndex - 1))
+                this.validationErrors = []
+            },
+            moveActionDown: function (taskIndex, actionIndex) {
+                if (actionIndex < this.jobConfiguration.tasks[taskIndex].actions.length - 1) {
+                    this.arrayMove(this.jobConfiguration.tasks[taskIndex].actions, actionIndex, actionIndex + 1)
+                    this.selectAction(taskIndex, (actionIndex + 1))
+                    this.validationErrors = []
+                }
+            },
+            arrayMove: function (array, oldIndex, newIndex) {
+                if (newIndex >= array.length) {
+                    let k = newIndex - array.length + 1
+                    while (k--) {
+                        array.push(undefined)
+                    }
+                }
+                array.splice(newIndex, 0, array.splice(oldIndex, 1)[0])
+            },
+            validateInput: async function () {
+                this.validationErrors = []
+
+                let jobConfiguratorResult = await this.$refs.jobConfigurator.validateInput()
+                if (!jobConfiguratorResult) {
+                    this.validationErrors.push('-1_-1')
+                }
+
+                let taskConfiguratorsResult = true
+                for (let i in this.$refs.taskConfigurators) {
+                    let result = this.$refs.taskConfigurators[i].validateInput()
+                    if (!result) {
+                        this.validationErrors.push(i + '_-1')
+                    }
+                    taskConfiguratorsResult = (result && taskConfiguratorsResult)
+                }
+
+                let actionConfiguratorsResult = true
+                for (let i in this.$refs.actionConfigurators) {
+                    let result = this.$refs.actionConfigurators[i].validateInput()
+                    if (!result) {
+                        this.validationErrors.push(this.$refs.actionConfigurators[i].actionKey)
+                    }
+                    actionConfiguratorsResult = (result && actionConfiguratorsResult)
+                }
+
+                if (!(jobConfiguratorResult && taskConfiguratorsResult && actionConfiguratorsResult)) {
+                    this.$root.$data.store.setFeedback('Validation failed!', true)
+                    return false
+                }
+
+                return true
+            },
+            updateSelectedTestResult: function () {
+                if (this.testResults != null) {
+                    let taskIndex = this.selectedTaskIndex
+                    let actionIndex = this.selectedActionIndex
+
+                    // The job has been selected:
+                    if (taskIndex == -1 && actionIndex == -1) {
+                        if (this.testResults.errorCause) {
+                            this.selectedTestResults = this.testResults
+                        } else {
+                            this.selectedTestResults = null
+                        }
+                        return
+                    }
+
+                    // A Task has been selected:
+                    if (taskIndex != -1 && actionIndex == -1) {
+                        if (this.testResults.taskResults[taskIndex] != null) {
+                            this.selectedTestResults = this.testResults.taskResults[taskIndex]
+                        }
+                    }
+
+                    // An action has been selected:
+                    if (taskIndex != -1 && actionIndex != -1) {
+                        let taskResults = this.testResults.taskResults
+                        if (taskResults[taskIndex] != null && taskResults[taskIndex].actionResults != null) {
+                            let actionResults = taskResults[taskIndex].actionResults
+                            if (actionResults[actionIndex] != null) {
+                                this.selectedTestResults = this.testResults.taskResults[taskIndex].actionResults[actionIndex]
+                            }
+                        }
+                    }
+                }
+            },
+            isTaskSelected: function (index) {
+                return (index == this.selectedTaskIndex && this.selectedActionIndex == -1)
+            },
+            isActionSelected: function (taskIndex, actionIndex) {
+                return taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex
+            },
+            runJob: async function () {
+                this.showRunDialog = false
+                if (!this.validateInput()) {
+                    return
+                }
+                this.jobConfiguration = await IgorBackend.postData('/api/job/run', this.jobConfiguration, 'Starting job', 'Job \'' +
+                    FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' started manually.', 'Job \'' +
+                    FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' startup failed!')
+            },
+            updateJobExecutions: async function () {
+                if (this.jobConfiguration.id) {
+                    this.jobExecutionsPage = await IgorBackend.getData('/api/execution/job/' + this.jobConfiguration.id + '?pageNumber=' +
+                        this.jobExecutionsPage.number + '&pageSize=' + this.jobExecutionsPage.size)
+                }
+            },
+            manualUpdateJobExecutions: async function (page) {
+                if (this.jobConfiguration.id) {
+                    clearInterval(this.jobExecutionsRefreshTimer)
+                    this.jobExecutionsPage = await IgorBackend.getData('/api/execution/job/' + this.jobConfiguration.id + '?pageNumber=' +
+                        page + '&pageSize=' + this.jobExecutionsPage.size)
+                    this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+                }
+            },
+            openExecutionDetailsDialog: async function (selectedJobExecutionListEntry) {
+                this.selectedJobExecutionId = selectedJobExecutionListEntry.id
+                this.selectedJobExecution = await IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId)
+                this.showExecutionDetailsDialog = true
+                if (this.selectedJobExecution.executionState === 'WAITING' || this.selectedJobExecution.executionState === 'RUNNING') {
+                    this.jobExecutionDetailsRefreshTimer = setInterval(() => {
+                        this.updateJobExectuionDetails()
+                    }, 1000)
+                }
+            },
+            closeExecutionDetailsDialog: function () {
+                if (this.jobExecutionDetailsRefreshTimer) {
+                    clearTimeout(this.jobExecutionDetailsRefreshTimer)
+                }
+                this.showExecutionDetailsDialog = false
+            },
+            updateJobExectuionDetails: async function () {
+                this.selectedJobExecution = await IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId)
+            },
+            openCancelJobDialog: function (selectedJobExecutionListEntry) {
+                this.selectedJobExecutionListEntry = selectedJobExecutionListEntry
+                this.showCancelJobDialog = true
+            },
+            cancelJobExecution: function () {
+                clearInterval(this.jobExecutionsRefreshTimer)
+                this.showCancelJobDialog = false
+                IgorBackend.postData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/cancel', null,
+                    "Cancelling job", "Job cancelled.", "Job could not be cancelled!").then(() => {
+                    this.updateJobExecutions().then(() => {
+                        this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+                    })
+                })
+            },
+            createService: function (selectionKey, parameterIndex, serviceCategory) {
+                this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, serviceCategory)
+                this.$router.push({name: 'service-editor'})
+            },
+            updateOriginalJobConfiguration: function () {
+                this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
+            },
+            openMarkJobExecutionResolvedDialog: async function (selectedJobExecutionListEntry) {
+                this.selectedJobExecutionListEntry = selectedJobExecutionListEntry
+                this.$root.$data.store.setWip('Loading job execution details...')
+                this.numFailedExecutionsForSelectedJob = await IgorBackend.getData('/api/execution/job/' +
+                    this.selectedJobExecutionListEntry.jobId + '/FAILED/count')
+                this.$root.$data.store.clearWip()
+                this.showMarkJobExecutionResolvedDialog = true
+            },
+            markJobExecutionResolved: async function () {
+                clearTimeout(this.jobExecutionsRefreshTimer)
+                await IgorBackend.putData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/' +
+                    this.selectedJobExecutionListEntry.jobId + '/FAILED/RESOLVED?updateAllOfJob=' + this.resolveAllFailedExecutionsOfJob, null,
+                    'Updating executions', 'Executions updated', 'Executions could not be updated!')
+                await this.manualUpdateJobExecutions(0)
+                this.resolveAllFailedExecutionsOfJob = false
+                this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+                this.showMarkJobExecutionResolvedDialog = false
+            }
+        },
+        mounted() {
+            let jobData = this.$root.$data.store.getJobData()
+            // Returning from a service configuration within a job configuration
+            if (jobData.jobConfiguration != null) {
+                this.jobConfiguration = jobData.jobConfiguration
+                if (this.jobConfiguration.id != null) {
+                    this.newJob = false
+                }
+
+                let selectionKey = jobData.selectionKey
+                if (selectionKey != null) {
+                    let taskIndex = -1
+                    let actionIndex = -1
+                    if ((typeof selectionKey === 'string' || selectionKey instanceof String) && selectionKey.includes('_')) {
+                        taskIndex = selectionKey.split('_')[0]
+                        actionIndex = selectionKey.split('_')[1]
+                    } else {
+                        taskIndex = selectionKey
+                    }
+
+                    if (taskIndex > -1 && actionIndex > -1) {
+                        if (jobData.serviceParameter != null && jobData.parameterIndex != null) {
+                            let parameter = this.jobConfiguration.tasks[taskIndex].actions[actionIndex].parameters[jobData.parameterIndex]
+                            parameter.serviceName = jobData.serviceParameter.name
+                            parameter.value = jobData.serviceParameter.id
+                        }
+                        this.selectAction(taskIndex, actionIndex)
+                    } else if (taskIndex > -1) {
+                        if (jobData.serviceParameter != null && jobData.parameterIndex != null) {
+                            let parameter = this.jobConfiguration.tasks[taskIndex].provider.parameters[jobData.parameterIndex]
+                            parameter.serviceName = jobData.serviceParameter.name
+                            parameter.value = jobData.serviceParameter.id
+                        }
+                        this.selectTask(taskIndex)
+                    }
+                }
+                this.updateJobExecutions().then(() => {
+                    this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+                })
+                this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
+                this.$root.$data.store.clearJobData()
+            } else if (this.jobId != null) {
+                this.newJob = false
+                this.loadJob(this.jobId).then(() => {
+                    this.updateJobExecutions().then(() => {
+                        this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+                    })
+                    this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
+                })
             } else {
-              this.jobConfiguration = result
-              this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
-              this.newJob = false
-              this.$root.$data.store.setFeedback('Job \'' + FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' saved.', false)
-              this.$router.push({name: 'job-editor', params: {jobId: this.jobConfiguration.id}})
+                // The job-configurator loads trigger data and modifies the initial jobConfiguration. So the 'originalJobConfiguration' property is set there...
+                this.createJob()
+                this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
             }
-          })
-        } else {
-          IgorBackend.putData('/api/job', this.jobConfiguration, 'Saving job',
-              'Job \'' + FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' updated.',
-              'Saving failed!').then(() => {
-            this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
-          })
-        }
-      },
-      testConfiguration: async function () {
-        if (!(await this.validateInput())) {
-          return
-        }
 
-        this.testResults = null
-        this.selectedTestResults = null
-
-        this.testResults = await IgorBackend.postData('/api/job/test', this.jobConfiguration, 'Testing job', 'Test OK.',
-            'Test Failed!')
-        this.updateSelectedTestResult()
-      },
-      cancelConfiguration: function () {
-        this.$router.push({name: 'app-status'})
-      },
-      selectJob: function () {
-        this.selectedTaskIndex = -1
-        this.selectedActionIndex = -1
-        this.updateSelectedTestResult()
-      },
-      selectTask: function (taskIndex) {
-        this.selectedTaskIndex = taskIndex
-        this.selectedActionIndex = -1
-        this.updateSelectedTestResult()
-      },
-      selectAction: function (taskIndex, actionIndex) {
-        this.selectedTaskIndex = taskIndex
-        this.selectedActionIndex = actionIndex
-        this.updateSelectedTestResult()
-      },
-      addTask: function () {
-        let task = {
-          name: 'Task',
-          description: '',
-          active: true,
-          dryrunLimit: 25,
-          provider: {
-            category: this.initialProviderCategory,
-            type: this.initialProviderType,
-            parameters: []
-          },
-          actions: []
-        }
-        this.jobConfiguration.tasks.push(task)
-        this.selectTask(this.jobConfiguration.tasks.length - 1)
-      },
-      duplicateTask: function (taskIndex) {
-        let copiedTask = JSON.parse(JSON.stringify(this.jobConfiguration.tasks[taskIndex]))
-        delete copiedTask.id
-        this.jobConfiguration.tasks.push(copiedTask)
-        this.selectTask(this.jobConfiguration.tasks.length - 1)
-      },
-      showDeleteTask: function (taskIndex) {
-        this.selectedTaskIndex = taskIndex
-        this.showDeleteTaskDialog = true
-      },
-      deleteTask: function () {
-        this.validationErrors = []
-        this.$delete(this.jobConfiguration.tasks, this.selectedTaskIndex)
-        this.showDeleteTaskDialog = false
-        this.selectedTaskIndex = -1
-        this.selectedActionIndex = -1
-      },
-      addAction: function (taskIndex) {
-        let action = {
-          category: this.initialActionCategory,
-          type: this.initialActionType,
-          parameters: []
-        }
-        this.jobConfiguration.tasks[taskIndex].actions.push(action)
-        this.selectAction(taskIndex, this.jobConfiguration.tasks[taskIndex].actions.length - 1)
-      },
-      showDeleteAction: function (taskIndex, actionIndex) {
-        this.selectedTaskIndex = taskIndex
-        this.selectedActionIndex = actionIndex
-        this.showDeleteActionDialog = true
-      },
-      deleteAction: function () {
-        this.validationErrors = []
-        this.jobConfiguration.tasks[this.selectedTaskIndex].actions.splice(this.selectedActionIndex, 1)
-        this.showDeleteActionDialog = false
-        this.selectedTaskIndex = -1
-        this.selectedActionIndex = -1
-      },
-      moveTaskUp: function (taskIndex) {
-        if (taskIndex === 0) {
-          return
-        }
-        this.arrayMove(this.jobConfiguration.tasks, taskIndex, taskIndex - 1)
-        this.selectTask((taskIndex - 1))
-      },
-      moveTaskDown: function (taskIndex) {
-        if (taskIndex < this.jobConfiguration.tasks.length - 1) {
-          this.arrayMove(this.jobConfiguration.tasks, taskIndex, taskIndex + 1)
-          this.selectTask((taskIndex + 1))
-        }
-      },
-      moveActionUp: function (taskIndex, actionIndex) {
-        if (actionIndex === 0) {
-          return
-        }
-        this.arrayMove(this.jobConfiguration.tasks[taskIndex].actions, actionIndex, actionIndex - 1)
-        this.selectAction(taskIndex, (actionIndex - 1))
-        this.validationErrors = []
-      },
-      moveActionDown: function (taskIndex, actionIndex) {
-        if (actionIndex < this.jobConfiguration.tasks[taskIndex].actions.length - 1) {
-          this.arrayMove(this.jobConfiguration.tasks[taskIndex].actions, actionIndex, actionIndex + 1)
-          this.selectAction(taskIndex, (actionIndex + 1))
-          this.validationErrors = []
-        }
-      },
-      arrayMove: function (array, oldIndex, newIndex) {
-        if (newIndex >= array.length) {
-          let k = newIndex - array.length + 1
-          while (k--) {
-            array.push(undefined)
-          }
-        }
-        array.splice(newIndex, 0, array.splice(oldIndex, 1)[0])
-      },
-      validateInput: async function () {
-        this.validationErrors = []
-
-        let jobConfiguratorResult = await this.$refs.jobConfigurator.validateInput()
-        if (!jobConfiguratorResult) {
-          this.validationErrors.push('-1_-1')
-        }
-
-        let taskConfiguratorsResult = true
-        for (let i in this.$refs.taskConfigurators) {
-          let result = this.$refs.taskConfigurators[i].validateInput()
-          if (!result) {
-            this.validationErrors.push(i + '_-1')
-          }
-          taskConfiguratorsResult = (result && taskConfiguratorsResult)
-        }
-
-        let actionConfiguratorsResult = true
-        for (let i in this.$refs.actionConfigurators) {
-          let result = this.$refs.actionConfigurators[i].validateInput()
-          if (!result) {
-            this.validationErrors.push(this.$refs.actionConfigurators[i].actionKey)
-          }
-          actionConfiguratorsResult = (result && actionConfiguratorsResult)
-        }
-
-        if (!(jobConfiguratorResult && taskConfiguratorsResult && actionConfiguratorsResult)) {
-          this.$root.$data.store.setFeedback('Validation failed!', true)
-          return false
-        }
-
-        return true
-      },
-      updateSelectedTestResult: function () {
-        if (this.testResults != null) {
-          let taskIndex = this.selectedTaskIndex
-          let actionIndex = this.selectedActionIndex
-
-          // The job has been selected:
-          if (taskIndex == -1 && actionIndex == -1) {
-            if (this.testResults.errorCause) {
-              this.selectedTestResults = this.testResults
+            let component = this
+            IgorBackend.getData('/api/category/provider').then((categoryResult) => {
+                this.initialProviderCategory = Array.from(categoryResult)[0]
+                IgorBackend.getData('/api/type/provider/' + component.initialProviderCategory.key).then((typeResult) => {
+                    component.initialProviderType = Array.from(typeResult)[0]
+                })
+            })
+            IgorBackend.getData('/api/category/action').then((categoryResult) => {
+                this.initialActionCategory = Array.from(categoryResult)[0]
+                IgorBackend.getData('/api/type/action/' + component.initialActionCategory.key).then((typeResult) => {
+                    component.initialActionType = Array.from(typeResult)[0]
+                })
+            })
+        },
+        destroyed() {
+            clearInterval(this.jobExecutionsRefreshTimer)
+            clearInterval(this.jobExecutionDetailsRefreshTimer)
+        },
+        beforeRouteLeave(to, from, next) {
+            // We leave the job editor to create a new service. No unsaved-values-check required!
+            let jobData = this.$root.$data.store.getJobData()
+            if (jobData.jobConfiguration) {
+                next()
             } else {
-              this.selectedTestResults = null
+                if (this.originalJobConfiguration) {
+                    let newJobConfiguration = JSON.stringify(this.jobConfiguration)
+                    if (!(this.originalJobConfiguration === newJobConfiguration)) {
+                        this.nextRoute = next
+                        this.showUnsavedValuesExistDialog = true
+                        return
+                    }
+                }
+                next();
             }
-            return
-          }
-
-          // A Task has been selected:
-          if (taskIndex != -1 && actionIndex == -1) {
-            if (this.testResults.taskResults[taskIndex] != null) {
-              this.selectedTestResults = this.testResults.taskResults[taskIndex]
-            }
-          }
-
-          // An action has been selected:
-          if (taskIndex != -1 && actionIndex != -1) {
-            let taskResults = this.testResults.taskResults
-            if (taskResults[taskIndex] != null && taskResults[taskIndex].actionResults != null) {
-              let actionResults = taskResults[taskIndex].actionResults
-              if (actionResults[actionIndex] != null) {
-                this.selectedTestResults = this.testResults.taskResults[taskIndex].actionResults[actionIndex]
-              }
-            }
-          }
         }
-      },
-      isTaskSelected: function (index) {
-        return (index == this.selectedTaskIndex && this.selectedActionIndex == -1)
-      },
-      isActionSelected: function (taskIndex, actionIndex) {
-        return taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex
-      },
-      runJob: async function () {
-        this.showRunDialog = false
-        if (!this.validateInput()) {
-          return
-        }
-        this.jobConfiguration = await IgorBackend.postData('/api/job/run', this.jobConfiguration, 'Starting job', 'Job \'' +
-            FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' started manually.', 'Job \'' +
-            FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' startup failed!')
-      },
-      updateJobExecutions: async function () {
-        if (this.jobConfiguration.id) {
-          this.jobExecutionsPage = await IgorBackend.getData('/api/execution/job/' + this.jobConfiguration.id + '?pageNumber=' +
-              this.jobExecutionsPage.number + '&pageSize=' + this.jobExecutionsPage.size)
-        }
-      },
-      manualUpdateJobExecutions: async function (page) {
-        if (this.jobConfiguration.id) {
-          clearInterval(this.jobExecutionsRefreshTimer)
-          this.jobExecutionsPage = await IgorBackend.getData('/api/execution/job/' + this.jobConfiguration.id + '?pageNumber=' +
-              page + '&pageSize=' + this.jobExecutionsPage.size)
-          this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
-        }
-      },
-      openExecutionDetailsDialog: async function (selectedJobExecutionListEntry) {
-        this.selectedJobExecutionId = selectedJobExecutionListEntry.id
-        this.selectedJobExecution = await IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId)
-        this.showExecutionDetailsDialog = true
-        if (this.selectedJobExecution.executionState === 'WAITING' || this.selectedJobExecution.executionState === 'RUNNING') {
-          this.jobExecutionDetailsRefreshTimer = setInterval(() => {
-            this.updateJobExectuionDetails()
-          }, 1000)
-        }
-      },
-      closeExecutionDetailsDialog: function () {
-        if (this.jobExecutionDetailsRefreshTimer) {
-          clearTimeout(this.jobExecutionDetailsRefreshTimer)
-        }
-        this.showExecutionDetailsDialog = false
-      },
-      updateJobExectuionDetails: async function () {
-        this.selectedJobExecution = await IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId)
-      },
-      openCancelJobDialog: function (selectedJobExecutionListEntry) {
-        this.selectedJobExecutionListEntry = selectedJobExecutionListEntry
-        this.showCancelJobDialog = true
-      },
-      cancelJobExecution: function () {
-        clearInterval(this.jobExecutionsRefreshTimer)
-        this.showCancelJobDialog = false
-        IgorBackend.postData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/cancel', null,
-            "Cancelling job", "Job cancelled.", "Job could not be cancelled!").then(() => {
-          this.updateJobExecutions().then(() => {
-            this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
-          })
-        })
-      },
-      createService: function (selectionKey, parameterIndex, serviceCategory) {
-        this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, serviceCategory)
-        this.$router.push({name: 'service-editor'})
-      },
-      updateOriginalJobConfiguration: function () {
-        this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
-      },
-      openMarkJobExecutionResolvedDialog: async function (selectedJobExecutionListEntry) {
-        this.selectedJobExecutionListEntry = selectedJobExecutionListEntry
-        this.$root.$data.store.setWip('Loading job execution details...')
-        this.numFailedExecutionsForSelectedJob = await IgorBackend.getData('/api/execution/job/' +
-            this.selectedJobExecutionListEntry.jobId + '/FAILED/count')
-        this.$root.$data.store.clearWip()
-        this.showMarkJobExecutionResolvedDialog = true
-      },
-      markJobExecutionResolved: async function () {
-        clearTimeout(this.jobExecutionsRefreshTimer)
-        await IgorBackend.putData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/' +
-            this.selectedJobExecutionListEntry.jobId + '/FAILED/RESOLVED?updateAllOfJob=' + this.resolveAllFailedExecutionsOfJob, null,
-            'Updating executions', 'Executions updated', 'Executions could not be updated!')
-        await this.manualUpdateJobExecutions(0)
-        this.resolveAllFailedExecutionsOfJob = false
-        this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
-        this.showMarkJobExecutionResolvedDialog = false
-      }
-    },
-    mounted() {
-      let jobData = this.$root.$data.store.getJobData()
-      // Returning from a service configuration within a job configuration
-      if (jobData.jobConfiguration != null) {
-        this.jobConfiguration = jobData.jobConfiguration
-        if (this.jobConfiguration.id != null) {
-          this.newJob = false
-        }
-
-        let selectionKey = jobData.selectionKey
-        if (selectionKey != null) {
-          let taskIndex = -1
-          let actionIndex = -1
-          if ((typeof selectionKey === 'string' || selectionKey instanceof String) && selectionKey.includes('_')) {
-            taskIndex = selectionKey.split('_')[0]
-            actionIndex = selectionKey.split('_')[1]
-          } else {
-            taskIndex = selectionKey
-          }
-
-          if (taskIndex > -1 && actionIndex > -1) {
-            if (jobData.serviceParameter != null && jobData.parameterIndex != null) {
-              let parameter = this.jobConfiguration.tasks[taskIndex].actions[actionIndex].parameters[jobData.parameterIndex]
-              parameter.serviceName = jobData.serviceParameter.name
-              parameter.value = jobData.serviceParameter.id
-            }
-            this.selectAction(taskIndex, actionIndex)
-          } else if (taskIndex > -1) {
-            if (jobData.serviceParameter != null && jobData.parameterIndex != null) {
-              let parameter = this.jobConfiguration.tasks[taskIndex].provider.parameters[jobData.parameterIndex]
-              parameter.serviceName = jobData.serviceParameter.name
-              parameter.value = jobData.serviceParameter.id
-            }
-            this.selectTask(taskIndex)
-          }
-        }
-        this.updateJobExecutions().then(() => {
-          this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
-        })
-        this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
-        this.$root.$data.store.clearJobData()
-      } else if (this.jobId != null) {
-        this.newJob = false
-        this.loadJob(this.jobId).then(() => {
-          this.updateJobExecutions().then(() => {
-            this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
-          })
-          this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
-        })
-      } else {
-        // The job-configurator loads trigger data and modifies the initial jobConfiguration. So the 'originalJobConfiguration' property is set there...
-        this.createJob()
-        this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
-      }
-
-      let component = this
-      IgorBackend.getData('/api/category/provider').then((categoryResult) => {
-        this.initialProviderCategory = Array.from(categoryResult)[0]
-        IgorBackend.getData('/api/type/provider/' + component.initialProviderCategory.key).then((typeResult) => {
-          component.initialProviderType = Array.from(typeResult)[0]
-        })
-      })
-      IgorBackend.getData('/api/category/action').then((categoryResult) => {
-        this.initialActionCategory = Array.from(categoryResult)[0]
-        IgorBackend.getData('/api/type/action/' + component.initialActionCategory.key).then((typeResult) => {
-          component.initialActionType = Array.from(typeResult)[0]
-        })
-      })
-    },
-    destroyed() {
-      clearInterval(this.jobExecutionsRefreshTimer)
-      clearInterval(this.jobExecutionDetailsRefreshTimer)
-    },
-    beforeRouteLeave(to, from, next) {
-      // We leave the job editor to create a new service. No unsaved-values-check required!
-      let jobData = this.$root.$data.store.getJobData()
-      if (jobData.jobConfiguration) {
-        next()
-      } else {
-        if (this.originalJobConfiguration) {
-          let newJobConfiguration = JSON.stringify(this.jobConfiguration)
-          if (!(this.originalJobConfiguration === newJobConfiguration)) {
-            this.nextRoute = next
-            this.showUnsavedValuesExistDialog = true
-            return
-          }
-        }
-        next();
-      }
     }
-  }
 </script>
 
 

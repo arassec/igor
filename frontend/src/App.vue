@@ -91,23 +91,6 @@
     margin-left: 5px;
   }
 
-  .side-menu-small {
-    width: 350px;
-  }
-
-  .side-menu-normal {
-    width: 400px;
-  }
-
-  .side-menu-large {
-    width: 480px;
-  }
-
-  .core-content-normal {
-    --content-width: 500px;
-      flex-grow: 1;
-  }
-
   .inactive {
     opacity: 0.5;
   }
@@ -116,6 +99,12 @@
     z-index: 5;
     position: sticky;
     top: 15px;
+  }
+
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
 </style>

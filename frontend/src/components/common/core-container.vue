@@ -1,31 +1,30 @@
 <template>
-  <div class="container">
-    <slot/>
-
-    <feedback-snackbar/>
-
-    <wip-window/>
-
-  </div>
+    <div class="container">
+        <slot/>
+        <feedback-snackbar/>
+        <wip-window/>
+    </div>
 </template>
 
 <script>
-  import FeedbackSnackbar from './feedback-snackbar'
-  import WipWindow from './wip-window'
+    import FeedbackSnackbar from './feedback-snackbar'
+    import WipWindow from './wip-window'
 
-  export default {
-  name: 'core-container',
-  components: {WipWindow, FeedbackSnackbar}
-}
+    export default {
+        name: 'core-container',
+        components: {WipWindow, FeedbackSnackbar}
+    }
 </script>
 
 <style scoped>
 
-  .container {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    flex-wrap: nowrap ;
-  }
+    .container {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        width: 100vw;
+        overflow: hidden;
+    }
 
 </style>

@@ -11,7 +11,7 @@
       </div>
       <p slot="right">
         <router-link :to="addButtonTarget" v-if="addButtonTarget != null">
-          <input-button icon="plus"/>
+          <input-button icon="plus" class="button-margin-left" />
         </router-link>
       </p>
     </layout-row>

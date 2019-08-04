@@ -21,6 +21,10 @@
 
 <style scoped>
 
+    .list-entry {
+        display: block;
+    }
+
     .list-entry:hover {
         cursor: pointer;
         background-color: var(--nav-background-color);

@@ -1,3 +1,4 @@
+- Filter input on client + server side (e.g. job name length!)
 - Refactor dry-runs to use dummy-services instead of extra logic per action
   - add 'IgorServiceAdaptor' to pass only idempotent methods to the real
     service, and return default values for all other methods

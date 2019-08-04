@@ -1,5 +1,5 @@
 <template>
-  <div class="list-name">
+  <div class="list-name truncate">
     <slot/>
   </div>
 </template>
@@ -12,6 +12,6 @@ export default {
 
 <style scoped>
   .list-name {
-    margin-top: 2px;
+    margin-top: 3px;
   }
 </style>
