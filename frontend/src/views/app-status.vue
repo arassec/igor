@@ -14,7 +14,7 @@
                 <feedback-box v-for="(runningJob, index) in runningJobsPage.items" :key="index" class="list-entry"
                               :clickable="true"
                               v-on:feedback-clicked="openExecutionDetailsDialog(runningJob)">
-                    <div slot="left">{{formatName(runningJob.jobName, 27)}}</div>
+                    <div slot="left" class="truncate shorten">{{runningJob.jobName}}</div>
                     <div slot="right">
                         {{runningJob.duration}}
                         <input-button slot="right" icon="times" v-on:clicked="openCancelJobDialog(runningJob)"/>
@@ -33,7 +33,7 @@
                 <feedback-box v-for="(waitingJob, index) in waitingJobsPage.items" :key="index" class="list-entry"
                               :clickable="true"
                               v-on:feedback-clicked="openExecutionDetailsDialog(waitingJob)">
-                    <div slot="left">{{formatName(waitingJob.jobName, 27)}}</div>
+                    <div slot="left" class="truncate shorten">{{waitingJob.jobName}}</div>
                     <div slot="right">
                         {{waitingJob.duration}}
                         <input-button slot="right" icon="times" v-on:clicked="openCancelJobDialog(waitingJob)"/>
@@ -52,7 +52,7 @@
                 <feedback-box v-for="(failedJob, index) in failedJobsPage.items" :key="index" class="list-entry"
                               :clickable="true" :alert="true"
                               v-on:feedback-clicked="openExecutionDetailsDialog(failedJob)">
-                    <div slot="left">{{formatName(failedJob.jobName, 20)}}</div>
+                    <div slot="left" class="truncate shorten">{{failedJob.jobName}}</div>
                     <div slot="right">
                         {{failedJob.finished}}
                         <input-button slot="right" icon="check"
@@ -80,10 +80,11 @@
         <modal-dialog v-if="showCancelJobDialog"
                       @close="showCancelJobDialog = false"
                       v-on:cancel="showCancelJobDialog = false">
-            <h1 slot="header">Cancel job execution</h1>
-            <p slot="body">
-                Are you sure you want to cancel this execution of job '{{selectedJobExecutionListEntry.jobName}}'?
-            </p>
+            <h1 slot="header">Cancel job execution?</h1>
+            <div slot="body">
+                Are you sure you want to cancel this execution of job:
+                <div class="truncate highlight">{{selectedJobExecutionListEntry.jobName}}</div>
+            </div>
             <layout-row slot="footer">
                 <input-button slot="left" v-on:clicked="showCancelJobDialog = false" icon="times"/>
                 <input-button slot="right" v-on:clicked="cancelJobExecution()" icon="check"/>
@@ -99,8 +100,9 @@
                     Mark this failed execution as resolved?
                 </div>
                 <div class="paragraph" v-if="numFailedExecutionsForSelectedJob > 1">
-                    Mark <b>all {{numFailedExecutionsForSelectedJob}}</b> executions of
-                    job '{{formatName(selectedJobExecutionListEntry.jobName, 27)}}' as resolved:
+                    Mark <b>all {{numFailedExecutionsForSelectedJob}}</b> executions of job
+                    <div class="truncate highlight">{{selectedJobExecutionListEntry.jobName}}</div>
+                    as resolved:
                     <font-awesome-icon :icon="resolveAllFailedExecutionsOfJob ? 'check-square' : 'square'"
                                        v-on:click="resolveAllFailedExecutionsOfJob = !resolveAllFailedExecutionsOfJob"/>
                 </div>
@@ -126,7 +128,7 @@
                 <feedback-box slot="body" v-for="scheduledJob in schedulePage.items" :key="scheduledJob.jobId"
                               :clickable="true"
                               v-on:feedback-clicked="editJob(scheduledJob.jobId)">
-                    <div slot="left" class="margin-right">{{formatName(scheduledJob.jobName, 27)}}</div>
+                    <div slot="left" class="margin-right truncate">{{scheduledJob.jobName}}</div>
                     <div slot="right">{{formatTimestamp(scheduledJob.nextRun)}}</div>
                 </feedback-box>
             </div>
@@ -314,9 +316,6 @@
                 this.enableRefreshTimer()
                 this.showMarkJobExecutionResolvedDialog = false
             },
-            formatName: function (name, length) {
-                return FormatUtils.shorten(name, length)
-            },
             enableRefreshTimer: function () {
                 this.jobExecutionsListRefreshTimer = setInterval(() => {
                     this.loadNumSlots()
@@ -382,11 +381,16 @@
 
     .schedule-box {
         min-height: 400px;
-        min-width: 520px;
+        min-width: 500px;
+        max-width: 650px;
     }
 
     .margin-right {
         margin-right: 25px;
+    }
+
+    .shorten {
+        max-width: 275px;
     }
 
 </style>

@@ -3,13 +3,14 @@
         <h1 slot="header">Delete Service?</h1>
         <div slot="body">
             <div class="paragraph">
-                Do you really want to delete service '{{formatName(serviceName)}}'?
+                Do you really want to delete service:
+                <div class="truncate highlight">{{serviceName}}</div>
             </div>
             <div class="paragraph" v-if="affectedJobs.length > 0">
                 The following jobs are using this service and will not be working any more:
                 <ul class="a">
                     <li v-for="affectedJob in affectedJobs" :key="affectedJob.key">
-                        {{formatName(affectedJob.value)}}
+                        <div class="truncate highlight">{{affectedJob.value}}</div>
                     </li>
                 </ul>
             </div>
@@ -31,7 +32,6 @@
   import ModalDialog from "../common/modal-dialog";
   import LayoutRow from "../common/layout-row";
   import InputButton from "../common/input-button";
-  import FormatUtils from "../../utils/format-utils.js";
   import IgorBackend from "../../utils/igor-backend.js";
 
   export default {
@@ -42,11 +42,6 @@
       return {
         affectedJobs: [],
         deleteJobs: false
-      }
-    },
-    methods: {
-      formatName: function (name) {
-        return FormatUtils.shorten(name, 40);
       }
     },
     mounted: function () {

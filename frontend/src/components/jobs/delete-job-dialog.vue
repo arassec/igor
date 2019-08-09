@@ -3,13 +3,14 @@
         <h1 slot="header">Delete Job?</h1>
         <div slot="body">
             <div class="paragraph">
-                Do you really want to delete job '{{formatName(jobName)}}'?
+                Do you really want to delete job:
+                <div class="truncate highlight">{{jobName}}</div>
             </div>
             <div class="paragraph" v-if="exclusiveServices.length > 0">
                 The following services are only used by this job:
                 <ul class="a">
                     <li v-for="exclusiveService in exclusiveServices" :key="exclusiveService.key">
-                        {{formatName(exclusiveService.value)}}
+                        <div class="truncate highlight">{{exclusiveService.value}}</div>
                     </li>
                 </ul>
             </div>
@@ -23,42 +24,35 @@
         <div slot="footer">
             <layout-row>
                 <input-button slot="left" v-on:clicked="$emit('cancel')" icon="times"/>
-                <input-button slot="right" v-on:clicked="deleteServices ? $emit('delete-plus') : $emit('delete')" icon="check"/>
+                <input-button slot="right" v-on:clicked="deleteServices ? $emit('delete-plus') : $emit('delete')"
+                              icon="check"/>
             </layout-row>
         </div>
     </modal-dialog>
 </template>
 
 <script>
-  import ModalDialog from "../common/modal-dialog";
-  import LayoutRow from "../common/layout-row";
-  import InputButton from "../common/input-button";
-  import FormatUtils from "../../utils/format-utils.js";
+    import ModalDialog from "../common/modal-dialog";
+    import LayoutRow from "../common/layout-row";
+    import InputButton from "../common/input-button";
+    import IgorBackend from "../../utils/igor-backend.js";
 
-  export default {
-    name: "delete-job-dialog",
-    components: {InputButton, LayoutRow, ModalDialog},
-    props: ['jobId', 'jobName'],
-    data: function () {
-      return {
-        exclusiveServices: [],
-        deleteServices: false
-      }
-    },
-    methods: {
-      formatName: function (name) {
-        return FormatUtils.shorten(name, 40);
-      }
-    },
-    mounted: function () {
-      let component = this
-      this.$http.get('/api/job/' + component.jobId + "/exclusive-service-references").then(function (response) {
-        component.exclusiveServices = Array.from(response.data)
-      }).catch(function (error) {
-        component.$root.$data.store.setFeedback('Could not load unused services (' + error + ')', true)
-      })
+    export default {
+        name: "delete-job-dialog",
+        components: {InputButton, LayoutRow, ModalDialog},
+        props: ['jobId', 'jobName'],
+        data: function () {
+            return {
+                exclusiveServices: [],
+                deleteServices: false
+            }
+        },
+        mounted: function () {
+            IgorBackend.getData('/api/job/' + this.jobId + "/exclusive-service-references").then((data) => {
+                this.exclusiveServices = Array.from(data)
+            })
+        }
     }
-  }
 </script>
 
 <style scoped>

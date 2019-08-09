@@ -80,7 +80,7 @@
                 <h2>Service Parameters</h2>
                 <parameter-editor v-if="Object.keys(serviceConfiguration.parameters).length > 0"
                                   :parameters="serviceConfiguration.parameters" ref="parameterEditor"/>
-                <p v-if="Object.keys(serviceConfiguration.parameters).length == 0">
+                <p v-if="Object.keys(serviceConfiguration.parameters).length === 0">
                     This service has no parameters to configure.
                 </p>
             </core-panel>
@@ -163,9 +163,9 @@
         methods: {
             loadService: async function (id) {
                 await IgorBackend.getData('/api/service/' + id).then((serviceConfiguration) => {
-                    this.serviceConfiguration = serviceConfiguration
-                    this.serviceCategories.push(this.serviceConfiguration.category)
-                    this.serviceTypes.push(this.serviceConfiguration.type)
+                    this.serviceConfiguration = serviceConfiguration;
+                    this.serviceCategories.push(this.serviceConfiguration.category);
+                    this.serviceTypes.push(this.serviceConfiguration.type);
                     this.newService = false
                 })
             },

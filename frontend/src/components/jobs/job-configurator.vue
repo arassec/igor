@@ -1,9 +1,9 @@
 <template>
-    <div class="sticky" v-if="jobConfiguration">
+    <div class="sticky max-width" v-if="jobConfiguration">
         <core-panel>
-            <h1>
+            <h1 class="truncate">
                 <font-awesome-icon icon="toolbox"/>
-                {{ jobConfiguration.name.length > 0 ? formatName(jobConfiguration.name) : 'Unnamed Job' }}
+                {{ jobConfiguration.name.length > 0 ? jobConfiguration.name : 'Unnamed Job' }}
             </h1>
             <table>
                 <tr>
@@ -84,102 +84,101 @@
 </template>
 
 <script>
-  import CorePanel from '../common/core-panel'
-  import ValidationError from '../common/validation-error'
-  import ParameterEditor from '../common/parameter-editor'
-  import IgorBackend from '../../utils/igor-backend.js'
-  import FormatUtils from '../../utils/format-utils.js'
+    import CorePanel from '../common/core-panel'
+    import ValidationError from '../common/validation-error'
+    import ParameterEditor from '../common/parameter-editor'
+    import IgorBackend from '../../utils/igor-backend.js'
 
-  export default {
-    name: 'job-configurator',
-    components: {ParameterEditor, ValidationError, CorePanel},
-    props: ['jobConfiguration'],
-    data: function () {
-      return {
-        nameValidationError: '',
-        triggerCategories: [],
-        triggerTypes: []
-      }
-    },
-    methods: {
-      loadCategories: async function () {
-        await IgorBackend.getData('/api/category/trigger').then((categories) => {
-          for (let i = this.triggerCategories.length; i > 0; i--) {
-            this.triggerCategories.pop()
-          }
-          let component = this
-          Array.from(categories).forEach(function (item) {
-            component.triggerCategories.push(item)
-          })
-          if (this.jobConfiguration.trigger.category == null) {
-            this.jobConfiguration.trigger.category = this.triggerCategories[0]
-          }
-        })
-      },
-      loadTypesOfCategory: async function (categoryKey) {
-        await IgorBackend.getData('/api/type/trigger/' + categoryKey).then((types) => {
-          for (let i = this.triggerTypes.length; i > 0; i--) {
-            this.triggerTypes.pop()
-          }
-          let component = this
-          Array.from(types).forEach(function (item) {
-            component.triggerTypes.push(item)
-          })
-          if (this.jobConfiguration.trigger.type == null) {
-            this.jobConfiguration.trigger.type = component.triggerTypes[0]
-          }
-        })
-      },
-      loadParametersOfType: async function (typeKey) {
-        await IgorBackend.getData('/api/parameters/trigger/' + typeKey).then((parameters) => {
-          this.jobConfiguration.trigger.parameters = parameters
-        })
-      },
-      validateInput: async function () {
-        this.nameValidationError = ''
+    export default {
+        name: 'job-configurator',
+        components: {ParameterEditor, ValidationError, CorePanel},
+        props: ['jobConfiguration'],
+        data: function () {
+            return {
+                nameValidationError: '',
+                triggerCategories: [],
+                triggerTypes: []
+            }
+        },
+        methods: {
+            loadCategories: async function () {
+                await IgorBackend.getData('/api/category/trigger').then((categories) => {
+                    for (let i = this.triggerCategories.length; i > 0; i--) {
+                        this.triggerCategories.pop()
+                    }
+                    let component = this
+                    Array.from(categories).forEach(function (item) {
+                        component.triggerCategories.push(item)
+                    })
+                    if (this.jobConfiguration.trigger.category == null) {
+                        this.jobConfiguration.trigger.category = this.triggerCategories[0]
+                    }
+                })
+            },
+            loadTypesOfCategory: async function (categoryKey) {
+                await IgorBackend.getData('/api/type/trigger/' + categoryKey).then((types) => {
+                    for (let i = this.triggerTypes.length; i > 0; i--) {
+                        this.triggerTypes.pop()
+                    }
+                    let component = this
+                    Array.from(types).forEach(function (item) {
+                        component.triggerTypes.push(item)
+                    })
+                    if (this.jobConfiguration.trigger.type == null) {
+                        this.jobConfiguration.trigger.type = component.triggerTypes[0]
+                    }
+                })
+            },
+            loadParametersOfType: async function (typeKey) {
+                await IgorBackend.getData('/api/parameters/trigger/' + typeKey).then((parameters) => {
+                    this.jobConfiguration.trigger.parameters = parameters
+                })
+            },
+            validateInput: async function () {
+                this.nameValidationError = '';
 
-        if (this.jobConfiguration.name == null || this.jobConfiguration.name === '') {
-          this.nameValidationError = 'Name must be set'
-        } else {
-          let nameAlreadyExists = await IgorBackend.getData('/api/job/check/'
-              + btoa(this.jobConfiguration.name) + '/' + (this.jobConfiguration.id === undefined ? -1 : this.jobConfiguration.id))
-          if (nameAlreadyExists === true) {
-            this.nameValidationError = 'A job with this name already exists!'
-          }
-        }
+                if (this.jobConfiguration.name == null || this.jobConfiguration.name === '') {
+                    this.nameValidationError = 'Name must be set'
+                } else {
+                    let nameAlreadyExists = await IgorBackend.getData('/api/job/check/'
+                        + btoa(this.jobConfiguration.name) + '/' + (this.jobConfiguration.id === undefined ? -1 : this.jobConfiguration.id))
+                    if (nameAlreadyExists === true) {
+                        this.nameValidationError = 'A job with this name already exists!'
+                    }
+                }
 
-        let parameterValidationResult = true
-        if (typeof this.$refs.parameterEditor !== 'undefined') {
-          parameterValidationResult = this.$refs.parameterEditor.validateInput()
-        }
+                let parameterValidationResult = true
+                if (typeof this.$refs.parameterEditor !== 'undefined') {
+                    parameterValidationResult = this.$refs.parameterEditor.validateInput()
+                }
 
-        return ((this.nameValidationError.length === 0) && parameterValidationResult)
-      },
-      setNameValidationError: function (errorMessage) {
-        this.nameValidationError = errorMessage
-      },
-      createService: function (parameterIndex, serviceCategory) {
-        this.$emit('create-service', this.taskKey, parameterIndex, serviceCategory)
-      },
-      formatName: function (name) {
-        return FormatUtils.shorten(name, 40)
-      }
-    },
-    mounted() {
-      let loadParameters = (this.jobConfiguration.trigger.type === null)
-      this.loadCategories().then(() => {
-        this.loadTypesOfCategory(this.jobConfiguration.trigger.category.key).then(() => {
-          if (loadParameters) {
-            this.loadParametersOfType(this.jobConfiguration.trigger.type.key).then(() => {
-              this.$emit('update-original-job-configuration')
+                return ((this.nameValidationError.length === 0) && parameterValidationResult)
+            },
+            setNameValidationError: function (errorMessage) {
+                this.nameValidationError = errorMessage
+            },
+            createService: function (parameterIndex, serviceCategory) {
+                this.$emit('create-service', this.taskKey, parameterIndex, serviceCategory)
+            }
+        },
+        mounted() {
+            let loadParameters = (this.jobConfiguration.trigger.type === null)
+            this.loadCategories().then(() => {
+                this.loadTypesOfCategory(this.jobConfiguration.trigger.category.key).then(() => {
+                    if (loadParameters) {
+                        this.loadParametersOfType(this.jobConfiguration.trigger.type.key).then(() => {
+                            this.$emit('update-original-job-configuration')
+                        })
+                    }
+                })
             })
-          }
-        })
-      })
+        }
     }
-  }
 </script>
 
 <style scoped>
 
+    .max-width {
+        max-width: 650px;
+    }
 </style>

@@ -107,4 +107,9 @@
     text-overflow: ellipsis;
   }
 
+  .highlight {
+    max-width: 500px;
+    margin: 10px;
+  }
+
 </style>

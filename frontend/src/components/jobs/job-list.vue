@@ -39,10 +39,10 @@
         <modal-dialog v-if="showRunDialog"
                       @close="showRunDialog = false"
                       v-on:cancel="showRunDialog = false">
-            <h1 slot="header">Start job</h1>
-            <p slot="body">
-                Manually start job '{{selectedJobName}}' now?
-            </p>
+            <h1 slot="header">Start job?</h1>
+            <div slot="body">
+                Manually start job <div class="truncate highlight">{{selectedJobName}}</div>now?
+            </div>
             <layout-row slot="footer">
                 <input-button slot="left" v-on:clicked="showRunDialog = false" icon="times"/>
                 <input-button slot="right" v-on:clicked="runJob()" icon="check"/>

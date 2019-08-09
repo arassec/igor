@@ -15,7 +15,7 @@
                                v-model.number="param.value"/>
                         <font-awesome-icon v-else-if="isBoolean(param.type)" :icon="param.value ? 'check-square' : 'square'"
                                            v-on:click="param.value = !param.value"/>
-                        <input v-else-if="isService(param)" :disabled="true" v-model="param.serviceName"/>
+                        <input v-else-if="isService(param)" :disabled="true" class="truncate" v-model="param.serviceName"/>
                         <textarea v-else-if="param.subtype === 'MULTI_LINE'" v-model="param.value" rows="8" cols="41"/>
                         <input v-else autocomplete="off"
                                :type="parameterInputTypes[index]" v-model.trim="param.value"/>
