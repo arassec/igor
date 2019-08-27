@@ -1,8 +1,8 @@
 package com.arassec.igor.module.file.service.http;
 
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.module.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +17,7 @@ import java.security.NoSuchAlgorithmException;
  * {@link FileService} that uses HTTPS as protocol.
  */
 @Slf4j
-@IgorService(label = "HTTPS")
+@IgorComponent("HTTPS")
 public class HttpsFileService extends HttpFileService {
 
     /**

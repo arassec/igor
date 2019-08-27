@@ -1,5 +1,5 @@
 <template>
-    <core-content>
+    <core-content overflow-hidden="true">
         <list-header :addButtonTarget="'service-editor'" :addButtonText="'Add Service'" :filter="filter"
                      :filter-key="'service-list-filter'">
             <p slot="title">

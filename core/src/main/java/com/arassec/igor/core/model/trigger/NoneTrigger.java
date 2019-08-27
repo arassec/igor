@@ -1,7 +1,7 @@
 package com.arassec.igor.core.model.trigger;
 
-import com.arassec.igor.core.model.IgorTrigger;
+import com.arassec.igor.core.model.IgorComponent;
 
-@IgorTrigger(label = "None")
+@IgorComponent("None")
 public class NoneTrigger extends BaseTrigger {
 }

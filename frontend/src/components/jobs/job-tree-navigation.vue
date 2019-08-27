@@ -221,7 +221,7 @@
 
     ul.tree li:before {
         position: relative;
-        top: -0.3em;
+        top: -0.6em;
         height: 1em;
         width: 12px;
         color: white;

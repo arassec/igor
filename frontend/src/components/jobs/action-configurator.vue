@@ -1,7 +1,7 @@
 <template>
-    <div class="sticky">
+    <div class="sticky max-width">
         <core-panel>
-            <h1>
+            <h1 class="truncate">
                 <font-awesome-icon icon="wrench"/>
                 {{ action.type.label }}
             </h1>

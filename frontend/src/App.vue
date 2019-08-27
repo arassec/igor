@@ -107,6 +107,10 @@
     text-overflow: ellipsis;
   }
 
+  .max-width {
+    max-width: 650px;
+  }
+
   .highlight {
     max-width: 500px;
     margin: 10px;

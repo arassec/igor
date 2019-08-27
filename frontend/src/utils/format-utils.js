@@ -8,12 +8,6 @@ export default {
     }
     return parts.join(' ');
   },
-  shorten: function (input, maxLength) {
-    if (input.length > maxLength) {
-      return input.substring(0, maxLength) + '...'
-    }
-    return input
-  },
   formatInstant: function (instant) {
     let options = {year: 'numeric', month: '2-digit', day: '2-digit'};
     let date = new Date(instant)

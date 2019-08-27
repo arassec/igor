@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.provider;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.IgorProvider;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.BaseProvider;
@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Provides file names from a specified directory.
  */
-@IgorProvider(label = "List Files")
+@IgorComponent("List Files")
 public class ListFilesProvider extends BaseProvider implements FileProvider {
 
     /**

@@ -36,11 +36,11 @@
                 </tr>
             </table>
 
-            <div v-if="jobExecution.executionState === 'RUNNING'">
-                <h2>Task: {{formatName(jobExecution.currentTask, 30)}}</h2>
+            <div v-if="jobExecution.executionState === 'RUNNING'" class="max-width">
+                <h2 class="truncate">Task: {{jobExecution.currentTask}}</h2>
 
                 <feedback-box v-for="(wip, index) in jobExecution.workInProgress" :key="index" :clickable="false">
-                    <div slot="left" class="margin-right">{{formatName(wip.name, 64)}}</div>
+                    <div slot="left" class="margin-right truncate">{{wip.name}}</div>
                     <div slot="right">{{formatPercent(wip.progressInPercent)}}</div>
                 </feedback-box>
             </div>
@@ -61,7 +61,6 @@
   import LayoutRow from '../common/layout-row'
   import InputButton from '../common/input-button'
   import FeedbackBox from '../common/feedback-box'
-  import FormatUtils from '../../utils/format-utils.js'
 
   export default {
     name: 'job-execution-details',
@@ -72,9 +71,6 @@
         let options = {year: 'numeric', month: '2-digit', day: '2-digit'};
         let date = new Date(unformattedDate)
         return date.toLocaleDateString(undefined, options) + ' ' + date.toLocaleTimeString()
-      },
-      formatName: function (input, length) {
-        return FormatUtils.shorten(input, length)
       },
       formatPercent: function (input) {
         return input.toFixed(2) + '%'

@@ -1,7 +1,7 @@
 package com.arassec.igor.module.message.service.rabbitmq;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.misc.ParameterSubtype;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.message.service.BaseMessageService;
@@ -15,7 +15,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 /**
  * {@link MessageService} to process messages via RabbitMQ.
  */
-@IgorService(label = "RabbitMQ")
+@IgorComponent("RabbitMQ")
 public class RabbitMqMessageService extends BaseMessageService {
 
     /**

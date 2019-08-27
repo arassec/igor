@@ -1,6 +1,6 @@
 package com.arassec.igor.module.misc.action.util;
 
-import com.arassec.igor.core.model.IgorAction;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * Sorts data by using a configurable pattern on a data value.
  */
-@IgorAction(label = "Sort by timestamp pattern")
+@IgorComponent("Sort by timestamp pattern")
 @Slf4j
 public class SortByTimestampPatternAction extends BaseUtilAction {
 
@@ -45,7 +45,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     /**
      * Unused by this action and thus made invisible in the UI.
      */
-    @IgorParam(visible = false)
+    @IgorParam(configurable = false)
     protected int numThreads;
 
     /**
@@ -57,10 +57,10 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * Collects all data in memory for later sorting.
      *
      * @param data         The data the action will work with.
-     * @param isDryRun     {@code true} if the data should be processed in an idempotent way, i.e. the data should not be
-     *                     changed irreversably. Set to {@code false} to process the data regularly according to the actions
-     *                     purpose.
+     * @param isDryRun     {@code true} if the data should be processed in an idempotent way, i.e. the data should not be changed
+     *                     irreversably. Set to {@code false} to process the data regularly according to the actions purpose.
      * @param jobExecution The job execution log.
+     *
      * @return Always {@code null}.
      */
     @Override
@@ -109,8 +109,8 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * @param p                    The pattern to use to find the date-time-String.
      * @param formatter            The {@link ZonedDateTime} for the supplied String.
      * @param applyDefaultTimezone Set to {@code true}, if the format is in {@link java.time.LocalDateTime} and the system's
-     *                             default
-     *                             time zone must be applied to the result.
+     *                             default time zone must be applied to the result.
+     *
      * @return The {@link ZonedDateTime} or {@ocde null}, if none could be extracted.
      */
     private ZonedDateTime extractDateTime(Map<String, Object> data, Pattern p, DateTimeFormatter formatter,

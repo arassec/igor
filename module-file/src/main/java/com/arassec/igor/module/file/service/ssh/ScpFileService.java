@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service.ssh;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * {@link FileService} for SCP file handling.
  */
 @Slf4j
-@IgorService(label = "SCP")
+@IgorComponent("SCP")
 public class ScpFileService extends BaseSshFileService {
 
     /**
@@ -59,7 +59,9 @@ public class ScpFileService extends BaseSshFileService {
      *
      * @param in  The InputStream to read.
      * @param log Will be filled with an error message from the server if the command was not successful.
+     *
      * @return The result of the last SSH command.
+     *
      * @throws IOException In case of errors.
      */
     private static int checkAck(InputStream in, StringBuffer log) throws IOException {
@@ -116,6 +118,7 @@ public class ScpFileService extends BaseSshFileService {
      *
      * @param dir   The directory.
      * @param input The file name from the 'ls' command.
+     *
      * @return The sanitized file name.
      */
     private String extractFilename(String dir, String input) {
@@ -136,6 +139,7 @@ public class ScpFileService extends BaseSshFileService {
      * This method extracts the timestamp relevant fields from the string and returns the formatted result.
      *
      * @param input One output line from the 'ls' command.
+     *
      * @return The extracted timestamp or {@code null}, if none could be extracted.
      */
     private String extractLastModified(String input) {
@@ -367,6 +371,7 @@ public class ScpFileService extends BaseSshFileService {
      * Executes the supplied shell command on the remote SSH server and returns the output as StringBuffer.
      *
      * @param command The shell command to execute.
+     *
      * @return The command's output.
      */
     private StringBuffer execute(String command) {

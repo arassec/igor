@@ -1,6 +1,6 @@
 package com.arassec.igor.module.misc.action.util;
 
-import com.arassec.igor.core.model.IgorAction;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Pauses the processing for a configurable amount of time.
  */
-@IgorAction(label = "Pause")
+@IgorComponent("Pause")
 @Slf4j
 public class PauseAction extends BaseUtilAction {
 
@@ -27,6 +27,7 @@ public class PauseAction extends BaseUtilAction {
      * @param data         The data the action will work with.
      * @param isDryRun     If set to {@code true}, the action does not pause processing.
      * @param jobExecution The job execution log.
+     *
      * @return Always {@code true}.
      */
     @Override

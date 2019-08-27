@@ -1,12 +1,16 @@
 package com.arassec.igor.core.application.factory;
 
-import com.arassec.igor.core.application.factory.util.CategoryScanner;
+import com.arassec.igor.core.application.factory.util.ArtifactScanner;
 import com.arassec.igor.core.application.factory.util.KeyLabelStore;
+import com.arassec.igor.core.model.IgorCategory;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
@@ -25,14 +29,14 @@ public abstract class ModelFactory<T> {
     /**
      * Base package for annotation scanning.
      * <p>
-     * TODO: This should be determined by e.g. an Igorfile or a list of configuration parameters or something else.
+     * TODO: This should be a list of configuration parameters configurable vai GUI.
      */
     private static final String BASE_PACKAGE = "com.arassec.igor";
 
     /**
      * Name of the annotation class' label() method.
      */
-    private static final String LABEL_METHOD_NAME = "label";
+    private static final String VALUE_METHOD_NAME = "value";
 
     /**
      * Contains the categories of models this factory provides.
@@ -56,23 +60,18 @@ public abstract class ModelFactory<T> {
 
     /**
      * Creates a new {@link ModelFactory}.
-     *
-     * @param modelClass              The model class this factory provides, e.g. 'Service'.
-     * @param categoryAnnotationClass The annotation that defines categories for the models of this factory, e.g. 'IgorServiceCategory'.
-     * @param typeAnnotationClass     The annotation that marks a class as type for this factory, e.g. 'IgorService'.
      */
-    ModelFactory(Class<T> modelClass, Class<? extends Annotation> categoryAnnotationClass,
-                 Class<? extends Annotation> typeAnnotationClass) {
-        log.info("Registering categories using: {}", categoryAnnotationClass.getName());
-        categories = findModelDefinitions(modelClass, categoryAnnotationClass, true);
+    ModelFactory() {
+        Class<T> modelClass = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), ModelFactory.class);
 
-        log.info("Registering types using: {}", typeAnnotationClass.getName());
-        types = findModelDefinitions(modelClass, typeAnnotationClass, false);
+        log.info("Registering classes for: {}", modelClass.getName());
+        categories = findCategories(modelClass);
+        types = findComponents(modelClass);
 
         types.forEach(type -> {
             KeyLabelStore category;
             try {
-                category = findModelDefintion(Class.forName(type.getKey()), categories);
+                category = findCategoryOfComponent(Class.forName(type.getKey()), categories);
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(e);
             }
@@ -88,6 +87,7 @@ public abstract class ModelFactory<T> {
      * Creates a new model instance of the provided type.
      *
      * @param type The model type to create.
+     *
      * @return An instance of the model or null, if none could be created.
      */
     public T createInstance(String type) {
@@ -104,6 +104,7 @@ public abstract class ModelFactory<T> {
      *
      * @param type       The model type to create.
      * @param parameters The model's parameters, that should be applied to the model.
+     *
      * @return The model instance with cleartext properties
      */
     public synchronized T createInstance(String type, Map<String, Object> parameters) {
@@ -132,6 +133,7 @@ public abstract class ModelFactory<T> {
      * Returns the category of the provided instance.
      *
      * @param instance The instance to get the category for.
+     *
      * @return The category definition or {@code null}, if none was found.
      */
     public KeyLabelStore getCategory(T instance) {
@@ -146,6 +148,7 @@ public abstract class ModelFactory<T> {
      * Returns the type of the supplied instance.
      *
      * @param instance The instance to get the type for.
+     *
      * @return The type or {@code null}, if none exists for this instance.
      */
     public KeyLabelStore getType(T instance) {
@@ -154,17 +157,18 @@ public abstract class ModelFactory<T> {
     }
 
     /**
-     * Finds the model definition for the supplied class in the set of supplied model definitions.
+     * Finds the category of the supplied component in the set of available categories.
      *
-     * @param modelClass       The model class to find a definition for.
-     * @param keyLabelStores The available model definitions.
+     * @param modelClass The model class to find a definition for.
+     * @param categories The available categories.
+     *
      * @return A model definition for the supplied class.
      */
-    private KeyLabelStore findModelDefintion(Class modelClass, Set<KeyLabelStore> keyLabelStores) {
-        for (KeyLabelStore keyLabelStore : keyLabelStores) {
+    private KeyLabelStore findCategoryOfComponent(Class modelClass, Set<KeyLabelStore> categories) {
+        for (KeyLabelStore category : categories) {
             try {
-                if (Class.forName(keyLabelStore.getKey()).isAssignableFrom(modelClass)) {
-                    return keyLabelStore;
+                if (Class.forName(category.getKey()).isAssignableFrom(modelClass)) {
+                    return category;
                 }
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(e);
@@ -174,41 +178,62 @@ public abstract class ModelFactory<T> {
     }
 
     /**
-     * Registers model definitions for the provided model and annotation class.
+     * Registers {@link IgorCategory}s for the provided model class.
      *
-     * @param modelClass      The model class this factory provides.
-     * @param annotationClass The annotation that defines the model definition, e.g. a type or category annotation.
-     * @return Set of {@link KeyLabelStore}s.
+     * @param modelClass The model class this factory provides.
+     *
+     * @return Set of {@link KeyLabelStore}s containing the model's categories.
      */
-    private Set<KeyLabelStore> findModelDefinitions(Class<T> modelClass, Class<? extends Annotation> annotationClass, boolean searchCategories) {
+    private Set<KeyLabelStore> findCategories(Class<T> modelClass) {
         Set<KeyLabelStore> result = new HashSet<>();
-
-        if (modelClass != null && annotationClass != null) {
-            ClassPathScanningCandidateComponentProvider scanner;
-            if (searchCategories) {
-                scanner = new CategoryScanner(annotationClass);
-            } else {
-                scanner = new ClassPathScanningCandidateComponentProvider(false);
-                scanner.addIncludeFilter(new AnnotationTypeFilter(annotationClass));
-            }
-
+        if (modelClass != null) {
+            ClassPathScanningCandidateComponentProvider scanner = new ArtifactScanner(modelClass, IgorCategory.class, true);
             for (BeanDefinition beanDefinition : scanner.findCandidateComponents(BASE_PACKAGE)) {
-                try {
-                    Class<?> clazz = Class.forName(beanDefinition.getBeanClassName());
-                    if (searchCategories || modelClass.isAssignableFrom(clazz)) {
-                        KeyLabelStore keyLabelStore = new KeyLabelStore();
-                        keyLabelStore.setKey(clazz.getName());
-                        keyLabelStore.setLabel(String.valueOf(annotationClass.getMethod(LABEL_METHOD_NAME).invoke(clazz.getAnnotation(annotationClass))));
-                        log.debug("Registered {} / '{}'", keyLabelStore.getKey(), keyLabelStore.getLabel());
-                        result.add(keyLabelStore);
-                    }
-                } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    throw new IllegalStateException(e);
-                }
+                KeyLabelStore keyLabelStore = createKeyLabelStore(beanDefinition, IgorCategory.class);
+                result.add(keyLabelStore);
+                log.debug("Registered category: {} / {}", keyLabelStore.getLabel(), keyLabelStore.getKey());
             }
         }
-
         return result;
+    }
+
+    /**
+     * Registers {@link IgorComponent} implementations for the provided model class.
+     *
+     * @param modelClass The model class this factory provides.
+     *
+     * @return Set of {@link KeyLabelStore}s containing the model's components.
+     */
+    private Set<KeyLabelStore> findComponents(Class<T> modelClass) {
+        Set<KeyLabelStore> result = new HashSet<>();
+        if (modelClass != null) {
+            ClassPathScanningCandidateComponentProvider scanner = new ArtifactScanner(modelClass, IgorComponent.class, false);
+            for (BeanDefinition beanDefinition : scanner.findCandidateComponents(BASE_PACKAGE)) {
+                result.add(createKeyLabelStore(beanDefinition, IgorComponent.class));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Creates a {@link KeyLabelStore} for the supplied bean definition an annotation class.
+     *
+     * @param beanDefinition  The bean definition to take the data from.
+     * @param annotationClass The annotation class to extract the label from.
+     *
+     * @return A {@link KeyLabelStore} for the supplied bean.
+     */
+    private KeyLabelStore createKeyLabelStore(BeanDefinition beanDefinition, Class<? extends Annotation> annotationClass) {
+        try {
+            Class<?> clazz = Class.forName(beanDefinition.getBeanClassName());
+            KeyLabelStore keyLabelStore = new KeyLabelStore();
+            keyLabelStore.setKey(clazz.getName());
+            keyLabelStore.setLabel(String.valueOf(annotationClass.getMethod(VALUE_METHOD_NAME).invoke(clazz.getAnnotation(annotationClass))));
+            log.debug("Registered {} / '{}'", keyLabelStore.getKey(), keyLabelStore.getLabel());
+            return keyLabelStore;
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**

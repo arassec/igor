@@ -1,6 +1,6 @@
 package com.arassec.igor.module.misc.action.util;
 
-import com.arassec.igor.core.model.IgorAction;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +16,12 @@ import java.util.Map;
  * Filters the supplied data by a regular expression.
  */
 @Slf4j
-@IgorAction(label = "Filter by timestamp")
+@IgorComponent("Filter by timestamp")
 public class FilterByTimestamp extends BaseUtilAction {
 
     /**
-     * If set to {@code true}, timestamps older than the configured one are filtered. If set to {@code false}, timestamps
-     * younger than the configured one are filtered.
+     * If set to {@code true}, timestamps older than the configured one are filtered. If set to {@code false}, timestamps younger
+     * than the configured one are filtered.
      */
     @IgorParam
     private boolean olderThan = true;
@@ -56,6 +56,7 @@ public class FilterByTimestamp extends BaseUtilAction {
      * @param data         The data the action will work with.
      * @param isDryRun     Unused - the action always filters by timestamp.
      * @param jobExecution The job's execution log.
+     *
      * @return
      */
     @Override

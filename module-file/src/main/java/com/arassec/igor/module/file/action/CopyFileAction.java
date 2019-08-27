@@ -1,6 +1,6 @@
 package com.arassec.igor.module.file.action;
 
-import com.arassec.igor.core.model.IgorAction;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
@@ -17,7 +17,7 @@ import java.util.Map;
  * Copies a file from one service to another.
  */
 @Slf4j
-@IgorAction(label = "Copy file")
+@IgorComponent("Copy file")
 public class CopyFileAction extends BaseFileAction {
 
     /**
@@ -89,6 +89,7 @@ public class CopyFileAction extends BaseFileAction {
      * @param isDryRun     Set to {@code true}, if this is a dry-run and the file should not actually be copied. Set to {@code
      *                     false} for an actual run.
      * @param jobExecution The job execution log.
+     *
      * @return The manipulated data.
      */
     @Override
@@ -150,6 +151,7 @@ public class CopyFileAction extends BaseFileAction {
      *
      * @param file   The source file.
      * @param suffix An optional file suffix to append to the target filename.
+     *
      * @return The filename with path of the target file.
      */
     private String getTargetFile(String file, String suffix) {
@@ -180,6 +182,7 @@ public class CopyFileAction extends BaseFileAction {
      *
      * @param sourceDirectory The path to the source directory.
      * @param file            The filename.
+     *
      * @return The path with the added filename.
      */
     private String getSourceFileWithPath(String sourceDirectory, String file) {

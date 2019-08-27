@@ -8,16 +8,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotates a member variable of an {@link IgorService}, {@link IgorProvider} or {@link IgorAction} as configuration
- * parameter, which should be made configurable with the UI.
+ * Annotates a member variable of an {@link IgorComponent} as configuration parameter.
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IgorParam {
 
     /**
-     * Indicates whether this parameter has to be encrypted before saving it to a repository. If set to {@code true},
-     * the parameter is masked in the UI by default, and encrypted in the repository.
+     * Indicates whether this parameter has to be encrypted before saving it to a repository. If set to {@code true}, the
+     * parameter is masked in the UI by default, and encrypted in the repository.
      *
      * @return {@code true}, if this parameter should be secured, {@code false} otherwise.
      */
@@ -26,8 +25,8 @@ public @interface IgorParam {
     /**
      * Indicates whether a parameter is optional and must not be set in the UI by the user.
      *
-     * @return {@code true}, if the parameter is optional and not needed for providing the service of the containing
-     * class. {@code false}, if the parameter must be set.
+     * @return {@code true}, if the parameter is optional and not needed for providing the service of the containing class. {@code
+     * false}, if the parameter must be set.
      */
     boolean optional() default false;
 
@@ -39,10 +38,10 @@ public @interface IgorParam {
     ParameterSubtype subtype() default ParameterSubtype.NONE;
 
     /**
-     * Enables or disables display of an igor parameter in the UI.
+     * Enables or disables the configuration of this parameter.
      *
-     * @return {@code true}, if the parameter should be visible in the UI, {@code false} otherwise.
+     * @return {@code true}, if the parameter should be configurable by the user, {@code false} otherwise.
      */
-    boolean visible() default true;
+    boolean configurable() default true;
 
 }

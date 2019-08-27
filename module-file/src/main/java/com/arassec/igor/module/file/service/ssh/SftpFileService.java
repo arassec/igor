@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service.ssh;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * {@link FileService} for SFTP file handling.
  */
 @Slf4j
-@IgorService(label = "SFTP")
+@IgorComponent("SFTP")
 public class SftpFileService extends BaseSshFileService {
 
     /**
@@ -211,6 +211,7 @@ public class SftpFileService extends BaseSshFileService {
      *
      * @param source The source file to move.
      * @param target The target file name.
+     *
      * @throws JSchException In case of SSH protocol errors.
      * @throws SftpException In case of SFTP errors.
      */

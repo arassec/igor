@@ -1,6 +1,6 @@
 package com.arassec.igor.module.file.action;
 
-import com.arassec.igor.core.model.IgorAction;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileService;
@@ -13,7 +13,7 @@ import java.util.Map;
  * Deletes a file.
  */
 @Slf4j
-@IgorAction(label = "Delete file")
+@IgorComponent("Delete file")
 public class DeleteFileAction extends BaseFileAction {
 
     /**
@@ -29,13 +29,14 @@ public class DeleteFileAction extends BaseFileAction {
     private String directoryKey = "directory";
 
     /**
-     * Copies the supplied source file to the destination service. During transfer the file is saved with the suffix
-     * ".igor", which will be removed after successful transfer.
+     * Copies the supplied source file to the destination service. During transfer the file is saved with the suffix ".igor",
+     * which will be removed after successful transfer.
      *
      * @param data         The data to process.
-     * @param isDryRun     Set to {@code true}, if this is a dry-run and the file should not actually be deleted. Set to
-     *                     {@code false} for an actual run.
+     * @param isDryRun     Set to {@code true}, if this is a dry-run and the file should not actually be deleted. Set to {@code
+     *                     false} for an actual run.
      * @param jobExecution The job execution log.
+     *
      * @return The manipulated data.
      */
     @Override

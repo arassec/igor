@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service.ftp;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 /**
  * {@link FileService} that uses FTP as protocol.
  */
-@IgorService(label = "FTP")
+@IgorComponent("FTP")
 public class FtpFileService extends BaseFileService {
 
     /**

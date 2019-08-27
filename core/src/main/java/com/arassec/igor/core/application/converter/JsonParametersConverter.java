@@ -46,7 +46,7 @@ public class JsonParametersConverter {
         Set<String> invisibleFields = new HashSet<>();
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
             if (field.isAnnotationPresent(IgorParam.class)) {
-                if (field.getAnnotation(IgorParam.class).visible()) {
+                if (field.getAnnotation(IgorParam.class).configurable()) {
                     JSONObject parameter = new JSONObject();
                     parameter.put(JsonKeys.NAME, field.getName());
                     parameter.put(JsonKeys.TYPE, field.getType().getName());
@@ -56,7 +56,7 @@ public class JsonParametersConverter {
                     if (addVolatile) {
                         parameter.put(JsonKeys.OPTIONAL, field.getAnnotation(IgorParam.class).optional());
                         parameter.put(JsonKeys.SUBTYPE, field.getAnnotation(IgorParam.class).subtype().name());
-                        parameter.put(JsonKeys.VISIBLE, true);
+                        parameter.put(JsonKeys.CONFIGURABLE, true);
                     }
                     boolean isService = Service.class.isAssignableFrom(field.getType());
                     parameter.put(JsonKeys.SERVICE, isService);
@@ -76,7 +76,7 @@ public class JsonParametersConverter {
 
         parameterList.forEach(parameter -> {
             if (invisibleFields.contains(parameter.getString(JsonKeys.NAME))) {
-                parameter.put(JsonKeys.VISIBLE, false);
+                parameter.put(JsonKeys.CONFIGURABLE, false);
             }
         });
 

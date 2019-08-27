@@ -61,9 +61,9 @@ public interface JsonKeys {
     String SUBTYPE = "subtype";
 
     /**
-     * The visible key.
+     * The configurable key.
      */
-    String VISIBLE = "visible";
+    String CONFIGURABLE = "configurable";
 
     /**
      * The key key. :)

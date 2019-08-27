@@ -1,6 +1,6 @@
 package com.arassec.igor.module.file.service;
 
-import com.arassec.igor.core.model.IgorServiceCategory;
+import com.arassec.igor.core.model.IgorCategory;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.Service;
 
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Base interface for all file based services.
  */
-@IgorServiceCategory(label = "File")
+@IgorCategory("File")
 public interface FileService extends Service {
 
     /**
@@ -18,6 +18,7 @@ public interface FileService extends Service {
      *
      * @param directory  The directory to search for files.
      * @param fileEnding An optional file ending to filter unwanted files.
+     *
      * @return The file names as List.
      */
     List<FileInfo> listFiles(String directory, String fileEnding);
@@ -27,6 +28,7 @@ public interface FileService extends Service {
      *
      * @param file           The file to read.
      * @param workInProgress The work in progress container.
+     *
      * @return The content of the file.
      */
     String read(String file, WorkInProgressMonitor workInProgress);
@@ -34,8 +36,9 @@ public interface FileService extends Service {
     /**
      * Reads the content of the specified file into the returned {@link InputStream}.
      *
-     * @param file The name of the file to read.
+     * @param file           The name of the file to read.
      * @param workInProgress The work in progress container.
+     *
      * @return The content of the file as stream of data.
      */
     FileStreamData readStream(String file, WorkInProgressMonitor workInProgress);

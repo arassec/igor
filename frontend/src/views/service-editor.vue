@@ -17,7 +17,7 @@
                               class="list-entry"
                               :clickable="true"
                               v-on:feedback-clicked="editJob(referencingJob.key)">
-                    <div slot="left">{{formatJobName(referencingJob.value)}}</div>
+                    <div slot="left" class="width-restricted truncate">{{referencingJob.value}}</div>
                 </feedback-box>
                 <list-pager :page="referencingJobsPage" v-if="referencingJobsPage.totalPages > 1"
                             v-on:first="loadReferencingJobs(0)"
@@ -283,9 +283,6 @@
                 }
 
                 return ((this.nameValidationError.length === 0) && parameterValidationResult)
-            },
-            formatJobName: function (name) {
-                return FormatUtils.shorten(name, 27)
             },
             editJob: function (jobId) {
                 this.$router.push({name: 'job-editor', params: {jobId: jobId}})

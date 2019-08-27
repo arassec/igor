@@ -1,5 +1,5 @@
 <template>
-    <core-container>
+    <core-container class="overflow-hidden">
 
         <side-menu>
             <div slot="title">
@@ -355,6 +355,10 @@
 </script>
 
 <style scoped>
+
+    .overflow-hidden {
+        overflow: hidden;
+    }
 
     .column {
         width: 50%;

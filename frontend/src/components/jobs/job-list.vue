@@ -1,5 +1,5 @@
 <template>
-    <core-content>
+    <core-content overflow-hidden="true">
         <list-header :addButtonTarget="'job-editor'" :addButtonText="'Add Job'" :filter="filter"
                      :filter-key="'job-list-filter'">
             <p slot="title">

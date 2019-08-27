@@ -178,7 +178,4 @@
 
 <style scoped>
 
-    .max-width {
-        max-width: 650px;
-    }
 </style>

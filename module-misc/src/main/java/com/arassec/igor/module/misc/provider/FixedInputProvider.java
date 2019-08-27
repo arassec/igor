@@ -1,7 +1,7 @@
 package com.arassec.igor.module.misc.provider;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.IgorProvider;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.misc.ParameterSubtype;
@@ -12,8 +12,8 @@ import java.util.*;
 /**
  * Provides fixed input to tasks.
  */
-@IgorProvider(label = "Fixed input")
-public class FixedInputProvider  extends BaseProvider implements UtilProvider {
+@IgorComponent("Fixed input")
+public class FixedInputProvider extends BaseProvider implements UtilProvider {
 
     /**
      * The service to use for file listing.

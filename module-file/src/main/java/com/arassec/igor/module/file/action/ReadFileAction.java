@@ -1,6 +1,6 @@
 package com.arassec.igor.module.file.action;
 
-import com.arassec.igor.core.model.IgorAction;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileService;
@@ -13,7 +13,7 @@ import java.util.Map;
  * Reads the content of a file.
  */
 @Slf4j
-@IgorAction(label = "Read file")
+@IgorComponent("Read file")
 public class ReadFileAction extends BaseFileAction {
 
     /**
@@ -33,6 +33,7 @@ public class ReadFileAction extends BaseFileAction {
      * @param data         The data to processData.
      * @param isDryRun     Unused - always reads the file's content.
      * @param jobExecution The job's execution log.
+     *
      * @return The manipulated data.
      */
     @Override

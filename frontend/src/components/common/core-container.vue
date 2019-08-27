@@ -24,7 +24,6 @@
         justify-content: flex-start;
         flex-wrap: nowrap;
         width: 100vw;
-        overflow: hidden;
     }
 
 </style>

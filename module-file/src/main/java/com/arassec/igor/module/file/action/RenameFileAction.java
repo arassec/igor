@@ -1,7 +1,6 @@
 package com.arassec.igor.module.file.action;
 
-
-import com.arassec.igor.core.model.IgorAction;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileService;
@@ -15,7 +14,7 @@ import java.util.Map;
  * Renames a file.
  */
 @Slf4j
-@IgorAction(label = "Rename file")
+@IgorComponent("Rename file")
 public class RenameFileAction extends BaseFileAction {
 
     /**

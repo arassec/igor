@@ -1,7 +1,7 @@
 <template>
-    <div class="sticky">
+    <div class="sticky max-width">
         <core-panel>
-            <h1>
+            <h1 class="truncate">
                 <font-awesome-icon icon="tasks"/>
                 {{ task.name.length > 0 ? task.name : 'Unnamed Task' }}
             </h1>

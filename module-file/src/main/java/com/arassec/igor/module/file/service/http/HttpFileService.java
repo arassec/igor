@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service.http;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.IgorService;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * {@link FileService} that uses HTTP as protocol.
  */
-@IgorService(label = "HTTP")
+@IgorComponent("HTTP")
 public class HttpFileService extends BaseFileService {
 
     /**
@@ -93,6 +93,7 @@ public class HttpFileService extends BaseFileService {
      * Creates the URI to the service.
      *
      * @param suffix The suffix to append after host and port.
+     *
      * @return The base URI to the service.
      */
     private String buildUri(String suffix) {
@@ -110,6 +111,7 @@ public class HttpFileService extends BaseFileService {
      * Creates the HTTP-Request.
      *
      * @param uriPart The variable part of the URI.
+     *
      * @return The {@link HttpRequest}.
      */
     private HttpRequest.Builder getRequestBuilder(String uriPart) {

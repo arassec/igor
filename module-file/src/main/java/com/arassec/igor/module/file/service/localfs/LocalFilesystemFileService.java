@@ -1,6 +1,6 @@
 package com.arassec.igor.module.file.service.localfs;
 
-import com.arassec.igor.core.model.IgorService;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
@@ -27,7 +27,7 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
  * {@link FileService} to access files in the local file system.
  */
 @Slf4j
-@IgorService(label = "Filesystem")
+@IgorComponent("Filesystem")
 public class LocalFilesystemFileService extends BaseFileService {
 
     /**
@@ -142,6 +142,7 @@ public class LocalFilesystemFileService extends BaseFileService {
      * Opens the supplied file for writing.
      *
      * @param file The file to open.
+     *
      * @return A {@link BufferedWriter} to the file.
      */
     public BufferedWriter openFileForWriting(String file) {

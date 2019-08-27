@@ -1,6 +1,6 @@
 package com.arassec.igor.module.file.service.ftp;
 
-import com.arassec.igor.core.model.IgorService;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileService;
 import org.apache.commons.net.ftp.FTP;
@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * {@link FileService} for FTPS servers.
  */
-@IgorService(label = "FTPS")
+@IgorComponent("FTPS")
 public class FtpsFileService extends FtpFileService {
 
     /**

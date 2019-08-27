@@ -1,6 +1,6 @@
 package com.arassec.igor.module.misc.action.persistence;
 
-import com.arassec.igor.core.model.IgorAction;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.persistence.PersistentValue;
@@ -13,7 +13,7 @@ import java.util.Map;
  * Persists a value from the supplied data to the persistence store.
  */
 @Slf4j
-@IgorAction(label = "Persist value")
+@IgorComponent("Persist value")
 public class PersistValueAction extends BasePersistenceAction {
 
     /**
@@ -28,6 +28,7 @@ public class PersistValueAction extends BasePersistenceAction {
      * @param data         The data the action will work with.
      * @param isDryRun     If set to {@code true}, the values are not actually persisted.
      * @param jobExecution The job execution log.
+     *
      * @return Always {@code true}.
      */
     @Override

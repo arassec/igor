@@ -1,6 +1,6 @@
 package com.arassec.igor.module.message.action;
 
-import com.arassec.igor.core.model.IgorAction;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.misc.ParameterSubtype;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * Sends a message to the specified messaging service.
  */
 @Slf4j
-@IgorAction(label = "Send message")
+@IgorComponent("Send message")
 public class SendMessageAction extends BaseMessageAction {
 
     /**
@@ -44,6 +44,7 @@ public class SendMessageAction extends BaseMessageAction {
      * @param data         The data the action will work with.
      * @param isDryRun     Only sends messages if set to {@code false}.
      * @param jobExecution The job execution log.
+     *
      * @return The manipulated data.
      */
     @Override

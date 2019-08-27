@@ -1,13 +1,13 @@
 package com.arassec.igor.core.model.trigger;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.IgorTrigger;
 import com.arassec.igor.core.model.misc.ParameterSubtype;
 
 /**
  * Triggers jobs according to a configurable CRON expression.
  */
-@IgorTrigger(label = "CRON")
+@IgorComponent("CRON")
 public class CronTrigger extends BaseTrigger {
 
     /**
