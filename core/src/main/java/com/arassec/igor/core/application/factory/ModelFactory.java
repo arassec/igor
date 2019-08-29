@@ -246,15 +246,6 @@ public abstract class ModelFactory<T> {
     }
 
     /**
-     * Returns the type definitions this factory provides.
-     *
-     * @return Set of type definitions.
-     */
-    public Set<KeyLabelStore> getTypes() {
-        return types;
-    }
-
-    /**
      * Returns the categories and their corresponding types.
      *
      * @return categories and their types.

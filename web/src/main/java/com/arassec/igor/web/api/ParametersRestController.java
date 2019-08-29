@@ -54,7 +54,7 @@ public class ParametersRestController {
     @GetMapping(value = "service/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getServiceParameters(@PathVariable("type") String type) {
         return parametersConverter.convert(
-                serviceManager.createService(type, null), false, true).toString();
+                serviceManager.createInstance(type, null), false, true).toString();
     }
 
     /**
@@ -66,7 +66,7 @@ public class ParametersRestController {
     @GetMapping(value = "action/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getActionParameters(@PathVariable("type") String type) {
         return parametersConverter.convert(
-                actionManager.createAction(type, null), false, true).toString();
+                actionManager.createInstance(type, null), false, true).toString();
     }
 
     /**
@@ -78,7 +78,7 @@ public class ParametersRestController {
     @GetMapping(value = "provider/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getProviderParameters(@PathVariable("type") String type) {
         return parametersConverter.convert(
-                providerManager.createProvider(type, null), false, true).toString();
+                providerManager.createInstance(type, null), false, true).toString();
     }
 
     /**
@@ -90,7 +90,7 @@ public class ParametersRestController {
     @GetMapping(value = "trigger/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTriggerParameters(@PathVariable("type") String type) {
         return parametersConverter.convert(
-                triggerManager.createTrigger(type, null), false, true).toString();
+                triggerManager.createInstance(type, null), false, true).toString();
     }
 
 }
