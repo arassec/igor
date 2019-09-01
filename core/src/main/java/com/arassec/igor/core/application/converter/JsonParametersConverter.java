@@ -31,29 +31,27 @@ public class JsonParametersConverter {
     /**
      * Returns the instance's paremters as {@link JSONArray}.
      *
-     * @param instance      The model instance to get the parameters from.
-     * @param applySecurity Set to {@code true} to encrypt secured properties. If set to {@code false}, secured
-     *                      properties will be kept in cleartext form.
-     * @param addVolatile   Set to {@code true} to add properties that only exist through annotations or could otherwise
-     *                      be obtained, but can be added for convenience.
-     * @param <T>           The instance type.
+     * @param instance The model instance to get the parameters from.
+     * @param config   The converter configuration.
+     * @param <T>      The instance type.
+     *
      * @return Map containing the parameters.
      */
-    public <T> JSONArray convert(T instance, boolean applySecurity, boolean addVolatile) {
+    public <T> JSONArray convert(T instance, ConverterConfig config) {
 
         JSONArray result = new JSONArray();
         List<JSONObject> parameterList = new LinkedList<>();
-        Set<String> invisibleFields = new HashSet<>();
+        Set<String> fixedFields = new HashSet<>();
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
             if (field.isAnnotationPresent(IgorParam.class)) {
                 if (field.getAnnotation(IgorParam.class).configurable()) {
                     JSONObject parameter = new JSONObject();
                     parameter.put(JsonKeys.NAME, field.getName());
-                    parameter.put(JsonKeys.TYPE, field.getType().getName());
-                    Object value = getFieldValue(instance, field, applySecurity);
+                    Object value = getFieldValue(instance, field, config);
                     parameter.put(JsonKeys.VALUE, value);
                     parameter.put(JsonKeys.SECURED, field.getAnnotation(IgorParam.class).secured());
-                    if (addVolatile) {
+                    if (config.isAnnotationDataEnabled()) {
+                        parameter.put(JsonKeys.TYPE, field.getType().getName());
                         parameter.put(JsonKeys.OPTIONAL, field.getAnnotation(IgorParam.class).optional());
                         parameter.put(JsonKeys.SUBTYPE, field.getAnnotation(IgorParam.class).subtype().name());
                         parameter.put(JsonKeys.CONFIGURABLE, true);
@@ -62,20 +60,20 @@ public class JsonParametersConverter {
                     parameter.put(JsonKeys.SERVICE, isService);
                     if (isService && value != null) {
                         Service service = (Service) value;
-                        if (addVolatile) {
+                        if (config.isAnnotationDataEnabled()) {
                             parameter.put(JsonKeys.SERVICE_NAME, service.getName());
                         }
                         parameter.put(JsonKeys.VALUE, service.getId());
                     }
                     parameterList.add(parameter);
                 } else {
-                    invisibleFields.add(field.getName());
+                    fixedFields.add(field.getName());
                 }
             }
         });
 
         parameterList.forEach(parameter -> {
-            if (invisibleFields.contains(parameter.getString(JsonKeys.NAME))) {
+            if (fixedFields.contains(parameter.getString(JsonKeys.NAME))) {
                 parameter.put(JsonKeys.CONFIGURABLE, false);
             }
         });
@@ -100,14 +98,14 @@ public class JsonParametersConverter {
      * Returns the provided parameters as Map.
      *
      * @param parameters    The parameters in JSON form.
-     * @param applySecurity Set to {@code true} to decrypt secured properties. If set to {@code false}, secured
-     *                      properties will be kept in encrypted form.
+     * @param config     The converter configuration.
+     *
      * @return A map containing only parameter name and parameter value.
      */
-    public Map<String, Object> convert(JSONArray parameters, boolean applySecurity) {
+    public Map<String, Object> convert(JSONArray parameters, ConverterConfig config) {
         Map<String, Object> result = new HashMap<>();
         for (int i = 0; i < parameters.length(); i++) {
-            convertParameter(parameters.getJSONObject(i), applySecurity, result);
+            convertParameter(parameters.getJSONObject(i), result, config);
         }
         return result;
     }
@@ -115,17 +113,16 @@ public class JsonParametersConverter {
     /**
      * Converts a single parameter from JSON to Map.
      *
-     * @param parameter     The parameter in JSON form.
-     * @param applySecurity Set to {@code true} to decrypt secured properties. If set to {@code false}, secured
-     *                      properties will be kept in encrypted form.
-     * @param target        The target map where the converted parameter should be stored in.
+     * @param parameter The parameter in JSON form.
+     * @param target    The target map where the converted parameter should be stored in.
+     * @param config    The converter configuration.
      */
-    protected void convertParameter(JSONObject parameter, boolean applySecurity, Map<String, Object> target) {
+    protected void convertParameter(JSONObject parameter, Map<String, Object> target, ConverterConfig config) {
         Object value = parameter.opt(JsonKeys.VALUE);
         if (value != null) {
             if (value instanceof String && StringUtils.isEmpty(value)) {
                 return;
-            } else if (parameter.getBoolean(JsonKeys.SECURED) && applySecurity) {
+            } else if (parameter.getBoolean(JsonKeys.SECURED) && config.isSecurityEnabled()) {
                 target.put(parameter.getString(JsonKeys.NAME), encryptionUtil.decrypt((String) value));
             } else {
                 target.put(parameter.getString(JsonKeys.NAME), value);
@@ -136,19 +133,19 @@ public class JsonParametersConverter {
     /**
      * Returns the value of the provided instance's property.
      *
-     * @param instance      The instance of a class to get the field's value from.
-     * @param field         The property of the instance to get the value from.
-     * @param applySecurity Set to {@code true} to encrypt secured properties. If set to {@code false}, secured
-     *                      properties will be kept in cleartext form.
-     * @param <T>           The instance type.
+     * @param instance The instance of a class to get the field's value from.
+     * @param field    The property of the instance to get the value from.
+     * @param config   The converter configuration.
+     * @param <T>      The instance type.
+     *
      * @return The propertie's value.
      */
-    private <T> Object getFieldValue(T instance, Field field, boolean applySecurity) {
+    private <T> Object getFieldValue(T instance, Field field, ConverterConfig config) {
         if (field != null) {
             try {
                 Object result;
                 field.setAccessible(true);
-                if (isSecured(field) && applySecurity) {
+                if (isSecured(field) && config.isSecurityEnabled()) {
                     result = encryptionUtil.encrypt((String) field.get(instance));
                 } else {
                     result = field.get(instance);
@@ -166,6 +163,7 @@ public class JsonParametersConverter {
      * Indicates whether a property is secured or not.
      *
      * @param field The property to check.
+     *
      * @return {@code true}, if the property is secured, {@code false} otherwise.
      */
     private boolean isSecured(Field field) {

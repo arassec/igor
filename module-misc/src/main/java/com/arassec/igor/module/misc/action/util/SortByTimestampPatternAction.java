@@ -57,14 +57,12 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * Collects all data in memory for later sorting.
      *
      * @param data         The data the action will work with.
-     * @param isDryRun     {@code true} if the data should be processed in an idempotent way, i.e. the data should not be changed
-     *                     irreversably. Set to {@code false} to process the data regularly according to the actions purpose.
      * @param jobExecution The job execution log.
      *
      * @return Always {@code null}.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
+    public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         if (isValid(data)) {
             collectedData.add(data);
         }

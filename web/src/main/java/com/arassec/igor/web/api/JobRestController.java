@@ -2,9 +2,15 @@ package com.arassec.igor.web.api;
 
 import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.application.ServiceManager;
+import com.arassec.igor.core.application.converter.ConverterConfig;
 import com.arassec.igor.core.application.converter.JsonJobConverter;
+import com.arassec.igor.core.application.converter.simulation.ActionProxy;
+import com.arassec.igor.core.application.converter.simulation.ProviderProxy;
+import com.arassec.igor.core.application.converter.simulation.SimulationDataCollector;
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
+import com.arassec.igor.web.api.model.simulation.SimulationActionResult;
+import com.arassec.igor.web.api.model.simulation.SimulationJobResult;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.CronTrigger;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.ModelPageHelper;
@@ -12,6 +18,8 @@ import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.api.error.RestControllerExceptionHandler;
 import com.arassec.igor.web.api.model.JobListEntry;
 import com.arassec.igor.web.api.model.ScheduleEntry;
+import com.arassec.igor.web.api.model.simulation.SimulationTaskResult;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +29,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,6 +56,13 @@ public class JobRestController {
      * Converter for Jobs.
      */
     private final JsonJobConverter jsonJobConverter;
+
+    private final ObjectMapper objectMapper;
+
+    /**
+     * JSON Converter configuration.
+     */
+    private ConverterConfig converterConfig = new ConverterConfig(false, true);
 
     /**
      * Returns the IDs of all available jobs.
@@ -76,6 +92,7 @@ public class JobRestController {
      * Returns the JSON-representation of the Job with the given ID.
      *
      * @param id The job's ID.
+     *
      * @return The job in JSON form.
      */
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -85,7 +102,7 @@ public class JobRestController {
         }
         Job job = jobManager.load(id);
         if (job != null) {
-            return jsonJobConverter.convert(job, false, true).toString();
+            return jsonJobConverter.convert(job, converterConfig).toString();
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found");
     }
@@ -94,15 +111,16 @@ public class JobRestController {
      * Creates a new job.
      *
      * @param jobJson The job in JSON form.
+     *
      * @return 'OK' on success.
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String createJob(@RequestBody String jobJson) {
-        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, false);
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, converterConfig);
         if (jobManager.loadByName(job.getName()) == null) {
             job.setId(null);
             Job savedJob = jobManager.save(job);
-            return jsonJobConverter.convert(savedJob, false, true).toString();
+            return jsonJobConverter.convert(savedJob, converterConfig).toString();
         } else {
             throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
         }
@@ -112,30 +130,77 @@ public class JobRestController {
      * Updates an existing job.
      *
      * @param jobJson The job in JSON form.
+     *
      * @return 'OK' on success.
      */
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String updateJob(@RequestBody String jobJson) {
-        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, false);
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, converterConfig);
         Job existingJobWithSameName = jobManager.loadByName(job.getName());
         if (existingJobWithSameName == null || existingJobWithSameName.getId().equals(job.getId())) {
             Job savedJob = jobManager.save(job);
-            return jsonJobConverter.convert(savedJob, false, true).toString();
+            return jsonJobConverter.convert(savedJob, converterConfig).toString();
         } else {
             throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
         }
     }
 
     /**
-     * Runs a dry-run of the supplied job.
+     * Runs a simulation of the supplied job.
      *
      * @param jobJson The job in JSON form.
-     * @return Test results of the dry-run.
+     *
+     * @return Test results of the simulated job run.
      */
-    @PostMapping("test")
-    public DryRunJobResult testJob(@RequestBody String jobJson) {
-        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, false);
-        return job.dryRun();
+    @PostMapping("simulate")
+    public SimulationJobResult simulateJob(@RequestBody String jobJson) {
+        ConverterConfig simulationConverterConfig = new ConverterConfig(false, true);
+        SimulationDataCollector simulationDataCollector = new SimulationDataCollector();
+        simulationConverterConfig.setSimulationDataCollector(simulationDataCollector);
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, simulationConverterConfig);
+        JobExecution jobExecution = new JobExecution();
+        job.run(jobExecution);
+
+        SimulationJobResult jobResult = new SimulationJobResult();
+        if (jobExecution.getErrorCause() != null) {
+            jobResult.setErrorCause(jobExecution.getErrorCause());
+        }
+
+        for (int i = 0; i < simulationDataCollector.getProviderProxies().size(); i++) {
+
+            ProviderProxy providerProxy = simulationDataCollector.getProviderProxies().get(i);
+
+            SimulationTaskResult taskResult = new SimulationTaskResult();
+            taskResult.setErrorCause(providerProxy.getErrorCause());
+            providerProxy.getCollectedData().stream()
+                    .forEach(jsonObject -> {
+                        try {
+                            taskResult.getResults().add(
+                                    objectMapper.readValue(jsonObject.toString(), HashMap.class));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+
+            List<ActionProxy> actionProxies = simulationDataCollector.getActionProxies().get(i);
+            actionProxies.stream().forEach(actionProxy -> {
+                SimulationActionResult actionResult = new SimulationActionResult();
+                actionResult.setErrorCause(actionProxy.getErrorCause());
+                actionProxy.getCollectedData().stream().forEach(jsonObject -> {
+                    try {
+                        actionResult.getResults().add(
+                                objectMapper.readValue(jsonObject.toString(), HashMap.class));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+                taskResult.getActionResults().add(actionResult);
+            });
+
+            jobResult.getTaskResults().add(taskResult);
+        }
+
+        return jobResult;
     }
 
     /**
@@ -143,6 +208,7 @@ public class JobRestController {
      *
      * @param encodedName The job's Base64 encoded name.
      * @param id          The job's ID.
+     *
      * @return {@code true} if a job with the provided name already exists, {@code false} otherwise.
      */
     @GetMapping("check/{name}/{id}")
@@ -176,22 +242,24 @@ public class JobRestController {
      * Runs the supplied job.
      *
      * @param jobJson The job in JSON form.
+     *
      * @return 'OK' on success.
      */
     @PostMapping(value = "run", produces = MediaType.APPLICATION_JSON_VALUE)
     public String runJob(@RequestBody String jobJson) {
-        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, false);
+        Job job = jsonJobConverter.convert(new JSONObject(jobJson), null, converterConfig);
         Job savedJob = jobManager.save(job);
         if (job.isActive()) {
             jobManager.enqueue(savedJob);
         }
-        return jsonJobConverter.convert(savedJob, false, true).toString();
+        return jsonJobConverter.convert(savedJob, converterConfig).toString();
     }
 
     /**
      * Runs the job with the given ID.
      *
      * @param id The job's ID.
+     *
      * @return 'OK' on success.
      */
     @PostMapping("run/{id}")
@@ -231,6 +299,7 @@ public class JobRestController {
      * Returns the services that are ONLY referenced by this job.
      *
      * @param id The job's ID.
+     *
      * @return The services.
      */
     @GetMapping(value = "{id}/exclusive-service-references", produces = MediaType.APPLICATION_JSON_VALUE)

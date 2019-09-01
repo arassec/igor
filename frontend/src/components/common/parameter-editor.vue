@@ -227,7 +227,7 @@
         color: var(--font-color-light);
         background-color: var(--element-background-color);
         border: none;
-        max-width: 300px;
+        max-width: 280px;
     }
 
 </style>

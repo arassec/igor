@@ -1,11 +1,17 @@
 package com.arassec.igor.core.application.converter;
 
+import com.arassec.igor.core.application.converter.simulation.ServiceProxy;
 import com.arassec.igor.core.application.converter.util.EncryptionUtil;
+import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.github.openjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Proxy;
 import java.util.Map;
 
 /**
@@ -34,19 +40,25 @@ public class JsonServiceAwareParametersConverter extends JsonParametersConverter
     /**
      * Converts the supplied parameter. If it is a service reference, a new service instance is created.
      *
-     * @param parameter     The parameter in JSON form.
-     * @param applySecurity Set to {@code true} to decrypt secured properties. If set to {@code false}, secured
-     *                      properties will be kept in encrypted form.
-     * @param target        The target map where the converted parameter should be stored in.
+     * @param parameter The parameter in JSON form.
+     * @param target    The target map where the converted parameter should be stored in.
+     * @param config    The converter configuration.
      */
     @Override
-    protected void convertParameter(JSONObject parameter, boolean applySecurity, Map<String, Object> target) {
+    protected void convertParameter(JSONObject parameter, Map<String, Object> target, ConverterConfig config) {
         Object value = parameter.opt(JsonKeys.VALUE);
         boolean isService = parameter.getBoolean(JsonKeys.SERVICE);
         if (isService && value != null && value instanceof Integer) {
-            target.put(parameter.getString(JsonKeys.NAME), serviceRepository.findById(Long.valueOf((Integer) value)));
+            Service service = serviceRepository.findById(Long.valueOf((Integer) value));
+            if (config.getSimulationDataCollector() != null) {
+                Object proxyService = Proxy.newProxyInstance(JsonServiceAwareParametersConverter.class.getClassLoader(),
+                        ClassUtils.getAllInterfaces(service), new ServiceProxy(service));
+                target.put(parameter.getString(JsonKeys.NAME), proxyService);
+            } else {
+                target.put(parameter.getString(JsonKeys.NAME), service);
+            }
         } else {
-            super.convertParameter(parameter, applySecurity, target);
+            super.convertParameter(parameter, target, config);
         }
     }
 

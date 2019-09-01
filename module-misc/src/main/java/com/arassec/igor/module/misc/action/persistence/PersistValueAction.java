@@ -26,30 +26,21 @@ public class PersistValueAction extends BasePersistenceAction {
      * Takes the value from the supplied data and saves it to the persistence store.
      *
      * @param data         The data the action will work with.
-     * @param isDryRun     If set to {@code true}, the values are not actually persisted.
      * @param jobExecution The job execution log.
      *
      * @return Always {@code true}.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
+    public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         if (isValid(data)) {
             Long jobId = getLong(data, JOB_ID_KEY);
             String taskId = getString(data, TASK_ID_KEY);
             PersistentValue value = new PersistentValue(getString(data, dataKey));
             if (!persistentValueRepository.isPersisted(jobId, taskId, value)) {
-                if (isDryRun) {
-                    data.put(DRY_RUN_COMMENT_KEY, "Persisted: " + data.get(dataKey));
-                } else {
-                    log.debug("Persisted: '{}'", value);
-                    persistentValueRepository.upsert(jobId, taskId, value);
-                }
+                log.debug("Persisted: '{}'", value);
+                persistentValueRepository.upsert(jobId, taskId, value);
             } else {
-                if (isDryRun) {
-                    data.put(DRY_RUN_COMMENT_KEY, data.get(dataKey) + " already persisted!");
-                } else {
-                    log.debug("Already persisted: '{}'", value);
-                }
+                log.debug("Already persisted: '{}'", value);
             }
             return List.of(data);
         }

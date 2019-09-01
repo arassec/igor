@@ -1,19 +1,13 @@
 package com.arassec.igor.core.model.job;
 
 import com.arassec.igor.core.model.action.Action;
-import com.arassec.igor.core.model.job.dryrun.DryRunActionResult;
-import com.arassec.igor.core.model.job.dryrun.DryRunJobResult;
-import com.arassec.igor.core.model.job.dryrun.DryRunTaskResult;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.misc.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.provider.Provider;
-import com.arassec.igor.core.util.StacktraceFormatter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.openjson.JSONObject;
+import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -64,9 +58,9 @@ public class Task {
     private List<Action> actions = new LinkedList<>();
 
     /**
-     * Limits the results in a dry-run.
+     * Limits the results in a simulated job run.
      */
-    private int dryrunLimit = 25;
+    private int simulationLimit = 25;
 
     /**
      * Creates a new Task.
@@ -164,93 +158,6 @@ public class Task {
         actions.forEach(action -> action.shutdown(jobId, id));
 
         log.debug("Task '{}' finished!", name);
-    }
-
-    /**
-     * Performs a dry-run of the task collecting data.
-     *
-     * @param result The target object to store results in.
-     * @param jobId  The ID of the job currently executing.
-     */
-    void dryRun(DryRunJobResult result, Long jobId) {
-
-        DryRunTaskResult taskResult = new DryRunTaskResult();
-
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            JobExecution jobExecution = new JobExecution();
-
-            provider.initialize(jobId, id, jobExecution);
-
-            actions.forEach(Action::initialize);
-
-            List<Map<String, Object>> providerResult = new LinkedList<>();
-
-            int counter = 0;
-            while (provider.hasNext() && counter < dryrunLimit) {
-                Map<String, Object> item = provider.next();
-                providerResult.add(item);
-                taskResult.getResults().add(objectMapper.readValue(new JSONObject(item).toString(), HashMap.class));
-                counter++;
-            }
-
-            for (Action action : actions) {
-                DryRunActionResult actionResult = new DryRunActionResult();
-
-                try {
-                    if (!action.isActive()) {
-                        Map<String, Object> item = new HashMap<>();
-                        item.put(Action.JOB_ID_KEY, jobId);
-                        item.put(Action.TASK_ID_KEY, getId());
-                        item.put(Action.DRY_RUN_COMMENT_KEY, "Action is disabled.");
-                        actionResult.getResults().add(item);
-                    } else {
-                        if (providerResult.isEmpty()) {
-                            Map<String, Object> item = new HashMap<>();
-                            item.put(Action.JOB_ID_KEY, jobId);
-                            item.put(Action.TASK_ID_KEY, getId());
-                            item.put(Action.DRY_RUN_COMMENT_KEY, "No data to process.");
-                            actionResult.getResults().add(item);
-                        } else {
-                            List<Map<String, Object>> actionItems = new LinkedList<>();
-                            for (Map<String, Object> item : providerResult) {
-                                List<Map<String, Object>> items = action.process(item, true, jobExecution);
-                                if (items != null && !items.isEmpty()) {
-                                    actionItems.addAll(items);
-                                }
-                            }
-
-                            List<Map<String, Object>> items = action.complete();
-                            if (items != null && !items.isEmpty()) {
-                                actionItems.addAll(items);
-                            }
-
-                            providerResult.clear();
-
-                            if (!actionItems.isEmpty()) {
-                                for (Map<String, Object> item : actionItems) {
-                                    actionResult.getResults()
-                                            .add(objectMapper.readValue(new JSONObject(item).toString(), HashMap.class));
-                                }
-                                providerResult.addAll(actionItems);
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    actionResult.setErrorCause(StacktraceFormatter.format(e));
-                }
-
-                taskResult.getActionResults().add(actionResult);
-            }
-
-            actions.forEach(action -> action.shutdown(jobId, id));
-
-        } catch (Exception e) {
-            taskResult.setErrorCause(StacktraceFormatter.format(e));
-        }
-
-        result.getTaskResults().add(taskResult);
     }
 
 }

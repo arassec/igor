@@ -30,14 +30,12 @@ public class JsonTaskConverter {
     /**
      * Converts a {@link Task} into its JSON representation.
      *
-     * @param task          The task to convert.
-     * @param applySecurity Set to {@code true} to encrypt secured properties. If set to {@code false}, secured
-     *                      properties will be kept in cleartext form.
-     * @param addVolatile   Set to {@code true} to add properties that only exist through annotations or could otherwise
-     *                      be obtained, but can be added for convenience.
+     * @param task   The task to convert.
+     * @param config The converter configuration.
+     *
      * @return A {@link JSONObject} representing the task.
      */
-    public JSONObject convert(Task task, boolean applySecurity, boolean addVolatile) {
+    public JSONObject convert(Task task, ConverterConfig config) {
         JSONObject taskJson = new JSONObject();
         if (task.getId() == null || task.getId().trim().isEmpty()) {
             task.setId(UUID.randomUUID().toString());
@@ -46,10 +44,10 @@ public class JsonTaskConverter {
         taskJson.put(JsonKeys.NAME, task.getName());
         taskJson.put(JsonKeys.DESCRIPTION, task.getDescription());
         taskJson.put(JsonKeys.ACTIVE, task.isActive());
-        taskJson.put(JsonKeys.DRYRUN_LIMIT, task.getDryrunLimit());
-        taskJson.put(JsonKeys.PROVIDER, jsonProviderConverter.convert(task.getProvider(), applySecurity, addVolatile));
+        taskJson.put(JsonKeys.SIMULATION_LIMIT, task.getSimulationLimit());
+        taskJson.put(JsonKeys.PROVIDER, jsonProviderConverter.convert(task.getProvider(), config));
         JSONArray actionJsons = new JSONArray();
-        task.getActions().stream().map(action -> jsonActionConverter.convert(action, applySecurity, addVolatile))
+        task.getActions().stream().map(action -> jsonActionConverter.convert(action, config))
                 .forEach(actionJsons::put);
         taskJson.put(JsonKeys.ACTIONS, actionJsons);
         return taskJson;
@@ -58,11 +56,12 @@ public class JsonTaskConverter {
     /**
      * Converts a {@link Task} in JSON form into an object instance.
      *
-     * @param taskJson      The task in JSON form.
-     * @param applySecurity Set to {@link true}, to decrypt secured properties.
+     * @param taskJson The task in JSON form.
+     * @param config   The converter configuration.
+     *
      * @return A newly created Task instance.
      */
-    public Task convert(JSONObject taskJson, boolean applySecurity) {
+    public Task convert(JSONObject taskJson, ConverterConfig config) {
         String id = taskJson.optString(JsonKeys.ID);
         if (id == null || id.trim().isEmpty()) {
             id = UUID.randomUUID().toString();
@@ -71,11 +70,16 @@ public class JsonTaskConverter {
         result.setName(taskJson.getString(JsonKeys.NAME));
         result.setDescription(taskJson.optString(JsonKeys.DESCRIPTION));
         result.setActive(taskJson.optBoolean(JsonKeys.ACTIVE, true));
-        result.setDryrunLimit(taskJson.optInt(JsonKeys.DRYRUN_LIMIT, 25));
-        result.setProvider(jsonProviderConverter.convert(taskJson.getJSONObject(JsonKeys.PROVIDER), applySecurity));
+        result.setSimulationLimit(taskJson.optInt(JsonKeys.SIMULATION_LIMIT, 25));
+        result.setProvider(jsonProviderConverter.convert(taskJson.getJSONObject(JsonKeys.PROVIDER), config));
         JSONArray actionJsons = taskJson.optJSONArray(JsonKeys.ACTIONS);
         for (int i = 0; i < actionJsons.length(); i++) {
-            result.getActions().add(jsonActionConverter.convert(actionJsons.getJSONObject(i), applySecurity));
+            result.getActions().add(jsonActionConverter.convert(actionJsons.getJSONObject(i), config));
+        }
+        if (config.getSimulationDataCollector() != null) {
+            config.getSimulationDataCollector().getProviderProxies()
+                    .get(config.getSimulationDataCollector().getCurIndex()).setSimulationLimit(result.getSimulationLimit());
+            config.getSimulationDataCollector().setCurIndex(config.getSimulationDataCollector().getCurIndex() + 1);
         }
         return result;
     }

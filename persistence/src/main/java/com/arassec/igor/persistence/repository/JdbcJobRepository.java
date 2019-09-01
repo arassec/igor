@@ -1,5 +1,6 @@
 package com.arassec.igor.persistence.repository;
 
+import com.arassec.igor.core.application.converter.ConverterConfig;
 import com.arassec.igor.core.application.converter.JsonJobConverter;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.repository.JobRepository;
@@ -52,6 +53,11 @@ public class JdbcJobRepository implements JobRepository {
     private final JsonJobConverter jsonJobConverter;
 
     /**
+     * The converter configuration.
+     */
+    private ConverterConfig converterConfig = new ConverterConfig(true, false);
+
+    /**
      * Persists jobs using JDBC. Either creates a new entry in the database or updates an existing one.
      *
      * @param job The job to persist.
@@ -69,7 +75,7 @@ public class JdbcJobRepository implements JobRepository {
                             " available!"));
         }
         jobEntity.setName(job.getName());
-        jobEntity.setContent(jsonJobConverter.convert(job, true, false).toString());
+        jobEntity.setContent(jsonJobConverter.convert(job, converterConfig).toString());
         JobEntity savedJob = jobDao.save(jobEntity);
         job.setId(savedJob.getId());
 
@@ -90,13 +96,14 @@ public class JdbcJobRepository implements JobRepository {
      * Finds a job by its ID.
      *
      * @param id The job's ID.
+     *
      * @return The {@link Job}.
      */
     @Override
     public Job findById(Long id) {
         Optional<JobEntity> jobEntityOptional = jobDao.findById(id);
         if (jobEntityOptional.isPresent()) {
-            Job job = jsonJobConverter.convert(new JSONObject(jobEntityOptional.get().getContent()), id, true);
+            Job job = jsonJobConverter.convert(new JSONObject(jobEntityOptional.get().getContent()), id, converterConfig);
             job.setId(id);
             return job;
         }
@@ -107,13 +114,14 @@ public class JdbcJobRepository implements JobRepository {
      * Finds a job by its name.
      *
      * @param name The job's name.
+     *
      * @return The {@link Job}.
      */
     @Override
     public Job findByName(String name) {
         JobEntity entity = jobDao.findByName(name);
         if (entity != null) {
-            Job job = jsonJobConverter.convert(new JSONObject(entity.getContent()), entity.getId(), true);
+            Job job = jsonJobConverter.convert(new JSONObject(entity.getContent()), entity.getId(), converterConfig);
             job.setId(entity.getId());
             return job;
         }
@@ -129,7 +137,7 @@ public class JdbcJobRepository implements JobRepository {
     public List<Job> findAll() {
         List<Job> result = new LinkedList<>();
         for (JobEntity jobEntity : jobDao.findAll()) {
-            Job job = jsonJobConverter.convert(new JSONObject(jobEntity.getContent()), jobEntity.getId(), true);
+            Job job = jsonJobConverter.convert(new JSONObject(jobEntity.getContent()), jobEntity.getId(), converterConfig);
             job.setId(jobEntity.getId());
             result.add(job);
         }
@@ -142,6 +150,7 @@ public class JdbcJobRepository implements JobRepository {
      * @param pageNumber The page number to load.
      * @param pageSize   The page size.
      * @param nameFilter An optional filter for the job's name.
+     *
      * @return The page of jobs.
      */
     @Override
@@ -158,7 +167,8 @@ public class JdbcJobRepository implements JobRepository {
 
         if (page != null && page.hasContent()) {
             ModelPage<Job> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
-            result.setItems(page.getContent().stream().map(jobEntity -> jsonJobConverter.convert(new JSONObject(jobEntity.getContent()), jobEntity.getId(), true)).collect(Collectors.toList()));
+            result.setItems(page.getContent().stream().map(jobEntity -> jsonJobConverter.convert(
+                    new JSONObject(jobEntity.getContent()), jobEntity.getId(), converterConfig)).collect(Collectors.toList()));
             return result;
         }
 

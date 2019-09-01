@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.job.dryrun;
+package com.arassec.igor.web.api.model.simulation;
 
 import lombok.Data;
 
@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Contains the dry-run results of a task.
+ * Contains the simulation results of a task.
  */
 @Data
-public class DryRunTaskResult {
+public class SimulationTaskResult {
 
     /**
      * Contains the provider's data.
@@ -23,9 +23,9 @@ public class DryRunTaskResult {
     private String errorCause;
 
     /**
-     * Contains the dry-run results of the task's actions.
+     * Contains the simulation results of the task's actions.
      */
-    private List<DryRunActionResult> actionResults = new LinkedList<>();
+    private List<SimulationActionResult> actionResults = new LinkedList<>();
 
 
 }

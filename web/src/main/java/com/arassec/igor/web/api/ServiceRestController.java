@@ -2,6 +2,7 @@ package com.arassec.igor.web.api;
 
 import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.application.ServiceManager;
+import com.arassec.igor.core.application.converter.ConverterConfig;
 import com.arassec.igor.core.application.converter.JsonServiceConverter;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.service.Service;
@@ -47,6 +48,11 @@ public class ServiceRestController {
     private final JsonServiceConverter jsonServiceConverter;
 
     /**
+     * JSON Converter configuration.
+     */
+    private ConverterConfig converterConfig = new ConverterConfig(false, true);
+
+    /**
      * Returns all available services.
      *
      * @return List of available services.
@@ -87,7 +93,7 @@ public class ServiceRestController {
 
         if (serviceModelPage.getItems() != null) {
             JSONArray items = new JSONArray();
-            serviceModelPage.getItems().forEach(service -> items.put(jsonServiceConverter.convert(service, false, true)));
+            serviceModelPage.getItems().forEach(service -> items.put(jsonServiceConverter.convert(service, converterConfig)));
 
             JSONObject result = new JSONObject();
             result.put("number", pageNumber);
@@ -111,7 +117,7 @@ public class ServiceRestController {
     public String getService(@PathVariable("id") Long id) {
         Service service = serviceManager.load(id);
         if (service != null) {
-            return jsonServiceConverter.convert(service, false, true).toString();
+            return jsonServiceConverter.convert(service, converterConfig).toString();
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Service not found");
     }
@@ -145,10 +151,10 @@ public class ServiceRestController {
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String createService(@RequestBody String serviceJson) {
-        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), null, false);
+        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), null, converterConfig);
         if (serviceManager.loadByName(service.getName()) == null) {
             Service savedService = serviceManager.save(service);
-            return jsonServiceConverter.convert(savedService, false, true).toString();
+            return jsonServiceConverter.convert(savedService, converterConfig).toString();
         } else {
             throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
         }
@@ -162,7 +168,7 @@ public class ServiceRestController {
     @PutMapping()
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateService(@RequestBody String serviceJson) {
-        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), null, false);
+        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), null, converterConfig);
         Service existingServiceWithSameName = serviceManager.loadByName(service.getName());
         if (existingServiceWithSameName == null || existingServiceWithSameName.getId().equals(service.getId())) {
             serviceManager.save(service);
@@ -179,7 +185,7 @@ public class ServiceRestController {
      */
     @PostMapping("test")
     public ResponseEntity<String> testService(@RequestBody String serviceJson) {
-        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), null, false);
+        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), null, converterConfig);
         try {
             service.testConfiguration();
             return new ResponseEntity<>("OK", HttpStatus.OK);

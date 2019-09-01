@@ -31,13 +31,12 @@ public class ReadFileAction extends BaseFileAction {
      * Reads the content of a file and returns it as string.
      *
      * @param data         The data to processData.
-     * @param isDryRun     Unused - always reads the file's content.
      * @param jobExecution The job's execution log.
      *
      * @return The manipulated data.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
+    public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         if (isValid(data)) {
             String file = getString(data, dataKey);
             log.debug("Reading file: '{}'", file);

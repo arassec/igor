@@ -41,19 +41,18 @@ public class JsonServiceConverter extends JsonBaseConverter {
     /**
      * Converts a {@link Service} into a JSON-string.
      *
-     * @param service       The service to convert.
-     * @param applySecurity Set to {@code true} to decrypt secured properties.
-     * @param addVolatile   Set to {@code true} to add properties that only exist through annotations or could otherwise
-     *                      be obtained, but can be added for convenience.
+     * @param service The service to convert.
+     * @param config  The converter configuration.
+     *
      * @return The service as JSON-string.
      */
-    public JSONObject convert(Service service, boolean applySecurity, boolean addVolatile) {
+    public JSONObject convert(Service service, ConverterConfig config) {
         JSONObject serviceJson = new JSONObject();
         serviceJson.put(JsonKeys.ID, service.getId());
         serviceJson.put(JsonKeys.NAME, service.getName());
         serviceJson.put(JsonKeys.CATEGORY, convertKeyLabelStore(serviceFactory.getCategory(service)));
         serviceJson.put(JsonKeys.TYPE, convertKeyLabelStore(serviceFactory.getType(service)));
-        serviceJson.put(JsonKeys.PARAMETERS, parametersConverter.convert(service, applySecurity, addVolatile));
+        serviceJson.put(JsonKeys.PARAMETERS, parametersConverter.convert(service, config));
         return serviceJson;
     }
 
@@ -62,13 +61,15 @@ public class JsonServiceConverter extends JsonBaseConverter {
      *
      * @param serviceJson The service in JSON form.
      * @param id          Optional ID of the service. Used, if the service's JSON doesn't contain an ID.
+     * @param config      The converter configuration.
+     *
      * @return A newly created service instance.
      */
-    public Service convert(JSONObject serviceJson, Long id, boolean applySecurity) {
+    public Service convert(JSONObject serviceJson, Long id, ConverterConfig config) {
         String name = serviceJson.getString(JsonKeys.NAME);
         String type = convertKeyLabelStore(serviceJson.getJSONObject(JsonKeys.TYPE)).getKey();
         Map<String, Object> parameters = parametersConverter
-                .convert(serviceJson.optJSONArray(JsonKeys.PARAMETERS), applySecurity);
+                .convert(serviceJson.optJSONArray(JsonKeys.PARAMETERS), config);
         Service result = serviceFactory.createInstance(type, parameters);
         if (result != null) {
             result.setId(serviceJson.optLong(JsonKeys.ID, -1));

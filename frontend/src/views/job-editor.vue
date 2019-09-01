@@ -319,8 +319,8 @@
                 this.testResults = null
                 this.selectedTestResults = null
 
-                this.testResults = await IgorBackend.postData('/api/job/test', this.jobConfiguration, 'Testing job', 'Test OK.',
-                    'Test Failed!')
+                this.testResults = await IgorBackend.postData('/api/job/simulate', this.jobConfiguration, 'Testing job',
+                    'Test OK.', 'Test Failed!')
                 this.updateSelectedTestResult()
             },
             cancelConfiguration: function () {
@@ -346,7 +346,7 @@
                     name: 'Task',
                     description: '',
                     active: true,
-                    dryrunLimit: 25,
+                    simulationLimit: 25,
                     provider: {
                         category: this.initialProviderCategory,
                         type: this.initialProviderType,
@@ -373,6 +373,7 @@
                 this.showDeleteTaskDialog = false
                 this.selectedTaskIndex = -1
                 this.selectedActionIndex = -1
+                this.testResults = null
             },
             addAction: function (taskIndex) {
                 let action = {
@@ -394,6 +395,7 @@
                 this.showDeleteActionDialog = false
                 this.selectedTaskIndex = -1
                 this.selectedActionIndex = -1
+                this.testResults = null
             },
             moveTaskUp: function (taskIndex) {
                 if (taskIndex === 0) {

@@ -34,9 +34,9 @@
                     <td/>
                 </tr>
                 <tr>
-                    <td><label>Dry-Run limit</label></td>
+                    <td><label>Simulation limit</label></td>
                     <td>
-                        <input type="text" autocomplete="off" v-model.number="task.dryrunLimit"/>
+                        <input type="text" autocomplete="off" v-model.number="task.simulationLimit"/>
                     </td>
                     <td/>
                 </tr>

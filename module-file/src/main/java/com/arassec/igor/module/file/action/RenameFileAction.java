@@ -39,7 +39,7 @@ public class RenameFileAction extends BaseFileAction {
      * {@inheritDoc}
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
+    public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         if (isValid(data)) {
             String directory = getString(data, directoryKey);
             if (StringUtils.isEmpty(directory)) {
@@ -48,13 +48,9 @@ public class RenameFileAction extends BaseFileAction {
                 directory += "/";
             }
             String targetFile = directory + getString(data, dataKey);
-            if (isDryRun) {
-                data.put(DRY_RUN_COMMENT_KEY, "Renamed file " + targetFile + " to " + targetFilename);
-            } else {
-                log.debug("Renaming file '{}' to '{}'", targetFile, targetFilename);
-                sourceService.move(targetFile, targetFilename, VOID_WORK_IN_PROGRESS_MONITOR);
-                log.debug("File '{}' renamed", targetFile, targetFilename);
-            }
+            log.debug("Renaming file '{}' to '{}'", targetFile, targetFilename);
+            sourceService.move(targetFile, targetFilename, VOID_WORK_IN_PROGRESS_MONITOR);
+            log.debug("File '{}' renamed", targetFile, targetFilename);
             return List.of(data);
         }
         return null;

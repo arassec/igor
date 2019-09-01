@@ -1,10 +1,6 @@
 - Filter input on client + server side (e.g. job name length!)
-- Refactor dry-runs to use dummy-services instead of extra logic per action
-  - add 'IgorServiceAdaptor' to pass only idempotent methods to the real
-    service, and return default values for all other methods
-  - all subsequent actions use dummy-services
-  - remove extra logic from all actions
 - Unit-Tests (Apache Mina SSHD!)
+- JSON test result highlighting with highlight.js
 - Persistence-service editor
 - Add Skip- and Limit-Actions
 - Add variables for parameters, e.g. $data$ as parameter value which
@@ -17,7 +13,9 @@
   - Encryption-Cipher in database, randomly generated at first start
 - Optional authentication + authorization (Frontend + Backend)
 - Directory-Browser for file services in the GUI
+- Integrate Search with lucene
 - Healthchecks + Spring-Boot-Admin support via actuators
 - Different, configurable color-schemes for different environments
+- Add JaCoCo reports and CodeCov integration
 - Add dependabot
-- Add Docker image
+- Add Docker images

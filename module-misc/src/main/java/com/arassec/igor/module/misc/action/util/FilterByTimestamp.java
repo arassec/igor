@@ -54,13 +54,12 @@ public class FilterByTimestamp extends BaseUtilAction {
      * Filters data according to the configured timestamp settings.
      *
      * @param data         The data the action will work with.
-     * @param isDryRun     Unused - the action always filters by timestamp.
      * @param jobExecution The job's execution log.
      *
      * @return
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
+    public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         if (isValid(data)) {
             LocalDateTime target;
             if (timezone != null) {

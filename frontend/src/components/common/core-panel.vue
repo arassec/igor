@@ -48,7 +48,7 @@ export default {
     border: none;
     background-color: var(--element-background-color);
     height: 25px;
-    min-width: 300px;
+    min-width: 280px;
     color: var(--font-color-light);
   }
 

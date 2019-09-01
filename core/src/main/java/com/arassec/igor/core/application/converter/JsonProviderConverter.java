@@ -1,11 +1,14 @@
 package com.arassec.igor.core.application.converter;
 
+import com.arassec.igor.core.application.converter.simulation.ProviderProxy;
+import com.arassec.igor.core.application.converter.simulation.SimulationDataCollector;
 import com.arassec.igor.core.application.factory.ProviderFactory;
 import com.arassec.igor.core.model.provider.Provider;
 import com.github.openjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -28,28 +31,35 @@ public class JsonProviderConverter extends JsonBaseConverter {
     /**
      * Converts the provided JSON into a {@link Provider}.
      *
-     * @param providerJson  The JSON with provider data.
-     * @param applySecurity Set to {@code true} to decrypt secured properties. If set to {@code false}, secured
-     *                      properties will be kept in encrypted form.
+     * @param providerJson The JSON with provider data.
+     * @param config       The converter configuration.
+     *
      * @return A newly created Provider instance.
      */
-    public Provider convert(JSONObject providerJson, boolean applySecurity) {
+    public Provider convert(JSONObject providerJson, ConverterConfig config) {
         Map<String, Object> parameters = parametersConverter.convert(
-                providerJson.getJSONArray(JsonKeys.PARAMETERS), applySecurity);
-        return providerFactory.createInstance(providerJson.getJSONObject(JsonKeys.TYPE).getString(JsonKeys.KEY), parameters);
+                providerJson.getJSONArray(JsonKeys.PARAMETERS), config);
+        Provider provider = providerFactory.createInstance(providerJson.getJSONObject(JsonKeys.TYPE).getString(JsonKeys.KEY), parameters);
+        if (config.getSimulationDataCollector() != null) {
+            ProviderProxy providerProxy = new ProviderProxy(provider);
+            config.getSimulationDataCollector().getProviderProxies().add(providerProxy);
+            config.getSimulationDataCollector().getActionProxies().put(config.getSimulationDataCollector().getCurIndex(),
+                    new LinkedList<>());
+            return providerProxy;
+        }
+        return provider;
     }
 
     /**
      * Converts the supplied {@link Provider} into its JSON representation.
      *
      * @param provider      The provider to convert.
-     * @param applySecurity Set to {@code true} to decrypt secured properties.
-     * @param addVolatile   Set to {@code true} to add properties that only exist through annotations or could otherwise
-     *                      be obtained, but can be added for convenience.
+     * @param config     The converter configuration.
+     *
      * @return The provider in JSON form.
      */
-    public JSONObject convert(Provider provider, boolean applySecurity, boolean addVolatile) {
-        return convertToStandardJson(providerFactory, provider, applySecurity, addVolatile, parametersConverter);
+    public JSONObject convert(Provider provider, ConverterConfig config) {
+        return convertToStandardJson(providerFactory, provider, parametersConverter, config);
     }
 
 }

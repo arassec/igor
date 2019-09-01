@@ -1,6 +1,7 @@
 package com.arassec.igor.module.file.service;
 
 import com.arassec.igor.core.model.IgorCategory;
+import com.arassec.igor.core.model.IgorSimulationSafe;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.Service;
 
@@ -21,6 +22,7 @@ public interface FileService extends Service {
      *
      * @return The file names as List.
      */
+    @IgorSimulationSafe
     List<FileInfo> listFiles(String directory, String fileEnding);
 
     /**
@@ -31,6 +33,7 @@ public interface FileService extends Service {
      *
      * @return The content of the file.
      */
+    @IgorSimulationSafe
     String read(String file, WorkInProgressMonitor workInProgress);
 
     /**
@@ -41,6 +44,7 @@ public interface FileService extends Service {
      *
      * @return The content of the file as stream of data.
      */
+    @IgorSimulationSafe
     FileStreamData readStream(String file, WorkInProgressMonitor workInProgress);
 
     /**

@@ -21,9 +21,9 @@ public interface JsonKeys {
     String ACTIVE = "active";
 
     /**
-     * The dry-run limit key.
+     * The simulation-limit key.
      */
-    String DRYRUN_LIMIT = "dryrunLimit";
+    String SIMULATION_LIMIT = "simulationLimit";
 
     /**
      * The tasks of a job.

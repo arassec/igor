@@ -86,14 +86,12 @@ public class CopyFileAction extends BaseFileAction {
      * .igor", which will be removed after successful transfer.
      *
      * @param data         The data to process.
-     * @param isDryRun     Set to {@code true}, if this is a dry-run and the file should not actually be copied. Set to {@code
-     *                     false} for an actual run.
      * @param jobExecution The job execution log.
      *
      * @return The manipulated data.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
+    public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         if (isValid(data)) {
             String sourceFile = (String) data.get(dataKey);
             String sourceDirectory = (String) data.get(directoryKey);
@@ -102,45 +100,34 @@ public class CopyFileAction extends BaseFileAction {
                 targetDirectory += "/";
             }
 
-            if (!isDryRun) {
+            WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor(sourceFile, 0);
+            jobExecution.addWorkInProgress(workInProgressMonitor);
 
-                WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor(sourceFile, 0);
-                jobExecution.addWorkInProgress(workInProgressMonitor);
-
-                try {
-                    String sourceFileWithPath = getSourceFileWithPath(sourceDirectory, sourceFile);
-                    FileStreamData fileStreamData = sourceService.readStream(sourceFileWithPath, VOID_WORK_IN_PROGRESS_MONITOR);
-                    String targetFile = getTargetFile(sourceFile, fileStreamData.getFilenameSuffix());
-                    String targetFilePath = targetDirectory + targetFile;
-                    log.debug("Copying file '{}' to '{}'", sourceFileWithPath, targetFilePath);
-                    String targetFileInTransfer = targetFilePath;
-                    if (appendTransferSuffix) {
-                        targetFileInTransfer += IN_TRANSFER_SUFFIX;
-                    }
-                    targetService.writeStream(targetFileInTransfer, fileStreamData, workInProgressMonitor);
-                    sourceService.finalizeStream(fileStreamData);
-                    if (appendTransferSuffix) {
-                        targetService.move(targetFileInTransfer, targetFilePath, VOID_WORK_IN_PROGRESS_MONITOR);
-                    }
-                    log.debug("File '{}' copied to '{}'", sourceFileWithPath, targetFilePath);
-                    data.put(KEY_TARGET_FILENAME, targetFile);
-                    data.put(KEY_TARGET_FILEPATH, targetFilePath);
-                    data.put(KEY_TARGET_DIRECTORY, targetDirectory);
-                } finally {
-                    jobExecution.removeWorkInProgress(workInProgressMonitor);
-                }
-
-            }
-            data.put(KEY_SOURCE_FILENAME, sourceFile);
-            if (isDryRun) {
-                String targetFile = getTargetFile(sourceFile, "dryRun");
+            try {
+                String sourceFileWithPath = getSourceFileWithPath(sourceDirectory, sourceFile);
+                FileStreamData fileStreamData = sourceService.readStream(sourceFileWithPath, VOID_WORK_IN_PROGRESS_MONITOR);
+                String targetFile = getTargetFile(sourceFile, fileStreamData.getFilenameSuffix());
                 String targetFilePath = targetDirectory + targetFile;
-                data.put(DRY_RUN_COMMENT_KEY,
-                        getSourceFileWithPath(sourceDirectory, sourceFile) + " copied to " + targetFilePath);
+                log.debug("Copying file '{}' to '{}'", sourceFileWithPath, targetFilePath);
+                String targetFileInTransfer = targetFilePath;
+                if (appendTransferSuffix) {
+                    targetFileInTransfer += IN_TRANSFER_SUFFIX;
+                }
+                targetService.writeStream(targetFileInTransfer, fileStreamData, workInProgressMonitor);
+                sourceService.finalizeStream(fileStreamData);
+                if (appendTransferSuffix) {
+                    targetService.move(targetFileInTransfer, targetFilePath, VOID_WORK_IN_PROGRESS_MONITOR);
+                }
+                log.debug("File '{}' copied to '{}'", sourceFileWithPath, targetFilePath);
                 data.put(KEY_TARGET_FILENAME, targetFile);
                 data.put(KEY_TARGET_FILEPATH, targetFilePath);
                 data.put(KEY_TARGET_DIRECTORY, targetDirectory);
+            } finally {
+                jobExecution.removeWorkInProgress(workInProgressMonitor);
             }
+
+
+            data.put(KEY_SOURCE_FILENAME, sourceFile);
             return List.of(data);
         }
         return null;

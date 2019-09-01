@@ -21,11 +21,6 @@ public interface Action {
     String TASK_ID_KEY = "taskId";
 
     /**
-     * JSON-Key for dry-run comments.
-     */
-    String DRY_RUN_COMMENT_KEY = "dryRunComment";
-
-    /**
      * Initializes the action before data processing.
      */
     void initialize();
@@ -34,13 +29,11 @@ public interface Action {
      * Executes the action.
      *
      * @param data         The data the action will work with.
-     * @param isDryRun     {@code true} if the data should be processed in an idempotent way, i.e. the data should not be
-     *                     changed irreversably. Set to {@code false} to process the data regularly according to the actions
-     *                     purpose.
      * @param jobExecution The job's execution log.
+     *
      * @return {@code true}, if the data should further be processed, {@code false} otherwise.
      */
-    List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution);
+    List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution);
 
     /**
      * Finalizes the action after all input data from the provider has been processed.

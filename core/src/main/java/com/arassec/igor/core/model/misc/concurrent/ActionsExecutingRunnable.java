@@ -117,7 +117,7 @@ public class ActionsExecutingRunnable implements Runnable {
 
             for (Map<String, Object> item : items) {
                 log.trace("Processing: {}", item);
-                List<Map<String, Object>> partialActionResult = action.process(item, false, jobExecution);
+                List<Map<String, Object>> partialActionResult = action.process(item, jobExecution);
                 if (partialActionResult != null && !partialActionResult.isEmpty()) {
                     actionResult.addAll(partialActionResult);
                 }

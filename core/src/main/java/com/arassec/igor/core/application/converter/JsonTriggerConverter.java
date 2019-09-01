@@ -28,28 +28,27 @@ public class JsonTriggerConverter extends JsonBaseConverter {
     /**
      * Converts the trigger JSON into a {@link Trigger}.
      *
-     * @param triggerJson  The JSON with trigger data.
-     * @param applySecurity Set to {@code true} to decrypt secured properties. If set to {@code false}, secured
-     *                      properties will be kept in encrypted form.
+     * @param triggerJson The JSON with trigger data.
+     * @param config      The converter configuration.
+     *
      * @return A newly created Trigger instance.
      */
-    public Trigger convert(JSONObject triggerJson, boolean applySecurity) {
+    public Trigger convert(JSONObject triggerJson, ConverterConfig config) {
         Map<String, Object> parameters = parametersConverter.convert(
-                triggerJson.getJSONArray(JsonKeys.PARAMETERS), applySecurity);
+                triggerJson.getJSONArray(JsonKeys.PARAMETERS), config);
         return triggerFactory.createInstance(triggerJson.getJSONObject(JsonKeys.TYPE).getString(JsonKeys.KEY), parameters);
     }
 
     /**
      * Converts the supplied {@link Trigger} into its JSON representation.
      *
-     * @param trigger      The trigger to convert.
-     * @param applySecurity Set to {@code true} to decrypt secured properties.
-     * @param addVolatile   Set to {@code true} to add properties that only exist through annotations or could otherwise
-     *                      be obtained, but can be added for convenience.
+     * @param trigger The trigger to convert.
+     * @param config  The converter configuration.
+     *
      * @return The trigger in JSON form.
      */
-    public JSONObject convert(Trigger trigger, boolean applySecurity, boolean addVolatile) {
-        return convertToStandardJson(triggerFactory, trigger, applySecurity, addVolatile, parametersConverter);
+    public JSONObject convert(Trigger trigger, ConverterConfig config) {
+        return convertToStandardJson(triggerFactory, trigger, parametersConverter, config);
     }
 
 }

@@ -4,6 +4,7 @@ import com.arassec.igor.core.application.ActionManager;
 import com.arassec.igor.core.application.ProviderManager;
 import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.application.TriggerManager;
+import com.arassec.igor.core.application.converter.ConverterConfig;
 import com.arassec.igor.core.application.converter.JsonServiceAwareParametersConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -46,51 +47,60 @@ public class ParametersRestController {
     private final JsonServiceAwareParametersConverter parametersConverter;
 
     /**
+     * JSON Converter configuration.
+     */
+    private ConverterConfig converterConfig = new ConverterConfig(false, true);
+
+    /**
      * Returns all configuration parameters of a service type.
      *
      * @param type The type to get parameters for.
+     *
      * @return List of parameters.
      */
     @GetMapping(value = "service/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getServiceParameters(@PathVariable("type") String type) {
         return parametersConverter.convert(
-                serviceManager.createInstance(type, null), false, true).toString();
+                serviceManager.createInstance(type, null), converterConfig).toString();
     }
 
     /**
      * Returns all configuration parameters of an action type.
      *
      * @param type The type to get parameters for.
+     *
      * @return List of parameters.
      */
     @GetMapping(value = "action/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getActionParameters(@PathVariable("type") String type) {
         return parametersConverter.convert(
-                actionManager.createInstance(type, null), false, true).toString();
+                actionManager.createInstance(type, null), converterConfig).toString();
     }
 
     /**
      * Returns all configuration parameters of an action type.
      *
      * @param type The type to get parameters for.
+     *
      * @return List of parameters.
      */
     @GetMapping(value = "provider/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getProviderParameters(@PathVariable("type") String type) {
         return parametersConverter.convert(
-                providerManager.createInstance(type, null), false, true).toString();
+                providerManager.createInstance(type, null), converterConfig).toString();
     }
 
     /**
      * Returns all configuration parameters of an action type.
      *
      * @param type The type to get parameters for.
+     *
      * @return List of parameters.
      */
     @GetMapping(value = "trigger/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTriggerParameters(@PathVariable("type") String type) {
         return parametersConverter.convert(
-                triggerManager.createInstance(type, null), false, true).toString();
+                triggerManager.createInstance(type, null), converterConfig).toString();
     }
 
 }

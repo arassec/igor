@@ -26,14 +26,13 @@ public class FilterByRegExpAction extends BaseUtilAction {
      * Matches the provided data against the configured regular expression and filters it, if it doesn't match.
      *
      * @param data         The data the action will work with.
-     * @param isDryRun     Unused - the action will always filter by regular expression.
      * @param jobExecution The job execution log.
      *
      * @return {@code true}, if the value under the configured {@link BaseAction#dataKey} matches the regular expresion, {@code
      * false} otherwise.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
+    public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         if (isValid(data)) {
             if (!getString(data, dataKey).matches(expression)) {
                 log.debug("Filtered '{}' against RegExp '{}'", getString(data, dataKey), expression);

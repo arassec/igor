@@ -20,13 +20,12 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
      * ignored.
      *
      * @param data         The data the action will work with.
-     * @param isDryRun     Unused - always filters persisted values.
      * @param jobExecution The job execution log.
      *
      * @return The manipulated data.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
+    public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         if (isValid(data)) {
             Long jobId = getLong(data, JOB_ID_KEY);
             String taskId = getString(data, TASK_ID_KEY);

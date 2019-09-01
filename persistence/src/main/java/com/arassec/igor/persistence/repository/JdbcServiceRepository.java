@@ -1,5 +1,6 @@
 package com.arassec.igor.persistence.repository;
 
+import com.arassec.igor.core.application.converter.ConverterConfig;
 import com.arassec.igor.core.application.converter.JsonServiceConverter;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
@@ -53,6 +54,11 @@ public class JdbcServiceRepository implements ServiceRepository {
     private final JsonServiceConverter jsonServiceConverter;
 
     /**
+     * The converter configuration.
+     */
+    private ConverterConfig converterConfig = new ConverterConfig(true, false);
+
+    /**
      * Saves a {@link Service} to the database. Either creates a new service or updates an existing one.
      *
      * @param service The service to save.
@@ -67,7 +73,7 @@ public class JdbcServiceRepository implements ServiceRepository {
                     .orElseThrow(() -> new IllegalStateException("No service with " + "ID " + service.getId() + " available!"));
         }
         serviceEntity.setName(service.getName());
-        serviceEntity.setContent(jsonServiceConverter.convert(service, true, false).toString());
+        serviceEntity.setContent(jsonServiceConverter.convert(service, converterConfig).toString());
         ServiceEntity savedEntity = serviceDao.save(serviceEntity);
         service.setId(savedEntity.getId());
         return service;
@@ -77,13 +83,14 @@ public class JdbcServiceRepository implements ServiceRepository {
      * Finds a {@link Service} by its ID.
      *
      * @param id The service's ID.
+     *
      * @return The service.
      */
     @Override
     public Service findById(Long id) {
         Optional<ServiceEntity> serviceEntityOptional = serviceDao.findById(id);
         if (serviceEntityOptional.isPresent()) {
-            Service service = jsonServiceConverter.convert(new JSONObject(serviceEntityOptional.get().getContent()), id, true);
+            Service service = jsonServiceConverter.convert(new JSONObject(serviceEntityOptional.get().getContent()), id, converterConfig);
             service.setId(id);
             return service;
         }
@@ -94,6 +101,7 @@ public class JdbcServiceRepository implements ServiceRepository {
      * Finds a {@link Service} by its name.
      *
      * @param name The service's name.
+     *
      * @return The service.
      */
     @Override
@@ -101,7 +109,7 @@ public class JdbcServiceRepository implements ServiceRepository {
         ServiceEntity serviceEntity = serviceDao.findByName(name);
         if (serviceEntity != null) {
             Service service = jsonServiceConverter
-                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), true);
+                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), converterConfig);
             service.setId(serviceEntity.getId());
             return service;
         }
@@ -118,7 +126,7 @@ public class JdbcServiceRepository implements ServiceRepository {
         List<Service> result = new LinkedList<>();
         for (ServiceEntity serviceEntity : serviceDao.findAll()) {
             Service service = jsonServiceConverter
-                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), true);
+                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), converterConfig);
             service.setId(serviceEntity.getId());
             result.add(service);
         }
@@ -131,6 +139,7 @@ public class JdbcServiceRepository implements ServiceRepository {
      * @param pageNumber The page number to load.
      * @param pageSize   The page size.
      * @param nameFilter An optional filter for the service's name.
+     *
      * @return The page of services.
      */
     @Override
@@ -148,7 +157,7 @@ public class JdbcServiceRepository implements ServiceRepository {
         if (page != null && page.hasContent()) {
             ModelPage<Service> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
             result.setItems(page.getContent().stream().map(serviceEntity -> jsonServiceConverter
-                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), true))
+                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), converterConfig))
                     .collect(Collectors.toList()));
             return result;
         }

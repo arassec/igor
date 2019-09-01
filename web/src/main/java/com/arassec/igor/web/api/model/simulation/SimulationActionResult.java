@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.job.dryrun;
+package com.arassec.igor.web.api.model.simulation;
 
 import lombok.Data;
 
@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Contains the dry-run result of an action.
+ * Contains the simulation result of an action.
  */
 @Data
-public class DryRunActionResult {
+public class SimulationActionResult {
 
     /**
      * The data after the action's processing.

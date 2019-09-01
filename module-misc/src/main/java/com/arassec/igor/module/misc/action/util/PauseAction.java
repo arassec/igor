@@ -2,6 +2,8 @@ package com.arassec.igor.module.misc.action.util;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,21 +27,16 @@ public class PauseAction extends BaseUtilAction {
      * Pauses the processing for every data that is supplied to it.
      *
      * @param data         The data the action will work with.
-     * @param isDryRun     If set to {@code true}, the action does not pause processing.
      * @param jobExecution The job execution log.
      *
      * @return Always {@code true}.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
-        if (isDryRun) {
-            data.put(DRY_RUN_COMMENT_KEY, "Sleep for " + milliseconds + " milliseconds.");
-        } else {
-            try {
-                Thread.sleep(milliseconds);
-            } catch (InterruptedException e) {
-                log.debug("Interrupted during pause action!");
-            }
+    public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            log.debug("Interrupted during pause action!");
         }
         return List.of(data);
     }

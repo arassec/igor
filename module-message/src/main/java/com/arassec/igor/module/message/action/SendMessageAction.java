@@ -42,13 +42,12 @@ public class SendMessageAction extends BaseMessageAction {
      * message is sent via a message service.
      *
      * @param data         The data the action will work with.
-     * @param isDryRun     Only sends messages if set to {@code false}.
      * @param jobExecution The job execution log.
      *
      * @return The manipulated data.
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, boolean isDryRun, JobExecution jobExecution) {
+    public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
         String content = messageTemplate;
 
@@ -63,14 +62,10 @@ public class SendMessageAction extends BaseMessageAction {
             }
         }
 
-        if (isDryRun) {
-            data.put(DRY_RUN_COMMENT_KEY, "sendMessage: " + content);
-        } else {
-            Message message = new Message();
-            message.setContent(content);
-            messageService.sendMessage(message);
-            log.debug("Message sent: '{}'", content);
-        }
+        Message message = new Message();
+        message.setContent(content);
+        messageService.sendMessage(message);
+        log.debug("Message sent: '{}'", content);
 
         return List.of(data);
     }
