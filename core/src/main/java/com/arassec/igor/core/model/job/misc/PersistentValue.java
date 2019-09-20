@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.job.persistence;
+package com.arassec.igor.core.model.job.misc;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,4 +35,5 @@ public class PersistentValue {
     public PersistentValue(String content) {
         this.content = content;
     }
+
 }

@@ -3,7 +3,7 @@ package com.arassec.igor.module.message.action;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.misc.ParameterSubtype;
+import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.module.message.service.Message;
 import com.arassec.igor.module.message.service.MessageService;
 import lombok.extern.slf4j.Slf4j;

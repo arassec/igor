@@ -1,7 +1,5 @@
 package com.arassec.igor.persistence.repository;
 
-import com.arassec.igor.core.application.converter.ConverterConfig;
-import com.arassec.igor.core.application.converter.JsonServiceConverter;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.core.util.ModelPage;
@@ -11,7 +9,8 @@ import com.arassec.igor.persistence.dao.JobServiceReferenceDao;
 import com.arassec.igor.persistence.dao.ServiceDao;
 import com.arassec.igor.persistence.entity.JobServiceReferenceEntity;
 import com.arassec.igor.persistence.entity.ServiceEntity;
-import com.github.openjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -49,14 +49,9 @@ public class JdbcServiceRepository implements ServiceRepository {
     private final JobServiceReferenceDao jobServiceReferenceDao;
 
     /**
-     * The converter for services.
+     * ObjectMapper for JSON conversion.
      */
-    private final JsonServiceConverter jsonServiceConverter;
-
-    /**
-     * The converter configuration.
-     */
-    private ConverterConfig converterConfig = new ConverterConfig(true, false);
+    private final ObjectMapper persistenceServiceMapper;
 
     /**
      * Saves a {@link Service} to the database. Either creates a new service or updates an existing one.
@@ -66,6 +61,7 @@ public class JdbcServiceRepository implements ServiceRepository {
     @Override
     public Service upsert(Service service) {
         ServiceEntity serviceEntity;
+
         if (service.getId() == null) {
             serviceEntity = new ServiceEntity();
         } else {
@@ -73,9 +69,18 @@ public class JdbcServiceRepository implements ServiceRepository {
                     .orElseThrow(() -> new IllegalStateException("No service with " + "ID " + service.getId() + " available!"));
         }
         serviceEntity.setName(service.getName());
-        serviceEntity.setContent(jsonServiceConverter.convert(service, converterConfig).toString());
+
+        try {
+            serviceEntity.setContent(persistenceServiceMapper.writeValueAsString(service));
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Could not save service!", e);
+        }
+
         ServiceEntity savedEntity = serviceDao.save(serviceEntity);
+
         service.setId(savedEntity.getId());
+        service.setName(savedEntity.getName());
+
         return service;
     }
 
@@ -90,8 +95,15 @@ public class JdbcServiceRepository implements ServiceRepository {
     public Service findById(Long id) {
         Optional<ServiceEntity> serviceEntityOptional = serviceDao.findById(id);
         if (serviceEntityOptional.isPresent()) {
-            Service service = jsonServiceConverter.convert(new JSONObject(serviceEntityOptional.get().getContent()), id, converterConfig);
-            service.setId(id);
+            Service service;
+            try {
+                ServiceEntity serviceEntity = serviceEntityOptional.get();
+                service = persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
+                service.setId(serviceEntity.getId());
+                service.setName(serviceEntity.getName());
+            } catch (IOException e) {
+                throw new IllegalStateException("Could not read service!", e);
+            }
             return service;
         }
         return null;
@@ -108,9 +120,14 @@ public class JdbcServiceRepository implements ServiceRepository {
     public Service findByName(String name) {
         ServiceEntity serviceEntity = serviceDao.findByName(name);
         if (serviceEntity != null) {
-            Service service = jsonServiceConverter
-                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), converterConfig);
-            service.setId(serviceEntity.getId());
+            Service service;
+            try {
+                service = persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
+                service.setId(serviceEntity.getId());
+                service.setName(serviceEntity.getName());
+            } catch (IOException e) {
+                throw new IllegalStateException("Could not read service!", e);
+            }
             return service;
         }
         return null;
@@ -125,9 +142,14 @@ public class JdbcServiceRepository implements ServiceRepository {
     public List<Service> findAll() {
         List<Service> result = new LinkedList<>();
         for (ServiceEntity serviceEntity : serviceDao.findAll()) {
-            Service service = jsonServiceConverter
-                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), converterConfig);
-            service.setId(serviceEntity.getId());
+            Service service;
+            try {
+                service = persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
+                service.setId(serviceEntity.getId());
+                service.setName(serviceEntity.getName());
+            } catch (IOException e) {
+                throw new IllegalStateException("Could not read service!", e);
+            }
             result.add(service);
         }
         return result;
@@ -156,9 +178,16 @@ public class JdbcServiceRepository implements ServiceRepository {
 
         if (page != null && page.hasContent()) {
             ModelPage<Service> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
-            result.setItems(page.getContent().stream().map(serviceEntity -> jsonServiceConverter
-                    .convert(new JSONObject(serviceEntity.getContent()), serviceEntity.getId(), converterConfig))
-                    .collect(Collectors.toList()));
+            result.setItems(page.getContent().stream().map(serviceEntity -> {
+                try {
+                    Service service = persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
+                    service.setId(serviceEntity.getId());
+                    service.setName(serviceEntity.getName());
+                    return service;
+                } catch (IOException e) {
+                    throw new IllegalStateException("Could not read service!", e);
+                }
+            }).collect(Collectors.toList()));
             return result;
         }
 

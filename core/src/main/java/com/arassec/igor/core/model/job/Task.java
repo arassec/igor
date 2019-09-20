@@ -2,15 +2,15 @@ package com.arassec.igor.core.model.job;
 
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.misc.concurrent.ConcurrencyGroup;
+import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.provider.Provider;
-import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -58,9 +58,11 @@ public class Task {
     private List<Action> actions = new LinkedList<>();
 
     /**
-     * Limits the results in a simulated job run.
+     * Creates a new Task with a random ID.
      */
-    private int simulationLimit = 25;
+    public Task() {
+        id = UUID.randomUUID().toString();
+    }
 
     /**
      * Creates a new Task.

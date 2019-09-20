@@ -2,7 +2,7 @@ package com.arassec.igor.module.misc.action.persistence;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.job.persistence.PersistentValue;
+import com.arassec.igor.core.model.job.misc.PersistentValue;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;

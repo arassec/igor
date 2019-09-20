@@ -1,4 +1,4 @@
-package com.arassec.igor.core.application.converter.simulation;
+package com.arassec.igor.web.api.simulation;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.Provider;
@@ -70,7 +70,7 @@ public class ProviderProxy implements Provider {
     @Override
     public boolean hasNext() {
         try {
-            if (curItemsProcessed < simulationLimit) {
+            if (curItemsProcessed < delegate.getSimulationLimit()) {
                 curItemsProcessed++;
                 return delegate.hasNext();
             }

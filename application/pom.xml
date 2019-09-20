@@ -25,6 +25,18 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>persistence</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>web</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>module-misc</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -38,18 +50,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>module-message</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>persistence</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>web</artifactId>
             <version>${project.version}</version>
         </dependency>
 

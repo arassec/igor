@@ -1,6 +1,6 @@
 package com.arassec.igor.core.repository;
 
-import com.arassec.igor.core.model.job.persistence.PersistentValue;
+import com.arassec.igor.core.model.job.misc.PersistentValue;
 
 /**
  * Repository for access to {@link PersistentValue}s.

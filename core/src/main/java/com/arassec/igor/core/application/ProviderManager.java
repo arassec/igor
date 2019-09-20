@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class ProviderManager extends ModelManager<Provider> {
+public class ProviderManager extends IgorComponentManager<Provider> {
 
     /**
      * Creates a new instance.

@@ -2,7 +2,7 @@ package com.arassec.igor.core.model.trigger;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.misc.ParameterSubtype;
+import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 
 /**
  * Triggers jobs according to a configurable CRON expression.

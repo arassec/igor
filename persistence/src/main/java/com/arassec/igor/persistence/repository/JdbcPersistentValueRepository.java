@@ -1,6 +1,6 @@
 package com.arassec.igor.persistence.repository;
 
-import com.arassec.igor.core.model.job.persistence.PersistentValue;
+import com.arassec.igor.core.model.job.misc.PersistentValue;
 import com.arassec.igor.core.repository.PersistentValueRepository;
 import com.arassec.igor.persistence.dao.PersistentValueDao;
 import com.arassec.igor.persistence.entity.PersistentValueEntity;

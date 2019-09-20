@@ -4,8 +4,9 @@ import com.arassec.igor.core.application.ActionManager;
 import com.arassec.igor.core.application.ProviderManager;
 import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.application.TriggerManager;
-import com.arassec.igor.core.application.converter.ConverterConfig;
-import com.arassec.igor.core.application.converter.JsonServiceAwareParametersConverter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.openjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,14 +43,9 @@ public class ParametersRestController {
     private final TriggerManager triggerManager;
 
     /**
-     * Converter for parameters to and from JSON.
+     * Job-Mapper for simulation runs.
      */
-    private final JsonServiceAwareParametersConverter parametersConverter;
-
-    /**
-     * JSON Converter configuration.
-     */
-    private ConverterConfig converterConfig = new ConverterConfig(false, true);
+    private final ObjectMapper objectMapper;
 
     /**
      * Returns all configuration parameters of a service type.
@@ -60,8 +56,12 @@ public class ParametersRestController {
      */
     @GetMapping(value = "service/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getServiceParameters(@PathVariable("type") String type) {
-        return parametersConverter.convert(
-                serviceManager.createInstance(type, null), converterConfig).toString();
+        try {
+            JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(serviceManager.createInstance(type, null)));
+            return jsonObject.getJSONArray("parameters").toString();
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Could not read parameters!", e);
+        }
     }
 
     /**
@@ -73,8 +73,12 @@ public class ParametersRestController {
      */
     @GetMapping(value = "action/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getActionParameters(@PathVariable("type") String type) {
-        return parametersConverter.convert(
-                actionManager.createInstance(type, null), converterConfig).toString();
+        try {
+            JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(actionManager.createInstance(type, null)));
+            return jsonObject.getJSONArray("parameters").toString();
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Could not read parameters!", e);
+        }
     }
 
     /**
@@ -86,8 +90,12 @@ public class ParametersRestController {
      */
     @GetMapping(value = "provider/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getProviderParameters(@PathVariable("type") String type) {
-        return parametersConverter.convert(
-                providerManager.createInstance(type, null), converterConfig).toString();
+        try {
+            JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(providerManager.createInstance(type, null)));
+            return jsonObject.getJSONArray("parameters").toString();
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Could not read parameters!", e);
+        }
     }
 
     /**
@@ -99,8 +107,12 @@ public class ParametersRestController {
      */
     @GetMapping(value = "trigger/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTriggerParameters(@PathVariable("type") String type) {
-        return parametersConverter.convert(
-                triggerManager.createInstance(type, null), converterConfig).toString();
+        try {
+            JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(triggerManager.createInstance(type, null)));
+            return jsonObject.getJSONArray("parameters").toString();
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Could not read parameters!", e);
+        }
     }
 
 }

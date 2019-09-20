@@ -1,4 +1,4 @@
-package com.arassec.igor.core.application.converter.simulation;
+package com.arassec.igor.web.api.simulation;
 
 import com.arassec.igor.core.model.IgorSimulationSafe;
 import com.arassec.igor.core.model.service.Service;
@@ -8,7 +8,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 /**
- * Proxy for {@link Service}s.
+ * Proxy for {@link Service}s. This proxy either calls the original method, if it is safe to do so during a simulated job run, or
+ * a mock method, to avoid problems for regular job runs.
  */
 public class ServiceProxy implements InvocationHandler {
 

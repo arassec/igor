@@ -19,12 +19,11 @@ public abstract class BaseAction implements Action {
     /**
      * Dummy work-in-progress monitor that can be used, if progress shouldn't be monitored.
      */
-    protected static final WorkInProgressMonitor VOID_WORK_IN_PROGRESS_MONITOR = new WorkInProgressMonitor("", 0);
+    protected static final WorkInProgressMonitor VOID_WIP_MONITOR = new WorkInProgressMonitor("", 0);
 
     /**
      * Activates or deactivates an action.
      */
-    @IgorParam
     protected boolean active = true;
 
     /**
@@ -78,6 +77,14 @@ public abstract class BaseAction implements Action {
     @Override
     public boolean isActive() {
         return active;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     /**

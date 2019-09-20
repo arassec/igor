@@ -1,9 +1,8 @@
 # Igor 
-This repository contains the sources of igor, a tool for managing 'continuous workarounds'. Workarounds for every-day problems 
-exist everywhere, and some of them exist longer than expected (or desired). This tool tries to provide a place to organize 
-data-centric workarounds in a centralized and reliable way. 
+This repository contains the sources of igor, a tool for managing 'continuous workarounds'. This tool tries to provide a place to organize 
+data-centric use-cases and workarounds in a centralized and reliable way. 
 
-[![Build Status](https://travis-ci.com/arassec/igor.svg?branch=master)](https://travis-ci.com/arassec/igor)
+[![Travis (.org)](https://img.shields.io/travis/arassec/igor?style=flat-square)](https://travis-ci.com/arassec/igor)
 
 # Status
 Igor is an application to configure generic ['Extract, Transform, Load'](https://en.wikipedia.org/wiki/Extract,_transform,_load)

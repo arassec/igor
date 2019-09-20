@@ -2,8 +2,6 @@ package com.arassec.igor.web.api;
 
 import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.application.ServiceManager;
-import com.arassec.igor.core.application.converter.ConverterConfig;
-import com.arassec.igor.core.application.converter.JsonServiceConverter;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
@@ -11,8 +9,6 @@ import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.api.error.RestControllerExceptionHandler;
 import com.arassec.igor.web.api.model.ServiceListEntry;
-import com.github.openjson.JSONArray;
-import com.github.openjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,16 +39,6 @@ public class ServiceRestController {
     private final JobManager jobManager;
 
     /**
-     * Converter for services from and to JSON.
-     */
-    private final JsonServiceConverter jsonServiceConverter;
-
-    /**
-     * JSON Converter configuration.
-     */
-    private ConverterConfig converterConfig = new ConverterConfig(false, true);
-
-    /**
      * Returns all available services.
      *
      * @return List of available services.
@@ -62,7 +48,6 @@ public class ServiceRestController {
             @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize,
             @RequestParam(value = "nameFilter", required = false) String nameFilter) {
-
         ModelPage<Service> servicesPage = serviceManager.loadPage(pageNumber, pageSize, nameFilter);
         if (servicesPage != null && !servicesPage.getItems().isEmpty()) {
             ModelPage<ServiceListEntry> result = new ModelPage<>(pageNumber, pageSize, servicesPage.getTotalPages(), null);
@@ -75,7 +60,6 @@ public class ServiceRestController {
 
             return result;
         }
-
         return new ModelPage<>(pageNumber, pageSize, 0, List.of());
     }
 
@@ -83,41 +67,28 @@ public class ServiceRestController {
      * Returns all services of a certain category.
      *
      * @param category The target category.
+     *
      * @return List of services in that category.
      */
     @GetMapping(value = "category/{category}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getServicesInCategory(@PathVariable("category") String category,
-                                        @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-                                        @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize) {
-        ModelPage<Service> serviceModelPage = serviceManager.loadAllOfCategory(category, pageNumber, pageSize);
-
-        if (serviceModelPage.getItems() != null) {
-            JSONArray items = new JSONArray();
-            serviceModelPage.getItems().forEach(service -> items.put(jsonServiceConverter.convert(service, converterConfig)));
-
-            JSONObject result = new JSONObject();
-            result.put("number", pageNumber);
-            result.put("size", pageSize);
-            result.put("totalPages", serviceModelPage.getTotalPages());
-            result.put("items", items);
-
-            return result.toString();
-        }
-
-        return new JSONObject().toString();
+    public ModelPage<Service> getServicesInCategory(@PathVariable("category") String category,
+                                                    @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+                                                    @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize) {
+        return serviceManager.loadAllOfCategory(category, pageNumber, pageSize);
     }
 
     /**
      * Returns the service with the given ID.
      *
      * @param id The service's ID.
+     *
      * @return The service.
      */
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getService(@PathVariable("id") Long id) {
+    public Service getService(@PathVariable("id") Long id) {
         Service service = serviceManager.load(id);
         if (service != null) {
-            return jsonServiceConverter.convert(service, converterConfig).toString();
+            return service;
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Service not found");
     }
@@ -146,15 +117,14 @@ public class ServiceRestController {
     /**
      * Creates a new service.
      *
-     * @param serviceJson The service configuration in JSON form.
+     * @param service The new service configuration.
+     *
      * @return The service JSON on success.
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public String createService(@RequestBody String serviceJson) {
-        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), null, converterConfig);
+    public Service createService(@RequestBody Service service) {
         if (serviceManager.loadByName(service.getName()) == null) {
-            Service savedService = serviceManager.save(service);
-            return jsonServiceConverter.convert(savedService, converterConfig).toString();
+            return serviceManager.save(service);
         } else {
             throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
         }
@@ -163,12 +133,11 @@ public class ServiceRestController {
     /**
      * Updates an existing service.
      *
-     * @param serviceJson The service configuration in JSON form.
+     * @param service The new service configuration.
      */
     @PutMapping()
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateService(@RequestBody String serviceJson) {
-        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), null, converterConfig);
+    public void updateService(@RequestBody Service service) {
         Service existingServiceWithSameName = serviceManager.loadByName(service.getName());
         if (existingServiceWithSameName == null || existingServiceWithSameName.getId().equals(service.getId())) {
             serviceManager.save(service);
@@ -180,12 +149,12 @@ public class ServiceRestController {
     /**
      * Tests the supplied service configuration.
      *
-     * @param serviceJson The service configuration in JSON form.
+     * @param service The service configuration.
+     *
      * @return The string 'OK' on success, an error message if the test was not successful.
      */
     @PostMapping("test")
-    public ResponseEntity<String> testService(@RequestBody String serviceJson) {
-        Service service = jsonServiceConverter.convert(new JSONObject(serviceJson), null, converterConfig);
+    public ResponseEntity<String> testService(@RequestBody Service service) {
         try {
             service.testConfiguration();
             return new ResponseEntity<>("OK", HttpStatus.OK);
@@ -203,6 +172,7 @@ public class ServiceRestController {
      *
      * @param encodedName The service's Base64 encoded name.
      * @param id          The service's ID.
+     *
      * @return {@code true} if a service with the provided name already exists, {@code false} otherwise.
      */
     @GetMapping("check/{name}/{id}")
@@ -216,6 +186,7 @@ public class ServiceRestController {
      * Returns the jobs that reference this service.
      *
      * @param id The service's ID.
+     *
      * @return The jobs.
      */
     @GetMapping(value = "{id}/job-references", produces = MediaType.APPLICATION_JSON_VALUE)

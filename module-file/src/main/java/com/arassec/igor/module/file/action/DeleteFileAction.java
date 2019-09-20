@@ -47,7 +47,7 @@ public class DeleteFileAction extends BaseFileAction {
             }
             String path = directory + file;
             log.debug("Deleting file: '{}'", path);
-            service.delete(path, VOID_WORK_IN_PROGRESS_MONITOR);
+            service.delete(path, VOID_WIP_MONITOR);
             log.debug("File '{}' deleted", path);
             return List.of(data);
         }

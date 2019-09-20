@@ -1,8 +1,8 @@
 package com.arassec.igor.persistence.repository;
 
-import com.arassec.igor.core.application.converter.ConverterConfig;
-import com.arassec.igor.core.application.converter.JsonJobConverter;
+import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
@@ -11,8 +11,8 @@ import com.arassec.igor.persistence.dao.JobServiceReferenceDao;
 import com.arassec.igor.persistence.dao.ServiceDao;
 import com.arassec.igor.persistence.entity.JobEntity;
 import com.arassec.igor.persistence.entity.JobServiceReferenceEntity;
-import com.arassec.igor.persistence.util.ServiceIdExtractor;
-import com.github.openjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ReflectionUtils;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,14 +50,9 @@ public class JdbcJobRepository implements JobRepository {
     private final JobServiceReferenceDao jobServiceReferenceDao;
 
     /**
-     * Converter for jobs.
+     * ObjectMapper for JSON conversion.
      */
-    private final JsonJobConverter jsonJobConverter;
-
-    /**
-     * The converter configuration.
-     */
-    private ConverterConfig converterConfig = new ConverterConfig(true, false);
+    private final ObjectMapper persistenceJobMapper;
 
     /**
      * Persists jobs using JDBC. Either creates a new entry in the database or updates an existing one.
@@ -70,12 +67,15 @@ public class JdbcJobRepository implements JobRepository {
         if (job.getId() == null) {
             jobEntity = new JobEntity();
         } else {
-            jobEntity =
-                    jobDao.findById(job.getId()).orElseThrow(() -> new IllegalStateException("No job with ID " + job.getId() +
-                            " available!"));
+            jobEntity = jobDao.findById(job.getId()).orElseThrow(
+                    () -> new IllegalStateException("No job with ID " + job.getId() + " available!"));
         }
         jobEntity.setName(job.getName());
-        jobEntity.setContent(jsonJobConverter.convert(job, converterConfig).toString());
+        try {
+            jobEntity.setContent(persistenceJobMapper.writeValueAsString(job));
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Could not upsert job!", e);
+        }
         JobEntity savedJob = jobDao.save(jobEntity);
         job.setId(savedJob.getId());
 
@@ -83,8 +83,8 @@ public class JdbcJobRepository implements JobRepository {
         jobServiceReferenceDao.deleteByJobId(savedJob.getId());
         List<Long> referencedServices = new LinkedList<>();
         job.getTasks().forEach(task -> {
-            referencedServices.addAll(ServiceIdExtractor.getServiceIds(task.getProvider()));
-            task.getActions().forEach(action -> referencedServices.addAll(ServiceIdExtractor.getServiceIds(action)));
+            referencedServices.addAll(getServiceIds(task.getProvider()));
+            task.getActions().forEach(action -> referencedServices.addAll(getServiceIds(action)));
         });
         referencedServices.forEach(serviceId -> jobServiceReferenceDao.save(new JobServiceReferenceEntity(savedJob.getId(),
                 serviceId)));
@@ -103,7 +103,13 @@ public class JdbcJobRepository implements JobRepository {
     public Job findById(Long id) {
         Optional<JobEntity> jobEntityOptional = jobDao.findById(id);
         if (jobEntityOptional.isPresent()) {
-            Job job = jsonJobConverter.convert(new JSONObject(jobEntityOptional.get().getContent()), id, converterConfig);
+            Job job;
+            try {
+                job = persistenceJobMapper.readValue(jobEntityOptional.get().getContent(), Job.class);
+                job.setId(id);
+            } catch (IOException e) {
+                throw new IllegalStateException("Could not read job!", e);
+            }
             job.setId(id);
             return job;
         }
@@ -121,7 +127,13 @@ public class JdbcJobRepository implements JobRepository {
     public Job findByName(String name) {
         JobEntity entity = jobDao.findByName(name);
         if (entity != null) {
-            Job job = jsonJobConverter.convert(new JSONObject(entity.getContent()), entity.getId(), converterConfig);
+            Job job;
+            try {
+                job = persistenceJobMapper.readValue(entity.getContent(), Job.class);
+                job.setId(entity.getId());
+            } catch (IOException e) {
+                throw new IllegalStateException("Could not read job!", e);
+            }
             job.setId(entity.getId());
             return job;
         }
@@ -137,7 +149,13 @@ public class JdbcJobRepository implements JobRepository {
     public List<Job> findAll() {
         List<Job> result = new LinkedList<>();
         for (JobEntity jobEntity : jobDao.findAll()) {
-            Job job = jsonJobConverter.convert(new JSONObject(jobEntity.getContent()), jobEntity.getId(), converterConfig);
+            Job job;
+            try {
+                job = persistenceJobMapper.readValue(jobEntity.getContent(), Job.class);
+                job.setId(jobEntity.getId());
+            } catch (IOException e) {
+                throw new IllegalStateException("Could not read job!", e);
+            }
             job.setId(jobEntity.getId());
             result.add(job);
         }
@@ -167,8 +185,15 @@ public class JdbcJobRepository implements JobRepository {
 
         if (page != null && page.hasContent()) {
             ModelPage<Job> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
-            result.setItems(page.getContent().stream().map(jobEntity -> jsonJobConverter.convert(
-                    new JSONObject(jobEntity.getContent()), jobEntity.getId(), converterConfig)).collect(Collectors.toList()));
+            result.setItems(page.getContent().stream().map(jobEntity -> {
+                try {
+                    Job job = persistenceJobMapper.readValue(jobEntity.getContent(), Job.class);
+                    job.setId(jobEntity.getId());
+                    return job;
+                } catch (IOException e) {
+                    throw new IllegalStateException("Could not read job!", e);
+                }
+            }).collect(Collectors.toList()));
             return result;
         }
 
@@ -201,6 +226,39 @@ public class JdbcJobRepository implements JobRepository {
                 result.add(new Pair<>(serviceId, serviceName));
             });
         }
+
+        return result;
+    }
+
+    /**
+     * Extracts service IDs from the parameters of the supplied class.
+     *
+     * @param instance The model instance.
+     * @return List of referenced service IDs.
+     */
+    private <T> List<Long> getServiceIds(T instance) {
+        List<Long> result = new LinkedList<>();
+
+        if (instance == null) {
+            return result;
+        }
+
+        ReflectionUtils.doWithFields(instance.getClass(), field -> {
+            if (field.isAnnotationPresent(IgorParam.class)) {
+                boolean isService = Service.class.isAssignableFrom(field.getType());
+                try {
+                    boolean accessibility = field.canAccess(instance);
+                    field.setAccessible(true);
+                    Object value = field.get(instance);
+                    field.setAccessible(accessibility);
+                    if (isService && value != null) {
+                        result.add(((Service) value).getId());
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new IllegalStateException("Could not read service ID!", e);
+                }
+            }
+        });
 
         return result;
     }

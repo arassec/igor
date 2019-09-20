@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.misc.concurrent;
+package com.arassec.igor.core.model.job.concurrent;
 
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;

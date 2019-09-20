@@ -2,7 +2,7 @@ package com.arassec.igor.module.message.service.rabbitmq;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.misc.ParameterSubtype;
+import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.message.service.BaseMessageService;
 import com.arassec.igor.module.message.service.Message;

@@ -1,4 +1,4 @@
-package com.arassec.igor.core.application.converter.simulation;
+package com.arassec.igor.web.api.simulation;
 
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
@@ -119,6 +119,14 @@ public class ActionProxy implements Action {
     @Override
     public boolean isActive() {
         return delegate.isActive();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setActive(boolean active) {
+        delegate.setActive(active);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.arassec.igor.core.application.converter.util;
+package com.arassec.igor.persistence.mapper;
 
 import org.jasypt.util.text.StrongTextEncryptor;
 import org.springframework.beans.factory.InitializingBean;

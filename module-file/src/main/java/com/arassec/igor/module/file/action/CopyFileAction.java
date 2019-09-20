@@ -105,7 +105,7 @@ public class CopyFileAction extends BaseFileAction {
 
             try {
                 String sourceFileWithPath = getSourceFileWithPath(sourceDirectory, sourceFile);
-                FileStreamData fileStreamData = sourceService.readStream(sourceFileWithPath, VOID_WORK_IN_PROGRESS_MONITOR);
+                FileStreamData fileStreamData = sourceService.readStream(sourceFileWithPath, VOID_WIP_MONITOR);
                 String targetFile = getTargetFile(sourceFile, fileStreamData.getFilenameSuffix());
                 String targetFilePath = targetDirectory + targetFile;
                 log.debug("Copying file '{}' to '{}'", sourceFileWithPath, targetFilePath);
@@ -116,7 +116,7 @@ public class CopyFileAction extends BaseFileAction {
                 targetService.writeStream(targetFileInTransfer, fileStreamData, workInProgressMonitor);
                 sourceService.finalizeStream(fileStreamData);
                 if (appendTransferSuffix) {
-                    targetService.move(targetFileInTransfer, targetFilePath, VOID_WORK_IN_PROGRESS_MONITOR);
+                    targetService.move(targetFileInTransfer, targetFilePath, VOID_WIP_MONITOR);
                 }
                 log.debug("File '{}' copied to '{}'", sourceFileWithPath, targetFilePath);
                 data.put(KEY_TARGET_FILENAME, targetFile);

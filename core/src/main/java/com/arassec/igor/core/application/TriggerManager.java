@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class TriggerManager extends ModelManager<Trigger> {
+public class TriggerManager extends IgorComponentManager<Trigger> {
 
     /**
      * Creates a new instance.

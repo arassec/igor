@@ -13,11 +13,11 @@
                 <ul class="tree">
                     <li v-for="(task, taskIndex) in jobConfiguration.tasks"
                         v-bind:key="taskIndex">
-                        <span class="item truncate"
+                        <span class="item truncate width-350"
                              v-bind:class="getTaskStyleClass(taskIndex, task)"
                              v-on:click="$emit('task-is-selected', taskIndex)">
                             <font-awesome-icon icon="tasks"/>
-                            <span>
+                            <span class="width-300">
                                         {{task.name.length > 0 ? task.name : 'Unnamed Task'}}
                                     </span>
                             <font-awesome-icon icon="arrow-up" class="fa-xs"
@@ -34,7 +34,7 @@
                         <ul>
                             <li v-for="(action, actionIndex) in task.actions"
                                 v-bind:key="actionIndex">
-                                <span class="item truncate"
+                                <span class="item truncate width-350"
                                      v-bind:class="getActionStyleClass(taskIndex, actionIndex, task, action)"
                                      v-on:click="$emit('action-is-selected', taskIndex, actionIndex)">
                                     <font-awesome-icon icon="wrench"/>
@@ -52,7 +52,7 @@
                                 </span>
                             </li>
                             <li>
-                                <span class="item truncate" :class="getAddActionStyleClass(task)"
+                                <span class="item truncate width-350" :class="getAddActionStyleClass(task)"
                                      v-on:click="$emit('add-action', taskIndex)">
                                     <font-awesome-icon :icon="['fas', 'plus-circle']" class="font-18"/>
                                     <span>
@@ -63,7 +63,7 @@
                         </ul>
                     </li>
                     <li>
-                        <div class="item truncate" :class="getAddTaskStyleClass()" v-on:click="$emit('add-task')">
+                        <div class="item truncate width-350" :class="getAddTaskStyleClass()" v-on:click="$emit('add-task')">
                             <font-awesome-icon :icon="['fas', 'plus-circle']"/>
                             <span>
                                         Add Task
@@ -116,15 +116,8 @@
                 if (taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex) {
                     return 'selected'
                 }
-                if (!this.jobConfiguration.active || !task.active) {
+                if (!this.jobConfiguration.active || !task.active || !action.active) {
                     return 'inactive'
-                }
-                if (action.parameters) {
-                    for (let i in action.parameters) {
-                        if (action.parameters[i].name === 'active' && action.parameters[i].value === false) {
-                            return 'inactive'
-                        }
-                    }
                 }
                 return ''
             },
@@ -163,8 +156,15 @@
         overflow: hidden;
     }
 
-    .item {
+    .width-300 {
         max-width: 300px;
+    }
+
+    .width-350 {
+        max-width: 350px;
+    }
+
+    .item {
         display: inline-block;
         padding: 4px 4px 0px 5px;
     }

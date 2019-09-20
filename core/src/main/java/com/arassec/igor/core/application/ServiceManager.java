@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * Manages {@link Service}s. Entry point from outside the core package to create and maintain services.
  */
 @Component
-public class ServiceManager extends ModelManager<Service> {
+public class ServiceManager extends IgorComponentManager<Service> {
 
     /**
      * Repository for services.

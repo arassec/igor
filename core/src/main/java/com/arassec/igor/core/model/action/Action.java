@@ -65,4 +65,11 @@ public interface Action {
      */
     boolean isActive();
 
+    /**
+     * Activates or deactivates the action.
+     *
+     * @param active Set to {@code true} to activate the action, {@code false} otherwise.
+     */
+    void setActive(boolean active);
+
 }

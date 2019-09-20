@@ -1,14 +1,13 @@
 package com.arassec.igor.persistence.repository;
 
-import com.arassec.igor.core.application.converter.JsonJobExecutionConverter;
-import com.arassec.igor.core.application.converter.JsonKeys;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.persistence.dao.JobExecutionDao;
 import com.arassec.igor.persistence.entity.JobExecutionEntity;
-import com.github.openjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,13 +16,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * {@link com.arassec.igor.core.repository.JobExecutionRepository} implementation that uses JDBC to persist {@link com.arassec.igor.core.model.job.execution.JobExecution}s.
+ * {@link com.arassec.igor.core.repository.JobExecutionRepository} implementation that uses JDBC to persist {@link
+ * com.arassec.igor.core.model.job.execution.JobExecution}s.
  */
 @Component
 @Transactional
@@ -36,9 +37,9 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     private final JobExecutionDao jobExecutionDao;
 
     /**
-     * Converter for job-executions.
+     * ObjectMapper for JSON conversion.
      */
-    private final JsonJobExecutionConverter jobExecutionConverter;
+    private final ObjectMapper persistenceJobMapper;
 
     /**
      * {@inheritDoc}
@@ -59,11 +60,11 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
             entity.setJobId(jobExecution.getJobId());
         }
         entity.setState(jobExecution.getExecutionState().name());
-        JSONObject jobExecutionJson = jobExecutionConverter.convert(jobExecution);
-        // The next two attributes are stored in separate columns in the database:
-        jobExecutionJson.remove(JsonKeys.ID);
-        jobExecutionJson.remove(JsonKeys.STATE);
-        entity.setContent(jobExecutionJson.toString());
+        try {
+            entity.setContent(persistenceJobMapper.writeValueAsString(jobExecution));
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Could not persist job execution!", e);
+        }
         JobExecutionEntity persistedEntity = jobExecutionDao.save(entity);
         jobExecution.setId(persistedEntity.getId());
         return jobExecution;
@@ -180,10 +181,16 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      * Converts a job-execution database entity into a {@link JobExecution}.
      *
      * @param entity The entity.
+     *
      * @return The newly created {@link JobExecution}.
      */
     private JobExecution convert(JobExecutionEntity entity) {
-        JobExecution result = jobExecutionConverter.convert(new JSONObject(entity.getContent()));
+        JobExecution result = null;
+        try {
+            result = persistenceJobMapper.readValue(entity.getContent(), JobExecution.class);
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not read job execution!", e);
+        }
         result.setId(entity.getId());
         result.setExecutionState(JobExecutionState.valueOf(entity.getState()));
         return result;

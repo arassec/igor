@@ -32,4 +32,11 @@ public interface Provider {
      */
     Map<String, Object> next();
 
+    /**
+     * The limit for test data during simulated job runs of this provider.
+     *
+     * @return The maximum number of data sets to use during simulations.
+     */
+    int getSimulationLimit();
+
 }

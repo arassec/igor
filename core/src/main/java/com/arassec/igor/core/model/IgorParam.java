@@ -1,6 +1,6 @@
 package com.arassec.igor.core.model;
 
-import com.arassec.igor.core.model.misc.ParameterSubtype;
+import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,6 +13,13 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IgorParam {
+
+    /**
+     * The sort index of this parameter for the UI.
+     *
+     * @return The sort index of this parameter.
+     */
+    int value() default 0;
 
     /**
      * Indicates whether this parameter has to be encrypted before saving it to a repository. If set to {@code true}, the

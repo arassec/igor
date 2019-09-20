@@ -15,7 +15,7 @@ import java.util.Set;
  */
 @Slf4j
 @RequiredArgsConstructor
-public abstract class ModelManager<T> {
+public abstract class IgorComponentManager<T> {
 
     /**
      * The factory for the model.

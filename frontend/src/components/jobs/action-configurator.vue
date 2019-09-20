@@ -8,6 +8,14 @@
 
             <table>
                 <tr>
+                    <td><label>Active</label></td>
+                    <td>
+                        <font-awesome-icon :icon="action.active ? 'check-square' : 'square'"
+                                           v-on:click="action.active = !action.active"/>
+                    </td>
+                    <td/>
+                </tr>
+                <tr>
                     <td><label>Category</label></td>
                     <td>
                         <select v-model="action.category" v-on:change="loadTypesOfCategory(action.category.key, true).then(() => {

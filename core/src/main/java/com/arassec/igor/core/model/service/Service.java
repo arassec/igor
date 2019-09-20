@@ -1,5 +1,7 @@
 package com.arassec.igor.core.model.service;
 
+import com.arassec.igor.core.model.IgorSimulationSafe;
+
 /**
  * Defines a source of data that can be manipulated using actions, or a destination for data to store it in.
  */
@@ -10,6 +12,7 @@ public interface Service {
      *
      * @return The ID.
      */
+    @IgorSimulationSafe
     Long getId();
 
     /**
@@ -17,6 +20,7 @@ public interface Service {
      *
      * @param id The service's ID.
      */
+    @IgorSimulationSafe
     void setId(Long id);
 
     /**
@@ -24,6 +28,7 @@ public interface Service {
      *
      * @return The service's name.
      */
+    @IgorSimulationSafe
     String getName();
 
     /**
@@ -31,6 +36,7 @@ public interface Service {
      *
      * @param name The new service name to set.
      */
+    @IgorSimulationSafe
     void setName(String name);
 
     /**

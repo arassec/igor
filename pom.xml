@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.5.RELEASE</version>
+        <version>2.1.8.RELEASE</version>
         <relativePath/>
     </parent>
 
@@ -29,11 +29,11 @@
     <modules>
         <module>core</module>
         <module>persistence</module>
+        <module>frontend</module>
+        <module>web</module>
         <module>module-misc</module>
         <module>module-file</module>
         <module>module-message</module>
-        <module>frontend</module>
-        <module>web</module>
         <module>application</module>
     </modules>
 
@@ -51,14 +51,14 @@
     <dependencyManagement>
         <dependencies>
 
-            <!-- core -->
-
+            <!-- persistence -->
             <dependency>
                 <groupId>org.jasypt</groupId>
                 <artifactId>jasypt</artifactId>
                 <version>1.9.3</version>
             </dependency>
 
+            <!-- web -->
             <!-- Spring-Boot doesn't provide org.json:json any more due to licensing issues -->
             <dependency>
                 <groupId>com.github.openjson</groupId>
@@ -67,7 +67,6 @@
             </dependency>
 
             <!-- module-file -->
-
             <dependency>
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
@@ -87,7 +86,6 @@
             </dependency>
 
             <!-- application -->
-
             <!-- JAXB-Dependencies for Spring-Boot to work with Java >10 -->
             <dependency>
                 <groupId>javax.xml.bind</groupId>

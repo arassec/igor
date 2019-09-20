@@ -49,7 +49,7 @@ public class RenameFileAction extends BaseFileAction {
             }
             String targetFile = directory + getString(data, dataKey);
             log.debug("Renaming file '{}' to '{}'", targetFile, targetFilename);
-            sourceService.move(targetFile, targetFilename, VOID_WORK_IN_PROGRESS_MONITOR);
+            sourceService.move(targetFile, targetFilename, VOID_WIP_MONITOR);
             log.debug("File '{}' renamed", targetFile, targetFilename);
             return List.of(data);
         }

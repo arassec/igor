@@ -5,14 +5,12 @@ import com.arassec.igor.core.model.action.Action;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 /**
  * Manages actions. Entry point from outside the core package to create and maintain actions.
  */
 @Slf4j
 @Component
-public class ActionManager extends ModelManager<Action> {
+public class ActionManager extends IgorComponentManager<Action> {
 
     /**
      * Creates a new instance.

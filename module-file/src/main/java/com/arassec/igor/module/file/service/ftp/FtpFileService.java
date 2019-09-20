@@ -163,7 +163,7 @@ public class FtpFileService extends BaseFileService {
                 return true;
             });
             if (ftpFiles != null && ftpFiles.length > 0) {
-                result = Stream.of(ftpFiles).map(ftpFile -> {
+                result = Stream.of(ftpFiles).filter(ftpFile -> ftpFile != null).map(ftpFile -> {
                     Instant mTime = Instant.ofEpochMilli(ftpFile.getTimestamp().getTime().getTime());
                     return new FileInfo(ftpFile.getName(), formatInstant(mTime));
                 }).collect(Collectors.toList());
