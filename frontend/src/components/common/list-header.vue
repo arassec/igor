@@ -19,11 +19,11 @@
 </template>
 
 <script>
-  import InputButton from './input-button'
-  import LayoutRow from './layout-row'
-  import CorePanel from './core-panel'
+    import InputButton from './input-button'
+    import LayoutRow from './layout-row'
+    import CorePanel from './core-panel'
 
-  export default {
+    export default {
   name: 'list-header',
   components: {CorePanel, LayoutRow, InputButton},
   props: ['filter', 'filterKey', 'addButtonText', 'addButtonTarget'],

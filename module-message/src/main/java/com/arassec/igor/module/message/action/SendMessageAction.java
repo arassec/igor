@@ -4,8 +4,8 @@ import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
+import com.arassec.igor.module.message.service.BaseMessageService;
 import com.arassec.igor.module.message.service.Message;
-import com.arassec.igor.module.message.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class SendMessageAction extends BaseMessageAction {
      * The service to use for message sending.
      */
     @IgorParam
-    private MessageService messageService;
+    private BaseMessageService messageService;
 
     /**
      * The message template to use.

@@ -29,12 +29,12 @@
 </template>
 
 <script>
-  import ModalDialog from "../common/modal-dialog";
-  import LayoutRow from "../common/layout-row";
-  import InputButton from "../common/input-button";
-  import IgorBackend from "../../utils/igor-backend.js";
+    import ModalDialog from "../common/modal-dialog";
+    import LayoutRow from "../common/layout-row";
+    import InputButton from "../common/input-button";
+    import IgorBackend from "../../utils/igor-backend.js";
 
-  export default {
+    export default {
     name: "delete-service-dialog",
     components: {InputButton, LayoutRow, ModalDialog},
     props: ['serviceId', 'serviceName'],

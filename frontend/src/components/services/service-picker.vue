@@ -32,13 +32,13 @@
 </template>
 
 <script>
-  import ModalDialog from '../common/modal-dialog'
-  import LayoutRow from '../common/layout-row'
-  import InputButton from '../common/input-button'
-  import ListPager from "../common/list-pager";
-  import FeedbackBox from "../common/feedback-box";
+    import ModalDialog from '../common/modal-dialog'
+    import LayoutRow from '../common/layout-row'
+    import InputButton from '../common/input-button'
+    import ListPager from "../common/list-pager";
+    import FeedbackBox from "../common/feedback-box";
 
-  export default {
+    export default {
     name: 'service-picker',
     components: {FeedbackBox, ListPager, InputButton, LayoutRow, ModalDialog},
     props: ['services', 'page'],

@@ -1,4 +1,4 @@
-package com.arassec.igor.web.api.error;
+package com.arassec.igor.web.api;
 
 import com.arassec.igor.core.model.service.ServiceException;
 import org.springframework.http.HttpHeaders;

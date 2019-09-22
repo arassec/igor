@@ -8,7 +8,6 @@ import com.arassec.igor.core.model.trigger.CronTrigger;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
-import com.arassec.igor.web.api.error.RestControllerExceptionHandler;
 import com.arassec.igor.web.api.model.JobListEntry;
 import com.arassec.igor.web.api.model.ScheduleEntry;
 import com.arassec.igor.web.api.model.simulation.SimulationActionResult;

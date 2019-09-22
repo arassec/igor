@@ -54,7 +54,7 @@
                                         loadParametersOfType(serviceConfiguration.type.key)})" :disabled="!newService">
                                 <option v-for="category in serviceCategories" v-bind:value="category"
                                         v-bind:key="category.key">
-                                    {{category.label}}
+                                    {{category.value}}
                                 </option>
                             </select>
                         </td>
@@ -67,7 +67,7 @@
                                     v-on:change="loadParametersOfType(serviceConfiguration.type.key)"
                                     :disabled="!newService">
                                 <option v-for="type in serviceTypes" v-bind:value="type" v-bind:key="type.key">
-                                    {{type.label}}
+                                    {{type.value}}
                                 </option>
                             </select>
                         </td>

@@ -10,10 +10,10 @@
 </template>
 
 <script>
-  import CorePanel from "./core-panel";
-  import LayoutRow from "./layout-row";
+    import CorePanel from "./core-panel";
+    import LayoutRow from "./layout-row";
 
-  export default {
+    export default {
     name: "list-entry",
     components: {LayoutRow, CorePanel}
   }

@@ -1,14 +1,12 @@
 package com.arassec.igor.module.file.service;
 
+import com.arassec.igor.core.model.IgorCategory;
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.IgorSimulationSafe;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.BaseService;
 import com.arassec.igor.core.model.service.ServiceException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.net.io.CopyStreamEvent;
-import org.apache.commons.net.io.CopyStreamException;
-import org.apache.commons.net.io.CopyStreamListener;
-import org.apache.commons.net.io.Util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,12 +15,14 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Base for file services.
  */
 @Slf4j
-public abstract class BaseFileService extends BaseService implements FileService {
+@IgorCategory("File")
+public abstract class BaseFileService extends BaseService {
 
     /**
      * Configures a timezone for the file service as String.
@@ -31,9 +31,67 @@ public abstract class BaseFileService extends BaseService implements FileService
     protected String timezone;
 
     /**
+     * Returns the names of all files in the specified directory, including the supplied directory in the name.
+     *
+     * @param directory  The directory to search for files.
+     * @param fileEnding An optional file ending to filter unwanted files.
+     *
+     * @return The file names as List.
+     */
+    @IgorSimulationSafe
+    public abstract List<FileInfo> listFiles(String directory, String fileEnding);
+
+    /**
+     * Reads the content of the specified file an returns it as string.
+     *
+     * @param file           The file to read.
+     * @param workInProgress The work in progress container.
+     *
+     * @return The content of the file.
+     */
+    @IgorSimulationSafe
+    public abstract String read(String file, WorkInProgressMonitor workInProgress);
+
+    /**
+     * Reads the content of the specified file into the returned {@link InputStream}.
+     *
+     * @param file           The name of the file to read.
+     * @param workInProgress The work in progress container.
+     *
+     * @return The content of the file as stream of data.
+     */
+    @IgorSimulationSafe
+    public abstract FileStreamData readStream(String file, WorkInProgressMonitor workInProgress);
+
+    /**
+     * Writes the data from the supplied {@link FileStreamData} into the provided file.
+     *
+     * @param file           The file to write into.
+     * @param fileStreamData Information about the file like the name or the length.
+     * @param workInProgress The work in progress container.
+     */
+    public abstract void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgress);
+
+    /**
+     * Moves a file from source to target.
+     *
+     * @param source         The source file.
+     * @param target         The target file.
+     * @param workInProgress The work in progress container.
+     */
+    public abstract void move(String source, String target, WorkInProgressMonitor workInProgress);
+
+    /**
+     * Deletes the specified file.
+     *
+     * @param file           The file to delete.
+     * @param workInProgress The work in progress container.
+     */
+    public abstract void delete(String file, WorkInProgressMonitor workInProgress);
+
+    /**
      * {@inheritDoc}
      */
-    @Override
     public void finalizeStream(FileStreamData fileStreamData) {
         // Nothing to do here by default...
     }
@@ -104,7 +162,7 @@ public abstract class BaseFileService extends BaseService implements FileService
      * @param total    The total amount.
      * @return The percentage.
      */
-    public double calculatePercentage(double obtained, double total) {
+    private double calculatePercentage(double obtained, double total) {
         return obtained * 100 / total;
     }
 

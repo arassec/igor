@@ -343,7 +343,7 @@
             },
             addTask: function () {
                 let task = {
-                    name: 'Task',
+                    name: 'New Task',
                     description: '',
                     active: true,
                     simulationLimit: 25,
@@ -377,6 +377,7 @@
             },
             addAction: function (taskIndex) {
                 let action = {
+                    active: true,
                     category: this.initialActionCategory,
                     type: this.initialActionType,
                     parameters: []

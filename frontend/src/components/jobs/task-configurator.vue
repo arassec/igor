@@ -3,7 +3,7 @@
         <core-panel>
             <h1 class="truncate">
                 <font-awesome-icon icon="tasks"/>
-                {{ task.name.length > 0 ? task.name : 'Unnamed Task' }}
+                {{ task.name.length > 0 ? task.name : 'New Task' }}
             </h1>
 
             <table>
@@ -54,7 +54,7 @@
                                         loadParametersOfType(task.provider.type.key)})">
                             <option v-for="providerCategory in providerCategories" v-bind:value="providerCategory"
                                     v-bind:key="providerCategory.key">
-                                {{providerCategory.label}}
+                                {{providerCategory.value}}
                             </option>
                         </select>
                     </td>
@@ -65,7 +65,7 @@
                         <select v-model="task.provider.type" v-on:change="loadParametersOfType(task.provider.type.key)">
                             <option v-for="providerType in providerTypes" v-bind:value="providerType"
                                     v-bind:key="providerType.key">
-                                {{providerType.label}}
+                                {{providerType.value}}
                             </option>
                         </select>
                     </td>
@@ -83,12 +83,12 @@
 </template>
 
 <script>
-  import ValidationError from '../common/validation-error'
-  import ParameterEditor from '../common/parameter-editor'
-  import CorePanel from '../common/core-panel'
-  import IgorBackend from '../../utils/igor-backend.js'
+    import ValidationError from '../common/validation-error'
+    import ParameterEditor from '../common/parameter-editor'
+    import CorePanel from '../common/core-panel'
+    import IgorBackend from '../../utils/igor-backend.js'
 
-  export default {
+    export default {
   name: 'task-configurator',
   components: {CorePanel, ParameterEditor, ValidationError},
   props: ['task', 'taskKey'],

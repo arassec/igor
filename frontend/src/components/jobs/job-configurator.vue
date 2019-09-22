@@ -54,7 +54,7 @@
                                 v-on:change="loadTypesOfCategory(jobConfiguration.trigger.category.key)">
                             <option v-for="triggerCategory in triggerCategories" v-bind:value="triggerCategory"
                                     v-bind:key="triggerCategory.key">
-                                {{triggerCategory.label}}
+                                {{triggerCategory.value}}
                             </option>
                         </select>
                     </td>
@@ -66,7 +66,7 @@
                                 v-on:change="loadParametersOfType(jobConfiguration.trigger.type.key)">
                             <option v-for="triggerType in triggerTypes" v-bind:value="triggerType"
                                     v-bind:key="triggerType.key">
-                                {{triggerType.label}}
+                                {{triggerType.value}}
                             </option>
                         </select>
                     </td>

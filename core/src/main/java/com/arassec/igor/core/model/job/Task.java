@@ -1,8 +1,8 @@
 package com.arassec.igor.core.model.job;
 
 import com.arassec.igor.core.model.action.Action;
-import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.Provider;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

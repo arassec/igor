@@ -8,9 +8,9 @@
 </template>
 
 <script>
-  import LayoutRow from './layout-row'
+    import LayoutRow from './layout-row'
 
-  export default {
+    export default {
   name: 'feedback-box',
   components: {LayoutRow},
     props: ['alert', 'clickable', 'alignLeft']

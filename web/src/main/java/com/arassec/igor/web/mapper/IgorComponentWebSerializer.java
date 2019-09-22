@@ -1,11 +1,11 @@
 package com.arassec.igor.web.mapper;
 
-import com.arassec.igor.core.application.factory.ModelFactory;
-import com.arassec.igor.core.application.factory.util.KeyLabelStore;
+import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.KeyLabelStore;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -13,7 +13,6 @@ import org.springframework.util.ReflectionUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,17 +26,17 @@ public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements W
     /**
      * The model factory.
      */
-    private ModelFactory<T> modelFactory;
+    private IgorComponentRegistry igorComponentRegistry;
 
     /**
      * Creates a new serializer instance.
      *
-     * @param t            The type of components this serializer processes.
-     * @param modelFactory The model factory.
+     * @param t                     The type of components this serializer processes.
+     * @param igorComponentRegistry The igor component registry.
      */
-    public IgorComponentWebSerializer(Class<T> t, ModelFactory<T> modelFactory) {
+    public IgorComponentWebSerializer(Class<T> t, IgorComponentRegistry igorComponentRegistry) {
         super(t);
-        this.modelFactory = modelFactory;
+        this.igorComponentRegistry = igorComponentRegistry;
     }
 
     /**
@@ -57,8 +56,8 @@ public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements W
         if (t instanceof Action) {
             jsonGenerator.writeBooleanField(ACTIVE, ((Action) t).isActive());
         }
-        writeKeyLabelStore(jsonGenerator, CATEGORY, modelFactory.getCategory(t));
-        writeKeyLabelStore(jsonGenerator, TYPE, modelFactory.getType(t));
+        writeKeyLabelStore(jsonGenerator, CATEGORY, igorComponentRegistry.getCategoryOfComponentInstance(t.getClass()));
+        writeKeyLabelStore(jsonGenerator, TYPE, igorComponentRegistry.getTypeOfComponentInstance(t.getClass()));
         writeParameters(jsonGenerator, t);
         jsonGenerator.writeEndObject();
     }
@@ -72,10 +71,10 @@ public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements W
      *
      * @throws IOException In case of serialization problems.
      */
-    void writeKeyLabelStore(JsonGenerator jsonGenerator, String name, KeyLabelStore keyLabelStore) throws IOException {
+    private void writeKeyLabelStore(JsonGenerator jsonGenerator, String name, KeyLabelStore keyLabelStore) throws IOException {
         jsonGenerator.writeObjectFieldStart(name);
         jsonGenerator.writeStringField(KEY, keyLabelStore.getKey());
-        jsonGenerator.writeStringField(LABEL, keyLabelStore.getLabel());
+        jsonGenerator.writeStringField(LABEL, keyLabelStore.getValue());
         jsonGenerator.writeEndObject();
     }
 
@@ -84,11 +83,11 @@ public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements W
      *
      * @param jsonGenerator The json generator.
      * @param instance      The component instance.
-     * @param <T>           The component's type.
+     * @param <I>           The component's type.
      *
-     * @throws IOException
+     * @throws IOException If parameters could not be written.
      */
-    <T> void writeParameters(JsonGenerator jsonGenerator, T instance) throws IOException {
+    private <I> void writeParameters(JsonGenerator jsonGenerator, I instance) throws IOException {
         jsonGenerator.writeArrayFieldStart(PARAMETERS);
 
         List<Field> fields = new LinkedList<>();
@@ -101,13 +100,13 @@ public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements W
             }
         });
 
-        Collections.sort(fields, (o1, o2) -> {
+        fields.sort((o1, o2) -> {
             Integer first = o1.getAnnotation(IgorParam.class).value();
             Integer second = o2.getAnnotation(IgorParam.class).value();
             return first.compareTo(second);
         });
 
-        fields.stream().forEach(field -> {
+        fields.forEach(field -> {
             try {
                 boolean accessibility = field.canAccess(instance);
                 field.setAccessible(true);
@@ -129,7 +128,7 @@ public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements W
                         jsonGenerator.writeNumberField(VALUE, ((Service) value).getId());
                         jsonGenerator.writeStringField(SERVICE_NAME, ((Service) value).getName());
                     } else {
-                        jsonGenerator.writeObjectField(VALUE, value);
+                        jsonGenerator.writeObjectField(VALUE, null);
                         jsonGenerator.writeStringField(SERVICE_NAME, "");
                     }
                     jsonGenerator.writeBooleanField(SERVICE, true);

@@ -3,13 +3,12 @@ package com.arassec.igor.module.file.service.ssh;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
-import com.arassec.igor.module.file.service.FileService;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 /**
- * Base for SSH based {@link FileService}s (like SFTP and SCP).
+ * Base for SSH based File-Services (like SFTP and SCP).
  */
 public abstract class BaseSshFileService extends BaseFileService {
 

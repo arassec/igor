@@ -1,11 +1,11 @@
 package com.arassec.igor.web.api;
 
-import com.arassec.igor.core.application.ActionManager;
-import com.arassec.igor.core.application.ProviderManager;
-import com.arassec.igor.core.application.ServiceManager;
-import com.arassec.igor.core.application.TriggerManager;
-import com.arassec.igor.core.application.factory.util.KeyLabelStore;
-import com.arassec.igor.web.api.util.Sorter;
+import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.provider.Provider;
+import com.arassec.igor.core.model.service.Service;
+import com.arassec.igor.core.model.trigger.Trigger;
+import com.arassec.igor.core.util.KeyLabelStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,27 +19,12 @@ import java.util.List;
 @RestController()
 @RequestMapping("/api/category")
 @RequiredArgsConstructor
-public class CategoryRestController {
+public class CategoryRestController extends BaseRestController {
 
     /**
-     * Manager for services.
+     * The igor component registry.
      */
-    private final ServiceManager serviceManager;
-
-    /**
-     * Manager for actions.
-     */
-    private final ActionManager actionManager;
-
-    /**
-     * Manager for providers.
-     */
-    private final ProviderManager providerManager;
-
-    /**
-     * Manager for triggers.
-     */
-    private final TriggerManager triggerManager;
+    private final IgorComponentRegistry igorComponentRegistry;
 
     /**
      * Returns all service categories as {@link KeyLabelStore}s.
@@ -48,7 +33,7 @@ public class CategoryRestController {
      */
     @GetMapping("service")
     public List<KeyLabelStore> getServiceCategories() {
-        return Sorter.sortByLabel(serviceManager.getCategories());
+        return sortByLabel(igorComponentRegistry.getCategoriesOfComponentType(Service.class));
     }
 
     /**
@@ -58,7 +43,7 @@ public class CategoryRestController {
      */
     @GetMapping("provider")
     public List<KeyLabelStore> getProviderCategories() {
-        return Sorter.sortByLabel(providerManager.getCategories());
+        return sortByLabel(igorComponentRegistry.getCategoriesOfComponentType(Provider.class));
     }
 
     /**
@@ -68,7 +53,7 @@ public class CategoryRestController {
      */
     @GetMapping("action")
     public List<KeyLabelStore> getActionCategories() {
-        return Sorter.sortByLabel(actionManager.getCategories());
+        return sortByLabel(igorComponentRegistry.getCategoriesOfComponentType(Action.class));
     }
 
     /**
@@ -78,7 +63,7 @@ public class CategoryRestController {
      */
     @GetMapping("trigger")
     public List<KeyLabelStore> getTriggerCategories() {
-        return Sorter.sortByLabel(triggerManager.getCategories());
+        return sortByLabel(igorComponentRegistry.getCategoriesOfComponentType(Trigger.class));
     }
 
 }

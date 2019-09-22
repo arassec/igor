@@ -6,14 +6,13 @@ import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.message.service.BaseMessageService;
 import com.arassec.igor.module.message.service.Message;
-import com.arassec.igor.module.message.service.MessageService;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 /**
- * {@link MessageService} to process messages via RabbitMQ.
+ * Message service to process messages via RabbitMQ.
  */
 @IgorComponent("RabbitMQ")
 public class RabbitMqMessageService extends BaseMessageService {

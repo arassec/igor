@@ -1,9 +1,5 @@
 package com.arassec.igor.web.api;
 
-import com.arassec.igor.core.application.ActionManager;
-import com.arassec.igor.core.application.ProviderManager;
-import com.arassec.igor.core.application.ServiceManager;
-import com.arassec.igor.core.application.TriggerManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONObject;
@@ -23,26 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ParametersRestController {
 
     /**
-     * The service manager.
-     */
-    private final ServiceManager serviceManager;
-
-    /**
-     * Manager for actions.
-     */
-    private final ActionManager actionManager;
-
-    /**
-     * Manager for providers.
-     */
-    private final ProviderManager providerManager;
-
-    /**
-     * Manager for triggers.
-     */
-    private final TriggerManager triggerManager;
-
-    /**
      * Job-Mapper for simulation runs.
      */
     private final ObjectMapper objectMapper;
@@ -56,12 +32,7 @@ public class ParametersRestController {
      */
     @GetMapping(value = "service/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getServiceParameters(@PathVariable("type") String type) {
-        try {
-            JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(serviceManager.createInstance(type, null)));
-            return jsonObject.getJSONArray("parameters").toString();
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Could not read parameters!", e);
-        }
+        return serializeParameters(type);
     }
 
     /**
@@ -73,12 +44,7 @@ public class ParametersRestController {
      */
     @GetMapping(value = "action/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getActionParameters(@PathVariable("type") String type) {
-        try {
-            JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(actionManager.createInstance(type, null)));
-            return jsonObject.getJSONArray("parameters").toString();
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Could not read parameters!", e);
-        }
+        return serializeParameters(type);
     }
 
     /**
@@ -90,12 +56,7 @@ public class ParametersRestController {
      */
     @GetMapping(value = "provider/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getProviderParameters(@PathVariable("type") String type) {
-        try {
-            JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(providerManager.createInstance(type, null)));
-            return jsonObject.getJSONArray("parameters").toString();
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Could not read parameters!", e);
-        }
+        return serializeParameters(type);
     }
 
     /**
@@ -107,10 +68,21 @@ public class ParametersRestController {
      */
     @GetMapping(value = "trigger/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTriggerParameters(@PathVariable("type") String type) {
+        return serializeParameters(type);
+    }
+
+    /**
+     * Serializes the igor parameters of the given type.
+     *
+     * @param type The type to get the parameters from.
+     *
+     * @return The parameters as JSON-String.
+     */
+    private String serializeParameters(String type) {
         try {
-            JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(triggerManager.createInstance(type, null)));
+            JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(Class.forName(type).getConstructor().newInstance()));
             return jsonObject.getJSONArray("parameters").toString();
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException | ReflectiveOperationException e) {
             throw new IllegalArgumentException("Could not read parameters!", e);
         }
     }

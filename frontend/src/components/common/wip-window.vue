@@ -5,9 +5,9 @@
 </template>
 
 <script>
-  import ModalDialog from './modal-dialog'
+    import ModalDialog from './modal-dialog'
 
-  export default {
+    export default {
   name: 'wip-window',
   components: {ModalDialog},
   computed: {

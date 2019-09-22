@@ -6,7 +6,6 @@ import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
-import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attributes;
@@ -27,7 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * {@link FileService} that uses HTTP as protocol.
+ * File-Service that uses HTTP as protocol.
  */
 @IgorComponent("HTTP")
 public class HttpFileService extends BaseFileService {

@@ -3,7 +3,7 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.service.BaseFileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -21,7 +21,7 @@ public class RenameFileAction extends BaseFileAction {
      * IgorParam for the service to rename the file.
      */
     @IgorParam
-    private FileService sourceService;
+    private BaseFileService sourceService;
 
     /**
      * The target name of the file.

@@ -25,11 +25,11 @@
 </template>
 
 <script>
-  import LayoutRow from '../common/layout-row'
-  import InputButton from '../common/input-button'
-  import CoreContent from '../common/core-content'
+    import LayoutRow from '../common/layout-row'
+    import InputButton from '../common/input-button'
+    import CoreContent from '../common/core-content'
 
-  export default {
+    export default {
     name: 'test-result-container',
     components: {CoreContent, InputButton, LayoutRow},
     props: ['selectedTestResults'],

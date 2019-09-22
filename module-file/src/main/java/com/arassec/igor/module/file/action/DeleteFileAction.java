@@ -3,7 +3,7 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.service.BaseFileService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class DeleteFileAction extends BaseFileAction {
      * The service providing the file to delete.
      */
     @IgorParam
-    private FileService service;
+    private BaseFileService service;
 
     /**
      * The key to the directory the source files are in.

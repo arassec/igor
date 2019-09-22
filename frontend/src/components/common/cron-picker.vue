@@ -47,12 +47,12 @@
 </template>
 
 <script>
-  import ModalDialog from './modal-dialog'
-  import InputButton from './input-button'
-  import LayoutRow from './layout-row'
-  import FeedbackBox from "./feedback-box";
+    import ModalDialog from './modal-dialog'
+    import InputButton from './input-button'
+    import LayoutRow from './layout-row'
+    import FeedbackBox from "./feedback-box";
 
-  export default {
+    export default {
   name: 'cron-picker',
     components: {FeedbackBox, LayoutRow, InputButton, ModalDialog}
 }

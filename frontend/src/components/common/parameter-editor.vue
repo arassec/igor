@@ -58,13 +58,13 @@
 </template>
 
 <script>
-  import ValidationError from './validation-error'
-  import InputButton from './input-button'
-  import ServicePicker from '../services/service-picker'
-  import CronPicker from "./cron-picker";
-  import IgorBackend from '../../utils/igor-backend.js'
+    import ValidationError from './validation-error'
+    import InputButton from './input-button'
+    import ServicePicker from '../services/service-picker'
+    import CronPicker from "./cron-picker";
+    import IgorBackend from '../../utils/igor-backend.js'
 
-  export default {
+    export default {
     name: 'parameter-editor',
     components: {CronPicker, ServicePicker, InputButton, ValidationError},
     props: ['parameters'],

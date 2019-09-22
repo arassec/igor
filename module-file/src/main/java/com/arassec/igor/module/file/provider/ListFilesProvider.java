@@ -4,9 +4,8 @@ import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.provider.BaseProvider;
+import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
-import com.arassec.igor.module.file.service.FileService;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,13 +16,13 @@ import java.util.Map;
  * Provides file names from a specified directory.
  */
 @IgorComponent("List Files")
-public class ListFilesProvider extends BaseProvider implements FileProvider {
+public class ListFilesProvider extends BaseFileProvider {
 
     /**
      * The service to use for file listing.
      */
     @IgorParam
-    private FileService sourceService;
+    private BaseFileService sourceService;
 
     /**
      * Defines the directory to list files in.

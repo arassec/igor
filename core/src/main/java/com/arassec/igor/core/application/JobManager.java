@@ -1,6 +1,5 @@
 package com.arassec.igor.core.application;
 
-import com.arassec.igor.core.application.execution.JobExecutor;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;

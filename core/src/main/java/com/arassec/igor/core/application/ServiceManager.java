@@ -1,6 +1,5 @@
 package com.arassec.igor.core.application;
 
-import com.arassec.igor.core.application.factory.ServiceFactory;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.core.util.ModelPage;
@@ -16,7 +15,12 @@ import java.util.stream.Collectors;
  * Manages {@link Service}s. Entry point from outside the core package to create and maintain services.
  */
 @Component
-public class ServiceManager extends IgorComponentManager<Service> {
+public class ServiceManager {
+
+    /**
+     * The igor component registry.
+     */
+    private final IgorComponentRegistry igorComponentRegistry;
 
     /**
      * Repository for services.
@@ -26,11 +30,11 @@ public class ServiceManager extends IgorComponentManager<Service> {
     /**
      * Creates a new instance.
      *
-     * @param serviceFactory    The factory to create {@link Service}s.
-     * @param serviceRepository The repository to load services from and store services into.
+     * @param igorComponentRegistry The registry for igor components.
+     * @param serviceRepository     The repository to load services from and store services into.
      */
-    public ServiceManager(ServiceFactory serviceFactory, ServiceRepository serviceRepository) {
-        super(serviceFactory);
+    public ServiceManager(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository) {
+        this.igorComponentRegistry = igorComponentRegistry;
         this.serviceRepository = serviceRepository;
     }
 
@@ -95,7 +99,7 @@ public class ServiceManager extends IgorComponentManager<Service> {
         }
         List<Service> services = serviceRepository.findAll();
         List<Service> allOfType = services.stream()
-                .filter(service -> category.equals(getModelFactory().getCategory(service).getKey()))
+                .filter(service -> category.equals(igorComponentRegistry.getCategoryOfComponentInstance(service.getClass()).getKey()))
                 .sorted(Comparator.comparing(Service::getName)).collect(Collectors.toList());
         return ModelPageHelper.getModelPage(allOfType, pageNumber, pageSize);
     }

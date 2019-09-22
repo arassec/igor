@@ -5,7 +5,6 @@ import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
-import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -24,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * {@link FileService} for SCP file handling.
+ * File-Service for SCP file handling.
  */
 @Slf4j
 @IgorComponent("SCP")

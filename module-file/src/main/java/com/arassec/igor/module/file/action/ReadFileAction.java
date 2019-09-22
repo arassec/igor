@@ -3,7 +3,7 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.service.BaseFileService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class ReadFileAction extends BaseFileAction {
      * IgorParam for the service to use for file listing.
      */
     @IgorParam
-    private FileService sourceService;
+    private BaseFileService sourceService;
 
     /**
      * Reads the content of a file and returns it as string.

@@ -5,7 +5,6 @@ import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
-import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -24,7 +23,7 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 /**
- * {@link FileService} to access files in the local file system.
+ * File-Service to access files in the local file system.
  */
 @Slf4j
 @IgorComponent("Filesystem")

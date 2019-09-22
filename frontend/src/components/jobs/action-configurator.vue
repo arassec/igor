@@ -3,7 +3,7 @@
         <core-panel>
             <h1 class="truncate">
                 <font-awesome-icon icon="wrench"/>
-                {{ action.type.label }}
+                {{ action.type.value }}
             </h1>
 
             <table>
@@ -22,7 +22,7 @@
                                         loadParametersOfType(action.type.key)})">
                             <option v-for="category in actionCategories" v-bind:value="category"
                                     v-bind:key="category.key">
-                                {{category.label}}
+                                {{category.value}}
                             </option>
                         </select>
                     </td>
@@ -33,7 +33,7 @@
                         <select v-model="action.type" v-on:change="loadParametersOfType(action.type.key)">
                             <option v-for="type in actionTypes" v-bind:value="type"
                                     v-bind:key="type.key">
-                                {{type.label}}
+                                {{type.value}}
                             </option>
                         </select>
                     </td>
@@ -50,11 +50,11 @@
 </template>
 
 <script>
-  import CorePanel from '../common/core-panel'
-  import ParameterEditor from '../common/parameter-editor'
-  import IgorBackend from '../../utils/igor-backend.js'
+    import CorePanel from '../common/core-panel'
+    import ParameterEditor from '../common/parameter-editor'
+    import IgorBackend from '../../utils/igor-backend.js'
 
-  export default {
+    export default {
   name: 'action-configurator',
   components: {CorePanel, ParameterEditor},
   props: ['action', 'actionKey'],

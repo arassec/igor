@@ -13,10 +13,10 @@
 </template>
 
 <script>
-  import LayoutRow from './layout-row'
-  import InputButton from './input-button'
+    import LayoutRow from './layout-row'
+    import InputButton from './input-button'
 
-  export default {
+    export default {
     name: 'feedback-snackbar',
     components: {InputButton, LayoutRow},
     methods: {

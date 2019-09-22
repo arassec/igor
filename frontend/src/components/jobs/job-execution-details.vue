@@ -57,12 +57,12 @@
 </template>
 
 <script>
-  import ModalDialog from '../common/modal-dialog'
-  import LayoutRow from '../common/layout-row'
-  import InputButton from '../common/input-button'
-  import FeedbackBox from '../common/feedback-box'
+    import ModalDialog from '../common/modal-dialog'
+    import LayoutRow from '../common/layout-row'
+    import InputButton from '../common/input-button'
+    import FeedbackBox from '../common/feedback-box'
 
-  export default {
+    export default {
     name: 'job-execution-details',
     props: ['jobExecution'],
     components: {FeedbackBox, InputButton, LayoutRow, ModalDialog},

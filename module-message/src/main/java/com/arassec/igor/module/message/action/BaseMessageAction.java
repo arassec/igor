@@ -1,9 +1,11 @@
 package com.arassec.igor.module.message.action;
 
+import com.arassec.igor.core.model.IgorCategory;
 import com.arassec.igor.core.model.action.BaseAction;
 
 /**
- * Base class for {@link MessageAction}s.
+ * Base class for message based actions.
  */
-public abstract class BaseMessageAction extends BaseAction implements MessageAction {
+@IgorCategory("Message")
+abstract class BaseMessageAction extends BaseAction {
 }

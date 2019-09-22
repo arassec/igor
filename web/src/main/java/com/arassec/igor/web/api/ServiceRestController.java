@@ -7,7 +7,6 @@ import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
-import com.arassec.igor.web.api.error.RestControllerExceptionHandler;
 import com.arassec.igor.web.api.model.ServiceListEntry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

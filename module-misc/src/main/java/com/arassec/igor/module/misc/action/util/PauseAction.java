@@ -2,8 +2,6 @@ package com.arassec.igor.module.misc.action.util;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
 

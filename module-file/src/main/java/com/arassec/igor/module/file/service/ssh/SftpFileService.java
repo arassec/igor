@@ -5,7 +5,6 @@ import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
-import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
@@ -23,7 +22,7 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 /**
- * {@link FileService} for SFTP file handling.
+ * File-Service for SFTP file handling.
  */
 @Slf4j
 @IgorComponent("SFTP")

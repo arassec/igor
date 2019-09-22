@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 /**
- * Configures the persistence module for igor.
+ * Configures the persistence layer for igor.
  */
 @Configuration
 public class PersistenceConfiguration {
@@ -79,7 +79,8 @@ public class PersistenceConfiguration {
     }
 
     /**
-     * Creates an {@link ObjectMapper} for igor {@link Service}s.
+     * Creates an {@link ObjectMapper} for igor {@link Service}s. A special mapper is required for services to avoid circular
+     * dependencies with the {@link ServiceRepository}, which is normally needed for parameter processing.
      *
      * @param encryptionUtil The encryption util for en- and decrypting secured parameter values.
      *

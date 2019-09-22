@@ -1,4 +1,4 @@
-package com.arassec.igor.core.application.execution;
+package com.arassec.igor.core.application;
 
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
