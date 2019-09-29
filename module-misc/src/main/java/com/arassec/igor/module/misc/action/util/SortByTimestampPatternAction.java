@@ -25,6 +25,12 @@ import java.util.stream.Collectors;
 public class SortByTimestampPatternAction extends BaseUtilAction {
 
     /**
+     * The input containing the timestamp to sort by.
+     */
+    @IgorParam
+    private String input;
+
+    /**
      * The pattern to use to extract the date from the target value.
      */
     @IgorParam
@@ -63,9 +69,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
-        if (isValid(data)) {
-            collectedData.add(data);
-        }
+        collectedData.add(data);
         return null;
     }
 
@@ -76,24 +80,39 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      */
     @Override
     public List<Map<String, Object>> complete() {
-        Pattern p = Pattern.compile(pattern);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timestampFormat);
+
+        final Pattern p;
+        if (isQuery(pattern)) {
+            p = null;
+        } else {
+            p = Pattern.compile(pattern);
+        }
+
+        final DateTimeFormatter formatter;
+        if (isQuery(timestampFormat)) {
+            formatter = null;
+        } else {
+            formatter = DateTimeFormatter.ofPattern(timestampFormat);
+        }
+
         final boolean applyDefaultTimezone = (!pattern.contains("V") && !pattern.contains("z") && !pattern
                 .contains("O") && !pattern.contains("X") && !pattern.contains("x") && !pattern.contains("Z"));
 
         if (!collectedData.isEmpty()) {
             List<Map<String, Object>> result = collectedData.stream()
                     .filter(data -> extractDateTime(data, p, formatter, applyDefaultTimezone) != null)
-                    .collect(Collectors.toList());
-            Collections.sort(result, (o1, o2) -> {
-                ZonedDateTime firstDateTime = extractDateTime(o1, p, formatter, applyDefaultTimezone);
-                ZonedDateTime secondDateTime = extractDateTime(o2, p, formatter, applyDefaultTimezone);
-                if (sortAscending) {
-                    return firstDateTime.compareTo(secondDateTime);
-                } else {
-                    return secondDateTime.compareTo(firstDateTime);
-                }
-            });
+                    .sorted((o1, o2) -> {
+                        ZonedDateTime firstDateTime = extractDateTime(o1, p, formatter, applyDefaultTimezone);
+                        ZonedDateTime secondDateTime = extractDateTime(o2, p, formatter, applyDefaultTimezone);
+                        if (firstDateTime == null || secondDateTime == null) {
+                            return 0;
+                        }
+                        if (sortAscending) {
+                            return firstDateTime.compareTo(secondDateTime);
+                        } else {
+                            return secondDateTime.compareTo(firstDateTime);
+                        }
+                    }).collect(Collectors.toList());
             return result;
         }
 
@@ -109,20 +128,50 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * @param applyDefaultTimezone Set to {@code true}, if the format is in {@link java.time.LocalDateTime} and the system's
      *                             default time zone must be applied to the result.
      *
-     * @return The {@link ZonedDateTime} or {@ocde null}, if none could be extracted.
+     * @return The {@link ZonedDateTime} or {@code null}, if none could be extracted.
      */
     private ZonedDateTime extractDateTime(Map<String, Object> data, Pattern p, DateTimeFormatter formatter,
                                           boolean applyDefaultTimezone) {
-        String rawValue = getString(data, dataKey);
-        Matcher m = p.matcher(rawValue);
+
+        String resolvedInput = getString(data, input);
+        if (resolvedInput == null) {
+            log.debug("Missing data to extract date-time: {}", input);
+            return null;
+        }
+
+        String rawValue = getString(data, resolvedInput);
+
+        Pattern pn = p;
+        if (pn == null) {
+            String resolvedPattern = getString(data, pattern);
+            if (resolvedPattern == null) {
+                log.debug("Missing pattern to extract date-time: {}", pattern);
+                return null;
+            }
+            pn = Pattern.compile(resolvedPattern);
+        }
+
+        DateTimeFormatter df = formatter;
+        if (df == null) {
+            String resolvedTimestampFormat = getString(data, timestampFormat);
+            if (resolvedTimestampFormat == null) {
+                log.debug("Missing timestamp format to extract date-time: {}", timestampFormat);
+                return null;
+            }
+            df = DateTimeFormatter.ofPattern(timestampFormat);
+        }
+
+        Matcher m = pn.matcher(rawValue);
+
         if (m.find()) {
             if (applyDefaultTimezone) {
-                return ZonedDateTime.of(LocalDateTime.parse(m.group(), formatter), ZoneId.systemDefault());
+                return ZonedDateTime.of(LocalDateTime.parse(m.group(), df), ZoneId.systemDefault());
             } else {
-                return ZonedDateTime.parse(m.group(), formatter);
+                return ZonedDateTime.parse(m.group(), df);
             }
 
         }
+
         return null;
     }
 

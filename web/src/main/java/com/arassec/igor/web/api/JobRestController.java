@@ -3,6 +3,7 @@ package com.arassec.igor.web.api;
 import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.CronTrigger;
 import com.arassec.igor.core.util.ModelPage;
@@ -163,8 +164,11 @@ public class JobRestController {
             providerProxy.getCollectedData().stream()
                     .forEach(jsonObject -> {
                         try {
-                            taskResult.getResults().add(
-                                    simulationObjectMapper.readValue(jsonObject.toString(), HashMap.class));
+                            Map<String, Object> item = new HashMap<>();
+                            HashMap data = simulationObjectMapper.readValue(jsonObject.toString(), HashMap.class);
+                            item.put(Task.DATA_KEY, data);
+                            item.put(Task.META_KEY, Task.createMetaData(job.getId(), task.getId()));
+                            taskResult.getResults().add(item);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

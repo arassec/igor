@@ -2,6 +2,7 @@ package com.arassec.igor.module.misc.action.util;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,10 +32,14 @@ public class PauseAction extends BaseUtilAction {
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            log.debug("Interrupted during pause action!");
+        if (isSimulation(data)) {
+            data.put(SIMULATION_LOG_KEY, "Would have paused for " + milliseconds + " milliseconds.");
+        } else {
+            try {
+                Thread.sleep(milliseconds);
+            } catch (InterruptedException e) {
+                log.debug("Interrupted during pause action!");
+            }
         }
         return List.of(data);
     }

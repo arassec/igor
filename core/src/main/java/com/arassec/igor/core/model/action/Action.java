@@ -11,16 +11,6 @@ import java.util.Map;
 public interface Action {
 
     /**
-     * JSON-Key for the job's ID.
-     */
-    String JOB_ID_KEY = "jobId";
-
-    /**
-     * JSON-Key for the Task's ID.
-     */
-    String TASK_ID_KEY = "taskId";
-
-    /**
      * Initializes the action before data processing.
      */
     void initialize();

@@ -62,6 +62,7 @@ public class IgorComponentPersistenceSerializer<T> extends StdSerializer<T> impl
         jsonGenerator.writeArrayFieldStart(PARAMETERS);
 
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
+            ReflectionUtils.makeAccessible(field);
             if (field.isAnnotationPresent(IgorParam.class)) {
                 try {
                     Object value = getFieldValue(instance, field);

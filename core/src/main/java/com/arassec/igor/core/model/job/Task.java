@@ -7,10 +7,8 @@ import com.arassec.igor.core.model.provider.Provider;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -21,6 +19,21 @@ import java.util.concurrent.BlockingQueue;
 @Data
 @Slf4j
 public class Task {
+
+    /**
+     * The key for the meta-data.
+     */
+    public static final String META_KEY = "meta";
+
+    /**
+     * The key for the provider's data.
+     */
+    public static final String DATA_KEY = "data";
+
+    /**
+     * The key for the simulation property.
+     */
+    public static final String SIMULATION_KEY = "simulation";
 
     /**
      * The task's (UU)ID.
@@ -74,8 +87,8 @@ public class Task {
     }
 
     /**
-     * Runs the task by first creating concurrency-groups for actions that should run with the same amount of threads
-     * and then requesting the provider for data to process.
+     * Runs the task by first creating concurrency-groups for actions that should run with the same amount of threads and then
+     * requesting the provider for data to process.
      * <p>
      * The retrieved data is than processed by the configured actions in ther concurrency-groups.
      *
@@ -125,10 +138,13 @@ public class Task {
 
         actions.forEach(Action::initialize);
 
+
         // Read the data from the provider and start working:
         provider.initialize(jobId, id, jobExecution);
         while (provider.hasNext() && jobExecution.isRunning()) {
-            Map<String, Object> data = provider.next();
+            Map<String, Object> data = new HashMap<>();
+            data.put(META_KEY, createMetaData(jobId, id));
+            data.put(DATA_KEY, provider.next());
             boolean added = false;
             while (!added) {
                 added = providerInputQueue.offer(data);
@@ -160,6 +176,21 @@ public class Task {
         actions.forEach(action -> action.shutdown(jobId, id));
 
         log.debug("Task '{}' finished!", name);
+    }
+
+    /**
+     * Creates the meta-data.
+     *
+     * @param jobId The job's ID.
+     *
+     * @return The meta-data for the job run.
+     */
+    public static Object createMetaData(Long jobId, String taskId) {
+        Map<String, Object> metaData = new HashMap<>();
+        metaData.put("jobId", jobId);
+        metaData.put("taskId", taskId);
+        metaData.put("timestamp", Instant.now().toEpochMilli());
+        return metaData;
     }
 
 }

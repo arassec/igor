@@ -1,4 +1,4 @@
 com.arassec.igor.module.file.action.CopyFileAction
 com.arassec.igor.module.file.action.DeleteFileAction
 com.arassec.igor.module.file.action.ReadFileAction
-com.arassec.igor.module.file.action.RenameFileAction
+com.arassec.igor.module.file.action.MoveFileAction

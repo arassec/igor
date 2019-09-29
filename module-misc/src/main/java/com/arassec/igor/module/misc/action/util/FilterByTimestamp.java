@@ -20,6 +20,12 @@ import java.util.Map;
 public class FilterByTimestamp extends BaseUtilAction {
 
     /**
+     * The input to use as Timestamp.
+     */
+    @IgorParam
+    private String input;
+
+    /**
      * If set to {@code true}, timestamps older than the configured one are filtered. If set to {@code false}, timestamps younger
      * than the configured one are filtered.
      */
@@ -56,37 +62,47 @@ public class FilterByTimestamp extends BaseUtilAction {
      * @param data         The data the action will work with.
      * @param jobExecution The job's execution log.
      *
-     * @return
+     * @return The supplied data, if the timestamp under the configured {@link #input} matches the configured criteria. {@code
+     * null} otherwise.
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
-        if (isValid(data)) {
-            LocalDateTime target;
-            if (timezone != null) {
-                target = LocalDateTime.now(ZoneId.of(timezone));
-            } else {
-                target = LocalDateTime.now();
-            }
 
-            target = target.minus(amount, ChronoUnit.valueOf(timeUnit));
+        String resolvedInput = getString(data, input);
+        String resolvedTimeUnit = getString(data, timeUnit);
+        String resolvedTimestampFormat = getString(data, timestampFormat);
+        String resolvedTimezone = getString(data, timezone);
 
-            LocalDateTime actual = LocalDateTime.parse(getString(data, dataKey), DateTimeFormatter.ofPattern(timestampFormat));
-
-            if (olderThan) {
-                if (actual.isAfter(target)) {
-                    log.debug("Filtered '{}' which is older than {} {}", actual, amount, timeUnit);
-                    return null;
-                }
-            } else {
-                if (actual.isBefore(target)) {
-                    log.debug("Filtered '{}' which is younger than {} {}", actual, amount, timeUnit);
-                    return null;
-                }
-            }
-            log.debug("Passed '{}' against older={}, {}, {}", actual, olderThan, amount, timeUnit);
-            return List.of(data);
+        if (resolvedInput == null || resolvedTimeUnit == null || resolvedTimestampFormat == null) {
+            log.debug("Missing required data for filtering: {} / {} / {}", resolvedInput, resolvedTimeUnit, resolvedTimestampFormat);
+            return null;
         }
-        return null;
+
+        LocalDateTime target;
+        if (resolvedTimezone != null) {
+            target = LocalDateTime.now(ZoneId.of(resolvedTimezone));
+        } else {
+            target = LocalDateTime.now();
+        }
+
+        target = target.minus(amount, ChronoUnit.valueOf(resolvedTimeUnit));
+
+        LocalDateTime actual = LocalDateTime.parse(resolvedInput, DateTimeFormatter.ofPattern(resolvedTimestampFormat));
+
+        if (olderThan) {
+            if (actual.isAfter(target)) {
+                log.debug("Filtered '{}' which is older than {} {}", actual, amount, resolvedTimeUnit);
+                return null;
+            }
+        } else {
+            if (actual.isBefore(target)) {
+                log.debug("Filtered '{}' which is younger than {} {}", actual, amount, resolvedTimeUnit);
+                return null;
+            }
+        }
+
+        log.debug("Passed '{}' against older={}, {}, {}", actual, olderThan, amount, resolvedTimeUnit);
+        return List.of(data);
     }
 
 }

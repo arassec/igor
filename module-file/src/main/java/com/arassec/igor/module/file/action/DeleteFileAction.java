@@ -3,7 +3,7 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.file.service.BaseFileService;
+import com.arassec.igor.module.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -20,38 +20,48 @@ public class DeleteFileAction extends BaseFileAction {
      * The service providing the file to delete.
      */
     @IgorParam
-    private BaseFileService service;
+    private FileService service;
 
     /**
-     * The key to the directory the source files are in.
+     * The directory the file is in.
      */
     @IgorParam
-    private String directoryKey = "directory";
+    private String directory;
 
     /**
-     * Copies the supplied source file to the destination service. During transfer the file is saved with the suffix ".igor",
-     * which will be removed after successful transfer.
+     * The name of the file.
+     */
+    @IgorParam
+    private String filename;
+
+    /**
+     * Deletes the configured file from the configured service.
      *
      * @param data         The data to process.
      * @param jobExecution The job execution log.
      *
-     * @return The manipulated data.
+     * @return The data.
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
-        if (isValid(data)) {
-            String file = getString(data, dataKey);
-            String directory = getString(data, directoryKey);
-            if (!directory.endsWith("/")) {
-                directory += "/";
+
+        String resolvedFilename = getString(data, filename);
+        String resolvedDirectory = resolveDirectory(data, directory);
+
+        if (resolvedFilename == null) {
+            if (isSimulation(data)) {
+                data.put(SIMULATION_LOG_KEY, "Couldn't resolve file to delete for configuration: " + filename);
             }
-            String path = directory + file;
-            log.debug("Deleting file: '{}'", path);
-            service.delete(path, VOID_WIP_MONITOR);
-            log.debug("File '{}' deleted", path);
             return List.of(data);
         }
-        return null;
+
+        String filePath = resolvedDirectory + resolvedFilename;
+
+        log.debug("Deleting file: '{}'", filePath);
+        service.delete(filePath, VOID_WIP_MONITOR);
+        log.debug("File '{}' deleted", filePath);
+
+        return List.of(data);
     }
 
 }

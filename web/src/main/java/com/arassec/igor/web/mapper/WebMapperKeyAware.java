@@ -51,11 +51,6 @@ public interface WebMapperKeyAware {
     String CATEGORY = "category";
 
     /**
-     * The label key.
-     */
-    String LABEL = "label";
-
-    /**
      * The secured key.
      */
     String SECURED = "secured";

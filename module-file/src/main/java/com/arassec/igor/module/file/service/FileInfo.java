@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FileInfo {
 
-    private String fileName;
+    private String filename;
 
     private String lastModified;
 

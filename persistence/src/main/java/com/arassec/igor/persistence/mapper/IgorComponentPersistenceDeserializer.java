@@ -66,13 +66,12 @@ public class IgorComponentPersistenceDeserializer<T> extends StdDeserializer<T> 
             List<Map<String, Object>> parameters = (List<Map<String, Object>>) map.get(PARAMETERS);
             if (parameters != null && !parameters.isEmpty()) {
                 ReflectionUtils.doWithFields(instance.getClass(), field -> {
+                    ReflectionUtils.makeAccessible(field);
                     if (field.isAnnotationPresent(IgorParam.class)) {
                         Map<String, Object> parameter = getParameter(field.getName(), parameters);
                         if (parameter == null) {
                             return;
                         }
-                        boolean accessibility = field.canAccess(instance);
-                        field.setAccessible(true);
                         if (parameter.containsKey(SERVICE) && (boolean) parameter.get(SERVICE) && serviceRepository != null) {
                             field.set(instance, serviceRepository.findById((Long.valueOf((Integer) parameter.get(VALUE)))));
                         } else if (parameter.containsKey(SECURED) && (boolean) parameter.get(SECURED)) {
@@ -80,7 +79,6 @@ public class IgorComponentPersistenceDeserializer<T> extends StdDeserializer<T> 
                         } else {
                             field.set(instance, parameter.get(VALUE));
                         }
-                        field.setAccessible(accessibility);
                     }
                 });
             }

@@ -1,6 +1,7 @@
 package com.arassec.igor.module.misc.action.persistence;
 
 import com.arassec.igor.core.model.IgorComponent;
+import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,12 @@ import java.util.Map;
 public class FilterPersistedValueAction extends BasePersistenceAction {
 
     /**
+     * The input (query) to persist.
+     */
+    @IgorParam
+    private String input;
+
+    /**
      * Retrieves the value from the supplied data and searches it in the persisted values. If it is already persisted, the data is
      * ignored.
      *
@@ -26,19 +33,25 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
-        if (isValid(data)) {
-            Long jobId = getLong(data, JOB_ID_KEY);
-            String taskId = getString(data, TASK_ID_KEY);
-            String rawValue = getString(data, dataKey);
-            PersistentValue value = new PersistentValue(rawValue);
-            if (persistentValueRepository.isPersisted(jobId, taskId, value)) {
-                log.debug("Filtered persisted value: '{}'", rawValue);
-                return null;
-            }
-            log.debug("Passed un-persisted value: '{}'", rawValue);
-            return List.of(data);
+
+        Long jobId = getJobId(data);
+        String taskId = getTaskId(data);
+
+        String resolvedInput = getString(data, input);
+
+        if (resolvedInput == null) {
+            log.debug("Not enough data to filter: {}", input);
+            return null;
         }
-        return null;
+
+        PersistentValue value = new PersistentValue(resolvedInput);
+        if (persistentValueRepository.isPersisted(jobId, taskId, value)) {
+            log.debug("Filtered persisted value: '{}'", resolvedInput);
+            return null;
+        }
+
+        log.debug("Passed un-persisted value: '{}'", resolvedInput);
+        return List.of(data);
     }
 
 }

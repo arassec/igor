@@ -10,6 +10,7 @@ import com.arassec.igor.core.util.KeyLabelStore;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
 
 import java.util.*;
 
@@ -124,6 +125,7 @@ public class IgorComponentRegistry {
         for (Object o : serviceLoader) {
             Class<?> componentInstanceClass = o.getClass();
 
+            // Handling type information
             IgorComponent igorComponentAnnotation = componentInstanceClass.getAnnotation(IgorComponent.class);
             if (igorComponentAnnotation == null) {
                 log.warn("{} is configured as igor component but lacks IgorComponent annotation!", componentInstanceClass.getName());
@@ -132,15 +134,26 @@ public class IgorComponentRegistry {
             KeyLabelStore type = new KeyLabelStore(componentInstanceClass.getName(), igorComponentAnnotation.value());
             typeByComponentInstance.put(componentInstanceClass, type);
 
+            // Determine the category
             KeyLabelStore category = FALLBACK_CATEGORY;
+            for (Class<?> anInterface : ClassUtils.getAllInterfacesForClass(componentInstanceClass)) {
+                if (anInterface.isAnnotationPresent(IgorCategory.class)) {
+                    IgorCategory igorCategoryAnnotation = anInterface.getAnnotation(IgorCategory.class);
+                    category = new KeyLabelStore(anInterface.getName(), igorCategoryAnnotation.value());
+                }
+            }
+
             Class<?> categoryDeclaringClass = AnnotationUtils.findAnnotationDeclaringClass(IgorCategory.class,
                     componentInstanceClass);
-            if (categoryDeclaringClass != null) {
+            if (FALLBACK_CATEGORY.equals(category) && categoryDeclaringClass != null) {
                 IgorCategory igorCategoryAnnotation = categoryDeclaringClass.getAnnotation(IgorCategory.class);
                 category = new KeyLabelStore(categoryDeclaringClass.getName(), igorCategoryAnnotation.value());
-            } else {
+            }
+
+            if (FALLBACK_CATEGORY.equals(category)) {
                 log.warn("{} is configured as igor component but lacks IgorCategory annotation!", componentInstanceClass.getName());
             }
+
             categoriesByComponentType.get(componentType).add(category);
             categoryByComponentInstance.put(componentInstanceClass, category);
 

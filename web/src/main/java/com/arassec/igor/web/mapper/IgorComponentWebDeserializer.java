@@ -65,14 +65,15 @@ public class IgorComponentWebDeserializer<T> extends StdDeserializer<T> implemen
 
             List<Map<String, Object>> parameters = (List<Map<String, Object>>) map.get(PARAMETERS);
             if (parameters != null && !parameters.isEmpty()) {
+                instance.getClass().getFields();
+
                 ReflectionUtils.doWithFields(instance.getClass(), field -> {
+                    ReflectionUtils.makeAccessible(field);
                     if (field.isAnnotationPresent(IgorParam.class)) {
                         Map<String, Object> parameter = getParameter(field.getName(), parameters);
                         if (parameter == null) {
                             return;
                         }
-                        boolean accessibility = field.canAccess(instance);
-                        field.setAccessible(true);
                         if (parameter.containsKey(SERVICE) && (boolean) parameter.get(SERVICE) && serviceRepository != null) {
                             if (simulationMode) {
                                 Long serviceId = Long.valueOf((Integer) parameter.get(VALUE));
@@ -89,7 +90,6 @@ public class IgorComponentWebDeserializer<T> extends StdDeserializer<T> implemen
                         } else {
                             field.set(instance, parameter.get(VALUE));
                         }
-                        field.setAccessible(accessibility);
                     }
                 });
             }

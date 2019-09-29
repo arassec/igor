@@ -90,4 +90,41 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>1.6.1</version>
+                        <configuration>
+                            <from>
+                                <image>adoptopenjdk/openjdk12:slim</image>
+                            </from>
+                            <to>
+                                <image>docker.io/arassec/igor</image>
+                                <auth>
+                                    <!--suppress UnresolvedMavenProperty -->
+                                    <username>${env.DOCKER_USERNAME}</username>
+                                    <!--suppress UnresolvedMavenProperty -->
+                                    <password>${env.DOCKER_PASSWORD}</password>
+                                </auth>
+                            </to>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>

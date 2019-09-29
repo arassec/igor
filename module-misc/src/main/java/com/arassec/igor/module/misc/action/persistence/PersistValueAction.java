@@ -17,6 +17,12 @@ import java.util.Map;
 public class PersistValueAction extends BasePersistenceAction {
 
     /**
+     * The input to persist.
+     */
+    @IgorParam
+    private String input;
+
+    /**
      * The number of values to keep in the persistence store.
      */
     @IgorParam
@@ -32,19 +38,25 @@ public class PersistValueAction extends BasePersistenceAction {
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
-        if (isValid(data)) {
-            Long jobId = getLong(data, JOB_ID_KEY);
-            String taskId = getString(data, TASK_ID_KEY);
-            PersistentValue value = new PersistentValue(getString(data, dataKey));
-            if (!persistentValueRepository.isPersisted(jobId, taskId, value)) {
-                log.debug("Persisted: '{}'", value);
-                persistentValueRepository.upsert(jobId, taskId, value);
-            } else {
-                log.debug("Already persisted: '{}'", value);
-            }
-            return List.of(data);
+
+        Long jobId = getJobId(data);
+        String taskId = getTaskId(data);
+
+        String resolvedInput = getString(data, input);
+        if (resolvedInput == null) {
+            log.debug("Not enough data to persist: {}", input);
+            return null;
         }
-        return null;
+
+        PersistentValue value = new PersistentValue(getString(data, resolvedInput));
+        if (!persistentValueRepository.isPersisted(jobId, taskId, value)) {
+            log.debug("Persisted: '{}'", value);
+            persistentValueRepository.upsert(jobId, taskId, value);
+        } else {
+            log.debug("Already persisted: '{}'", value);
+        }
+
+        return List.of(data);
     }
 
     /**

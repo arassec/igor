@@ -2,7 +2,6 @@ package com.arassec.igor.module.misc.action.util;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +16,12 @@ import java.util.Map;
 public class FilterByRegExpAction extends BaseUtilAction {
 
     /**
+     * The input to test against the regular expression.
+     */
+    @IgorParam
+    private String input;
+
+    /**
      * The Regular expression to filter the input with.
      */
     @IgorParam
@@ -28,20 +33,27 @@ public class FilterByRegExpAction extends BaseUtilAction {
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
      *
-     * @return {@code true}, if the value under the configured {@link BaseAction#dataKey} matches the regular expresion, {@code
-     * false} otherwise.
+     * @return The supplied data, if the value under the configured {@link #input} matches the regular expresion. {@code null}
+     * otherwise.
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
-        if (isValid(data)) {
-            if (!getString(data, dataKey).matches(expression)) {
-                log.debug("Filtered '{}' against RegExp '{}'", getString(data, dataKey), expression);
-                return null;
-            }
-            log.debug("Passed '{}' against RegExp '{}'", getString(data, dataKey), expression);
-            return List.of(data);
+
+        String resolvedInput = getString(data, input);
+        String resolvedExpression = getString(data, expression);
+
+        if (resolvedInput == null || resolvedExpression == null) {
+            log.debug("Missing required data for filtering: {} / {}", resolvedInput, resolvedExpression);
+            return null;
         }
-        return null;
+
+        if (!resolvedInput.matches(resolvedExpression)) {
+            log.debug("Filtered '{}' against RegExp '{}'", resolvedInput, resolvedExpression);
+            return null;
+        }
+
+        log.debug("Passed '{}' against RegExp '{}'", resolvedInput, resolvedExpression);
+        return List.of(data);
     }
 
 }

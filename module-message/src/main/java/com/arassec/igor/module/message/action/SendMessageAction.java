@@ -4,8 +4,8 @@ import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
-import com.arassec.igor.module.message.service.BaseMessageService;
 import com.arassec.igor.module.message.service.Message;
+import com.arassec.igor.module.message.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class SendMessageAction extends BaseMessageAction {
      * The service to use for message sending.
      */
     @IgorParam
-    private BaseMessageService messageService;
+    private MessageService messageService;
 
     /**
      * The message template to use.
@@ -35,7 +35,7 @@ public class SendMessageAction extends BaseMessageAction {
     /**
      * Pattern to extract variables from the message template.
      */
-    private Pattern pattern = Pattern.compile("\\$(.*?)\\$");
+    private Pattern pattern = Pattern.compile("##(.*?)##");
 
     /**
      * Processes the supplied data and replaces variables from a message template with the values from the data. The resulting
@@ -53,12 +53,12 @@ public class SendMessageAction extends BaseMessageAction {
 
         Matcher m = pattern.matcher(content);
         while (m.find()) {
-            // e.g. $targetFilename$
+            // e.g. ##$.data.targetFilename##
             String variableName = m.group();
             // e.g. file.zip
-            Object variableContent = data.get(variableName.replace("$", ""));
+            String variableContent = getString(data, variableName.replace("##", ""));
             if (variableContent != null) {
-                content = content.replace(variableName, String.valueOf(variableContent));
+                content = content.replace(variableName, variableContent);
             }
         }
 

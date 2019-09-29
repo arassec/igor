@@ -74,7 +74,7 @@ public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements W
     private void writeKeyLabelStore(JsonGenerator jsonGenerator, String name, KeyLabelStore keyLabelStore) throws IOException {
         jsonGenerator.writeObjectFieldStart(name);
         jsonGenerator.writeStringField(KEY, keyLabelStore.getKey());
-        jsonGenerator.writeStringField(LABEL, keyLabelStore.getValue());
+        jsonGenerator.writeStringField(VALUE, keyLabelStore.getValue());
         jsonGenerator.writeEndObject();
     }
 
@@ -92,6 +92,7 @@ public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements W
 
         List<Field> fields = new LinkedList<>();
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
+            ReflectionUtils.makeAccessible(field);
             if (field.isAnnotationPresent(IgorParam.class)) {
                 IgorParam annotation = field.getAnnotation(IgorParam.class);
                 if (annotation.configurable()) {
@@ -108,11 +109,8 @@ public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements W
 
         fields.forEach(field -> {
             try {
-                boolean accessibility = field.canAccess(instance);
-                field.setAccessible(true);
                 Object value = field.get(instance);
                 IgorParam annotation = field.getAnnotation(IgorParam.class);
-                field.setAccessible(accessibility);
 
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeStringField(NAME, field.getName());

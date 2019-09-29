@@ -2,7 +2,6 @@ package com.arassec.igor.module.misc.provider;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 
@@ -15,6 +14,11 @@ import java.util.*;
 public class FixedInputProvider extends BaseUtilProvider {
 
     /**
+     * The key for the provided data.
+     */
+    private static final String INPUT_KEY = "input";
+
+    /**
      * The service to use for file listing.
      */
     @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
@@ -25,12 +29,6 @@ public class FixedInputProvider extends BaseUtilProvider {
      */
     @IgorParam
     private boolean separateLines = true;
-
-    /**
-     * The key the files are listed under.
-     */
-    @IgorParam
-    private String dataKey = "data";
 
     /**
      * Contains the separate lines from the input.
@@ -72,9 +70,7 @@ public class FixedInputProvider extends BaseUtilProvider {
     @Override
     public Map<String, Object> next() {
         Map<String, Object> item = new HashMap<>();
-        item.put(Action.JOB_ID_KEY, getJobId());
-        item.put(Action.TASK_ID_KEY, getTaskId());
-        item.put(dataKey, inputParts.get(index));
+        item.put(INPUT_KEY, inputParts.get(index));
         index++;
         return item;
     }
