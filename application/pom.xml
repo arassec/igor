@@ -104,7 +104,11 @@
                                 <image>adoptopenjdk/openjdk12:slim</image>
                             </from>
                             <to>
-                                <image>docker.io/arassec/igor:${project.version}</image>
+                                <image>docker.io/arassec/igor</image>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                    <tag>latest</tag>
+                                </tags>
                                 <auth>
                                     <!--suppress UnresolvedMavenProperty -->
                                     <username>${env.DOCKER_USERNAME}</username>

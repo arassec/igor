@@ -18,4 +18,3 @@
 - Different, configurable color-schemes for different environments
 - Add JaCoCo reports and CodeCov integration
 - Add dependabot
-- Add Docker images
