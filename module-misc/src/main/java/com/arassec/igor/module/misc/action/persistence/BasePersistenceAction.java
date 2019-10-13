@@ -1,6 +1,5 @@
 package com.arassec.igor.module.misc.action.persistence;
 
-import com.arassec.igor.core.model.IgorCategory;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.repository.PersistentValueRepository;
 import com.arassec.igor.core.util.ApplicationContextProvider;
@@ -8,7 +7,6 @@ import com.arassec.igor.core.util.ApplicationContextProvider;
 /**
  * Base class for actions that work with persistence services.
  */
-@IgorCategory("Persistence")
 public abstract class BasePersistenceAction extends BaseAction {
 
     /**
@@ -24,6 +22,14 @@ public abstract class BasePersistenceAction extends BaseAction {
     public void initialize() {
         super.initialize();
         persistentValueRepository = ApplicationContextProvider.getBean(PersistentValueRepository.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCategoryId() {
+        return "69b6ab78-9ab4-4282-91bd-8a78bff1aa7b";
     }
 
 }

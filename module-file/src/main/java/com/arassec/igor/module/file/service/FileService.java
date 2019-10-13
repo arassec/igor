@@ -1,6 +1,5 @@
 package com.arassec.igor.module.file.service;
 
-import com.arassec.igor.core.model.IgorCategory;
 import com.arassec.igor.core.model.IgorSimulationSafe;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.Service;
@@ -11,7 +10,6 @@ import java.util.List;
 /**
  * Interface for file based services.
  */
-@IgorCategory("File")
 public interface FileService extends Service {
 
     /**

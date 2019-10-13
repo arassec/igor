@@ -1,9 +1,10 @@
 package com.arassec.igor.module.misc.action.util;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -16,7 +17,8 @@ import java.util.Map;
  * Filters the supplied data by a regular expression.
  */
 @Slf4j
-@IgorComponent("Filter by timestamp")
+@Component
+@Scope("prototype")
 public class FilterByTimestamp extends BaseUtilAction {
 
     /**
@@ -103,6 +105,14 @@ public class FilterByTimestamp extends BaseUtilAction {
 
         log.debug("Passed '{}' against older={}, {}, {}", actual, olderThan, amount, resolvedTimeUnit);
         return List.of(data);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "aca4d78f-ad37-451c-baab-0533c5735333";
     }
 
 }

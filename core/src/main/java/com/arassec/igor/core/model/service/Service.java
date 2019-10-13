@@ -1,11 +1,12 @@
 package com.arassec.igor.core.model.service;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorSimulationSafe;
 
 /**
  * Defines a source of data that can be manipulated using actions, or a destination for data to store it in.
  */
-public interface Service {
+public interface Service extends IgorComponent {
 
     /**
      * Returns the system-wide unique ID of the service.

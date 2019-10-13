@@ -1,5 +1,6 @@
 package com.arassec.igor.core.model.action;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Map;
 /**
  * Defines an action, used by jobs. Actions take a single piece of data and process it.
  */
-public interface Action {
+public interface Action extends IgorComponent {
 
     /**
      * Initializes the action before data processing.

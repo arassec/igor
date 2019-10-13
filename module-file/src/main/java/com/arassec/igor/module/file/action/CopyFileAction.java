@@ -1,12 +1,14 @@
 package com.arassec.igor.module.file.action;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -17,7 +19,9 @@ import java.util.Map;
  * Copies a file from one service to another.
  */
 @Slf4j
-@IgorComponent("Copy file")
+@Component
+@Scope("prototype")
+@ConditionalOnBean(FileService.class)
 public class CopyFileAction extends BaseFileAction {
 
     /**
@@ -206,6 +210,14 @@ public class CopyFileAction extends BaseFileAction {
         }
 
         return directory + file;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "d8564415-7dd9-4814-9b46-c2c5b56ed5cc";
     }
 
 }

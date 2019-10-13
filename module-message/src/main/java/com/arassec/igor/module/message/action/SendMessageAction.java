@@ -1,12 +1,14 @@
 package com.arassec.igor.module.message.action;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.module.message.service.Message;
 import com.arassec.igor.module.message.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +19,9 @@ import java.util.regex.Pattern;
  * Sends a message to the specified messaging service.
  */
 @Slf4j
-@IgorComponent("Send message")
+@Component
+@Scope("prototype")
+@ConditionalOnBean(MessageService.class)
 public class SendMessageAction extends BaseMessageAction {
 
     /**
@@ -68,6 +72,14 @@ public class SendMessageAction extends BaseMessageAction {
         log.debug("Message sent: '{}'", content);
 
         return List.of(data);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "88a0e988-d3ec-4b91-b98c-92d99c09ba33";
     }
 
 }

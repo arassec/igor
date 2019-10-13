@@ -43,6 +43,6 @@ public interface PersistenceMapperKeyAware {
     /**
      * The type key.
      */
-    String TYPE = "type";
+    String TYPE_ID = "typeId";
 
 }

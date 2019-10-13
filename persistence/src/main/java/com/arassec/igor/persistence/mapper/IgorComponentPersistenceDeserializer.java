@@ -1,9 +1,12 @@
 package com.arassec.igor.persistence.mapper;
 
+import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.util.ApplicationContextProvider;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -13,14 +16,18 @@ import org.springframework.util.ReflectionUtils;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Deserializer for igor components that converts JSON into components.
- *
- * @param <T> The component this deserializer is used for.
  */
 @Slf4j
-public class IgorComponentPersistenceDeserializer<T> extends StdDeserializer<T> implements PersistenceMapperKeyAware {
+public class IgorComponentPersistenceDeserializer<T extends IgorComponent> extends StdDeserializer<T> implements PersistenceMapperKeyAware {
+
+    /**
+     * The component registry.
+     */
+    private IgorComponentRegistry igorComponentRegistry;
 
     /**
      * Encryption util for secured parameters that should be decrypted during deserialization.
@@ -35,12 +42,15 @@ public class IgorComponentPersistenceDeserializer<T> extends StdDeserializer<T> 
     /**
      * Creates a new deserializer.
      *
-     * @param vc                The component, this deserializer is used for.
-     * @param serviceRepository The repository for services. Can be {@code null} to ignore services as parameter values.
-     * @param encryptionUtil    The encryption utility to decrypt secured parameter values.
+     * @param clazz                 The class parameter.
+     * @param igorComponentRegistry The component registry.
+     * @param serviceRepository     The repository for services. Can be {@code null} to ignore services as parameter values.
+     * @param encryptionUtil        The encryption utility to decrypt secured parameter values.
      */
-    public IgorComponentPersistenceDeserializer(Class<?> vc, ServiceRepository serviceRepository, EncryptionUtil encryptionUtil) {
-        super(vc);
+    public IgorComponentPersistenceDeserializer(Class<T> clazz, IgorComponentRegistry igorComponentRegistry,
+                                                ServiceRepository serviceRepository, EncryptionUtil encryptionUtil) {
+        super(clazz);
+        this.igorComponentRegistry = igorComponentRegistry;
         this.serviceRepository = serviceRepository;
         this.encryptionUtil = encryptionUtil;
     }
@@ -53,41 +63,42 @@ public class IgorComponentPersistenceDeserializer<T> extends StdDeserializer<T> 
 
         Map<String, Object> map = deserializationContext.readValue(jsonParser, Map.class);
 
-        try {
-            String type = getType(map);
-            if (type == null) {
-                return null;
-            }
-
-            T instance = (T) Class.forName(type).getConstructor().newInstance();
-
-            setComponentSpecifica(instance, map);
-
-            List<Map<String, Object>> parameters = (List<Map<String, Object>>) map.get(PARAMETERS);
-            if (parameters != null && !parameters.isEmpty()) {
-                ReflectionUtils.doWithFields(instance.getClass(), field -> {
-                    ReflectionUtils.makeAccessible(field);
-                    if (field.isAnnotationPresent(IgorParam.class)) {
-                        Map<String, Object> parameter = getParameter(field.getName(), parameters);
-                        if (parameter == null) {
-                            return;
-                        }
-                        if (parameter.containsKey(SERVICE) && (boolean) parameter.get(SERVICE) && serviceRepository != null) {
-                            field.set(instance, serviceRepository.findById((Long.valueOf((Integer) parameter.get(VALUE)))));
-                        } else if (parameter.containsKey(SECURED) && (boolean) parameter.get(SECURED)) {
-                            field.set(instance, encryptionUtil.decrypt(String.valueOf(parameter.get(VALUE))));
-                        } else {
-                            field.set(instance, parameter.get(VALUE));
-                        }
-                    }
-                });
-            }
-
-            return instance;
-
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Could not deserialize igor componente!", e);
+        String typeId = getTypeId(map);
+        if (typeId == null) {
+            return null;
         }
+
+        Optional<IgorComponent> classOptional = igorComponentRegistry.getClass(typeId);
+        if (classOptional.isEmpty()) {
+            throw new IllegalStateException("Unknown type ID: " + typeId);
+        }
+
+        IgorComponent igorComponent = classOptional.get();
+        T instance = (T) ApplicationContextProvider.getIgorComponent(igorComponent.getClass(), typeId);
+
+        setComponentSpecifica(instance, map);
+
+        List<Map<String, Object>> parameters = (List<Map<String, Object>>) map.get(PARAMETERS);
+        if (parameters != null && !parameters.isEmpty()) {
+            ReflectionUtils.doWithFields(instance.getClass(), field -> {
+                ReflectionUtils.makeAccessible(field);
+                if (field.isAnnotationPresent(IgorParam.class)) {
+                    Map<String, Object> parameter = getParameter(field.getName(), parameters);
+                    if (parameter == null) {
+                        return;
+                    }
+                    if (parameter.containsKey(SERVICE) && (boolean) parameter.get(SERVICE) && serviceRepository != null) {
+                        field.set(instance, serviceRepository.findById((Long.valueOf((Integer) parameter.get(VALUE)))));
+                    } else if (parameter.containsKey(SECURED) && (boolean) parameter.get(SECURED)) {
+                        field.set(instance, encryptionUtil.decrypt(String.valueOf(parameter.get(VALUE))));
+                    } else {
+                        field.set(instance, parameter.get(VALUE));
+                    }
+                }
+            });
+        }
+
+        return instance;
     }
 
     /**
@@ -97,8 +108,8 @@ public class IgorComponentPersistenceDeserializer<T> extends StdDeserializer<T> 
      *
      * @return The type of the component.
      */
-    private String getType(Map<String, Object> map) {
-        Object type = map.get(TYPE);
+    private String getTypeId(Map<String, Object> map) {
+        Object type = map.get(TYPE_ID);
         if (type instanceof String) {
             return (String) type;
         }
@@ -111,7 +122,7 @@ public class IgorComponentPersistenceDeserializer<T> extends StdDeserializer<T> 
      * @param instance The newly created component instance.
      * @param map      The map of component data.
      */
-    private void setComponentSpecifica(T instance, Map<String, Object> map) {
+    private void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
         if (instance instanceof Service) {
             if (map.containsKey(ID)) {
                 ((Service) instance).setId(Long.valueOf(String.valueOf(map.get(ID))));

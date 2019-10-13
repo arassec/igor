@@ -1,5 +1,6 @@
 package com.arassec.igor.persistence.mapper;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.service.Service;
@@ -7,16 +8,15 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 
 /**
  * Serializer for igor components in the persistence module.
- *
- * @param <T> The igor component this serializer is used for.
  */
-public class IgorComponentPersistenceSerializer<T> extends StdSerializer<T> implements PersistenceMapperKeyAware {
+public class IgorComponentPersistenceSerializer extends StdSerializer<IgorComponent> implements PersistenceMapperKeyAware {
 
     /**
      * The encryption util to encrypt secured parameter values.
@@ -26,11 +26,10 @@ public class IgorComponentPersistenceSerializer<T> extends StdSerializer<T> impl
     /**
      * Creates a new serializer instance.
      *
-     * @param t              The igor component, this serializer is used for.
      * @param encryptionUtil The encryption util to handle secured parameter values.
      */
-    public IgorComponentPersistenceSerializer(Class<T> t, EncryptionUtil encryptionUtil) {
-        super(t);
+    public IgorComponentPersistenceSerializer(EncryptionUtil encryptionUtil) {
+        super(IgorComponent.class);
         this.encryptionUtil = encryptionUtil;
     }
 
@@ -38,13 +37,13 @@ public class IgorComponentPersistenceSerializer<T> extends StdSerializer<T> impl
      * {@inheritDoc}
      */
     @Override
-    public void serialize(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(IgorComponent instance, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeStringField(TYPE, t.getClass().getName());
-        if (t instanceof Action) {
-            jsonGenerator.writeBooleanField(ACTIVE, ((Action) t).isActive());
+        jsonGenerator.writeStringField(TYPE_ID, instance.getTypeId());
+        if (instance instanceof Action) {
+            jsonGenerator.writeBooleanField(ACTIVE, ((Action) instance).isActive());
         }
-        serializeParameters(jsonGenerator, t);
+        serializeParameters(instance, jsonGenerator);
         jsonGenerator.writeEndObject();
 
     }
@@ -52,13 +51,12 @@ public class IgorComponentPersistenceSerializer<T> extends StdSerializer<T> impl
     /**
      * Serializes the component's parameters.
      *
-     * @param jsonGenerator The JSON generator.
      * @param instance      The component instance to serialize.
-     * @param <T>           The instance type.
+     * @param jsonGenerator The JSON generator.
      *
      * @throws IOException In case of serialization errors.
      */
-    <T> void serializeParameters(JsonGenerator jsonGenerator, T instance) throws IOException {
+    private void serializeParameters(IgorComponent instance, JsonGenerator jsonGenerator) throws IOException {
         jsonGenerator.writeArrayFieldStart(PARAMETERS);
 
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
@@ -66,21 +64,24 @@ public class IgorComponentPersistenceSerializer<T> extends StdSerializer<T> impl
             if (field.isAnnotationPresent(IgorParam.class)) {
                 try {
                     Object value = getFieldValue(instance, field);
-                    if (value != null) {
-                        jsonGenerator.writeStartObject();
-                        jsonGenerator.writeStringField(NAME, field.getName());
-                        boolean isService = Service.class.isAssignableFrom(field.getType());
-                        if (isService) {
-                            jsonGenerator.writeNumberField(VALUE, ((Service) value).getId());
-                            jsonGenerator.writeBooleanField(SERVICE, true);
-                        } else {
-                            jsonGenerator.writeObjectField(VALUE, value);
-                            if (value instanceof String && isSecured(field)) {
-                                jsonGenerator.writeBooleanField(SECURED, true);
-                            }
-                        }
-                        jsonGenerator.writeEndObject();
+                    if (value == null) {
+                        return;
                     }
+                    if (value instanceof String && StringUtils.isEmpty(value)) {
+                        return;
+                    }
+                    jsonGenerator.writeStartObject();
+                    jsonGenerator.writeStringField(NAME, field.getName());
+                    if (Service.class.isAssignableFrom(field.getType()) && value instanceof Service) {
+                        jsonGenerator.writeNumberField(VALUE, ((Service) value).getId());
+                        jsonGenerator.writeBooleanField(SERVICE, true);
+                    } else {
+                        jsonGenerator.writeObjectField(VALUE, value);
+                        if (value instanceof String && isSecured(field)) {
+                            jsonGenerator.writeBooleanField(SECURED, true);
+                        }
+                    }
+                    jsonGenerator.writeEndObject();
                 } catch (IOException e) {
                     throw new IllegalStateException("Could not convert parameter to JSON!", e);
                 }
@@ -96,11 +97,10 @@ public class IgorComponentPersistenceSerializer<T> extends StdSerializer<T> impl
      *
      * @param instance The instance of a class to get the field's value from.
      * @param field    The property of the instance to get the value from.
-     * @param <T>      The instance type.
      *
      * @return The propertie's value.
      */
-    private <T> Object getFieldValue(T instance, Field field) {
+    private Object getFieldValue(IgorComponent instance, Field field) {
         if (field != null) {
             try {
                 Object result;

@@ -1,6 +1,5 @@
 package com.arassec.igor.module.message.service.rabbitmq;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.model.service.ServiceException;
@@ -10,11 +9,16 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Message service to process messages via RabbitMQ.
  */
-@IgorComponent("RabbitMQ")
+@Component
+@Scope("prototype")
+@ConditionalOnClass(RabbitTemplate.class)
 public class RabbitMqMessageService extends BaseMessageService {
 
     /**
@@ -133,6 +137,14 @@ public class RabbitMqMessageService extends BaseMessageService {
         if (connection != null) {
             connection.close();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "481df4ed-008f-4d6e-a186-76b71325f362";
     }
 
 }

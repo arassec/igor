@@ -1,18 +1,21 @@
 package com.arassec.igor.module.file.service.localfs;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
 import java.time.temporal.ChronoUnit;
@@ -26,7 +29,8 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
  * File-Service to access files in the local file system.
  */
 @Slf4j
-@IgorComponent("Filesystem")
+@Component
+@Scope("prototype")
 public class LocalFilesystemFileService extends BaseFileService {
 
     /**
@@ -150,6 +154,14 @@ public class LocalFilesystemFileService extends BaseFileService {
         } catch (IOException e) {
             throw new ServiceException("Could not open file for writing: " + file, e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "eead09e7-7144-42b8-a969-e0d61ff5e28f";
     }
 
 }

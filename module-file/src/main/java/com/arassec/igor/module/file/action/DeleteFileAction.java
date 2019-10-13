@@ -1,10 +1,12 @@
 package com.arassec.igor.module.file.action;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +15,9 @@ import java.util.Map;
  * Deletes a file.
  */
 @Slf4j
-@IgorComponent("Delete file")
+@Component
+@Scope("prototype")
+@ConditionalOnBean(FileService.class)
 public class DeleteFileAction extends BaseFileAction {
 
     /**
@@ -62,6 +66,14 @@ public class DeleteFileAction extends BaseFileAction {
         log.debug("File '{}' deleted", filePath);
 
         return List.of(data);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "f83ed584-a6a2-458f-86bd-aaaae347227b";
     }
 
 }

@@ -1,5 +1,7 @@
 package com.arassec.igor.persistence;
 
+import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.provider.Provider;
@@ -33,32 +35,29 @@ public class PersistenceConfiguration {
     /**
      * Creates an {@link ObjectMapper} for igor {@link Job}s.
      *
-     * @param serviceRepository The repository for services.
-     * @param encryptionUtil    The encryption util for en- and decrypting secured parameter values.
+     * @param igorComponentRegistry The igor component registry.
+     * @param serviceRepository     The repository for services.
+     * @param encryptionUtil        The encryption util for en- and decrypting secured parameter values.
      *
      * @return A newly created {@link ObjectMapper} instance.
      */
     @Bean(name = "persistenceJobMapper")
-    public ObjectMapper persistenceJobMapper(ServiceRepository serviceRepository, EncryptionUtil encryptionUtil) {
+    public ObjectMapper persistenceJobMapper(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository,
+                                             EncryptionUtil encryptionUtil) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         SimpleModule mapperModule = new SimpleModule();
 
-        mapperModule.addSerializer(Trigger.class, new IgorComponentPersistenceSerializer<>(Trigger.class, encryptionUtil));
+        mapperModule.addSerializer(new IgorComponentPersistenceSerializer(encryptionUtil));
+        mapperModule.addDeserializer(Service.class, new IgorComponentPersistenceDeserializer<>(Service.class,
+                igorComponentRegistry, serviceRepository, encryptionUtil));
+        mapperModule.addDeserializer(Action.class, new IgorComponentPersistenceDeserializer<>(Action.class,
+                igorComponentRegistry, serviceRepository, encryptionUtil));
         mapperModule.addDeserializer(Trigger.class, new IgorComponentPersistenceDeserializer<>(Trigger.class,
-                serviceRepository, encryptionUtil));
-
-        mapperModule.addSerializer(Provider.class, new IgorComponentPersistenceSerializer<>(Provider.class, encryptionUtil));
-        mapperModule.addDeserializer(Provider.class, new IgorComponentPersistenceDeserializer<>(Provider.class, serviceRepository,
-                encryptionUtil));
-
-        mapperModule.addSerializer(Action.class, new IgorComponentPersistenceSerializer<>(Action.class, encryptionUtil));
-        mapperModule.addDeserializer(Action.class, new IgorComponentPersistenceDeserializer<>(Action.class, serviceRepository, encryptionUtil));
-
-        mapperModule.addSerializer(Service.class, new IgorComponentPersistenceSerializer<>(Service.class, encryptionUtil));
-        mapperModule.addDeserializer(Service.class, new IgorComponentPersistenceDeserializer<>(Service.class, null,
-                encryptionUtil));
+                igorComponentRegistry, serviceRepository, encryptionUtil));
+        mapperModule.addDeserializer(Provider.class, new IgorComponentPersistenceDeserializer<>(Provider.class,
+                igorComponentRegistry, serviceRepository, encryptionUtil));
 
         mapperModule.addSerializer(Instant.class, new StdSerializer<>(Instant.class) {
             @Override
@@ -82,23 +81,25 @@ public class PersistenceConfiguration {
      * Creates an {@link ObjectMapper} for igor {@link Service}s. A special mapper is required for services to avoid circular
      * dependencies with the {@link ServiceRepository}, which is normally needed for parameter processing.
      *
-     * @param encryptionUtil The encryption util for en- and decrypting secured parameter values.
+     * @param igorComponentRegistry The igor component registry.
+     * @param encryptionUtil        The encryption util for en- and decrypting secured parameter values.
      *
      * @return A newly created {@link ObjectMapper} instance.
      */
     @Bean(name = "persistenceServiceMapper")
-    public ObjectMapper persistenceServiceMapper(EncryptionUtil encryptionUtil) {
+    public ObjectMapper persistenceServiceMapper(IgorComponentRegistry igorComponentRegistry, EncryptionUtil encryptionUtil) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         SimpleModule mapperModule = new SimpleModule();
 
-        mapperModule.addSerializer(Service.class, new IgorComponentPersistenceSerializer<>(Service.class, encryptionUtil));
-        mapperModule.addDeserializer(Service.class, new IgorComponentPersistenceDeserializer<>(Service.class, null,
-                encryptionUtil));
+        mapperModule.addSerializer(new IgorComponentPersistenceSerializer(encryptionUtil));
+        mapperModule.addDeserializer(Service.class, new IgorComponentPersistenceDeserializer<>(Service.class,
+                igorComponentRegistry, null, encryptionUtil));
 
         objectMapper.registerModule(mapperModule);
 
         return objectMapper;
     }
+
 }

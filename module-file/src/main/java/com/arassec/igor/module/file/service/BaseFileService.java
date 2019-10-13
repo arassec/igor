@@ -103,4 +103,12 @@ public abstract class BaseFileService extends BaseService implements FileService
         return obtained * 100 / total;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCategoryId() {
+        return "ead60d29-bc68-42bf-93fb-95d5f9a7effd";
+    }
+
 }

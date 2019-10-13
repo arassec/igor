@@ -1,10 +1,11 @@
 package com.arassec.igor.module.misc.action.persistence;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,8 @@ import java.util.Map;
  * Filters data of which a value has already been persisted before.
  */
 @Slf4j
-@IgorComponent("Filter persisted value")
+@Component
+@Scope("prototype")
 public class FilterPersistedValueAction extends BasePersistenceAction {
 
     /**
@@ -52,6 +54,14 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
 
         log.debug("Passed un-persisted value: '{}'", resolvedInput);
         return List.of(data);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "e9579cb0-9581-42a0-a295-f169b9bd8aec";
     }
 
 }

@@ -1,8 +1,11 @@
 package com.arassec.igor.core.util;
 
+import com.arassec.igor.core.model.IgorComponent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * Provides the Spring-Boot application context to non-spring beans.
@@ -20,7 +23,7 @@ public class ApplicationContextProvider implements ApplicationContextAware {
      */
     @Override
     public void setApplicationContext(ApplicationContext context) {
-        this.context = context;
+        ApplicationContextProvider.context = context;
     }
 
     /**
@@ -28,10 +31,30 @@ public class ApplicationContextProvider implements ApplicationContextAware {
      *
      * @param aClass Class of the bean.
      * @param <T>    The type of the bean.
+     *
      * @return The bean.
      */
     public static <T> T getBean(Class<T> aClass) {
         return context.getBean(aClass);
+    }
+
+    /**
+     * Returns an instace of a igor component.
+     *
+     * @param aClass The class.
+     * @param typeId The type ID of the igor component.
+     * @param <T>    The type parameter.
+     *
+     * @return A newly created Instance.
+     */
+    public static <T extends IgorComponent> T getIgorComponent(Class<T> aClass, String typeId) {
+        Map<String, T> beansOfType = context.getBeansOfType(aClass);
+        for (T instance : beansOfType.values()) {
+            if (instance.getTypeId().equals(typeId)) {
+                return instance;
+            }
+        }
+        throw new IllegalStateException("Invalid class or type ID: " + aClass + " / " + typeId);
     }
 
 }

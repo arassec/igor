@@ -1,4 +1,5 @@
 - Filter input on client + server side (e.g. job name length!)
+  -> bean-validation annotations!
 - Unit-Tests (Apache Mina SSHD!)
 - JSON test result highlighting with highlight.js
 - Persistence-service editor
@@ -18,3 +19,4 @@
 - Different, configurable color-schemes for different environments
 - Add JaCoCo reports and CodeCov integration
 - Add dependabot
+- Help-System with descriptions of Actions, Services, ...

@@ -1,9 +1,10 @@
 package com.arassec.igor.module.misc.action.util;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,8 @@ import java.util.Map;
  * Filters the supplied data by a regular expression.
  */
 @Slf4j
-@IgorComponent("Filter by regular expression")
+@Component
+@Scope("prototype")
 public class FilterByRegExpAction extends BaseUtilAction {
 
     /**
@@ -56,4 +58,11 @@ public class FilterByRegExpAction extends BaseUtilAction {
         return List.of(data);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "b404544a-a145-440c-80a3-1017e2b193cf";
+    }
 }

@@ -1,11 +1,12 @@
 package com.arassec.igor.module.file.action;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,9 @@ import java.util.Map;
  * Moves a file.
  */
 @Slf4j
-@IgorComponent("Move file")
+@Component
+@Scope("prototype")
+@ConditionalOnBean(FileService.class)
 public class MoveFileAction extends BaseFileAction {
 
     /**
@@ -82,6 +85,14 @@ public class MoveFileAction extends BaseFileAction {
 
         return List.of(data);
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "a3b7f9e9-9eea-4944-a867-62cdab3ddc07";
     }
 
 }

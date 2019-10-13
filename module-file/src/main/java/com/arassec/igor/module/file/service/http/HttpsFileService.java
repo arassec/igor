@@ -1,9 +1,11 @@
 package com.arassec.igor.module.file.service.http;
 
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -16,7 +18,9 @@ import java.security.NoSuchAlgorithmException;
  * File-Service that uses HTTPS as protocol.
  */
 @Slf4j
-@IgorComponent("HTTPS")
+@Component
+@Scope("prototype")
+@ConditionalOnClass(HttpClient.class)
 public class HttpsFileService extends HttpFileService {
 
     /**
@@ -75,6 +79,14 @@ public class HttpsFileService extends HttpFileService {
         }
 
         return httpClientBuilder.build();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "7244c422-84f5-4ead-a3a9-73df49b1910a";
     }
 
 }

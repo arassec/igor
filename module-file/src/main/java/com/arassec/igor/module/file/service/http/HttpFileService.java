@@ -1,17 +1,20 @@
 package com.arassec.igor.module.file.service.http;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -28,7 +31,9 @@ import java.util.stream.Collectors;
 /**
  * File-Service that uses HTTP as protocol.
  */
-@IgorComponent("HTTP")
+@Component
+@Scope("prototype")
+@ConditionalOnClass(HttpClient.class)
 public class HttpFileService extends BaseFileService {
 
     /**
@@ -328,4 +333,13 @@ public class HttpFileService extends BaseFileService {
             throw new ServiceException("HTTP request failed: " + e.getMessage() + " (" + request.uri().toString() + ")");
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "425e739c-8250-493b-a238-05f984195978";
+    }
+
 }

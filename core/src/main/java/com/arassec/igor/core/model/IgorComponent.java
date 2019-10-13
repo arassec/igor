@@ -1,24 +1,22 @@
 package com.arassec.igor.core.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Annotates a class as component of the igor application. All classes annotated as {@code IgorComponent} are fetched during
- * startup and can be created with their respective {@link com.arassec.igor.core.application.factory.ModelFactory}, depending
- * on the interfaces they implement.
+ * Defines a component in the igor application.
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface IgorComponent {
+public interface IgorComponent {
 
     /**
-     * The component's label for the UI.
+     * Returns the ID of the category of this component.
      *
-     * @return The label.
+     * @return The unique category ID.
      */
-    String value();
+    String getCategoryId();
+
+    /**
+     * Returns the ID of the type of this component.
+     *
+     * @return The unique type ID.
+     */
+    String getTypeId();
 
 }

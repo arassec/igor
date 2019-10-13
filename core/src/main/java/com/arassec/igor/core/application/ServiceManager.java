@@ -87,19 +87,19 @@ public class ServiceManager {
     /**
      * Loads all service of a given category.
      *
-     * @param category   The category to filter services with.
+     * @param categoryId   The category to filter services with.
      * @param pageNumber The page to load.
      * @param pageSize   The size of the page.
      *
      * @return List of services in the category.
      */
-    public ModelPage<Service> loadAllOfCategory(String category, int pageNumber, int pageSize) {
-        if (category == null) {
+    public ModelPage<Service> loadAllOfCategory(String categoryId, int pageNumber, int pageSize) {
+        if (categoryId == null) {
             return new ModelPage<>(0, 0, 0, List.of());
         }
         List<Service> services = serviceRepository.findAll();
         List<Service> allOfType = services.stream()
-                .filter(service -> category.equals(igorComponentRegistry.getCategoryOfComponentInstance(service.getClass()).getKey()))
+                .filter(service -> categoryId.equals(service.getCategoryId()))
                 .sorted(Comparator.comparing(Service::getName)).collect(Collectors.toList());
         return ModelPageHelper.getModelPage(allOfType, pageNumber, pageSize);
     }

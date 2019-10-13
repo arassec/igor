@@ -1,10 +1,11 @@
 package com.arassec.igor.module.misc.action.persistence;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,8 @@ import java.util.Map;
  * Persists a value from the supplied data to the persistence store.
  */
 @Slf4j
-@IgorComponent("Persist value")
+@Component
+@Scope("prototype")
 public class PersistValueAction extends BasePersistenceAction {
 
     /**
@@ -70,6 +72,14 @@ public class PersistValueAction extends BasePersistenceAction {
         if (numValuesToKeep > 0) {
             persistentValueRepository.cleanup(jobId, taskId, numValuesToKeep);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "6d768a9f-8f25-4ac1-ad8a-f825fbd1465c";
     }
 
 }

@@ -1,10 +1,12 @@
 package com.arassec.igor.module.file.provider;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -14,7 +16,9 @@ import java.util.Map;
 /**
  * Provides file names from a specified directory.
  */
-@IgorComponent("List Files")
+@Component
+@Scope("prototype")
+@ConditionalOnBean(FileService.class)
 public class ListFilesProvider extends BaseFileProvider {
 
     /**
@@ -104,6 +108,14 @@ public class ListFilesProvider extends BaseFileProvider {
         currentFile++;
 
         return item;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "ac6ff9d1-7003-49cc-85b8-7be305fd90a4";
     }
 
 }

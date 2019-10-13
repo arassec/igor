@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.repository.PersistentValueRepository;
@@ -201,9 +202,9 @@ public class JobManager implements InitializingBean, DisposableBean {
      */
     public List<Job> loadScheduled() {
         return jobRepository.findAll().stream().filter(Job::isActive)
-                .filter(job -> job.getTrigger() instanceof com.arassec.igor.core.model.trigger.CronTrigger).sorted((o1, o2) -> {
-                    String firstCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o1.getTrigger()).getCronExpression();
-                    String secondCron = ((com.arassec.igor.core.model.trigger.CronTrigger) o2.getTrigger()).getCronExpression();
+                .filter(job -> job.getTrigger() instanceof ScheduledTrigger).sorted((o1, o2) -> {
+                    String firstCron = ((ScheduledTrigger) o1.getTrigger()).getCronExpression();
+                    String secondCron = ((ScheduledTrigger) o2.getTrigger()).getCronExpression();
                     CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(firstCron);
                     Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
                     CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(secondCron);
@@ -301,8 +302,8 @@ public class JobManager implements InitializingBean, DisposableBean {
             return;
         }
 
-        if (job.getTrigger() instanceof com.arassec.igor.core.model.trigger.CronTrigger) {
-            String cronExpression = ((com.arassec.igor.core.model.trigger.CronTrigger) job.getTrigger()).getCronExpression();
+        if (job.getTrigger() instanceof ScheduledTrigger) {
+            String cronExpression = ((ScheduledTrigger) job.getTrigger()).getCronExpression();
             try {
                 scheduledJobs.put(job.getId(), taskScheduler.schedule(new Thread(() -> {
                     log.info("Trying to automatically enqueue job: {} ({})", job.getName(), job.getId());

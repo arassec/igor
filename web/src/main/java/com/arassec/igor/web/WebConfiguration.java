@@ -1,6 +1,7 @@
 package com.arassec.igor.web;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.service.Service;
@@ -15,11 +16,26 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.HierarchicalMessageSource;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.ResourceBundle;
 
 /**
  * Configures the web layer of igor.
@@ -29,14 +45,36 @@ import java.time.Instant;
 public class WebConfiguration {
 
     /**
-     * The repository for {@link Service}s.
+     * Creates a {@link AcceptHeaderLocaleResolver} that processes the accept-language header and has the ROOT locale configured
+     * as fallback.
+     *
+     * @return A new {@lin LocaleResolver} instance.
      */
-    private final ServiceRepository serviceRepository;
+    @Bean
+    public LocaleResolver localeResolver() {
+        AcceptHeaderLocaleResolver localeResolver = new AcceptHeaderLocaleResolver();
+        localeResolver.setDefaultLocale(Locale.ROOT);
+        return localeResolver;
+    }
 
     /**
-     * The igor component registry.
+     * Creates a {@link MessageSource} to support I18N. All configured message sources from igor sub-modules are configured as
+     * hierarchy of parent message sources, to allow individual message sources per module.
+     *
+     * @param messageSources All available message sources.
+     *
+     * @return The primary message source.
      */
-    private final IgorComponentRegistry igorComponentRegistry;
+    @Bean
+    public MessageSource messageSource(final List<MessageSource> messageSources) {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        for (int i = 1; i < messageSources.size(); i++) {
+            ((HierarchicalMessageSource) messageSources.get(i)).setParentMessageSource(messageSources.get(i - 1));
+        }
+        messageSource.setParentMessageSource(messageSources.get(messageSources.size() - 1));
+        messageSource.setUseCodeAsDefaultMessage(true);
+        return messageSource;
+    }
 
     /**
      * Creates the default object mapper for the web layer.
@@ -44,8 +82,9 @@ public class WebConfiguration {
      * @return The default {@link ObjectMapper}.
      */
     @Bean
-    public ObjectMapper objectMapper() {
-        return createObjectMapper(false);
+    public ObjectMapper objectMapper(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository,
+                                     MessageSource messageSource) {
+        return createObjectMapper(igorComponentRegistry, serviceRepository, messageSource, false);
     }
 
     /**
@@ -54,8 +93,8 @@ public class WebConfiguration {
      * @return The {@link ObjectMapper} for simulated job runs.
      */
     @Bean
-    public ObjectMapper simulationObjectMapper() {
-        return createObjectMapper(true);
+    public ObjectMapper simulationObjectMapper(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository, MessageSource messageSource) {
+        return createObjectMapper(igorComponentRegistry, serviceRepository, messageSource, true);
     }
 
     /**
@@ -65,7 +104,8 @@ public class WebConfiguration {
      *
      * @return A newly created {@link ObjectMapper} instance.
      */
-    private ObjectMapper createObjectMapper(boolean simulationMode) {
+    private ObjectMapper createObjectMapper(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository,
+                                            MessageSource messageSource, boolean simulationMode) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -73,18 +113,14 @@ public class WebConfiguration {
 
         SimpleModule mapperModule = new SimpleModule();
 
-        mapperModule.addSerializer(Trigger.class, new IgorComponentWebSerializer<>(Trigger.class, igorComponentRegistry));
-        mapperModule.addSerializer(Provider.class, new IgorComponentWebSerializer<>(Provider.class, igorComponentRegistry));
-        mapperModule.addSerializer(Action.class, new IgorComponentWebSerializer<>(Action.class, igorComponentRegistry));
-        mapperModule.addSerializer(Service.class, new IgorComponentWebSerializer<>(Service.class, igorComponentRegistry));
-
-        mapperModule.addDeserializer(Trigger.class, new IgorComponentWebDeserializer<>(Trigger.class,
+        mapperModule.addSerializer(new IgorComponentWebSerializer(messageSource));
+        mapperModule.addDeserializer(Service.class, new IgorComponentWebDeserializer<>(Service.class, igorComponentRegistry,
                 serviceRepository, simulationMode));
-        mapperModule.addDeserializer(Provider.class, new IgorComponentWebDeserializer<>(Provider.class,
+        mapperModule.addDeserializer(Action.class, new IgorComponentWebDeserializer<>(Action.class, igorComponentRegistry,
                 serviceRepository, simulationMode));
-        mapperModule.addDeserializer(Action.class, new IgorComponentWebDeserializer<>(Action.class,
+        mapperModule.addDeserializer(Trigger.class, new IgorComponentWebDeserializer<>(Trigger.class, igorComponentRegistry,
                 serviceRepository, simulationMode));
-        mapperModule.addDeserializer(Service.class, new IgorComponentWebDeserializer<>(Service.class,
+        mapperModule.addDeserializer(Provider.class, new IgorComponentWebDeserializer<>(Provider.class, igorComponentRegistry,
                 serviceRepository, simulationMode));
 
         mapperModule.addSerializer(Instant.class, new StdSerializer<>(Instant.class) {

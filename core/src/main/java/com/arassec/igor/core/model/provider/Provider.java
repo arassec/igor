@@ -1,5 +1,6 @@
 package com.arassec.igor.core.model.provider;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 
 import java.util.Map;
@@ -7,7 +8,7 @@ import java.util.Map;
 /**
  * Provides data for a job to process.
  */
-public interface Provider {
+public interface Provider extends IgorComponent {
 
     /**
      * Initializes the provider.

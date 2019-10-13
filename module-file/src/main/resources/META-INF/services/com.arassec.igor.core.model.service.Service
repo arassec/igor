@@ -1,7 +1,0 @@
-com.arassec.igor.module.file.service.ftp.FtpFileService
-com.arassec.igor.module.file.service.ftp.FtpsFileService
-com.arassec.igor.module.file.service.http.HttpFileService
-com.arassec.igor.module.file.service.http.HttpsFileService
-com.arassec.igor.module.file.service.localfs.LocalFilesystemFileService
-com.arassec.igor.module.file.service.ssh.ScpFileService
-com.arassec.igor.module.file.service.ssh.SftpFileService

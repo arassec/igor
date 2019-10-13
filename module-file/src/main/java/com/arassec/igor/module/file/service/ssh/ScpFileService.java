@@ -1,16 +1,15 @@
 package com.arassec.igor.module.file.service.ssh;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -26,7 +25,9 @@ import java.util.stream.Collectors;
  * File-Service for SCP file handling.
  */
 @Slf4j
-@IgorComponent("SCP")
+@Component
+@Scope("prototype")
+@ConditionalOnClass(JSch.class)
 public class ScpFileService extends BaseSshFileService {
 
     /**
@@ -438,6 +439,14 @@ public class ScpFileService extends BaseSshFileService {
     public void testConfiguration() throws ServiceException {
         Session session = connect(host, port, username, password);
         session.disconnect();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "b2213d4e-db92-4e87-9fea-882b71385ae4";
     }
 
 }

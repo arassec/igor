@@ -1,10 +1,12 @@
 package com.arassec.igor.module.file.action;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +15,9 @@ import java.util.Map;
  * Reads the content of a file.
  */
 @Slf4j
-@IgorComponent("Read file")
+@Component
+@Scope("prototype")
+@ConditionalOnBean(FileService.class)
 public class ReadFileAction extends BaseFileAction {
 
     /**
@@ -68,6 +72,14 @@ public class ReadFileAction extends BaseFileAction {
 
         return List.of(data);
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "52256687-b1e4-438d-b2f1-e077d1c86193";
     }
 
 }

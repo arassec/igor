@@ -1,16 +1,18 @@
 package com.arassec.igor.module.misc.provider;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 /**
  * Provides fixed input to tasks.
  */
-@IgorComponent("Fixed input")
+@Component
+@Scope("prototype")
 public class FixedInputProvider extends BaseUtilProvider {
 
     /**
@@ -73,6 +75,14 @@ public class FixedInputProvider extends BaseUtilProvider {
         item.put(INPUT_KEY, inputParts.get(index));
         index++;
         return item;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "6b0cdf46-1412-43c0-8b8a-467ea3a60796";
     }
 
 }

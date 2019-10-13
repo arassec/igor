@@ -1,12 +1,10 @@
 package com.arassec.igor.module.message.service;
 
-import com.arassec.igor.core.model.IgorCategory;
 import com.arassec.igor.core.model.service.Service;
 
 /**
  * Interface for message related services.
  */
-@IgorCategory("Message")
 public interface MessageService extends Service {
 
     /**

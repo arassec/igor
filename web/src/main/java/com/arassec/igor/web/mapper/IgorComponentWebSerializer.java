@@ -1,15 +1,18 @@
 package com.arassec.igor.web.mapper;
 
-import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
-import com.arassec.igor.core.util.KeyLabelStore;
+import com.arassec.igor.web.model.KeyLabelStore;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -18,47 +21,48 @@ import java.util.List;
 
 /**
  * Serializer for igor components in the web layer.
- *
- * @param <T> The type of component this serializer processes.
  */
-public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements WebMapperKeyAware {
+public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> implements WebMapperKeyAware {
 
     /**
-     * The model factory.
+     * The message source for I18N.
      */
-    private IgorComponentRegistry igorComponentRegistry;
+    private final MessageSource messageSource;
 
     /**
      * Creates a new serializer instance.
      *
-     * @param t                     The type of components this serializer processes.
-     * @param igorComponentRegistry The igor component registry.
+     * @param messageSource         The message source for I18N.
      */
-    public IgorComponentWebSerializer(Class<T> t, IgorComponentRegistry igorComponentRegistry) {
-        super(t);
-        this.igorComponentRegistry = igorComponentRegistry;
+    public IgorComponentWebSerializer(MessageSource messageSource) {
+        super(IgorComponent.class);
+        this.messageSource = messageSource;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void serialize(T t, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(IgorComponent instance, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        if (t instanceof Service) {
-            if (((Service) t).getId() != null) {
-                jsonGenerator.writeNumberField(ID, ((Service) t).getId());
+        if (instance instanceof Service) {
+            if (((Service) instance).getId() != null) {
+                jsonGenerator.writeNumberField(ID, ((Service) instance).getId());
             }
-            if (((Service) t).getName() != null) {
-                jsonGenerator.writeStringField(NAME, ((Service) t).getName());
+            if (((Service) instance).getName() != null) {
+                jsonGenerator.writeStringField(NAME, ((Service) instance).getName());
             }
         }
-        if (t instanceof Action) {
-            jsonGenerator.writeBooleanField(ACTIVE, ((Action) t).isActive());
+        if (instance instanceof Action) {
+            jsonGenerator.writeBooleanField(ACTIVE, ((Action) instance).isActive());
         }
-        writeKeyLabelStore(jsonGenerator, CATEGORY, igorComponentRegistry.getCategoryOfComponentInstance(t.getClass()));
-        writeKeyLabelStore(jsonGenerator, TYPE, igorComponentRegistry.getTypeOfComponentInstance(t.getClass()));
-        writeParameters(jsonGenerator, t);
+        writeKeyLabelStore(jsonGenerator, CATEGORY,
+                new KeyLabelStore(instance.getCategoryId(), messageSource.getMessage(instance.getCategoryId(), null,
+                        LocaleContextHolder.getLocale())));
+        writeKeyLabelStore(jsonGenerator, TYPE,
+                new KeyLabelStore(instance.getTypeId(), messageSource.getMessage(instance.getTypeId(), null,
+                        LocaleContextHolder.getLocale())));
+        writeParameters(jsonGenerator, instance);
         jsonGenerator.writeEndObject();
     }
 
@@ -83,11 +87,10 @@ public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements W
      *
      * @param jsonGenerator The json generator.
      * @param instance      The component instance.
-     * @param <I>           The component's type.
      *
      * @throws IOException If parameters could not be written.
      */
-    private <I> void writeParameters(JsonGenerator jsonGenerator, I instance) throws IOException {
+    private void writeParameters(JsonGenerator jsonGenerator, IgorComponent instance) throws IOException {
         jsonGenerator.writeArrayFieldStart(PARAMETERS);
 
         List<Field> fields = new LinkedList<>();
@@ -131,9 +134,12 @@ public class IgorComponentWebSerializer<T> extends StdSerializer<T> implements W
                     }
                     jsonGenerator.writeBooleanField(SERVICE, true);
                 } else {
-                    jsonGenerator.writeObjectField(VALUE, value);
+                    if (value instanceof String && StringUtils.isEmpty(value)) {
+                        jsonGenerator.writeObjectField(VALUE, null);
+                    } else {
+                        jsonGenerator.writeObjectField(VALUE, value);
+                    }
                     jsonGenerator.writeBooleanField(SERVICE, false);
-
                 }
                 jsonGenerator.writeEndObject();
             } catch (IOException | IllegalAccessException e) {

@@ -1,16 +1,15 @@
 package com.arassec.igor.module.file.service.ssh;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -25,7 +24,9 @@ import java.util.stream.Collectors;
  * File-Service for SFTP file handling.
  */
 @Slf4j
-@IgorComponent("SFTP")
+@Component
+@Scope("prototype")
+@ConditionalOnClass(JSch.class)
 public class SftpFileService extends BaseSshFileService {
 
     /**
@@ -221,6 +222,14 @@ public class SftpFileService extends BaseSshFileService {
         channel.rename(source, target);
         channel.disconnect();
         session.disconnect();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "bf63c188-b930-4920-bb93-4da49db21eea";
     }
 
 }

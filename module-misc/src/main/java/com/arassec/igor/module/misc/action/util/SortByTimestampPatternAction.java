@@ -1,15 +1,15 @@
 package com.arassec.igor.module.misc.action.util;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +20,9 @@ import java.util.stream.Collectors;
 /**
  * Sorts data by using a configurable pattern on a data value.
  */
-@IgorComponent("Sort by timestamp pattern")
 @Slf4j
+@Component
+@Scope("prototype")
 public class SortByTimestampPatternAction extends BaseUtilAction {
 
     /**
@@ -183,6 +184,14 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     @Override
     public int getNumThreads() {
         return 1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "e43efa64-d1a3-422f-ac6c-f34cd56be0c2";
     }
 
 }

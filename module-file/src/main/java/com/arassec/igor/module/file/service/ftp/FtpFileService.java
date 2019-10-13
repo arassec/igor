@@ -1,6 +1,5 @@
 package com.arassec.igor.module.file.service.ftp;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
@@ -8,11 +7,13 @@ import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.BufferedOutputStream;
@@ -28,9 +29,10 @@ import java.util.stream.Stream;
 /**
  * File-Service that uses FTP as protocol.
  */
-@EqualsAndHashCode(callSuper = true)
+@Component
+@Scope("prototype")
+@ConditionalOnClass(FTPClient.class)
 @Data
-@IgorComponent("FTP")
 public class FtpFileService extends BaseFileService {
 
     /**
@@ -296,6 +298,14 @@ public class FtpFileService extends BaseFileService {
     public void testConfiguration() throws ServiceException {
         FTPClient ftpClient = connect();
         disconnect(ftpClient);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTypeId() {
+        return "b0b068a5-2f4f-46e5-8098-464e323b538b";
     }
 
 }
