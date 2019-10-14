@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
@@ -104,7 +105,7 @@ public class JobRestController {
      * @return 'OK' on success.
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Job createJob(@RequestBody Job job) {
+    public Job createJob(@Valid @RequestBody Job job) {
         if (jobManager.loadByName(job.getName()) == null) {
             job.setId(null);
             return jobManager.save(job);
@@ -121,7 +122,7 @@ public class JobRestController {
      * @return 'OK' on success.
      */
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Job updateJob(@RequestBody Job job) {
+    public Job updateJob(@Valid @RequestBody Job job) {
         Job existingJobWithSameName = jobManager.loadByName(job.getName());
         if (existingJobWithSameName == null || existingJobWithSameName.getId().equals(job.getId())) {
             return jobManager.save(job);
@@ -138,7 +139,7 @@ public class JobRestController {
      * @return Test results of the simulated job run.
      */
     @PostMapping("simulate")
-    public SimulationJobResult simulateJob(@RequestBody String jobJson) {
+    public SimulationJobResult simulateJob(@Valid @RequestBody String jobJson) {
 
         Job job;
         try {
@@ -235,7 +236,7 @@ public class JobRestController {
      * @return 'OK' on success.
      */
     @PostMapping(value = "run", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Job runJob(@RequestBody Job job) {
+    public Job runJob(@Valid @RequestBody Job job) {
         Job savedJob = jobManager.save(job);
         if (job.isActive()) {
             jobManager.enqueue(savedJob);

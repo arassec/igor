@@ -14,6 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
@@ -31,7 +35,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JobManager implements InitializingBean, DisposableBean {
+public class JobManager implements ApplicationListener<ContextStartedEvent>, DisposableBean {
 
     /**
      * Repository for jobs.
@@ -65,9 +69,11 @@ public class JobManager implements InitializingBean, DisposableBean {
 
     /**
      * Initializes the manager by scheduling all available jobs.
+     *
+     * @param contextStartedEvent Event indicating that the spring context has been created.
      */
     @Override
-    public void afterPropertiesSet() {
+    public void onApplicationEvent(ContextStartedEvent contextStartedEvent) {
         // If jobs are already 'running' (e.g. after a server restart) the are updated here:
         ModelPage<JobExecution> jobExecutions = jobExecutionRepository
                 .findInState(JobExecutionState.RUNNING, 0, Integer.MAX_VALUE);
@@ -126,11 +132,11 @@ public class JobManager implements InitializingBean, DisposableBean {
     }
 
     /**
-     * Enqueues the provided job to the exeuction list. The job will be run as soon as an execution slot is availalbe
-     * and after previously enqueued executions are processed.
+     * Enqueues the provided job to the exeuction list. The job will be run as soon as an execution slot is availalbe and after
+     * previously enqueued executions are processed.
      * <p>
-     * This method should be called if the job should run immediately and only once. If the job should run regularly
-     * according to its trigger configuration, {@link JobManager#schedule(Job)} should be used.
+     * This method should be called if the job should run immediately and only once. If the job should run regularly according to
+     * its trigger configuration, {@link JobManager#schedule(Job)} should be used.
      *
      * @param job The job to run as soon as possible.
      */
@@ -167,6 +173,7 @@ public class JobManager implements InitializingBean, DisposableBean {
      * Loads the job with the given ID.
      *
      * @param id The job's ID.
+     *
      * @return The job with the given ID or {@code null}, if none was found.
      */
     public Job load(Long id) {
@@ -177,6 +184,7 @@ public class JobManager implements InitializingBean, DisposableBean {
      * Loads a job with the given name.
      *
      * @param name The job's name.
+     *
      * @return The job with the given name or {@code null}, if none exists.
      */
     public Job loadByName(String name) {
@@ -189,6 +197,7 @@ public class JobManager implements InitializingBean, DisposableBean {
      * @param pageNumber The page number.
      * @param pageSize   The page size.
      * @param nameFilter An optional name filter for the jobs.
+     *
      * @return The page with jobs matching the criteria.
      */
     public ModelPage<Job> loadPage(int pageNumber, int pageSize, String nameFilter) {
@@ -219,6 +228,7 @@ public class JobManager implements InitializingBean, DisposableBean {
      * @param jobId      The job's ID.
      * @param pageNumber The page to load.
      * @param pageSize   The number of items on the page.
+     *
      * @return A page with {@link JobExecution}s of the job.
      */
     public ModelPage<JobExecution> getJobExecutionsOfJob(Long jobId, int pageNumber, int pageSize) {
@@ -229,6 +239,7 @@ public class JobManager implements InitializingBean, DisposableBean {
      * Returns the job-execution with the given ID.
      *
      * @param id The job-execution's ID.
+     *
      * @return The {@link JobExecution}.
      */
     public JobExecution getJobExecution(Long id) {
@@ -249,6 +260,7 @@ public class JobManager implements InitializingBean, DisposableBean {
      * @param state      The state the job executions must be in to be listed.
      * @param pageNumber The page to load.
      * @param pageSize   The number of items on the page.
+     *
      * @return The list of job executions in that state.
      */
     public ModelPage<JobExecution> getJobExecutionsInState(JobExecutionState state, int pageNumber, int pageSize) {
@@ -359,6 +371,7 @@ public class JobManager implements InitializingBean, DisposableBean {
      * Searches for services referencing the job with the given ID.
      *
      * @param id The job's ID.
+     *
      * @return Set of services referencing this service.
      */
     public Set<Pair<Long, String>> getReferencedServices(Long id) {

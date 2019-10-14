@@ -6,6 +6,9 @@ import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +29,8 @@ public class Job {
     /**
      * The job's name.
      */
+    @NotEmpty
+    @Size(max = 20)
     private String name;
 
     /**

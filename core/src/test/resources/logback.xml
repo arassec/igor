@@ -11,8 +11,6 @@
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="net.schmizz.sshj" level="ERROR"/>
-
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>

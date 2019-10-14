@@ -5,6 +5,8 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.module.message.service.Message;
 import com.arassec.igor.module.message.service.MessageService;
+import lombok.Builder;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Scope;
@@ -22,6 +24,7 @@ import java.util.regex.Pattern;
 @Component
 @Scope("prototype")
 @ConditionalOnBean(MessageService.class)
+@Data
 public class SendMessageAction extends BaseMessageAction {
 
     /**

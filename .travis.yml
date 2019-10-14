@@ -3,6 +3,8 @@ jdk:
   - openjdk12
 before_install:
   - chmod +x mvnw
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 deploy:
   provider: script
   script: "./mvnw clean install -Prelease"
