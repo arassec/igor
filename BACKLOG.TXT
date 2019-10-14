@@ -1,6 +1,8 @@
 - Filter input on client + server side (e.g. job name length!)
   -> bean-validation annotations!
 - Unit-Tests (Apache Mina SSHD!)
+- Export + Import of jobs and services (via JSON)
+- Add Job property 'self-heal' to auto-resolve failed job runs after successful job execution.
 - JSON test result highlighting with highlight.js
 - Persistence-service editor
 - Add Skip- and Limit-Actions
@@ -8,15 +10,13 @@
   will be replaced by the actual json value
 - SSH access with key
 - CIFS-/Samba supporting FileService
-- Export + Import of jobs and services (via JSON)
 - Configuration-View with system configuration
   - Initial setup with configuration on first start
   - Encryption-Cipher in database, randomly generated at first start
 - Optional authentication + authorization (Frontend + Backend)
 - Directory-Browser for file services in the GUI
-- Integrate Search with lucene
 - Healthchecks + Spring-Boot-Admin support via actuators
+- Integrate Search with lucene
 - Different, configurable color-schemes for different environments
-- Add JaCoCo reports and CodeCov integration
 - Add dependabot
 - Help-System with descriptions of Actions, Services, ...

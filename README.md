@@ -1,5 +1,5 @@
-![Travis (.com)](https://img.shields.io/travis/com/arassec/igor)
-![Codecov](https://img.shields.io/codecov/c/github/arassec/igor)
+[![Travis (.com)](https://img.shields.io/travis/com/arassec/igor)](https://travis-ci.com/arassec/igor)
+[![Codecov](https://img.shields.io/codecov/c/github/arassec/igor)](https://codecov.io/gh/arassec/igor)
 
 # Igor 
 This repository contains the sources of igor, a tool for managing 'continuous workarounds'. This tool tries to provide a place to organize 
