@@ -7,11 +7,9 @@ import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
@@ -20,7 +18,7 @@ import java.util.*;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class IgorComponentRegistry {
+public class IgorComponentRegistry implements InitializingBean {
 
     /**
      * All available actions.
@@ -60,8 +58,8 @@ public class IgorComponentRegistry {
     /**
      * Initializes the component registry.
      */
-    @PostConstruct
-    public void initialize() {
+    @Override
+    public void afterPropertiesSet() {
         initializeComponent(Action.class, actions);
         initializeComponent(Provider.class, providers);
         initializeComponent(Trigger.class, triggers);

@@ -23,6 +23,12 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- ConditionalOnBean-Support -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.amqp</groupId>
             <artifactId>spring-rabbit</artifactId>

@@ -5,8 +5,8 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.module.message.service.Message;
 import com.arassec.igor.module.message.service.MessageService;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Scope;
@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 @Scope("prototype")
 @ConditionalOnBean(MessageService.class)
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class SendMessageAction extends BaseMessageAction {
 
     /**
@@ -42,7 +43,7 @@ public class SendMessageAction extends BaseMessageAction {
     /**
      * Pattern to extract variables from the message template.
      */
-    private Pattern pattern = Pattern.compile("##(.*?)##");
+    private final Pattern pattern = Pattern.compile("##(.*?)##");
 
     /**
      * Processes the supplied data and replaces variables from a message template with the values from the data. The resulting
