@@ -3,6 +3,7 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileService;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Scope;
@@ -18,12 +19,13 @@ import java.util.Map;
 @Component
 @Scope("prototype")
 @ConditionalOnBean(FileService.class)
+@Data
 public class ReadFileAction extends BaseFileAction {
 
     /**
      * The key in the data object where the content of the file should be placed.
      */
-    private static final String KEY_FILE_CONTENTS = "fileContents";
+    public static final String KEY_FILE_CONTENTS = "fileContents";
 
     /**
      * The service providing the file to read.

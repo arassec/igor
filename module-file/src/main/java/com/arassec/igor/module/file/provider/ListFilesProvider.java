@@ -24,17 +24,17 @@ public class ListFilesProvider extends BaseFileProvider {
     /**
      * The key to the filename.
      */
-    private static final String FILENAME_KEY = "filename";
+    public static final String FILENAME_KEY = "filename";
 
     /**
      * The key to the directory.
      */
-    private static final String DIRECTORY_KEY = "directory";
+    public static final String DIRECTORY_KEY = "directory";
 
     /**
      * The key to the file's last modification timestamp.
      */
-    private static final String LAST_MODIFIED_KEY = "lastModified";
+    public static final String LAST_MODIFIED_KEY = "lastModified";
 
     /**
      * The service to use for file listing.

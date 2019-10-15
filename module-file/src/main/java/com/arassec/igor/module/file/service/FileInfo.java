@@ -12,8 +12,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FileInfo {
 
+    /**
+     * The file's name.
+     */
     private String filename;
 
+    /**
+     * Timestamp of the last modification of the file.
+     */
     private String lastModified;
 
 }
