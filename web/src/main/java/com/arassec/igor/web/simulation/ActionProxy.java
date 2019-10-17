@@ -3,7 +3,6 @@ package com.arassec.igor.web.simulation;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.StacktraceFormatter;
-import com.github.openjson.JSONObject;
 import lombok.Data;
 
 import java.util.LinkedList;
@@ -24,7 +23,7 @@ public class ActionProxy implements Action {
     /**
      * The collected Data.
      */
-    private List<JSONObject> collectedData = new LinkedList<>();
+    private List<Map<String, Object>> collectedData = new LinkedList<>();
 
     /**
      * Might contain an error cause if the action finished abnormally.
@@ -65,7 +64,7 @@ public class ActionProxy implements Action {
         try {
             List<Map<String, Object>> resultData = delegate.process(data, jobExecution);
             if (resultData != null) {
-                collectedData.add(new JSONObject(data));
+                collectedData.addAll(resultData);
             }
             return resultData;
         } catch (Exception e) {
@@ -84,7 +83,7 @@ public class ActionProxy implements Action {
         try {
             List<Map<String, Object>> resultData = delegate.complete();
             if (resultData != null && !resultData.isEmpty()) {
-                resultData.stream().forEach(data -> collectedData.add(new JSONObject(data)));
+                resultData.forEach(data -> collectedData.addAll(resultData));
             }
             return resultData;
         } catch (Exception e) {

@@ -1,15 +1,19 @@
 package com.arassec.igor.web.controller;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.core.model.IgorComponent;
+import com.arassec.igor.web.mapper.WebMapperKeyAware;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.openjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 /**
  * REST-Controller for parameter requests.
@@ -37,7 +41,7 @@ public class ParametersRestController {
      * @return List of parameters.
      */
     @GetMapping(value = "service/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getServiceParameters(@PathVariable("type") String type) {
+    public Object getServiceParameters(@PathVariable("type") String type) {
         return serializeParameters(type);
     }
 
@@ -49,7 +53,7 @@ public class ParametersRestController {
      * @return List of parameters.
      */
     @GetMapping(value = "action/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getActionParameters(@PathVariable("type") String type) {
+    public Object getActionParameters(@PathVariable("type") String type) {
         return serializeParameters(type);
     }
 
@@ -61,7 +65,7 @@ public class ParametersRestController {
      * @return List of parameters.
      */
     @GetMapping(value = "provider/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getProviderParameters(@PathVariable("type") String type) {
+    public Object getProviderParameters(@PathVariable("type") String type) {
         return serializeParameters(type);
     }
 
@@ -73,7 +77,7 @@ public class ParametersRestController {
      * @return List of parameters.
      */
     @GetMapping(value = "trigger/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getTriggerParameters(@PathVariable("type") String type) {
+    public Object getTriggerParameters(@PathVariable("type") String type) {
         return serializeParameters(type);
     }
 
@@ -84,11 +88,13 @@ public class ParametersRestController {
      *
      * @return The parameters as JSON-String.
      */
-    private String serializeParameters(String typeId) {
+    private Object serializeParameters(String typeId) {
         try {
-            JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(
-                    igorComponentRegistry.getClass(typeId).orElseThrow(() -> new IllegalArgumentException("Unknown type ID: " + typeId))));
-            return jsonObject.getJSONArray("parameters").toString();
+            IgorComponent igorComponent = igorComponentRegistry.getClass(typeId).orElseThrow(() -> new IllegalArgumentException("Unknown type ID: " + typeId));
+            Map<String, Object> jsonMap = objectMapper.readValue(objectMapper.writeValueAsString(igorComponent),
+                    new TypeReference<>() {
+                    });
+            return jsonMap.get(WebMapperKeyAware.PARAMETERS);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Could not read parameters!", e);
         }

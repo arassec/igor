@@ -3,7 +3,6 @@ package com.arassec.igor.web.simulation;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.util.StacktraceFormatter;
-import com.github.openjson.JSONObject;
 import lombok.Data;
 
 import java.util.LinkedList;
@@ -34,7 +33,7 @@ public class ProviderProxy implements Provider {
     /**
      * The collected data.
      */
-    private List<JSONObject> collectedData = new LinkedList<>();
+    private List<Map<String, Object>> collectedData = new LinkedList<>();
 
     /**
      * Might contain an error cause if the proxied provider failed abnormally.
@@ -90,7 +89,7 @@ public class ProviderProxy implements Provider {
         try {
             Map<String, Object> data = delegate.next();
             if (data != null) {
-                collectedData.add(new JSONObject(data));
+                collectedData.add(data);
             }
             return data;
         } catch (Exception e) {
