@@ -6,8 +6,9 @@ import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.LinkedList;
@@ -30,7 +31,7 @@ public class Job {
      * The job's name.
      */
     @NotEmpty
-    @Size(max = 20)
+    @Size(max = 250)
     private String name;
 
     /**
@@ -41,6 +42,7 @@ public class Job {
     /**
      * A trigger for the job.
      */
+    @Valid
     private Trigger trigger;
 
     /**
@@ -51,11 +53,13 @@ public class Job {
     /**
      * Max. number of job-execution entries to keep for this job.
      */
+    @PositiveOrZero
     private int executionHistoryLimit = 5;
 
     /**
      * The tasks this job will perform.
      */
+    @Valid
     private List<Task> tasks = new LinkedList<>();
 
     /**

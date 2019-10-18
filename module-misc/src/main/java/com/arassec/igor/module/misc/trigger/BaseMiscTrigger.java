@@ -1,7 +1,6 @@
 package com.arassec.igor.module.misc.trigger;
 
 import com.arassec.igor.core.model.trigger.BaseTrigger;
-import com.arassec.igor.core.model.trigger.Trigger;
 
 /**
  * Baseclass for Triggers.

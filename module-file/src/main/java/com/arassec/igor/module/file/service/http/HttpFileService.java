@@ -6,7 +6,6 @@ import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
-import org.apache.commons.net.ftp.FTPSClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
@@ -17,6 +16,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,12 +40,14 @@ public class HttpFileService extends BaseFileService {
     /**
      * The server's hostname.
      */
+    @NotBlank
     @IgorParam
     protected String host;
 
     /**
      * The server's port.
      */
+    @Positive
     @IgorParam
     protected int port = 80;
 

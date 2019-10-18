@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -121,7 +122,7 @@ public class ServiceRestController {
      * @return The service JSON on success.
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Service createService(@RequestBody Service service) {
+    public Service createService(@Valid @RequestBody Service service) {
         if (serviceManager.loadByName(service.getName()) == null) {
             return serviceManager.save(service);
         } else {
@@ -136,7 +137,7 @@ public class ServiceRestController {
      */
     @PutMapping()
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateService(@RequestBody Service service) {
+    public void updateService(@Valid @RequestBody Service service) {
         Service existingServiceWithSameName = serviceManager.loadByName(service.getName());
         if (existingServiceWithSameName == null || existingServiceWithSameName.getId().equals(service.getId())) {
             serviceManager.save(service);
@@ -153,7 +154,7 @@ public class ServiceRestController {
      * @return The string 'OK' on success, an error message if the test was not successful.
      */
     @PostMapping("test")
-    public ResponseEntity<String> testService(@RequestBody Service service) {
+    public ResponseEntity<String> testService(@Valid @RequestBody Service service) {
         try {
             service.testConfiguration();
             return new ResponseEntity<>("OK", HttpStatus.OK);

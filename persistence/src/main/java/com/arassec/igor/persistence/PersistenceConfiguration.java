@@ -1,7 +1,6 @@
 package com.arassec.igor.persistence;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.provider.Provider;

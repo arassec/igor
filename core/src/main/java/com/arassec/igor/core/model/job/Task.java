@@ -7,6 +7,9 @@ import com.arassec.igor.core.model.provider.Provider;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -48,6 +51,8 @@ public class Task {
     /**
      * The name of the task.
      */
+    @NotEmpty
+    @Size(max = 250)
     private String name;
 
     /**
@@ -63,11 +68,13 @@ public class Task {
     /**
      * The data provider for the task.
      */
+    @Valid
     private Provider provider;
 
     /**
      * The actions this job will perform during its run.
      */
+    @Valid
     private List<Action> actions = new LinkedList<>();
 
     /**

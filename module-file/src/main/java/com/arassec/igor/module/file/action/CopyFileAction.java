@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
@@ -52,36 +54,42 @@ public class CopyFileAction extends BaseFileAction {
     /**
      * The service providing the file to copy.
      */
+    @NotNull
     @IgorParam
     private FileService sourceService;
 
     /**
      * Source directory to copy the file from.
      */
+    @NotBlank
     @IgorParam
     private String sourceDirectory;
 
     /**
      * Source file to copy.
      */
+    @NotBlank
     @IgorParam
     private String sourceFilename;
 
     /**
      * The destination for the copied file.
      */
+    @NotBlank
     @IgorParam
     private FileService targetService;
 
     /**
      * The target directory to copy/move the file to.
      */
+    @NotBlank
     @IgorParam
     private String targetDirectory;
 
     /**
      * The target file name.
      */
+    @NotBlank
     @IgorParam
     private String targetFilename;
 

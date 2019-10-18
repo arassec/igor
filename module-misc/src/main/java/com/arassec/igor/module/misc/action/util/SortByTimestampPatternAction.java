@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -28,18 +29,21 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     /**
      * The input containing the timestamp to sort by.
      */
+    @NotBlank
     @IgorParam
     private String input;
 
     /**
      * The pattern to use to extract the date from the target value.
      */
+    @NotBlank
     @IgorParam
     private String pattern;
 
     /**
      * The timestamp format.
      */
+    @NotBlank
     @IgorParam
     private String timestampFormat = TIME_FORMAT;
 

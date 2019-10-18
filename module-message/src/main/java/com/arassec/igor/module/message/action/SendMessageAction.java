@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -31,12 +32,14 @@ public class SendMessageAction extends BaseMessageAction {
     /**
      * The service to use for message sending.
      */
+    @NotBlank
     @IgorParam
     private MessageService messageService;
 
     /**
      * The message template to use.
      */
+    @NotBlank
     @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
     private String messageTemplate;
 

@@ -1,7 +1,6 @@
 package com.arassec.igor.web;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.service.Service;
@@ -15,27 +14,15 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.HierarchicalMessageSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
-import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -44,8 +31,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
-import java.util.ResourceBundle;
 
 /**
  * Configures the web layer of igor.

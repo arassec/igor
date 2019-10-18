@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 /**
@@ -23,6 +24,7 @@ public class FixedInputProvider extends BaseUtilProvider {
     /**
      * The service to use for file listing.
      */
+    @NotBlank
     @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
     private String input;
 

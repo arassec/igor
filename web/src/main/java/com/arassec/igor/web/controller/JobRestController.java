@@ -18,6 +18,7 @@ import com.arassec.igor.web.simulation.ActionProxy;
 import com.arassec.igor.web.simulation.ProviderProxy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.support.CronSequenceGenerator;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/job")
 @RequiredArgsConstructor
+@Slf4j
 public class JobRestController {
 
     /**
@@ -157,36 +159,24 @@ public class JobRestController {
             jobResult.setErrorCause(jobExecution.getErrorCause());
         }
 
-        job.getTasks().stream().forEach(task -> {
+        job.getTasks().forEach(task -> {
             ProviderProxy providerProxy = (ProviderProxy) task.getProvider();
 
             SimulationTaskResult taskResult = new SimulationTaskResult();
             taskResult.setErrorCause(providerProxy.getErrorCause());
-            providerProxy.getCollectedData().stream()
+            providerProxy.getCollectedData()
                     .forEach(jsonObject -> {
-                        try {
-                            Map<String, Object> item = new HashMap<>();
-                            HashMap data = simulationObjectMapper.readValue(jsonObject.toString(), HashMap.class);
-                            item.put(Task.DATA_KEY, data);
-                            item.put(Task.META_KEY, Task.createMetaData(job.getId(), task.getId()));
-                            taskResult.getResults().add(item);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        Map<String, Object> item = new HashMap<>();
+                        item.put(Task.DATA_KEY, jsonObject);
+                        item.put(Task.META_KEY, Task.createMetaData(job.getId(), task.getId()));
+                        taskResult.getResults().add(item);
                     });
 
-            task.getActions().stream().forEach(action -> {
+            task.getActions().forEach(action -> {
                 ActionProxy actionProxy = (ActionProxy) action;
                 SimulationActionResult actionResult = new SimulationActionResult();
                 actionResult.setErrorCause(actionProxy.getErrorCause());
-                actionProxy.getCollectedData().stream().forEach(jsonObject -> {
-                    try {
-                        actionResult.getResults().add(
-                                simulationObjectMapper.readValue(jsonObject.toString(), HashMap.class));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                actionProxy.getCollectedData().forEach(jsonObject -> actionResult.getResults().add(jsonObject));
                 taskResult.getActionResults().add(actionResult);
             });
 
@@ -222,7 +212,7 @@ public class JobRestController {
         if (deleteExclusiveServices) {
             List<Pair<Long, String>> exclusiveServices = getExclusiveServices(id);
             if (exclusiveServices != null && !exclusiveServices.isEmpty()) {
-                exclusiveServices.stream().forEach(exclusiveService -> serviceManager.deleteService(exclusiveService.getKey()));
+                exclusiveServices.forEach(exclusiveService -> serviceManager.deleteService(exclusiveService.getKey()));
             }
         }
         jobManager.delete(id);
@@ -248,8 +238,6 @@ public class JobRestController {
      * Runs the job with the given ID.
      *
      * @param id The job's ID.
-     *
-     * @return 'OK' on success.
      */
     @PostMapping("run/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -297,7 +285,7 @@ public class JobRestController {
 
         Set<Pair<Long, String>> referencedServices = jobManager.getReferencedServices(id);
         if (referencedServices != null && !referencedServices.isEmpty()) {
-            referencedServices.stream().forEach(referencedService -> {
+            referencedServices.forEach(referencedService -> {
                 ModelPage<Pair<Long, String>> referencingJobs = serviceManager
                         .getReferencingJobs(referencedService.getKey(), 0, Integer.MAX_VALUE);
                 if (referencingJobs != null && referencingJobs.getItems().size() == 1 && referencingJobs.getItems().iterator()
@@ -305,7 +293,7 @@ public class JobRestController {
                     result.add(referencedService);
                 }
             });
-            Collections.sort(result, Comparator.comparing(Pair::getValue));
+            result.sort(Comparator.comparing(Pair::getValue));
         }
 
         return result;

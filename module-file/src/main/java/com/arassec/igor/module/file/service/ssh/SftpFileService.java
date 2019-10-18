@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -32,24 +34,28 @@ public class SftpFileService extends BaseSshFileService {
     /**
      * The host of the remote server.
      */
+    @NotBlank
     @IgorParam
     private String host;
 
     /**
      * The port of the remote server.
      */
+    @Positive
     @IgorParam
     private int port = 22;
 
     /**
      * The username to login with.
      */
+    @NotBlank
     @IgorParam
     private String username;
 
     /**
      * The password used for authentication.
      */
+    @NotBlank
     @IgorParam(secured = true)
     private String password;
 

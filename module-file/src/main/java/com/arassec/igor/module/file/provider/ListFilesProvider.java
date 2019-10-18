@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,12 +41,14 @@ public class ListFilesProvider extends BaseFileProvider {
     /**
      * The service to use for file listing.
      */
+    @NotNull
     @IgorParam
     private FileService service;
 
     /**
      * Defines the directory to list files in.
      */
+    @NotBlank
     @IgorParam
     private String directory;
 

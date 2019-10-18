@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 
@@ -21,14 +22,15 @@ public class PersistValueAction extends BasePersistenceAction {
     /**
      * The input to persist.
      */
+    @NotBlank
     @IgorParam
     private String input;
 
     /**
-     * The number of values to keep in the persistence store.
+     * The number of values to keep in the persistence store. The cleanup is only triggered if a value greater zero is configured.
      */
     @IgorParam
-    private int numValuesToKeep;
+    private int numValuesToKeep = 0;
 
     /**
      * Takes the value from the supplied data and saves it to the persistence store.

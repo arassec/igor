@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,12 +40,14 @@ public class FtpFileService extends BaseFileService {
     /**
      * The host of the FTP server.
      */
+    @NotBlank
     @IgorParam
     private String host;
 
     /**
      * The port of the FTP server.
      */
+    @Positive
     @IgorParam
     private int port = 21;
 

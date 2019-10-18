@@ -58,7 +58,7 @@ public abstract class BaseFileService extends BaseService implements FileService
                 }
                 out.write(buf, 0, foo);
                 fileSize -= foo;
-                if (fileSize == 0L) {
+                if (fileSize <= 0L) {
                     break;
                 }
                 out.flush();

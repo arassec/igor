@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
     /**
      * The input (query) to persist.
      */
+    @NotBlank
     @IgorParam
     private String input;
 

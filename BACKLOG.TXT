@@ -1,8 +1,7 @@
-- Filter input on client + server side (e.g. job name length!)
-  -> bean-validation annotations!
 - Unit-Tests (Apache Mina SSHD!)
-- Export + Import of jobs and services (via JSON)
+- Export + Import of jobs (persisted values!) and services (via JSON)
 - Add Job property 'self-heal' to auto-resolve failed job runs after successful job execution.
+- Support PostgreSQL
 - JSON test result highlighting with highlight.js
 - Persistence-service editor
 - Add Skip- and Limit-Actions

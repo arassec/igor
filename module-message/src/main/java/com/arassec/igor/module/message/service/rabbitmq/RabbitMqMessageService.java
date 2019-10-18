@@ -13,6 +13,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+
 /**
  * Message service to process messages via RabbitMQ.
  */
@@ -24,30 +27,35 @@ public class RabbitMqMessageService extends BaseMessageService {
     /**
      * The RabbitMQ host.
      */
+    @NotBlank
     @IgorParam
     private String host;
 
     /**
      * The RabbitMQ port.
      */
+    @Positive
     @IgorParam
     private int port = 5672;
 
     /**
      * The RabbitMQ username.
      */
+    @NotBlank
     @IgorParam
     private String username;
 
     /**
      * The RabbitMQ password.
      */
+    @NotBlank
     @IgorParam(secured = true)
     private String password;
 
     /**
      * The exchange messages are sent to.
      */
+    @NotBlank
     @IgorParam
     private String exchange;
 

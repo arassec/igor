@@ -6,6 +6,7 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 
+import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,7 @@ public abstract class BaseAction implements Action {
     /**
      * Defines the number of threads the action should be processed with.
      */
+    @Min(1)
     @IgorParam
     protected int numThreads = 1;
 

@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -24,6 +26,7 @@ public class FilterByTimestamp extends BaseUtilAction {
     /**
      * The input to use as Timestamp.
      */
+    @NotBlank
     @IgorParam
     private String input;
 
@@ -37,18 +40,21 @@ public class FilterByTimestamp extends BaseUtilAction {
     /**
      * The amount of time (configured by {@link #timeUnit}) to use for filtering.
      */
+    @PositiveOrZero
     @IgorParam
     private long amount;
 
     /**
      * The time unit to use for filtering.
      */
+    @NotBlank
     @IgorParam
     private String timeUnit = ChronoUnit.DAYS.name();
 
     /**
      * The format of the timestamp.
      */
+    @NotBlank
     @IgorParam
     private String timestampFormat = TIME_FORMAT;
 

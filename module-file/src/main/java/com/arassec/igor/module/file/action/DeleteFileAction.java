@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
@@ -23,18 +25,21 @@ public class DeleteFileAction extends BaseFileAction {
     /**
      * The service providing the file to delete.
      */
+    @NotNull
     @IgorParam
     private FileService service;
 
     /**
      * The directory the file is in.
      */
+    @NotBlank
     @IgorParam
     private String directory;
 
     /**
      * The name of the file.
      */
+    @NotBlank
     @IgorParam
     private String filename;
 

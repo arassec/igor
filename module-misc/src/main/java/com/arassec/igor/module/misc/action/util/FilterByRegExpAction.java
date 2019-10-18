@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 
@@ -20,12 +21,14 @@ public class FilterByRegExpAction extends BaseUtilAction {
     /**
      * The input to test against the regular expression.
      */
+    @NotBlank
     @IgorParam
     private String input;
 
     /**
      * The Regular expression to filter the input with.
      */
+    @NotBlank
     @IgorParam
     private String expression;
 

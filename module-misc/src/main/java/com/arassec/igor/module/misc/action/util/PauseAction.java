@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ public class PauseAction extends BaseUtilAction {
     /**
      * Amount of milliseconds the action should pause data processing.
      */
+    @PositiveOrZero
     @IgorParam
     private long milliseconds;
 

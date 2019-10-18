@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 
@@ -23,38 +24,37 @@ public class MoveFileAction extends BaseFileAction {
     /**
      * Service where the file can be found.
      */
+    @NotBlank
     @IgorParam
     private FileService service;
 
     /**
      * Source file to copy.
      */
+    @NotBlank
     @IgorParam
     private String sourceFilename;
 
     /**
      * Source directory to copy the file from.
      */
+    @NotBlank
     @IgorParam
     private String sourceDirectory;
 
     /**
      * The target file name.
      */
+    @NotBlank
     @IgorParam
     private String targetFilename;
 
     /**
      * The target directory to copy/move the file to.
      */
+    @NotBlank
     @IgorParam
     private String targetDirectory;
-
-    /**
-     * The source directory to use.
-     */
-    @IgorParam
-    private String directoryKey = "directory";
 
     /**
      * {@inheritDoc}

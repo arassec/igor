@@ -98,7 +98,7 @@ public class ExecutionRestController {
                 }
             });
         }
-        return executions.stream().map(jobExecution -> jobExecution.getJobId()).collect(Collectors.toList());
+        return executions.stream().map(JobExecution::getJobId).collect(Collectors.toList());
     }
 
     /**
