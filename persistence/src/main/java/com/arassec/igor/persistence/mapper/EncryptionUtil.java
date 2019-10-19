@@ -36,7 +36,7 @@ public class EncryptionUtil implements InitializingBean {
      * @param value The value to encrypt.
      * @return The encrypted value.
      */
-    public String encrypt(String value) {
+    String encrypt(String value) {
         return textEncryptor.encrypt(value);
     }
 
@@ -46,7 +46,7 @@ public class EncryptionUtil implements InitializingBean {
      * @param value The value to decrypt.
      * @return The decrypted value.
      */
-    public String decrypt(String value) {
+    String decrypt(String value) {
         return textEncryptor.decrypt(value);
     }
 

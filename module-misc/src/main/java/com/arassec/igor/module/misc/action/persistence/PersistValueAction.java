@@ -3,6 +3,7 @@ package com.arassec.igor.module.misc.action.persistence;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @Scope("prototype")
+@Data
 public class PersistValueAction extends BasePersistenceAction {
 
     /**

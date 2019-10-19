@@ -26,7 +26,7 @@ class ReadFileActionTest extends BaseFileActionTest {
      */
     @Test
     @DisplayName("Tests the action with JSON-Path parameters.")
-    public void testProcess() {
+    void testProcess() {
         FileService fileServiceMock = mock(FileService.class);
         when(fileServiceMock.read(eq("/directory/test/filename.txt"), any(WorkInProgressMonitor.class))).thenReturn("igor-junit-test");
 

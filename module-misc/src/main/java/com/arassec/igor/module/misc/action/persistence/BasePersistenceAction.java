@@ -10,6 +10,11 @@ import com.arassec.igor.core.util.ApplicationContextProvider;
 public abstract class BasePersistenceAction extends BaseAction {
 
     /**
+     * The persistence category.
+     */
+    public static final String CATEGORY_ID = "69b6ab78-9ab4-4282-91bd-8a78bff1aa7b";
+
+    /**
      * The repository for access to the persistent values in igor's database. This is a spring-bean and will be
      * retrieved using the {@link ApplicationContextProvider}.
      */
@@ -29,7 +34,7 @@ public abstract class BasePersistenceAction extends BaseAction {
      */
     @Override
     public String getCategoryId() {
-        return "69b6ab78-9ab4-4282-91bd-8a78bff1aa7b";
+        return CATEGORY_ID;
     }
 
 }
