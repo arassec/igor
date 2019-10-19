@@ -10,15 +10,14 @@ import java.time.Instant;
  */
 @Data
 @Entity
-@Table(name = "persistent_value", schema = "igor")
-@SequenceGenerator(name = "persistentValueIdSequence", sequenceName = "PERSISTENT_VALUE_ID_SEQUENCE", allocationSize=1)
+@Table(name = "persistent_value")
 public class PersistentValueEntity {
 
     /**
      * The service's ID.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "persistentValueIdSequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

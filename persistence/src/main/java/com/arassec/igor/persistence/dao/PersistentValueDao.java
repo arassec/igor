@@ -32,7 +32,7 @@ public interface PersistentValueDao extends PagingAndSortingRepository<Persisten
      * @param limit  The limit.
      * @return List of IDs.
      */
-    @Query(value = "SELECT id FROM igor.persistent_value WHERE job_id = :jobId AND task_id = :taskId ORDER BY id DESC LIMIT :limit",
+    @Query(value = "SELECT id FROM persistent_value WHERE job_id = :jobId AND task_id = :taskId ORDER BY id DESC LIMIT :limit",
             nativeQuery = true)
     List<Integer> findMostRecentIds(@Param("jobId") Long jobId, @Param("taskId") String taskId, @Param("limit") int limit);
 

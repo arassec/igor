@@ -37,7 +37,7 @@ public interface JobDao extends PagingAndSortingRepository<JobEntity, Long> {
      * @param id The job's ID.
      * @return The job's name.
      */
-    @Query(value = "SELECT name FROM igor.job WHERE id = :id", nativeQuery = true)
+    @Query(value = "SELECT name FROM job WHERE id = :id", nativeQuery = true)
     String findNameById(@Param("id") Long id);
 
 }

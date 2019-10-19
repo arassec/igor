@@ -9,15 +9,14 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@Table(name = "job", schema = "igor")
-@SequenceGenerator(name = "jobIdSequence", sequenceName = "JOB_ID_SEQUENCE", allocationSize=1)
+@Table(name = "job")
 public class JobEntity {
 
     /**
      * The job's ID.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "jobIdSequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

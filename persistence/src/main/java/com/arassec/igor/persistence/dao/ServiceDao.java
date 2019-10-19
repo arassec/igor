@@ -37,7 +37,7 @@ public interface ServiceDao extends PagingAndSortingRepository<ServiceEntity, Lo
      * @param id The service's ID.
      * @return The service's name.
      */
-    @Query(value = "SELECT name FROM igor.service WHERE id = :id", nativeQuery = true)
+    @Query(value = "SELECT name FROM service WHERE id = :id", nativeQuery = true)
     String findNameById(@Param("id") Long id);
 
 }

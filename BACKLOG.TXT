@@ -1,7 +1,7 @@
+- optional Encryption-Key from command line or properties file
 - Unit-Tests (Apache Mina SSHD!)
 - Export + Import of jobs (persisted values!) and services (via JSON)
 - Add Job property 'self-heal' to auto-resolve failed job runs after successful job execution.
-- Support PostgreSQL
 - JSON test result highlighting with highlight.js
 - Persistence-service editor
 - Add Skip- and Limit-Actions
@@ -9,9 +9,6 @@
   will be replaced by the actual json value
 - SSH access with key
 - CIFS-/Samba supporting FileService
-- Configuration-View with system configuration
-  - Initial setup with configuration on first start
-  - Encryption-Cipher in database, randomly generated at first start
 - Optional authentication + authorization (Frontend + Backend)
 - Directory-Browser for file services in the GUI
 - Healthchecks + Spring-Boot-Admin support via actuators

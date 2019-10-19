@@ -11,7 +11,7 @@ import javax.persistence.Table;
  */
 @Data
 @Entity
-@Table(name = "job_service_reference", schema = "igor")
+@Table(name = "job_service_reference")
 public class JobServiceReferenceEntity {
 
     /**

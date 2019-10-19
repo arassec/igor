@@ -30,3 +30,4 @@ dbdata/
 appdata/
 frontend/package-lock.json
 web/src/main/resources/static
+application.properties
