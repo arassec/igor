@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.service.Service;
+import com.arassec.igor.persistence.security.SecurityProvider;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -19,18 +20,18 @@ import java.lang.reflect.Field;
 public class IgorComponentPersistenceSerializer extends StdSerializer<IgorComponent> implements PersistenceMapperKeyAware {
 
     /**
-     * The encryption util to encrypt secured parameter values.
+     * The security provider to encrypt secured parameter values.
      */
-    private final EncryptionUtil encryptionUtil;
+    private final SecurityProvider securityProvider;
 
     /**
      * Creates a new serializer instance.
      *
-     * @param encryptionUtil The encryption util to handle secured parameter values.
+     * @param securityProvider The security provider to handle secured parameter values.
      */
-    public IgorComponentPersistenceSerializer(EncryptionUtil encryptionUtil) {
+    public IgorComponentPersistenceSerializer(SecurityProvider securityProvider) {
         super(IgorComponent.class);
-        this.encryptionUtil = encryptionUtil;
+        this.securityProvider = securityProvider;
     }
 
     /**
@@ -106,7 +107,8 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
                 Object result;
                 field.setAccessible(true);
                 if (isSecured(field)) {
-                    result = encryptionUtil.encrypt((String) field.get(instance));
+                    // TODO: Use instance.getId() as soon as it's implemented...
+                    result = securityProvider.encrypt(null, field.getName(), (String) field.get(instance));
                 } else {
                     result = field.get(instance);
                 }

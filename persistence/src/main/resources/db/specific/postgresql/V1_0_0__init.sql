@@ -2,14 +2,14 @@ CREATE TABLE job (
     id SERIAL PRIMARY KEY,
     version INTEGER,
     name VARCHAR(256) NOT NULL UNIQUE,
-    content JSONB
+    content TEXT
 );
 
 CREATE TABLE service (
     id SERIAL PRIMARY KEY,
     version INTEGER,
     name VARCHAR(256) NOT NULL UNIQUE,
-    content JSONB
+    content TEXT
 );
 
 CREATE TABLE job_execution (
@@ -17,7 +17,7 @@ CREATE TABLE job_execution (
     version INTEGER,
     job_id INTEGER NOT NULL,
     state VARCHAR(64) NOT NULL,
-    content JSONB
+    content TEXT
 );
 
 CREATE TABLE persistent_value (

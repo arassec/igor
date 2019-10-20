@@ -7,9 +7,9 @@ import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.repository.ServiceRepository;
-import com.arassec.igor.persistence.mapper.EncryptionUtil;
 import com.arassec.igor.persistence.mapper.IgorComponentPersistenceDeserializer;
 import com.arassec.igor.persistence.mapper.IgorComponentPersistenceSerializer;
+import com.arassec.igor.persistence.security.SecurityProvider;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -36,27 +36,27 @@ public class PersistenceConfiguration {
      *
      * @param igorComponentRegistry The igor component registry.
      * @param serviceRepository     The repository for services.
-     * @param encryptionUtil        The encryption util for en- and decrypting secured parameter values.
+     * @param securityProvider      The security provider for en- and decrypting secured parameter values.
      *
      * @return A newly created {@link ObjectMapper} instance.
      */
     @Bean(name = "persistenceJobMapper")
     public ObjectMapper persistenceJobMapper(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository,
-                                             EncryptionUtil encryptionUtil) {
+                                             SecurityProvider securityProvider) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         SimpleModule mapperModule = new SimpleModule();
 
-        mapperModule.addSerializer(new IgorComponentPersistenceSerializer(encryptionUtil));
+        mapperModule.addSerializer(new IgorComponentPersistenceSerializer(securityProvider));
         mapperModule.addDeserializer(Service.class, new IgorComponentPersistenceDeserializer<>(Service.class,
-                igorComponentRegistry, serviceRepository, encryptionUtil));
+                igorComponentRegistry, serviceRepository, securityProvider));
         mapperModule.addDeserializer(Action.class, new IgorComponentPersistenceDeserializer<>(Action.class,
-                igorComponentRegistry, serviceRepository, encryptionUtil));
+                igorComponentRegistry, serviceRepository, securityProvider));
         mapperModule.addDeserializer(Trigger.class, new IgorComponentPersistenceDeserializer<>(Trigger.class,
-                igorComponentRegistry, serviceRepository, encryptionUtil));
+                igorComponentRegistry, serviceRepository, securityProvider));
         mapperModule.addDeserializer(Provider.class, new IgorComponentPersistenceDeserializer<>(Provider.class,
-                igorComponentRegistry, serviceRepository, encryptionUtil));
+                igorComponentRegistry, serviceRepository, securityProvider));
 
         mapperModule.addSerializer(Instant.class, new StdSerializer<>(Instant.class) {
             @Override
@@ -81,20 +81,20 @@ public class PersistenceConfiguration {
      * dependencies with the {@link ServiceRepository}, which is normally needed for parameter processing.
      *
      * @param igorComponentRegistry The igor component registry.
-     * @param encryptionUtil        The encryption util for en- and decrypting secured parameter values.
+     * @param securityProvider      The security provider for en- and decrypting secured parameter values.
      *
      * @return A newly created {@link ObjectMapper} instance.
      */
     @Bean(name = "persistenceServiceMapper")
-    public ObjectMapper persistenceServiceMapper(IgorComponentRegistry igorComponentRegistry, EncryptionUtil encryptionUtil) {
+    public ObjectMapper persistenceServiceMapper(IgorComponentRegistry igorComponentRegistry, SecurityProvider securityProvider) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         SimpleModule mapperModule = new SimpleModule();
 
-        mapperModule.addSerializer(new IgorComponentPersistenceSerializer(encryptionUtil));
+        mapperModule.addSerializer(new IgorComponentPersistenceSerializer(securityProvider));
         mapperModule.addDeserializer(Service.class, new IgorComponentPersistenceDeserializer<>(Service.class,
-                igorComponentRegistry, null, encryptionUtil));
+                igorComponentRegistry, null, securityProvider));
 
         objectMapper.registerModule(mapperModule);
 

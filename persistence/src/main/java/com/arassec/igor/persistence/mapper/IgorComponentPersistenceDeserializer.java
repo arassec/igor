@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.core.util.ApplicationContextProvider;
+import com.arassec.igor.persistence.security.SecurityProvider;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -30,9 +31,9 @@ public class IgorComponentPersistenceDeserializer<T extends IgorComponent> exten
     private IgorComponentRegistry igorComponentRegistry;
 
     /**
-     * Encryption util for secured parameters that should be decrypted during deserialization.
+     * Security provider for secured parameters that should be decrypted during deserialization.
      */
-    private EncryptionUtil encryptionUtil;
+    private SecurityProvider securityProvider;
 
     /**
      * The {@link ServiceRepository} to load services as parameter values. Can be {@code null} if no services should be loaded.
@@ -45,14 +46,14 @@ public class IgorComponentPersistenceDeserializer<T extends IgorComponent> exten
      * @param clazz                 The class parameter.
      * @param igorComponentRegistry The component registry.
      * @param serviceRepository     The repository for services. Can be {@code null} to ignore services as parameter values.
-     * @param encryptionUtil        The encryption utility to decrypt secured parameter values.
+     * @param securityProvider      The security provider to decrypt secured parameter values.
      */
     public IgorComponentPersistenceDeserializer(Class<T> clazz, IgorComponentRegistry igorComponentRegistry,
-                                                ServiceRepository serviceRepository, EncryptionUtil encryptionUtil) {
+                                                ServiceRepository serviceRepository, SecurityProvider securityProvider) {
         super(clazz);
         this.igorComponentRegistry = igorComponentRegistry;
         this.serviceRepository = serviceRepository;
-        this.encryptionUtil = encryptionUtil;
+        this.securityProvider = securityProvider;
     }
 
     /**
@@ -90,7 +91,9 @@ public class IgorComponentPersistenceDeserializer<T extends IgorComponent> exten
                     if (parameter.containsKey(SERVICE) && (boolean) parameter.get(SERVICE) && serviceRepository != null) {
                         field.set(instance, serviceRepository.findById((Long.valueOf((Integer) parameter.get(VALUE)))));
                     } else if (parameter.containsKey(SECURED) && (boolean) parameter.get(SECURED)) {
-                        field.set(instance, encryptionUtil.decrypt(String.valueOf(parameter.get(VALUE))));
+                        // TODO: Use instance.getId() as soon as it's implemented...
+                        field.set(instance, securityProvider.decrypt(null, field.getName(),
+                                String.valueOf(parameter.get(VALUE))));
                     } else {
                         field.set(instance, parameter.get(VALUE));
                     }
