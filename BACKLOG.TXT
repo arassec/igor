@@ -15,5 +15,4 @@
 - Healthchecks + Spring-Boot-Admin support via actuators
 - Integrate Search with lucene
 - Different, configurable color-schemes for different environments
-- Add dependabot
 - Help-System with descriptions of Actions, Services, ...
