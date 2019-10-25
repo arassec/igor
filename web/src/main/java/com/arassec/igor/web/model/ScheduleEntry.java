@@ -17,7 +17,7 @@ public class ScheduleEntry {
     /**
      * The job's ID.
      */
-    private Long jobId;
+    private String jobId;
 
     /**
      * The job's name.

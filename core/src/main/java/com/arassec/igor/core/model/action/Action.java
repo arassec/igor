@@ -12,11 +12,6 @@ import java.util.Map;
 public interface Action extends IgorComponent {
 
     /**
-     * Initializes the action before data processing.
-     */
-    void initialize();
-
-    /**
      * Executes the action.
      *
      * @param data         The data the action will work with.
@@ -32,14 +27,6 @@ public interface Action extends IgorComponent {
      * @return List of final data that should be processed by later actions.
      */
     List<Map<String, Object>> complete();
-
-    /**
-     * Shuts the action down after all data has been processed. This method is called at the end of the job execution.
-     *
-     * @param jobId  The job's ID.
-     * @param taskId The task's ID.
-     */
-    void shutdown(Long jobId, String taskId);
 
     /**
      * Returns the number of threads this action should be executed with.

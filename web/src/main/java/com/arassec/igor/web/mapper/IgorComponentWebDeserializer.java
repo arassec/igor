@@ -77,6 +77,10 @@ public class IgorComponentWebDeserializer<T extends IgorComponent> extends StdDe
         IgorComponent igorComponent = classOptional.get();
         T instance = (T) ApplicationContextProvider.getIgorComponent(igorComponent.getClass(), typeId);
 
+        if (map.containsKey(ID)) {
+            instance.setId(String.valueOf(map.get(ID)));
+        }
+
         setComponentSpecifica(instance, map);
 
         List<Map<String, Object>> parameters = (List<Map<String, Object>>) map.get(PARAMETERS);
@@ -92,7 +96,7 @@ public class IgorComponentWebDeserializer<T extends IgorComponent> extends StdDe
                     }
                     if (parameter.containsKey(SERVICE) && (boolean) parameter.get(SERVICE) && serviceRepository != null) {
                         if (simulationMode) {
-                            Long serviceId = Long.valueOf((Integer) parameter.get(VALUE));
+                            String serviceId = String.valueOf(parameter.get(VALUE));
                             Service service = serviceRepository.findById(serviceId);
                             if (service == null) {
                                 throw new IllegalArgumentException("No service with ID " + serviceId + " found!");
@@ -101,7 +105,7 @@ public class IgorComponentWebDeserializer<T extends IgorComponent> extends StdDe
                             field.set(instance, Proxy.newProxyInstance(IgorComponentWebDeserializer.class.getClassLoader(),
                                     new Class[]{field.getType()}, serviceProxy));
                         } else {
-                            field.set(instance, serviceRepository.findById((Long.valueOf((Integer) parameter.get(VALUE)))));
+                            field.set(instance, serviceRepository.findById(String.valueOf(parameter.get(VALUE))));
                         }
                     } else {
                         Object value = parameter.get(VALUE);
@@ -149,7 +153,7 @@ public class IgorComponentWebDeserializer<T extends IgorComponent> extends StdDe
     private void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
         if (instance instanceof Service) {
             if (map.containsKey(ID)) {
-                ((Service) instance).setId(Long.valueOf(String.valueOf(map.get(ID))));
+                instance.setId(String.valueOf(map.get(ID)));
             }
             ((Service) instance).setName(String.valueOf(map.get(NAME)));
         } else if (instance instanceof Action) {

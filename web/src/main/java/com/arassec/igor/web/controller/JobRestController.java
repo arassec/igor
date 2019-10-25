@@ -88,7 +88,7 @@ public class JobRestController {
      * @return The job in JSON form.
      */
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Job getJob(@PathVariable("id") Long id) {
+    public Job getJob(@PathVariable("id") String id) {
         if (StringUtils.isEmpty(id)) {
             throw new IllegalArgumentException("ID required");
         }
@@ -195,7 +195,7 @@ public class JobRestController {
      * @return {@code true} if a job with the provided name already exists, {@code false} otherwise.
      */
     @GetMapping("check/{name}/{id}")
-    public Boolean checkJobName(@PathVariable("name") String encodedName, @PathVariable("id") Long id) {
+    public Boolean checkJobName(@PathVariable("name") String encodedName, @PathVariable("id") String id) {
         String name = new String(Base64.getDecoder().decode(encodedName));
         Job existingJob = jobManager.loadByName(name);
         return existingJob != null && !(existingJob.getId().equals(id));
@@ -204,13 +204,14 @@ public class JobRestController {
     /**
      * Deletes the job with the given ID.
      *
-     * @param id The job's ID.
+     * @param id                      The job's ID.
+     * @param deleteExclusiveServices Set to {@code true} to delete services only used by this job.
      */
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJob(@PathVariable("id") Long id, @RequestParam Boolean deleteExclusiveServices) {
+    public void deleteJob(@PathVariable("id") String id, @RequestParam Boolean deleteExclusiveServices) {
         if (deleteExclusiveServices) {
-            List<Pair<Long, String>> exclusiveServices = getExclusiveServices(id);
+            List<Pair<String, String>> exclusiveServices = getExclusiveServices(id);
             if (exclusiveServices != null && !exclusiveServices.isEmpty()) {
                 exclusiveServices.forEach(exclusiveService -> serviceManager.deleteService(exclusiveService.getKey()));
             }
@@ -241,7 +242,7 @@ public class JobRestController {
      */
     @PostMapping("run/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void runJobFromId(@PathVariable("id") Long id) {
+    public void runJobFromId(@PathVariable("id") String id) {
         Job job = jobManager.load(id);
         if (job != null) {
             if (job.isActive()) {
@@ -280,13 +281,13 @@ public class JobRestController {
      * @return The services.
      */
     @GetMapping(value = "{id}/exclusive-service-references", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Pair<Long, String>> getExclusiveServices(@PathVariable("id") Long id) {
-        List<Pair<Long, String>> result = new LinkedList<>();
+    public List<Pair<String, String>> getExclusiveServices(@PathVariable("id") String id) {
+        List<Pair<String, String>> result = new LinkedList<>();
 
-        Set<Pair<Long, String>> referencedServices = jobManager.getReferencedServices(id);
+        Set<Pair<String, String>> referencedServices = jobManager.getReferencedServices(id);
         if (referencedServices != null && !referencedServices.isEmpty()) {
             referencedServices.forEach(referencedService -> {
-                ModelPage<Pair<Long, String>> referencingJobs = serviceManager
+                ModelPage<Pair<String, String>> referencingJobs = serviceManager
                         .getReferencingJobs(referencedService.getKey(), 0, Integer.MAX_VALUE);
                 if (referencingJobs != null && referencingJobs.getItems().size() == 1 && referencingJobs.getItems().iterator()
                         .next().getKey().equals(id)) {

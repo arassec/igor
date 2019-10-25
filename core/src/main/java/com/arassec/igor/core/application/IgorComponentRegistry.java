@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -41,12 +43,14 @@ public class IgorComponentRegistry implements InitializingBean {
     private final List<Service> services;
 
     /**
-     * Contains the categories of a certain component type (e.g. Action or Service etc.).
+     * Contains the categories of a certain component type (e.g. Action.class -> Action-Categories or Service.class ->
+     * Service-Categories etc.).
      */
     private Map<Class, Set<String>> categoriesByComponentType = new HashMap<>();
 
     /**
-     * Contains all available component types in a certain category.
+     * Contains all available component types in a certain category (e.g. Category 'File-Actions'-ID -> 'List-Files'-ID,
+     * 'Copy-File'-ID etc.).
      */
     private Map<String, Set<String>> typesByCategoryKey = new HashMap<>();
 
@@ -54,6 +58,11 @@ public class IgorComponentRegistry implements InitializingBean {
      * Contains the prototype of a specific igor component, indexed by its type.
      */
     private Map<String, IgorComponent> typeToComponentPrototype = new HashMap<>();
+
+    /**
+     * Contains a service interface and its category.
+     */
+    private Map<Class, String> serviceInterfaceToCategory = new HashMap<>();
 
     /**
      * Initializes the component registry.
@@ -95,6 +104,20 @@ public class IgorComponentRegistry implements InitializingBean {
     }
 
     /**
+     * Returns the category ID of services implementing the given service interface.
+     *
+     * @param serviceInterface The interface of the services to get the category of.
+     *
+     * @return The category.
+     */
+    public String getCagetoryOfServiceInterface(Class serviceInterface) {
+        if (serviceInterfaceToCategory.containsKey(serviceInterface)) {
+            return serviceInterfaceToCategory.get(serviceInterface);
+        }
+        throw new IllegalArgumentException("Unknown service interface: " + serviceInterface);
+    }
+
+    /**
      * Returns the class of the component with the provided type ID.
      *
      * @param typeId The component's type ID.
@@ -117,6 +140,19 @@ public class IgorComponentRegistry implements InitializingBean {
         categoriesByComponentType.put(componentType, new HashSet<>());
 
         for (IgorComponent component : components) {
+
+            if (component instanceof Service) {
+                Class<?>[] interfaces = ClassUtils.getAllInterfaces(component);
+                if (interfaces != null && interfaces.length > 0) {
+                    for (int i = 0; i < interfaces.length; i++) {
+                        // Skip IgorComponent and Service
+                        if (!interfaces[i].equals(IgorComponent.class) && !interfaces[i].equals(Service.class)) {
+                            serviceInterfaceToCategory.put(interfaces[i], component.getCategoryId());
+                        }
+                    }
+                }
+            }
+
             categoriesByComponentType.get(componentType).add(component.getCategoryId());
 
             if (!typesByCategoryKey.containsKey(component.getCategoryId())) {

@@ -29,7 +29,7 @@ public class JobExecutionEntity {
      * The job's ID.
      */
     @Column(name = "job_id")
-    private Long jobId;
+    private String jobId;
 
     /**
      * The job-execution's state.

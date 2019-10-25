@@ -23,6 +23,7 @@ public class JobServiceReferenceEntity {
     /**
      * Creates a new {@link JobServiceReferenceEntity}.
      */
+    @SuppressWarnings("unused")
     public JobServiceReferenceEntity() {
     }
 
@@ -32,7 +33,7 @@ public class JobServiceReferenceEntity {
      * @param jobId     The job's ID.
      * @param serviceId The service's ID.
      */
-    public JobServiceReferenceEntity(Long jobId, Long serviceId) {
+    public JobServiceReferenceEntity(String jobId, String serviceId) {
         this.jobServiceReferenceIdentity = new JobServiceReferenceIdentity(jobId, serviceId);
     }
 

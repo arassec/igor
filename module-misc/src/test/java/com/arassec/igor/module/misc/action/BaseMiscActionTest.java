@@ -30,7 +30,7 @@ public abstract class BaseMiscActionTest {
         item.put(PARAM_KEY, PARAM_VALUE);
 
         Map<String, Object> result = new HashMap<>();
-        result.put(Task.META_KEY, Task.createMetaData(1L, "1"));
+        result.put(Task.META_KEY, Task.createMetaData("1", "1"));
         result.put(Task.DATA_KEY, item);
 
         return result;

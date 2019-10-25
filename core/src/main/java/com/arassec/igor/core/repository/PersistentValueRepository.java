@@ -15,7 +15,7 @@ public interface PersistentValueRepository {
      * @param value  The value to save.
      * @return The persisted value.
      */
-    PersistentValue upsert(Long jobId, String taskId, PersistentValue value);
+    PersistentValue upsert(String jobId, String taskId, PersistentValue value);
 
     /**
      * Returns whether a value is already persisted or not.
@@ -25,7 +25,7 @@ public interface PersistentValueRepository {
      * @param value  The value to check.
      * @return {@code true} if the value is persisted, {@code false} otherwise.
      */
-    boolean isPersisted(Long jobId, String taskId, PersistentValue value);
+    boolean isPersisted(String jobId, String taskId, PersistentValue value);
 
     /**
      * Deletes old, persisted values.
@@ -34,13 +34,13 @@ public interface PersistentValueRepository {
      * @param taskId           The task's ID.
      * @param numEntriesToKeep Number of entries to keep.
      */
-    void cleanup(Long jobId, String taskId, int numEntriesToKeep);
+    void cleanup(String jobId, String taskId, int numEntriesToKeep);
 
     /**
      * Deletes all values of the given job.
      *
      * @param jobId The job's ID.
      */
-    void deleteByJobId(Long jobId);
+    void deleteByJobId(String jobId);
 
 }

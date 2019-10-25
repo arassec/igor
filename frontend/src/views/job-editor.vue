@@ -269,6 +269,7 @@
                 this.jobConfiguration = {
                     name: 'New Job',
                     trigger: {
+                        id: null,
                         category: null,
                         type: null,
                         parameters: []
@@ -343,11 +344,13 @@
             },
             addTask: function () {
                 let task = {
+                    id: null,
                     name: 'New Task',
                     description: '',
                     active: true,
                     simulationLimit: 25,
                     provider: {
+                        id: null,
                         category: this.initialProviderCategory,
                         type: this.initialProviderType,
                         parameters: []
@@ -377,6 +380,7 @@
             },
             addAction: function (taskIndex) {
                 let action = {
+                    id: null,
                     active: true,
                     category: this.initialActionCategory,
                     type: this.initialActionType,

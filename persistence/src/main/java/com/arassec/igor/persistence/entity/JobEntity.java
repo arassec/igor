@@ -16,8 +16,7 @@ public class JobEntity {
      * The job's ID.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     /**
      * JPA version.

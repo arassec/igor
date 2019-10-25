@@ -1,5 +1,6 @@
 package com.arassec.igor.web.mapper;
 
+import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.Action;
@@ -30,13 +31,19 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> imp
     private final MessageSource messageSource;
 
     /**
+     * The igor component registry.
+     */
+    private final IgorComponentRegistry igorComponentRegistry;
+
+    /**
      * Creates a new serializer instance.
      *
      * @param messageSource         The message source for I18N.
      */
-    public IgorComponentWebSerializer(MessageSource messageSource) {
+    public IgorComponentWebSerializer(MessageSource messageSource, IgorComponentRegistry igorComponentRegistry) {
         super(IgorComponent.class);
         this.messageSource = messageSource;
+        this.igorComponentRegistry = igorComponentRegistry;
     }
 
     /**
@@ -45,10 +52,8 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> imp
     @Override
     public void serialize(IgorComponent instance, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
+        jsonGenerator.writeStringField(ID, instance.getId());
         if (instance instanceof Service) {
-            if (((Service) instance).getId() != null) {
-                jsonGenerator.writeNumberField(ID, ((Service) instance).getId());
-            }
             if (((Service) instance).getName() != null) {
                 jsonGenerator.writeStringField(NAME, ((Service) instance).getName());
             }
@@ -125,8 +130,9 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> imp
 
                 boolean isService = Service.class.isAssignableFrom(field.getType());
                 if (isService) {
+                    jsonGenerator.writeStringField(TYPE, igorComponentRegistry.getCagetoryOfServiceInterface(field.getType()));
                     if (value != null) {
-                        jsonGenerator.writeNumberField(VALUE, ((Service) value).getId());
+                        jsonGenerator.writeStringField(VALUE, ((Service) value).getId());
                         jsonGenerator.writeStringField(SERVICE_NAME, ((Service) value).getName());
                     } else {
                         jsonGenerator.writeObjectField(VALUE, null);

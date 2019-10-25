@@ -43,9 +43,9 @@ public class ActionProxy implements Action {
      * {@inheritDoc}
      */
     @Override
-    public void initialize() {
+    public void initialize(String jobId, String taskId, JobExecution jobExecution) {
         try {
-            delegate.initialize();
+            delegate.initialize(jobId, taskId, jobExecution);
         } catch (Exception e) {
             errorCause = StacktraceFormatter.format(e);
         }
@@ -96,9 +96,9 @@ public class ActionProxy implements Action {
      * {@inheritDoc}
      */
     @Override
-    public void shutdown(Long jobId, String taskId) {
+    public void shutdown(String jobId, String taskId, JobExecution jobExecution) {
         try {
-            delegate.shutdown(jobId, taskId);
+            delegate.shutdown(jobId, taskId, jobExecution);
         } catch (Exception e) {
             errorCause = StacktraceFormatter.format(e);
         }
@@ -142,6 +142,22 @@ public class ActionProxy implements Action {
     @Override
     public String getTypeId() {
         return delegate.getTypeId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getId() {
+        return delegate.getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setId(String id) {
+        delegate.setId(id);
     }
 
 }

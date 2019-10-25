@@ -40,7 +40,11 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
     @Override
     public void serialize(IgorComponent instance, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
+        jsonGenerator.writeStringField(ID, instance.getId());
         jsonGenerator.writeStringField(TYPE_ID, instance.getTypeId());
+        if (instance instanceof Service) {
+            jsonGenerator.writeStringField(NAME, ((Service) instance).getName());
+        }
         if (instance instanceof Action) {
             jsonGenerator.writeBooleanField(ACTIVE, ((Action) instance).isActive());
         }
@@ -74,7 +78,7 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
                     jsonGenerator.writeStartObject();
                     jsonGenerator.writeStringField(NAME, field.getName());
                     if (Service.class.isAssignableFrom(field.getType()) && value instanceof Service) {
-                        jsonGenerator.writeNumberField(VALUE, ((Service) value).getId());
+                        jsonGenerator.writeStringField(VALUE, ((Service) value).getId());
                         jsonGenerator.writeBooleanField(SERVICE, true);
                     } else {
                         jsonGenerator.writeObjectField(VALUE, value);
@@ -107,8 +111,7 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
                 Object result;
                 field.setAccessible(true);
                 if (isSecured(field)) {
-                    // TODO: Use instance.getId() as soon as it's implemented...
-                    result = securityProvider.encrypt(null, field.getName(), (String) field.get(instance));
+                    result = securityProvider.encrypt(instance.getId(), field.getName(), (String) field.get(instance));
                 } else {
                     result = field.get(instance);
                 }

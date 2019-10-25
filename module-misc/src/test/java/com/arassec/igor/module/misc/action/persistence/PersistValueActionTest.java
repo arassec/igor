@@ -41,7 +41,7 @@ class PersistValueActionTest extends BaseMiscActionTest {
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
         assertEquals(1, result.size());
-        verify(persistentValueRepositoryMock, times(1)).upsert(eq(1L), eq("1"), argCap.capture());
+        verify(persistentValueRepositoryMock, times(1)).upsert(eq("1"), eq("1"), argCap.capture());
         assertEquals(PARAM_VALUE, argCap.getValue().getContent());
     }
 

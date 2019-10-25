@@ -18,7 +18,7 @@ public class JobExecutionListEntry {
     /**
      * The job's ID.
      */
-    private Long jobId;
+    private String jobId;
 
     /**
      * The name of the job.

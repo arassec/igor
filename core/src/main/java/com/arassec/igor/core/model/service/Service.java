@@ -9,22 +9,6 @@ import com.arassec.igor.core.model.IgorSimulationSafe;
 public interface Service extends IgorComponent {
 
     /**
-     * Returns the system-wide unique ID of the service.
-     *
-     * @return The ID.
-     */
-    @IgorSimulationSafe
-    Long getId();
-
-    /**
-     * Sets the ID of the service.
-     *
-     * @param id The service's ID.
-     */
-    @IgorSimulationSafe
-    void setId(Long id);
-
-    /**
      * Returns the service's name.
      *
      * @return The service's name.

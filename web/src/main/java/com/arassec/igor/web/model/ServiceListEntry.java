@@ -13,7 +13,7 @@ public class ServiceListEntry {
     /**
      * The service's ID.
      */
-    private Long id;
+    private String id;
 
     /**
      * The name.

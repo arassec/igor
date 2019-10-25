@@ -11,7 +11,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -39,14 +42,14 @@ public class Task {
     public static final String SIMULATION_KEY = "simulation";
 
     /**
-     * The task's (UU)ID.
-     */
-    private String id;
-
-    /**
      * The name pattern for concurrency-group IDs.
      */
     private static final String CONCURRENCY_GROUP_ID_PATTERN = "%s_%s_%d";
+
+    /**
+     * The task's (UU)ID.
+     */
+    private String id;
 
     /**
      * The name of the task.
@@ -78,19 +81,18 @@ public class Task {
     private List<Action> actions = new LinkedList<>();
 
     /**
-     * Creates a new Task with a random ID.
-     */
-    public Task() {
-        id = UUID.randomUUID().toString();
-    }
-
-    /**
-     * Creates a new Task.
+     * Initializes the {@link Provider} and all {@link Action}s of the task.
      *
-     * @param id The task's ID.
+     * @param jobId        The job's ID.
+     * @param jobExecution Contains information about the job execution.
      */
-    public Task(String id) {
-        this.id = id;
+    public void initialize(String jobId, JobExecution jobExecution) {
+        provider.initialize(jobId, id, jobExecution);
+        IgorComponentUtil.initializeServices(provider, jobId, id, jobExecution);
+        actions.forEach(action -> {
+            action.initialize(jobId, id, jobExecution);
+            IgorComponentUtil.initializeServices(action, jobId, id, jobExecution);
+        });
     }
 
     /**
@@ -102,7 +104,7 @@ public class Task {
      * @param jobId        The ID of the job.
      * @param jobExecution The {@link JobExecution} that contains the state of the current job run.
      */
-    public void run(Long jobId, JobExecution jobExecution) {
+    public void run(String jobId, JobExecution jobExecution) {
 
         log.debug("Starting task '{}'", name);
 
@@ -143,9 +145,6 @@ public class Task {
             concurrencyGroups.add(concurrencyGroup);
         }
 
-        actions.forEach(Action::initialize);
-
-
         // Read the data from the provider and start working:
         provider.initialize(jobId, id, jobExecution);
         while (provider.hasNext() && jobExecution.isRunning()) {
@@ -180,9 +179,22 @@ public class Task {
             log.debug("Threads terminated over all concurrency-groups: {}", allThreadsTerminated);
         }
 
-        actions.forEach(action -> action.shutdown(jobId, id));
-
         log.debug("Task '{}' finished!", name);
+    }
+
+    /**
+     * Shuts the {@link Provider} and all {@link Action}s of the task down.
+     *
+     * @param jobId        The job's ID.
+     * @param jobExecution Contains information about the job execution.
+     */
+    void shutdown(String jobId, JobExecution jobExecution) {
+        actions.forEach(action -> {
+            IgorComponentUtil.shutdownServices(action, jobId, id, jobExecution);
+            action.shutdown(jobId, id, jobExecution);
+        });
+        IgorComponentUtil.shutdownServices(provider, jobId, id, jobExecution);
+        provider.shutdown(jobId, id, jobExecution);
     }
 
     /**
@@ -192,7 +204,7 @@ public class Task {
      *
      * @return The meta-data for the job run.
      */
-    public static Object createMetaData(Long jobId, String taskId) {
+    public static Object createMetaData(String jobId, String taskId) {
         Map<String, Object> metaData = new HashMap<>();
         metaData.put("jobId", jobId);
         metaData.put("taskId", taskId);

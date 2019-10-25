@@ -14,7 +14,7 @@ public class StacktraceFormatter {
      * @param throwable The throwable to format.
      * @return The stacktrace as String.
      */
-    public static final String format(Throwable throwable) {
+    public static String format(Throwable throwable) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         throwable.printStackTrace(pw);

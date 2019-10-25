@@ -12,12 +12,13 @@ import org.springframework.stereotype.Repository;
  * Defines access to {@link com.arassec.igor.core.model.service.Service}s in the database.
  */
 @Repository
-public interface ServiceDao extends PagingAndSortingRepository<ServiceEntity, Long> {
+public interface ServiceDao extends PagingAndSortingRepository<ServiceEntity, String> {
 
     /**
      * Finds a service entity by its name.
      *
      * @param name The service's name.
+     *
      * @return The service.
      */
     ServiceEntity findByName(String name);
@@ -27,6 +28,7 @@ public interface ServiceDao extends PagingAndSortingRepository<ServiceEntity, Lo
      *
      * @param name     The name part to search for.
      * @param pageable The page parameters to use.
+     *
      * @return The page of entities.
      */
     Page<ServiceEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
@@ -35,9 +37,10 @@ public interface ServiceDao extends PagingAndSortingRepository<ServiceEntity, Lo
      * Returns a service's name by its ID.
      *
      * @param id The service's ID.
+     *
      * @return The service's name.
      */
     @Query(value = "SELECT name FROM service WHERE id = :id", nativeQuery = true)
-    String findNameById(@Param("id") Long id);
+    String findNameById(@Param("id") String id);
 
 }

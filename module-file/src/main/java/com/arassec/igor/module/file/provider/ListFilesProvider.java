@@ -72,7 +72,7 @@ public class ListFilesProvider extends BaseFileProvider {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(Long jobId, String taskId, JobExecution jobExecution) {
+    public void initialize(String jobId, String taskId, JobExecution jobExecution) {
         super.initialize(jobId, taskId, jobExecution);
         files = service.listFiles(directory, fileEnding);
         currentFile = 0;

@@ -77,6 +77,10 @@ public class IgorComponentPersistenceDeserializer<T extends IgorComponent> exten
         IgorComponent igorComponent = classOptional.get();
         T instance = (T) ApplicationContextProvider.getIgorComponent(igorComponent.getClass(), typeId);
 
+        if (map.containsKey(ID)) {
+            instance.setId(String.valueOf(map.get(ID)));
+        }
+
         setComponentSpecifica(instance, map);
 
         List<Map<String, Object>> parameters = (List<Map<String, Object>>) map.get(PARAMETERS);
@@ -89,10 +93,9 @@ public class IgorComponentPersistenceDeserializer<T extends IgorComponent> exten
                         return;
                     }
                     if (parameter.containsKey(SERVICE) && (boolean) parameter.get(SERVICE) && serviceRepository != null) {
-                        field.set(instance, serviceRepository.findById((Long.valueOf((Integer) parameter.get(VALUE)))));
+                        field.set(instance, serviceRepository.findById(String.valueOf(parameter.get(VALUE))));
                     } else if (parameter.containsKey(SECURED) && (boolean) parameter.get(SECURED)) {
-                        // TODO: Use instance.getId() as soon as it's implemented...
-                        field.set(instance, securityProvider.decrypt(null, field.getName(),
+                        field.set(instance, securityProvider.decrypt(instance.getId(), field.getName(),
                                 String.valueOf(parameter.get(VALUE))));
                     } else {
                         field.set(instance, parameter.get(VALUE));
@@ -127,9 +130,6 @@ public class IgorComponentPersistenceDeserializer<T extends IgorComponent> exten
      */
     private void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
         if (instance instanceof Service) {
-            if (map.containsKey(ID)) {
-                ((Service) instance).setId(Long.valueOf(String.valueOf(map.get(ID))));
-            }
             ((Service) instance).setName(String.valueOf(map.get(NAME)));
         } else if (instance instanceof Action) {
             if (map.containsKey(ACTIVE)) {

@@ -122,7 +122,7 @@ public class WebConfiguration {
 
         SimpleModule mapperModule = new SimpleModule();
 
-        mapperModule.addSerializer(new IgorComponentWebSerializer(messageSource));
+        mapperModule.addSerializer(new IgorComponentWebSerializer(messageSource, igorComponentRegistry));
         mapperModule.addDeserializer(Service.class, new IgorComponentWebDeserializer<>(Service.class, igorComponentRegistry,
                 serviceRepository, simulationMode));
         mapperModule.addDeserializer(Action.class, new IgorComponentWebDeserializer<>(Action.class, igorComponentRegistry,

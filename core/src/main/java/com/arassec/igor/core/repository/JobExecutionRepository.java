@@ -35,7 +35,7 @@ public interface JobExecutionRepository {
      * @param pageSize   The size of the page.
      * @return List of executions of this job.
      */
-    ModelPage<JobExecution> findAllOfJob(Long jobId, int pageNumber, int pageSize);
+    ModelPage<JobExecution> findAllOfJob(String jobId, int pageNumber, int pageSize);
 
     /**
      * Returns all job-executions of a certain job in the specified state.
@@ -44,7 +44,7 @@ public interface JobExecutionRepository {
      * @param state The state the job-execution should be in.
      * @return List of executions.
      */
-    List<JobExecution> findAllOfJobInState(Long jobId, JobExecutionState state);
+    List<JobExecution> findAllOfJobInState(String jobId, JobExecutionState state);
 
     /**
      * Finds all job-executions in the specified state.
@@ -62,14 +62,14 @@ public interface JobExecutionRepository {
      * @param jobId     The job's ID.
      * @param numToKeep The number of job-executions to keep.
      */
-    void cleanup(Long jobId, int numToKeep);
+    void cleanup(String jobId, int numToKeep);
 
     /**
      * Deletes all job-executions of the specified job.
      *
      * @param jobId The job's ID.
      */
-    void deleteByJobId(Long jobId);
+    void deleteByJobId(String jobId);
 
     /**
      * Sets a new state to a job execution with the given ID.
@@ -86,6 +86,6 @@ public interface JobExecutionRepository {
      * @param oldState The old state to change.
      * @param newState The new state to set.
      */
-    void updateAllJobExecutionsOfJob(Long jobId, JobExecutionState oldState, JobExecutionState newState);
+    void updateAllJobExecutionsOfJob(String jobId, JobExecutionState oldState, JobExecutionState newState);
 
 }

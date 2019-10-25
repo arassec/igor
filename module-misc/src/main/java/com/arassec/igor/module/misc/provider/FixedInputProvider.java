@@ -48,7 +48,7 @@ public class FixedInputProvider extends BaseUtilProvider {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(Long jobId, String taskId, JobExecution jobExecution) {
+    public void initialize(String jobId, String taskId, JobExecution jobExecution) {
         super.initialize(jobId, taskId, jobExecution);
         index = 0;
         if (input != null && !input.isEmpty()) {

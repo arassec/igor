@@ -1,10 +1,12 @@
 package com.arassec.igor.core.application;
 
 import com.arassec.igor.core.model.service.Service;
+import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
@@ -14,13 +16,9 @@ import java.util.stream.Collectors;
 /**
  * Manages {@link Service}s. Entry point from outside the core package to create and maintain services.
  */
+@Slf4j
 @Component
 public class ServiceManager {
-
-    /**
-     * The igor component registry.
-     */
-    private final IgorComponentRegistry igorComponentRegistry;
 
     /**
      * Repository for services.
@@ -30,11 +28,9 @@ public class ServiceManager {
     /**
      * Creates a new instance.
      *
-     * @param igorComponentRegistry The registry for igor components.
-     * @param serviceRepository     The repository to load services from and store services into.
+     * @param serviceRepository The repository to load services from and store services into.
      */
-    public ServiceManager(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository) {
-        this.igorComponentRegistry = igorComponentRegistry;
+    public ServiceManager(ServiceRepository serviceRepository) {
         this.serviceRepository = serviceRepository;
     }
 
@@ -56,7 +52,7 @@ public class ServiceManager {
      *
      * @return The {@link Service} with the given ID or {@code null}, if none exists.
      */
-    public Service load(Long id) {
+    public Service load(String id) {
         return serviceRepository.findById(id);
     }
 
@@ -109,7 +105,7 @@ public class ServiceManager {
      *
      * @param id The service's ID.
      */
-    public void deleteService(Long id) {
+    public void deleteService(String id) {
         serviceRepository.deleteById(id);
     }
 
@@ -122,7 +118,7 @@ public class ServiceManager {
      *
      * @return Set of jobs referencing this service.
      */
-    public ModelPage<Pair<Long, String>> getReferencingJobs(Long id, int pageNumber, int pageSize) {
+    public ModelPage<Pair<String, String>> getReferencingJobs(String id, int pageNumber, int pageSize) {
         return serviceRepository.findReferencingJobs(id, pageNumber, pageSize);
     }
 

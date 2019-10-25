@@ -1,6 +1,7 @@
 package com.arassec.igor.module.message.service.rabbitmq;
 
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.message.service.BaseMessageService;
@@ -96,38 +97,61 @@ public class RabbitMqMessageService extends BaseMessageService {
     private int heartBeat = 30;
 
     /**
+     * The connection factory to the RabbitMQ server.
+     */
+    private CachingConnectionFactory connectionFactory;
+
+    /**
+     * The RabbitMQ-Client.
+     */
+    private RabbitTemplate rabbitTemplate;
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    public void sendMessage(Message message) {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host, port);
+    public void initialize(String jobId, String taskId, JobExecution jobExecution) {
+        super.initialize(jobId, taskId, jobExecution);
+
+        connectionFactory = new CachingConnectionFactory(host, port);
         connectionFactory.setUsername(username);
         connectionFactory.setPassword(password);
         connectionFactory.setRequestedHeartBeat(heartBeat);
         connectionFactory.setVirtualHost(virtualHost);
 
-        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate = new RabbitTemplate(connectionFactory);
+    }
 
-        try {
-            MessageProperties messageProperties = new MessageProperties();
-            messageProperties.setContentEncoding(contentEncoding);
-            messageProperties.setContentType(contentType);
-            if (headers != null) {
-                String[] seperatedHeaders = headers.split("\n");
-                for (String header : seperatedHeaders) {
-                    String[] headerParts = header.split(":");
-                    if (headerParts.length == 2) {
-                        messageProperties.getHeaders().put(headerParts[0], headerParts[1]);
-                    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sendMessage(Message message) {
+        MessageProperties messageProperties = new MessageProperties();
+        messageProperties.setContentEncoding(contentEncoding);
+        messageProperties.setContentType(contentType);
+        if (headers != null) {
+            String[] seperatedHeaders = headers.split("\n");
+            for (String header : seperatedHeaders) {
+                String[] headerParts = header.split(":");
+                if (headerParts.length == 2) {
+                    messageProperties.getHeaders().put(headerParts[0], headerParts[1]);
                 }
             }
-
-            org.springframework.amqp.core.Message rabbitMessage = new org.springframework.amqp.core.Message(message.getContent().getBytes(), messageProperties);
-            rabbitTemplate.send(exchange, routingKey, rabbitMessage);
-        } finally {
-            rabbitTemplate.stop();
-            connectionFactory.destroy();
         }
+
+        org.springframework.amqp.core.Message rabbitMessage = new org.springframework.amqp.core.Message(message.getContent().getBytes(), messageProperties);
+        rabbitTemplate.send(exchange, routingKey, rabbitMessage);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void shutdown(String jobId, String taskId, JobExecution jobExecution) {
+        super.shutdown(jobId, taskId, jobExecution);
+        rabbitTemplate.stop();
+        connectionFactory.destroy();
     }
 
     /**

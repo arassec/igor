@@ -16,8 +16,7 @@ public class ServiceEntity {
      * The service's ID.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     /**
      * JPA version.

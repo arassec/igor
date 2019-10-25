@@ -23,10 +23,11 @@ public interface JobServiceReferenceDao extends PagingAndSortingRepository<JobSe
      * Finds all job-service-references for the given job ID.
      *
      * @param jobId The job's ID.
+     *
      * @return List of job-service-references.
      */
     @Query(value = "SELECT * FROM job_service_reference WHERE job_id = :jobId", nativeQuery = true)
-    List<JobServiceReferenceEntity> findByJobId(@Param("jobId") Long jobId);
+    List<JobServiceReferenceEntity> findByJobId(@Param("jobId") String jobId);
 
     /**
      * Deletes all entries for the given job ID.
@@ -35,16 +36,17 @@ public interface JobServiceReferenceDao extends PagingAndSortingRepository<JobSe
      */
     @Modifying
     @Query(value = "DELETE FROM job_service_reference WHERE job_id = :jobId", nativeQuery = true)
-    void deleteByJobId(@Param("jobId") Long jobId);
+    void deleteByJobId(@Param("jobId") String jobId);
 
     /**
      * Finds all job-service-references for the given service ID.
      *
      * @param serviceId The service's ID.
+     *
      * @return List of job-service-references.
      */
     @Query(value = "SELECT * FROM job_service_reference WHERE service_id = :serviceId", nativeQuery = true)
-    Page<JobServiceReferenceEntity> findByServiceId(@Param("serviceId") Long serviceId, Pageable pageable);
+    Page<JobServiceReferenceEntity> findByServiceId(@Param("serviceId") String serviceId, Pageable pageable);
 
     /**
      * Deletes all entities for the given service ID.
@@ -53,6 +55,6 @@ public interface JobServiceReferenceDao extends PagingAndSortingRepository<JobSe
      */
     @Modifying
     @Query(value = "DELETE FROM job_service_reference WHERE service_id = :serviceId", nativeQuery = true)
-    void deleteByServiceId(@Param("serviceId") Long serviceId);
+    void deleteByServiceId(@Param("serviceId") String serviceId);
 
 }

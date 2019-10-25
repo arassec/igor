@@ -1,5 +1,6 @@
 package com.arassec.igor.core.model.action;
 
+import com.arassec.igor.core.model.BaseIgorComponent;
 import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.jayway.jsonpath.Configuration;
@@ -13,7 +14,7 @@ import java.util.Map;
 /**
  * Base action that implements common functionality of an action. Specific actions should be derived from this class.
  */
-public abstract class BaseAction implements Action {
+public abstract class BaseAction extends BaseIgorComponent implements Action {
 
     /**
      * Query for the Job-ID.
@@ -62,25 +63,9 @@ public abstract class BaseAction implements Action {
      * {@inheritDoc}
      */
     @Override
-    public void initialize() {
-        // Nothing to do here...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public List<Map<String, Object>> complete() {
         // Nothing to do here...
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void shutdown(Long jobId, String taskName) {
-        // Nothing to do here...
     }
 
     /**
@@ -114,9 +99,9 @@ public abstract class BaseAction implements Action {
      *
      * @return The job's ID.
      */
-    protected Long getJobId(Map<String, Object> data) {
+    protected String getJobId(Map<String, Object> data) {
         if (data != null && !data.isEmpty()) {
-            Long jobId = getLong(data, JOB_ID_QUERY);
+            String jobId = getString(data, JOB_ID_QUERY);
             if (jobId != null) {
                 return jobId;
             }
@@ -210,26 +195,6 @@ public abstract class BaseAction implements Action {
         }
 
         return false;
-    }
-
-    /**
-     * Returns a long value from the supplied data using the supplied query.
-     *
-     * @param data  The data to execute the query on.
-     * @param query The JSON-Path query.
-     *
-     * @return The querie's result or {@code null}, if no data could be retrieved.
-     */
-    protected Long getLong(Map<String, Object> data, String query) {
-        if (data == null || query == null) {
-            return null;
-        }
-
-        if (!query.startsWith("$")) {
-            return null;
-        }
-
-        return JsonPath.using(jsonPathConfiguration).parse(data).read(query);
     }
 
 }

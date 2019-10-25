@@ -53,7 +53,7 @@ public class ProviderProxy implements Provider {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(Long jobId, String taskId, JobExecution jobExecution) {
+    public void initialize(String jobId, String taskId, JobExecution jobExecution) {
         try {
             delegate.initialize(jobId, taskId, jobExecution);
         } catch (Exception e) {
@@ -102,6 +102,18 @@ public class ProviderProxy implements Provider {
      * {@inheritDoc}
      */
     @Override
+    public void shutdown(String jobId, String taskId, JobExecution jobExecution) {
+        try {
+            delegate.shutdown(jobId, taskId, jobExecution);
+        } catch (Exception e) {
+            errorCause = StacktraceFormatter.format(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getCategoryId() {
         return delegate.getCategoryId();
     }
@@ -112,6 +124,22 @@ public class ProviderProxy implements Provider {
     @Override
     public String getTypeId() {
         return delegate.getTypeId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getId() {
+        return delegate.getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setId(String id) {
+        delegate.setId(id);
     }
 
 }

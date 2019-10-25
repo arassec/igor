@@ -49,6 +49,7 @@ public class PersistenceConfiguration {
         SimpleModule mapperModule = new SimpleModule();
 
         mapperModule.addSerializer(new IgorComponentPersistenceSerializer(securityProvider));
+
         mapperModule.addDeserializer(Service.class, new IgorComponentPersistenceDeserializer<>(Service.class,
                 igorComponentRegistry, serviceRepository, securityProvider));
         mapperModule.addDeserializer(Action.class, new IgorComponentPersistenceDeserializer<>(Action.class,

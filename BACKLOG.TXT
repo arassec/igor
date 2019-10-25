@@ -1,5 +1,3 @@
-- initialize() and teardown() methods in IgorComponent
-- UUIDs as IgorComponent-IDs
 - Unit-Tests (Apache Mina SSHD!)
 - Export + Import of jobs (persisted values!) and services (via JSON)
 - Add Job property 'self-heal' to auto-resolve failed job runs after successful job execution.

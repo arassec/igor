@@ -13,7 +13,7 @@ public final class IgorConfigHelper {
      *
      * @param baseNames The basenames of the properties files to use.
      *
-     * @return
+     * @return A newly created {@link MessageSource}.
      */
     public static MessageSource createMessageSource(String... baseNames) {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();

@@ -30,7 +30,7 @@ public class PersistentValueEntity {
      * The job's ID.
      */
     @Column(name = "job_id")
-    private Long jobId;
+    private String jobId;
 
     /**
      * The task's ID.

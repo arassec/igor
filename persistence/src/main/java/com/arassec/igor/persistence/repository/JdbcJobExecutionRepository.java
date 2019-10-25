@@ -86,7 +86,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      * {@inheritDoc}
      */
     @Override
-    public ModelPage<JobExecution> findAllOfJob(Long jobId, int pageNumber, int pageSize) {
+    public ModelPage<JobExecution> findAllOfJob(String jobId, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id").descending());
         Page<JobExecutionEntity> page = jobExecutionDao.findByJobId(jobId, pageable);
         if (page != null && page.hasContent()) {
@@ -101,7 +101,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      * {@inheritDoc}
      */
     @Override
-    public List<JobExecution> findAllOfJobInState(Long jobId, JobExecutionState state) {
+    public List<JobExecution> findAllOfJobInState(String jobId, JobExecutionState state) {
         List<JobExecutionEntity> jobExecutionEntities = jobExecutionDao.findByJobIdAndStateOrderByIdDesc(jobId, state.name());
         if (jobExecutionEntities != null) {
             return jobExecutionEntities.stream().map(this::convert).collect(Collectors.toList());
@@ -128,7 +128,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      * {@inheritDoc}
      */
     @Override
-    public void cleanup(Long jobId, int numToKeep) {
+    public void cleanup(String jobId, int numToKeep) {
         Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by("id").descending());
         Page<JobExecutionEntity> page = jobExecutionDao.findByJobId(jobId, pageable);
         if (page != null && page.hasContent() && page.getTotalElements() > numToKeep) {
@@ -150,7 +150,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      * {@inheritDoc}
      */
     @Override
-    public void deleteByJobId(Long jobId) {
+    public void deleteByJobId(String jobId) {
         if (jobId != null) {
             jobExecutionDao.deleteByJobId(jobId);
         }
@@ -168,7 +168,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     /**
      * {@inheritDoc}
      */
-    public void updateAllJobExecutionsOfJob(Long jobId, JobExecutionState oldState, JobExecutionState newState) {
+    public void updateAllJobExecutionsOfJob(String jobId, JobExecutionState oldState, JobExecutionState newState) {
         if (jobId != null && oldState != null && newState != null) {
             List<JobExecutionEntity> executionEntities = jobExecutionDao.findByJobIdAndStateOrderByIdDesc(jobId, oldState.name());
             if (executionEntities != null) {
@@ -185,7 +185,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      * @return The newly created {@link JobExecution}.
      */
     private JobExecution convert(JobExecutionEntity entity) {
-        JobExecution result = null;
+        JobExecution result;
         try {
             result = persistenceJobMapper.readValue(entity.getContent(), JobExecution.class);
         } catch (IOException e) {

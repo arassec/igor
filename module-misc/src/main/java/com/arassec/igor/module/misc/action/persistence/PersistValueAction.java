@@ -29,7 +29,8 @@ public class PersistValueAction extends BasePersistenceAction {
     private String input;
 
     /**
-     * The number of values to keep in the persistence store. The cleanup is only triggered if a value greater zero is configured.
+     * The number of values to keep in the persistence store. The cleanup is only triggered if a value greater zero is
+     * configured.
      */
     @IgorParam
     private int numValuesToKeep = 0;
@@ -45,7 +46,7 @@ public class PersistValueAction extends BasePersistenceAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        Long jobId = getJobId(data);
+        String jobId = getJobId(data);
         String taskId = getTaskId(data);
 
         String resolvedInput = getString(data, input);
@@ -68,11 +69,12 @@ public class PersistValueAction extends BasePersistenceAction {
     /**
      * Cleans up the persisted values and keep only the {@link #numValuesToKeep} most recent values in the store.
      *
-     * @param jobId  The job's ID.
-     * @param taskId The task's ID.
+     * @param jobId        The job's ID.
+     * @param taskId       The task's ID.
+     * @param jobExecution The container for job execution details.
      */
     @Override
-    public void shutdown(Long jobId, String taskId) {
+    public void shutdown(String jobId, String taskId, JobExecution jobExecution) {
         if (numValuesToKeep > 0) {
             persistentValueRepository.cleanup(jobId, taskId, numValuesToKeep);
         }

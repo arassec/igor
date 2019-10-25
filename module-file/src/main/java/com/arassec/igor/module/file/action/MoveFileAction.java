@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class MoveFileAction extends BaseFileAction {
     /**
      * Service where the file can be found.
      */
-    @NotBlank
+    @NotNull
     @IgorParam
     private FileService service;
 

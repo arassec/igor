@@ -12,12 +12,13 @@ import org.springframework.stereotype.Repository;
  * Defines access to {@link com.arassec.igor.core.model.job.Job}s in the database.
  */
 @Repository
-public interface JobDao extends PagingAndSortingRepository<JobEntity, Long> {
+public interface JobDao extends PagingAndSortingRepository<JobEntity, String> {
 
     /**
      * Finds a job entity by its name.
      *
      * @param name The job's name.
+     *
      * @return The job.
      */
     JobEntity findByName(String name);
@@ -27,6 +28,7 @@ public interface JobDao extends PagingAndSortingRepository<JobEntity, Long> {
      *
      * @param name     The name part to search for.
      * @param pageable The page parameters to use.
+     *
      * @return The page of entities.
      */
     Page<JobEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
@@ -35,9 +37,10 @@ public interface JobDao extends PagingAndSortingRepository<JobEntity, Long> {
      * Returns a job's name by its ID.
      *
      * @param id The job's ID.
+     *
      * @return The job's name.
      */
     @Query(value = "SELECT name FROM job WHERE id = :id", nativeQuery = true)
-    String findNameById(@Param("id") Long id);
+    String findNameById(@Param("id") String id);
 
 }

@@ -33,7 +33,7 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
      * @return The persisted value. An ID is added if required.
      */
     @Override
-    public PersistentValue upsert(Long jobId, String taskId, PersistentValue value) {
+    public PersistentValue upsert(String jobId, String taskId, PersistentValue value) {
         PersistentValueEntity entity = new PersistentValueEntity();
         if (value.getId() != null) {
             entity = persistentValueDao.findById(value.getId()).orElseThrow(
@@ -63,7 +63,7 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
      * @return {@code true} if the value is persisted, {@code false} otherwise.
      */
     @Override
-    public boolean isPersisted(Long jobId, String taskId, PersistentValue value) {
+    public boolean isPersisted(String jobId, String taskId, PersistentValue value) {
         return (persistentValueDao.findByJobIdAndTaskIdAndContent(jobId, taskId, value.getContent()) != null);
     }
 
@@ -75,7 +75,7 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
      * @param numEntriesToKeep Number of entries to keep.
      */
     @Override
-    public void cleanup(Long jobId, String taskId, int numEntriesToKeep) {
+    public void cleanup(String jobId, String taskId, int numEntriesToKeep) {
         List<Integer> ids = persistentValueDao.findMostRecentIds(jobId, taskId, numEntriesToKeep);
         if (ids != null && ids.size() == numEntriesToKeep) {
             Integer oldestIdToKeep = ids.get(numEntriesToKeep - 1);
@@ -87,7 +87,7 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
      * {@inheritDoc}
      */
     @Override
-    public void deleteByJobId(Long jobId) {
+    public void deleteByJobId(String jobId) {
         if (jobId != null) {
             persistentValueDao.deleteByJobId(jobId);
         }

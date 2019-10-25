@@ -38,7 +38,7 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        Long jobId = getJobId(data);
+        String jobId = getJobId(data);
         String taskId = getTaskId(data);
 
         String resolvedInput = getString(data, input);

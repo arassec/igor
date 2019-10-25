@@ -65,28 +65,49 @@ public class JdbcJobRepository implements JobRepository {
         // Process the job itself:
         JobEntity jobEntity;
         if (job.getId() == null) {
+            job.setId(UUID.randomUUID().toString());
             jobEntity = new JobEntity();
+            jobEntity.setId(job.getId());
         } else {
             jobEntity = jobDao.findById(job.getId()).orElseThrow(
                     () -> new IllegalStateException("No job with ID " + job.getId() + " available!"));
         }
         jobEntity.setName(job.getName());
+
+        // Generate IDs if necessary:
+        if (job.getTrigger() != null && job.getTrigger().getId() == null) {
+            job.getTrigger().setId(UUID.randomUUID().toString());
+        }
+        job.getTasks().forEach(task -> {
+            if (task.getId() == null) {
+                task.setId(UUID.randomUUID().toString());
+            }
+            if (task.getProvider() != null && task.getProvider().getId() == null) {
+                task.getProvider().setId(null);
+            }
+            task.getActions().forEach(action -> {
+                if (action.getId() == null) {
+                    action.setId(UUID.randomUUID().toString());
+                }
+            });
+        });
+
         try {
             jobEntity.setContent(persistenceJobMapper.writeValueAsString(job));
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Could not upsert job!", e);
         }
-        JobEntity savedJob = jobDao.save(jobEntity);
-        job.setId(savedJob.getId());
+
+        jobDao.save(jobEntity);
 
         // Now update the service references:
-        jobServiceReferenceDao.deleteByJobId(savedJob.getId());
-        List<Long> referencedServices = new LinkedList<>();
+        jobServiceReferenceDao.deleteByJobId(job.getId());
+        List<String> referencedServices = new LinkedList<>();
         job.getTasks().forEach(task -> {
             referencedServices.addAll(getServiceIds(task.getProvider()));
             task.getActions().forEach(action -> referencedServices.addAll(getServiceIds(action)));
         });
-        referencedServices.forEach(serviceId -> jobServiceReferenceDao.save(new JobServiceReferenceEntity(savedJob.getId(),
+        referencedServices.forEach(serviceId -> jobServiceReferenceDao.save(new JobServiceReferenceEntity(job.getId(),
                 serviceId)));
 
         return job;
@@ -95,23 +116,19 @@ public class JdbcJobRepository implements JobRepository {
     /**
      * Finds a job by its ID.
      *
-     * @param id The job's ID.
+     * @param jobId The job's ID.
      *
      * @return The {@link Job}.
      */
     @Override
-    public Job findById(Long id) {
-        Optional<JobEntity> jobEntityOptional = jobDao.findById(id);
+    public Job findById(String jobId) {
+        Optional<JobEntity> jobEntityOptional = jobDao.findById(jobId);
         if (jobEntityOptional.isPresent()) {
-            Job job;
             try {
-                job = persistenceJobMapper.readValue(jobEntityOptional.get().getContent(), Job.class);
-                job.setId(id);
+                return persistenceJobMapper.readValue(jobEntityOptional.get().getContent(), Job.class);
             } catch (IOException e) {
                 throw new IllegalStateException("Could not read job!", e);
             }
-            job.setId(id);
-            return job;
         }
         return null;
     }
@@ -127,15 +144,11 @@ public class JdbcJobRepository implements JobRepository {
     public Job findByName(String name) {
         JobEntity entity = jobDao.findByName(name);
         if (entity != null) {
-            Job job;
             try {
-                job = persistenceJobMapper.readValue(entity.getContent(), Job.class);
-                job.setId(entity.getId());
+                return persistenceJobMapper.readValue(entity.getContent(), Job.class);
             } catch (IOException e) {
                 throw new IllegalStateException("Could not read job!", e);
             }
-            job.setId(entity.getId());
-            return job;
         }
         return null;
     }
@@ -149,15 +162,11 @@ public class JdbcJobRepository implements JobRepository {
     public List<Job> findAll() {
         List<Job> result = new LinkedList<>();
         for (JobEntity jobEntity : jobDao.findAll()) {
-            Job job;
             try {
-                job = persistenceJobMapper.readValue(jobEntity.getContent(), Job.class);
-                job.setId(jobEntity.getId());
+                result.add(persistenceJobMapper.readValue(jobEntity.getContent(), Job.class));
             } catch (IOException e) {
                 throw new IllegalStateException("Could not read job!", e);
             }
-            job.setId(jobEntity.getId());
-            result.add(job);
         }
         return result;
     }
@@ -187,9 +196,7 @@ public class JdbcJobRepository implements JobRepository {
             ModelPage<Job> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
             result.setItems(page.getContent().stream().map(jobEntity -> {
                 try {
-                    Job job = persistenceJobMapper.readValue(jobEntity.getContent(), Job.class);
-                    job.setId(jobEntity.getId());
-                    return job;
+                    return persistenceJobMapper.readValue(jobEntity.getContent(), Job.class);
                 } catch (IOException e) {
                     throw new IllegalStateException("Could not read job!", e);
                 }
@@ -206,7 +213,7 @@ public class JdbcJobRepository implements JobRepository {
      * @param id The ID of the job to delete.
      */
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         jobDao.deleteById(id);
         jobServiceReferenceDao.deleteByJobId(id);
     }
@@ -215,13 +222,13 @@ public class JdbcJobRepository implements JobRepository {
      * {@inheritDoc}
      */
     @Override
-    public Set<Pair<Long, String>> findReferencedServices(Long id) {
-        Set<Pair<Long, String>> result = new HashSet<>();
+    public Set<Pair<String, String>> findReferencedServices(String jobId) {
+        Set<Pair<String, String>> result = new HashSet<>();
 
-        List<JobServiceReferenceEntity> serviceReferences = jobServiceReferenceDao.findByJobId(id);
+        List<JobServiceReferenceEntity> serviceReferences = jobServiceReferenceDao.findByJobId(jobId);
         if (serviceReferences != null) {
             serviceReferences.forEach(serviceReference -> {
-                Long serviceId = serviceReference.getJobServiceReferenceIdentity().getServiceId();
+                String serviceId = serviceReference.getJobServiceReferenceIdentity().getServiceId();
                 String serviceName = serviceDao.findNameById(serviceId);
                 result.add(new Pair<>(serviceId, serviceName));
             });
@@ -234,10 +241,11 @@ public class JdbcJobRepository implements JobRepository {
      * Extracts service IDs from the parameters of the supplied class.
      *
      * @param instance The model instance.
+     *
      * @return List of referenced service IDs.
      */
-    private <T> List<Long> getServiceIds(T instance) {
-        List<Long> result = new LinkedList<>();
+    private <T> List<String> getServiceIds(T instance) {
+        List<String> result = new LinkedList<>();
 
         if (instance == null) {
             return result;

@@ -42,7 +42,7 @@ public class ExecutionRestController {
      * been executed.
      */
     @GetMapping("job/{jobId}")
-    public ModelPage<JobExecutionListEntry> getExecutionsOfJob(@PathVariable("jobId") Long jobId,
+    public ModelPage<JobExecutionListEntry> getExecutionsOfJob(@PathVariable("jobId") String jobId,
                                                                @RequestParam(value = "pageNumber", required = false,
                                                                        defaultValue = "0") int pageNumber,
                                                                @RequestParam(value = "pageSize", required = false,
@@ -72,7 +72,7 @@ public class ExecutionRestController {
      * been executed.
      */
     @GetMapping("job/{jobId}/{state}/count")
-    public Long countExecutionsOfJobInState(@PathVariable("jobId") Long jobId, @PathVariable("state") JobExecutionState state) {
+    public Long countExecutionsOfJobInState(@PathVariable("jobId") String jobId, @PathVariable("state") JobExecutionState state) {
         ModelPage<JobExecution> jobExecutions = jobManager.getJobExecutionsOfJob(jobId, 0, Integer.MAX_VALUE);
         if (jobExecutions != null && jobExecutions.getItems() != null) {
             return jobExecutions.getItems().stream().filter(jobExecution -> jobExecution.getExecutionState().equals(state))
@@ -88,7 +88,7 @@ public class ExecutionRestController {
      * @return List of Job IDs.
      */
     @GetMapping("jobs")
-    public List<Long> getJobIdsInState(@RequestParam("states") Set<JobExecutionState> states) {
+    public List<String> getJobIdsInState(@RequestParam("states") Set<JobExecutionState> states) {
         List<JobExecution> executions = new LinkedList<>();
         if (states != null && !states.isEmpty()) {
             states.forEach(state -> {
@@ -182,7 +182,7 @@ public class ExecutionRestController {
      */
     @PutMapping("{id}/{jobId}/{oldState}/{newState}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateExecutionState(@PathVariable("id") Long id, @PathVariable("jobId") Long jobId,
+    public void updateExecutionState(@PathVariable("id") Long id, @PathVariable("jobId") String jobId,
                                      @PathVariable("oldState") JobExecutionState oldState,
                                      @PathVariable("newState") JobExecutionState newState,
                                      @RequestParam(value = "updateAllOfJob", required = false, defaultValue = "false") boolean updateAllOfJob) {

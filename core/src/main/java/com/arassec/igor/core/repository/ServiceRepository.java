@@ -42,7 +42,7 @@ public interface ServiceRepository {
      * @param id The service's ID.
      * @return The {@link Service}.
      */
-    Service findById(Long id);
+    Service findById(String id);
 
     /**
      * Finds a service by its name.
@@ -57,7 +57,7 @@ public interface ServiceRepository {
      *
      * @param id The ID of the service to delete.
      */
-    void deleteById(Long id);
+    void deleteById(String id);
 
     /**
      * Returns all jobs that use the given service.
@@ -67,6 +67,6 @@ public interface ServiceRepository {
      * @param pageSize   The size of the page.
      * @return List of job IDs and names that are using this service.
      */
-    ModelPage<Pair<Long, String>> findReferencingJobs(Long id, int pageNumber, int pageSize);
+    ModelPage<Pair<String, String>> findReferencingJobs(String id, int pageNumber, int pageSize);
 
 }

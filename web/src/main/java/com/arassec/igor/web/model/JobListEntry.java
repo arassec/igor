@@ -13,7 +13,7 @@ public class JobListEntry {
     /**
      * The job's ID.
      */
-    private Long id;
+    private String id;
 
     /**
      * The name.

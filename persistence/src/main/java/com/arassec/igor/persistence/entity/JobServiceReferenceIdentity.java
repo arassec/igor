@@ -23,12 +23,12 @@ public class JobServiceReferenceIdentity implements Serializable {
      * The job's ID.
      */
     @Column(name = "job_id")
-    private Long jobId;
+    private String jobId;
 
     /**
      * The services's ID.
      */
     @Column(name = "service_id")
-    private Long serviceId;
+    private String serviceId;
 
 }

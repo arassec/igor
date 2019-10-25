@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -63,7 +64,9 @@ public class JdbcServiceRepository implements ServiceRepository {
         ServiceEntity serviceEntity;
 
         if (service.getId() == null) {
+            service.setId(UUID.randomUUID().toString());
             serviceEntity = new ServiceEntity();
+            serviceEntity.setId(service.getId());
         } else {
             serviceEntity = serviceDao.findById(service.getId())
                     .orElseThrow(() -> new IllegalStateException("No service with " + "ID " + service.getId() + " available!"));
@@ -76,10 +79,7 @@ public class JdbcServiceRepository implements ServiceRepository {
             throw new IllegalStateException("Could not save service!", e);
         }
 
-        ServiceEntity savedEntity = serviceDao.save(serviceEntity);
-
-        service.setId(savedEntity.getId());
-        service.setName(savedEntity.getName());
+       serviceDao.save(serviceEntity);
 
         return service;
     }
@@ -92,19 +92,15 @@ public class JdbcServiceRepository implements ServiceRepository {
      * @return The service.
      */
     @Override
-    public Service findById(Long id) {
+    public Service findById(String id) {
         Optional<ServiceEntity> serviceEntityOptional = serviceDao.findById(id);
         if (serviceEntityOptional.isPresent()) {
-            Service service;
             try {
                 ServiceEntity serviceEntity = serviceEntityOptional.get();
-                service = persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
-                service.setId(serviceEntity.getId());
-                service.setName(serviceEntity.getName());
+                return persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
             } catch (IOException e) {
                 throw new IllegalStateException("Could not read service!", e);
             }
-            return service;
         }
         return null;
     }
@@ -120,15 +116,11 @@ public class JdbcServiceRepository implements ServiceRepository {
     public Service findByName(String name) {
         ServiceEntity serviceEntity = serviceDao.findByName(name);
         if (serviceEntity != null) {
-            Service service;
             try {
-                service = persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
-                service.setId(serviceEntity.getId());
-                service.setName(serviceEntity.getName());
+                return persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
             } catch (IOException e) {
                 throw new IllegalStateException("Could not read service!", e);
             }
-            return service;
         }
         return null;
     }
@@ -142,15 +134,11 @@ public class JdbcServiceRepository implements ServiceRepository {
     public List<Service> findAll() {
         List<Service> result = new LinkedList<>();
         for (ServiceEntity serviceEntity : serviceDao.findAll()) {
-            Service service;
             try {
-                service = persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
-                service.setId(serviceEntity.getId());
-                service.setName(serviceEntity.getName());
+                result.add(persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class));
             } catch (IOException e) {
                 throw new IllegalStateException("Could not read service!", e);
             }
-            result.add(service);
         }
         return result;
     }
@@ -180,10 +168,7 @@ public class JdbcServiceRepository implements ServiceRepository {
             ModelPage<Service> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
             result.setItems(page.getContent().stream().map(serviceEntity -> {
                 try {
-                    Service service = persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
-                    service.setId(serviceEntity.getId());
-                    service.setName(serviceEntity.getName());
-                    return service;
+                    return persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
                 } catch (IOException e) {
                     throw new IllegalStateException("Could not read service!", e);
                 }
@@ -200,7 +185,7 @@ public class JdbcServiceRepository implements ServiceRepository {
      * @param id The ID of the service to delete.
      */
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         serviceDao.deleteById(id);
         jobServiceReferenceDao.deleteByServiceId(id);
     }
@@ -209,11 +194,11 @@ public class JdbcServiceRepository implements ServiceRepository {
      * {@inheritDoc}
      */
     @Override
-    public ModelPage<Pair<Long, String>> findReferencingJobs(Long id, int pageNumber, int pageSize) {
+    public ModelPage<Pair<String, String>> findReferencingJobs(String id, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<JobServiceReferenceEntity> serviceReferences = jobServiceReferenceDao.findByServiceId(id, pageable);
         if (serviceReferences != null && serviceReferences.hasContent()) {
-            ModelPage<Pair<Long, String>> result = new ModelPage<>(pageNumber, pageSize, serviceReferences.getTotalPages(), null);
+            ModelPage<Pair<String, String>> result = new ModelPage<>(pageNumber, pageSize, serviceReferences.getTotalPages(), null);
             result.setItems(serviceReferences.get()
                     .map(reference -> new Pair<>(reference.getJobServiceReferenceIdentity().getJobId(),
                             jobDao.findNameById(reference.getJobServiceReferenceIdentity().getJobId())))

@@ -55,7 +55,7 @@ public class JobExecutor {
     /**
      * Contains the currently running jobs, indexed by their ID.
      */
-    private Map<Long, Job> runningJobs = new HashMap<>();
+    private Map<String, Job> runningJobs = new HashMap<>();
 
     /**
      * Creates a new JobExecutor instance.
@@ -125,7 +125,7 @@ public class JobExecutor {
      *
      * @param jobId The job's ID.
      */
-    public void cancel(Long jobId) {
+    public void cancel(String jobId) {
         if (jobId == null) {
             throw new IllegalStateException("Cannot cancel a job without a job ID!");
         }
@@ -149,7 +149,7 @@ public class JobExecutor {
      * @param jobId The job's ID.
      * @return The {@link JobExecution} or {@code null}, if none could be found.
      */
-    public JobExecution getJobExecution(Long jobId) {
+    JobExecution getJobExecution(String jobId) {
         if (runningJobs.containsKey(jobId)) {
             return runningJobs.get(jobId).getCurrentJobExecution();
         }

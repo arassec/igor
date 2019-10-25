@@ -25,7 +25,7 @@ public class Job {
     /**
      * The job's ID.
      */
-    private Long id;
+    private String id;
 
     /**
      * The job's name.
@@ -82,6 +82,7 @@ public class Job {
         currentJobExecution.setStarted(Instant.now());
         running = true;
         try {
+            initializeComponents(jobExecution);
             for (Task task : tasks) {
                 if (!currentJobExecution.isRunning()) {
                     break;
@@ -98,9 +99,10 @@ public class Job {
             log.error("Exception during job execution!", e);
             currentJobExecution.fail(e);
         } finally {
+            shutdownComponents(jobExecution);
             currentJobExecution.setFinished(Instant.now());
-            log.debug("Finished job: {} ({}): {}", name, id, currentJobExecution);
             running = false;
+            log.debug("Finished job: {} ({}): {}", name, id, currentJobExecution);
         }
     }
 
@@ -112,4 +114,31 @@ public class Job {
             currentJobExecution.setExecutionState(JobExecutionState.CANCELLED);
         }
     }
+
+    /**
+     * Initializes igor components before a job run.
+     *
+     * @param jobExecution Container for execution information.
+     */
+    private void initializeComponents(JobExecution jobExecution) {
+        if (trigger != null) {
+            trigger.initialize(id, null, jobExecution);
+            IgorComponentUtil.initializeServices(trigger, id, null, jobExecution);
+        }
+        tasks.forEach(task -> task.initialize(id, jobExecution));
+    }
+
+    /**
+     * Shuts igor components down after a job run.
+     *
+     * @param jobExecution Container for execution information.
+     */
+    private void shutdownComponents(JobExecution jobExecution) {
+        tasks.forEach(task -> task.shutdown(id, jobExecution));
+        if (trigger != null) {
+            IgorComponentUtil.shutdownServices(trigger, id, null, jobExecution);
+            trigger.shutdown(id, null, jobExecution);
+        }
+    }
+
 }

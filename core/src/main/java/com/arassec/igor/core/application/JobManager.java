@@ -62,7 +62,7 @@ public class JobManager implements ApplicationListener<ContextStartedEvent>, Dis
     /**
      * Keeps track of all scheduled jobs.
      */
-    private Map<Long, ScheduledFuture> scheduledJobs = new ConcurrentHashMap<>();
+    private Map<String, ScheduledFuture> scheduledJobs = new ConcurrentHashMap<>();
 
     /**
      * Initializes the manager by scheduling all available jobs.
@@ -116,7 +116,7 @@ public class JobManager implements ApplicationListener<ContextStartedEvent>, Dis
      *
      * @param id The ID of the job that should be deleted.
      */
-    public void delete(Long id) {
+    public void delete(String id) {
         jobExecutor.cancel(id);
         Job job = jobRepository.findById(id);
         if (job != null) {
@@ -173,7 +173,7 @@ public class JobManager implements ApplicationListener<ContextStartedEvent>, Dis
      *
      * @return The job with the given ID or {@code null}, if none was found.
      */
-    public Job load(Long id) {
+    public Job load(String id) {
         return jobRepository.findById(id);
     }
 
@@ -228,7 +228,7 @@ public class JobManager implements ApplicationListener<ContextStartedEvent>, Dis
      *
      * @return A page with {@link JobExecution}s of the job.
      */
-    public ModelPage<JobExecution> getJobExecutionsOfJob(Long jobId, int pageNumber, int pageSize) {
+    public ModelPage<JobExecution> getJobExecutionsOfJob(String jobId, int pageNumber, int pageSize) {
         return jobExecutionRepository.findAllOfJob(jobId, pageNumber, pageSize);
     }
 
@@ -245,7 +245,7 @@ public class JobManager implements ApplicationListener<ContextStartedEvent>, Dis
             JobExecution runningJobExecution = jobExecutor.getJobExecution(jobExecution.getJobId());
             if (runningJobExecution != null) {
                 jobExecution.setCurrentTask(runningJobExecution.getCurrentTask());
-                jobExecution.setWorkInProgress(runningJobExecution.getWorkInProgress());
+                jobExecution.getWorkInProgress().addAll(runningJobExecution.getWorkInProgress());
             }
         }
         return jobExecution;
@@ -284,7 +284,7 @@ public class JobManager implements ApplicationListener<ContextStartedEvent>, Dis
      * @param oldState The old state to change.
      * @param newState The new state to set.
      */
-    public void updateAllJobExecutionsOfJob(Long jobId, JobExecutionState oldState, JobExecutionState newState) {
+    public void updateAllJobExecutionsOfJob(String jobId, JobExecutionState oldState, JobExecutionState newState) {
         jobExecutionRepository.updateAllJobExecutionsOfJob(jobId, oldState, newState);
     }
 
@@ -371,7 +371,7 @@ public class JobManager implements ApplicationListener<ContextStartedEvent>, Dis
      *
      * @return Set of services referencing this service.
      */
-    public Set<Pair<Long, String>> getReferencedServices(Long id) {
+    public Set<Pair<String, String>> getReferencedServices(String id) {
         return jobRepository.findReferencedServices(id);
     }
 

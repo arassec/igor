@@ -75,7 +75,7 @@ public class CopyFileAction extends BaseFileAction {
     /**
      * The destination for the copied file.
      */
-    @NotBlank
+    @NotNull
     @IgorParam
     private FileService targetService;
 

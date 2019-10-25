@@ -53,7 +53,7 @@ public class ServiceRestController {
             ModelPage<ServiceListEntry> result = new ModelPage<>(pageNumber, pageSize, servicesPage.getTotalPages(), null);
 
             result.setItems(servicesPage.getItems().stream().map(service -> {
-                ModelPage<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(service.getId(), 0, 1);
+                ModelPage<Pair<String, String>> referencingJobs = serviceManager.getReferencingJobs(service.getId(), 0, 1);
                 return new ServiceListEntry(service.getId(), service.getName(),
                         (referencingJobs != null && !referencingJobs.getItems().isEmpty()));
             }).collect(Collectors.toList()));
@@ -85,7 +85,7 @@ public class ServiceRestController {
      * @return The service.
      */
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Service getService(@PathVariable("id") Long id) {
+    public Service getService(@PathVariable("id") String id) {
         Service service = serviceManager.load(id);
         if (service != null) {
             return service;
@@ -100,8 +100,8 @@ public class ServiceRestController {
      */
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteService(@PathVariable("id") Long id, @RequestParam Boolean deleteAffectedJobs) {
-        ModelPage<Pair<Long, String>> referencingJobs = getReferencingJobs(id, 0, Integer.MAX_VALUE);
+    public void deleteService(@PathVariable("id") String id, @RequestParam Boolean deleteAffectedJobs) {
+        ModelPage<Pair<String, String>> referencingJobs = getReferencingJobs(id, 0, Integer.MAX_VALUE);
         if (referencingJobs.getItems() != null && deleteAffectedJobs) {
             referencingJobs.getItems().forEach(jobReference -> jobManager.delete(jobReference.getKey()));
         } else if (referencingJobs.getItems() != null) {
@@ -176,7 +176,7 @@ public class ServiceRestController {
      * @return {@code true} if a service with the provided name already exists, {@code false} otherwise.
      */
     @GetMapping("check/{name}/{id}")
-    public Boolean checkServiceName(@PathVariable("name") String encodedName, @PathVariable("id") Long id) {
+    public Boolean checkServiceName(@PathVariable("name") String encodedName, @PathVariable("id") String id) {
         String name = new String(Base64.getDecoder().decode(encodedName));
         Service existingService = serviceManager.loadByName(name);
         return (existingService != null && !(existingService.getId().equals(id)));
@@ -190,12 +190,12 @@ public class ServiceRestController {
      * @return The jobs.
      */
     @GetMapping(value = "{id}/job-references", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ModelPage<Pair<Long, String>> getReferencingJobs(@PathVariable("id") Long id,
+    public ModelPage<Pair<String, String>> getReferencingJobs(@PathVariable("id") String id,
                                                             @RequestParam(value = "pageNumber", required = false, defaultValue
                                                                     = "0") int pageNumber,
                                                             @RequestParam(value = "pageSize", required = false, defaultValue =
                                                                     "2147483647") int pageSize) {
-        ModelPage<Pair<Long, String>> referencingJobs = serviceManager.getReferencingJobs(id, pageNumber, pageSize);
+        ModelPage<Pair<String, String>> referencingJobs = serviceManager.getReferencingJobs(id, pageNumber, pageSize);
         if (referencingJobs != null) {
             return referencingJobs;
         }

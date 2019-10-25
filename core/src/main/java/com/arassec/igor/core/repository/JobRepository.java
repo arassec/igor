@@ -43,7 +43,7 @@ public interface JobRepository {
      * @param id The job's ID.
      * @return The {@link Job}.
      */
-    Job findById(Long id);
+    Job findById(String id);
 
     /**
      * Finds a job by its name.
@@ -58,7 +58,7 @@ public interface JobRepository {
      *
      * @param id The ID of the job to delete.
      */
-    void deleteById(Long id);
+    void deleteById(String id);
 
     /**
      * Returns all services that are used by the given job.
@@ -66,6 +66,6 @@ public interface JobRepository {
      * @param id The job's ID.
      * @return List of service IDs and names used by this job.
      */
-    Set<Pair<Long, String>> findReferencedServices(Long id);
+    Set<Pair<String, String>> findReferencedServices(String id);
 
 }

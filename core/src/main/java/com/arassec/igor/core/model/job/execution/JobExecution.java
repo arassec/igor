@@ -24,7 +24,7 @@ public class JobExecution {
     /**
      * The job's ID.
      */
-    private Long jobId;
+    private String jobId;
 
     /**
      * The timestamp of the creation of this job-execution.
@@ -59,7 +59,7 @@ public class JobExecution {
     /**
      * List with current work in progress, that should be visible in the UI for the user.
      */
-    private List<WorkInProgressMonitor> workInProgress = Collections.synchronizedList(new LinkedList<>());
+    private final List<WorkInProgressMonitor> workInProgress = Collections.synchronizedList(new LinkedList<>());
 
     /**
      * Cancels the job by setting the state accordingly.
