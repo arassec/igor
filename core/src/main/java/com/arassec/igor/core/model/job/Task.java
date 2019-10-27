@@ -81,6 +81,11 @@ public class Task {
     private List<Action> actions = new LinkedList<>();
 
     /**
+     * Indicates whether the task has been initialized or not.
+     */
+    private boolean initialized = false;
+
+    /**
      * Initializes the {@link Provider} and all {@link Action}s of the task.
      *
      * @param jobId        The job's ID.
@@ -89,10 +94,11 @@ public class Task {
     public void initialize(String jobId, JobExecution jobExecution) {
         provider.initialize(jobId, id, jobExecution);
         IgorComponentUtil.initializeServices(provider, jobId, id, jobExecution);
-        actions.forEach(action -> {
+        actions.stream().filter(Action::isActive).forEach(action -> {
             action.initialize(jobId, id, jobExecution);
             IgorComponentUtil.initializeServices(action, jobId, id, jobExecution);
         });
+        initialized = true;
     }
 
     /**
@@ -109,6 +115,16 @@ public class Task {
         log.debug("Starting task '{}'", name);
 
         jobExecution.setCurrentTask(name);
+
+        if (provider == null) {
+            log.debug("No provider set for task '{}'", name);
+            return;
+        }
+
+        if (!initialized) {
+            log.debug("Task has not been initialized!");
+            return;
+        }
 
         // Scan all actions to create lists of actions that belong to the same concurrency group (i.e. use the same
         // number of threads):
@@ -146,7 +162,6 @@ public class Task {
         }
 
         // Read the data from the provider and start working:
-        provider.initialize(jobId, id, jobExecution);
         while (provider.hasNext() && jobExecution.isRunning()) {
             Map<String, Object> data = new HashMap<>();
             data.put(META_KEY, createMetaData(jobId, id));
@@ -189,12 +204,13 @@ public class Task {
      * @param jobExecution Contains information about the job execution.
      */
     void shutdown(String jobId, JobExecution jobExecution) {
-        actions.forEach(action -> {
+        actions.stream().filter(Action::isActive).forEach(action -> {
             IgorComponentUtil.shutdownServices(action, jobId, id, jobExecution);
             action.shutdown(jobId, id, jobExecution);
         });
         IgorComponentUtil.shutdownServices(provider, jobId, id, jobExecution);
         provider.shutdown(jobId, id, jobExecution);
+        initialized = false;
     }
 
     /**

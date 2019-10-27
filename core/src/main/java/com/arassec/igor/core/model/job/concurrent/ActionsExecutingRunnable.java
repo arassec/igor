@@ -125,7 +125,7 @@ public class ActionsExecutingRunnable implements Runnable {
 
             items.clear();
 
-            if (actionResult == null || actionResult.isEmpty()) {
+            if (actionResult.isEmpty()) {
                 break;
             } else {
                 items.addAll(actionResult);

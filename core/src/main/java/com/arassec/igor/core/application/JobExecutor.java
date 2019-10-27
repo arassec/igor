@@ -8,6 +8,7 @@ import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.util.ModelPage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -40,6 +41,7 @@ public class JobExecutor {
      * Maximum number of jobs executed in parallel.s
      */
     @Getter
+    @Value("${igor.num.job-queue-size}")
     private int jobQueueSize = 5;
 
     /**

@@ -143,8 +143,13 @@
                 let jobConfiguration = await IgorBackend.getData('/api/job/' + id)
                 jobConfiguration.name = 'Copy of ' + jobConfiguration.name
                 delete jobConfiguration.id
-                for (let i = 0; i < jobConfiguration.tasks.length; i++) {
+                delete jobConfiguration.trigger.id
+                for (let i in jobConfiguration.tasks) {
                     delete jobConfiguration.tasks[i].id
+                    delete jobConfiguration.tasks[i].provider.id
+                    for (let j in jobConfiguration.tasks[i].actions) {
+                        delete jobConfiguration.tasks[i].actions[j].id
+                    }
                 }
                 this.$root.$data.store.setJobData(jobConfiguration, '-1_-1', -1, '')
                 this.$router.push({name: 'job-editor'})

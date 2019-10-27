@@ -45,7 +45,7 @@
                 </feedback-box>
             </div>
 
-            <div v-if="jobExecution.errorCause != ''">
+            <div v-if="jobExecution.errorCause">
                 <h2>Error cause</h2>
                 <pre><code>{{ jobExecution.errorCause }}
       </code>
@@ -100,6 +100,7 @@
     }
 
     pre {
+        padding: 10px;
         max-height: calc(100vh / 2);
         height: auto;
         overflow: auto;

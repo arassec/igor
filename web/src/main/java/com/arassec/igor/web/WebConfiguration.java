@@ -8,6 +8,7 @@ import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.web.mapper.IgorComponentWebDeserializer;
 import com.arassec.igor.web.mapper.IgorComponentWebSerializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
@@ -119,6 +120,7 @@ public class WebConfiguration {
         objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         SimpleModule mapperModule = new SimpleModule();
 

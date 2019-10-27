@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronSequenceGenerator;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JobManager implements ApplicationListener<ContextStartedEvent>, DisposableBean {
+public class JobManager implements ApplicationListener<ContextRefreshedEvent>, DisposableBean {
 
     /**
      * Repository for jobs.
@@ -67,10 +68,10 @@ public class JobManager implements ApplicationListener<ContextStartedEvent>, Dis
     /**
      * Initializes the manager by scheduling all available jobs.
      *
-     * @param contextStartedEvent Event indicating that the spring context has been created.
+     * @param contextRefreshedEvent Event indicating that the spring context has been refreshed.
      */
     @Override
-    public void onApplicationEvent(ContextStartedEvent contextStartedEvent) {
+    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         // If jobs are already 'running' (e.g. after a server restart) the are updated here:
         ModelPage<JobExecution> jobExecutions = jobExecutionRepository
                 .findInState(JobExecutionState.RUNNING, 0, Integer.MAX_VALUE);

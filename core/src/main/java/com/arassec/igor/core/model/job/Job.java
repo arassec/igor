@@ -125,7 +125,7 @@ public class Job {
             trigger.initialize(id, null, jobExecution);
             IgorComponentUtil.initializeServices(trigger, id, null, jobExecution);
         }
-        tasks.forEach(task -> task.initialize(id, jobExecution));
+        tasks.stream().filter(Task::isActive).forEach(task -> task.initialize(id, jobExecution));
     }
 
     /**
@@ -134,7 +134,7 @@ public class Job {
      * @param jobExecution Container for execution information.
      */
     private void shutdownComponents(JobExecution jobExecution) {
-        tasks.forEach(task -> task.shutdown(id, jobExecution));
+        tasks.stream().filter(Task::isActive).forEach(task -> task.shutdown(id, jobExecution));
         if (trigger != null) {
             IgorComponentUtil.shutdownServices(trigger, id, null, jobExecution);
             trigger.shutdown(id, null, jobExecution);

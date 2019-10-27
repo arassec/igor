@@ -269,7 +269,6 @@
                 this.jobConfiguration = {
                     name: 'New Job',
                     trigger: {
-                        id: null,
                         category: null,
                         type: null,
                         parameters: []
@@ -344,13 +343,11 @@
             },
             addTask: function () {
                 let task = {
-                    id: null,
                     name: 'New Task',
                     description: '',
                     active: true,
                     simulationLimit: 25,
                     provider: {
-                        id: null,
                         category: this.initialProviderCategory,
                         type: this.initialProviderType,
                         parameters: []
@@ -363,6 +360,10 @@
             duplicateTask: function (taskIndex) {
                 let copiedTask = JSON.parse(JSON.stringify(this.jobConfiguration.tasks[taskIndex]))
                 delete copiedTask.id
+                delete copiedTask.provider.id
+                for (let i in copiedTask.actions) {
+                    delete copiedTask.actions[i].id
+                }
                 this.jobConfiguration.tasks.push(copiedTask)
                 this.selectTask(this.jobConfiguration.tasks.length - 1)
             },
@@ -380,7 +381,6 @@
             },
             addAction: function (taskIndex) {
                 let action = {
-                    id: null,
                     active: true,
                     category: this.initialActionCategory,
                     type: this.initialActionType,

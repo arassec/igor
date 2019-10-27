@@ -1,6 +1,8 @@
 - Unit-Tests (Apache Mina SSHD!)
+- Spring-Boot-Starter for igor
 - Export + Import of jobs (persisted values!) and services (via JSON)
 - Add Job property 'self-heal' to auto-resolve failed job runs after successful job execution.
+- Spring-Vault SecurityProvider
 - JSON test result highlighting with highlight.js
 - Persistence-service editor
 - Add Skip- and Limit-Actions

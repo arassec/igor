@@ -26,6 +26,7 @@
     .scroll {
         overflow-x: auto;
         margin-right: 15px;
+        flex: 1 1 auto;
     }
 
     .left {
