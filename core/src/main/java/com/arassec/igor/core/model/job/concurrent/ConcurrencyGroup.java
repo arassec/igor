@@ -2,6 +2,8 @@ package com.arassec.igor.core.model.job.concurrent;
 
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedList;
@@ -51,6 +53,8 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      * The {@link JobExecution} contains information about the state of the current job run. Required here because an
      * exception in a thread should stop the whole job, which runs in another thread.
      */
+    @Getter
+    @Setter
     private JobExecution jobExecution;
 
     /**
@@ -68,7 +72,10 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         this.concurrencyGroupId = concurrencyGroupId;
         this.jobExecution = jobExecution;
 
-        int numThreads = actions.get(0).getNumThreads();
+        int numThreads = 1;
+        if (actions != null && !actions.isEmpty()) {
+            numThreads = actions.get(0).getNumThreads();
+        }
 
         executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads, new ThreadFactory() {
             private final AtomicInteger counter = new AtomicInteger();
@@ -120,7 +127,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         log.debug("Total/Active/Completed Threads in '{}': {}/{}/{}", concurrencyGroupId, executorService.getPoolSize(),
                 executorService.getActiveCount(), executorService.getCompletedTaskCount());
         try {
-            if (!jobExecution.isRunning()) {
+            if (jobExecution != null && !jobExecution.isRunning()) {
                 executorService.shutdownNow();
                 return true;
             }
@@ -154,7 +161,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
-        if (jobExecution.isRunning()) {
+        if (jobExecution != null && jobExecution.isRunning()) {
             jobExecution.fail(throwable);
             log.error("Exception caught in ConcurrencyGroup!", throwable);
         }
@@ -165,7 +172,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      */
     private void waitForEmptyInputQueue() {
         while (!inputQueue.isEmpty()) {
-            if (!jobExecution.isRunning()) {
+            if (jobExecution != null && !jobExecution.isRunning()) {
                 log.debug("Job cancelled. Not waiting for empty input queue in concurrency group: {}", concurrencyGroupId);
                 break;
             }

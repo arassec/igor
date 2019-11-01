@@ -10,12 +10,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,8 +33,8 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests input validation.")
     void testInputvalidation() {
         assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, null, null, null));
-        assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, null, new ArrayBlockingQueue<>(1), null));
-        assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, new ArrayBlockingQueue<>(1), null, null));
+        assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, null, new LinkedBlockingQueue<>(), null));
+        assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, new LinkedBlockingQueue<>(), null, null));
     }
 
     /**
@@ -45,13 +46,13 @@ class ActionsExecutingRunnnableTest {
         Map<String, Object> inputData = new HashMap<>();
         inputData.put(Task.META_KEY, Task.createMetaData("job-id", "task-id"));
 
-        BlockingQueue<Map<String, Object>> inputQueue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         inputQueue.offer(inputData);
 
         Map<String, Object> outputData = new HashMap<>();
         outputData.put("foo", "bar");
 
-        BlockingQueue<Map<String, Object>> outputQueue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingQueue<>();
 
         List<Action> actions = new LinkedList<>();
         Action firstActionMock = mock(Action.class);
@@ -88,8 +89,8 @@ class ActionsExecutingRunnnableTest {
         Map<String, Object> inputData = new HashMap<>();
         inputData.put(Task.META_KEY, Task.createMetaData("job-id", "task-id"));
 
-        BlockingQueue<Map<String, Object>> inputQueue = new ArrayBlockingQueue<>(1);
-        BlockingQueue<Map<String, Object>> outputQueue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
+        BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingQueue<>();
 
         Map<String, Object> outputData = new HashMap<>();
         outputData.put("foo", "bar");

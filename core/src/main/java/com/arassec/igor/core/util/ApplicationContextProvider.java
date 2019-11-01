@@ -39,7 +39,7 @@ public class ApplicationContextProvider implements ApplicationContextAware {
     }
 
     /**
-     * Returns an instace of a igor component.
+     * Returns an instance of a igor component with the specified class and type ID.
      *
      * @param aClass The class.
      * @param typeId The type ID of the igor component.

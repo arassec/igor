@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * A task is an encapsulated unit of work in a job. It is responsible for processing actions, either in the main thread of the
@@ -148,7 +148,7 @@ public class Task {
 
         // Create concurrency groups which start the threads that process the actions:
         List<ConcurrencyGroup> concurrencyGroups = new LinkedList<>();
-        BlockingQueue<Map<String, Object>> providerInputQueue = new ArrayBlockingQueue<>(1000);
+        BlockingQueue<Map<String, Object>> providerInputQueue = new LinkedBlockingQueue<>();
         BlockingQueue<Map<String, Object>> inputQueue = providerInputQueue;
 
         for (List<Action> concurrencyList : concurrencyLists) {

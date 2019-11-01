@@ -31,7 +31,7 @@ public class ModelPageHelper {
                 return new ModelPage<>(pageNumber, pageSize, totalPages, all.subList(startIndex, endIndex));
             }
         }
-
         return new ModelPage<>(pageNumber, 0, 0, List.of());
     }
+
 }
