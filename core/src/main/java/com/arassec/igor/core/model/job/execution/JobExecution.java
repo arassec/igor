@@ -76,7 +76,9 @@ public class JobExecution {
      */
     public synchronized void fail(Throwable errorCause) {
         this.executionState = JobExecutionState.FAILED;
-        this.errorCause = StacktraceFormatter.format(errorCause);
+        if (errorCause != null) {
+            this.errorCause = StacktraceFormatter.format(errorCause);
+        }
         this.finished = Instant.now();
     }
 

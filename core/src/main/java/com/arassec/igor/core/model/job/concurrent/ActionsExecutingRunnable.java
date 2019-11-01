@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Runnable that uses {@link Action}s to process data in a separate thread.
@@ -48,8 +49,16 @@ public class ActionsExecutingRunnable implements Runnable {
      * @param inputQueue  The input queue with incoming data.
      * @param outputQueue The output queue for the processed data.
      */
-    public ActionsExecutingRunnable(List<Action> actions, BlockingQueue<Map<String, Object>> inputQueue,
-                                    BlockingQueue<Map<String, Object>> outputQueue, JobExecution jobExecution) {
+    ActionsExecutingRunnable(List<Action> actions, BlockingQueue<Map<String, Object>> inputQueue,
+                             BlockingQueue<Map<String, Object>> outputQueue, JobExecution jobExecution) {
+        if (inputQueue == null) {
+            throw new IllegalArgumentException("InputQueue required!");
+        }
+
+        if (outputQueue == null) {
+            throw new IllegalArgumentException("OutputQueue required!");
+        }
+
         this.actions = actions;
         this.inputQueue = inputQueue;
         this.outputQueue = outputQueue;
@@ -57,27 +66,21 @@ public class ActionsExecutingRunnable implements Runnable {
     }
 
     /**
-     * Picks the next data from the input queue, lets all actions process the data, and stores the resulting data in
-     * the output queue.
+     * Picks the next data from the input queue, lets all actions process the data, and stores the resulting data in the output
+     * queue.
      * <p>
      * This is done until the {@link ActionsExecutingRunnable#shutdown()} method is called.
      */
     @Override
     public void run() {
         while (active) {
-            Map<String, Object> nextInputItem = inputQueue.poll();
-            if (nextInputItem != null && !nextInputItem.isEmpty()) {
-
-                List<Map<String, Object>> items = new LinkedList<>();
-                items.add(nextInputItem);
-
-                process(actions, items);
-            } else {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    // Doesn't matter, we just waited for the next piece of work...
+            try {
+                Map<String, Object> nextInputItem = inputQueue.poll(500, TimeUnit.MILLISECONDS);
+                if (nextInputItem != null && !nextInputItem.isEmpty()) {
+                    process(actions, List.of(nextInputItem));
                 }
+            } catch (InterruptedException e) {
+                // Doesn't matter, we just waited for the next piece of work...
             }
         }
     }
@@ -101,6 +104,13 @@ public class ActionsExecutingRunnable implements Runnable {
     }
 
     /**
+     * Shuts this thread down by preventing it to read more data from the input queue.
+     */
+    public void shutdown() {
+        active = false;
+    }
+
+    /**
      * Processes the data with the supplied actions.
      *
      * @param actions The actions to apply to the data.
@@ -111,28 +121,30 @@ public class ActionsExecutingRunnable implements Runnable {
             return;
         }
 
+        List<Map<String, Object>> workingItems = new LinkedList<>(items);
+
         for (Action action : actions) {
 
             List<Map<String, Object>> actionResult = new LinkedList<>();
 
-            for (Map<String, Object> item : items) {
-                log.trace("Processing: {}", item);
-                List<Map<String, Object>> partialActionResult = action.process(item, jobExecution);
+            for (Map<String, Object> workingItem : workingItems) {
+                log.trace("Processing: {}", workingItem);
+                List<Map<String, Object>> partialActionResult = action.process(workingItem, jobExecution);
                 if (partialActionResult != null && !partialActionResult.isEmpty()) {
                     actionResult.addAll(partialActionResult);
                 }
             }
 
-            items.clear();
+            workingItems.clear();
 
             if (actionResult.isEmpty()) {
                 break;
             } else {
-                items.addAll(actionResult);
+                workingItems.addAll(actionResult);
             }
         }
 
-        putToOutputQueue(items);
+        putToOutputQueue(workingItems);
     }
 
     /**
@@ -150,13 +162,6 @@ public class ActionsExecutingRunnable implements Runnable {
                 }
             }
         }
-    }
-
-    /**
-     * Shuts this thread down by preventing it to read more data from the input queue.
-     */
-    public void shutdown() {
-        active = false;
     }
 
 }

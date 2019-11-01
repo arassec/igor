@@ -51,9 +51,7 @@ class JobTest {
         assertEquals(JobExecutionState.FINISHED, jobExecution.getExecutionState());
 
         // inactive Task:
-        verify(taskMock, times(0)).initialize(eq("job-id"), eq(jobExecution));
         verify(taskMock, times(0)).run(eq("job-id"), eq(jobExecution));
-        verify(taskMock, times(0)).shutdown(eq("job-id"), eq(jobExecution));
     }
 
     /**
@@ -74,9 +72,7 @@ class JobTest {
         job.run(jobExecution);
 
         assertEquals(JobExecutionState.FINISHED, jobExecution.getExecutionState());
-        verify(taskMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
         verify(taskMock, times(1)).run(eq("job-id"), eq(jobExecution));
-        verify(taskMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
     }
 
     /**
@@ -99,11 +95,11 @@ class JobTest {
     }
 
     /**
-     * Tests cancelling a running job.
+     * Tests cancelling a running job by setting the job-execution's state to {@link JobExecutionState#CANCELLED}.
      */
     @Test
-    @DisplayName("Tests cancelling a running job.")
-    void testJobCancellation() {
+    @DisplayName("Tests cancelling a running job by setting the execution state.")
+    void testJobCancellationByExecutionState() {
         Job job = new Job();
         job.setId("job-id");
         JobExecution jobExecution = new JobExecution();
@@ -125,6 +121,25 @@ class JobTest {
 
         verify(firstTaskMock, times(1)).run(eq("job-id"), eq(jobExecution));
         verify(secondTaskMock, times(0)).run(eq("job-id"), eq(jobExecution));
+    }
+
+    /**
+     * Tests calling the {@link Job#cancel()} method.
+     */
+    @Test
+    @DisplayName("Tests cancelling a running job by calling the cancel() method.")
+    void testJobCancellationByMethod() {
+        Job job = new Job();
+        job.setId("job-id");
+
+        JobExecution jobExecution = new JobExecution();
+        jobExecution.setExecutionState(JobExecutionState.RUNNING);
+
+        job.setCurrentJobExecution(jobExecution);
+
+        job.cancel();
+
+        assertEquals(JobExecutionState.CANCELLED, jobExecution.getExecutionState());
     }
 
     /**

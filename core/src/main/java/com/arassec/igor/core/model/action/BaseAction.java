@@ -2,10 +2,15 @@ package com.arassec.igor.core.model.action;
 
 import com.arassec.igor.core.model.BaseIgorComponent;
 import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
+import com.arassec.igor.core.model.provider.Provider;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import java.util.List;
@@ -17,19 +22,25 @@ import java.util.Map;
 public abstract class BaseAction extends BaseIgorComponent implements Action {
 
     /**
+     * The default JSON-Path configuration.
+     */
+    static final Configuration DEFAULT_JSONPATH_CONFIG = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS,
+            Option.DEFAULT_PATH_LEAF_TO_NULL);
+
+    /**
      * Query for the Job-ID.
      */
-    private static final String JOB_ID_QUERY = "$.meta.jobId";
+    private static final String JOB_ID_QUERY = "$." + Task.META_KEY + "." + Task.JOB_ID_KEY;
 
     /**
      * Query for the Task-ID.
      */
-    private static final String TASK_ID_QUERY = "$.meta.taskId";
+    private static final String TASK_ID_QUERY = "$." + Task.META_KEY + "." + Task.TASK_ID_KEY;
 
     /**
      * Query for the simulation property that indicates a simulated job run.
      */
-    private static final String SIMULATION_QUERY = "$.data.simulation";
+    private static final String SIMULATION_QUERY = "$." + Task.DATA_KEY + "." + Provider.SIMULATION_KEY;
 
     /**
      * The key for simulation log entries.
@@ -56,8 +67,9 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     /**
      * The JSON-Path configuration.
      */
-    private Configuration jsonPathConfiguration = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS,
-            Option.DEFAULT_PATH_LEAF_TO_NULL);
+    @Getter
+    @Setter
+    private Configuration jsonPathConfiguration = DEFAULT_JSONPATH_CONFIG;
 
     /**
      * {@inheritDoc}
@@ -134,7 +146,7 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      * @return {@code true} if the data is processed during a simulated job run, {@code false} otherwise.
      */
     protected boolean isSimulation(Map<String, Object> data) {
-        return getBoolean(data, SIMULATION_QUERY);
+        return getBoolean(data);
     }
 
     /**
@@ -165,7 +177,7 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
             return null;
         }
 
-        if (!query.startsWith("$")) {
+        if (!isQuery(query)) {
             return query;
         }
 
@@ -175,21 +187,16 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     /**
      * Executes the provided JSON-Path query against the supplied data and returns the result as Boolean.
      *
-     * @param data  The data to execute the query on.
-     * @param query The JSON-Path query.
+     * @param data The data to execute the query on.
      *
      * @return The querie's result if any, or {@code false} in every other case.
      */
-    protected boolean getBoolean(Map<String, Object> data, String query) {
-        if (data == null || query == null) {
+    private boolean getBoolean(Map<String, Object> data) {
+        if (data == null || data.isEmpty()) {
             return false;
         }
 
-        if (!query.startsWith("$")) {
-            return false;
-        }
-
-        Boolean value = JsonPath.using(jsonPathConfiguration).parse(data).read(query);
+        Boolean value = JsonPath.using(jsonPathConfiguration).parse(data).read(BaseAction.SIMULATION_QUERY);
         if (value != null) {
             return value;
         }

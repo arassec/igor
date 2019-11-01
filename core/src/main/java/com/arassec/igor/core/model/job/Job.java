@@ -82,7 +82,7 @@ public class Job {
         currentJobExecution.setStarted(Instant.now());
         running = true;
         try {
-            initializeComponents(jobExecution);
+            initialize(jobExecution);
             for (Task task : tasks) {
                 if (!currentJobExecution.isRunning()) {
                     break;
@@ -99,7 +99,7 @@ public class Job {
             log.error("Exception during job execution!", e);
             currentJobExecution.fail(e);
         } finally {
-            shutdownComponents(jobExecution);
+            shutdown(jobExecution);
             currentJobExecution.setFinished(Instant.now());
             running = false;
             log.debug("Finished job: {} ({}): {}", name, id, currentJobExecution);
@@ -120,12 +120,11 @@ public class Job {
      *
      * @param jobExecution Container for execution information.
      */
-    private void initializeComponents(JobExecution jobExecution) {
+    private void initialize(JobExecution jobExecution) {
         if (trigger != null) {
             trigger.initialize(id, null, jobExecution);
             IgorComponentUtil.initializeServices(trigger, id, null, jobExecution);
         }
-        tasks.stream().filter(Task::isActive).forEach(task -> task.initialize(id, jobExecution));
     }
 
     /**
@@ -133,8 +132,7 @@ public class Job {
      *
      * @param jobExecution Container for execution information.
      */
-    private void shutdownComponents(JobExecution jobExecution) {
-        tasks.stream().filter(Task::isActive).forEach(task -> task.shutdown(id, jobExecution));
+    private void shutdown(JobExecution jobExecution) {
         if (trigger != null) {
             IgorComponentUtil.shutdownServices(trigger, id, null, jobExecution);
             trigger.shutdown(id, null, jobExecution);

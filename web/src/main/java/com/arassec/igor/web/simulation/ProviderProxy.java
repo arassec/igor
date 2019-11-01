@@ -89,6 +89,7 @@ public class ProviderProxy implements Provider {
         try {
             Map<String, Object> data = delegate.next();
             if (data != null) {
+                data.put(Provider.SIMULATION_KEY, true);
                 collectedData.add(data);
             }
             return data;

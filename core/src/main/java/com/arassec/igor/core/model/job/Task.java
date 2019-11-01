@@ -37,9 +37,19 @@ public class Task {
     public static final String DATA_KEY = "data";
 
     /**
-     * The key for the simulation property.
+     * The key to the job's ID in the meta-data.
      */
-    public static final String SIMULATION_KEY = "simulation";
+    public static final String JOB_ID_KEY = "jobId";
+
+    /**
+     * The key to the task's ID in the meta-data.
+     */
+    public static final String TASK_ID_KEY = "taskId";
+
+    /**
+     * The key to the current timestamp in the meta-data.
+     */
+    public static final String TIMESTAMP_KEY = "timestamp";
 
     /**
      * The name pattern for concurrency-group IDs.
@@ -81,24 +91,18 @@ public class Task {
     private List<Action> actions = new LinkedList<>();
 
     /**
-     * Indicates whether the task has been initialized or not.
-     */
-    private boolean initialized = false;
-
-    /**
-     * Initializes the {@link Provider} and all {@link Action}s of the task.
+     * Creates the meta-data.
      *
-     * @param jobId        The job's ID.
-     * @param jobExecution Contains information about the job execution.
+     * @param jobId The job's ID.
+     *
+     * @return The meta-data for the job run.
      */
-    public void initialize(String jobId, JobExecution jobExecution) {
-        provider.initialize(jobId, id, jobExecution);
-        IgorComponentUtil.initializeServices(provider, jobId, id, jobExecution);
-        actions.stream().filter(Action::isActive).forEach(action -> {
-            action.initialize(jobId, id, jobExecution);
-            IgorComponentUtil.initializeServices(action, jobId, id, jobExecution);
-        });
-        initialized = true;
+    public static Map<String, Object> createMetaData(String jobId, String taskId) {
+        Map<String, Object> metaData = new HashMap<>();
+        metaData.put(JOB_ID_KEY, jobId);
+        metaData.put(TASK_ID_KEY, taskId);
+        metaData.put(TIMESTAMP_KEY, Instant.now().toEpochMilli());
+        return metaData;
     }
 
     /**
@@ -118,11 +122,6 @@ public class Task {
 
         if (provider == null) {
             log.debug("No provider set for task '{}'", name);
-            return;
-        }
-
-        if (!initialized) {
-            log.debug("Task has not been initialized!");
             return;
         }
 
@@ -161,6 +160,9 @@ public class Task {
             concurrencyGroups.add(concurrencyGroup);
         }
 
+        // Initialize IgorComponents used by the task:
+        initialize(jobId, jobExecution);
+
         // Read the data from the provider and start working:
         while (provider.hasNext() && jobExecution.isRunning()) {
             Map<String, Object> data = new HashMap<>();
@@ -194,7 +196,25 @@ public class Task {
             log.debug("Threads terminated over all concurrency-groups: {}", allThreadsTerminated);
         }
 
+        // Shutdown IgorComponents after task execution:
+        shutdown(jobId, jobExecution);
+
         log.debug("Task '{}' finished!", name);
+    }
+
+    /**
+     * Initializes the {@link Provider} and all {@link Action}s of the task.
+     *
+     * @param jobId        The job's ID.
+     * @param jobExecution Contains information about the job execution.
+     */
+    private void initialize(String jobId, JobExecution jobExecution) {
+        provider.initialize(jobId, id, jobExecution);
+        IgorComponentUtil.initializeServices(provider, jobId, id, jobExecution);
+        actions.stream().filter(Action::isActive).forEach(action -> {
+            action.initialize(jobId, id, jobExecution);
+            IgorComponentUtil.initializeServices(action, jobId, id, jobExecution);
+        });
     }
 
     /**
@@ -203,29 +223,13 @@ public class Task {
      * @param jobId        The job's ID.
      * @param jobExecution Contains information about the job execution.
      */
-    void shutdown(String jobId, JobExecution jobExecution) {
+    private void shutdown(String jobId, JobExecution jobExecution) {
         actions.stream().filter(Action::isActive).forEach(action -> {
             IgorComponentUtil.shutdownServices(action, jobId, id, jobExecution);
             action.shutdown(jobId, id, jobExecution);
         });
         IgorComponentUtil.shutdownServices(provider, jobId, id, jobExecution);
         provider.shutdown(jobId, id, jobExecution);
-        initialized = false;
-    }
-
-    /**
-     * Creates the meta-data.
-     *
-     * @param jobId The job's ID.
-     *
-     * @return The meta-data for the job run.
-     */
-    public static Object createMetaData(String jobId, String taskId) {
-        Map<String, Object> metaData = new HashMap<>();
-        metaData.put("jobId", jobId);
-        metaData.put("taskId", taskId);
-        metaData.put("timestamp", Instant.now().toEpochMilli());
-        return metaData;
     }
 
 }

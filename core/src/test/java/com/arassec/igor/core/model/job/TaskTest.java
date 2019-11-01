@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 /**
@@ -33,7 +33,6 @@ class TaskTest {
         task.run("job-id", jobExecution);
 
         assertEquals("test-task", jobExecution.getCurrentTask());
-        assertFalse(task.isInitialized());
     }
 
     /**
@@ -44,7 +43,7 @@ class TaskTest {
     void testRunMinimalTask() {
         Task task = new Task();
         task.setName("test-task");
-        task.setInitialized(true);
+        task.setId("task-id");
 
         JobExecution jobExecution = new JobExecution();
         jobExecution.setExecutionState(JobExecutionState.RUNNING);
@@ -63,9 +62,27 @@ class TaskTest {
 
         task.run("job-id", jobExecution);
 
+        verify(providerMock, times(1)).initialize(eq("job-id"), eq("task-id"), eq(jobExecution));
+        verify(actionMock, times(1)).initialize(eq("job-id"), eq("task-id"), eq(jobExecution));
+
         verify(providerMock, times(2)).hasNext();
         verify(providerMock, times(1)).next();
         verify(actionMock, times(1)).process(anyMap(), eq(jobExecution));
+
+        verify(providerMock, times(1)).shutdown(eq("job-id"), eq("task-id"), eq(jobExecution));
+        verify(actionMock, times(1)).shutdown(eq("job-id"), eq("task-id"), eq(jobExecution));
+    }
+
+    /**
+     * Tests creating the meta-data for a task data item.
+     */
+    @Test
+    @DisplayName("Tests creating job meta-data.")
+    void testCreateMetaData() {
+        Map<String, Object> metaData = Task.createMetaData("job-id", "task-id");
+        assertEquals("job-id", metaData.get(Task.JOB_ID_KEY));
+        assertEquals("task-id", metaData.get(Task.TASK_ID_KEY));
+        assertNotNull(metaData.get(Task.TIMESTAMP_KEY));
     }
 
 }
