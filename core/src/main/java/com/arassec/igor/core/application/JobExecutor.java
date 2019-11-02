@@ -41,7 +41,7 @@ public class JobExecutor {
      * Maximum number of jobs executed in parallel.s
      */
     @Getter
-    @Value("${igor.num.job-queue-size}")
+    @Value("${igor.job-queue.size}")
     private int jobQueueSize = 5;
 
     /**

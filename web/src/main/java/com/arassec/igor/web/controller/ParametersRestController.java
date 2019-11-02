@@ -90,7 +90,7 @@ public class ParametersRestController {
      */
     private Object serializeParameters(String typeId) {
         try {
-            IgorComponent igorComponent = igorComponentRegistry.getClass(typeId).orElseThrow(() -> new IllegalArgumentException("Unknown type ID: " + typeId));
+            IgorComponent igorComponent = igorComponentRegistry.getInstance(typeId).orElseThrow(() -> new IllegalArgumentException("Unknown type ID: " + typeId));
             Map<String, Object> jsonMap = objectMapper.readValue(objectMapper.writeValueAsString(igorComponent),
                     new TypeReference<>() {
                     });

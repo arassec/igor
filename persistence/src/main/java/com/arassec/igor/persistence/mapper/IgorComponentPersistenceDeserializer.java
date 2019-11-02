@@ -69,7 +69,7 @@ public class IgorComponentPersistenceDeserializer<T extends IgorComponent> exten
             return null;
         }
 
-        Optional<IgorComponent> classOptional = igorComponentRegistry.getClass(typeId);
+        Optional<IgorComponent> classOptional = igorComponentRegistry.getInstance(typeId);
         if (classOptional.isEmpty()) {
             throw new IllegalStateException("Unknown type ID: " + typeId);
         }

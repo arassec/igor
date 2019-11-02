@@ -69,7 +69,7 @@ public class IgorComponentWebDeserializer<T extends IgorComponent> extends StdDe
 
         String typeId = getTypeId((Map<String, Object>) map.get(TYPE));
 
-        Optional<IgorComponent> classOptional = igorComponentRegistry.getClass(typeId);
+        Optional<IgorComponent> classOptional = igorComponentRegistry.getInstance(typeId);
         if (classOptional.isEmpty()) {
             throw new IllegalStateException("Unknown type ID: " + typeId);
         }

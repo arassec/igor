@@ -11,7 +11,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -118,13 +117,13 @@ public class IgorComponentRegistry implements InitializingBean {
     }
 
     /**
-     * Returns the class of the component with the provided type ID.
+     * Returns an instance of the component with the provided type ID.
      *
      * @param typeId The component's type ID.
      *
-     * @return The component's class if available.
+     * @return The component instance if available.
      */
-    public Optional<IgorComponent> getClass(String typeId) {
+    public Optional<IgorComponent> getInstance(String typeId) {
         if (typeToComponentPrototype.containsKey(typeId)) {
             return Optional.of(typeToComponentPrototype.get(typeId));
         }
@@ -144,10 +143,10 @@ public class IgorComponentRegistry implements InitializingBean {
             if (component instanceof Service) {
                 Class<?>[] interfaces = ClassUtils.getAllInterfaces(component);
                 if (interfaces != null && interfaces.length > 0) {
-                    for (int i = 0; i < interfaces.length; i++) {
+                    for (Class<?> anInterface : interfaces) {
                         // Skip IgorComponent and Service
-                        if (!interfaces[i].equals(IgorComponent.class) && !interfaces[i].equals(Service.class)) {
-                            serviceInterfaceToCategory.put(interfaces[i], component.getCategoryId());
+                        if (!anInterface.equals(IgorComponent.class) && !anInterface.equals(Service.class)) {
+                            serviceInterfaceToCategory.put(anInterface, component.getCategoryId());
                         }
                     }
                 }

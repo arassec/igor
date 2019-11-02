@@ -26,7 +26,7 @@ public class JobRunningCallable implements Callable<Job> {
      * @param job          The job.
      * @param jobExecution The job's execution.
      */
-    public JobRunningCallable(Job job, JobExecution jobExecution) {
+    JobRunningCallable(Job job, JobExecution jobExecution) {
         this.job = job;
         this.jobExecution = jobExecution;
     }

@@ -6,6 +6,7 @@ import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -18,21 +19,13 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ServiceManager {
 
     /**
      * Repository for services.
      */
     private final ServiceRepository serviceRepository;
-
-    /**
-     * Creates a new instance.
-     *
-     * @param serviceRepository The repository to load services from and store services into.
-     */
-    public ServiceManager(ServiceRepository serviceRepository) {
-        this.serviceRepository = serviceRepository;
-    }
 
     /**
      * Saves the provided service.
