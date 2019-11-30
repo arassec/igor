@@ -10,11 +10,6 @@ import java.util.Map;
 public interface Provider extends IgorComponent {
 
     /**
-     * The key for the simulation property.
-     */
-    String SIMULATION_KEY = "simulation";
-
-    /**
      * Returns {@code true}, if there is further data to process.
      *
      * @return {@code true}, if there is data to process, {@code false} otherwise.

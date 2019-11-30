@@ -1,10 +1,9 @@
 package com.arassec.igor.module.misc.action.util;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -14,8 +13,7 @@ import java.util.Map;
  * Pauses the processing for a configurable amount of time.
  */
 @Slf4j
-@Component
-@Scope("prototype")
+@IgorComponent
 public class PauseAction extends BaseUtilAction {
 
     /**
@@ -24,6 +22,13 @@ public class PauseAction extends BaseUtilAction {
     @PositiveOrZero
     @IgorParam
     private long milliseconds;
+
+    /**
+     * Creates a new component instance.
+     */
+    public PauseAction()  {
+        super("a8a0bd17-5ee7-48bd-8df1-5fe898e1d38a");
+    }
 
     /**
      * Pauses the processing for every data that is supplied to it.
@@ -41,17 +46,11 @@ public class PauseAction extends BaseUtilAction {
             try {
                 Thread.sleep(milliseconds);
             } catch (InterruptedException e) {
-                log.debug("Interrupted during pause action!");
+                log.error("Interrupted during pause action!", e);
+                Thread.currentThread().interrupt();
             }
         }
         return List.of(data);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "a8a0bd17-5ee7-48bd-8df1-5fe898e1d38a";
-    }
 }

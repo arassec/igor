@@ -7,7 +7,6 @@ import com.arassec.igor.module.misc.action.BaseMiscActionTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -29,12 +28,9 @@ class PersistValueActionTest extends BaseMiscActionTest {
     void testProcessWithoutCleanup() {
         PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
 
-        PersistValueAction action = new PersistValueAction();
+        PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
         action.setInput("$.data." + PARAM_KEY);
         action.setNumValuesToKeep(0);
-
-        // PowerMock doesn't support JUnit 5 yet...
-        ReflectionTestUtils.setField(action, "persistentValueRepository", persistentValueRepositoryMock);
 
         ArgumentCaptor<PersistentValue> argCap = ArgumentCaptor.forClass(PersistentValue.class);
 

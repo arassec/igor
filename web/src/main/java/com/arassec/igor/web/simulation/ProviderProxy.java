@@ -1,9 +1,11 @@
 package com.arassec.igor.web.simulation;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.util.StacktraceFormatter;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,8 +14,9 @@ import java.util.Map;
 /**
  * Proxy for {@link Provider}s, that collects the provided data for later processing.
  */
-@Data
-public class ProviderProxy implements Provider {
+@Getter
+@Setter
+public class ProviderProxy extends BaseProxy<Provider> implements Provider {
 
     /**
      * The real provider proxied by this class.
@@ -36,16 +39,12 @@ public class ProviderProxy implements Provider {
     private List<Map<String, Object>> collectedData = new LinkedList<>();
 
     /**
-     * Might contain an error cause if the proxied provider failed abnormally.
-     */
-    private String errorCause;
-
-    /**
      * Creates a new proxy instance.
      *
      * @param delegate The real provider proxied by this instance.
      */
     public ProviderProxy(Provider delegate) {
+        super(delegate);
         this.delegate = delegate;
     }
 
@@ -57,7 +56,7 @@ public class ProviderProxy implements Provider {
         try {
             delegate.initialize(jobId, taskId, jobExecution);
         } catch (Exception e) {
-            errorCause = StacktraceFormatter.format(e);
+            setErrorCause(StacktraceFormatter.format(e));
         }
     }
 
@@ -74,7 +73,7 @@ public class ProviderProxy implements Provider {
                 return delegate.hasNext();
             }
         } catch (Exception e) {
-            errorCause = StacktraceFormatter.format(e);
+            setErrorCause(StacktraceFormatter.format(e));
         }
         return false;
     }
@@ -89,58 +88,14 @@ public class ProviderProxy implements Provider {
         try {
             Map<String, Object> data = delegate.next();
             if (data != null) {
-                data.put(Provider.SIMULATION_KEY, true);
+                data.put(DataKey.SIMULATION.getKey(), true);
                 collectedData.add(data);
             }
             return data;
         } catch (Exception e) {
-            errorCause = StacktraceFormatter.format(e);
+            setErrorCause(StacktraceFormatter.format(e));
         }
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void shutdown(String jobId, String taskId, JobExecution jobExecution) {
-        try {
-            delegate.shutdown(jobId, taskId, jobExecution);
-        } catch (Exception e) {
-            errorCause = StacktraceFormatter.format(e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getCategoryId() {
-        return delegate.getCategoryId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return delegate.getTypeId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getId() {
-        return delegate.getId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setId(String id) {
-        delegate.setId(id);
     }
 
 }

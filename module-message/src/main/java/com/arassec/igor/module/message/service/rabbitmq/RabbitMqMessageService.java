@@ -1,9 +1,9 @@
 package com.arassec.igor.module.message.service.rabbitmq;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
-import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.message.service.BaseMessageService;
 import com.arassec.igor.module.message.service.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -11,8 +11,6 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
@@ -20,9 +18,8 @@ import javax.validation.constraints.Positive;
 /**
  * Message service to process messages via RabbitMQ.
  */
-@Component
-@Scope("prototype")
 @ConditionalOnClass(RabbitTemplate.class)
+@IgorComponent
 public class RabbitMqMessageService extends BaseMessageService {
 
     /**
@@ -107,6 +104,13 @@ public class RabbitMqMessageService extends BaseMessageService {
     private RabbitTemplate rabbitTemplate;
 
     /**
+     * Creates a new component instance.
+     */
+    public RabbitMqMessageService() {
+        super("481df4ed-008f-4d6e-a186-76b71325f362");
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -158,25 +162,15 @@ public class RabbitMqMessageService extends BaseMessageService {
      * {@inheritDoc}
      */
     @Override
-    public void testConfiguration() throws ServiceException {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host, port);
-        connectionFactory.setUsername(username);
-        connectionFactory.setPassword(password);
-        connectionFactory.setRequestedHeartBeat(heartBeat);
-        connectionFactory.setVirtualHost(virtualHost);
+    public void testConfiguration() {
+        CachingConnectionFactory testConnectionFactory = new CachingConnectionFactory(host, port);
+        testConnectionFactory.setUsername(username);
+        testConnectionFactory.setPassword(password);
+        testConnectionFactory.setRequestedHeartBeat(heartBeat);
+        testConnectionFactory.setVirtualHost(virtualHost);
 
-        Connection connection = connectionFactory.createConnection();
-        if (connection != null) {
-            connection.close();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "481df4ed-008f-4d6e-a186-76b71325f362";
+        Connection connection = testConnectionFactory.createConnection();
+        connection.close();
     }
 
 }

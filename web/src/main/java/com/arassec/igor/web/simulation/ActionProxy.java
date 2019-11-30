@@ -3,7 +3,8 @@ package com.arassec.igor.web.simulation;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.StacktraceFormatter;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,8 +13,9 @@ import java.util.Map;
 /**
  * Proxy for {@link Action}s that collects the result data of the action and stores it for further processing.
  */
-@Data
-public class ActionProxy implements Action {
+@Getter
+@Setter
+public class ActionProxy extends BaseProxy<Action> implements Action {
 
     /**
      * The real action this proxy is hiding.
@@ -36,6 +38,7 @@ public class ActionProxy implements Action {
      * @param delegate The proxied action.
      */
     public ActionProxy(Action delegate) {
+        super(delegate);
         this.delegate = delegate;
     }
 
@@ -70,7 +73,7 @@ public class ActionProxy implements Action {
         } catch (Exception e) {
             errorCause = StacktraceFormatter.format(e);
         }
-        return null;
+        return List.of();
     }
 
     /**
@@ -96,18 +99,6 @@ public class ActionProxy implements Action {
      * {@inheritDoc}
      */
     @Override
-    public void shutdown(String jobId, String taskId, JobExecution jobExecution) {
-        try {
-            delegate.shutdown(jobId, taskId, jobExecution);
-        } catch (Exception e) {
-            errorCause = StacktraceFormatter.format(e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public int getNumThreads() {
         return delegate.getNumThreads();
     }
@@ -126,38 +117,6 @@ public class ActionProxy implements Action {
     @Override
     public void setActive(boolean active) {
         delegate.setActive(active);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getCategoryId() {
-        return delegate.getCategoryId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return delegate.getTypeId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getId() {
-        return delegate.getId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setId(String id) {
-        delegate.setId(id);
     }
 
 }

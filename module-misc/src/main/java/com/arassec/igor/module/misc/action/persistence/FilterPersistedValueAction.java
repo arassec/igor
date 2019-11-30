@@ -1,11 +1,11 @@
 package com.arassec.igor.module.misc.action.persistence;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
+import com.arassec.igor.core.repository.PersistentValueRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -15,8 +15,7 @@ import java.util.Map;
  * Filters data of which a value has already been persisted before.
  */
 @Slf4j
-@Component
-@Scope("prototype")
+@IgorComponent
 public class FilterPersistedValueAction extends BasePersistenceAction {
 
     /**
@@ -25,6 +24,15 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
     @NotBlank
     @IgorParam
     private String input;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param persistentValueRepository The repository for persisted values.
+     */
+    public FilterPersistedValueAction(PersistentValueRepository persistentValueRepository) {
+        super("e9579cb0-9581-42a0-a295-f169b9bd8aec", persistentValueRepository);
+    }
 
     /**
      * Retrieves the value from the supplied data and searches it in the persisted values. If it is already persisted, the data is
@@ -45,25 +53,17 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
 
         if (resolvedInput == null) {
             log.debug("Not enough data to filter: {}", input);
-            return null;
+            return List.of();
         }
 
         PersistentValue value = new PersistentValue(resolvedInput);
         if (persistentValueRepository.isPersisted(jobId, taskId, value)) {
             log.debug("Filtered persisted value: '{}'", resolvedInput);
-            return null;
+            return List.of();
         }
 
         log.debug("Passed un-persisted value: '{}'", resolvedInput);
         return List.of(data);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "e9579cb0-9581-42a0-a295-f169b9bd8aec";
     }
 
 }

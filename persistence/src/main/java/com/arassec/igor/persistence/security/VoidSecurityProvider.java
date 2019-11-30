@@ -1,11 +1,13 @@
 package com.arassec.igor.persistence.security;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 /**
  * {@link SecurityProvider} that doesn't provide security at all. Can be used to disable parameter encryption.
  */
+@Primary
 @Component
 @ConditionalOnSingleCandidate(SecurityProvider.class)
 public class VoidSecurityProvider extends BaseSecurityProvider {

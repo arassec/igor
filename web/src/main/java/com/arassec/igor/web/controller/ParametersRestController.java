@@ -2,7 +2,11 @@ package com.arassec.igor.web.controller;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
-import com.arassec.igor.web.mapper.WebMapperKeyAware;
+import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.provider.Provider;
+import com.arassec.igor.core.model.service.Service;
+import com.arassec.igor.core.model.trigger.Trigger;
+import com.arassec.igor.web.mapper.WebMapperKey;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +46,7 @@ public class ParametersRestController {
      */
     @GetMapping(value = "service/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Object getServiceParameters(@PathVariable("type") String type) {
-        return serializeParameters(type);
+        return serializeParameters(Service.class, type);
     }
 
     /**
@@ -54,7 +58,7 @@ public class ParametersRestController {
      */
     @GetMapping(value = "action/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Object getActionParameters(@PathVariable("type") String type) {
-        return serializeParameters(type);
+        return serializeParameters(Action.class, type);
     }
 
     /**
@@ -66,7 +70,7 @@ public class ParametersRestController {
      */
     @GetMapping(value = "provider/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Object getProviderParameters(@PathVariable("type") String type) {
-        return serializeParameters(type);
+        return serializeParameters(Provider.class, type);
     }
 
     /**
@@ -78,7 +82,7 @@ public class ParametersRestController {
      */
     @GetMapping(value = "trigger/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Object getTriggerParameters(@PathVariable("type") String type) {
-        return serializeParameters(type);
+        return serializeParameters(Trigger.class, type);
     }
 
     /**
@@ -88,13 +92,24 @@ public class ParametersRestController {
      *
      * @return The parameters as JSON-String.
      */
-    private Object serializeParameters(String typeId) {
+    private Object serializeParameters(Class<? extends IgorComponent> clazz, String typeId) {
         try {
-            IgorComponent igorComponent = igorComponentRegistry.getInstance(typeId).orElseThrow(() -> new IllegalArgumentException("Unknown type ID: " + typeId));
+            IgorComponent igorComponent;
+            if (clazz.equals(Action.class)) {
+                igorComponent = igorComponentRegistry.getActionInstance(typeId, null);
+            } else if (clazz.equals(Service.class)) {
+                igorComponent = igorComponentRegistry.getServiceInstance(typeId, null);
+            } else if (clazz.equals(Provider.class)) {
+                igorComponent = igorComponentRegistry.getProviderInstance(typeId, null);
+            } else if (clazz.equals(Trigger.class)) {
+                igorComponent = igorComponentRegistry.getTriggerInstance(typeId, null);
+            } else {
+                throw new IllegalArgumentException("Unknown igor component type: " + clazz);
+            }
             Map<String, Object> jsonMap = objectMapper.readValue(objectMapper.writeValueAsString(igorComponent),
                     new TypeReference<>() {
                     });
-            return jsonMap.get(WebMapperKeyAware.PARAMETERS);
+            return jsonMap.get(WebMapperKey.PARAMETERS.getKey());
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Could not read parameters!", e);
         }

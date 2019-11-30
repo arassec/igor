@@ -1,7 +1,10 @@
 package com.arassec.igor.core.model;
 
+import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import org.springframework.lang.Nullable;
+
+import java.util.Set;
 
 /**
  * Defines a component in the igor application.
@@ -39,6 +42,12 @@ public interface IgorComponent {
      */
     @IgorSimulationSafe
     void setId(String id);
+
+    /**
+     * Returns
+     */
+    @IgorSimulationSafe
+    Set<String> getUnEditableProperties();
 
     /**
      * Initializes the component before job executions.

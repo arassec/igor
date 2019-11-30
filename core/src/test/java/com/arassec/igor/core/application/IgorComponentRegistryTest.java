@@ -1,24 +1,23 @@
 package com.arassec.igor.core.application;
 
-import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.service.BaseService;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.model.trigger.Trigger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationContext;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests the {@link IgorComponentRegistry}.
@@ -33,15 +32,38 @@ class IgorComponentRegistryTest {
     private IgorComponentRegistry igorComponentRegistry;
 
     /**
+     * Mock of the spring application context.
+     */
+    private ApplicationContext applicationContextMock;
+
+    /**
+     * An action mock.
+     */
+    private Action actionMock = mock(Action.class);
+
+    /**
      * Initializes the test environment.
      */
     @BeforeEach
     void initialize() {
-        Action actionMock = mock(Action.class);
+
         when(actionMock.getTypeId()).thenReturn("action-type-id");
         when(actionMock.getCategoryId()).thenReturn("action-category-id");
-        igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock), List.of(), List.of(), List.of(new TestServiceImpl()));
+
+        Provider providerMock = mock(Provider.class);
+        when(providerMock.getTypeId()).thenReturn("provider-type-id");
+        when(providerMock.getCategoryId()).thenReturn("provider-category-id");
+
+        Trigger triggerMock = mock(Trigger.class);
+        when(triggerMock.getTypeId()).thenReturn("trigger-type-id");
+        when(triggerMock.getCategoryId()).thenReturn("trigger-category-id");
+
+        applicationContextMock = mock(ApplicationContext.class);
+
+        igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock), List.of(providerMock), List.of(triggerMock),
+                List.of(new TestServiceImpl()));
         igorComponentRegistry.afterPropertiesSet();
+        igorComponentRegistry.setApplicationContext(applicationContextMock);
     }
 
     /**
@@ -50,7 +72,6 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting all categories of a component type")
     void testGetCategoriesOfComponentType() {
-        assertTrue(igorComponentRegistry.getCategoriesOfComponentType(Provider.class).isEmpty());
         Set<String> categoriesOfComponentType = igorComponentRegistry.getCategoriesOfComponentType(Action.class);
         assertEquals("action-category-id", categoriesOfComponentType.iterator().next());
     }
@@ -80,13 +101,11 @@ class IgorComponentRegistryTest {
      * Tests getting a component instance.
      */
     @Test
-    @DisplayName("Tests getting an IgorComponent instance.")
-    void testGetInstance() {
-        assertTrue(igorComponentRegistry.getInstance("unknown-type-id").isEmpty());
-        Optional<IgorComponent> igorComponentOptional = igorComponentRegistry.getInstance("action-type-id");
-        assertTrue(igorComponentOptional.isPresent());
-        assertTrue(igorComponentOptional.get() instanceof Action);
-        assertEquals("action-category-id", igorComponentOptional.get().getCategoryId());
+    @DisplayName("Tests getting an Action instance.")
+    void testGetActionInstance() {
+        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.getActionInstance("unknown-type-id", null));
+        igorComponentRegistry.getActionInstance("action-type-id", null);
+        verify(applicationContextMock, times(1)).getBean(eq(actionMock.getClass()));
     }
 
     /**
@@ -101,27 +120,19 @@ class IgorComponentRegistryTest {
     private static class TestServiceImpl extends BaseService implements TestService {
 
         /**
+         * Creates a new component instance.
+         */
+        TestServiceImpl() {
+            super("service-category-id", "service-type-id");
+        }
+
+        /**
          * {@inheritDoc}
          */
         @Override
         public void testConfiguration() throws ServiceException {
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getCategoryId() {
-            return "service-category-id";
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getTypeId() {
-            return "service-type-id";
-        }
     }
 
 }

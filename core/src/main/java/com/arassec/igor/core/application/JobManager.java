@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
@@ -242,7 +241,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      */
     public JobExecution getJobExecution(Long id) {
         JobExecution jobExecution = jobExecutionRepository.findById(id);
-        if (JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {
+        if (jobExecution != null && JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {
             JobExecution runningJobExecution = jobExecutor.getJobExecution(jobExecution.getJobId());
             if (runningJobExecution != null) {
                 jobExecution.setCurrentTask(runningJobExecution.getCurrentTask());
@@ -315,10 +314,10 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
         if (job.getTrigger() instanceof ScheduledTrigger) {
             String cronExpression = ((ScheduledTrigger) job.getTrigger()).getCronExpression();
             try {
-                scheduledJobs.put(job.getId(), taskScheduler.schedule(new Thread(() -> {
+                scheduledJobs.put(job.getId(), taskScheduler.schedule(() -> {
                     log.info("Trying to automatically enqueue job: {} ({})", job.getName(), job.getId());
                     enqueueJob(job);
-                }), new CronTrigger(cronExpression)));
+                }, new CronTrigger(cronExpression)));
                 log.info("Scheduled job: {} ({}).", job.getName(), job.getId());
             } catch (IllegalArgumentException e) {
                 throw new IllegalStateException("Illegal trigger configured (" + e.getMessage() + ")");

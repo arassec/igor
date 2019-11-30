@@ -1,6 +1,6 @@
 package com.arassec.igor.web.simulation;
 
-import com.arassec.igor.core.model.IgorSimulationSafe;
+import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.model.service.Service;
 import org.mockito.Mockito;
 

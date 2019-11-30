@@ -1,5 +1,6 @@
 package com.arassec.igor.module.misc.action;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.Task;
 
 import java.util.HashMap;
@@ -30,8 +31,8 @@ public abstract class BaseMiscActionTest {
         item.put(PARAM_KEY, PARAM_VALUE);
 
         Map<String, Object> result = new HashMap<>();
-        result.put(Task.META_KEY, Task.createMetaData("1", "1"));
-        result.put(Task.DATA_KEY, item);
+        result.put(DataKey.META.getKey(), Task.createMetaData("1", "1"));
+        result.put(DataKey.DATA.getKey(), item);
 
         return result;
     }

@@ -1,10 +1,9 @@
 package com.arassec.igor.module.misc.action.util;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -14,8 +13,7 @@ import java.util.Map;
  * Filters the supplied data by a regular expression.
  */
 @Slf4j
-@Component
-@Scope("prototype")
+@IgorComponent
 public class FilterByRegExpAction extends BaseUtilAction {
 
     /**
@@ -31,6 +29,13 @@ public class FilterByRegExpAction extends BaseUtilAction {
     @NotBlank
     @IgorParam
     private String expression;
+
+    /**
+     * Creates a new component instance.
+     */
+    public FilterByRegExpAction() {
+        super("b404544a-a145-440c-80a3-1017e2b193cf");
+    }
 
     /**
      * Matches the provided data against the configured regular expression and filters it, if it doesn't match.
@@ -49,23 +54,16 @@ public class FilterByRegExpAction extends BaseUtilAction {
 
         if (resolvedInput == null || resolvedExpression == null) {
             log.debug("Missing required data for filtering: {} / {}", resolvedInput, resolvedExpression);
-            return null;
+            return List.of();
         }
 
         if (!resolvedInput.matches(resolvedExpression)) {
             log.debug("Filtered '{}' against RegExp '{}'", resolvedInput, resolvedExpression);
-            return null;
+            return List.of();
         }
 
         log.debug("Passed '{}' against RegExp '{}'", resolvedInput, resolvedExpression);
         return List.of(data);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "b404544a-a145-440c-80a3-1017e2b193cf";
-    }
 }

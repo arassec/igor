@@ -18,6 +18,16 @@ public abstract class BaseService extends BaseIgorComponent implements Service {
     private String name;
 
     /**
+     * Creates a new component instance.
+     *
+     * @param categoryId The category ID.
+     * @param typeId     The type ID.
+     */
+    public BaseService(String categoryId, String typeId) {
+        super(categoryId, typeId);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

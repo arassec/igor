@@ -9,6 +9,12 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 public final class IgorConfigHelper {
 
     /**
+     * Prevent instantiation.
+     */
+    private IgorConfigHelper() {
+    }
+
+    /**
      * Creates a {@link MessageSource} to suppoer i18n.
      *
      * @param baseNames The basenames of the properties files to use.

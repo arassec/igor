@@ -1,7 +1,7 @@
 package com.arassec.igor.core.model.action;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.Task;
-import com.arassec.igor.core.model.provider.Provider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,10 +41,10 @@ class BaseActionTest {
     static void initialize() {
         Map<String, Object> meta = Task.createMetaData("job-id", "task-id");
         Map<String, Object> data = new HashMap<>();
-        data.put(Provider.SIMULATION_KEY, true);
+        data.put(DataKey.SIMULATION.getKey(), true);
 
-        testData.put(Task.META_KEY, meta);
-        testData.put(Task.DATA_KEY, data);
+        testData.put(DataKey.META.getKey(), meta);
+        testData.put(DataKey.DATA.getKey(), data);
 
         wrongData.put("foo", "bar");
 
@@ -108,7 +108,7 @@ class BaseActionTest {
         assertNull(baseAction.getString(null, "$.test"));
         assertNull(baseAction.getString(testData, null));
         assertEquals("original-input", baseAction.getString(testData, "original-input"));
-        assertEquals("job-id", baseAction.getString(testData, "$." + Task.META_KEY + "." + Task.JOB_ID_KEY));
+        assertEquals("job-id", baseAction.getString(testData, "$." + DataKey.META.getKey() + "." + DataKey.JOB_ID.getKey()));
     }
 
 }

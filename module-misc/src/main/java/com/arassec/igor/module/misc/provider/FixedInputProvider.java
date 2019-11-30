@@ -1,10 +1,9 @@
 package com.arassec.igor.module.misc.provider;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
 import java.util.*;
@@ -12,8 +11,7 @@ import java.util.*;
 /**
  * Provides fixed input to tasks.
  */
-@Component
-@Scope("prototype")
+@IgorComponent
 public class FixedInputProvider extends BaseUtilProvider {
 
     /**
@@ -43,6 +41,13 @@ public class FixedInputProvider extends BaseUtilProvider {
      * Maintains the index into the inputParts-list.
      */
     private int index;
+
+    /**
+     * Creates a new component instance.
+     */
+    public FixedInputProvider() {
+        super("6b0cdf46-1412-43c0-8b8a-467ea3a60796");
+    }
 
     /**
      * {@inheritDoc}
@@ -77,14 +82,6 @@ public class FixedInputProvider extends BaseUtilProvider {
         item.put(INPUT_KEY, inputParts.get(index));
         index++;
         return item;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "6b0cdf46-1412-43c0-8b8a-467ea3a60796";
     }
 
 }

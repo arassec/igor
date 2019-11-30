@@ -4,8 +4,7 @@
         <table>
             <template v-for="(param, index) in parameters" v-bind:id="param.name" v-bind:index="index">
                 <tr v-bind:key="param.name"
-                    v-show="param.configurable && ((showAdvancedParameters && isAdvancedParameter(param)) ||
-                    !isAdvancedParameter(param))">
+                    v-show="(showAdvancedParameters && isAdvancedParameter(param)) || !isAdvancedParameter(param)">
                     <td class="text-top">
                         <label v-if="param.optional">{{formatParameterName(param.name)}}</label>
                         <label v-if="!param.optional">{{formatParameterName(param.name)}}*</label>

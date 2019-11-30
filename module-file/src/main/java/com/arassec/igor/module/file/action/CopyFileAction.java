@@ -1,18 +1,19 @@
 package com.arassec.igor.module.file.action;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Map;
 
@@ -21,9 +22,10 @@ import java.util.Map;
  * Copies a file from one service to another.
  */
 @Slf4j
-@Component
-@Scope("prototype")
+@Setter
+@Getter
 @ConditionalOnBean(FileService.class)
+@IgorComponent
 public class CopyFileAction extends BaseFileAction {
 
     /**
@@ -54,7 +56,7 @@ public class CopyFileAction extends BaseFileAction {
     /**
      * The service providing the file to copy.
      */
-    @NotNull
+    @NotEmpty
     @IgorParam
     private FileService sourceService;
 
@@ -75,7 +77,7 @@ public class CopyFileAction extends BaseFileAction {
     /**
      * The destination for the copied file.
      */
-    @NotNull
+    @NotEmpty
     @IgorParam
     private FileService targetService;
 
@@ -106,6 +108,13 @@ public class CopyFileAction extends BaseFileAction {
     private boolean appendFiletypeSuffix = false;
 
     /**
+     * Creates a new component instance.
+     */
+    public CopyFileAction() {
+        super("d8564415-7dd9-4814-9b46-c2c5b56ed5cc");
+    }
+
+    /**
      * Copies the supplied source file to the destination service. During transfer the file is optionally saved with the suffix
      * ".igor", which will be removed after successful transfer.
      *
@@ -117,31 +126,22 @@ public class CopyFileAction extends BaseFileAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String resolvedSourceFilename = getString(data, sourceFilename);
-        String resolvedSourceDirectory = resolveDirectory(data, sourceDirectory);
-        String resolvedTargetFilename = getString(data, targetFilename);
-        String resolvedTargetDirectory = resolveDirectory(data, targetDirectory);
-
-        if (resolvedSourceFilename == null || resolvedTargetFilename == null) {
-            if (isSimulation(data)) {
-                data.put(SIMULATION_LOG_KEY,
-                        "Couldn't resolve variables for copying: source ("
-                                + resolvedSourceFilename + ") / target (" + resolvedTargetFilename + ")");
-            }
+        ResolvedData resolvedData = resolveData(data, sourceFilename, sourceDirectory, targetFilename, targetDirectory);
+        if (resolvedData == null) {
             return List.of(data);
         }
 
-        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor(resolvedSourceFilename, 0);
+        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor(resolvedData.getSourceFilename(), 0);
         jobExecution.addWorkInProgress(workInProgressMonitor);
 
         try {
-            String sourceFileWithPath = getFilePath(resolvedSourceDirectory, resolvedSourceFilename);
+            String sourceFileWithPath = getFilePath(resolvedData.getSourceDirectory(), resolvedData.getSourceFilename());
 
             FileStreamData fileStreamData = sourceService.readStream(sourceFileWithPath, VOID_WIP_MONITOR);
 
-            String targetFileWithSuffix = appendSuffixIfRequired(resolvedTargetFilename, fileStreamData.getFilenameSuffix());
+            String targetFileWithSuffix = appendSuffixIfRequired(resolvedData.getTargetFilename(), fileStreamData.getFilenameSuffix());
 
-            String targetFileWithPath = getFilePath(resolvedTargetDirectory, targetFileWithSuffix);
+            String targetFileWithPath = getFilePath(resolvedData.getTargetDirectory(), targetFileWithSuffix);
 
             log.debug("Copying file '{}' to '{}'", sourceFileWithPath, targetFileWithPath);
 
@@ -160,10 +160,10 @@ public class CopyFileAction extends BaseFileAction {
 
             log.debug("File '{}' copied to '{}'", sourceFileWithPath, targetFileWithPath);
 
-            data.put(KEY_SOURCE_FILENAME, resolvedSourceFilename);
-            data.put(KEY_SOURCE_DIRECTORY, resolvedSourceDirectory);
+            data.put(KEY_SOURCE_FILENAME, resolvedData.getSourceFilename());
+            data.put(KEY_SOURCE_DIRECTORY, resolvedData.getSourceDirectory());
             data.put(KEY_TARGET_FILENAME, targetFileWithSuffix);
-            data.put(KEY_TARGET_DIRECTORY, resolvedTargetDirectory);
+            data.put(KEY_TARGET_DIRECTORY, resolvedData.getTargetDirectory());
 
         } finally {
             jobExecution.removeWorkInProgress(workInProgressMonitor);
@@ -218,14 +218,6 @@ public class CopyFileAction extends BaseFileAction {
         }
 
         return directory + file;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "d8564415-7dd9-4814-9b46-c2c5b56ed5cc";
     }
 
 }

@@ -1,6 +1,7 @@
 package com.arassec.igor.persistence.repository;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.JobRepository;
@@ -33,6 +34,11 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class JdbcJobRepository implements JobRepository {
+
+    /**
+     * Error message if reading a job fails.
+     */
+    private static final String READ_JOB_ERROR = "Could not read job!";
 
     /**
      * DAO for job entities.
@@ -127,7 +133,7 @@ public class JdbcJobRepository implements JobRepository {
             try {
                 return persistenceJobMapper.readValue(jobEntityOptional.get().getContent(), Job.class);
             } catch (IOException e) {
-                throw new IllegalStateException("Could not read job!", e);
+                throw new IllegalStateException(READ_JOB_ERROR, e);
             }
         }
         return null;
@@ -147,7 +153,7 @@ public class JdbcJobRepository implements JobRepository {
             try {
                 return persistenceJobMapper.readValue(entity.getContent(), Job.class);
             } catch (IOException e) {
-                throw new IllegalStateException("Could not read job!", e);
+                throw new IllegalStateException(READ_JOB_ERROR, e);
             }
         }
         return null;
@@ -165,7 +171,7 @@ public class JdbcJobRepository implements JobRepository {
             try {
                 result.add(persistenceJobMapper.readValue(jobEntity.getContent(), Job.class));
             } catch (IOException e) {
-                throw new IllegalStateException("Could not read job!", e);
+                throw new IllegalStateException(READ_JOB_ERROR, e);
             }
         }
         return result;
@@ -198,7 +204,7 @@ public class JdbcJobRepository implements JobRepository {
                 try {
                     return persistenceJobMapper.readValue(jobEntity.getContent(), Job.class);
                 } catch (IOException e) {
-                    throw new IllegalStateException("Could not read job!", e);
+                    throw new IllegalStateException(READ_JOB_ERROR, e);
                 }
             }).collect(Collectors.toList()));
             return result;
@@ -244,7 +250,7 @@ public class JdbcJobRepository implements JobRepository {
      *
      * @return List of referenced service IDs.
      */
-    private <T> List<String> getServiceIds(T instance) {
+    private <T extends IgorComponent> List<String> getServiceIds(T instance) {
         List<String> result = new LinkedList<>();
 
         if (instance == null) {
@@ -255,10 +261,8 @@ public class JdbcJobRepository implements JobRepository {
             if (field.isAnnotationPresent(IgorParam.class)) {
                 boolean isService = Service.class.isAssignableFrom(field.getType());
                 try {
-                    boolean accessibility = field.canAccess(instance);
-                    field.setAccessible(true);
+                    ReflectionUtils.makeAccessible(field);
                     Object value = field.get(instance);
-                    field.setAccessible(accessibility);
                     if (isService && value != null) {
                         result.add(((Service) value).getId());
                     }

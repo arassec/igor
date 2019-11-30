@@ -1,7 +1,7 @@
 package com.arassec.igor.core.model.provider;
 
 import com.arassec.igor.core.model.BaseIgorComponent;
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.Getter;
 
@@ -34,6 +34,16 @@ public abstract class BaseProvider extends BaseIgorComponent implements Provider
     @PositiveOrZero
     @IgorParam
     private int simulationLimit = 25;
+
+    /**
+     * Creates a new component instance.
+     *
+     * @param categoryId The category ID.
+     * @param typeId     The type ID.
+     */
+    public BaseProvider(String categoryId, String typeId) {
+        super(categoryId, typeId);
+    }
 
     /**
      * {@inheritDoc}

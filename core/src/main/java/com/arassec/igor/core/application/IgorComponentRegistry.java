@@ -8,8 +8,11 @@ import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
 
 import java.util.*;
 
@@ -19,7 +22,12 @@ import java.util.*;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class IgorComponentRegistry implements InitializingBean {
+public class IgorComponentRegistry implements InitializingBean, ApplicationContextAware {
+
+    /**
+     * The Spring application context.
+     */
+    private ApplicationContext applicationContext;
 
     /**
      * All available actions.
@@ -54,11 +62,6 @@ public class IgorComponentRegistry implements InitializingBean {
     private Map<String, Set<String>> typesByCategoryKey = new HashMap<>();
 
     /**
-     * Contains the prototype of a specific igor component, indexed by its type.
-     */
-    private Map<String, IgorComponent> typeToComponentPrototype = new HashMap<>();
-
-    /**
      * Contains a service interface and its category.
      */
     private Map<Class, String> serviceInterfaceToCategory = new HashMap<>();
@@ -72,6 +75,16 @@ public class IgorComponentRegistry implements InitializingBean {
         initializeComponent(Provider.class, providers);
         initializeComponent(Trigger.class, triggers);
         initializeComponent(Service.class, services);
+    }
+
+    /**
+     * Sets the application context to create new instances igor-component beans by their type-ID.
+     *
+     * @param applicationContext The Spring application context.
+     */
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
     /**
@@ -117,17 +130,75 @@ public class IgorComponentRegistry implements InitializingBean {
     }
 
     /**
-     * Returns an instance of the component with the provided type ID.
+     * Returns a new {@link Action} instance for the given type ID.
      *
-     * @param typeId The component's type ID.
+     * @param typeId     The action's type ID.
+     * @param parameters The parameters of the newly created action.
      *
-     * @return The component instance if available.
+     * @return The new {@link Action} instance.
      */
-    public Optional<IgorComponent> getInstance(String typeId) {
-        if (typeToComponentPrototype.containsKey(typeId)) {
-            return Optional.of(typeToComponentPrototype.get(typeId));
+    public Action getActionInstance(String typeId, Map<String, Object> parameters) {
+        Optional<Action> optional = actions.stream().filter(action -> action.getTypeId().equals(typeId)).findFirst();
+        if (optional.isPresent()) {
+            Action action = applicationContext.getBean(optional.get().getClass());
+            applyParameters(action, parameters);
+            return action;
         }
-        return Optional.empty();
+        throw new IllegalArgumentException("No action found for type ID: " + typeId);
+    }
+
+    /**
+     * Returns a new {@link Service} instance for the given type ID.
+     *
+     * @param typeId     The service's type ID.
+     * @param parameters The parameters of the newly created action.
+     *
+     * @return The new {@link Service} instance.
+     */
+    public Service getServiceInstance(String typeId, Map<String, Object> parameters) {
+        Optional<Service> optional = services.stream().filter(service -> service.getTypeId().equals(typeId)).findFirst();
+        if (optional.isPresent()) {
+            Service service = applicationContext.getBean(optional.get().getClass());
+            applyParameters(service, parameters);
+            return service;
+        }
+        throw new IllegalArgumentException("No service found for type ID: " + typeId);
+    }
+
+    /**
+     * Returns a new {@link Provider} instance for the given type ID.
+     *
+     * @param typeId     The provider's type ID.
+     * @param parameters The parameters of the newly created action.
+     *
+     * @return The new {@link Provider} instance.
+     */
+    public Provider getProviderInstance(String typeId, Map<String, Object> parameters) {
+        Optional<Provider> optional = providers.stream().filter(provider -> provider.getTypeId().equals(typeId)).findFirst();
+        if (optional.isPresent()) {
+            Provider provider = applicationContext.getBean(optional.get().getClass());
+            applyParameters(provider, parameters);
+            return provider;
+        }
+        throw new IllegalArgumentException("No provider found for type ID: " + typeId);
+    }
+
+    /**
+     * Returns a new {@link Trigger} instance for the given type ID.
+     *
+     * @param typeId     The trigger's type ID.
+     * @param parameters The parameters of the newly created action.
+     *
+     * @return The new {@link Trigger} instance.
+     */
+    public Trigger getTriggerInstance(String typeId, Map<String, Object> parameters) {
+        Optional<Trigger> optional = triggers.stream().filter(trigger -> trigger.getTypeId().equals(typeId)).findFirst();
+        if (optional.isPresent()) {
+            Trigger trigger = applicationContext.getBean(optional.get().getClass());
+            applyParameters(trigger, parameters);
+            return trigger;
+        }
+        throw new IllegalArgumentException("No trigger found for type ID: " + typeId);
     }
 
     /**
@@ -141,15 +212,7 @@ public class IgorComponentRegistry implements InitializingBean {
         for (IgorComponent component : components) {
 
             if (component instanceof Service) {
-                Class<?>[] interfaces = ClassUtils.getAllInterfaces(component);
-                if (interfaces != null && interfaces.length > 0) {
-                    for (Class<?> anInterface : interfaces) {
-                        // Skip IgorComponent and Service
-                        if (!anInterface.equals(IgorComponent.class) && !anInterface.equals(Service.class)) {
-                            serviceInterfaceToCategory.put(anInterface, component.getCategoryId());
-                        }
-                    }
-                }
+                initializeServiceInterface(component);
             }
 
             categoriesByComponentType.get(componentType).add(component.getCategoryId());
@@ -157,9 +220,42 @@ public class IgorComponentRegistry implements InitializingBean {
             if (!typesByCategoryKey.containsKey(component.getCategoryId())) {
                 typesByCategoryKey.put(component.getCategoryId(), new HashSet<>());
             }
-            typesByCategoryKey.get(component.getCategoryId()).add(component.getTypeId());
 
-            typeToComponentPrototype.put(component.getTypeId(), component);
+            typesByCategoryKey.get(component.getCategoryId()).add(component.getTypeId());
+        }
+    }
+
+    /**
+     * Determines the base interface of a {@link Service} and saves the category ID of it.
+     *
+     * @param component The service.
+     */
+    private void initializeServiceInterface(IgorComponent component) {
+        Class<?>[] interfaces = ClassUtils.getAllInterfaces(component);
+        if (interfaces.length > 0) {
+            for (Class<?> anInterface : interfaces) {
+                // Skip IgorComponent and Service
+                if (!anInterface.equals(IgorComponent.class) && !anInterface.equals(Service.class)) {
+                    serviceInterfaceToCategory.put(anInterface, component.getCategoryId());
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the supplied parameters at the supplied instance.
+     *
+     * @param instance   The instnace to apply the parameters to.
+     * @param parameters The parameters to set.
+     */
+    private void applyParameters(Object instance, Map<String, Object> parameters) {
+        if (instance != null && parameters != null && !parameters.isEmpty()) {
+            ReflectionUtils.doWithFields(instance.getClass(), field -> {
+                if (parameters.containsKey(field.getName())) {
+                    ReflectionUtils.makeAccessible(field);
+                    ReflectionUtils.setField(field, instance, parameters.get(field.getName()));
+                }
+            });
         }
     }
 

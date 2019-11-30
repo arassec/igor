@@ -1,12 +1,13 @@
 package com.arassec.igor.module.misc.action.persistence;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
-import lombok.Data;
+import com.arassec.igor.core.repository.PersistentValueRepository;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -16,14 +17,14 @@ import java.util.Map;
  * Persists a value from the supplied data to the persistence store.
  */
 @Slf4j
-@Component
-@Scope("prototype")
-@Data
+@IgorComponent
 public class PersistValueAction extends BasePersistenceAction {
 
     /**
      * The input to persist.
      */
+    @Getter
+    @Setter
     @NotBlank
     @IgorParam
     private String input;
@@ -32,8 +33,19 @@ public class PersistValueAction extends BasePersistenceAction {
      * The number of values to keep in the persistence store. The cleanup is only triggered if a value greater zero is
      * configured.
      */
+    @Getter
+    @Setter
     @IgorParam
     private int numValuesToKeep = 0;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param persistentValueRepository The repository for persisted values.
+     */
+    public PersistValueAction(PersistentValueRepository persistentValueRepository) {
+        super("6d768a9f-8f25-4ac1-ad8a-f825fbd1465c", persistentValueRepository);
+    }
 
     /**
      * Takes the value from the supplied data and saves it to the persistence store.
@@ -52,7 +64,7 @@ public class PersistValueAction extends BasePersistenceAction {
         String resolvedInput = getString(data, input);
         if (resolvedInput == null) {
             log.debug("Not enough data to persist: {}", input);
-            return null;
+            return List.of();
         }
 
         PersistentValue value = new PersistentValue(getString(data, resolvedInput));
@@ -78,14 +90,6 @@ public class PersistValueAction extends BasePersistenceAction {
         if (numValuesToKeep > 0) {
             persistentValueRepository.cleanup(jobId, taskId, numValuesToKeep);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "6d768a9f-8f25-4ac1-ad8a-f825fbd1465c";
     }
 
 }

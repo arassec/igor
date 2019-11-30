@@ -1,21 +1,18 @@
 package com.arassec.igor.module.misc.trigger;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import com.arassec.igor.core.model.annotation.IgorComponent;
 
 /**
  * Trigger for manual job executions.
  */
-@Component
-@Scope("prototype")
+@IgorComponent
 public class ManualTrigger extends BaseMiscTrigger {
 
     /**
-     * {@inheritDoc}
+     * Creates a new component instance.
      */
-    @Override
-    public String getTypeId() {
-        return "4af90cde-1da2-4d1e-a582-21443af3955b";
+    public ManualTrigger() {
+        super("4af90cde-1da2-4d1e-a582-21443af3955b");
     }
 
 }

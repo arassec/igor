@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model;
+package com.arassec.igor.core.model.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,9 +1,11 @@
 package com.arassec.igor.module.file.service;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.BaseService;
 import com.arassec.igor.core.model.service.ServiceException;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -17,6 +19,8 @@ import java.time.format.DateTimeFormatter;
 /**
  * Base for file services.
  */
+@Getter
+@Setter
 @Slf4j
 public abstract class BaseFileService extends BaseService implements FileService {
 
@@ -24,7 +28,15 @@ public abstract class BaseFileService extends BaseService implements FileService
      * Configures a timezone for the file service as String.
      */
     @IgorParam(optional = true)
-    protected String timezone;
+    private String timezone;
+
+    /**
+     * Creates a new component instance.
+     * @param typeId     The type ID.
+     */
+    public BaseFileService(String typeId) {
+        super("ead60d29-bc68-42bf-93fb-95d5f9a7effd", typeId);
+    }
 
     /**
      * {@inheritDoc}
@@ -54,7 +66,8 @@ public abstract class BaseFileService extends BaseService implements FileService
                 }
                 foo = in.read(buf, 0, foo);
                 if (foo < 0) {
-                    break; // error
+                    // A negative return value indicates an error.
+                    throw new ServiceException("Could not copy data via streams!");
                 }
                 out.write(buf, 0, foo);
                 fileSize -= foo;
@@ -101,14 +114,6 @@ public abstract class BaseFileService extends BaseService implements FileService
      */
     private double calculatePercentage(double obtained, double total) {
         return obtained * 100 / total;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getCategoryId() {
-        return "ead60d29-bc68-42bf-93fb-95d5f9a7effd";
     }
 
 }

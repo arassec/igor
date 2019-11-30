@@ -8,16 +8,17 @@ import com.arassec.igor.core.model.action.BaseAction;
 public abstract class BaseUtilAction extends BaseAction {
 
     /**
-     * The (default) time format to use for parsing data timestamps.
+     * The default time format to use for parsing data timestamps.
      */
-    String TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
+    String defaultTimeFormat = "yyyy-MM-dd'T'HH:mm:ssXXX";
 
     /**
-     * {@inheritDoc}
+     * Creates a new component instance.
+     *
+     * @param typeId     The type ID.
      */
-    @Override
-    public String getCategoryId() {
-        return "c2ff4c41-fae4-4b9b-98a8-1d5d1ce6e0be";
+    public BaseUtilAction(String typeId) {
+        super("c2ff4c41-fae4-4b9b-98a8-1d5d1ce6e0be", typeId);
     }
 
 }

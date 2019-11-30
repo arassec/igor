@@ -1,10 +1,11 @@
 package com.arassec.igor.module.misc.action.util;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
@@ -22,8 +23,9 @@ import java.util.stream.Collectors;
  * Sorts data by using a configurable pattern on a data value.
  */
 @Slf4j
-@Component
-@Scope("prototype")
+@Getter
+@Setter
+@IgorComponent
 public class SortByTimestampPatternAction extends BaseUtilAction {
 
     /**
@@ -45,7 +47,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      */
     @NotBlank
     @IgorParam
-    private String timestampFormat = TIME_FORMAT;
+    private String timestampFormat = defaultTimeFormat;
 
     /**
      * Defines the sort order
@@ -54,15 +56,18 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     private boolean sortAscending = true;
 
     /**
-     * Unused by this action and thus made invisible in the UI.
-     */
-    @IgorParam(configurable = false)
-    protected int numThreads;
-
-    /**
      * Contains all data that should have been processed by the action.
      */
     private List<Map<String, Object>> collectedData = new LinkedList<>();
+
+    /**
+     * Creates a new instance.
+     */
+    public SortByTimestampPatternAction() {
+        super("e43efa64-d1a3-422f-ac6c-f34cd56be0c2");
+        // This action requires to be run in a single thread!
+        getUnEditableProperties().add("numThreads");
+    }
 
     /**
      * Collects all data in memory for later sorting.
@@ -75,7 +80,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         collectedData.add(data);
-        return null;
+        return List.of();
     }
 
     /**
@@ -104,7 +109,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
                 .contains("O") && !pattern.contains("X") && !pattern.contains("x") && !pattern.contains("Z"));
 
         if (!collectedData.isEmpty()) {
-            List<Map<String, Object>> result = collectedData.stream()
+            return collectedData.stream()
                     .filter(data -> extractDateTime(data, p, formatter, applyDefaultTimezone) != null)
                     .sorted((o1, o2) -> {
                         ZonedDateTime firstDateTime = extractDateTime(o1, p, formatter, applyDefaultTimezone);
@@ -118,10 +123,9 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
                             return secondDateTime.compareTo(firstDateTime);
                         }
                     }).collect(Collectors.toList());
-            return result;
         }
 
-        return null;
+        return List.of();
     }
 
     /**
@@ -188,14 +192,6 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     @Override
     public int getNumThreads() {
         return 1;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "e43efa64-d1a3-422f-ac6c-f34cd56be0c2";
     }
 
 }

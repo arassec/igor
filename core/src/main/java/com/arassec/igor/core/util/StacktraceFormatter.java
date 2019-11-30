@@ -9,6 +9,12 @@ import java.io.StringWriter;
 public class StacktraceFormatter {
 
     /**
+     * Prevents instantiation.
+     */
+    private StacktraceFormatter() {
+    }
+
+    /**
      * Formats the parameter's stacktrace as String.
      *
      * @param throwable The throwable to format.

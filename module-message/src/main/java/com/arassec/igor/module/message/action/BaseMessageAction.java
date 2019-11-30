@@ -8,11 +8,12 @@ import com.arassec.igor.core.model.action.BaseAction;
 abstract class BaseMessageAction extends BaseAction {
 
     /**
-     * {@inheritDoc}
+     * Creates a new component instance.
+     *
+     * @param typeId The type ID.
      */
-    @Override
-    public String getCategoryId() {
-        return "02e1da3f-cdaa-4b4b-9a60-460480c7b87d";
+    public BaseMessageAction(String typeId) {
+        super("02e1da3f-cdaa-4b4b-9a60-460480c7b87d", typeId);
     }
 
 }

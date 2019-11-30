@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Base class for REST-Controllers.
  */
-public abstract class BaseRestController {
+public interface BaseRestController {
 
     /**
      * Sorts the supplied {@link KeyLabelStore} items by their label.
@@ -18,7 +18,7 @@ public abstract class BaseRestController {
      * @param input The {@link KeyLabelStore}s to sort.
      * @return The sorted list.
      */
-    List<KeyLabelStore> sortByLabel(Set<KeyLabelStore> input) {
+    default List<KeyLabelStore> sortByLabel(Set<KeyLabelStore> input) {
         List<KeyLabelStore> result = new LinkedList<>(input);
         result.sort(Comparator.comparing(KeyLabelStore::getValue));
         return result;

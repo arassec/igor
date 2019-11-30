@@ -17,6 +17,11 @@ import java.io.InputStream;
 public class SshInputStreamWrapper extends InputStream {
 
     /**
+     * Error message when reading fails.
+     */
+    private static final String READ_ERROR = "Error during SSH Stream read: ";
+
+    /**
      * The original input stream provided by a JSch channel.
      */
     private InputStream inputStream;
@@ -37,7 +42,7 @@ public class SshInputStreamWrapper extends InputStream {
      * @param inputStream The original input stream.
      * @param fileSize    The size of the file that is being transferred.
      */
-    public SshInputStreamWrapper(InputStream inputStream, long fileSize) {
+    SshInputStreamWrapper(InputStream inputStream, long fileSize) {
         this.inputStream = inputStream;
         this.fileSize = fileSize;
         this.allRead = false;
@@ -62,13 +67,13 @@ public class SshInputStreamWrapper extends InputStream {
         if ((fileSize - len) > 0) {
             n = inputStream.read(b, off, len);
             if (n < 0) {
-                throw new ServiceException("Error during SSH Stream read: " + n);
+                throw new ServiceException(READ_ERROR + n);
             }
             fileSize -= n;
         } else if ((fileSize - len) == 0) {
             n = inputStream.read(b, off, len);
             if (n < 0) {
-                throw new ServiceException("Error during SSH Stream read: " + n);
+                throw new ServiceException(READ_ERROR + n);
             }
             fileSize -= n;
             if (fileSize == 0) {
@@ -77,7 +82,7 @@ public class SshInputStreamWrapper extends InputStream {
         } else {
             n = inputStream.read(b, off, (int) fileSize);
             if (n < 0) {
-                throw new ServiceException("Error during SSH Stream read: " + n);
+                throw new ServiceException(READ_ERROR + n);
             }
             fileSize -= n;
             if (fileSize == 0) {

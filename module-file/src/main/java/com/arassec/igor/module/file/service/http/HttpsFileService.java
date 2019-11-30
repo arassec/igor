@@ -1,11 +1,10 @@
 package com.arassec.igor.module.file.service.http;
 
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -18,10 +17,9 @@ import java.security.NoSuchAlgorithmException;
  * File-Service that uses HTTPS as protocol.
  */
 @Slf4j
-@Component
-@Scope("prototype")
 @ConditionalOnClass(HttpClient.class)
-public class HttpsFileService extends HttpFileService {
+@IgorComponent
+public class HttpsFileService extends BaseHttpFileService {
 
     /**
      * Enables or disables SSL certificate verification.
@@ -33,6 +31,7 @@ public class HttpsFileService extends HttpFileService {
      * Creates a new Instance.
      */
     public HttpsFileService() {
+        super("7244c422-84f5-4ead-a3a9-73df49b1910a");
         this.port = 443;
         this.protocol = "https";
     }
@@ -42,6 +41,7 @@ public class HttpsFileService extends HttpFileService {
      *
      * @return A newly created {@link HttpClient}.
      */
+    @Override
     protected HttpClient connect() {
 
         HttpClient.Builder httpClientBuilder = HttpClient.newBuilder();
@@ -56,21 +56,29 @@ public class HttpsFileService extends HttpFileService {
             TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
                         public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return null;
+                            return new java.security.cert.X509Certificate[0];
                         }
 
+                        // For now, all certificates are accepted if the user wishes to do so. In the future, igor will provide
+                        // the ability to accept specific, invalid certificates.
+                        @SuppressWarnings("squid:S4424")
                         public void checkClientTrusted(
                                 java.security.cert.X509Certificate[] certs, String authType) {
+                            // Accept all certificates...
                         }
 
+                        // For now, all certificates are accepted if the user wishes to do so. In the future, igor will provide
+                        // the ability to accept specific, invalid certificates.
+                        @SuppressWarnings("squid:S4424")
                         public void checkServerTrusted(
                                 java.security.cert.X509Certificate[] certs, String authType) {
+                            // Accept all certificates...
                         }
                     }
             };
 
             try {
-                SSLContext sslContext = SSLContext.getInstance("SSL");
+                SSLContext sslContext = SSLContext.getInstance("TLS");
                 sslContext.init(null, trustAllCerts, null);
                 httpClientBuilder.sslContext(sslContext);
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
@@ -79,14 +87,6 @@ public class HttpsFileService extends HttpFileService {
         }
 
         return httpClientBuilder.build();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "7244c422-84f5-4ead-a3a9-73df49b1910a";
     }
 
 }

@@ -8,11 +8,12 @@ import com.arassec.igor.core.model.trigger.BaseTrigger;
 public abstract class BaseMiscTrigger extends BaseTrigger {
 
     /**
-     * {@inheritDoc}
+     * Creates a new component instance.
+     *
+     * @param typeId The type ID.
      */
-    @Override
-    public String getCategoryId() {
-        return "945edfe8-d118-4a63-9daf-ccf8c6e41cb5";
+    public BaseMiscTrigger(String typeId) {
+        super("945edfe8-d118-4a63-9daf-ccf8c6e41cb5", typeId);
     }
 
 }

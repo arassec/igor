@@ -1,5 +1,6 @@
 package com.arassec.igor.core.model.job;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
@@ -80,9 +81,9 @@ class TaskTest {
     @DisplayName("Tests creating job meta-data.")
     void testCreateMetaData() {
         Map<String, Object> metaData = Task.createMetaData("job-id", "task-id");
-        assertEquals("job-id", metaData.get(Task.JOB_ID_KEY));
-        assertEquals("task-id", metaData.get(Task.TASK_ID_KEY));
-        assertNotNull(metaData.get(Task.TIMESTAMP_KEY));
+        assertEquals("job-id", metaData.get(DataKey.JOB_ID.getKey()));
+        assertEquals("task-id", metaData.get(DataKey.TASK_ID.getKey()));
+        assertNotNull(metaData.get(DataKey.TIMESTAMP.getKey()));
     }
 
 }

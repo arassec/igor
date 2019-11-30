@@ -1,7 +1,6 @@
 package com.arassec.igor.core.application;
 
 import com.arassec.igor.core.model.service.Service;
-import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.ModelPageHelper;

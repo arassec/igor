@@ -2,41 +2,36 @@ package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
-import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.Action;
-import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.service.Service;
+import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.repository.ServiceRepository;
-import com.arassec.igor.core.util.ApplicationContextProvider;
-import com.arassec.igor.web.simulation.ActionProxy;
-import com.arassec.igor.web.simulation.ProviderProxy;
 import com.arassec.igor.web.simulation.ServiceProxy;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Deserializer for igor components in the web layer.
  */
-public class IgorComponentWebDeserializer<T extends IgorComponent> extends StdDeserializer<T> implements WebMapperKeyAware {
+public abstract class IgorComponentWebDeserializer<T extends IgorComponent> extends StdDeserializer<T> {
 
     /**
      * The igor component registry.
      */
-    private final IgorComponentRegistry igorComponentRegistry;
+    final transient IgorComponentRegistry igorComponentRegistry;
 
     /**
      * The {@link ServiceRepository} to load services as parameter values.
      */
-    private final ServiceRepository serviceRepository;
+    private final transient ServiceRepository serviceRepository;
 
     /**
      * Can be set to {@code true} to deserialize components in simulation mode, i.e. wrap proxies around them for job
@@ -50,9 +45,9 @@ public class IgorComponentWebDeserializer<T extends IgorComponent> extends StdDe
      * @param serviceRepository The service repository to load services from.
      * @param simulationMode    Set to {@code true} if the resulting  components are used during simulated job runs.
      */
-    public IgorComponentWebDeserializer(Class<T> clazz, IgorComponentRegistry igorComponentRegistry,
-                                        ServiceRepository serviceRepository,
-                                        boolean simulationMode) {
+    IgorComponentWebDeserializer(Class<T> clazz, IgorComponentRegistry igorComponentRegistry,
+                                 ServiceRepository serviceRepository,
+                                 boolean simulationMode) {
         super(clazz);
         this.igorComponentRegistry = igorComponentRegistry;
         this.serviceRepository = serviceRepository;
@@ -65,67 +60,85 @@ public class IgorComponentWebDeserializer<T extends IgorComponent> extends StdDe
     @Override
     public T deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
 
-        Map<String, Object> map = deserializationContext.readValue(jsonParser, Map.class);
+        Map map = deserializationContext.readValue(jsonParser, Map.class);
 
-        String typeId = getTypeId((Map<String, Object>) map.get(TYPE));
+        String typeId = getTypeId((Map) map.get(WebMapperKey.TYPE.getKey()));
 
-        Optional<IgorComponent> classOptional = igorComponentRegistry.getInstance(typeId);
-        if (classOptional.isEmpty()) {
-            throw new IllegalStateException("Unknown type ID: " + typeId);
-        }
+        @SuppressWarnings("unchecked")
+        Map<String, Object> parameters = deserializeParameters((List<Map>) map.get(WebMapperKey.PARAMETERS.getKey()));
 
-        IgorComponent igorComponent = classOptional.get();
-        T instance = (T) ApplicationContextProvider.getIgorComponent(igorComponent.getClass(), typeId);
-
-        if (map.containsKey(ID)) {
-            instance.setId(String.valueOf(map.get(ID)));
-        }
+        T instance = createInstance(typeId, parameters, simulationMode);
 
         setComponentSpecifica(instance, map);
 
-        List<Map<String, Object>> parameters = (List<Map<String, Object>>) map.get(PARAMETERS);
-        if (parameters != null && !parameters.isEmpty()) {
-            instance.getClass().getFields();
+        return instance;
+    }
 
-            ReflectionUtils.doWithFields(instance.getClass(), field -> {
-                ReflectionUtils.makeAccessible(field);
-                if (field.isAnnotationPresent(IgorParam.class)) {
-                    Map<String, Object> parameter = getParameter(field.getName(), parameters);
-                    if (parameter == null) {
+    /**
+     * Creates an instance of the igor component.
+     * <p>
+     * Has to be implemented by subclasses to provide an actual instance of a concrete component type (e.g. Action).
+     *
+     * @param typeId     The component's type ID.
+     * @param parameters The component's parameters.
+     *
+     * @return A newly created component instance.
+     */
+    abstract T createInstance(String typeId, Map<String, Object> parameters, boolean simulationMode);
+
+    /**
+     * Deserializes the JSON parameters.
+     *
+     * @param parameters The parameters in JSON form.
+     *
+     * @return The parameters as Map of objects.
+     */
+    private Map<String, Object> deserializeParameters(List<Map> parameters) {
+        if (parameters == null || parameters.isEmpty()) {
+            return null;
+        }
+        Map<String, Object> result = new HashMap<>();
+        parameters.forEach(jsonParameter -> {
+            String parameterName = String.valueOf(jsonParameter.get(WebMapperKey.NAME.getKey()));
+            if (jsonParameter.containsKey(WebMapperKey.SERVICE.getKey()) && (boolean) jsonParameter.get(WebMapperKey.SERVICE.getKey()) && serviceRepository != null) {
+                result.put(parameterName, deserializeServiceParameter(jsonParameter));
+            } else {
+                Object value = jsonParameter.get(WebMapperKey.VALUE.getKey());
+                if (value != null) {
+                    if (value instanceof String && StringUtils.isEmpty(value)) {
                         return;
                     }
-                    if (parameter.containsKey(SERVICE) && (boolean) parameter.get(SERVICE) && serviceRepository != null) {
-                        if (simulationMode) {
-                            String serviceId = String.valueOf(parameter.get(VALUE));
-                            Service service = serviceRepository.findById(serviceId);
-                            if (service == null) {
-                                throw new IllegalArgumentException("No service with ID " + serviceId + " found!");
-                            }
-                            ServiceProxy serviceProxy = new ServiceProxy(service);
-                            field.set(instance, Proxy.newProxyInstance(IgorComponentWebDeserializer.class.getClassLoader(),
-                                    new Class[]{field.getType()}, serviceProxy));
-                        } else {
-                            field.set(instance, serviceRepository.findById(String.valueOf(parameter.get(VALUE))));
-                        }
-                    } else {
-                        Object value = parameter.get(VALUE);
-                        if (value != null) {
-                            if (value instanceof String && StringUtils.isEmpty(value)) {
-                                return;
-                            }
-                            field.set(instance, value);
-                        }
-                    }
+                    result.put(parameterName, value);
                 }
-            });
-        }
+            }
+        });
+        return result;
+    }
 
-        if (instance instanceof Provider && simulationMode) {
-            return (T) new ProviderProxy((Provider) instance);
-        } else if (instance instanceof Action && simulationMode) {
-            return (T) new ActionProxy((Action) instance);
+    /**
+     * Deserializes a service parameter.
+     *
+     * @param jsonParameter The parameter in JSON form.
+     *
+     * @return The newly created service instance.
+     */
+    private Service deserializeServiceParameter(Map jsonParameter) {
+        if (simulationMode) {
+            String serviceId = String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey()));
+            Service service = serviceRepository.findById(serviceId);
+            if (service == null) {
+                throw new IllegalArgumentException("No service with ID " + serviceId + " found!");
+            }
+            ServiceProxy serviceProxy = new ServiceProxy(service);
+            try {
+                return (Service) Proxy.newProxyInstance(IgorComponentWebDeserializer.class.getClassLoader(),
+                        new Class[]{Class.forName(String.valueOf(jsonParameter.get(WebMapperKey.SERVICE_CLASS.getKey())))},
+                        serviceProxy);
+            } catch (ClassNotFoundException e) {
+                throw new ServiceException("Unknown service class: " + jsonParameter.get(WebMapperKey.SERVICE_CLASS.getKey()));
+            }
         } else {
-            return instance;
+            return serviceRepository.findById(String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey())));
         }
     }
 
@@ -136,8 +149,8 @@ public class IgorComponentWebDeserializer<T extends IgorComponent> extends StdDe
      *
      * @return The type of the component.
      */
-    private String getTypeId(Map<String, Object> map) {
-        Object type = map.get(KEY);
+    private String getTypeId(Map map) {
+        Object type = map.get(WebMapperKey.KEY.getKey());
         if (type instanceof String) {
             return (String) type;
         }
@@ -150,32 +163,18 @@ public class IgorComponentWebDeserializer<T extends IgorComponent> extends StdDe
      * @param instance The newly created component instance.
      * @param map      The map of component data.
      */
-    private void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
+    private void setComponentSpecifica(IgorComponent instance, Map map) {
+        if (map.containsKey(WebMapperKey.ID.getKey())) {
+            instance.setId(String.valueOf(map.get(WebMapperKey.ID.getKey())));
+        }
         if (instance instanceof Service) {
-            if (map.containsKey(ID)) {
-                instance.setId(String.valueOf(map.get(ID)));
+            if (map.containsKey(WebMapperKey.ID.getKey())) {
+                instance.setId(String.valueOf(map.get(WebMapperKey.ID.getKey())));
             }
-            ((Service) instance).setName(String.valueOf(map.get(NAME)));
+            ((Service) instance).setName(String.valueOf(map.get(WebMapperKey.NAME.getKey())));
         } else if (instance instanceof Action) {
-            ((Action) instance).setActive((boolean) map.get(ACTIVE));
+            ((Action) instance).setActive((boolean) map.get(WebMapperKey.ACTIVE.getKey()));
         }
-    }
-
-    /**
-     * Returns the parameter with the given name or {@code null}, if none could be found.
-     *
-     * @param name       The parameter's name.
-     * @param parameters All parameters of the component.
-     *
-     * @return The parameter as Map or {@code null}, if none with the given name exists.
-     */
-    private Map<String, Object> getParameter(String name, List<Map<String, Object>> parameters) {
-        for (Map<String, Object> parameter : parameters) {
-            if (parameter.containsKey(NAME) && name.equals(parameter.get(NAME))) {
-                return parameter;
-            }
-        }
-        return null;
     }
 
 }

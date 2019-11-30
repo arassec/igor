@@ -1,6 +1,6 @@
 package com.arassec.igor.module.file.service.ssh;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
@@ -8,12 +8,8 @@ import com.arassec.igor.module.file.service.FileStreamData;
 import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -26,38 +22,16 @@ import java.util.stream.Collectors;
  * File-Service for SFTP file handling.
  */
 @Slf4j
-@Component
-@Scope("prototype")
 @ConditionalOnClass(JSch.class)
+@IgorComponent
 public class SftpFileService extends BaseSshFileService {
 
     /**
-     * The host of the remote server.
+     * Creates a new component instance.
      */
-    @NotBlank
-    @IgorParam
-    private String host;
-
-    /**
-     * The port of the remote server.
-     */
-    @Positive
-    @IgorParam
-    private int port = 22;
-
-    /**
-     * The username to login with.
-     */
-    @NotBlank
-    @IgorParam
-    private String username;
-
-    /**
-     * The password used for authentication.
-     */
-    @NotBlank
-    @IgorParam(secured = true)
-    private String password;
+    public SftpFileService() {
+        super("bf63c188-b930-4920-bb93-4da49db21eea");
+    }
 
     /**
      * {@inheritDoc}
@@ -66,14 +40,12 @@ public class SftpFileService extends BaseSshFileService {
     public List<FileInfo> listFiles(String directory, String fileEnding) {
         try {
             final String dir = directory.endsWith("/") ? directory : directory + "/";
-            Session session = connect(host, port, username, password);
+            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
             List<ChannelSftp.LsEntry> files = new LinkedList<>();
             channel.ls(directory, entry -> {
-                if (fileEnding == null || StringUtils.isEmpty(fileEnding)) {
-                    files.add(entry);
-                } else if (entry.getFilename().endsWith(fileEnding)) {
+                if (fileEnding == null || StringUtils.isEmpty(fileEnding) || entry.getFilename().endsWith(fileEnding)) {
                     files.add(entry);
                 }
                 return ChannelSftp.LsEntrySelector.CONTINUE;
@@ -93,7 +65,7 @@ public class SftpFileService extends BaseSshFileService {
     @Override
     public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            Session session = connect(host, port, username, password);
+            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
             channel.get(file, outputStream);
@@ -111,13 +83,14 @@ public class SftpFileService extends BaseSshFileService {
     @Override
     public FileStreamData readStream(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
-            Session session = connect(host, port, username, password);
+            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
-            Vector<ChannelSftp.LsEntry> lsEntries = channel.ls(file);
-            if (lsEntries != null && !lsEntries.isEmpty()) {
+            @SuppressWarnings("squid:S1149") // Don't change JSCH code.
+            Vector lsEntries = channel.ls(file);
+            if (lsEntries != null && !lsEntries.isEmpty() && lsEntries.firstElement() instanceof ChannelSftp.LsEntry) {
                 FileStreamData result = new FileStreamData();
-                result.setFileSize(lsEntries.firstElement().getAttrs().getSize());
+                result.setFileSize(((ChannelSftp.LsEntry) lsEntries.firstElement()).getAttrs().getSize());
                 result.setData(channel.get(file));
 
                 SshConnectionData sshConnectionData = new SshConnectionData();
@@ -142,7 +115,7 @@ public class SftpFileService extends BaseSshFileService {
     @Override
     public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
         try {
-            Session session = connect(host, port, username, password);
+            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
             channel.put(fileStreamData.getData(), file,
@@ -159,8 +132,7 @@ public class SftpFileService extends BaseSshFileService {
      */
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
-        if (fileStreamData.getSourceConnectionData() != null && fileStreamData
-                .getSourceConnectionData() instanceof SshConnectionData) {
+        if (fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
             SshConnectionData sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
             sshConnectionData.getChannel().disconnect();
             sshConnectionData.getSession().disconnect();
@@ -173,7 +145,7 @@ public class SftpFileService extends BaseSshFileService {
     @Override
     public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
-            Session session = connect(host, port, username, password);
+            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
             channel.rm(file);
@@ -197,7 +169,10 @@ public class SftpFileService extends BaseSshFileService {
                 // without problems...
                 Thread.sleep(30000);
                 moveInternal(source, target);
-            } catch (SftpException | JSchException | InterruptedException e1) {
+            } catch (InterruptedException i) {
+                log.error("Interrupted while waiting for the SFTP server!", e);
+                Thread.currentThread().interrupt();
+            } catch (SftpException | JSchException e1) {
                 throw new ServiceException("Could not move file: " + source + " to " + target, e);
             }
         }
@@ -207,8 +182,8 @@ public class SftpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void testConfiguration() throws ServiceException {
-        Session session = connect(host, port, username, password);
+    public void testConfiguration() {
+        Session session = connect(getHost(), getPort(), getUsername(), getPassword());
         session.disconnect();
     }
 
@@ -222,20 +197,12 @@ public class SftpFileService extends BaseSshFileService {
      * @throws SftpException In case of SFTP errors.
      */
     private void moveInternal(String source, String target) throws JSchException, SftpException {
-        Session session = connect(host, port, username, password);
+        Session session = connect(getHost(), getPort(), getUsername(), getPassword());
         ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
         channel.connect();
         channel.rename(source, target);
         channel.disconnect();
         session.disconnect();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "bf63c188-b930-4920-bb93-4da49db21eea";
     }
 
 }

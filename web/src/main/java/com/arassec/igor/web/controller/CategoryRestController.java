@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RestController()
 @RequestMapping("/api/category")
 @RequiredArgsConstructor
-public class CategoryRestController extends BaseRestController {
+public class CategoryRestController implements BaseRestController {
 
     /**
      * The message source with translations.

@@ -1,10 +1,10 @@
 package com.arassec.igor.module.misc.provider;
 
 
-import com.arassec.igor.core.model.IgorParam;
-import lombok.Data;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.PositiveOrZero;
 import java.util.HashMap;
@@ -13,9 +13,9 @@ import java.util.Map;
 /**
  * Provides a configurable amount of empty input data to tasks.
  */
-@Component
-@Scope("prototype")
-@Data
+@Getter
+@Setter
+@IgorComponent
 public class EmptyInputProvider extends BaseUtilProvider {
 
     /**
@@ -29,6 +29,13 @@ public class EmptyInputProvider extends BaseUtilProvider {
      * The number of items already generated.
      */
     private int current = 0;
+
+    /**
+     * Creates a new component instance.
+     */
+    public EmptyInputProvider() {
+        super("5e1969ae-fd31-47f5-9194-1b58546d129c");
+    }
 
     /**
      * {@inheritDoc}
@@ -47,11 +54,4 @@ public class EmptyInputProvider extends BaseUtilProvider {
         return new HashMap<>();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "5e1969ae-fd31-47f5-9194-1b58546d129c";
-    }
 }

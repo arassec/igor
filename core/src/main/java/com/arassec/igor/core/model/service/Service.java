@@ -1,7 +1,7 @@
 package com.arassec.igor.core.model.service;
 
 import com.arassec.igor.core.model.IgorComponent;
-import com.arassec.igor.core.model.IgorSimulationSafe;
+import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 
 /**
  * Defines a source of data that can be manipulated using actions, or a destination for data to store it in.
@@ -26,9 +26,7 @@ public interface Service extends IgorComponent {
 
     /**
      * Tests the service's configuration.
-     *
-     * @throws ServiceException In case of errors.
      */
-    void testConfiguration() throws ServiceException;
-
+    void testConfiguration();
+    
 }

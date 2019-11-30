@@ -1,10 +1,11 @@
 package com.arassec.igor.module.misc.action.util;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
@@ -19,8 +20,9 @@ import java.util.Map;
  * Filters the supplied data by a regular expression.
  */
 @Slf4j
-@Component
-@Scope("prototype")
+@Setter
+@Getter
+@IgorComponent
 public class FilterByTimestamp extends BaseUtilAction {
 
     /**
@@ -56,13 +58,20 @@ public class FilterByTimestamp extends BaseUtilAction {
      */
     @NotBlank
     @IgorParam
-    private String timestampFormat = TIME_FORMAT;
+    private String timestampFormat = defaultTimeFormat;
 
     /**
      * The optional time zone of the timestamp.
      */
     @IgorParam(optional = true)
     private String timezone;
+
+    /**
+     * Creates a new component instance.
+     */
+    public FilterByTimestamp() {
+        super("aca4d78f-ad37-451c-baab-0533c5735333");
+    }
 
     /**
      * Filters data according to the configured timestamp settings.
@@ -83,7 +92,7 @@ public class FilterByTimestamp extends BaseUtilAction {
 
         if (resolvedInput == null || resolvedTimeUnit == null || resolvedTimestampFormat == null) {
             log.debug("Missing required data for filtering: {} / {} / {}", resolvedInput, resolvedTimeUnit, resolvedTimestampFormat);
-            return null;
+            return List.of();
         }
 
         LocalDateTime target;
@@ -100,25 +109,17 @@ public class FilterByTimestamp extends BaseUtilAction {
         if (olderThan) {
             if (actual.isAfter(target)) {
                 log.debug("Filtered '{}' which is older than {} {}", actual, amount, resolvedTimeUnit);
-                return null;
+                return List.of();
             }
         } else {
             if (actual.isBefore(target)) {
                 log.debug("Filtered '{}' which is younger than {} {}", actual, amount, resolvedTimeUnit);
-                return null;
+                return List.of();
             }
         }
 
         log.debug("Passed '{}' against older={}, {}, {}", actual, olderThan, amount, resolvedTimeUnit);
         return List.of(data);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "aca4d78f-ad37-451c-baab-0533c5735333";
     }
 
 }

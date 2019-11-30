@@ -1,5 +1,6 @@
 package com.arassec.igor.core.model.job.concurrent;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.job.execution.JobExecution;
@@ -44,7 +45,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests actually running the runnable.")
     void testRun() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(Task.META_KEY, Task.createMetaData("job-id", "task-id"));
+        inputData.put(DataKey.META.getKey(), Task.createMetaData("job-id", "task-id"));
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         inputQueue.offer(inputData);
@@ -87,7 +88,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests completing the runnable.")
     void testComplete() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(Task.META_KEY, Task.createMetaData("job-id", "task-id"));
+        inputData.put(DataKey.META.getKey(), Task.createMetaData("job-id", "task-id"));
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingQueue<>();

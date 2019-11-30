@@ -1,14 +1,12 @@
 package com.arassec.igor.core.model.action;
 
 import com.arassec.igor.core.model.BaseIgorComponent;
-import com.arassec.igor.core.model.IgorParam;
-import com.arassec.igor.core.model.job.Task;
+import com.arassec.igor.core.model.DataKey;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.provider.Provider;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,17 +28,17 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     /**
      * Query for the Job-ID.
      */
-    private static final String JOB_ID_QUERY = "$." + Task.META_KEY + "." + Task.JOB_ID_KEY;
+    private static final String JOB_ID_QUERY = "$." + DataKey.META.getKey() + "." + DataKey.JOB_ID.getKey();
 
     /**
      * Query for the Task-ID.
      */
-    private static final String TASK_ID_QUERY = "$." + Task.META_KEY + "." + Task.TASK_ID_KEY;
+    private static final String TASK_ID_QUERY = "$." + DataKey.META.getKey() + "." + DataKey.TASK_ID.getKey();
 
     /**
      * Query for the simulation property that indicates a simulated job run.
      */
-    private static final String SIMULATION_QUERY = "$." + Task.DATA_KEY + "." + Provider.SIMULATION_KEY;
+    private static final String SIMULATION_QUERY = "$." + DataKey.DATA.getKey() + "." + DataKey.SIMULATION.getKey();
 
     /**
      * The key for simulation log entries.
@@ -72,12 +70,22 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     private Configuration jsonPathConfiguration = DEFAULT_JSONPATH_CONFIG;
 
     /**
+     * Creates a new component instance.
+     *
+     * @param categoryId The category ID.
+     * @param typeId     The type ID.
+     */
+    public BaseAction(String categoryId, String typeId) {
+        super(categoryId, typeId);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public List<Map<String, Object>> complete() {
         // Nothing to do here...
-        return null;
+        return List.of();
     }
 
     /**

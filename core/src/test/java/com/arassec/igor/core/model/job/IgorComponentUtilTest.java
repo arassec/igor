@@ -1,15 +1,10 @@
 package com.arassec.igor.core.model.job;
 
-import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.action.BaseAction;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.service.BaseService;
 import com.arassec.igor.core.model.service.Service;
-import com.arassec.igor.core.model.service.ServiceException;
-import lombok.Data;
-import lombok.Setter;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -90,6 +85,13 @@ class IgorComponentUtilTest {
         private Service testService;
 
         /**
+         * Creates a new component instance.
+         */
+        TestAction() {
+            super("action-category-id", "action-type-id");
+        }
+
+        /**
          * {@inheritDoc}
          */
         @Override
@@ -97,21 +99,6 @@ class IgorComponentUtilTest {
             return List.of();
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getCategoryId() {
-            return "action-category-id";
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getTypeId() {
-            return "action-type-id";
-        }
     }
 
 }

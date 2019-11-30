@@ -1,6 +1,6 @@
 package com.arassec.igor.module.file.service.ssh;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
@@ -8,12 +8,8 @@ import com.arassec.igor.module.file.service.FileStreamData;
 import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,38 +23,16 @@ import java.util.stream.Collectors;
  * File-Service for SCP file handling.
  */
 @Slf4j
-@Component
-@Scope("prototype")
 @ConditionalOnClass(JSch.class)
+@IgorComponent
 public class ScpFileService extends BaseSshFileService {
 
     /**
-     * The host of the remote server.
+     * Creates a new component instance.
      */
-    @NotBlank
-    @IgorParam
-    private String host;
-
-    /**
-     * The port of the remote server.
-     */
-    @Positive
-    @IgorParam
-    private int port = 22;
-
-    /**
-     * The username to login with.
-     */
-    @NotBlank
-    @IgorParam
-    private String username;
-
-    /**
-     * The password used for authentication.
-     */
-    @NotBlank
-    @IgorParam(secured = true)
-    private String password;
+    public ScpFileService() {
+        super("b2213d4e-db92-4e87-9fea-882b71385ae4");
+    }
 
     /**
      * Reads from the provided InputStream to check the return value of the last SSH command sent to the server.
@@ -70,12 +44,10 @@ public class ScpFileService extends BaseSshFileService {
      *
      * @throws IOException In case of errors.
      */
-    private static int checkAck(InputStream in, StringBuffer log) throws IOException {
+    private static int checkAck(InputStream in, StringBuilder log) throws IOException {
         int b = in.read();
         // b may be 0 for success, 1 for error, 2 for fatal error, -1 (e.g. for closed input stream)
-        if (b == 0) {
-            return b;
-        } else if (b == -1) {
+        if (b == 0 || b == -1) {
             return b;
         }
 
@@ -105,7 +77,7 @@ public class ScpFileService extends BaseSshFileService {
             command += " *." + fileEnding;
         }
         try {
-            StringBuffer result = execute(command);
+            StringBuilder result = execute(command);
             return Arrays.stream(result.toString().split("\n")).skip(numResultsToSkip)
                     .map(lsResult -> new FileInfo(extractFilename(dir, lsResult), extractLastModified(lsResult)))
                     .collect(Collectors.toList());
@@ -129,10 +101,8 @@ public class ScpFileService extends BaseSshFileService {
      */
     private String extractFilename(String dir, String input) {
         String[] split = input.split("\\s");
-        if (split.length >= 3) {
-            if (split[split.length - 2].equals("->")) {
-                return dir + split[split.length - 3];
-            }
+        if (split.length >= 3 && split[split.length - 2].equals("->")) {
+            return dir + split[split.length - 3];
         }
         return dir + split[split.length - 1];
     }
@@ -148,6 +118,7 @@ public class ScpFileService extends BaseSshFileService {
      *
      * @return The extracted timestamp or {@code null}, if none could be extracted.
      */
+    @SuppressWarnings("squid:S4784") // Using RegExps is OK...
     private String extractLastModified(String input) {
         String yearPart = null;
         String timePart = null;
@@ -199,7 +170,7 @@ public class ScpFileService extends BaseSshFileService {
 
             // exec 'scp -f rfile' remotely
             String command = "scp -f " + file;
-            Session session = connect(host, port, username, password);
+            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
 
             ChannelExec channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
@@ -217,7 +188,7 @@ public class ScpFileService extends BaseSshFileService {
             sshOutputStream.write(buf, 0, 1);
             sshOutputStream.flush();
 
-            StringBuffer log = new StringBuffer();
+            StringBuilder log = new StringBuilder();
             int c = checkAck(sshInputStream, log);
             if (c != 'C') {
                 throw new ServiceException("Could not read remote SSH file " + file + ": " + log);
@@ -277,7 +248,7 @@ public class ScpFileService extends BaseSshFileService {
     public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
         try {
             String command = "scp -t " + file;
-            Session session = connect(host, port, username, password);
+            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelExec channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
 
@@ -286,7 +257,7 @@ public class ScpFileService extends BaseSshFileService {
 
             channel.connect();
 
-            StringBuffer log = new StringBuffer();
+            StringBuilder log = new StringBuilder();
             int sshReturnCode = checkAck(sshInputStream, log);
             if (sshReturnCode != 0) {
                 throw new ServiceException("Error during SCP file transfer (" + sshReturnCode + "): " + log);
@@ -302,7 +273,7 @@ public class ScpFileService extends BaseSshFileService {
             sshOutputStream.write(command.getBytes());
             sshOutputStream.flush();
 
-            log = new StringBuffer();
+            log = new StringBuilder();
             sshReturnCode = checkAck(sshInputStream, log);
             if (sshReturnCode != 0) {
                 throw new ServiceException("Error during SCP file transfer (" + sshReturnCode + "): " + log);
@@ -310,7 +281,7 @@ public class ScpFileService extends BaseSshFileService {
 
             copyStream(fileStreamData.getData(), sshOutputStream, fileStreamData.getFileSize(), workInProgressMonitor);
 
-            finalize(session, channel, sshOutputStream, sshInputStream);
+            finalizeStreams(session, channel, sshOutputStream, sshInputStream);
         } catch (IOException | JSchException e) {
             throw new ServiceException("Could not write file stream via SSH!", e);
         }
@@ -321,10 +292,9 @@ public class ScpFileService extends BaseSshFileService {
      */
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
-        if (fileStreamData.getSourceConnectionData() != null && fileStreamData
-                .getSourceConnectionData() instanceof SshConnectionData) {
+        if (fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
             SshConnectionData sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
-            finalize(sshConnectionData.getSession(), sshConnectionData.getChannel(), sshConnectionData.getSshOutputStream(),
+            finalizeStreams(sshConnectionData.getSession(), sshConnectionData.getChannel(), sshConnectionData.getSshOutputStream(),
                     sshConnectionData.getSshInputStream());
         }
     }
@@ -345,13 +315,13 @@ public class ScpFileService extends BaseSshFileService {
      * @param sshOutputStream The SSH output stream.
      * @param sshInputStream  The SSH input stream.
      */
-    private void finalize(Session session, Channel channel, OutputStream sshOutputStream, InputStream sshInputStream) {
+    private void finalizeStreams(Session session, Channel channel, OutputStream sshOutputStream, InputStream sshInputStream) {
         try {
             // send '\0'
             byte[] buf = {0};
             sshOutputStream.write(buf, 0, 1);
             sshOutputStream.flush();
-            StringBuffer log = new StringBuffer();
+            StringBuilder log = new StringBuilder();
             int sshReturnCode = checkAck(sshInputStream, log);
             if (sshReturnCode != 0) {
                 throw new ServiceException("SSH command not successful (" + sshReturnCode + "): " + log);
@@ -380,18 +350,22 @@ public class ScpFileService extends BaseSshFileService {
      *
      * @return The command's output.
      */
-    private StringBuffer execute(String command) {
-        StringBuffer result = new StringBuffer();
+    private StringBuilder execute(String command) {
+        StringBuilder result = new StringBuilder();
 
-        InputStream in = null;
+        Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+        ChannelExec channel;
         try {
-            Session session = connect(host, port, username, password);
-            ChannelExec channel = (ChannelExec) session.openChannel("exec");
-            channel.setCommand(command);
-            channel.setInputStream(null);
-            ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-            channel.setErrStream(errorStream);
-            in = channel.getInputStream();
+            channel = (ChannelExec) session.openChannel("exec");
+        } catch (JSchException e) {
+            throw new ServiceException("Could not open channel to SSH server!", e);
+        }
+        channel.setCommand(command);
+        channel.setInputStream(null);
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+        channel.setErrStream(errorStream);
+
+        try (InputStream in = channel.getInputStream()) {
             channel.connect();
 
             byte[] tmp = new byte[1024];
@@ -403,22 +377,10 @@ public class ScpFileService extends BaseSshFileService {
                     }
                     result.append(new String(tmp, 0, i));
                 }
-                if (channel.isClosed()) {
-                    if (in.available() > 0) {
-                        continue;
-                    }
-                    if (!(channel.getExitStatus() == 0)) {
-                        throw new ServiceException(
-                                "Exit status != 0 received: " + channel.getExitStatus() + "\n(" + errorStream.toString()
-                                        .replace("\n", "") + ")");
-                    }
+                if (shouldExecutionStop(channel, in, errorStream)) {
                     break;
                 }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new ServiceException("Service interrupted during file listing via SSH!", e);
-                }
+                idle();
             }
 
             channel.disconnect();
@@ -427,14 +389,6 @@ public class ScpFileService extends BaseSshFileService {
             return result;
         } catch (IOException | JSchException e) {
             throw new ServiceException("Could not execute command on SSH server!", e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    throw new ServiceException("Could not close input stream (SSH).", e);
-                }
-            }
         }
     }
 
@@ -442,17 +396,45 @@ public class ScpFileService extends BaseSshFileService {
      * {@inheritDoc}
      */
     @Override
-    public void testConfiguration() throws ServiceException {
-        Session session = connect(host, port, username, password);
+    public void testConfiguration() {
+        Session session = connect(getHost(), getPort(), getUsername(), getPassword());
         session.disconnect();
     }
 
     /**
-     * {@inheritDoc}
+     * Checks whether the execution should be stopped or not.
+     *
+     * @param channel     The execution channel.
+     * @param in          The SSH input stream from the server.
+     * @param errorStream The SSH error stream.
+     *
+     * @return {@code true}, if the exeuction should be stopped, {@code false} otherwise.
      */
-    @Override
-    public String getTypeId() {
-        return "b2213d4e-db92-4e87-9fea-882b71385ae4";
+    private boolean shouldExecutionStop(ChannelExec channel, InputStream in, ByteArrayOutputStream errorStream) throws IOException {
+        if (channel.isClosed()) {
+            if (in.available() > 0) {
+                return false;
+            }
+            if (channel.getExitStatus() != 0) {
+                throw new ServiceException(
+                        "Exit status != 0 received: " + channel.getExitStatus() + "\n(" + errorStream.toString()
+                                .replace("\n", "") + ")");
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Puts the thread to sleep for a fixed amount of time.
+     */
+    private void idle() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            log.error("Service interrupted during file listing via SSH!", e);
+            Thread.currentThread().interrupt();
+        }
     }
 
 }

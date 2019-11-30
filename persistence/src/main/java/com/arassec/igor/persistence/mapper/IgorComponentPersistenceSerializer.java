@@ -1,8 +1,8 @@
 package com.arassec.igor.persistence.mapper;
 
 import com.arassec.igor.core.model.IgorComponent;
-import com.arassec.igor.core.model.IgorParam;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.persistence.security.SecurityProvider;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -17,12 +17,12 @@ import java.lang.reflect.Field;
 /**
  * Serializer for igor components in the persistence module.
  */
-public class IgorComponentPersistenceSerializer extends StdSerializer<IgorComponent> implements PersistenceMapperKeyAware {
+public class IgorComponentPersistenceSerializer extends StdSerializer<IgorComponent> {
 
     /**
      * The security provider to encrypt secured parameter values.
      */
-    private final SecurityProvider securityProvider;
+    private final transient SecurityProvider securityProvider;
 
     /**
      * Creates a new serializer instance.
@@ -40,13 +40,13 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
     @Override
     public void serialize(IgorComponent instance, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeStringField(ID, instance.getId());
-        jsonGenerator.writeStringField(TYPE_ID, instance.getTypeId());
+        jsonGenerator.writeStringField(PersistenceMapperKey.ID.getKey(), instance.getId());
+        jsonGenerator.writeStringField(PersistenceMapperKey.TYPE_ID.getKey(), instance.getTypeId());
         if (instance instanceof Service) {
-            jsonGenerator.writeStringField(NAME, ((Service) instance).getName());
+            jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), ((Service) instance).getName());
         }
         if (instance instanceof Action) {
-            jsonGenerator.writeBooleanField(ACTIVE, ((Action) instance).isActive());
+            jsonGenerator.writeBooleanField(PersistenceMapperKey.ACTIVE.getKey(), ((Action) instance).isActive());
         }
         serializeParameters(instance, jsonGenerator);
         jsonGenerator.writeEndObject();
@@ -62,31 +62,13 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
      * @throws IOException In case of serialization errors.
      */
     private void serializeParameters(IgorComponent instance, JsonGenerator jsonGenerator) throws IOException {
-        jsonGenerator.writeArrayFieldStart(PARAMETERS);
+        jsonGenerator.writeArrayFieldStart(PersistenceMapperKey.PARAMETERS.getKey());
 
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
             ReflectionUtils.makeAccessible(field);
             if (field.isAnnotationPresent(IgorParam.class)) {
                 try {
-                    Object value = getFieldValue(instance, field);
-                    if (value == null) {
-                        return;
-                    }
-                    if (value instanceof String && StringUtils.isEmpty(value)) {
-                        return;
-                    }
-                    jsonGenerator.writeStartObject();
-                    jsonGenerator.writeStringField(NAME, field.getName());
-                    if (Service.class.isAssignableFrom(field.getType()) && value instanceof Service) {
-                        jsonGenerator.writeStringField(VALUE, ((Service) value).getId());
-                        jsonGenerator.writeBooleanField(SERVICE, true);
-                    } else {
-                        jsonGenerator.writeObjectField(VALUE, value);
-                        if (value instanceof String && isSecured(field)) {
-                            jsonGenerator.writeBooleanField(SECURED, true);
-                        }
-                    }
-                    jsonGenerator.writeEndObject();
+                    serializeParameter(instance, jsonGenerator, field);
                 } catch (IOException e) {
                     throw new IllegalStateException("Could not convert parameter to JSON!", e);
                 }
@@ -96,6 +78,36 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
         jsonGenerator.writeEndArray();
     }
 
+    /**
+     * Serializes a single parameter of the component.
+     *
+     * @param instance      The component instance.
+     * @param jsonGenerator The JSON generator to write the parameter to.
+     * @param field         The parameter to serialize.
+     *
+     * @throws IOException If the parameter could not be serialized.
+     */
+    private void serializeParameter(IgorComponent instance, JsonGenerator jsonGenerator, Field field) throws IOException {
+        Object value = getFieldValue(instance, field);
+        if (value == null) {
+            return;
+        }
+        if (value instanceof String && StringUtils.isEmpty(value)) {
+            return;
+        }
+        jsonGenerator.writeStartObject();
+        jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), field.getName());
+        if (Service.class.isAssignableFrom(field.getType()) && value instanceof Service) {
+            jsonGenerator.writeStringField(PersistenceMapperKey.VALUE.getKey(), ((Service) value).getId());
+            jsonGenerator.writeBooleanField(PersistenceMapperKey.SERVICE.getKey(), true);
+        } else {
+            jsonGenerator.writeObjectField(PersistenceMapperKey.VALUE.getKey(), value);
+            if (value instanceof String && isSecured(field)) {
+                jsonGenerator.writeBooleanField(PersistenceMapperKey.SECURED.getKey(), true);
+            }
+        }
+        jsonGenerator.writeEndObject();
+    }
 
     /**
      * Returns the value of the provided instance's property.
@@ -109,7 +121,7 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
         if (field != null) {
             try {
                 Object result;
-                field.setAccessible(true);
+                ReflectionUtils.makeAccessible(field);
                 if (isSecured(field)) {
                     result = securityProvider.encrypt(instance.getId(), field.getName(), (String) field.get(instance));
                 } else {

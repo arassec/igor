@@ -48,6 +48,12 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
+        <!-- Remove when Jackson 3 is provided by Spring-Boot -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.jasypt</groupId>
             <artifactId>jasypt</artifactId>

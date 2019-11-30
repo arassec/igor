@@ -13,15 +13,17 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * Executes jobs and keeps track of their state. Prevents parallel execution and limits the number of jobs running in
- * parallel.
+ * Executes jobs and keeps track of their state. Prevents parallel execution and limits the number of jobs running in parallel.
  */
 @Slf4j
 @Component
@@ -76,21 +78,7 @@ public class JobExecutor {
     public void update() {
 
         // First check the state of the running jobs:
-        Iterator<Future<Job>> runningJobFuturesIterator = runningJobFutures.iterator();
-        while (runningJobFuturesIterator.hasNext()) {
-            Future<Job> jobFuture = runningJobFuturesIterator.next();
-            try {
-                if (jobFuture.isDone()) {
-                    Job job = jobFuture.get();
-                    JobExecution jobExecution = job.getCurrentJobExecution();
-                    jobExecutionRepository.upsert(jobExecution);
-                    runningJobs.remove(job.getId());
-                    runningJobFuturesIterator.remove();
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                log.warn("Interrupted during job execution!", e);
-            }
-        }
+        runningJobFutures.removeIf(this::processFinished);
 
         // If the queue is still full, no more job executions are processed:
         if (runningJobFutures.size() == jobQueueSize) {
@@ -139,7 +127,7 @@ public class JobExecutor {
                 try {
                     Thread.sleep(100L);
                 } catch (InterruptedException e) {
-                    // Not important, just waiting for the job to finish in an endless loop...
+                    Thread.currentThread().interrupt();
                 }
             }
         }
@@ -149,6 +137,7 @@ public class JobExecutor {
      * Returns the job execution of a currently running job.
      *
      * @param jobId The job's ID.
+     *
      * @return The {@link JobExecution} or {@code null}, if none could be found.
      */
     JobExecution getJobExecution(String jobId) {
@@ -156,6 +145,31 @@ public class JobExecutor {
             return runningJobs.get(jobId).getCurrentJobExecution();
         }
         return null;
+    }
+
+    /**
+     * Checks whether the supplied job finished its work or not.
+     *
+     * @param jobFuture The future containing the running job.
+     *
+     * @return {@code true}, if the job has finished, {@code false} otherwise.
+     */
+    private boolean processFinished(Future<Job> jobFuture) {
+        try {
+            if (jobFuture.isDone()) {
+                Job job = jobFuture.get();
+                JobExecution jobExecution = job.getCurrentJobExecution();
+                jobExecutionRepository.upsert(jobExecution);
+                runningJobs.remove(job.getId());
+                return true;
+            }
+        } catch (InterruptedException e) {
+            log.error("Interrupted during job execution!", e);
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            log.warn("Exception during job execution!", e);
+        }
+        return false;
     }
 
 }

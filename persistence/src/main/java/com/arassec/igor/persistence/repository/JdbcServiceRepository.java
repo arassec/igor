@@ -35,6 +35,11 @@ import java.util.stream.Collectors;
 public class JdbcServiceRepository implements ServiceRepository {
 
     /**
+     * Error message if reading a service fails.
+     */
+    private static final String READ_SERVICE_ERROR = "Could not read service!";
+
+    /**
      * The DAO for services.
      */
     private final ServiceDao serviceDao;
@@ -99,7 +104,7 @@ public class JdbcServiceRepository implements ServiceRepository {
                 ServiceEntity serviceEntity = serviceEntityOptional.get();
                 return persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
             } catch (IOException e) {
-                throw new IllegalStateException("Could not read service!", e);
+                throw new IllegalStateException(READ_SERVICE_ERROR, e);
             }
         }
         return null;
@@ -119,7 +124,7 @@ public class JdbcServiceRepository implements ServiceRepository {
             try {
                 return persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
             } catch (IOException e) {
-                throw new IllegalStateException("Could not read service!", e);
+                throw new IllegalStateException(READ_SERVICE_ERROR, e);
             }
         }
         return null;
@@ -137,7 +142,7 @@ public class JdbcServiceRepository implements ServiceRepository {
             try {
                 result.add(persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class));
             } catch (IOException e) {
-                throw new IllegalStateException("Could not read service!", e);
+                throw new IllegalStateException(READ_SERVICE_ERROR, e);
             }
         }
         return result;
@@ -170,7 +175,7 @@ public class JdbcServiceRepository implements ServiceRepository {
                 try {
                     return persistenceServiceMapper.readValue(serviceEntity.getContent(), Service.class);
                 } catch (IOException e) {
-                    throw new IllegalStateException("Could not read service!", e);
+                    throw new IllegalStateException(READ_SERVICE_ERROR, e);
                 }
             }).collect(Collectors.toList()));
             return result;

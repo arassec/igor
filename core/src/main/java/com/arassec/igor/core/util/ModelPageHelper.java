@@ -8,12 +8,19 @@ import java.util.List;
 public class ModelPageHelper {
 
     /**
+     * Prevents instantiation.
+     */
+    private ModelPageHelper() {
+    }
+
+    /**
      * Creates the requested model page for the given number of elements.
      *
      * @param all        All available elements.
      * @param pageNumber The desired page number.
      * @param pageSize   The desired page size.
      * @param <T>        The model class.
+     *
      * @return The {@link ModelPage}.
      */
     public static <T> ModelPage<T> getModelPage(List<T> all, int pageNumber, int pageSize) {

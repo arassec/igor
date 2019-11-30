@@ -15,8 +15,8 @@ export default {
   .error {
     padding: 0px 5px 0px 5px;
     line-height: 24px;
-    background-color: var(--alert-background-color);
-    color: var(--font-color-light);
+    color: var(--alert-background-color);
+    font-weight: bold;
   }
 
 </style>

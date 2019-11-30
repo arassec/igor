@@ -1,7 +1,6 @@
 package com.arassec.igor.core.model.job.concurrent;
 
 import com.arassec.igor.core.model.action.Action;
-import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.service.ServiceException;

@@ -2,7 +2,6 @@ package com.arassec.igor.core.model.job.concurrent;
 
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.service.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedList;
@@ -80,7 +79,7 @@ public class ActionsExecutingRunnable implements Runnable {
                     process(actions, List.of(nextInputItem));
                 }
             } catch (InterruptedException e) {
-                // Doesn't matter, we just waited for the next piece of work...
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -158,7 +157,8 @@ public class ActionsExecutingRunnable implements Runnable {
                 try {
                     outputQueue.put(outputItem);
                 } catch (InterruptedException e) {
-                    throw new ServiceException("Interrupted while putting data to the output queue!", e);
+                    log.error("Interrupted while putting data to the output queue!", e);
+                    Thread.currentThread().interrupt();
                 }
             }
         }

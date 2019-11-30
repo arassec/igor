@@ -6,15 +6,14 @@ import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.repository.ServiceRepository;
-import com.arassec.igor.web.mapper.IgorComponentWebDeserializer;
-import com.arassec.igor.web.mapper.IgorComponentWebSerializer;
+import com.arassec.igor.web.mapper.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.HierarchicalMessageSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -28,8 +27,6 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 
@@ -58,7 +55,7 @@ public class WebConfiguration {
      * Creates a {@link AcceptHeaderLocaleResolver} that processes the accept-language header and has the ROOT locale configured
      * as fallback.
      *
-     * @return A new {@lin LocaleResolver} instance.
+     * @return A new {@link LocaleResolver} instance.
      */
     @Bean
     public LocaleResolver localeResolver() {
@@ -116,40 +113,26 @@ public class WebConfiguration {
      */
     private ObjectMapper createObjectMapper(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository,
                                             MessageSource messageSource, boolean simulationMode) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         SimpleModule mapperModule = new SimpleModule();
 
         mapperModule.addSerializer(new IgorComponentWebSerializer(messageSource, igorComponentRegistry));
-        mapperModule.addDeserializer(Service.class, new IgorComponentWebDeserializer<>(Service.class, igorComponentRegistry,
-                serviceRepository, simulationMode));
-        mapperModule.addDeserializer(Action.class, new IgorComponentWebDeserializer<>(Action.class, igorComponentRegistry,
-                serviceRepository, simulationMode));
-        mapperModule.addDeserializer(Trigger.class, new IgorComponentWebDeserializer<>(Trigger.class, igorComponentRegistry,
-                serviceRepository, simulationMode));
-        mapperModule.addDeserializer(Provider.class, new IgorComponentWebDeserializer<>(Provider.class, igorComponentRegistry,
-                serviceRepository, simulationMode));
+        mapperModule.addDeserializer(Service.class, new ServiceWebDeserializer(igorComponentRegistry, simulationMode));
+        mapperModule.addDeserializer(Action.class, new ActionWebDeserializer(igorComponentRegistry, serviceRepository,
+                simulationMode));
+        mapperModule.addDeserializer(Trigger.class, new TriggerWebDeserializer(igorComponentRegistry, serviceRepository,
+                simulationMode));
+        mapperModule.addDeserializer(Provider.class, new ProviderWebDeserializer(igorComponentRegistry, serviceRepository,
+                simulationMode));
 
-        mapperModule.addSerializer(Instant.class, new StdSerializer<>(Instant.class) {
-            @Override
-            public void serialize(Instant instant, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-                jsonGenerator.writeNumber(instant.toEpochMilli());
-            }
-        });
-        mapperModule.addDeserializer(Instant.class, new StdDeserializer<>(Instant.class) {
-            @Override
-            public Instant deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-                return Instant.ofEpochMilli(jsonParser.readValueAs(Long.class));
-            }
-        });
-
-        objectMapper.registerModule(mapperModule);
-
-        return objectMapper;
+        return new ObjectMapper()
+                .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+                .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .registerModule(new JavaTimeModule())
+                .registerModule(mapperModule);
     }
 
 }

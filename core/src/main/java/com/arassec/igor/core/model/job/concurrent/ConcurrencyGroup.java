@@ -138,6 +138,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         } catch (InterruptedException e) {
             log.error("Concurrency-Group interrupted during awaitTermination()!", e);
             executorService.shutdownNow();
+            Thread.currentThread().interrupt();
             return true;
         }
     }
@@ -180,7 +181,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                // doesn't matter, just waiting for the threads to finish their jobs.
+                Thread.currentThread().interrupt();
             }
         }
     }

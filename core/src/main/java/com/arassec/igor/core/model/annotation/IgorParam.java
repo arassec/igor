@@ -1,5 +1,6 @@
-package com.arassec.igor.core.model;
+package com.arassec.igor.core.model.annotation;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 
 import java.lang.annotation.ElementType;
@@ -43,12 +44,5 @@ public @interface IgorParam {
      * @return A value of {@link ParameterSubtype}.
      */
     ParameterSubtype subtype() default ParameterSubtype.NONE;
-
-    /**
-     * Enables or disables the configuration of this parameter.
-     *
-     * @return {@code true}, if the parameter should be configurable by the user, {@code false} otherwise.
-     */
-    boolean configurable() default true;
 
 }

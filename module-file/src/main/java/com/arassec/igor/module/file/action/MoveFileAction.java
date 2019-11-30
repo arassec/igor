@@ -1,12 +1,11 @@
 package com.arassec.igor.module.file.action;
 
-import com.arassec.igor.core.model.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,9 +16,8 @@ import java.util.Map;
  * Moves a file.
  */
 @Slf4j
-@Component
-@Scope("prototype")
 @ConditionalOnBean(FileService.class)
+@IgorComponent
 public class MoveFileAction extends BaseFileAction {
 
     /**
@@ -58,27 +56,25 @@ public class MoveFileAction extends BaseFileAction {
     private String targetDirectory;
 
     /**
+     * Creates a new component instance.
+     */
+    public MoveFileAction() {
+        super("a3b7f9e9-9eea-4944-a867-62cdab3ddc07");
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String resolvedSourceFilename = getString(data, sourceFilename);
-        String resolvedSourceDirectory = resolveDirectory(data, sourceDirectory);
-        String resolvedTargetFilename = getString(data, targetFilename);
-        String resolvedTargetDirectory = resolveDirectory(data, targetDirectory);
-
-        if (resolvedSourceFilename == null || resolvedTargetFilename == null) {
-            if (isSimulation(data)) {
-                data.put(SIMULATION_LOG_KEY,
-                        "Couldn't resolve variables for moving: source ("
-                                + resolvedSourceFilename + ") / target (" + resolvedTargetFilename + ")");
-            }
+        ResolvedData resolvedData = resolveData(data, sourceFilename, sourceDirectory, targetFilename, targetDirectory);
+        if (resolvedData == null) {
             return List.of(data);
         }
 
-        String sourceFilePath = resolvedSourceDirectory + resolvedSourceFilename;
-        String targetFilePath = resolvedTargetDirectory + resolvedSourceFilename;
+        String sourceFilePath = resolvedData.getSourceDirectory() + resolvedData.getSourceFilename();
+        String targetFilePath = resolvedData.getTargetDirectory() + resolvedData.getTargetFilename();
 
         log.debug("Moving file '{}' to '{}'", sourceFilePath, targetFilePath);
         service.move(sourceFilePath, targetFilePath, VOID_WIP_MONITOR);
@@ -86,14 +82,6 @@ public class MoveFileAction extends BaseFileAction {
 
         return List.of(data);
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return "a3b7f9e9-9eea-4944-a867-62cdab3ddc07";
     }
 
 }
