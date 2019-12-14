@@ -211,7 +211,7 @@ public class JobRestController {
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteJob(@PathVariable("id") String id, @RequestParam Boolean deleteExclusiveServices) {
-        if (deleteExclusiveServices) {
+        if (Boolean.TRUE.equals(deleteExclusiveServices)) {
             List<Pair<String, String>> exclusiveServices = getExclusiveServices(id);
             if (exclusiveServices != null && !exclusiveServices.isEmpty()) {
                 exclusiveServices.forEach(exclusiveService -> serviceManager.deleteService(exclusiveService.getKey()));

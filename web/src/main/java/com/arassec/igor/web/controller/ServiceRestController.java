@@ -102,7 +102,7 @@ public class ServiceRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteService(@PathVariable("id") String id, @RequestParam Boolean deleteAffectedJobs) {
         ModelPage<Pair<String, String>> referencingJobs = getReferencingJobs(id, 0, Integer.MAX_VALUE);
-        if (referencingJobs.getItems() != null && deleteAffectedJobs) {
+        if (referencingJobs.getItems() != null && Boolean.TRUE.equals(deleteAffectedJobs)) {
             referencingJobs.getItems().forEach(jobReference -> jobManager.delete(jobReference.getKey()));
         } else if (referencingJobs.getItems() != null) {
             referencingJobs.getItems().forEach(jobReference -> {

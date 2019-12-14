@@ -62,7 +62,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     /**
      * Keeps track of all scheduled jobs.
      */
-    private Map<String, ScheduledFuture> scheduledJobs = new ConcurrentHashMap<>();
+    private Map<String, ScheduledFuture<?>> scheduledJobs = new ConcurrentHashMap<>();
 
     /**
      * Initializes the manager by scheduling all available jobs.
@@ -129,8 +129,8 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     }
 
     /**
-     * Enqueues the provided job to the exeuction list. The job will be run as soon as an execution slot is availalbe and after
-     * previously enqueued executions are processed.
+     * Enqueues the provided job to the exeuction list if no previously enqueued execution of the same job currently exists. The
+     * job will be run as soon as an execution slot is availalbe
      * <p>
      * This method should be called if the job should run immediately and only once. If the job should run regularly according to
      * its trigger configuration, {@link JobManager#schedule(Job)} should be used.
@@ -142,8 +142,24 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             throw new IllegalArgumentException("Job with ID required for run!");
         }
         log.info("Trying to manually enqueue job: {} ({})", job.getName(), job.getId());
-        enqueueJob(job);
+        List<JobExecution> runningJobExecutions = jobExecutionRepository
+                .findAllOfJobInState(job.getId(), JobExecutionState.RUNNING);
+        List<JobExecution> waitingJobExecutions = jobExecutionRepository
+                .findAllOfJobInState(job.getId(), JobExecutionState.WAITING);
+        if ((runningJobExecutions == null || runningJobExecutions
+                .isEmpty()) && (waitingJobExecutions == null || waitingJobExecutions.isEmpty())) {
+            JobExecution jobExecution = new JobExecution();
+            jobExecution.setJobId(job.getId());
+            jobExecution.setCreated(Instant.now());
+            jobExecution.setExecutionState(JobExecutionState.WAITING);
+            jobExecutionRepository.upsert(jobExecution);
+            jobExecutionRepository.cleanup(job.getId(), job.getExecutionHistoryLimit());
+        } else {
+            log.info("Job '{}' ({}) already executing or waiting for execution. Skipped execution until next time.",
+                    job.getName(), job.getId());
+        }
     }
+
 
     /**
      * Cancels a running or waiting job-execution.
@@ -298,6 +314,17 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     }
 
     /**
+     * Searches for services referencing the job with the given ID.
+     *
+     * @param id The job's ID.
+     *
+     * @return Set of services referencing this service.
+     */
+    public Set<Pair<String, String>> getReferencedServices(String id) {
+        return jobRepository.findReferencedServices(id);
+    }
+
+    /**
      * Schedules the given job according to its trigger configuration.
      *
      * @param job The job to schedule.
@@ -316,7 +343,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             try {
                 scheduledJobs.put(job.getId(), taskScheduler.schedule(() -> {
                     log.info("Trying to automatically enqueue job: {} ({})", job.getName(), job.getId());
-                    enqueueJob(job);
+                    enqueue(job);
                 }, new CronTrigger(cronExpression)));
                 log.info("Scheduled job: {} ({}).", job.getName(), job.getId());
             } catch (IllegalArgumentException e) {
@@ -338,41 +365,6 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             scheduledJobs.remove(job.getId());
             log.info("Unscheduled job: {} ({})", job.getName(), job.getId());
         }
-    }
-
-    /**
-     * Enqueues the supplied job if there is no other execution of this job waiting for its run.
-     *
-     * @param job The Job to enqueue.
-     */
-    private void enqueueJob(Job job) {
-        List<JobExecution> runningJobExecutions = jobExecutionRepository
-                .findAllOfJobInState(job.getId(), JobExecutionState.RUNNING);
-        List<JobExecution> waitingJobExecutions = jobExecutionRepository
-                .findAllOfJobInState(job.getId(), JobExecutionState.WAITING);
-        if ((runningJobExecutions == null || runningJobExecutions
-                .isEmpty()) && (waitingJobExecutions == null || waitingJobExecutions.isEmpty())) {
-            JobExecution jobExecution = new JobExecution();
-            jobExecution.setJobId(job.getId());
-            jobExecution.setCreated(Instant.now());
-            jobExecution.setExecutionState(JobExecutionState.WAITING);
-            jobExecutionRepository.upsert(jobExecution);
-            jobExecutionRepository.cleanup(job.getId(), job.getExecutionHistoryLimit());
-        } else {
-            log.info("Job '{}' ({}) already executing or waiting for execution. Skipped execution until next time.",
-                    job.getName(), job.getId());
-        }
-    }
-
-    /**
-     * Searches for services referencing the job with the given ID.
-     *
-     * @param id The job's ID.
-     *
-     * @return Set of services referencing this service.
-     */
-    public Set<Pair<String, String>> getReferencedServices(String id) {
-        return jobRepository.findReferencedServices(id);
     }
 
 }
