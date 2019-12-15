@@ -18,7 +18,7 @@ public abstract class BaseIgorComponent implements IgorComponent {
     /**
      * Contains the names of properties which should not be editable.
      */
-    private Set<String> unEditableProperties = new HashSet<>();
+    private final Set<String> unEditableProperties = new HashSet<>();
 
     /**
      * This component's category ID.

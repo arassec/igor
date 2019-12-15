@@ -13,12 +13,12 @@ public class JobRunningCallable implements Callable<Job> {
     /**
      * The job to run.
      */
-    private Job job;
+    private final Job job;
 
     /**
      * The job's execution.
      */
-    private JobExecution jobExecution;
+    private final JobExecution jobExecution;
 
     /**
      * Creates a new JobRunningCallable instance.

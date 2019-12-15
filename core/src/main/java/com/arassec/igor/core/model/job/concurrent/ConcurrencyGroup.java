@@ -27,27 +27,27 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     /**
      * Contains the incoming data for this concurrency-group. This is the output-queue of the previous concurrency-group.
      */
-    private BlockingQueue<Map<String, Object>> inputQueue;
+    private final BlockingQueue<Map<String, Object>> inputQueue;
 
     /**
      * Contains the output of this concurrency-group, which models the input for the following concurrency-group.
      */
-    private BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingDeque<>();
+    private final BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingDeque<>();
 
     /**
      * The {@link ExecutorService} managing the threads.
      */
-    private ThreadPoolExecutor executorService;
+    private final ThreadPoolExecutor executorService;
 
     /**
      * The ID of this concurrency-group. Only used for logging purposes to identify this concureency-group.
      */
-    private String concurrencyGroupId;
+    private final String concurrencyGroupId;
 
     /**
      * The runnables that invoke the actions.
      */
-    private List<ActionsExecutingRunnable> runnables = new LinkedList<>();
+    private final List<ActionsExecutingRunnable> runnables = new LinkedList<>();
 
     /**
      * The {@link JobExecution} contains information about the state of the current job run. Required here because an

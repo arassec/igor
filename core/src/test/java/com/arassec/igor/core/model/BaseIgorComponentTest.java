@@ -16,7 +16,7 @@ class BaseIgorComponentTest {
     /**
      * The class under test.
      */
-    private BaseIgorComponent baseIgorComponent = mock(BaseIgorComponent.class, CALLS_REAL_METHODS);
+    private final BaseIgorComponent baseIgorComponent = mock(BaseIgorComponent.class, CALLS_REAL_METHODS);
 
     /**
      * Tests ID handling.

@@ -22,7 +22,7 @@ class BaseActionTest {
     /**
      * The class under test.
      */
-    private static BaseAction baseAction = mock(BaseAction.class, CALLS_REAL_METHODS);
+    private static final BaseAction baseAction = mock(BaseAction.class, CALLS_REAL_METHODS);
 
     /**
      * The data for testing.

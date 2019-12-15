@@ -97,7 +97,7 @@ public class JobExecution {
      * @param workInProgressMonitor The new monitor to add.
      */
     public void addWorkInProgress(WorkInProgressMonitor workInProgressMonitor) {
-        this.workInProgress.add(workInProgressMonitor);
+        workInProgress.add(workInProgressMonitor);
     }
 
     /**
@@ -106,7 +106,7 @@ public class JobExecution {
      * @param workInProgressMonitor The monitor to remove.
      */
     public void removeWorkInProgress(WorkInProgressMonitor workInProgressMonitor) {
-        this.workInProgress.remove(workInProgressMonitor);
+        workInProgress.remove(workInProgressMonitor);
     }
 
     /**

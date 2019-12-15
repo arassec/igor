@@ -16,7 +16,7 @@ class BaseServiceTest {
     /**
      * The class under test.
      */
-    private BaseService baseService = mock(BaseService.class, CALLS_REAL_METHODS);
+    private final BaseService baseService = mock(BaseService.class, CALLS_REAL_METHODS);
 
     /**
      * Tests the base-service's name handling.

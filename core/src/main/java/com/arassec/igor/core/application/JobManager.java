@@ -62,7 +62,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     /**
      * Keeps track of all scheduled jobs.
      */
-    private Map<String, ScheduledFuture<?>> scheduledJobs = new ConcurrentHashMap<>();
+    private final Map<String, ScheduledFuture<?>> scheduledJobs = new ConcurrentHashMap<>();
 
     /**
      * Initializes the manager by scheduling all available jobs.
@@ -261,7 +261,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             JobExecution runningJobExecution = jobExecutor.getJobExecution(jobExecution.getJobId());
             if (runningJobExecution != null) {
                 jobExecution.setCurrentTask(runningJobExecution.getCurrentTask());
-                jobExecution.getWorkInProgress().addAll(runningJobExecution.getWorkInProgress());
+                runningJobExecution.getWorkInProgress().forEach(jobExecution::addWorkInProgress);
             }
         }
         return jobExecution;

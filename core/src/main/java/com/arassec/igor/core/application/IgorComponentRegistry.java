@@ -53,18 +53,18 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * Contains the categories of a certain component type (e.g. Action.class -> Action-Categories or Service.class ->
      * Service-Categories etc.).
      */
-    private Map<Class, Set<String>> categoriesByComponentType = new HashMap<>();
+    private final Map<Class<? extends IgorComponent>, Set<String>> categoriesByComponentType = new HashMap<>();
 
     /**
      * Contains all available component types in a certain category (e.g. Category 'File-Actions'-ID -> 'List-Files'-ID,
      * 'Copy-File'-ID etc.).
      */
-    private Map<String, Set<String>> typesByCategoryKey = new HashMap<>();
+    private final Map<String, Set<String>> typesByCategoryKey = new HashMap<>();
 
     /**
      * Contains a service interface and its category.
      */
-    private Map<Class, String> serviceInterfaceToCategory = new HashMap<>();
+    private final Map<Class<?>, String> serviceInterfaceToCategory = new HashMap<>();
 
     /**
      * Initializes the component registry.
@@ -94,7 +94,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      *
      * @return Set of categories of the specified component type or an empty set, if none are available.
      */
-    public Set<String> getCategoriesOfComponentType(Class componentType) {
+    public Set<String> getCategoriesOfComponentType(Class<? extends IgorComponent> componentType) {
         if (categoriesByComponentType.containsKey(componentType)) {
             return categoriesByComponentType.get(componentType);
         }
@@ -122,7 +122,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      *
      * @return The category.
      */
-    public String getCagetoryOfServiceInterface(Class serviceInterface) {
+    public String getCagetoryOfServiceInterface(Class<?> serviceInterface) {
         if (serviceInterfaceToCategory.containsKey(serviceInterface)) {
             return serviceInterfaceToCategory.get(serviceInterface);
         }

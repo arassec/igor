@@ -3,12 +3,14 @@ package com.arassec.igor.core.application;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.repository.PersistentValueRepository;
 import com.arassec.igor.core.util.ModelPage;
+import com.arassec.igor.core.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,8 +24,10 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
@@ -398,6 +402,98 @@ class JobManagerTest {
         ModelPage<JobExecution> jobExecutionModelPage = new ModelPage<>(1, 2, 3, List.of());
         when(jobExecutionRepository.findAllOfJob(eq("job-id"), eq(1), eq(2))).thenReturn(jobExecutionModelPage);
         assertEquals(jobExecutionModelPage, jobManager.getJobExecutionsOfJob("job-id", 1, 2));
+    }
+
+    /**
+     * Tests loading a job execution by ID.
+     */
+    @Test
+    @DisplayName("Tests loading a specific job execution.")
+    void testGetJobExecution() {
+        assertNull(jobManager.getJobExecution(-1L));
+
+        // Finished job execution:
+        JobExecution jobExecution = new JobExecution();
+        jobExecution.setExecutionState(JobExecutionState.FINISHED);
+        when(jobExecutionRepository.findById(eq(1L))).thenReturn(jobExecution);
+
+        assertEquals(jobExecution, jobManager.getJobExecution(1L));
+        assertNull(jobExecution.getCurrentTask());
+
+        // Running job execution without executor information:
+        jobExecution.setExecutionState(JobExecutionState.RUNNING);
+
+        assertEquals(jobExecution, jobManager.getJobExecution(1L));
+        assertNull(jobExecution.getCurrentTask());
+
+        // Running job execution with executor information:
+        jobExecution.setJobId("job-id");
+
+        JobExecution executorJobExecution = new JobExecution();
+        executorJobExecution.setCurrentTask("current-task");
+        executorJobExecution.addWorkInProgress(new WorkInProgressMonitor("wip-mon", 12.3));
+        when(jobExecutor.getJobExecution(eq("job-id"))).thenReturn(executorJobExecution);
+
+        assertEquals(jobExecution, jobManager.getJobExecution(1L));
+        assertEquals("current-task", jobExecution.getCurrentTask());
+        assertEquals(executorJobExecution.getWorkInProgress(), jobExecution.getWorkInProgress());
+    }
+
+    /**
+     * Loads a page of job executions in a certain state.
+     */
+    @Test
+    @DisplayName("Tests loading job executions in state.")
+    void testGetJobExecutionsInState() {
+        assertThrows(IllegalArgumentException.class, () -> jobManager.getJobExecutionsInState(null, 1, 1), "JobExecutionState " +
+                "required!");
+
+        ModelPage<JobExecution> jobExecutionModelPage = new ModelPage<>(1, 2, 3, List.of());
+        when(jobExecutionRepository.findInState(eq(JobExecutionState.RUNNING), eq(1), eq(2))).thenReturn(jobExecutionModelPage);
+
+        assertEquals(jobExecutionModelPage, jobManager.getJobExecutionsInState(JobExecutionState.RUNNING, 1, 2));
+    }
+
+    /**
+     * Tests updating a job execution's state.
+     */
+    @Test
+    @DisplayName("Tests updating a job execution's state.")
+    void testUpdateJobExecutionState() {
+        jobManager.updateJobExecutionState(666L, JobExecutionState.RESOLVED);
+        verify(jobExecutionRepository, times(1)).updateJobExecutionState(eq(666L), eq(JobExecutionState.RESOLVED));
+    }
+
+    /**
+     * Tests updating all job executions of a given job.
+     */
+    @Test
+    @DisplayName("Tests bulk updating job executions.")
+    void testUpdateAllJobExecutionsOfJob() {
+        jobManager.updateAllJobExecutionsOfJob("job-id", JobExecutionState.FAILED, JobExecutionState.RESOLVED);
+        verify(jobExecutionRepository, times(1)).updateAllJobExecutionsOfJob(eq("job-id"), eq(JobExecutionState.FAILED),
+                eq(JobExecutionState.RESOLVED));
+    }
+
+    /**
+     * Tests retrieving the number of execution slots for jobs.
+     */
+    @Test
+    @DisplayName("Tests the retrieval of job execution slots.")
+    void testGetNumSlots() {
+        when(jobExecutor.getJobQueueSize()).thenReturn(23);
+        assertEquals(23, jobManager.getNumSlots());
+    }
+
+    /**
+     * Tests retrieving all services that a job with a given ID uses.
+     */
+    @Test
+    @DisplayName("Tests finding services used by a job.")
+    void testGetReferencedServices() {
+        Set<Pair<String, String>> result = new HashSet<>();
+        when(jobRepository.findReferencedServices(eq("job-id"))).thenReturn(result);
+        assertEquals(result, jobManager.getReferencedServices("job-id"));
     }
 
 }

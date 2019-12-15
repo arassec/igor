@@ -49,17 +49,17 @@ public class JobExecutor {
     /**
      * The executor service to run the jobs.
      */
-    private ThreadPoolExecutor executorService;
+    private final ThreadPoolExecutor executorService;
 
     /**
      * Contains the futures of currently running jobs.
      */
-    private List<Future<Job>> runningJobFutures = new LinkedList<>();
+    private final List<Future<Job>> runningJobFutures = new LinkedList<>();
 
     /**
      * Contains the currently running jobs, indexed by their ID.
      */
-    private Map<String, Job> runningJobs = new HashMap<>();
+    private final Map<String, Job> runningJobs = new HashMap<>();
 
     /**
      * Creates a new JobExecutor instance.

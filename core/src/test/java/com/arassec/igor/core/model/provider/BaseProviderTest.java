@@ -17,7 +17,7 @@ class BaseProviderTest {
     /**
      * The class under test.
      */
-    private BaseProvider baseProvider = mock(BaseProvider.class, CALLS_REAL_METHODS);
+    private final BaseProvider baseProvider = mock(BaseProvider.class, CALLS_REAL_METHODS);
 
     /**
      * Tests provider initialization.

@@ -18,7 +18,7 @@ class ModelPageHelperTest {
     /**
      * Test data.
      */
-    private List<Integer> all = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    private final List<Integer> all = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
     /**
      * Tests getting an empty model page.
