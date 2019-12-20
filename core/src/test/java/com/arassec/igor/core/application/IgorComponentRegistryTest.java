@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 
@@ -43,17 +44,20 @@ class IgorComponentRegistryTest {
     /**
      * An action mock.
      */
-    private final Action actionMock = mock(Action.class);
+    @Mock
+    private Action actionMock;
 
     /**
      * A provider mock.
      */
-    private final Provider providerMock = mock(Provider.class);
+    @Mock
+    private Provider providerMock;
 
     /**
      * A trigger mock.
      */
-    private final Trigger triggerMock = mock(Trigger.class);
+    @Mock
+    private Trigger triggerMock;
 
     /**
      * Initializes the test environment.

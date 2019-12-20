@@ -117,7 +117,7 @@ public class JobExecutor {
      */
     public void cancel(String jobId) {
         if (jobId == null) {
-            throw new IllegalStateException("Cannot cancel a job without a job ID!");
+            throw new IllegalArgumentException("Cannot cancel a job without a job ID!");
         }
         if (runningJobs.containsKey(jobId)) {
             Job job = runningJobs.get(jobId);

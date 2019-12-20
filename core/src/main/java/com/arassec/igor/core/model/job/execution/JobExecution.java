@@ -1,8 +1,7 @@
 package com.arassec.igor.core.model.job.execution;
 
 import com.arassec.igor.core.util.StacktraceFormatter;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -13,6 +12,9 @@ import java.util.List;
  * Contains information about a single job run.
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class JobExecution {
 
