@@ -6,6 +6,8 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.module.message.service.BaseMessageService;
 import com.arassec.igor.module.message.service.Message;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.Connection;
@@ -18,6 +20,8 @@ import javax.validation.constraints.Positive;
 /**
  * Message service to process messages via RabbitMQ.
  */
+@Getter
+@Setter
 @ConditionalOnClass(RabbitTemplate.class)
 @IgorComponent
 public class RabbitMqMessageService extends BaseMessageService {
@@ -94,6 +98,12 @@ public class RabbitMqMessageService extends BaseMessageService {
     private int heartBeat = 30;
 
     /**
+     * Optional connection timeout.
+     */
+    @IgorParam(optional = true)
+    private int connectionTimeout = 60000;
+
+    /**
      * The connection factory to the RabbitMQ server.
      */
     private CachingConnectionFactory connectionFactory;
@@ -122,6 +132,7 @@ public class RabbitMqMessageService extends BaseMessageService {
         connectionFactory.setPassword(password);
         connectionFactory.setRequestedHeartBeat(heartBeat);
         connectionFactory.setVirtualHost(virtualHost);
+        connectionFactory.setConnectionTimeout(connectionTimeout);
 
         rabbitTemplate = new RabbitTemplate(connectionFactory);
     }
@@ -168,6 +179,7 @@ public class RabbitMqMessageService extends BaseMessageService {
         testConnectionFactory.setPassword(password);
         testConnectionFactory.setRequestedHeartBeat(heartBeat);
         testConnectionFactory.setVirtualHost(virtualHost);
+        testConnectionFactory.setConnectionTimeout(connectionTimeout);
 
         Connection connection = testConnectionFactory.createConnection();
         connection.close();

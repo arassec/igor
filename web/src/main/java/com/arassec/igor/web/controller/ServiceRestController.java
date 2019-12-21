@@ -4,7 +4,6 @@ import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.service.Service;
-import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.model.ServiceListEntry;
@@ -158,7 +157,7 @@ public class ServiceRestController {
         try {
             service.testConfiguration();
             return new ResponseEntity<>("OK", HttpStatus.OK);
-        } catch (ServiceException e) {
+        } catch (Exception e) {
             String result = e.getMessage();
             if (e.getCause() != null) {
                 result += " (" + e.getCause().getMessage() + ")";

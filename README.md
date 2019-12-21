@@ -1,5 +1,5 @@
 [![Travis (.com)](https://img.shields.io/travis/com/arassec/igor)](https://travis-ci.com/arassec/igor) 
-[![Codecov](https://img.shields.io/codecov/c/github/arassec/igor)](https://codecov.io/gh/arassec/igor)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=arassec_igor&metric=coverage)](https://sonarcloud.io/dashboard?id=arassec_igor)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=arassec_igor&metric=alert_status)](https://sonarcloud.io/dashboard?id=arassec_igor) 
 
 # Igor 
