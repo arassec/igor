@@ -24,10 +24,7 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
@@ -494,6 +491,48 @@ class JobManagerTest {
         Set<Pair<String, String>> result = new HashSet<>();
         when(jobRepository.findReferencedServices(eq("job-id"))).thenReturn(result);
         assertEquals(result, jobManager.getReferencedServices("job-id"));
+    }
+
+    /**
+     * Tests scheduling a job by calling {@link JobManager#onApplicationEvent} with different job configurations.
+     */
+    @Test
+    @DisplayName("Tests scheduling a job.")
+    void testSchedule() {
+        Job job = mock(Job.class);
+        when(job.getName()).thenReturn("job-name");
+        when(jobRepository.findAll()).thenReturn(List.of(job));
+
+        // Job without ID:
+        assertThrows(IllegalArgumentException.class, () -> jobManager.onApplicationEvent(mock(ContextRefreshedEvent.class)),
+                "A job without ID should throw an exception!");
+
+        // Inactive Job:
+        when(job.getId()).thenReturn("job-id");
+        when(job.isActive()).thenReturn(false);
+
+        jobManager.onApplicationEvent(mock(ContextRefreshedEvent.class));
+        assertNull(verify(job, times(0)).getTrigger());
+
+        // Invalid CRON expression:
+        job = new Job();
+        job.setId("job-id");
+        job.setName("job-name");
+        job.setActive(true);
+
+        ScheduledTrigger scheduledTriggerMock = mock(ScheduledTrigger.class);
+        lenient().when(scheduledTriggerMock.getCronExpression()).thenReturn("INVALID-CRON-EXPRESSION");
+        job.setTrigger(scheduledTriggerMock);
+        when(jobRepository.findAll()).thenReturn(List.of(job));
+
+        assertThrows(IllegalStateException.class, () -> jobManager.onApplicationEvent(mock(ContextRefreshedEvent.class)),
+                "Invalid CRON expression should trigger Exception!");
+
+        // A valid job:
+        ReflectionTestUtils.setField(jobManager, "scheduledJobs", new HashMap<>());
+        lenient().when(scheduledTriggerMock.getCronExpression()).thenReturn("0 0 0 * * ?");
+        jobManager.onApplicationEvent(mock(ContextRefreshedEvent.class));
+        verify(taskScheduler, times(1)).schedule(any(Runnable.class), any(CronTrigger.class));
     }
 
 }

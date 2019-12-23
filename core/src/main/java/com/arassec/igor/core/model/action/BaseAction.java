@@ -41,11 +41,6 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     private static final String SIMULATION_QUERY = "$." + DataKey.DATA.getKey() + "." + DataKey.SIMULATION.getKey();
 
     /**
-     * The key for simulation log entries.
-     */
-    protected static final String SIMULATION_LOG_KEY = "simulationLog";
-
-    /**
      * Dummy work-in-progress monitor that can be used, if progress shouldn't be monitored.
      */
     protected static final WorkInProgressMonitor VOID_WIP_MONITOR = new WorkInProgressMonitor("", 0);
@@ -154,7 +149,16 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      * @return {@code true} if the data is processed during a simulated job run, {@code false} otherwise.
      */
     protected boolean isSimulation(Map<String, Object> data) {
-        return getBoolean(data);
+        if (data == null || data.isEmpty()) {
+            return false;
+        }
+
+        Boolean value = JsonPath.using(jsonPathConfiguration).parse(data).read(BaseAction.SIMULATION_QUERY);
+        if (value != null) {
+            return value;
+        }
+
+        return false;
     }
 
     /**
@@ -190,26 +194,6 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
         }
 
         return JsonPath.using(jsonPathConfiguration).parse(data).read(query);
-    }
-
-    /**
-     * Executes the provided JSON-Path query against the supplied data and returns the result as Boolean.
-     *
-     * @param data The data to execute the query on.
-     *
-     * @return The querie's result if any, or {@code false} in every other case.
-     */
-    private boolean getBoolean(Map<String, Object> data) {
-        if (data == null || data.isEmpty()) {
-            return false;
-        }
-
-        Boolean value = JsonPath.using(jsonPathConfiguration).parse(data).read(BaseAction.SIMULATION_QUERY);
-        if (value != null) {
-            return value;
-        }
-
-        return false;
     }
 
 }

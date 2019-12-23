@@ -22,6 +22,16 @@ public abstract class BaseMiscActionTest {
     protected static final String PARAM_VALUE = "igor-message-test";
 
     /**
+     * The job's ID.
+     */
+    protected static final String JOB_ID = "job-id";
+
+    /**
+     * The task's ID.
+     */
+    protected static final String TASK_ID = "task-id";
+
+    /**
      * Creates an input data map for tests.
      *
      * @return Test data.
@@ -31,7 +41,7 @@ public abstract class BaseMiscActionTest {
         item.put(PARAM_KEY, PARAM_VALUE);
 
         Map<String, Object> result = new HashMap<>();
-        result.put(DataKey.META.getKey(), Task.createMetaData("1", "1"));
+        result.put(DataKey.META.getKey(), Task.createMetaData(JOB_ID, TASK_ID));
         result.put(DataKey.DATA.getKey(), item);
 
         return result;

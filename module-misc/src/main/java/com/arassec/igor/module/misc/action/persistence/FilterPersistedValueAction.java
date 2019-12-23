@@ -5,6 +5,8 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
 import com.arassec.igor.core.repository.PersistentValueRepository;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
@@ -15,6 +17,8 @@ import java.util.Map;
  * Filters data of which a value has already been persisted before.
  */
 @Slf4j
+@Getter
+@Setter
 @IgorComponent
 public class FilterPersistedValueAction extends BasePersistenceAction {
 

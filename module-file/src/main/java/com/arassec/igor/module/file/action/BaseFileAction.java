@@ -1,5 +1,6 @@
 package com.arassec.igor.module.file.action;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.BaseAction;
 import lombok.Data;
 
@@ -40,8 +41,8 @@ public abstract class BaseFileAction extends BaseAction {
 
         if (result.getSourceFilename() == null || result.getTargetFilename() == null) {
             if (isSimulation(data)) {
-                data.put(SIMULATION_LOG_KEY, "Couldn't resolve variables: source (" + result.getSourceFilename() + ") /" +
-                        " target (" + result.getTargetFilename() + ")");
+                data.put(DataKey.SIMULATION_LOG.getKey(), "Couldn't resolve variables: source (" + result.getSourceFilename() +
+                        ") / target (" + result.getTargetFilename() + ")");
             }
             return null;
         }
@@ -64,7 +65,7 @@ public abstract class BaseFileAction extends BaseAction {
 
         if (resolvedFilename == null) {
             if (isSimulation(data)) {
-                data.put(SIMULATION_LOG_KEY, "Couldn't resolve file variable: " + filename);
+                data.put(DataKey.SIMULATION_LOG.getKey(), "Couldn't resolve file variable: " + filename);
             }
             return null;
         }

@@ -35,7 +35,12 @@ public enum DataKey {
     /**
      * The key for the simulation property.
      */
-    SIMULATION("simulation");
+    SIMULATION("simulation"),
+
+    /**
+     * The key for simulation log entries.
+     */
+    SIMULATION_LOG("simulationLog");
 
     /**
      * The key as String.
