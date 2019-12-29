@@ -4,6 +4,8 @@ import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.util.*;
@@ -17,11 +19,13 @@ public class FixedInputProvider extends BaseUtilProvider {
     /**
      * The key for the provided data.
      */
-    private static final String INPUT_KEY = "input";
+    public static final String INPUT_KEY = "input";
 
     /**
      * The service to use for file listing.
      */
+    @Getter
+    @Setter
     @NotBlank
     @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
     private String input;
@@ -29,6 +33,8 @@ public class FixedInputProvider extends BaseUtilProvider {
     /**
      * Indicates whether the input should be split by newlines or not.
      */
+    @Getter
+    @Setter
     @IgorParam
     private boolean separateLines = true;
 

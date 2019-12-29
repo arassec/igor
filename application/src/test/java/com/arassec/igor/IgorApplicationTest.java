@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * Tests the {@link IgorApplication}.
  */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:file:./target/dbdata/igor;AUTO_SERVER=true"})
 class IgorApplicationTest {
 
     /**

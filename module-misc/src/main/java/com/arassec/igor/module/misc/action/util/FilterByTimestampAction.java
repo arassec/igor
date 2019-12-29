@@ -23,7 +23,7 @@ import java.util.Map;
 @Setter
 @Getter
 @IgorComponent
-public class FilterByTimestamp extends BaseUtilAction {
+public class FilterByTimestampAction extends BaseUtilAction {
 
     /**
      * The input to use as Timestamp.
@@ -69,7 +69,7 @@ public class FilterByTimestamp extends BaseUtilAction {
     /**
      * Creates a new component instance.
      */
-    public FilterByTimestamp() {
+    public FilterByTimestampAction() {
         super("aca4d78f-ad37-451c-baab-0533c5735333");
     }
 
@@ -107,18 +107,19 @@ public class FilterByTimestamp extends BaseUtilAction {
         LocalDateTime actual = LocalDateTime.parse(resolvedInput, DateTimeFormatter.ofPattern(resolvedTimestampFormat));
 
         if (olderThan) {
-            if (actual.isAfter(target)) {
-                log.debug("Filtered '{}' which is older than {} {}", actual, amount, resolvedTimeUnit);
-                return List.of();
-            }
-        } else {
             if (actual.isBefore(target)) {
-                log.debug("Filtered '{}' which is younger than {} {}", actual, amount, resolvedTimeUnit);
+                log.debug("Filtered '{}' against '{}' which is older than '{} {}'", actual, target, amount, resolvedTimeUnit);
                 return List.of();
             }
+            log.debug("Passed '{}' against '{}' which is younger than '{} {}'", actual, target, amount, resolvedTimeUnit);
+        } else {
+            if (actual.isAfter(target)) {
+                log.debug("Filtered '{}' against '{}' which is younger than '{} {}'", actual, target, amount, resolvedTimeUnit);
+                return List.of();
+            }
+            log.debug("Passed '{}' against '{}' which is older than '{} {}'", actual, target, amount, resolvedTimeUnit);
         }
 
-        log.debug("Passed '{}' against older={}, {}, {}", actual, olderThan, amount, resolvedTimeUnit);
         return List.of(data);
     }
 

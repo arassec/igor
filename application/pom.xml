@@ -15,6 +15,10 @@
     <name>application</name>
     <description>Combines all parts of igor together into a running application.</description>
 
+    <properties>
+        <sonar.skip>true</sonar.skip>
+    </properties>
+
     <dependencies>
 
         <dependency>

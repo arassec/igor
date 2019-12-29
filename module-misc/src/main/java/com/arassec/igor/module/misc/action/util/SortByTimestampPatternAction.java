@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -114,13 +115,10 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
                     .sorted((o1, o2) -> {
                         ZonedDateTime firstDateTime = extractDateTime(o1, p, formatter, applyDefaultTimezone);
                         ZonedDateTime secondDateTime = extractDateTime(o2, p, formatter, applyDefaultTimezone);
-                        if (firstDateTime == null || secondDateTime == null) {
-                            return 0;
-                        }
                         if (sortAscending) {
-                            return firstDateTime.compareTo(secondDateTime);
+                            return Objects.requireNonNull(firstDateTime).compareTo(Objects.requireNonNull(secondDateTime));
                         } else {
-                            return secondDateTime.compareTo(firstDateTime);
+                            return Objects.requireNonNull(secondDateTime).compareTo(Objects.requireNonNull(firstDateTime));
                         }
                     }).collect(Collectors.toList());
         }
@@ -167,7 +165,10 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
                 log.debug("Missing timestamp format to extract date-time: {}", timestampFormat);
                 return null;
             }
-            df = DateTimeFormatter.ofPattern(timestampFormat);
+            applyDefaultTimezone = (!resolvedTimestampFormat.contains("V") && !resolvedTimestampFormat.contains("z")
+                    && !resolvedTimestampFormat.contains("O") && !resolvedTimestampFormat.contains("X")
+                    && !resolvedTimestampFormat.contains("x") && !resolvedTimestampFormat.contains("Z"));
+            df = DateTimeFormatter.ofPattern(resolvedTimestampFormat);
         }
 
         Matcher m = pn.matcher(rawValue);

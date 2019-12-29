@@ -3,6 +3,8 @@ package com.arassec.igor.module.misc.action.util;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
@@ -13,6 +15,8 @@ import java.util.Map;
  * Filters the supplied data by a regular expression.
  */
 @Slf4j
+@Getter
+@Setter
 @IgorComponent
 public class FilterByRegExpAction extends BaseUtilAction {
 
