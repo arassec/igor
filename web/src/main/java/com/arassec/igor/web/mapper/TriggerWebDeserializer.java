@@ -26,7 +26,7 @@ public class TriggerWebDeserializer extends IgorComponentWebDeserializer<Trigger
      */
     @Override
     Trigger createInstance(String typeId, Map<String, Object> parameters, boolean simulationMode) {
-        return igorComponentRegistry.getTriggerInstance(typeId, parameters);
+        return igorComponentRegistry.createTriggerInstance(typeId, parameters);
     }
 
 }

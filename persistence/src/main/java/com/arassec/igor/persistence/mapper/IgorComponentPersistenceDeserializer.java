@@ -2,8 +2,6 @@ package com.arassec.igor.persistence.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
-import com.arassec.igor.core.model.action.Action;
-import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.persistence.security.SecurityProvider;
 import com.fasterxml.jackson.core.JsonParser;
@@ -58,12 +56,16 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
      */
     @Override
     public T deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        Map map = deserializationContext.readValue(jsonParser, Map.class);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = deserializationContext.readValue(jsonParser, Map.class);
 
         String typeId = getTypeId(map);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> parameters = deserializeParameters((List<Map>) map.get(PersistenceMapperKey.PARAMETERS.getKey()), typeId);
+        List<Map<String, Object>> rawParameters = (List<Map<String, Object>>) map.get(PersistenceMapperKey.PARAMETERS.getKey());
+
+        Map<String, Object> parameters = deserializeParameters(rawParameters, typeId);
 
         T instance = createInstance(typeId, parameters);
 
@@ -92,7 +94,7 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
      *
      * @return The parameters as Map of objects.
      */
-    private Map<String, Object> deserializeParameters(List<Map> parameters, String typeId) {
+    private Map<String, Object> deserializeParameters(List<Map<String, Object>> parameters, String typeId) {
         if (parameters == null || parameters.isEmpty()) {
             return null;
         }
@@ -119,7 +121,7 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
      *
      * @return The type of the component.
      */
-    private String getTypeId(Map map) {
+    private String getTypeId(Map<String, Object> map) {
         Object type = map.get(PersistenceMapperKey.TYPE_ID.getKey());
         if (type instanceof String) {
             return (String) type;
@@ -133,14 +135,9 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
      * @param instance The newly created component instance.
      * @param map      The map of component data.
      */
-    private void setComponentSpecifica(IgorComponent instance, Map map) {
+    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
         if (map.containsKey(PersistenceMapperKey.ID.getKey())) {
             instance.setId(String.valueOf(map.get(PersistenceMapperKey.ID.getKey())));
-        }
-        if (instance instanceof Service) {
-            ((Service) instance).setName(String.valueOf(map.get(PersistenceMapperKey.NAME.getKey())));
-        } else if (instance instanceof Action && map.containsKey(PersistenceMapperKey.ACTIVE.getKey())) {
-            ((Action) instance).setActive((boolean) map.get(PersistenceMapperKey.ACTIVE.getKey()));
         }
     }
 

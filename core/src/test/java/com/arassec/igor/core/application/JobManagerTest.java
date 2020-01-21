@@ -219,8 +219,8 @@ class JobManagerTest {
     @Test
     @DisplayName("Tests enqueueing a new job.")
     void testEnqueueNewJob() {
-        assertThrows(IllegalArgumentException.class, () -> jobManager.enqueue(null), "Job with ID required for run!");
-        assertThrows(IllegalArgumentException.class, () -> jobManager.enqueue(new Job()), "Job with ID required for run!");
+        assertThrows(IllegalArgumentException.class, () -> jobManager.enqueue(null));
+        assertThrows(IllegalArgumentException.class, () -> jobManager.enqueue(new Job()));
 
         Job job = new Job();
         job.setId("job-id");
@@ -273,7 +273,7 @@ class JobManagerTest {
     @Test
     @DisplayName("Tests cancelling a job with an invalid state.")
     void testCancelInvalid() {
-        assertThrows(IllegalArgumentException.class, () -> jobManager.cancel(null), "ID required to cancel job-execution!");
+        assertThrows(IllegalArgumentException.class, () -> jobManager.cancel(null));
 
         // Cancelling a non-existing job execution should silently be ignored:
         jobManager.cancel(-1L);

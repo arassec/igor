@@ -1,6 +1,6 @@
 [![Travis (.com)](https://img.shields.io/travis/com/arassec/igor)](https://travis-ci.com/arassec/igor) 
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=arassec_igor&metric=coverage)](https://sonarcloud.io/component_measures?id=arassec_igor&metric=coverage&view=treemap)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=arassec_igor&metric=alert_status)](https://sonarcloud.io/dashboard?id=arassec_igor) 
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=arassec_igor&metric=coverage)](https://sonarcloud.io/component_measures?id=arassec_igor&metric=coverage&view=treemap)
 
 # Igor 
 This repository contains the sources of igor, a tool for managing 'continuous workarounds'. This tool tries to provide a place to organize 
@@ -29,3 +29,7 @@ java -jar application/target/igor-<VERSION>.jar
 ```
 
 You can then navigate to the running application in your browser at: http://localhost:8080
+
+# License
+
+This project is licensed under the [MIT License](https://github.com/arassec/igor/blob/master/LICENSE)

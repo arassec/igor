@@ -1,0 +1,40 @@
+{
+  "id": "service-id",
+  "typeId": "service-type-id",
+  "name": "service-name",
+  "parameters": [
+    {
+      "name": "intParam",
+      "value": 1
+    },
+    {
+      "name": "integerParam",
+      "value": 2
+    },
+    {
+      "name": "longParam",
+      "value": -9223372036854775808
+    },
+    {
+      "name": "longObjectParam",
+      "value": 9223372036854775807
+    },
+    {
+      "name": "booleanParam",
+      "value": true
+    },
+    {
+      "name": "booleanObjectParam",
+      "value": false
+    },
+    {
+      "name": "stringParam",
+      "value": "string-param"
+    },
+    {
+      "name": "securedStringParam",
+      "value": "TestSecurityProvider.encrypt()",
+      "secured": true
+    }
+  ]
+}

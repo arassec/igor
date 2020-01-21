@@ -25,7 +25,7 @@ public class ProviderPersistenceDeserializer extends IgorComponentPersistenceDes
      */
     @Override
     Provider createInstance(String typeId, Map<String, Object> parameters) {
-        return igorComponentRegistry.getProviderInstance(typeId, parameters);
+        return igorComponentRegistry.createProviderInstance(typeId, parameters);
     }
 
 }

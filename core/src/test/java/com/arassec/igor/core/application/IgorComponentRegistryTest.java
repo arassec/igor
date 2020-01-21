@@ -120,8 +120,8 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting an Action instance.")
     void testGetActionInstance() {
-        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.getActionInstance("unknown-type-id", null));
-        igorComponentRegistry.getActionInstance("action-type-id", null);
+        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.createActionInstance("unknown-type-id", null));
+        igorComponentRegistry.createActionInstance("action-type-id", null);
         verify(applicationContextMock, times(1)).getBean(eq(actionMock.getClass()));
     }
 
@@ -131,8 +131,8 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting a Service instance.")
     void testGetServiceInstance() {
-        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.getServiceInstance("unknown-type-id", null));
-        igorComponentRegistry.getServiceInstance("service-type-id", null);
+        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.createServiceInstance("unknown-type-id", null));
+        igorComponentRegistry.createServiceInstance("service-type-id", null);
         verify(applicationContextMock, times(1)).getBean(eq(TestServiceImpl.class));
     }
 
@@ -145,7 +145,7 @@ class IgorComponentRegistryTest {
         Map<String, Object> params = new HashMap<>();
         params.put("testParam", 666);
         when(applicationContextMock.getBean(eq(TestServiceImpl.class))).thenReturn(new TestServiceImpl());
-        TestServiceImpl serviceInstance = (TestServiceImpl) igorComponentRegistry.getServiceInstance("service-type-id", params);
+        TestServiceImpl serviceInstance = (TestServiceImpl) igorComponentRegistry.createServiceInstance("service-type-id", params);
         assertEquals(666, serviceInstance.getTestParam());
     }
 
@@ -155,8 +155,8 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting a Provider instance.")
     void testGetProviderInstance() {
-        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.getProviderInstance("unknown-type-id", null));
-        igorComponentRegistry.getProviderInstance("provider-type-id", null);
+        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.createProviderInstance("unknown-type-id", null));
+        igorComponentRegistry.createProviderInstance("provider-type-id", null);
         verify(applicationContextMock, times(1)).getBean(eq(providerMock.getClass()));
     }
 
@@ -166,8 +166,8 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting a Trigger instance.")
     void testGetTriggerInstance() {
-        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.getTriggerInstance("unknown-type-id", null));
-        igorComponentRegistry.getTriggerInstance("trigger-type-id", null);
+        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.createTriggerInstance("unknown-type-id", null));
+        igorComponentRegistry.createTriggerInstance("trigger-type-id", null);
         verify(applicationContextMock, times(1)).getBean(eq(triggerMock.getClass()));
     }
 

@@ -137,7 +137,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      *
      * @return The new {@link Action} instance.
      */
-    public Action getActionInstance(String typeId, Map<String, Object> parameters) {
+    public Action createActionInstance(String typeId, Map<String, Object> parameters) {
         Optional<Action> optional = actions.stream().filter(action -> action.getTypeId().equals(typeId)).findFirst();
         if (optional.isPresent()) {
             Action action = applicationContext.getBean(optional.get().getClass());
@@ -155,7 +155,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      *
      * @return The new {@link Service} instance.
      */
-    public Service getServiceInstance(String typeId, Map<String, Object> parameters) {
+    public Service createServiceInstance(String typeId, Map<String, Object> parameters) {
         Optional<Service> optional = services.stream().filter(service -> service.getTypeId().equals(typeId)).findFirst();
         if (optional.isPresent()) {
             Service service = applicationContext.getBean(optional.get().getClass());
@@ -173,7 +173,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      *
      * @return The new {@link Provider} instance.
      */
-    public Provider getProviderInstance(String typeId, Map<String, Object> parameters) {
+    public Provider createProviderInstance(String typeId, Map<String, Object> parameters) {
         Optional<Provider> optional = providers.stream().filter(provider -> provider.getTypeId().equals(typeId)).findFirst();
         if (optional.isPresent()) {
             Provider provider = applicationContext.getBean(optional.get().getClass());
@@ -191,7 +191,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      *
      * @return The new {@link Trigger} instance.
      */
-    public Trigger getTriggerInstance(String typeId, Map<String, Object> parameters) {
+    public Trigger createTriggerInstance(String typeId, Map<String, Object> parameters) {
         Optional<Trigger> optional = triggers.stream().filter(trigger -> trigger.getTypeId().equals(typeId)).findFirst();
         if (optional.isPresent()) {
             Trigger trigger = applicationContext.getBean(optional.get().getClass());

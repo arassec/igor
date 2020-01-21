@@ -3,6 +3,7 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.module.file.service.FallbackFileService;
 import com.arassec.igor.module.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -46,6 +47,7 @@ public class DeleteFileAction extends BaseFileAction {
      */
     public DeleteFileAction() {
         super("f83ed584-a6a2-458f-86bd-aaaae347227b");
+        service = new FallbackFileService();
     }
 
     /**

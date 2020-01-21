@@ -27,7 +27,7 @@ public class ProviderWebDeserializer extends IgorComponentWebDeserializer<Provid
      */
     @Override
     Provider createInstance(String typeId, Map<String, Object> parameters, boolean simulationMode) {
-        Provider provider = igorComponentRegistry.getProviderInstance(typeId, parameters);
+        Provider provider = igorComponentRegistry.createProviderInstance(typeId, parameters);
         if (simulationMode) {
             return new ProviderProxy(provider);
         } else {

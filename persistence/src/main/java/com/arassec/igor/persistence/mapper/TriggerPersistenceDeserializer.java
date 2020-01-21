@@ -25,7 +25,7 @@ public class TriggerPersistenceDeserializer extends IgorComponentPersistenceDese
      */
     @Override
     Trigger createInstance(String typeId, Map<String, Object> parameters) {
-        return igorComponentRegistry.getTriggerInstance(typeId, parameters);
+        return igorComponentRegistry.createTriggerInstance(typeId, parameters);
     }
 
 }

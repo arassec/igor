@@ -1,6 +1,7 @@
 package com.arassec.igor.persistence.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.persistence.security.SecurityProvider;
 
@@ -23,7 +24,15 @@ public class ServicePersistenceDeserializer extends IgorComponentPersistenceDese
      */
     @Override
     Service createInstance(String typeId, Map<String, Object> parameters) {
-        return igorComponentRegistry.getServiceInstance(typeId, parameters);
+        return igorComponentRegistry.createServiceInstance(typeId, parameters);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
+        super.setComponentSpecifica(instance, map);
+        ((Service) instance).setName(String.valueOf(map.get(PersistenceMapperKey.NAME.getKey())));
+    }
 }

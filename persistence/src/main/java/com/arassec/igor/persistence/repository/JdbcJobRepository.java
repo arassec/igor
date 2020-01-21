@@ -89,7 +89,7 @@ public class JdbcJobRepository implements JobRepository {
                 task.setId(UUID.randomUUID().toString());
             }
             if (task.getProvider() != null && task.getProvider().getId() == null) {
-                task.getProvider().setId(null);
+                task.getProvider().setId(UUID.randomUUID().toString());
             }
             task.getActions().forEach(action -> {
                 if (action.getId() == null) {

@@ -45,12 +45,11 @@ public class PersistenceConfiguration {
         mapperModule.addDeserializer(Trigger.class, new TriggerPersistenceDeserializer(igorComponentRegistry, serviceRepository, securityProvider));
         mapperModule.addDeserializer(Provider.class, new ProviderPersistenceDeserializer(igorComponentRegistry, serviceRepository, securityProvider));
 
-        return new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
-                .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
-                .registerModule(new JavaTimeModule())
-                .registerModule(mapperModule);
+        ObjectMapper result = applyDefaultConfiguration(new ObjectMapper()).registerModule(mapperModule);
+
+        result.addMixIn(Job.class, JobMixin.class);
+
+        return result;
     }
 
     /**
@@ -70,10 +69,20 @@ public class PersistenceConfiguration {
         mapperModule.addSerializer(new IgorComponentPersistenceSerializer(securityProvider));
         mapperModule.addDeserializer(Service.class, new ServicePersistenceDeserializer(igorComponentRegistry, securityProvider));
 
-        return new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .registerModule(new JavaTimeModule())
-                .registerModule(mapperModule);
+        return applyDefaultConfiguration(new ObjectMapper()).registerModule(mapperModule);
+    }
+
+    /**
+     * Applies the persistence default configuration to the supplied {@link ObjectMapper}.
+     *
+     * @param objectMapper The object mapper to configure.
+     * @return The same object mapper instance with applied configuration settings.
+     */
+    public ObjectMapper applyDefaultConfiguration(ObjectMapper objectMapper) {
+        return objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+                .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+                .registerModule(new JavaTimeModule());
     }
 
 }

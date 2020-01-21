@@ -24,10 +24,17 @@ public interface Provider extends IgorComponent {
     Map<String, Object> next();
 
     /**
-     * The limit for test data during simulated job runs of this provider.
+     * Returns the limit for test data during simulated job runs of this provider.
      *
      * @return The maximum number of data sets to use during simulations.
      */
     int getSimulationLimit();
 
+    /**
+     * Sets the limit for test data during simulated job runs.
+     *
+     * @param limit The new limit to set.
+     */
+    void setSimulationLimit(int limit);
+    
 }

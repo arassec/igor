@@ -3,6 +3,7 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.module.file.service.FallbackFileService;
 import com.arassec.igor.module.file.service.FileService;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,6 +56,7 @@ public class ReadFileAction extends BaseFileAction {
      */
     public ReadFileAction() {
         super("52256687-b1e4-438d-b2f1-e077d1c86193");
+        service = new FallbackFileService();
     }
 
     /**

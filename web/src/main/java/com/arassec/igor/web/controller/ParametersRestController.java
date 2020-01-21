@@ -96,13 +96,13 @@ public class ParametersRestController {
         try {
             IgorComponent igorComponent;
             if (clazz.equals(Action.class)) {
-                igorComponent = igorComponentRegistry.getActionInstance(typeId, null);
+                igorComponent = igorComponentRegistry.createActionInstance(typeId, null);
             } else if (clazz.equals(Service.class)) {
-                igorComponent = igorComponentRegistry.getServiceInstance(typeId, null);
+                igorComponent = igorComponentRegistry.createServiceInstance(typeId, null);
             } else if (clazz.equals(Provider.class)) {
-                igorComponent = igorComponentRegistry.getProviderInstance(typeId, null);
+                igorComponent = igorComponentRegistry.createProviderInstance(typeId, null);
             } else if (clazz.equals(Trigger.class)) {
-                igorComponent = igorComponentRegistry.getTriggerInstance(typeId, null);
+                igorComponent = igorComponentRegistry.createTriggerInstance(typeId, null);
             } else {
                 throw new IllegalArgumentException("Unknown igor component type: " + clazz);
             }

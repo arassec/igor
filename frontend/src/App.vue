@@ -5,9 +5,9 @@
 </template>
 
 <script>
-    import Navigation from './components/app-navigation'
+  import Navigation from './components/app-navigation'
 
-    export default {
+  export default {
   name: 'app',
   components: {
     Navigation

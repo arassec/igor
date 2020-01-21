@@ -46,6 +46,9 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      */
     @Override
     public JobExecution upsert(JobExecution jobExecution) {
+        if (jobExecution == null) {
+            return null;
+        }
         JobExecutionEntity entity;
         if (jobExecution.getId() != null) {
             Optional<JobExecutionEntity> jobExecutionEntityOptional = jobExecutionDao.findById(jobExecution.getId());
@@ -63,7 +66,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
         try {
             entity.setContent(persistenceJobMapper.writeValueAsString(jobExecution));
         } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Could not persist job execution!", e);
+            throw new IllegalStateException("Could not convert job execution to JSON!", e);
         }
         JobExecutionEntity persistedEntity = jobExecutionDao.save(entity);
         jobExecution.setId(persistedEntity.getId());
@@ -89,12 +92,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     public ModelPage<JobExecution> findAllOfJob(String jobId, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id").descending());
         Page<JobExecutionEntity> page = jobExecutionDao.findByJobId(jobId, pageable);
-        if (page != null && page.hasContent()) {
-            ModelPage<JobExecution> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
-            result.setItems(page.getContent().stream().map(this::convert).collect(Collectors.toList()));
-            return result;
-        }
-        return new ModelPage<>(pageNumber, 0, 0, List.of());
+        return convertpage(page, pageNumber);
     }
 
     /**
@@ -116,12 +114,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     public ModelPage<JobExecution> findInState(JobExecutionState state, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id").descending());
         Page<JobExecutionEntity> page = jobExecutionDao.findByState(state.name(), pageable);
-        if (page != null && page.hasContent()) {
-            ModelPage<JobExecution> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
-            result.setItems(page.getContent().stream().map(this::convert).collect(Collectors.toList()));
-            return result;
-        }
-        return new ModelPage<>(pageNumber, 0, 0, List.of());
+        return convertpage(page, pageNumber);
     }
 
     /**
@@ -178,6 +171,23 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     }
 
     /**
+     * Converts a page of entities into a page of {@link JobExecution}s.
+     *
+     * @param page       The Spring-Data page.
+     * @param pageNumber The requested page number.
+     *
+     * @return A {@link ModelPage} with {@link JobExecution}s.
+     */
+    private ModelPage<JobExecution> convertpage(Page<JobExecutionEntity> page, int pageNumber) {
+        if (page != null && page.hasContent()) {
+            ModelPage<JobExecution> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
+            result.setItems(page.getContent().stream().map(this::convert).collect(Collectors.toList()));
+            return result;
+        }
+        return new ModelPage<>(pageNumber, 0, 0, List.of());
+    }
+
+    /**
      * Converts a job-execution database entity into a {@link JobExecution}.
      *
      * @param entity The entity.
@@ -188,11 +198,11 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
         JobExecution result;
         try {
             result = persistenceJobMapper.readValue(entity.getContent(), JobExecution.class);
+            result.setId(entity.getId());
+            result.setExecutionState(JobExecutionState.valueOf(entity.getState()));
         } catch (IOException e) {
             throw new IllegalStateException("Could not read job execution!", e);
         }
-        result.setId(entity.getId());
-        result.setExecutionState(JobExecutionState.valueOf(entity.getState()));
         return result;
     }
 

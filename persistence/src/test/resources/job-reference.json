@@ -1,0 +1,52 @@
+{
+  "id": "job-id",
+  "name": "job-name",
+  "description": "job-description",
+  "trigger": {
+    "id": "trigger-id",
+    "typeId": "trigger-type-id",
+    "parameters": []
+  },
+  "active": true,
+  "executionHistoryLimit": 666,
+  "tasks": [
+    {
+      "id": "task-id",
+      "name": "task-name",
+      "description": "task-description",
+      "active": true,
+      "provider": {
+        "id": "provider-id",
+        "typeId": "provider-type-id",
+        "parameters": [
+          {
+            "name": "testProviderParam",
+            "value": "test-provider-param"
+          },
+          {
+            "name": "simulationLimit",
+            "value": 456
+          }
+        ]
+      },
+      "actions": [
+        {
+          "id": "action-id",
+          "typeId": "action-type-id",
+          "active": true,
+          "parameters": [
+            {
+              "name": "testService",
+              "value": "service-id",
+              "service": true
+            },
+            {
+              "name": "numThreads",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

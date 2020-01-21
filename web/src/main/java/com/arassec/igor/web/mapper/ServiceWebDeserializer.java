@@ -25,7 +25,7 @@ public class ServiceWebDeserializer extends IgorComponentWebDeserializer<Service
      */
     @Override
     Service createInstance(String typeId, Map<String, Object> parameters, boolean simulationMode) {
-        return igorComponentRegistry.getServiceInstance(typeId, parameters);
+        return igorComponentRegistry.createServiceInstance(typeId, parameters);
     }
 
 }

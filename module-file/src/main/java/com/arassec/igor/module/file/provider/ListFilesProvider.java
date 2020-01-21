@@ -3,6 +3,7 @@ package com.arassec.igor.module.file.provider;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.module.file.service.FallbackFileService;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -71,6 +72,7 @@ public class ListFilesProvider extends BaseFileProvider {
      */
     public ListFilesProvider() {
         super("ac6ff9d1-7003-49cc-85b8-7be305fd90a4");
+        service = new FallbackFileService();
     }
 
     /**

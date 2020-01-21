@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.BaseIgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.PositiveOrZero;
 
@@ -31,6 +32,7 @@ public abstract class BaseProvider extends BaseIgorComponent implements Provider
     /**
      * Limits the results in a simulated job run.
      */
+    @Setter
     @PositiveOrZero
     @IgorParam
     private int simulationLimit = 25;

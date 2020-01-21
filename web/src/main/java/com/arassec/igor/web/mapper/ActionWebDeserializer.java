@@ -27,7 +27,7 @@ public class ActionWebDeserializer extends IgorComponentWebDeserializer<Action> 
      */
     @Override
     Action createInstance(String typeId, Map<String, Object> parameters, boolean simulationMode) {
-        Action action = igorComponentRegistry.getActionInstance(typeId, parameters);
+        Action action = igorComponentRegistry.createActionInstance(typeId, parameters);
         if (simulationMode) {
             return new ActionProxy(action);
         } else {

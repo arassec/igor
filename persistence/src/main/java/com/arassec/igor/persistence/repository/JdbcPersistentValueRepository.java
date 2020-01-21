@@ -64,6 +64,9 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
      */
     @Override
     public boolean isPersisted(String jobId, String taskId, PersistentValue value) {
+        if (value == null) {
+            return false;
+        }
         return (persistentValueDao.findByJobIdAndTaskIdAndContent(jobId, taskId, value.getContent()) != null);
     }
 

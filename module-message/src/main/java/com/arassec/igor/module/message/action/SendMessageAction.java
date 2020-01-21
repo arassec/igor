@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
+import com.arassec.igor.module.message.service.FallbackMessageService;
 import com.arassec.igor.module.message.service.Message;
 import com.arassec.igor.module.message.service.MessageService;
 import lombok.Getter;
@@ -51,6 +52,8 @@ public class SendMessageAction extends BaseMessageAction {
      */
     public SendMessageAction() {
         super("88a0e988-d3ec-4b91-b98c-92d99c09ba33");
+        messageService = new FallbackMessageService();
+        messageTemplate = "";
     }
 
     /**

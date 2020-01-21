@@ -1,6 +1,7 @@
 package com.arassec.igor.persistence.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.persistence.security.SecurityProvider;
@@ -28,7 +29,17 @@ public class ActionPersistenceDeserializer extends IgorComponentPersistenceDeser
      */
     @Override
     Action createInstance(String typeId, Map<String, Object> parameters) {
-        return igorComponentRegistry.getActionInstance(typeId, parameters);
+        return igorComponentRegistry.createActionInstance(typeId, parameters);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
+        super.setComponentSpecifica(instance, map);
+        if (map.containsKey(PersistenceMapperKey.ACTIVE.getKey())) {
+            ((Action) instance).setActive((boolean) map.get(PersistenceMapperKey.ACTIVE.getKey()));
+        }
+    }
 }
