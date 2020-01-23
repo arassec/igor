@@ -1,0 +1,113 @@
+{
+  "id": "job-id",
+  "name": "job-name",
+  "description": "job-description",
+  "trigger": {
+    "id": "trigger-id",
+    "category": {
+      "key": "trigger-category-id",
+      "value": "Trigger Category"
+    },
+    "type": {
+      "key": "trigger-type-id",
+      "value": "Trigger Type"
+    },
+    "parameters": []
+  },
+  "active": true,
+  "executionHistoryLimit": 666,
+  "tasks": [
+    {
+      "id": "task-id",
+      "name": "task-name",
+      "description": "task-description",
+      "active": true,
+      "provider": {
+        "id": "provider-id",
+        "category": {
+          "key": "provider-category-id",
+          "value": "Provider Category"
+        },
+        "type": {
+          "key": "provider-type-id",
+          "value": "Provider Type"
+        },
+        "parameters": [
+          {
+            "name": "testProviderParam",
+            "secured": false,
+            "optional": false,
+            "subtype": "MULTI_LINE",
+            "type": "java.lang.String",
+            "value": "test-provider-param",
+            "service": false
+          },
+          {
+            "name": "emptyStringParam",
+            "secured": false,
+            "optional": false,
+            "subtype": "CRON",
+            "type": "java.lang.String",
+            "value": null,
+            "service": false
+          },
+          {
+            "name": "nullInteger",
+            "secured": false,
+            "optional": false,
+            "subtype": "NONE",
+            "type": "java.lang.Integer",
+            "value": null,
+            "service": false
+          },
+          {
+            "name": "simulationLimit",
+            "secured": false,
+            "optional": false,
+            "subtype": "NONE",
+            "type": "int",
+            "value": 456,
+            "service": false
+          }
+        ]
+      },
+      "actions": [
+        {
+          "id": "action-id",
+          "active": true,
+          "category": {
+            "key": "action-category-id",
+            "value": "Action Category"
+          },
+          "type": {
+            "key": "action-type-id",
+            "value": "Action Type"
+          },
+          "parameters": [
+            {
+              "name": "testService",
+              "secured": false,
+              "optional": false,
+              "subtype": "NONE",
+              "type": "service-category-id",
+              "serviceClass": "com.arassec.igor.web.test.TestServiceInterface",
+              "value": "service-id",
+              "serviceName": null,
+              "service": true
+            },
+            {
+              "name": "numThreads",
+              "secured": false,
+              "optional": false,
+              "subtype": "NONE",
+              "type": "int",
+              "value": 1,
+              "service": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "running": false
+}

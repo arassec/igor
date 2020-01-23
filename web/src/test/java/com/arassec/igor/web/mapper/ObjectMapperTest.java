@@ -1,11 +1,12 @@
-package com.arassec.igor.persistence.mapper;
+package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.Task;
-import com.arassec.igor.persistence.test.TestAction;
-import com.arassec.igor.persistence.test.TestProvider;
-import com.arassec.igor.persistence.test.TestService;
-import com.arassec.igor.persistence.test.TestTrigger;
+import com.arassec.igor.core.model.service.Service;
+import com.arassec.igor.web.test.TestAction;
+import com.arassec.igor.web.test.TestProvider;
+import com.arassec.igor.web.test.TestService;
+import com.arassec.igor.web.test.TestTrigger;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests {@link com.arassec.igor.core.model.job.Job} mapping.
+ * Tests the Object mapping in the web layer.
  */
-@DisplayName("Tests mapping a job.")
-public class JobMapperTest extends BaseMapperTest {
+@DisplayName("Web-Layer ObjectMapper Tests")
+public class ObjectMapperTest extends BaseMapperTest {
 
     /**
      * Tests serializing a job.
@@ -31,7 +32,7 @@ public class JobMapperTest extends BaseMapperTest {
     @Test
     @DisplayName("Tests serializing a job.")
     @SneakyThrows(IOException.class)
-    void testSerialization() {
+    void testJobSerialization() {
         Job job = new Job();
         job.setId("job-id");
         job.setName("job-name");
@@ -69,7 +70,7 @@ public class JobMapperTest extends BaseMapperTest {
 
         Writer serializedJob = new StringWriter();
 
-        jobObjectMapper.writeValue(serializedJob, job);
+        objectMapper.writeValue(serializedJob, job);
 
         Files.writeString(Paths.get("target/job-reference.json"), serializedJob.toString());
 
@@ -85,10 +86,10 @@ public class JobMapperTest extends BaseMapperTest {
     @Test
     @DisplayName("Tests deserializing a job.")
     @SneakyThrows(IOException.class)
-    void testDeserialization() {
+    void testJobDeserialization() {
         String jobJson = Files.readString(Paths.get("src/test/resources/job-reference.json"));
 
-        Job testJob = jobObjectMapper.readValue(jobJson, Job.class);
+        Job testJob = objectMapper.readValue(jobJson, Job.class);
 
         assertEquals("job-id", testJob.getId());
         assertEquals("job-name", testJob.getName());
@@ -124,6 +125,46 @@ public class JobMapperTest extends BaseMapperTest {
         assertEquals(TestAction.CATEGORY_ID, testAction.getCategoryId());
         assertEquals(TestAction.TYPE_ID, testAction.getTypeId());
         assertTrue(testAction.getTestService() instanceof TestService);
+    }
+
+    /**
+     * Tests serializing a service.
+     */
+    @Test
+    @DisplayName("Tests serializing a service.")
+    @SneakyThrows(IOException.class)
+    void testServiceSerialization() {
+        TestService testService = new TestService();
+        testService.setId(TestService.SERVICE_ID);
+        testService.setName("service-name");
+
+        Writer serializedService = new StringWriter();
+
+        objectMapper.writeValue(serializedService, testService);
+
+        Files.writeString(Paths.get("target/service-reference.json"), serializedService.toString());
+
+        String serializedJson = serializedService.toString();
+        String referenceJson = Files.readString(Paths.get("src/test/resources/service-reference.json"));
+
+        assertTrue(isJsonEqual(referenceJson, serializedJson));
+    }
+
+    /**
+     * Tests deserializing a service.
+     */
+    @Test
+    @DisplayName("Tests deserializing a service.")
+    @SneakyThrows(IOException.class)
+    void testServiceDeserialization() {
+        String serviceJson = Files.readString(Paths.get("src/test/resources/service-reference.json"));
+
+        Service testService = objectMapper.readValue(serviceJson, Service.class);
+
+        assertTrue(testService instanceof TestService);
+
+        assertEquals(TestService.SERVICE_ID, testService.getId());
+        assertEquals("service-name", testService.getName());
     }
 
 }

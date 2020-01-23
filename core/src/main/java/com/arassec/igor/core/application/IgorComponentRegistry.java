@@ -245,7 +245,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     /**
      * Sets the supplied parameters at the supplied instance.
      *
-     * @param instance   The instnace to apply the parameters to.
+     * @param instance   The instance to apply the parameters to.
      * @param parameters The parameters to set.
      */
     private void applyParameters(Object instance, Map<String, Object> parameters) {

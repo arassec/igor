@@ -1,9 +1,9 @@
-package com.arassec.igor.persistence.mapper;
+package com.arassec.igor.persistence.test;
 
 import com.arassec.igor.core.model.trigger.BaseTrigger;
 
 /**
- * A trigger to test object mapping. This trigger has no parameters which must be handled during object mapping.
+ * A trigger to test object mapping. This trigger has no parameters, which must be handled safely during object mapping.
  */
 public class TestTrigger extends BaseTrigger {
 

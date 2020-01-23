@@ -1,6 +1,7 @@
 package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.repository.ServiceRepository;
 import com.arassec.igor.web.simulation.ActionProxy;
@@ -33,6 +34,15 @@ public class ActionWebDeserializer extends IgorComponentWebDeserializer<Action> 
         } else {
             return action;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
+        super.setComponentSpecifica(instance, map);
+        ((Action) instance).setActive((boolean) map.get(WebMapperKey.ACTIVE.getKey()));
     }
 
 }

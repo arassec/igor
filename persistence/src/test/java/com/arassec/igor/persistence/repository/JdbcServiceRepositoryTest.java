@@ -9,7 +9,7 @@ import com.arassec.igor.persistence.dao.ServiceDao;
 import com.arassec.igor.persistence.entity.JobServiceReferenceEntity;
 import com.arassec.igor.persistence.entity.JobServiceReferenceIdentity;
 import com.arassec.igor.persistence.entity.ServiceEntity;
-import com.arassec.igor.persistence.mapper.TestService;
+import com.arassec.igor.persistence.test.TestService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;

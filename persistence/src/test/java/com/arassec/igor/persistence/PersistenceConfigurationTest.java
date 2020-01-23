@@ -46,9 +46,9 @@ public class PersistenceConfigurationTest {
     void testJobMapperConfiguration() {
         PersistenceConfiguration persistenceConfiguration = new PersistenceConfiguration();
         ObjectMapper jobMapper = persistenceConfiguration.persistenceJobMapper(igorComponentRegistry, serviceRepository, securityProvider);
-        assertFalse(jobMapper.getDeserializationConfig().isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
-        assertFalse(jobMapper.getDeserializationConfig().isEnabled(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS));
-        assertFalse(jobMapper.getSerializationConfig().isEnabled(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS));
+        assertFalse(jobMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
+        assertFalse(jobMapper.isEnabled(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS));
+        assertFalse(jobMapper.isEnabled(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS));
         assertTrue(jobMapper.getRegisteredModuleIds().contains("com.fasterxml.jackson.datatype.jsr310.JavaTimeModule"));
     }
 
@@ -60,7 +60,7 @@ public class PersistenceConfigurationTest {
     void testServiceMapperConfiguration() {
         PersistenceConfiguration persistenceConfiguration = new PersistenceConfiguration();
         ObjectMapper serviceMapper = persistenceConfiguration.persistenceServiceMapper(igorComponentRegistry, securityProvider);
-        assertFalse(serviceMapper.getDeserializationConfig().isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
+        assertFalse(serviceMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
         assertTrue(serviceMapper.getRegisteredModuleIds().contains("com.fasterxml.jackson.datatype.jsr310.JavaTimeModule"));
     }
 

@@ -21,11 +21,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.List;
 import java.util.Locale;
@@ -34,22 +29,7 @@ import java.util.Locale;
  * Configures the web layer of igor.
  */
 @Configuration
-@EnableSwagger2
 public class WebConfiguration {
-
-    /**
-     * Swagger configuration.
-     *
-     * @return {@link Docket} for swagger API documentation.
-     */
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2).select()
-                .apis(RequestHandlerSelectors
-                        .basePackage("com.arassec.igor.web.controller"))
-                .paths(PathSelectors.regex("/.*"))
-                .build();
-    }
 
     /**
      * Creates a {@link AcceptHeaderLocaleResolver} that processes the accept-language header and has the ROOT locale configured

@@ -1,6 +1,7 @@
-package com.arassec.igor.persistence.mapper;
+package com.arassec.igor.web.test;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.model.provider.BaseProvider;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import lombok.Setter;
 import java.util.Map;
 
 /**
- * A provider for testing the object mapper.
+ * A provider for testing the persistence layer.
  */
 public class TestProvider extends BaseProvider {
 
@@ -27,7 +28,7 @@ public class TestProvider extends BaseProvider {
      */
     @Getter
     @Setter
-    @IgorParam
+    @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
     private String testProviderParam = "provider-test-param";
 
     /**
@@ -35,7 +36,7 @@ public class TestProvider extends BaseProvider {
      */
     @Getter
     @Setter
-    @IgorParam
+    @IgorParam(subtype = ParameterSubtype.CRON)
     private String emptyStringParam = "";
 
     /**

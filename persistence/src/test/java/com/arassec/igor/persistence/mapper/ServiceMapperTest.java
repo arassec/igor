@@ -1,6 +1,7 @@
 package com.arassec.igor.persistence.mapper;
 
 import com.arassec.igor.core.model.service.Service;
+import com.arassec.igor.persistence.test.TestService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

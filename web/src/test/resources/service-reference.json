@@ -1,0 +1,86 @@
+{
+  "id": "service-id",
+  "name": "service-name",
+  "category": {
+    "key": "service-category-id",
+    "value": "Service Category"
+  },
+  "type": {
+    "key": "service-type-id",
+    "value": "Service Type"
+  },
+  "parameters": [
+    {
+      "name": "intParam",
+      "secured": false,
+      "optional": false,
+      "subtype": "NONE",
+      "type": "int",
+      "value": 0,
+      "service": false
+    },
+    {
+      "name": "integerParam",
+      "secured": false,
+      "optional": false,
+      "subtype": "NONE",
+      "type": "java.lang.Integer",
+      "value": null,
+      "service": false
+    },
+    {
+      "name": "longParam",
+      "secured": false,
+      "optional": false,
+      "subtype": "NONE",
+      "type": "long",
+      "value": 0,
+      "service": false
+    },
+    {
+      "name": "longObjectParam",
+      "secured": false,
+      "optional": false,
+      "subtype": "NONE",
+      "type": "java.lang.Long",
+      "value": null,
+      "service": false
+    },
+    {
+      "name": "booleanParam",
+      "secured": false,
+      "optional": false,
+      "subtype": "NONE",
+      "type": "boolean",
+      "value": false,
+      "service": false
+    },
+    {
+      "name": "booleanObjectParam",
+      "secured": false,
+      "optional": false,
+      "subtype": "NONE",
+      "type": "java.lang.Boolean",
+      "value": null,
+      "service": false
+    },
+    {
+      "name": "stringParam",
+      "secured": false,
+      "optional": false,
+      "subtype": "NONE",
+      "type": "java.lang.String",
+      "value": null,
+      "service": false
+    },
+    {
+      "name": "securedStringParam",
+      "secured": true,
+      "optional": false,
+      "subtype": "NONE",
+      "type": "java.lang.String",
+      "value": null,
+      "service": false
+    }
+  ]
+}

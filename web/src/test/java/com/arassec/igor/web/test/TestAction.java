@@ -1,4 +1,4 @@
-package com.arassec.igor.persistence.mapper;
+package com.arassec.igor.web.test;
 
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An action just for testing the object mapping.
+ * An action just for testing.
  */
 @Getter
 @Setter
@@ -31,7 +31,7 @@ public class TestAction extends BaseAction {
      * A service as parameter.
      */
     @IgorParam
-    private Service testService;
+    private TestServiceInterface testService;
 
     /**
      * Creates a new component instance.

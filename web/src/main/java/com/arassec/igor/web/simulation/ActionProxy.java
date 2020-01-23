@@ -28,11 +28,6 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
     private List<Map<String, Object>> collectedData = new LinkedList<>();
 
     /**
-     * Might contain an error cause if the action finished abnormally.
-     */
-    private String errorCause;
-
-    /**
      * Creates a new proxy instance.
      *
      * @param delegate The proxied action.
@@ -50,7 +45,7 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
         try {
             delegate.initialize(jobId, taskId, jobExecution);
         } catch (Exception e) {
-            errorCause = StacktraceFormatter.format(e);
+            setErrorCause(StacktraceFormatter.format(e));
         }
     }
 
@@ -71,7 +66,7 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
             }
             return resultData;
         } catch (Exception e) {
-            errorCause = StacktraceFormatter.format(e);
+            setErrorCause(StacktraceFormatter.format(e));
         }
         return List.of();
     }
@@ -90,7 +85,7 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
             }
             return resultData;
         } catch (Exception e) {
-            errorCause = StacktraceFormatter.format(e);
+            setErrorCause(StacktraceFormatter.format(e));
         }
         return List.of();
     }

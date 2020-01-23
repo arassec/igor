@@ -117,7 +117,6 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
 
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), field.getName());
-                jsonGenerator.writeStringField(WebMapperKey.TYPE.getKey(), field.getType().getName());
                 jsonGenerator.writeBooleanField(WebMapperKey.SECURED.getKey(), annotation.secured());
                 jsonGenerator.writeBooleanField(WebMapperKey.OPTIONAL.getKey(), annotation.optional());
                 jsonGenerator.writeStringField(WebMapperKey.SUBTYPE.getKey(), annotation.subtype().name());
@@ -126,6 +125,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                 if (isService) {
                     writeServiceParameter(jsonGenerator, field, value);
                 } else {
+                    jsonGenerator.writeStringField(WebMapperKey.TYPE.getKey(), field.getType().getName());
                     if (value instanceof String && StringUtils.isEmpty(value)) {
                         jsonGenerator.writeObjectField(WebMapperKey.VALUE.getKey(), null);
                     } else {

@@ -2,7 +2,6 @@ package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
-import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.repository.ServiceRepository;
@@ -60,12 +59,14 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
     @Override
     public T deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
 
-        Map map = deserializationContext.readValue(jsonParser, Map.class);
-
-        String typeId = getTypeId((Map) map.get(WebMapperKey.TYPE.getKey()));
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = deserializationContext.readValue(jsonParser, Map.class);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> parameters = deserializeParameters((List<Map>) map.get(WebMapperKey.PARAMETERS.getKey()));
+        String typeId = getTypeId((Map<String, Object>) map.get(WebMapperKey.TYPE.getKey()));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> parameters = deserializeParameters((List<Map<String, Object>>) map.get(WebMapperKey.PARAMETERS.getKey()));
 
         T instance = createInstance(typeId, parameters, simulationMode);
 
@@ -93,7 +94,7 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
      *
      * @return The parameters as Map of objects.
      */
-    private Map<String, Object> deserializeParameters(List<Map> parameters) {
+    private Map<String, Object> deserializeParameters(List<Map<String, Object>> parameters) {
         if (parameters == null || parameters.isEmpty()) {
             return null;
         }
@@ -122,7 +123,7 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
      *
      * @return The newly created service instance.
      */
-    private Service deserializeServiceParameter(Map jsonParameter) {
+    private Service deserializeServiceParameter(Map<String, Object> jsonParameter) {
         if (simulationMode) {
             String serviceId = String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey()));
             Service service = serviceRepository.findById(serviceId);
@@ -149,7 +150,7 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
      *
      * @return The type of the component.
      */
-    private String getTypeId(Map map) {
+    private String getTypeId(Map<String, Object> map) {
         Object type = map.get(WebMapperKey.KEY.getKey());
         if (type instanceof String) {
             return (String) type;
@@ -163,17 +164,9 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
      * @param instance The newly created component instance.
      * @param map      The map of component data.
      */
-    private void setComponentSpecifica(IgorComponent instance, Map map) {
+    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
         if (map.containsKey(WebMapperKey.ID.getKey())) {
             instance.setId(String.valueOf(map.get(WebMapperKey.ID.getKey())));
-        }
-        if (instance instanceof Service) {
-            if (map.containsKey(WebMapperKey.ID.getKey())) {
-                instance.setId(String.valueOf(map.get(WebMapperKey.ID.getKey())));
-            }
-            ((Service) instance).setName(String.valueOf(map.get(WebMapperKey.NAME.getKey())));
-        } else if (instance instanceof Action) {
-            ((Action) instance).setActive((boolean) map.get(WebMapperKey.ACTIVE.getKey()));
         }
     }
 

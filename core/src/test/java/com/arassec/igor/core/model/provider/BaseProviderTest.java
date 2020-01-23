@@ -1,12 +1,12 @@
 package com.arassec.igor.core.model.provider;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.trigger.BaseTrigger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests the {@link BaseProvider} model.
@@ -17,7 +17,18 @@ class BaseProviderTest {
     /**
      * The class under test.
      */
-    private final BaseProvider baseProvider = mock(BaseProvider.class, CALLS_REAL_METHODS);
+    private final BaseProvider baseProvider = mock(BaseProvider.class,
+            withSettings().useConstructor("category-id", "type-id").defaultAnswer(CALLS_REAL_METHODS));
+
+    /**
+     * Tests the {@link BaseProvider}'s constructor.
+     */
+    @Test
+    @DisplayName("Tests the base-provider's constructor.")
+    void testBaseProvider() {
+        assertEquals("category-id", baseProvider.getCategoryId());
+        assertEquals("type-id", baseProvider.getTypeId());
+    }
 
     /**
      * Tests provider initialization.

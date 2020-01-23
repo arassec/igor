@@ -1,4 +1,4 @@
-package com.arassec.igor.persistence.mapper;
+package com.arassec.igor.persistence.test;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.service.BaseService;
@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Service for testing the persistence mappers.
+ * Service for testing the persistence layer.
  */
 @Getter
 @Setter

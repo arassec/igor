@@ -1,4 +1,4 @@
-package com.arassec.igor.persistence.mapper;
+package com.arassec.igor.persistence.test;
 
 import com.arassec.igor.persistence.security.BaseSecurityProvider;
 
