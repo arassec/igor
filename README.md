@@ -1,6 +1,6 @@
 [![Travis (.com)](https://img.shields.io/travis/com/arassec/igor)](https://travis-ci.com/arassec/igor) 
-[![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=arassec_igor&metric=alert_status)](https://sonarcloud.io/dashboard?id=arassec_igor) 
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=arassec_igor&metric=coverage)](https://sonarcloud.io/component_measures?id=arassec_igor&metric=coverage&view=treemap)
+[![Sonar Quality Gate](https://img.shields.io/sonar/quality_gate/arassec_igor?server=http%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/dashboard?id=arassec_igor)
+[![Sonar Coverage](https://img.shields.io/sonar/coverage/arassec_igor?server=http%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/component_measures?id=arassec_igor&metric=coverage&view=treemap)
 
 # Igor 
 This repository contains the sources of igor, a tool for managing 'continuous workarounds'. This tool tries to provide a place to organize 
