@@ -2,7 +2,7 @@ package com.arassec.igor.web.test;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.service.BaseService;
-import com.arassec.igor.core.model.service.Service;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.support.CronSequenceGenerator;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -90,9 +89,6 @@ public class JobRestController {
      */
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Job getJob(@PathVariable("id") String id) {
-        if (StringUtils.isEmpty(id)) {
-            throw new IllegalArgumentException("ID required");
-        }
         Job job = jobManager.load(id);
         if (job != null) {
             return job;
@@ -230,7 +226,7 @@ public class JobRestController {
     @PostMapping(value = "run", produces = MediaType.APPLICATION_JSON_VALUE)
     public Job runJob(@Valid @RequestBody Job job) {
         Job savedJob = jobManager.save(job);
-        if (job.isActive()) {
+        if (savedJob.isActive()) {
             jobManager.enqueue(savedJob);
         }
         return savedJob;

@@ -164,11 +164,11 @@ public class ExecutionRestController {
      */
     @PostMapping("{id}/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancelJob(@PathVariable("id") Long id) {
+    public void cancelExecution(@PathVariable("id") Long id) {
         if (id == null || id < 0) {
             throw new IllegalArgumentException("Invalid ID");
         }
-        jobManager.cancel(id);
+        jobManager.cancelExecution(id);
     }
 
     /**

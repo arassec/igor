@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
+import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.Getter;
@@ -138,6 +139,10 @@ public class CopyFileAction extends BaseFileAction {
             String sourceFileWithPath = getFilePath(resolvedData.getSourceDirectory(), resolvedData.getSourceFilename());
 
             FileStreamData fileStreamData = sourceService.readStream(sourceFileWithPath, VOID_WIP_MONITOR);
+
+            if (fileStreamData == null || fileStreamData.getData() == null) {
+                throw new ServiceException("Not valid or not a file!");
+            }
 
             String targetFileWithSuffix = appendSuffixIfRequired(resolvedData.getTargetFilename(), fileStreamData.getFilenameSuffix());
 

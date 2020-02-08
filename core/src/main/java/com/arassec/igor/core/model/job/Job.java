@@ -3,7 +3,10 @@ package com.arassec.igor.core.model.job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.trigger.Trigger;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
@@ -19,6 +22,9 @@ import java.util.Objects;
  * Defines an igor job.
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Slf4j
 public class Job {
 
@@ -53,12 +59,14 @@ public class Job {
     /**
      * Max. number of job-execution entries to keep for this job.
      */
+    @Builder.Default
     @PositiveOrZero
     private int executionHistoryLimit = 5;
 
     /**
      * The tasks this job will perform.
      */
+    @Builder.Default
     @Valid
     private List<Task> tasks = new LinkedList<>();
 
@@ -70,6 +78,7 @@ public class Job {
     /**
      * Indicates whether the job is running or not.
      */
+    @Builder.Default
     private boolean running = false;
 
     /**

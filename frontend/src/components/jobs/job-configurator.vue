@@ -116,7 +116,7 @@
                 })
             },
             loadTypesOfCategory: async function (categoryKey) {
-                await IgorBackend.getData('/api/type/trigger/' + categoryKey).then((types) => {
+                await IgorBackend.getData('/api/type/' + categoryKey).then((types) => {
                     for (let i = this.triggerTypes.length; i > 0; i--) {
                         this.triggerTypes.pop()
                     }

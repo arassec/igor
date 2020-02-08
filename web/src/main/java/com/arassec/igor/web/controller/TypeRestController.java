@@ -32,56 +32,14 @@ public class TypeRestController implements BaseRestController {
     private final IgorComponentRegistry igorComponentRegistry;
 
     /**
-     * Returns all service types of a certain category as {@link KeyLabelStore}s.
+     * Returns all types of a certain category as {@link KeyLabelStore}s.
      *
-     * @param category The service category to use.
+     * @param category The category to use.
      *
-     * @return Set of service types.
+     * @return Set of types.
      */
-    @GetMapping("service/{category}")
-    public List<KeyLabelStore> getServiceTypes(Locale locale, @PathVariable("category") String category) {
-        return sortByLabel(igorComponentRegistry.getTypesOfCategory(category).stream()
-                .map(typeId -> new KeyLabelStore(typeId, messageSource.getMessage(typeId, null, locale)))
-                .collect(Collectors.toSet()));
-    }
-
-    /**
-     * Returns all action types of a certain category as {@link KeyLabelStore}s.
-     *
-     * @param category The action category to use.
-     *
-     * @return Set of action types.
-     */
-    @GetMapping("action/{category}")
-    public List<KeyLabelStore> getActionTypes(Locale locale, @PathVariable("category") String category) {
-        return sortByLabel(igorComponentRegistry.getTypesOfCategory(category).stream()
-                .map(typeId -> new KeyLabelStore(typeId, messageSource.getMessage(typeId, null, locale)))
-                .collect(Collectors.toSet()));
-    }
-
-    /**
-     * Returns all action types of a certain category as {@link KeyLabelStore}s.
-     *
-     * @param category The action category to use.
-     *
-     * @return Set of action types.
-     */
-    @GetMapping("provider/{category}")
-    public List<KeyLabelStore> getProviderTypes(Locale locale, @PathVariable("category") String category) {
-        return sortByLabel(igorComponentRegistry.getTypesOfCategory(category).stream()
-                .map(typeId -> new KeyLabelStore(typeId, messageSource.getMessage(typeId, null, locale)))
-                .collect(Collectors.toSet()));
-    }
-
-    /**
-     * Returns all action types of a certain category as {@link KeyLabelStore}s.
-     *
-     * @param category The action category to use.
-     *
-     * @return Set of action types.
-     */
-    @GetMapping("trigger/{category}")
-    public List<KeyLabelStore> getTriggerTypes(Locale locale, @PathVariable("category") String category) {
+    @GetMapping("{category}")
+    public List<KeyLabelStore> getTypes(Locale locale, @PathVariable("category") String category) {
         return sortByLabel(igorComponentRegistry.getTypesOfCategory(category).stream()
                 .map(typeId -> new KeyLabelStore(typeId, messageSource.getMessage(typeId, null, locale)))
                 .collect(Collectors.toSet()));

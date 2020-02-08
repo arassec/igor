@@ -271,12 +271,12 @@ class JobManagerTest {
      * Tests cancelling a job that doesn't exist or a job that is not in state {@link JobExecutionState#WAITING}.
      */
     @Test
-    @DisplayName("Tests cancelling a job with an invalid state.")
-    void testCancelInvalid() {
-        assertThrows(IllegalArgumentException.class, () -> jobManager.cancel(null));
+    @DisplayName("Tests cancelling a job execution with an invalid state.")
+    void testCancelExecutionInvalid() {
+        assertThrows(IllegalArgumentException.class, () -> jobManager.cancelExecution(null));
 
         // Cancelling a non-existing job execution should silently be ignored:
-        jobManager.cancel(-1L);
+        jobManager.cancelExecution(-1L);
 
         verify(jobExecutionRepository, times(0)).upsert(any(JobExecution.class));
         verify(jobExecutor, times(0)).cancel(any(String.class));
@@ -286,7 +286,7 @@ class JobManagerTest {
         when(jobExecutionMock.getExecutionState()).thenReturn(JobExecutionState.FINISHED);
         when(jobExecutionRepository.findById(eq(666L))).thenReturn(jobExecutionMock);
 
-        jobManager.cancel(666L);
+        jobManager.cancelExecution(666L);
 
         verify(jobExecutionRepository, times(0)).upsert(any(JobExecution.class));
         verify(jobExecutor, times(0)).cancel(any(String.class));
@@ -296,13 +296,13 @@ class JobManagerTest {
      * Tests cancelling a waiting job.
      */
     @Test
-    @DisplayName("Tests cancelling a waiting job.")
-    void testCancelWaiting() {
+    @DisplayName("Tests cancelling a waiting job execution.")
+    void testCancelExecutionWaiting() {
         JobExecution jobExecutionMock = mock(JobExecution.class);
         when(jobExecutionMock.getExecutionState()).thenReturn(JobExecutionState.WAITING);
         when(jobExecutionRepository.findById(eq(666L))).thenReturn(jobExecutionMock);
 
-        jobManager.cancel(666L);
+        jobManager.cancelExecution(666L);
 
         verify(jobExecutionRepository, times(1)).upsert(eq(jobExecutionMock));
         verify(jobExecutionMock, times(1)).setExecutionState(eq(JobExecutionState.CANCELLED));
@@ -313,14 +313,14 @@ class JobManagerTest {
      * Tests cancelling a running job.
      */
     @Test
-    @DisplayName("Tests cancelling a running job.")
-    void testCancelRunning() {
+    @DisplayName("Tests cancelling a running job execution.")
+    void testCancelExecutionRunning() {
         JobExecution jobExecutionMock = mock(JobExecution.class);
         when(jobExecutionMock.getJobId()).thenReturn("job-id");
         when(jobExecutionMock.getExecutionState()).thenReturn(JobExecutionState.RUNNING);
         when(jobExecutionRepository.findById(eq(666L))).thenReturn(jobExecutionMock);
 
-        jobManager.cancel(666L);
+        jobManager.cancelExecution(666L);
 
         verify(jobExecutor, times(1)).cancel(eq("job-id"));
     }

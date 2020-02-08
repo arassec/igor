@@ -2,11 +2,13 @@ package com.arassec.igor.web.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Contains all data to display a job as list entry in the job overview.
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class JobListEntry {
 

@@ -166,7 +166,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      *
      * @param jobExecutionId The ID of the job-execution that should be cancelled.
      */
-    public void cancel(Long jobExecutionId) {
+    public void cancelExecution(Long jobExecutionId) {
         if (jobExecutionId == null) {
             throw new IllegalArgumentException("ID required to cancel job-execution!");
         }

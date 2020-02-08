@@ -5,7 +5,10 @@ import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.Provider;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
@@ -24,6 +27,9 @@ import java.util.concurrent.LinkedBlockingQueue;
  * task or as multiple threads in their own thread pool.
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Slf4j
 public class Task {
 
@@ -63,6 +69,7 @@ public class Task {
     /**
      * The actions this job will perform during its run.
      */
+    @Builder.Default
     @Valid
     private List<Action> actions = new LinkedList<>();
 

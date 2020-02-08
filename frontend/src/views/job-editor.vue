@@ -652,13 +652,13 @@
             let component = this
             IgorBackend.getData('/api/category/provider').then((categoryResult) => {
                 this.initialProviderCategory = Array.from(categoryResult)[0]
-                IgorBackend.getData('/api/type/provider/' + component.initialProviderCategory.key).then((typeResult) => {
+                IgorBackend.getData('/api/type/' + component.initialProviderCategory.key).then((typeResult) => {
                     component.initialProviderType = Array.from(typeResult)[0]
                 })
             })
             IgorBackend.getData('/api/category/action').then((categoryResult) => {
                 this.initialActionCategory = Array.from(categoryResult)[0]
-                IgorBackend.getData('/api/type/action/' + component.initialActionCategory.key).then((typeResult) => {
+                IgorBackend.getData('/api/type/' + component.initialActionCategory.key).then((typeResult) => {
                     component.initialActionType = Array.from(typeResult)[0]
                 })
             })

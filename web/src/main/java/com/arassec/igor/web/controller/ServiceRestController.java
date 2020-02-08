@@ -99,7 +99,9 @@ public class ServiceRestController {
      */
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteService(@PathVariable("id") String id, @RequestParam Boolean deleteAffectedJobs) {
+    public void deleteService(@PathVariable("id") String id,
+                              @RequestParam(value = "deleteAffectedJobs", required = false, defaultValue = "false")
+                                      Boolean deleteAffectedJobs) {
         ModelPage<Pair<String, String>> referencingJobs = getReferencingJobs(id, 0, Integer.MAX_VALUE);
         if (referencingJobs.getItems() != null && Boolean.TRUE.equals(deleteAffectedJobs)) {
             referencingJobs.getItems().forEach(jobReference -> jobManager.delete(jobReference.getKey()));
@@ -190,10 +192,10 @@ public class ServiceRestController {
      */
     @GetMapping(value = "{id}/job-references", produces = MediaType.APPLICATION_JSON_VALUE)
     public ModelPage<Pair<String, String>> getReferencingJobs(@PathVariable("id") String id,
-                                                            @RequestParam(value = "pageNumber", required = false, defaultValue
-                                                                    = "0") int pageNumber,
-                                                            @RequestParam(value = "pageSize", required = false, defaultValue =
-                                                                    "2147483647") int pageSize) {
+                                                              @RequestParam(value = "pageNumber", required = false, defaultValue
+                                                                      = "0") int pageNumber,
+                                                              @RequestParam(value = "pageSize", required = false, defaultValue =
+                                                                      "2147483647") int pageSize) {
         ModelPage<Pair<String, String>> referencingJobs = serviceManager.getReferencingJobs(id, pageNumber, pageSize);
         if (referencingJobs != null) {
             return referencingJobs;

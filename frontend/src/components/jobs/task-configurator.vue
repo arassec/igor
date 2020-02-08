@@ -112,7 +112,7 @@
       })
     },
     loadTypesOfCategory: async function (categoryKey, selectFirst) {
-      await IgorBackend.getData('/api/type/provider/' + categoryKey).then((types) => {
+      await IgorBackend.getData('/api/type/' + categoryKey).then((types) => {
         for (let i = this.providerTypes.length; i > 0; i--) {
           this.providerTypes.pop()
         }

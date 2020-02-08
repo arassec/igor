@@ -55,10 +55,12 @@ public class WebConfiguration {
     @Bean
     public MessageSource messageSource(final List<MessageSource> messageSources) {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        for (int i = 1; i < messageSources.size(); i++) {
-            ((HierarchicalMessageSource) messageSources.get(i)).setParentMessageSource(messageSources.get(i - 1));
+        if (messageSources != null && !messageSources.isEmpty()) {
+            for (int i = 1; i < messageSources.size(); i++) {
+                ((HierarchicalMessageSource) messageSources.get(i)).setParentMessageSource(messageSources.get(i - 1));
+            }
+            messageSource.setParentMessageSource(messageSources.get(messageSources.size() - 1));
         }
-        messageSource.setParentMessageSource(messageSources.get(messageSources.size() - 1));
         messageSource.setUseCodeAsDefaultMessage(true);
         return messageSource;
     }
