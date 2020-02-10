@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
  * Tests the {@link ReadFileAction}.
  */
 @DisplayName("'Read file' action tests.")
-class ReadFileActionTest extends BaseFileActionTest {
+class ReadFileActionTest extends FileActionBaseTest {
 
     /**
      * Tests processing the action with JSON-Path parameters.

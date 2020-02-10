@@ -6,7 +6,8 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FallbackFileService;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -18,7 +19,8 @@ import java.util.Map;
 /**
  * Provides file names from a specified directory.
  */
-@ConditionalOnBean(FileService.class)
+@Getter
+@Setter
 @IgorComponent
 public class ListFilesProvider extends BaseFileProvider {
 

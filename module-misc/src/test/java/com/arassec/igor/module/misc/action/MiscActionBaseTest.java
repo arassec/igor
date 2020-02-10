@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Base class for action tests.
  */
-public abstract class BaseMiscActionTest {
+public abstract class MiscActionBaseTest {
 
     /**
      * Key for the data parameter provided to tests.

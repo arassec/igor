@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("'Send message' action tests.")
-class SendMessageActionTest extends BaseMessageActionTest {
+class SendMessageActionTest extends MessageActionBaseTest {
 
     /**
      * Tests processing the action with JSON-Path parameters.

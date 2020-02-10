@@ -41,9 +41,9 @@ public class LocalFilesystemFileService extends BaseFileService {
         try {
             final PathMatcher matcher;
             if (StringUtils.isEmpty(fileEnding)) {
-                matcher = FileSystems.getDefault().getPathMatcher("glob:*");
+                matcher = FileSystems.getDefault().getPathMatcher("glob:**/*");
             } else {
-                matcher = FileSystems.getDefault().getPathMatcher("glob:*." + fileEnding);
+                matcher = FileSystems.getDefault().getPathMatcher("glob:**/*." + fileEnding);
             }
             try (Stream<Path> files = Files.list(Paths.get(directory))) {
                 return files.filter(matcher::matches).map(path -> {
@@ -68,7 +68,9 @@ public class LocalFilesystemFileService extends BaseFileService {
     @Override
     public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
-            return new String(Files.readAllBytes(Paths.get(file)));
+            String result = new String(Files.readAllBytes(Paths.get(file)));
+            workInProgressMonitor.setProgressInPercent(100);
+            return result;
         } catch (IOException e) {
             throw new ServiceException("Could not read file: " + file, e);
         }
@@ -108,6 +110,7 @@ public class LocalFilesystemFileService extends BaseFileService {
     public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
         try {
             Files.delete(Paths.get(file));
+            workInProgressMonitor.setProgressInPercent(100);
         } catch (IOException e) {
             throw new ServiceException("Could not delete local file " + file, e);
         }
@@ -120,6 +123,7 @@ public class LocalFilesystemFileService extends BaseFileService {
     public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
         try {
             Files.move(Paths.get(source), Paths.get(target), StandardCopyOption.REPLACE_EXISTING);
+            workInProgressMonitor.setProgressInPercent(100);
         } catch (IOException e) {
             throw new ServiceException("Could not move local file '" + source + "' to '" + target + "'!", e);
         }

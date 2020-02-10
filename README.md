@@ -9,7 +9,7 @@
 > *Terry Pratchett, Making Money* 
 
 Igor is a tool for managing 'continuous workarounds'.
-Its aim is to provide an easy to use, reliable place where you can put all those dirty little workarounds, which would 
+It provides an easy to use, reliable place where you can put all those dirty little workarounds, which would 
 otherwise be solved by scattered scripts or code fragments across your applications and services. 
 
 Keep your applications clean and let your igor do the dirty work.
@@ -20,7 +20,7 @@ Igor tries to give the user a toolbox consisting of services and actions, which 
 
 It is similar to [nodered](https://nodered.org/) or [beehive](https://github.com/muesli/beehive), but focuses more on
 data processing instead of specific online services or home automation. 
-It's written entirely in Java using [Spring Boot](https://spring.io/projects/spring-boot) and provides an easy-to-use web-frontend written in [vue.js](https://vuejs.org/).
+It's written in Java using [Spring Boot](https://spring.io/projects/spring-boot) and provides an easy-to-use web-frontend written in [vue.js](https://vuejs.org/).
 
 There are a handful of use-cases around file processing that can be solved right now, 
 e.g. 'Regularly copy new files from an FTP-Server to a destination server via SCP'.
@@ -28,7 +28,7 @@ e.g. 'Regularly copy new files from an FTP-Server to a destination server via SC
 In the future, databases, messaging systems or other interfaces could be added to extract, transform and load the data. 
 
 # Installation
-The application uses Spring-Boot and is currently delivered as standalone (fat) JAR. 
+The application is currently delivered as standalone (fat) JAR. 
 In order to compile igor, at least Java 11 is required. 
 An embedded h2 database is used as database by default. 
 It will automatically be generated upon first start in the current  working directory, in a directory named 'dbdata'. 

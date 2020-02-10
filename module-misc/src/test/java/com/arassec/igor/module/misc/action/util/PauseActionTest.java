@@ -5,7 +5,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.misc.action.BaseMiscActionTest;
+import com.arassec.igor.module.misc.action.MiscActionBaseTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests the {@link PauseAction}.
  */
 @DisplayName("'Pause action' tests.")
-class PauseActionTest extends BaseMiscActionTest {
+class PauseActionTest extends MiscActionBaseTest {
 
     /**
      * Tests pausing the job run during simulations.

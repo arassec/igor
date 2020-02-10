@@ -2,7 +2,7 @@ package com.arassec.igor.module.misc.action.util;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.misc.action.BaseMiscActionTest;
+import com.arassec.igor.module.misc.action.MiscActionBaseTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests the {@link FilterByRegExpAction}.
  */
 @DisplayName("'Filter by regular expression' Tests.")
-class FilterByRegExpActionTest extends BaseMiscActionTest {
+class FilterByRegExpActionTest extends MiscActionBaseTest {
 
     /**
      * Tests configuration errors.

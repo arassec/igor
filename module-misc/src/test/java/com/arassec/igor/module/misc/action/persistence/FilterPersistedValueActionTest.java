@@ -3,7 +3,7 @@ package com.arassec.igor.module.misc.action.persistence;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
 import com.arassec.igor.core.repository.PersistentValueRepository;
-import com.arassec.igor.module.misc.action.BaseMiscActionTest;
+import com.arassec.igor.module.misc.action.MiscActionBaseTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
  * Tests the {@link FilterPersistedValueAction}.
  */
 @DisplayName("'Filter persisted value' action tests.")
-class FilterPersistedValueActionTest extends BaseMiscActionTest {
+class FilterPersistedValueActionTest extends MiscActionBaseTest {
 
     /**
      * Tests the action failing safe if no value can be retrieved.

@@ -1,25 +1,16 @@
-package com.arassec.igor.module.message.action;
+package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.Task;
+import com.arassec.igor.module.file.provider.ListFilesProvider;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Base class for message action tests.
+ * Base class for action tests of the file module.
  */
-abstract class BaseMessageActionTest {
-
-    /**
-     * Key for the data parameter provided to tests.
-     */
-    static final String PARAM_KEY = "parameter";
-
-    /**
-     * Value of the data parameter.
-     */
-    static final String PARAM_VALUE = "igor-message-test";
+abstract class FileActionBaseTest {
 
     /**
      * Creates an input data map for tests.
@@ -28,7 +19,9 @@ abstract class BaseMessageActionTest {
      */
     Map<String, Object> createData() {
         Map<String, Object> item = new HashMap<>();
-        item.put(PARAM_KEY, PARAM_VALUE);
+        item.put(ListFilesProvider.FILENAME_KEY, "filename.txt");
+        item.put(ListFilesProvider.DIRECTORY_KEY, "/directory/test");
+        item.put(ListFilesProvider.LAST_MODIFIED_KEY, "123");
 
         Map<String, Object> result = new HashMap<>();
         result.put(DataKey.META.getKey(), Task.createMetaData("1", "1"));
