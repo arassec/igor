@@ -10,7 +10,6 @@ import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotBlank;
@@ -25,7 +24,6 @@ import java.util.Map;
 @Slf4j
 @Setter
 @Getter
-@ConditionalOnBean(FileService.class)
 @IgorComponent
 public class CopyFileAction extends BaseFileAction {
 

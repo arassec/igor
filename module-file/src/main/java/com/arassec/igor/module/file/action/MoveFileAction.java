@@ -5,8 +5,8 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FallbackFileService;
 import com.arassec.igor.module.file.service.FileService;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,7 +17,8 @@ import java.util.Map;
  * Moves a file.
  */
 @Slf4j
-@ConditionalOnBean(FileService.class)
+@Getter
+@Setter
 @IgorComponent
 public class MoveFileAction extends BaseFileAction {
 

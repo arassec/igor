@@ -8,7 +8,6 @@ import com.arassec.igor.module.file.service.FileService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -21,7 +20,6 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-@ConditionalOnBean(FileService.class)
 @IgorComponent
 public class ReadFileAction extends BaseFileAction {
 

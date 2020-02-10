@@ -43,10 +43,10 @@ class LocalFilesystemFileServiceTest {
     void testListFiles() {
         List<FileInfo> fileInfos = fileService.listFiles("src/test/resources/localfs", null);
         assertEquals(2, fileInfos.size());
-        assertEquals("test.tmp", fileInfos.get(0).getFilename());
-        assertNotNull(fileInfos.get(0).getLastModified());
-        assertEquals("test.txt", fileInfos.get(1).getFilename());
-        assertNotNull(fileInfos.get(1).getLastModified());
+        fileInfos.forEach(fileInfo -> {
+            assertTrue("test.tmp".equals(fileInfo.getFilename()) || "test.txt".equals(fileInfo.getFilename()));
+            assertNotNull(fileInfo.getLastModified());
+        });
 
         fileInfos = fileService.listFiles("src/test/resources/localfs", "txt");
         assertEquals(1, fileInfos.size());
