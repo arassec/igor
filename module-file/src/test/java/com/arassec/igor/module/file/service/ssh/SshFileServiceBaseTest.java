@@ -14,8 +14,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Base class for {@link ScpFileService} and {@link SftpFileService} tests.
@@ -99,9 +98,9 @@ public abstract class SshFileServiceBaseTest {
         assertEquals(2, fileInfos.size());
         assertAll("All file infos are retrieved.",
                 () -> assertEquals("alpha.txt", fileInfos.get(0).getFilename()),
-                () -> assertEquals("2020-02-22T17:43:13+01:00", fileInfos.get(0).getLastModified()),
+                () -> assertFalse(fileInfos.get(0).getLastModified().isBlank()),
                 () -> assertEquals("beta.test", fileInfos.get(1).getFilename()),
-                () -> assertEquals("2020-02-22T17:43:18+01:00", fileInfos.get(1).getLastModified())
+                () -> assertFalse(fileInfos.get(1).getLastModified().isBlank())
         );
 
         List<FileInfo> filteredFileInfos = service.listFiles("src/test/resources/ssh", "test");
@@ -109,7 +108,7 @@ public abstract class SshFileServiceBaseTest {
         assertEquals(1, filteredFileInfos.size());
         assertAll("All file infos are retrieved.",
                 () -> assertEquals("beta.test", filteredFileInfos.get(0).getFilename()),
-                () -> assertEquals("2020-02-22T17:43:18+01:00", filteredFileInfos.get(0).getLastModified())
+                () -> assertFalse(filteredFileInfos.get(0).getLastModified().isBlank())
         );
     }
 
