@@ -1,23 +1,23 @@
 package com.arassec.igor.core.model.job.execution;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Monitors work in progress that is executed.
  */
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WorkInProgressMonitor {
 
     /**
      * The name of the work.
      */
-    private String name;
+    private final String name;
 
     /**
      * The progress in percent.
      */
-    private double progressInPercent;
+    private double progressInPercent = 0;
 
 }

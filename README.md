@@ -9,16 +9,16 @@
 > *Terry Pratchett, Making Money* 
 
 Igor is a tool for managing 'continuous workarounds'.
-It provides an easy to use, reliable place where you can put all those dirty little workarounds, which would 
+It provides an easy to use, reliable place where you can put all those workarounds, which would 
 otherwise be solved by scattered scripts or code fragments across your applications and services. 
 
-Keep your applications clean and let your igor do the dirty work.
+Keep your applications clean and let igor do the dirty work.
 
 # Status
 
 Igor tries to give the user a toolbox consisting of services and actions, which can be flexibly combined to solve bigger tasks.
 
-It is similar to [nodered](https://nodered.org/) or [beehive](https://github.com/muesli/beehive), but focuses more on
+It is similar to [Node-RED](https://nodered.org/), [Huginn](https://github.com/huginn/huginn) or [Beehive](https://github.com/muesli/beehive), but focuses more on
 data processing instead of specific online services or home automation. 
 It's written in Java using [Spring Boot](https://spring.io/projects/spring-boot) and provides an easy-to-use web-frontend written in [vue.js](https://vuejs.org/).
 

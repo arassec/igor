@@ -100,41 +100,6 @@ public abstract class BaseHttpFileService extends BaseFileService {
     }
 
     /**
-     * Creates the URI to the service.
-     *
-     * @param suffix The suffix to append after host and port.
-     *
-     * @return The base URI to the service.
-     */
-    private String buildUri(String suffix) {
-        String result = protocol + "://";
-        result += host;
-        result += ":" + port;
-        if (!suffix.startsWith("/")) {
-            result += "/";
-        }
-        result += suffix;
-        return result;
-    }
-
-    /**
-     * Creates the HTTP-Request.
-     *
-     * @param uriPart The variable part of the URI.
-     *
-     * @return The {@link HttpRequest}.
-     */
-    private HttpRequest.Builder getRequestBuilder(String uriPart) {
-        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder().uri(URI.create(buildUri(uriPart)))
-                .timeout(Duration.ofSeconds(timeout));
-        String authorizationHeader = createBasicAuthHeader();
-        if (!StringUtils.isEmpty(authorizationHeader)) {
-            httpRequestBuilder.headers(authorizationHeader);
-        }
-        return httpRequestBuilder;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -164,11 +129,9 @@ public abstract class BaseHttpFileService extends BaseFileService {
         } catch (IOException e) {
             throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         } catch (InterruptedException e) {
-            log.error(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
             Thread.currentThread().interrupt();
+            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         }
-
-        return List.of();
     }
 
     /**
@@ -188,10 +151,9 @@ public abstract class BaseHttpFileService extends BaseFileService {
         } catch (IOException e) {
             throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         } catch (InterruptedException e) {
-            log.error(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
             Thread.currentThread().interrupt();
+            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         }
-        return null;
     }
 
     /**
@@ -211,11 +173,11 @@ public abstract class BaseHttpFileService extends BaseFileService {
             String filenameSuffix = null;
             Optional<String> optionalContentType = response.headers().firstValue("Content-Type");
             if (optionalContentType.isPresent()) {
-                String[] contentTypeParts = optionalContentType.get().split(" ");
+                String[] contentTypeParts = optionalContentType.get().split(";");
                 if (contentTypeParts.length > 0) {
                     String[] mimeTypeParts = contentTypeParts[0].split("/");
                     if (mimeTypeParts.length > 1) {
-                        filenameSuffix = mimeTypeParts[1].substring(0, mimeTypeParts[1].length() - 1);
+                        filenameSuffix = mimeTypeParts[1];
                     }
                 }
             }
@@ -240,11 +202,9 @@ public abstract class BaseHttpFileService extends BaseFileService {
         } catch (IOException e) {
             throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         } catch (InterruptedException e) {
-            log.error(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
             Thread.currentThread().interrupt();
+            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         }
-
-        return new FileStreamData();
     }
 
     /**
@@ -307,8 +267,16 @@ public abstract class BaseHttpFileService extends BaseFileService {
             throw new ServiceException("GET failed for URL: " + request.uri().toASCIIString(), e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new ServiceException("GET failed for URL: " + request.uri().toASCIIString(), e);
         }
     }
+
+    /**
+     * Connects to the HTTP(S)-Server.
+     *
+     * @return An {@link HttpClient} for the configured server.
+     */
+    protected abstract HttpClient connect();
 
     /**
      * Extracts filenames from the provided HTML elements.
@@ -345,7 +313,7 @@ public abstract class BaseHttpFileService extends BaseFileService {
      */
     private String createBasicAuthHeader() {
         if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
-            return "Authorization: Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+            return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
         }
         return null;
     }
@@ -365,10 +333,44 @@ public abstract class BaseHttpFileService extends BaseFileService {
         } catch (IOException e) {
             throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         } catch (InterruptedException e) {
-            log.error(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
             Thread.currentThread().interrupt();
+            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         }
     }
 
-    protected abstract HttpClient connect();
+    /**
+     * Creates the URI to the service.
+     *
+     * @param suffix The suffix to append after host and port.
+     *
+     * @return The base URI to the service.
+     */
+    private String buildUri(String suffix) {
+        String result = protocol + "://";
+        result += host;
+        result += ":" + port;
+        if (!suffix.startsWith("/")) {
+            result += "/";
+        }
+        result += suffix;
+        return result;
+    }
+
+    /**
+     * Creates the HTTP-Request.
+     *
+     * @param uriPart The variable part of the URI.
+     *
+     * @return The {@link HttpRequest}.
+     */
+    private HttpRequest.Builder getRequestBuilder(String uriPart) {
+        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder().uri(URI.create(buildUri(uriPart)))
+                .timeout(Duration.ofSeconds(timeout));
+        String authorizationHeader = createBasicAuthHeader();
+        if (!StringUtils.isEmpty(authorizationHeader)) {
+            httpRequestBuilder.header("Authorization", authorizationHeader);
+        }
+        return httpRequestBuilder;
+    }
+
 }

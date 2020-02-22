@@ -24,19 +24,19 @@ class FallbackFileServiceTest {
         assertThrows(IllegalStateException.class, () -> service.listFiles("", ""));
 
         assertThrows(IllegalStateException.class, () -> service.read(null, null));
-        assertThrows(IllegalStateException.class, () -> service.read("", new WorkInProgressMonitor("", 0)));
+        assertThrows(IllegalStateException.class, () -> service.read("", new WorkInProgressMonitor("")));
 
         assertThrows(IllegalStateException.class, () -> service.readStream(null, null));
-        assertThrows(IllegalStateException.class, () -> service.readStream("", new WorkInProgressMonitor("", 0)));
+        assertThrows(IllegalStateException.class, () -> service.readStream("", new WorkInProgressMonitor("")));
 
         assertThrows(IllegalStateException.class, () -> service.writeStream(null, null, null));
-        assertThrows(IllegalStateException.class, () -> service.writeStream("", new FileStreamData(), new WorkInProgressMonitor("", 0)));
+        assertThrows(IllegalStateException.class, () -> service.writeStream("", new FileStreamData(), new WorkInProgressMonitor("")));
 
         assertThrows(IllegalStateException.class, () -> service.move(null, null, null));
-        assertThrows(IllegalStateException.class, () -> service.move("", "", new WorkInProgressMonitor("", 0)));
+        assertThrows(IllegalStateException.class, () -> service.move("", "", new WorkInProgressMonitor("")));
 
         assertThrows(IllegalStateException.class, () -> service.delete(null, null));
-        assertThrows(IllegalStateException.class, () -> service.delete("", new WorkInProgressMonitor("", 0)));
+        assertThrows(IllegalStateException.class, () -> service.delete("", new WorkInProgressMonitor("")));
 
         assertThrows(IllegalStateException.class, service::testConfiguration);
     }

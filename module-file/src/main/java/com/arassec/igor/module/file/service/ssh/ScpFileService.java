@@ -71,7 +71,7 @@ public class ScpFileService extends BaseSshFileService {
     public List<FileInfo> listFiles(String directory, String fileEnding) {
         final String dir = directory.endsWith("/") ? directory : directory + "/";
         int numResultsToSkip = 1; // Without filter the total number of files is the first line of the result
-        String command = "cd " + dir + " && ls -Al --time-style=full-iso";
+        String command = "cd " + dir + " && ls -Alp --time-style=full-iso | grep -v /";
         if (!StringUtils.isEmpty(fileEnding)) {
             numResultsToSkip = 0;
             command += " *." + fileEnding;
@@ -79,7 +79,7 @@ public class ScpFileService extends BaseSshFileService {
         try {
             StringBuilder result = execute(command);
             return Arrays.stream(result.toString().split("\n")).skip(numResultsToSkip)
-                    .map(lsResult -> new FileInfo(extractFilename(dir, lsResult), extractLastModified(lsResult)))
+                    .map(lsResult -> new FileInfo(extractFilename(lsResult), extractLastModified(lsResult)))
                     .collect(Collectors.toList());
         } catch (ServiceException e) {
             if (!StringUtils.isEmpty(fileEnding) && e.getMessage().contains("No such file or directory")) {
@@ -88,59 +88,6 @@ public class ScpFileService extends BaseSshFileService {
                 throw e;
             }
         }
-    }
-
-    /**
-     * Creates the filename from the given input. The 'ls' command e.g. returns symlinks in the form of 'tmp -> /home/tmp', which
-     * is not desired for igor.
-     *
-     * @param dir   The directory.
-     * @param input The file name from the 'ls' command.
-     *
-     * @return The sanitized file name.
-     */
-    private String extractFilename(String dir, String input) {
-        String[] split = input.split("\\s");
-        if (split.length >= 3 && split[split.length - 2].equals("->")) {
-            return dir + split[split.length - 3];
-        }
-        return dir + split[split.length - 1];
-    }
-
-    /**
-     * Extracts the last modified timestamp from the 'ls' command's output. Example output looks like:
-     * <p>
-     * drwxr-xr-x  10 root root 3760 2019-06-04 13:14:23.965495985 +0200 text.txt
-     * </p>
-     * This method extracts the timestamp relevant fields from the string and returns the formatted result.
-     *
-     * @param input One output line from the 'ls' command.
-     *
-     * @return The extracted timestamp or {@code null}, if none could be extracted.
-     */
-    @SuppressWarnings("squid:S4784") // Using RegExps is OK...
-    private String extractLastModified(String input) {
-        String yearPart = null;
-        String timePart = null;
-        String timezonePart = null;
-
-        String[] split = input.split("\\s");
-        for (String part : split) {
-            if (part.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) { // 2019-06-04
-                yearPart = part;
-            } else if (part.matches("[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{9}")) { // 13:14:23
-                timePart = part;
-            } else if (part.matches("\\+[0-9]{4}")) { // +0200
-                timezonePart = part;
-            }
-        }
-
-        if (yearPart != null && timePart != null && timezonePart != null) {
-            return yearPart + "T" + timePart.substring(0, 8) + "+" + timezonePart.substring(1, 3) + ":" + timezonePart
-                    .substring(3, 5);
-        }
-
-        return null;
     }
 
     /**
@@ -308,6 +255,75 @@ public class ScpFileService extends BaseSshFileService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
+        execute("mv " + source + " " + target);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void testConfiguration() {
+        Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+        session.disconnect();
+    }
+
+    /**
+     * Creates the filename from the given input. The 'ls' command e.g. returns symlinks in the form of 'tmp -> /home/tmp', which
+     * is not desired for igor.
+     *
+     * @param input The file name from the 'ls' command.
+     *
+     * @return The sanitized file name.
+     */
+    private String extractFilename(String input) {
+        String[] split = input.split("\\s");
+        if (split.length >= 3 && split[split.length - 2].equals("->")) {
+            return split[split.length - 3];
+        }
+        return split[split.length - 1];
+    }
+
+    /**
+     * Extracts the last modified timestamp from the 'ls' command's output. Example output looks like:
+     * <p>
+     * drwxr-xr-x  10 root root 3760 2019-06-04 13:14:23.965495985 +0200 text.txt
+     * </p>
+     * This method extracts the timestamp relevant fields from the string and returns the formatted result.
+     *
+     * @param input One output line from the 'ls' command.
+     *
+     * @return The extracted timestamp or {@code null}, if none could be extracted.
+     */
+    @SuppressWarnings("squid:S4784") // Using RegExps is OK...
+    private String extractLastModified(String input) {
+        String yearPart = null;
+        String timePart = null;
+        String timezonePart = null;
+
+        String[] split = input.split("\\s");
+        for (String part : split) {
+            if (part.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) { // 2019-06-04
+                yearPart = part;
+            } else if (part.matches("[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{9}")) { // 13:14:23
+                timePart = part;
+            } else if (part.matches("\\+[0-9]{4}")) { // +0200
+                timezonePart = part;
+            }
+        }
+
+        if (yearPart != null && timePart != null && timezonePart != null) {
+            return yearPart + "T" + timePart.substring(0, 8) + "+" + timezonePart.substring(1, 3) + ":" + timezonePart
+                    .substring(3, 5);
+        }
+
+        return null;
+    }
+
+    /**
      * Finalizes the supplied streams and closes the SSH session and channel.
      *
      * @param session         The SSH session.
@@ -333,14 +349,6 @@ public class ScpFileService extends BaseSshFileService {
         } catch (IOException e) {
             throw new ServiceException("Could not complete SSH streams!", e);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
-        execute("mv " + source + " " + target);
     }
 
     /**
@@ -390,15 +398,6 @@ public class ScpFileService extends BaseSshFileService {
         } catch (IOException | JSchException e) {
             throw new ServiceException("Could not execute command on SSH server!", e);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void testConfiguration() {
-        Session session = connect(getHost(), getPort(), getUsername(), getPassword());
-        session.disconnect();
     }
 
     /**

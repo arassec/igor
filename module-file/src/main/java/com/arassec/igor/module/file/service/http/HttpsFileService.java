@@ -3,8 +3,9 @@ package com.arassec.igor.module.file.service.http;
 
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -17,13 +18,14 @@ import java.security.NoSuchAlgorithmException;
  * File-Service that uses HTTPS as protocol.
  */
 @Slf4j
-@ConditionalOnClass(HttpClient.class)
 @IgorComponent
 public class HttpsFileService extends BaseHttpFileService {
 
     /**
      * Enables or disables SSL certificate verification.
      */
+    @Getter
+    @Setter
     @IgorParam(optional = true)
     private boolean certificateVerification = true;
 

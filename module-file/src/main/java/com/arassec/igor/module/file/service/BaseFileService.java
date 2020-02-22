@@ -32,7 +32,8 @@ public abstract class BaseFileService extends BaseService implements FileService
 
     /**
      * Creates a new component instance.
-     * @param typeId     The type ID.
+     *
+     * @param typeId The type ID.
      */
     public BaseFileService(String typeId) {
         super("ead60d29-bc68-42bf-93fb-95d5f9a7effd", typeId);
@@ -48,9 +49,9 @@ public abstract class BaseFileService extends BaseService implements FileService
     /**
      * Copies the content of the input stream into the output stream.
      *
-     * @param in             The input stream.
-     * @param out            The output stream.
-     * @param fileSize       The max number of bytes to copy.
+     * @param in                    The input stream.
+     * @param out                   The output stream.
+     * @param fileSize              The max number of bytes to copy.
      * @param workInProgressMonitor The {@link WorkInProgressMonitor} that keeps track of the copy progress.
      */
     protected void copyStream(InputStream in, OutputStream out, long fileSize, WorkInProgressMonitor workInProgressMonitor) {
@@ -72,11 +73,11 @@ public abstract class BaseFileService extends BaseService implements FileService
                 out.write(buf, 0, foo);
                 fileSize -= foo;
                 if (fileSize <= 0L) {
+                    workInProgressMonitor.setProgressInPercent(100);
                     break;
                 }
                 out.flush();
-                workInProgressMonitor
-                        .setProgressInPercent(calculatePercentage(fileSize, totalSize));
+                workInProgressMonitor.setProgressInPercent(calculatePercentage(fileSize, totalSize));
             }
             out.flush();
         } catch (IOException e) {
@@ -88,6 +89,7 @@ public abstract class BaseFileService extends BaseService implements FileService
      * Formats an {@link Instant} as a String.
      *
      * @param instant The timestamp to format.
+     *
      * @return The formatted time as String.
      */
     protected String formatInstant(Instant instant) {
@@ -110,6 +112,7 @@ public abstract class BaseFileService extends BaseService implements FileService
      *
      * @param obtained The optained part of the total.
      * @param total    The total amount.
+     *
      * @return The percentage.
      */
     private double calculatePercentage(double obtained, double total) {

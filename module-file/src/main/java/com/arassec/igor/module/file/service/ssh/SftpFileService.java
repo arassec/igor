@@ -39,20 +39,20 @@ public class SftpFileService extends BaseSshFileService {
     @Override
     public List<FileInfo> listFiles(String directory, String fileEnding) {
         try {
-            final String dir = directory.endsWith("/") ? directory : directory + "/";
             Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
             List<ChannelSftp.LsEntry> files = new LinkedList<>();
             channel.ls(directory, entry -> {
-                if (fileEnding == null || StringUtils.isEmpty(fileEnding) || entry.getFilename().endsWith(fileEnding)) {
+                if ((fileEnding == null || StringUtils.isEmpty(fileEnding) || entry.getFilename().endsWith(fileEnding))
+                        && !entry.getAttrs().isDir()) {
                     files.add(entry);
                 }
                 return ChannelSftp.LsEntrySelector.CONTINUE;
             });
             channel.disconnect();
             session.disconnect();
-            return files.stream().map(lsEntry -> new FileInfo(dir + lsEntry.getFilename(),
+            return files.stream().map(lsEntry -> new FileInfo(lsEntry.getFilename(),
                     formatInstant(Instant.ofEpochMilli(lsEntry.getAttrs().getMTime() * 1000L)))).collect(Collectors.toList());
         } catch (JSchException | SftpException e) {
             throw new ServiceException("Could not list files via SFTP!", e);

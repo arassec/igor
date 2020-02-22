@@ -99,66 +99,6 @@ public abstract class BaseFtpFileService extends BaseFileService {
     }
 
     /**
-     * Configures the FTP client and connects to the server.
-     *
-     * @param ftpClient The client to use.
-     *
-     * @throws IOException If the connection to the server fails.
-     */
-    void configureAndConnect(FTPClient ftpClient) throws IOException {
-        ftpClient.setStrictReplyParsing(false);
-
-        if (windowsFtp) {
-            ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYST_NT));
-        } else {
-            ftpClient.configure(new FTPClientConfig());
-        }
-
-        ftpClient.setBufferSize(bufferSize);
-
-        ftpClient.connect(host, port);
-
-        if (passiveMode) {
-            ftpClient.enterLocalPassiveMode();
-        } else {
-            ftpClient.enterLocalActiveMode();
-        }
-
-        String user = username;
-        String pass = password;
-        if (user == null || pass == null) {
-            user = "anonymous";
-            pass = "igor";
-        }
-
-        if (!ftpClient.login(user, pass)) {
-            throw new ServiceException("Login to FTP server " + host + ":" + port + " failed for user: " + user);
-        }
-
-        ftpClient.setDataTimeout(dataTimeout);
-        ftpClient.setControlKeepAliveTimeout(keepAliveTimeout);
-        ftpClient.setControlKeepAliveReplyTimeout(keepAliveTimeout);
-        ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
-        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-    }
-
-    /**
-     * Shuts the FTP client down.
-     */
-    private void disconnect(FTPClient ftpClient) {
-        if (ftpClient.isConnected()) {
-            try {
-                if (!ftpClient.logout()) {
-                    throw new ServiceException("Could not logout from FTP server " + host + ":" + port);
-                }
-                ftpClient.disconnect();
-            } catch (IOException e) {
-                throw new ServiceException("Error during logout from FTP server " + host + ":" + port, e);
-            }
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -171,7 +111,7 @@ public abstract class BaseFtpFileService extends BaseFileService {
             FTPFile[] ftpFiles = ftpClient.listFiles(directory,
                     ftpFile -> StringUtils.isEmpty(fileEnding) || ftpFile.getName().endsWith(fileEnding));
             if (ftpFiles != null && ftpFiles.length > 0) {
-                result = Stream.of(ftpFiles).filter(Objects::nonNull).map(ftpFile -> {
+                result = Stream.of(ftpFiles).filter(Objects::nonNull).filter(FTPFile::isFile).map(ftpFile -> {
                     Instant mTime = Instant.ofEpochMilli(ftpFile.getTimestamp().getTime().getTime());
                     return new FileInfo(ftpFile.getName(), formatInstant(mTime));
                 }).collect(Collectors.toList());
@@ -241,9 +181,9 @@ public abstract class BaseFtpFileService extends BaseFileService {
      */
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
-        try {
-            if (fileStreamData.getSourceConnectionData() instanceof FTPClient) {
-                FTPClient ftpClient = (FTPClient) fileStreamData.getSourceConnectionData();
+        if (fileStreamData.getSourceConnectionData() instanceof FTPClient) {
+            FTPClient ftpClient = (FTPClient) fileStreamData.getSourceConnectionData();
+            try {
                 if (!ftpClient.completePendingCommand()) {
                     ftpClient.logout();
                     ftpClient.disconnect();
@@ -251,9 +191,9 @@ public abstract class BaseFtpFileService extends BaseFileService {
                 } else {
                     disconnect(ftpClient);
                 }
+            } catch (IOException e) {
+                throw new ServiceException("FTP stream handling was not successful!", e);
             }
-        } catch (IOException e) {
-            throw new ServiceException("FTP stream handling was not successful!", e);
         }
     }
 
@@ -296,6 +236,71 @@ public abstract class BaseFtpFileService extends BaseFileService {
         disconnect(ftpClient);
     }
 
+    /**
+     * Connects to the FTP(S)-Server. Must be implemented by subclasses.
+     *
+     * @return A new FTPClient instance.
+     */
     protected abstract FTPClient connect();
+
+    /**
+     * Configures the FTP client and connects to the server.
+     *
+     * @param ftpClient The client to use.
+     *
+     * @throws IOException If the connection to the server fails.
+     */
+    void configureAndConnect(FTPClient ftpClient) throws IOException {
+        ftpClient.setStrictReplyParsing(false);
+
+        if (windowsFtp) {
+            ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYST_NT));
+        } else {
+            ftpClient.configure(new FTPClientConfig());
+        }
+
+        ftpClient.setBufferSize(bufferSize);
+
+        ftpClient.connect(host, port);
+
+        if (passiveMode) {
+            ftpClient.enterLocalPassiveMode();
+        } else {
+            ftpClient.enterLocalActiveMode();
+        }
+
+        String user = username;
+        String pass = password;
+        if (user == null || pass == null) {
+            user = "anonymous";
+            pass = "igor";
+        }
+
+        if (!ftpClient.login(user, pass)) {
+            throw new ServiceException("Login to FTP server " + host + ":" + port + " failed for user: " + user);
+        }
+
+        ftpClient.setDataTimeout(dataTimeout);
+        ftpClient.setControlKeepAliveTimeout(keepAliveTimeout);
+        ftpClient.setControlKeepAliveReplyTimeout(keepAliveTimeout);
+        ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
+        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+    }
+
+    /**
+     * Shuts the FTP client down.
+     */
+    private void disconnect(FTPClient ftpClient) {
+        if (ftpClient.isConnected()) {
+            try {
+                if (!ftpClient.logout()) {
+                    throw new ServiceException("Could not logout from FTP server " + host + ":" + port);
+                }
+                ftpClient.disconnect();
+            } catch (IOException e) {
+                throw new ServiceException("Error during logout from FTP server " + host + ":" + port, e);
+            }
+        }
+    }
 
 }

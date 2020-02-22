@@ -428,7 +428,7 @@ class JobManagerTest {
 
         JobExecution executorJobExecution = new JobExecution();
         executorJobExecution.setCurrentTask("current-task");
-        executorJobExecution.addWorkInProgress(new WorkInProgressMonitor("wip-mon", 12.3));
+        executorJobExecution.addWorkInProgress(new WorkInProgressMonitor("wip-mon"));
         when(jobExecutor.getJobExecution(eq("job-id"))).thenReturn(executorJobExecution);
 
         assertEquals(jobExecution, jobManager.getJobExecution(1L));

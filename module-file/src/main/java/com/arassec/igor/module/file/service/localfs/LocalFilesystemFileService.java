@@ -46,7 +46,7 @@ public class LocalFilesystemFileService extends BaseFileService {
                 matcher = FileSystems.getDefault().getPathMatcher("glob:**/*." + fileEnding);
             }
             try (Stream<Path> files = Files.list(Paths.get(directory))) {
-                return files.filter(matcher::matches).map(path -> {
+                return files.filter(matcher::matches).filter(path -> !Files.isDirectory(path)).map(path -> {
                     FileTime lastModifiedTime = null;
                     try {
                         lastModifiedTime = Files.getLastModifiedTime(path);

@@ -10,35 +10,36 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
- * Tests the {@link ReadFileAction}.
+ * Tests the {@link DeleteFileAction}.
  */
-@DisplayName("'Read file' action tests.")
-class ReadFileActionTest extends FileActionBaseTest {
+@DisplayName("'Delete file' action tests.")
+class DeleteFileActionTest extends FileActionBaseTest {
 
     /**
      * Tests processing the action with JSON-Path parameters.
      */
     @Test
     @DisplayName("Tests the action with JSON-Path parameters.")
-    void testProcess() {
+    void process() {
         FileService fileServiceMock = mock(FileService.class);
-        when(fileServiceMock.read(eq("/directory/test/filename.txt"), any(WorkInProgressMonitor.class))).thenReturn("igor-junit-test");
 
-        ReadFileAction action = new ReadFileAction();
+        DeleteFileAction action = new DeleteFileAction();
         action.setService(fileServiceMock);
         action.setDirectory("$.data.directory");
         action.setFilename("$.data.filename");
 
-        List<Map<String, Object>> result = action.process(createData(), new JobExecution());
+        Map<String, Object> data = createData();
 
-        assertEquals(1, result.size());
-        assertEquals("igor-junit-test", result.get(0).get(ReadFileAction.KEY_FILE_CONTENTS));
+        List<Map<String, Object>> processedData = action.process(data, new JobExecution());
+
+        assertEquals(1, processedData.size());
+        assertEquals(data, processedData.get(0));
+
+        verify(fileServiceMock, times(1))
+                .delete(eq("/directory/test/filename.txt"), any(WorkInProgressMonitor.class));
     }
 
     /**
@@ -47,10 +48,12 @@ class ReadFileActionTest extends FileActionBaseTest {
     @Test
     @DisplayName("Tests the action with unresolved parameters.")
     void testProcessUnresolvedParameter() {
-        ReadFileAction action = new ReadFileAction();
+        DeleteFileAction action = new DeleteFileAction();
+        action.setDirectory("$.INVALID");
         action.setFilename("$.INVALID");
 
         Map<String, Object> data = createData();
+
         List<Map<String, Object>> processedData = action.process(data, new JobExecution());
 
         assertEquals(1, processedData.size());

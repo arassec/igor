@@ -43,7 +43,7 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     /**
      * Dummy work-in-progress monitor that can be used, if progress shouldn't be monitored.
      */
-    protected static final WorkInProgressMonitor VOID_WIP_MONITOR = new WorkInProgressMonitor("", 0);
+    protected static final WorkInProgressMonitor VOID_WIP_MONITOR = new WorkInProgressMonitor("");
 
     /**
      * Activates or deactivates an action.

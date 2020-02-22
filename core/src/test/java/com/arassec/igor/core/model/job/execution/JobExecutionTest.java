@@ -76,7 +76,7 @@ class JobExecutionTest {
         JobExecution jobExecution = new JobExecution();
         assertTrue(jobExecution.getWorkInProgress().isEmpty());
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("test-wip-mon", 123);
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("test-wip-mon");
 
         jobExecution.addWorkInProgress(wipMon);
         assertEquals(wipMon, jobExecution.getWorkInProgress().get(0));

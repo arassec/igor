@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.module.file.service.FallbackFileService;
 import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.Getter;
@@ -13,7 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,24 +30,29 @@ import java.util.Map;
 public class CopyFileAction extends BaseFileAction {
 
     /**
+     * Key for the copy file action's data.
+     */
+    public static final String KEY_COPY_FILE_ACTION = "copyFileAction";
+
+    /**
      * Key to the source file's name.
      */
-    private static final String KEY_SOURCE_FILENAME = "sourceFilename";
+    public static final String KEY_SOURCE_FILENAME = "sourceFilename";
 
     /**
      * Key to the source file's directory.
      */
-    private static final String KEY_SOURCE_DIRECTORY = "sourceDirectory";
+    public static final String KEY_SOURCE_DIRECTORY = "sourceDirectory";
 
     /**
      * Key to the target file's name.
      */
-    private static final String KEY_TARGET_FILENAME = "targetFilename";
+    public static final String KEY_TARGET_FILENAME = "targetFilename";
 
     /**
      * Key to the target directory.
      */
-    private static final String KEY_TARGET_DIRECTORY = "targetDirectory";
+    public static final String KEY_TARGET_DIRECTORY = "targetDirectory";
 
     /**
      * File-suffix appended to files during transfer.
@@ -55,7 +62,7 @@ public class CopyFileAction extends BaseFileAction {
     /**
      * The service providing the file to copy.
      */
-    @NotEmpty
+    @NotNull
     @IgorParam
     private FileService sourceService;
 
@@ -76,7 +83,7 @@ public class CopyFileAction extends BaseFileAction {
     /**
      * The destination for the copied file.
      */
-    @NotEmpty
+    @NotNull
     @IgorParam
     private FileService targetService;
 
@@ -111,6 +118,8 @@ public class CopyFileAction extends BaseFileAction {
      */
     public CopyFileAction() {
         super("d8564415-7dd9-4814-9b46-c2c5b56ed5cc");
+        sourceService = new FallbackFileService();
+        targetService = new FallbackFileService();
     }
 
     /**
@@ -130,7 +139,7 @@ public class CopyFileAction extends BaseFileAction {
             return List.of(data);
         }
 
-        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor(resolvedData.getSourceFilename(), 0);
+        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor(resolvedData.getSourceFilename());
         jobExecution.addWorkInProgress(workInProgressMonitor);
 
         try {
@@ -163,10 +172,12 @@ public class CopyFileAction extends BaseFileAction {
 
             log.debug("File '{}' copied to '{}'", sourceFileWithPath, targetFileWithPath);
 
-            data.put(KEY_SOURCE_FILENAME, resolvedData.getSourceFilename());
-            data.put(KEY_SOURCE_DIRECTORY, resolvedData.getSourceDirectory());
-            data.put(KEY_TARGET_FILENAME, targetFileWithSuffix);
-            data.put(KEY_TARGET_DIRECTORY, resolvedData.getTargetDirectory());
+            Map<String, Object> actionData = new HashMap<>();
+            actionData.put(KEY_SOURCE_FILENAME, resolvedData.getSourceFilename());
+            actionData.put(KEY_SOURCE_DIRECTORY, resolvedData.getSourceDirectory());
+            actionData.put(KEY_TARGET_FILENAME, targetFileWithSuffix);
+            actionData.put(KEY_TARGET_DIRECTORY, resolvedData.getTargetDirectory());
+            data.put(KEY_COPY_FILE_ACTION, actionData);
 
         } finally {
             jobExecution.removeWorkInProgress(workInProgressMonitor);

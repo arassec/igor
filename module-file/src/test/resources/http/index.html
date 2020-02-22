@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+    <title>My page title</title>
+</head>
+<body>
+<p>
+    <a href="sample/file.txt?ignored=true">test link</a>
+</p>
+<div>
+    <table>
+        <tr>
+            <td>fileA</td>
+            <td><a href="fileA.jpeg">fileA</a></td>
+        </tr>
+        <tr>
+            <td>fileB</td>
+            <td><a href="fileB.jpg#cut-off">fileA</a></td>
+        </tr>
+        <tr>
+            <td>filtered: empty</td>
+            <td><a href="">empty</a></td>
+        </tr>
+        <tr>
+            <td>filtered: parent dir</td>
+            <td><a href="..">parentDir</a></td>
+        </tr>
+        <tr>
+            <td>filtered: current dir</td>
+            <td><a href=".">currentDir</a></td>
+        </tr>
+        <tr>
+            <td>filtered: slash directory</td>
+            <td><a href="/directory">directory</a></td>
+        </tr>
+        <tr>
+            <td>filtered: slash directory slash</td>
+            <td><a href="/directory/">directory</a></td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>
