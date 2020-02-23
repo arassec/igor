@@ -10,7 +10,7 @@ addons:
     organization: 'arassec'
 
 jdk:
-  - openjdk12
+  - openjdk11
 
 cache:
   directories:
