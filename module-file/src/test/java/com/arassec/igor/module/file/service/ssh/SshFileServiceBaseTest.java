@@ -97,9 +97,11 @@ public abstract class SshFileServiceBaseTest {
 
         assertEquals(2, fileInfos.size());
         assertAll("All file infos are retrieved.",
-                () -> assertEquals("alpha.txt", fileInfos.get(0).getFilename()),
+                () -> assertTrue("alpha.txt".equals(fileInfos.get(0).getFilename())
+                        || "beta.test".equals(fileInfos.get(0).getFilename())),
                 () -> assertFalse(fileInfos.get(0).getLastModified().isBlank()),
-                () -> assertEquals("beta.test", fileInfos.get(1).getFilename()),
+                () -> assertTrue("alpha.txt".equals(fileInfos.get(1).getFilename())
+                        || "beta.test".equals(fileInfos.get(1).getFilename())),
                 () -> assertFalse(fileInfos.get(1).getLastModified().isBlank())
         );
 
