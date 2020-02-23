@@ -63,7 +63,7 @@ public class HttpsFileService extends BaseHttpFileService {
 
                         // For now, all certificates are accepted if the user wishes to do so. In the future, igor will provide
                         // the ability to accept specific, invalid certificates.
-                        @SuppressWarnings("squid:S4424")
+                        @SuppressWarnings("java:S4830")
                         public void checkClientTrusted(
                                 java.security.cert.X509Certificate[] certs, String authType) {
                             // Accept all certificates...
@@ -71,7 +71,7 @@ public class HttpsFileService extends BaseHttpFileService {
 
                         // For now, all certificates are accepted if the user wishes to do so. In the future, igor will provide
                         // the ability to accept specific, invalid certificates.
-                        @SuppressWarnings("squid:S4424")
+                        @SuppressWarnings("java:S4830")
                         public void checkServerTrusted(
                                 java.security.cert.X509Certificate[] certs, String authType) {
                             // Accept all certificates...
