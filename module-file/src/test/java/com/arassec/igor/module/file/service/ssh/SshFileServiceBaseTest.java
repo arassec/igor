@@ -1,6 +1,10 @@
 package com.arassec.igor.module.file.service.ssh;
 
+import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
+import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
+import com.arassec.igor.module.file.service.FileStreamData;
+import lombok.SneakyThrows;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
@@ -8,9 +12,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.SocketUtils;
+import org.springframework.util.StreamUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.List;
 
@@ -112,6 +121,105 @@ public abstract class SshFileServiceBaseTest {
                 () -> assertEquals("beta.test", filteredFileInfos.get(0).getFilename()),
                 () -> assertFalse(filteredFileInfos.get(0).getLastModified().isBlank())
         );
+    }
+
+    /**
+     * Tests reading a file.
+     */
+    @Test
+    @DisplayName("Tests reading a file.")
+    void testRead() {
+        assertEquals("ALPHA-igor-ssh-service-tests",
+                service.read("src/test/resources/ssh/alpha.txt", new WorkInProgressMonitor("ssh-read-test")));
+
+        assertThrows(ServiceException.class, () -> service.read("non-existing-file",
+                new WorkInProgressMonitor("ssh-read-non-existing-file-test")));
+    }
+
+    /**
+     * Tests reading a file as stream.
+     */
+    @Test
+    @DisplayName("Tests reading a file as stream.")
+    @SneakyThrows
+    void testReadStream() {
+        FileStreamData fileStreamData = service.readStream("src/test/resources/ssh/alpha.txt", new WorkInProgressMonitor("ssh-read-stream-test"));
+
+        assertEquals("ALPHA-igor-ssh-service-tests", StreamUtils.copyToString(fileStreamData.getData(),
+                Charset.defaultCharset()));
+
+        service.finalizeStream(fileStreamData);
+    }
+
+    /**
+     * Tests writing a file from a stream.
+     */
+    @Test
+    @DisplayName("Tests writing a file from a stream.")
+    @SneakyThrows
+    void testWriteStream() {
+        String fileName = "target/ssh-write-stream-test.txt";
+        String fileContent = "igor-ssh-write-test";
+
+        assertFalse(Files.exists(Paths.get(fileName)));
+
+        FileStreamData fileStreamData = new FileStreamData();
+        fileStreamData.setData(new ByteArrayInputStream(fileContent.getBytes()));
+        fileStreamData.setFileSize(fileContent.getBytes().length);
+
+        service.writeStream(fileName, fileStreamData,
+                new WorkInProgressMonitor("ssh-write-stream-test"));
+
+        assertEquals(fileContent, Files.readString(Paths.get(fileName)));
+
+        Files.deleteIfExists(Paths.get(fileName));
+    }
+
+    /**
+     * Tests deleting a file.
+     */
+    @Test
+    @DisplayName("Tests deleting a file.")
+    @SneakyThrows
+    void testDelete() {
+        String fileName = "target/ssh-delete-test.txt";
+        Files.writeString(Paths.get(fileName), "ssh-delete-test", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+        service.delete(fileName, new WorkInProgressMonitor("ssh-delete-test"));
+
+        assertFalse(Files.exists(Paths.get(fileName)));
+    }
+
+    /**
+     * Tests moving a file.
+     */
+    @Test
+    @DisplayName("Tests moving a file.")
+    @SneakyThrows
+    void testMove() {
+        String fileName = "target/ssh-move-test.txt";
+        String targetFilename = fileName + ".moved";
+
+        Files.writeString(Paths.get(fileName), "ssh-move-test", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+        assertTrue(Files.exists(Paths.get(fileName)));
+        assertFalse(Files.exists(Paths.get(targetFilename)));
+
+        service.move(fileName, fileName + ".moved", new WorkInProgressMonitor("ssh-move-test"));
+
+        assertFalse(Files.exists(Paths.get(fileName)));
+        assertTrue(Files.exists(Paths.get(targetFilename)));
+
+        Files.deleteIfExists(Paths.get(targetFilename));
+    }
+
+    /**
+     * Tests testing the configuration.
+     */
+    @Test
+    @DisplayName("Tests testing the configuration.")
+    void testTestConfiguration() {
+        assertDoesNotThrow(() -> service.testConfiguration());
     }
 
 }

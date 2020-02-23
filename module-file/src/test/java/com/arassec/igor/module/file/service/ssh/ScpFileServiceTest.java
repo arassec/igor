@@ -2,12 +2,14 @@ package com.arassec.igor.module.file.service.ssh;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 
 import java.io.IOException;
 
 /**
  * Tests the {@link ScpFileService}.
  */
+@DisplayName("SCP file-service Tests")
 public class ScpFileServiceTest extends SshFileServiceBaseTest {
 
     /**

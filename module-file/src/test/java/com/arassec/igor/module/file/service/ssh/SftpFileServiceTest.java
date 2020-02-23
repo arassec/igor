@@ -2,12 +2,14 @@ package com.arassec.igor.module.file.service.ssh;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 
 import java.io.IOException;
 
 /**
  * Tests the {@link SftpFileService}.
  */
+@DisplayName("SFTP file-service Tests")
 public class SftpFileServiceTest extends SshFileServiceBaseTest {
 
     /**

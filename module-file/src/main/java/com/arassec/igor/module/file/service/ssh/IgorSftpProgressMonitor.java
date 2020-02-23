@@ -57,6 +57,7 @@ public class IgorSftpProgressMonitor implements SftpProgressMonitor {
     public boolean count(long bytes) {
         count += bytes;
         if (count >= fileSize) {
+            workInProgressMonitor.setProgressInPercent(100);
             return false;
         }
         workInProgressMonitor.setProgressInPercent((double) count * 100 / (double) fileSize);

@@ -20,11 +20,21 @@ public class ScpCommandFactoryMock implements CommandFactory {
     @Override
     public Command createCommand(ChannelSession channelSession, String commandString) {
         if ("cd src/test/resources/ssh/ && ls -Alp --time-style=full-iso | grep -v /".equals(commandString)) {
-            return new ListFilesCommandMock(1);
+            return new CommandMock(1);
         } else if ("cd src/test/resources/ssh/ && ls -Alp --time-style=full-iso | grep -v / *.test".equals(commandString)) {
-            return new ListFilesCommandMock(2);
+            return new CommandMock(2);
+        } else if ("scp -f src/test/resources/ssh/alpha.txt".equals(commandString)) {
+            return new CommandMock(3);
+        } else if ("scp -f non-existing-file".equals(commandString)) {
+            return new CommandMock(4);
+        } else if ("scp -t target/ssh-write-stream-test.txt".equals(commandString)) {
+            return new CommandMock(5);
+        } else if ("rm -f target/ssh-delete-test.txt".equals(commandString)) {
+            return new CommandMock(6);
+        } else if ("mv target/ssh-move-test.txt target/ssh-move-test.txt.moved".equals(commandString)) {
+            return new CommandMock(7);
         }
-        return null;
+        throw new IllegalStateException("un-mocked SSH command: " + commandString);
     }
 
 }
