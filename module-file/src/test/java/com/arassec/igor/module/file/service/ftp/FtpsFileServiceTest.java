@@ -16,7 +16,7 @@ public class FtpsFileServiceTest extends FtpFileServiceBaseTest {
      */
     @BeforeAll
     public static void initialize() throws IOException, FtpException {
-        initializeTestEnvironment(new FtpsFileService(), "target/ftps-tests/");
+        initializeTestEnvironment(new FtpsFileService(), "target/ftps-tests/", true);
     }
 
     /**

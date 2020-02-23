@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.ftpserver.FtpServer;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.*;
 /**
  * Base class for {@link FtpFileService} and {@link FtpsFileService} tests.
  */
+@Slf4j
 public abstract class FtpFileServiceBaseTest {
 
     /**
@@ -75,11 +77,13 @@ public abstract class FtpFileServiceBaseTest {
      *
      * @param baseFtpFileService The FTP(S)-Fileservice-Instance to configure and use for testing.
      * @param ftpRootDir Root directory for files of the test.
+     * @param enableFtps Set to {@code true} to enable FTPS.
      *
      * @throws IOException  In case of filesystem problems.
      * @throws FtpException In case of Apache Mina FTP-Server problems.
      */
-    protected static void initializeTestEnvironment(BaseFtpFileService baseFtpFileService, String ftpRootDir) throws IOException,
+    protected static void initializeTestEnvironment(BaseFtpFileService baseFtpFileService, String ftpRootDir,
+                                                    boolean enableFtps) throws IOException,
             FtpException {
 
         // The FTP basedir is copied to test deletion and file upload.
@@ -105,11 +109,13 @@ public abstract class FtpFileServiceBaseTest {
         listenerFactory.setServerAddress(FTP_HOST);
         listenerFactory.setPort(port);
 
-        SslConfigurationFactory ssl = new SslConfigurationFactory();
-        ssl.setKeystoreFile(new File("src/test/resources/igor-tests-keystore.jks"));
-        ssl.setKeystorePassword("password");
+        if (enableFtps) {
+            SslConfigurationFactory ssl = new SslConfigurationFactory();
+            ssl.setKeystoreFile(new File("src/test/resources/igor-tests-keystore.jks"));
+            ssl.setKeystorePassword("password");
 
-        listenerFactory.setSslConfiguration(ssl.createSslConfiguration());
+            listenerFactory.setSslConfiguration(ssl.createSslConfiguration());
+        }
 
         FtpServerFactory factory = new FtpServerFactory();
         factory.setUserManager(userManager);
@@ -141,6 +147,7 @@ public abstract class FtpFileServiceBaseTest {
     @Test
     @DisplayName("Tests listing files.")
     void testListFiles() {
+        log.info("testListFiles");
         List<FileInfo> fileInfos = service.listFiles(".", null);
 
         assertEquals(3, fileInfos.size());
@@ -173,6 +180,7 @@ public abstract class FtpFileServiceBaseTest {
         // List files in not existing directory must fail safe:
         List<FileInfo> emptyFiles = service.listFiles("not/existing/subdir", null);
         assertTrue(emptyFiles.isEmpty());
+        log.info("testListFiles");
     }
 
     /**
@@ -181,7 +189,9 @@ public abstract class FtpFileServiceBaseTest {
     @Test
     @DisplayName("Tests reading a file.")
     void testRead() {
+        log.info("testRead");
         assertEquals("DELTA-igor-ftp-service-tests", service.read("subdir/delta.txt", new WorkInProgressMonitor("ftp-read-test")));
+        log.info("testRead");
     }
 
     /**
@@ -191,12 +201,15 @@ public abstract class FtpFileServiceBaseTest {
     @DisplayName("Tests reading a file as stream.")
     @SneakyThrows
     void testReadStream() {
+        log.info("testReadStream");
+
         FileStreamData fileStreamData = service.readStream("alpha.txt", new WorkInProgressMonitor("ftp-readstream-test"));
 
         StringWriter stringWriter = new StringWriter();
         IOUtils.copy(fileStreamData.getData(), stringWriter);
         assertEquals("ALPHA-igor-ftp-service-tests", stringWriter.toString());
         assertEquals(28, fileStreamData.getFileSize());
+        log.info("testReadStream");
     }
 
     /**
@@ -205,6 +218,8 @@ public abstract class FtpFileServiceBaseTest {
     @Test
     @DisplayName("Tests writing a file as stream.")
     void testWriteStream() throws IOException {
+        log.info("testWriteStream");
+
         String fileName = "write-stream-test.txt";
         String fileContent = "ftp-writestream-test";
 
@@ -220,6 +235,7 @@ public abstract class FtpFileServiceBaseTest {
         assertEquals(fileContent, Files.readString(Paths.get(ftpRoot + fileName)));
 
         Files.deleteIfExists(Paths.get(ftpRoot + fileName));
+        log.info("testWriteStream");
     }
 
     /**
@@ -229,6 +245,8 @@ public abstract class FtpFileServiceBaseTest {
     @DisplayName("Tests finalizing a stream.")
     @SneakyThrows
     void testFinalizeStream() {
+        log.info("testWriteStream");
+
         // Test FTP error during finalization:
         FTPClient ftpClientMock = mock(FTPClient.class);
 
@@ -276,6 +294,8 @@ public abstract class FtpFileServiceBaseTest {
         service.finalizeStream(fileStreamData);
 
         verify(ftpClientMock, times(0)).disconnect();
+        log.info("testFinalizeStream");
+
     }
 
     /**
@@ -285,12 +305,15 @@ public abstract class FtpFileServiceBaseTest {
     @DisplayName("Tests deleting a file.")
     @SneakyThrows
     void testDelete() {
+        log.info("testDelete");
+
         Files.copy(Paths.get(ftpRoot + "beta.save"), Paths.get(ftpRoot + "beta.delete"), StandardCopyOption.REPLACE_EXISTING);
         assertTrue(Files.exists(Paths.get(ftpRoot + "beta.delete")));
 
         service.delete("beta.delete", new WorkInProgressMonitor("ftp-delete-test"));
 
         assertFalse(Files.exists(Paths.get(ftpRoot + "beta.delete")));
+        log.info("testDelete");
     }
 
     /**
@@ -300,6 +323,8 @@ public abstract class FtpFileServiceBaseTest {
     @DisplayName("Tests moving a file.")
     @SneakyThrows
     void testMove() {
+        log.info("testMove");
+
         Files.copy(Paths.get(ftpRoot + "beta.save"), Paths.get(ftpRoot + "beta.move"), StandardCopyOption.REPLACE_EXISTING);
         assertTrue(Files.exists(Paths.get(ftpRoot + "beta.move")));
 
@@ -311,6 +336,8 @@ public abstract class FtpFileServiceBaseTest {
         assertEquals("BETA-igor-ftp-service-tests", Files.readString(Paths.get(ftpRoot + "epsilon.moved")));
 
         Files.deleteIfExists(Paths.get(ftpRoot + "epsilon.moved"));
+        log.info("testMove");
+
     }
 
     /**
@@ -319,7 +346,11 @@ public abstract class FtpFileServiceBaseTest {
     @Test
     @DisplayName("Tests testing an FTP configuration.")
     void testTestConfiguration() {
+        log.info("testTestConfiguration");
+
         assertDoesNotThrow(() -> service.testConfiguration());
+        log.info("testTestConfiguration");
+
     }
 
     /**
@@ -328,8 +359,12 @@ public abstract class FtpFileServiceBaseTest {
     @Test
     @DisplayName("Tests connection problem handling.")
     void testConnectionProblemHandling() {
+        log.info("testConnectionProblemHandling");
+
         service.setPort(0);
         assertThrows(ServiceException.class, () -> service.connect());
+        log.info("testTestConfiguration");
+
     }
 
     /**
@@ -338,6 +373,8 @@ public abstract class FtpFileServiceBaseTest {
     @Test
     @DisplayName("Tests an alternative configuration.")
     void testAlternativeConfiguration() {
+        log.info("testAlternativeConfiguration");
+
         service.setUsername(null);
         service.setPassword(null);
         service.setWindowsFtp(true);
@@ -349,6 +386,8 @@ public abstract class FtpFileServiceBaseTest {
         service.setPassword(FTP_PASS);
         service.setWindowsFtp(false);
         service.setPassiveMode(false);
+        log.info("testAlternativeConfiguration");
+
     }
 
 }

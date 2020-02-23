@@ -15,6 +15,6 @@
     <logger name="org.eclipse" level="INFO"/>
 
     <!-- Turning down Apache Mina logging -->
-    <logger name="org.apache" level="DEBUG"/>
+    <logger name="org.apache" level="INFO"/>
 
 </configuration>
