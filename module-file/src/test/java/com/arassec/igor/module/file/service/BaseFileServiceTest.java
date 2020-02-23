@@ -37,24 +37,6 @@ class BaseFileServiceTest {
     }
 
     /**
-     * Tests formatting a timestamp.
-     */
-    @Test
-    @DisplayName("Tests formatting a timestamp.")
-    void testFormatInstant() {
-        assertNull(baseFileService.formatInstant(null));
-
-        LocalDate date = LocalDate.parse("2020-02-22");
-        Instant instant = date.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
-
-        assertEquals("2020-02-22T00:00:00+01:00", baseFileService.formatInstant(instant));
-
-        baseFileService.setTimezone("Etc/UCT");
-
-        assertEquals("2020-02-21T23:00:00Z", baseFileService.formatInstant(instant));
-    }
-
-    /**
      * Tests copying a stream.
      */
     @Test
