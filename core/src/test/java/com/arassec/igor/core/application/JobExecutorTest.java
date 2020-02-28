@@ -1,5 +1,6 @@
 package com.arassec.igor.core.application;
 
+import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
@@ -39,6 +40,12 @@ public class JobExecutorTest {
     private JobExecutor jobExecutor;
 
     /**
+     * Mocked core configuration properties.
+     */
+    @Mock
+    private IgorCoreProperties igorCoreProperties;
+
+    /**
      * Mocked repository for jobs.
      */
     @Mock
@@ -55,7 +62,8 @@ public class JobExecutorTest {
      */
     @BeforeEach
     void initialize() {
-        jobExecutor = new JobExecutor(jobRepository, jobExecutionRepository);
+        when(igorCoreProperties.getJobQueueSize()).thenReturn(1);
+        jobExecutor = new JobExecutor(igorCoreProperties, jobRepository, jobExecutionRepository);
     }
 
     /**
@@ -95,9 +103,6 @@ public class JobExecutorTest {
     @Test
     @DisplayName("Tests queue size verification.")
     void testUpdateFullSlots() {
-        // Configure the job slots to one:
-        ReflectionTestUtils.setField(jobExecutor, "jobQueueSize", 1);
-
         // One job is currently executed:
         @SuppressWarnings("unchecked")
         Future<Job> finishedJobFuture = mock(Future.class);
@@ -118,9 +123,6 @@ public class JobExecutorTest {
     @Test
     @DisplayName("Tests executing waiting jobs.")
     void testUpdateExecute() {
-        // Configure the job slots to one, no jobs are currently running:
-        ReflectionTestUtils.setField(jobExecutor, "jobQueueSize", 1);
-
         // First execution: No job found because it has been deleted this very moment:
         JobExecution ignoredExecution = JobExecution.builder().build();
         // Second execution: executed because the slot is free:

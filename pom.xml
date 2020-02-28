@@ -43,6 +43,7 @@
         <module>module-misc</module>
         <module>module-file</module>
         <module>module-message</module>
+        <module>igor-spring-boot-starter</module>
         <module>application</module>
     </modules>
 

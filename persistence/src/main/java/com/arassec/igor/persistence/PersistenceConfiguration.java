@@ -14,13 +14,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Configures the persistence layer for igor.
  */
 @Configuration
+@ComponentScan
+@EnableJpaRepositories
+@EntityScan
+@EnableTransactionManagement
+@EnableConfigurationProperties(IgorPersistenceProperties.class)
 public class PersistenceConfiguration {
 
     /**

@@ -1,8 +1,7 @@
 package com.arassec.igor.persistence.security;
 
+import com.arassec.igor.persistence.IgorPersistenceProperties;
 import org.jasypt.util.text.StrongTextEncryptor;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -13,14 +12,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnClass(StrongTextEncryptor.class)
-@ConditionalOnProperty(value="igor.local-security-provider.token")
-public class LocalSecurityProvider extends BaseSecurityProvider implements InitializingBean {
-
-    /**
-     * Password for property encryption.
-     */
-    @Value("${igor.local-security-provider.token}")
-    private String token;
+@ConditionalOnProperty("igor.persistence.local-security-token")
+public class LocalSecurityProvider extends BaseSecurityProvider {
 
     /**
      * Provides encryption for secured properties.
@@ -30,9 +23,8 @@ public class LocalSecurityProvider extends BaseSecurityProvider implements Initi
     /**
      * Prepares the property encryption.
      */
-    @Override
-    public void afterPropertiesSet() {
-        textEncryptor.setPassword(token);
+    public LocalSecurityProvider(IgorPersistenceProperties igorPersistenceProperties) {
+        textEncryptor.setPassword(igorPersistenceProperties.getLocalSecurityToken());
     }
 
     /**

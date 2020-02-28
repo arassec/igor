@@ -3,12 +3,14 @@ package com.arassec.igor.module.message;
 import com.arassec.igor.core.util.IgorConfigHelper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuration for the igor message-module.
  */
 @Configuration
+@ComponentScan
 public class ModuleMessageConfiguration {
 
     /**

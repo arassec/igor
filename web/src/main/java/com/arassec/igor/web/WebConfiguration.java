@@ -17,6 +17,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.HierarchicalMessageSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.LocaleResolver;
@@ -29,6 +30,7 @@ import java.util.Locale;
  * Configures the web layer of igor.
  */
 @Configuration
+@ComponentScan
 public class WebConfiguration {
 
     /**

@@ -1,5 +1,6 @@
 package com.arassec.igor.core.application;
 
+import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
@@ -33,6 +35,11 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class JobManager implements ApplicationListener<ContextRefreshedEvent>, DisposableBean {
+
+    /**
+     * Igor's core configuration properties.
+     */
+    private final IgorCoreProperties igorCoreProperties;
 
     /**
      * Repository for jobs.
@@ -70,7 +77,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      * @param contextRefreshedEvent Event indicating that the spring context has been refreshed.
      */
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+    public void onApplicationEvent(@NonNull ContextRefreshedEvent contextRefreshedEvent) {
         // If jobs are already 'running' (e.g. after a server restart) the are updated here:
         ModelPage<JobExecution> jobExecutions = jobExecutionRepository
                 .findInState(JobExecutionState.RUNNING, 0, Integer.MAX_VALUE);
@@ -310,7 +317,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      * @return The number of slots.
      */
     public int getNumSlots() {
-        return jobExecutor.getJobQueueSize();
+        return igorCoreProperties.getJobQueueSize();
     }
 
     /**

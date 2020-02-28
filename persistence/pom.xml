@@ -41,6 +41,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -57,7 +58,6 @@
         <dependency>
             <groupId>org.jasypt</groupId>
             <artifactId>jasypt</artifactId>
-            <scope>provided</scope>
         </dependency>
 
     </dependencies>

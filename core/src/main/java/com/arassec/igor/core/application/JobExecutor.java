@@ -1,14 +1,13 @@
 package com.arassec.igor.core.application;
 
+import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.util.ModelPage;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +29,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class JobExecutor {
 
     /**
+     * Igor's core configuration properties.
+     */
+    private final IgorCoreProperties igorCoreProperties;
+
+    /**
      * Repository for jobs.
      */
     private final JobRepository jobRepository;
@@ -38,13 +42,6 @@ public class JobExecutor {
      * Repository for job-executions.
      */
     private final JobExecutionRepository jobExecutionRepository;
-
-    /**
-     * Maximum number of jobs executed in parallel.s
-     */
-    @Getter
-    @Value("${igor.job-queue.size}")
-    private int jobQueueSize = 5;
 
     /**
      * The executor service to run the jobs.
@@ -64,11 +61,13 @@ public class JobExecutor {
     /**
      * Creates a new JobExecutor instance.
      */
-    public JobExecutor(JobRepository jobRepository, JobExecutionRepository jobExecutionRepository) {
+    public JobExecutor(IgorCoreProperties igorCoreProperties, JobRepository jobRepository,
+                       JobExecutionRepository jobExecutionRepository) {
+        this.igorCoreProperties = igorCoreProperties;
         this.jobRepository = jobRepository;
         this.jobExecutionRepository = jobExecutionRepository;
         executorService = (ThreadPoolExecutor) Executors
-                .newFixedThreadPool(jobQueueSize, runnable -> new Thread(runnable, "job-executor-thread"));
+                .newFixedThreadPool(igorCoreProperties.getJobQueueSize(), runnable -> new Thread(runnable, "job-executor-thread"));
     }
 
     /**
@@ -81,12 +80,12 @@ public class JobExecutor {
         runningJobFutures.removeIf(this::processFinished);
 
         // If the queue is still full, no more job executions are processed:
-        if (runningJobFutures.size() == jobQueueSize) {
+        if (runningJobFutures.size() == igorCoreProperties.getJobQueueSize()) {
             return;
         }
 
         // At this point we run the next jobs if necessary:
-        int freeSlots = jobQueueSize - runningJobs.size();
+        int freeSlots = igorCoreProperties.getJobQueueSize() - runningJobs.size();
         ModelPage<JobExecution> waitingJobExecutions = jobExecutionRepository
                 .findInState(JobExecutionState.WAITING, 0, Integer.MAX_VALUE);
         if (waitingJobExecutions != null && waitingJobExecutions.getItems() != null) {

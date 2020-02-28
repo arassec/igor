@@ -1,4 +1,4 @@
-package com.arassec.igor;
+package com.arassec.igor.application;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

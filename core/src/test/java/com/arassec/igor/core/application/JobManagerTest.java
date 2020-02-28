@@ -1,5 +1,6 @@
 package com.arassec.igor.core.application;
 
+import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
@@ -44,6 +45,12 @@ class JobManagerTest {
     private JobManager jobManager;
 
     /**
+     * Mocked core configuration properties.
+     */
+    @Mock
+    private IgorCoreProperties igorCoreProperties;
+
+    /**
      * Repository for jobs.
      */
     @Mock
@@ -78,7 +85,8 @@ class JobManagerTest {
      */
     @BeforeEach
     void initialize() {
-        jobManager = new JobManager(jobRepository, jobExecutionRepository, persistentValueRepository, taskScheduler, jobExecutor);
+        jobManager = new JobManager(igorCoreProperties, jobRepository, jobExecutionRepository,
+                persistentValueRepository, taskScheduler, jobExecutor);
     }
 
     /**
@@ -478,7 +486,7 @@ class JobManagerTest {
     @Test
     @DisplayName("Tests the retrieval of job execution slots.")
     void testGetNumSlots() {
-        when(jobExecutor.getJobQueueSize()).thenReturn(23);
+        when(igorCoreProperties.getJobQueueSize()).thenReturn(23);
         assertEquals(23, jobManager.getNumSlots());
     }
 

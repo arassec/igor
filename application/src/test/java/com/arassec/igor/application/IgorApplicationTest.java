@@ -1,4 +1,4 @@
-package com.arassec.igor;
+package com.arassec.igor.application;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import org.junit.jupiter.api.Test;
