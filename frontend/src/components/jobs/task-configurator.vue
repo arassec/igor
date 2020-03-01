@@ -146,8 +146,8 @@
 
       return (nameValidationResult && parameterValidationResult)
     },
-    createService: function (parameterIndex, serviceCategory) {
-      this.$emit('create-service', this.taskKey, parameterIndex, serviceCategory)
+    createService: function (parameterIndex, serviceCategoryCandidates) {
+      this.$emit('create-service', this.taskKey, parameterIndex, serviceCategoryCandidates)
     }
   },
   watch: {

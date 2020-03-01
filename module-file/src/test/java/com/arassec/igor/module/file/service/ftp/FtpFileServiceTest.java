@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service.ftp;
 
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.SneakyThrows;
@@ -147,7 +147,7 @@ public class FtpFileServiceTest extends FtpFileServiceBaseTest {
         FileStreamData fileStreamData = new FileStreamData();
         fileStreamData.setSourceConnectionData(ftpClientMock);
 
-        assertThrows(ServiceException.class, () -> service.finalizeStream(fileStreamData));
+        assertThrows(IgorException.class, () -> service.finalizeStream(fileStreamData));
         verify(ftpClientMock, times(1)).completePendingCommand();
         verify(ftpClientMock, times(1)).logout();
         verify(ftpClientMock, times(1)).disconnect();
@@ -167,7 +167,7 @@ public class FtpFileServiceTest extends FtpFileServiceBaseTest {
         // Test exception handling:
         when(ftpClientMock.completePendingCommand()).thenThrow(new IOException("ftp-finalize-test-exception"));
 
-        assertThrows(ServiceException.class, () -> service.finalizeStream(fileStreamData));
+        assertThrows(IgorException.class, () -> service.finalizeStream(fileStreamData));
 
         // Test error during logout:
         ftpClientMock = mock(FTPClient.class);
@@ -177,7 +177,7 @@ public class FtpFileServiceTest extends FtpFileServiceBaseTest {
 
         fileStreamData.setSourceConnectionData(ftpClientMock);
 
-        assertThrows(ServiceException.class, () -> service.finalizeStream(fileStreamData));
+        assertThrows(IgorException.class, () -> service.finalizeStream(fileStreamData));
 
         // Test disconnect is called only on connected clients.
         ftpClientMock = mock(FTPClient.class);
@@ -241,7 +241,7 @@ public class FtpFileServiceTest extends FtpFileServiceBaseTest {
     @DisplayName("Tests connection problem handling.")
     void testConnectionProblemHandling() {
         service.setPort(0);
-        assertThrows(ServiceException.class, () -> service.connect());
+        assertThrows(IgorException.class, () -> service.connect());
     }
 
 }

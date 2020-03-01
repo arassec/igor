@@ -39,7 +39,7 @@ export const store = {
     jobConfiguration: null,
     selectionKey: null,
     parameterIndex: null,
-    serviceCategory: null,
+    serviceCategoryCandidates: null,
     serviceParameter: null
   },
   valueStore: {},
@@ -94,11 +94,11 @@ export const store = {
   clearServiceData () {
     this.serviceData.serviceConfiguration = null
   },
-  setJobData (jobConfiguration, selectionKey, parameterIndex, serviceCategory) {
+  setJobData (jobConfiguration, selectionKey, parameterIndex, serviceCategoryCandidates) {
     this.jobData.jobConfiguration = jobConfiguration
     this.jobData.selectionKey = selectionKey
     this.jobData.parameterIndex = parameterIndex
-    this.jobData.serviceCategory = serviceCategory
+    this.jobData.serviceCategoryCandidates = serviceCategoryCandidates
   },
   getJobData () {
     return this.jobData

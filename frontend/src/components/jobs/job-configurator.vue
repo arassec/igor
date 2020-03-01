@@ -157,8 +157,8 @@
             setNameValidationError: function (errorMessage) {
                 this.nameValidationError = errorMessage
             },
-            createService: function (parameterIndex, serviceCategory) {
-                this.$emit('create-service', this.taskKey, parameterIndex, serviceCategory)
+            createService: function (parameterIndex, serviceCategoryCandidates) {
+                this.$emit('create-service', this.taskKey, parameterIndex, serviceCategoryCandidates)
             }
         },
         mounted() {

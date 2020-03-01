@@ -1,6 +1,5 @@
 package com.arassec.igor.core.util;
 
-import com.arassec.igor.core.model.service.ServiceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +19,8 @@ class StacktraceFormatterTest {
     @DisplayName("Tests formatting a throwable.")
     void testFormat() {
         assertNull(StacktraceFormatter.format(null));
-        assertTrue(StacktraceFormatter.format(new ServiceException("test")).startsWith("com.arassec.igor.core.model.service.ServiceException: test"));
+        assertTrue(StacktraceFormatter.format(new IgorException("test"))
+                .startsWith("com.arassec.igor.core.util.IgorException: test"));
     }
 
 }

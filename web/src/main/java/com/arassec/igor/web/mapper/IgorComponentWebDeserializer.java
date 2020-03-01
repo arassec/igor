@@ -3,16 +3,19 @@ package com.arassec.igor.web.mapper;
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.service.Service;
-import com.arassec.igor.core.model.service.ServiceException;
 import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.web.simulation.ServiceProxy;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.implementation.InvocationHandlerAdapter;
+import net.bytebuddy.matcher.ElementMatchers;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,20 +126,25 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
      *
      * @return The newly created service instance.
      */
-    private Service deserializeServiceParameter(Map<String, Object> jsonParameter) {
+    private Object deserializeServiceParameter(Map<String, Object> jsonParameter) {
         if (simulationMode) {
             String serviceId = String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey()));
             Service service = serviceRepository.findById(serviceId);
             if (service == null) {
                 throw new IllegalArgumentException("No service with ID " + serviceId + " found!");
             }
-            ServiceProxy serviceProxy = new ServiceProxy(service);
             try {
-                return (Service) Proxy.newProxyInstance(IgorComponentWebDeserializer.class.getClassLoader(),
-                        new Class[]{Class.forName(String.valueOf(jsonParameter.get(WebMapperKey.SERVICE_CLASS.getKey())))},
-                        serviceProxy);
-            } catch (ClassNotFoundException e) {
-                throw new ServiceException("Unknown service class: " + jsonParameter.get(WebMapperKey.SERVICE_CLASS.getKey()));
+                return new ByteBuddy()
+                        .subclass(service.getClass())
+                        .method(ElementMatchers.any())
+                        .intercept(InvocationHandlerAdapter.of(new ServiceProxy(service)))
+                        .make()
+                        .load(service.getClass().getClassLoader())
+                        .getLoaded()
+                        .getDeclaredConstructor()
+                        .newInstance();
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new IgorException("Could not create service proxy!", e);
             }
         } else {
             return serviceRepository.findById(String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey())));

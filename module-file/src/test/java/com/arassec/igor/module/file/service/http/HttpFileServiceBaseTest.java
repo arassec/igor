@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service.http;
 
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -217,7 +217,7 @@ public abstract class HttpFileServiceBaseTest {
         Mockito.verify(inputStreamMock, times(1)).close();
 
         doThrow(new IOException("test-exception")).when(inputStreamMock).close();
-        assertThrows(ServiceException.class, () -> service.finalizeStream(fileStreamData));
+        assertThrows(IgorException.class, () -> service.finalizeStream(fileStreamData));
     }
 
     /**
@@ -237,7 +237,7 @@ public abstract class HttpFileServiceBaseTest {
                 get("/").willReturn(aResponse().withStatus(404))
         );
 
-        assertThrows(ServiceException.class, () -> service.testConfiguration());
+        assertThrows(IgorException.class, () -> service.testConfiguration());
     }
 
     /**
@@ -258,7 +258,7 @@ public abstract class HttpFileServiceBaseTest {
 
         service.setFollowRedirects(false);
 
-        assertThrows(ServiceException.class, () ->
+        assertThrows(IgorException.class, () ->
                 service.read("/test.html", new WorkInProgressMonitor("http-follow-redirects-test")));
     }
 
@@ -299,14 +299,14 @@ public abstract class HttpFileServiceBaseTest {
         );
 
         assertAll("HTTP errors must be handled safely.",
-                () -> assertThrows(ServiceException.class, () -> service.listFiles("/test.html", null)),
-                () -> assertThrows(ServiceException.class, () -> service.read("/test.html",
+                () -> assertThrows(IgorException.class, () -> service.listFiles("/test.html", null)),
+                () -> assertThrows(IgorException.class, () -> service.read("/test.html",
                         new WorkInProgressMonitor("http-error-handling-test"))),
-                () -> assertThrows(ServiceException.class, () -> service.readStream("/test.html",
+                () -> assertThrows(IgorException.class, () -> service.readStream("/test.html",
                         new WorkInProgressMonitor("http-error-handling-test"))),
-                () -> assertThrows(ServiceException.class, () -> service.writeStream("/test.html", mock(FileStreamData.class),
+                () -> assertThrows(IgorException.class, () -> service.writeStream("/test.html", mock(FileStreamData.class),
                         new WorkInProgressMonitor("http-error-handling-test"))),
-                () -> assertThrows(ServiceException.class, () -> service.delete("/test.html",
+                () -> assertThrows(IgorException.class, () -> service.delete("/test.html",
                         new WorkInProgressMonitor("http-error-handling-test")))
         );
     }
@@ -331,16 +331,16 @@ public abstract class HttpFileServiceBaseTest {
         );
 
         assertAll("Exceptions must be handled safely.",
-                () -> assertThrows(ServiceException.class, () -> service.listFiles("/test.html", null)),
-                () -> assertThrows(ServiceException.class, () -> service.read("/test.html",
+                () -> assertThrows(IgorException.class, () -> service.listFiles("/test.html", null)),
+                () -> assertThrows(IgorException.class, () -> service.read("/test.html",
                         new WorkInProgressMonitor("http-exception-handling-test"))),
-                () -> assertThrows(ServiceException.class, () -> service.readStream("/test.html",
+                () -> assertThrows(IgorException.class, () -> service.readStream("/test.html",
                         new WorkInProgressMonitor("http-exception-handling-test"))),
-                () -> assertThrows(ServiceException.class, () -> service.writeStream("/test.html", mock(FileStreamData.class),
+                () -> assertThrows(IgorException.class, () -> service.writeStream("/test.html", mock(FileStreamData.class),
                         new WorkInProgressMonitor("http-exception-handling-test"))),
-                () -> assertThrows(ServiceException.class, () -> service.delete("/test.html",
+                () -> assertThrows(IgorException.class, () -> service.delete("/test.html",
                         new WorkInProgressMonitor("http-exception-handling-test"))),
-                () -> assertThrows(ServiceException.class, () -> service.testConfiguration())
+                () -> assertThrows(IgorException.class, () -> service.testConfiguration())
         );
     }
 

@@ -120,6 +120,13 @@
                 <version>1.12.2</version>
             </dependency>
 
+            <!-- web -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>1.10.8</version>
+            </dependency>
+
             <!-- for testing bean validation annotations -->
             <dependency>
                 <groupId>org.hibernate.validator</groupId>

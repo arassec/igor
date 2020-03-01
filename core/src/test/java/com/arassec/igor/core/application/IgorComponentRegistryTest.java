@@ -5,7 +5,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.service.BaseService;
 import com.arassec.igor.core.model.service.Service;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
@@ -105,16 +105,6 @@ class IgorComponentRegistryTest {
     }
 
     /**
-     * Tests getting the category for a specific service interface.
-     */
-    @Test
-    @DisplayName("Tests getting the category of a specific service interface.")
-    void testGetCagetoryOfServiceInterface() {
-        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.getCagetoryOfServiceInterface(Action.class));
-        assertEquals("service-category-id", igorComponentRegistry.getCagetoryOfServiceInterface(TestService.class));
-    }
-
-    /**
      * Tests getting a component instance.
      */
     @Test
@@ -172,6 +162,29 @@ class IgorComponentRegistryTest {
     }
 
     /**
+     * Tests getting all component candidates for a parameter class.
+     */
+    @Test
+    @DisplayName("Tests getting all component candidates for a parameter class.")
+    void testGetParameterCategoryAndType() {
+        assertTrue(igorComponentRegistry.getParameterCategoryAndType(String.class).isEmpty());
+
+        TestServiceImpl expected = new TestServiceImpl();
+
+        // The interface works...
+        Map<String, Set<String>> candidates = igorComponentRegistry.getParameterCategoryAndType(TestService.class);
+        assertEquals(1, candidates.size());
+        assertEquals(1, candidates.get(expected.getCategoryId()).size());
+        assertEquals(expected.getTypeId(), candidates.get(expected.getCategoryId()).iterator().next());
+
+        // ...as well as the concrete implementation.
+        candidates = igorComponentRegistry.getParameterCategoryAndType(TestServiceImpl.class);
+        assertEquals(1, candidates.size());
+        assertEquals(1, candidates.get(expected.getCategoryId()).size());
+        assertEquals(expected.getTypeId(), candidates.get(expected.getCategoryId()).iterator().next());
+    }
+
+    /**
      * Service-Interface for testing.
      */
     private interface TestService extends Service {
@@ -197,7 +210,7 @@ class IgorComponentRegistryTest {
          * {@inheritDoc}
          */
         @Override
-        public void testConfiguration() throws ServiceException {
+        public void testConfiguration() throws IgorException {
         }
 
     }

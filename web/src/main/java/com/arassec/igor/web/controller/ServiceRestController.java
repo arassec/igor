@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * REST controller for {@link Service}s.
@@ -63,17 +63,20 @@ public class ServiceRestController {
     }
 
     /**
-     * Returns all services of a certain category.
+     * Returns all services which are a candidate for the supplied type IDs.
      *
-     * @param category The target category.
+     * @param types The required service types.
      *
-     * @return List of services in that category.
+     * @return List of available services of the given types.
      */
-    @GetMapping(value = "category/{category}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ModelPage<Service> getServicesInCategory(@PathVariable("category") String category,
-                                                    @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-                                                    @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize) {
-        return serviceManager.loadAllOfCategory(category, pageNumber, pageSize);
+    @GetMapping(value = "candidate/{types}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ModelPage<Service> getServiceCandidates(@PathVariable("types") String types,
+                                                   @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+                                                   @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize) {
+        // Type-IDs are comma separated and Base64 encoded:
+        Set<String> typeIds = new HashSet<>();
+        Stream.of(types.split(",")).filter(Objects::nonNull).forEach(typeId -> typeIds.add(new String(Base64.getDecoder().decode(typeId))));
+        return serviceManager.loadAllOfType(typeIds, pageNumber, pageSize);
     }
 
     /**

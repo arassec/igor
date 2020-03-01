@@ -6,9 +6,9 @@
             <input-button slot="right" icon="times" v-on:clicked="$emit('cancel')"/>
         </layout-row>
 
-        <div slot="body">
+        <div slot="body" class="max-width">
             <label v-if="services == null || services.length === 0">
-                No service of the required category is available. Please create a new service with the button on the right below.
+                No suitable service found. Please create a new service with the button on the right below.
             </label>
 
             <div class="services-container max-width">

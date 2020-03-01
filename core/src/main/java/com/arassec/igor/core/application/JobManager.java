@@ -4,7 +4,7 @@ import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
@@ -367,7 +367,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     private void unschedule(Job job) {
         if (job.getId() != null && scheduledJobs.containsKey(job.getId())) {
             if (!scheduledJobs.get(job.getId()).cancel(true)) {
-                throw new ServiceException("Job " + job.getId() + " could not be cancelled!");
+                throw new IgorException("Job " + job.getId() + " could not be cancelled!");
             }
             scheduledJobs.remove(job.getId());
             log.info("Unscheduled job: {} ({})", job.getName(), job.getId());

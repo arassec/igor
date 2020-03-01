@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests the {@link ModelPageHelper} utility.
@@ -66,6 +65,19 @@ class ModelPageHelperTest {
         assertEquals(4, page.getItems().get(0));
         assertEquals(5, page.getItems().get(1));
         assertEquals(6, page.getItems().get(2));
+    }
+
+    /**
+     * Tests input validation.
+     */
+    @Test
+    @DisplayName("Tests input validation.")
+    void testInputValidation() {
+        ModelPage<Integer> page = ModelPageHelper.getModelPage(all, 1, 0);
+        assertEquals(1, page.getNumber());
+        assertEquals(0, page.getSize());
+        assertEquals(0, page.getTotalPages());
+        assertEquals(0, page.getItems().size());
     }
 
 }

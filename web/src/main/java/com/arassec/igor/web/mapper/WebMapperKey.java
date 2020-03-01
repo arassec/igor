@@ -18,6 +18,11 @@ public enum WebMapperKey {
     TYPE("type"),
 
     /**
+     * The 'typeCandidates' key.
+     */
+    TYPE_CANDIDATES("typeCandidates"),
+
+    /**
      * The name key.
      */
     NAME("name"),
@@ -51,6 +56,11 @@ public enum WebMapperKey {
      * The category key.
      */
     CATEGORY("category"),
+
+    /**
+     * The 'categoryCandidates' key.
+     */
+    CATEGORY_CANDIDATES("categoryCandidates"),
 
     /**
      * The secured key.

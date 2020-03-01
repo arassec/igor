@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service.ssh;
 
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.SneakyThrows;
@@ -132,7 +132,7 @@ public abstract class SshFileServiceBaseTest {
         assertEquals("ALPHA-igor-ssh-service-tests",
                 service.read("src/test/resources/ssh/alpha.txt", new WorkInProgressMonitor("ssh-read-test")));
 
-        assertThrows(ServiceException.class, () -> service.read("non-existing-file",
+        assertThrows(IgorException.class, () -> service.read("non-existing-file",
                 new WorkInProgressMonitor("ssh-read-non-existing-file-test")));
     }
 

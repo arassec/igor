@@ -1,26 +1,26 @@
-package com.arassec.igor.core.model.service;
+package com.arassec.igor.core.util;
 
 /**
  * Exception for all errors that occur during a service interaction.
  */
-public class ServiceException extends RuntimeException {
+public class IgorException extends RuntimeException {
 
     /**
-     * Creates a new {@link ServiceException}.
+     * Creates a new {@link IgorException}.
      *
      * @param message The message to use.
      */
-    public ServiceException(String message) {
+    public IgorException(String message) {
         super(message);
     }
 
     /**
-     * Creates a new {@link ServiceException}.
+     * Creates a new {@link IgorException}.
      *
      * @param message The message to use.
      * @param cause   The underlying cause of the error.
      */
-    public ServiceException(String message, Throwable cause) {
+    public IgorException(String message, Throwable cause) {
         super(message, cause);
     }
 

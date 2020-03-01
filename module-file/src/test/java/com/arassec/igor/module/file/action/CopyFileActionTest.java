@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.service.FileService;
 import com.arassec.igor.module.file.service.FileStreamData;
 import org.junit.jupiter.api.DisplayName;
@@ -152,7 +152,7 @@ class CopyFileActionTest extends FileActionBaseTest {
         action.setTargetDirectory("target");
         action.setTargetFilename("copy-file-action-alpha.txt");
 
-        assertThrows(ServiceException.class, () -> action.process(createData(), new JobExecution()));
+        assertThrows(IgorException.class, () -> action.process(createData(), new JobExecution()));
     }
 
 }

@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service.localfs;
 
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
 import lombok.SneakyThrows;
@@ -151,10 +151,10 @@ class LocalFilesystemFileServiceTest {
         String file = "target/non-existing.file";
         assertFalse(Files.exists(Paths.get(file)));
 
-        assertThrows(ServiceException.class, () -> fileService.read(file, mock(WorkInProgressMonitor.class)));
-        assertThrows(ServiceException.class, () -> fileService.readStream(file, mock(WorkInProgressMonitor.class)));
-        assertThrows(ServiceException.class, () -> fileService.delete(file, mock(WorkInProgressMonitor.class)));
-        assertThrows(ServiceException.class, () -> fileService.move(file, file, mock(WorkInProgressMonitor.class)));
+        assertThrows(IgorException.class, () -> fileService.read(file, mock(WorkInProgressMonitor.class)));
+        assertThrows(IgorException.class, () -> fileService.readStream(file, mock(WorkInProgressMonitor.class)));
+        assertThrows(IgorException.class, () -> fileService.delete(file, mock(WorkInProgressMonitor.class)));
+        assertThrows(IgorException.class, () -> fileService.move(file, file, mock(WorkInProgressMonitor.class)));
     }
 
 }

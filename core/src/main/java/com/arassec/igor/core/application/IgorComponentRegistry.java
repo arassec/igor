@@ -10,8 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.util.*;
@@ -62,11 +62,6 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     private final Map<String, Set<String>> typesByCategoryKey = new HashMap<>();
 
     /**
-     * Contains a service interface and its category.
-     */
-    private final Map<Class<?>, String> serviceInterfaceToCategory = new HashMap<>();
-
-    /**
      * Initializes the component registry.
      */
     @Override
@@ -83,7 +78,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * @param applicationContext The Spring application context.
      */
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
@@ -113,20 +108,6 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
             return typesByCategoryKey.get(categoryKey);
         }
         return Set.of();
-    }
-
-    /**
-     * Returns the category ID of services implementing the given service interface.
-     *
-     * @param serviceInterface The interface of the services to get the category of.
-     *
-     * @return The category.
-     */
-    public String getCagetoryOfServiceInterface(Class<?> serviceInterface) {
-        if (serviceInterfaceToCategory.containsKey(serviceInterface)) {
-            return serviceInterfaceToCategory.get(serviceInterface);
-        }
-        throw new IllegalArgumentException("Unknown service interface: " + serviceInterface);
     }
 
     /**
@@ -202,6 +183,29 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     }
 
     /**
+     * Returns all valid categories and types of components that can be used as parameter values for the supplied parameter
+     * class.
+     *
+     * @param parameterClass The class of the parameter.
+     *
+     * @return List of components that can be assigned to the parameter.
+     */
+    public Map<String, Set<String>> getParameterCategoryAndType(Class<?> parameterClass) {
+        Map<String, Set<String>> result = new HashMap<>();
+        if (parameterClass != null) {
+            services.stream()
+                    .filter(service -> parameterClass.isAssignableFrom(service.getClass()))
+                    .forEach(service -> {
+                        if (!result.containsKey(service.getCategoryId())) {
+                            result.put(service.getCategoryId(), new HashSet<>());
+                        }
+                        result.get(service.getCategoryId()).add(service.getTypeId());
+                    });
+        }
+        return result;
+    }
+
+    /**
      * Initializes categories and types of a specific igor component, e.g. {@link Service}.
      *
      * @param componentType The type of the component to initialize.
@@ -211,10 +215,6 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
 
         for (IgorComponent component : components) {
 
-            if (component instanceof Service) {
-                initializeServiceInterface(component);
-            }
-
             categoriesByComponentType.get(componentType).add(component.getCategoryId());
 
             if (!typesByCategoryKey.containsKey(component.getCategoryId())) {
@@ -222,23 +222,6 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
             }
 
             typesByCategoryKey.get(component.getCategoryId()).add(component.getTypeId());
-        }
-    }
-
-    /**
-     * Determines the base interface of a {@link Service} and saves the category ID of it.
-     *
-     * @param component The service.
-     */
-    private void initializeServiceInterface(IgorComponent component) {
-        Class<?>[] interfaces = ClassUtils.getAllInterfaces(component);
-        if (interfaces.length > 0) {
-            for (Class<?> anInterface : interfaces) {
-                // Skip IgorComponent and Service
-                if (!anInterface.equals(IgorComponent.class) && !anInterface.equals(Service.class)) {
-                    serviceInterfaceToCategory.put(anInterface, component.getCategoryId());
-                }
-            }
         }
     }
 

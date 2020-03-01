@@ -89,8 +89,18 @@
               "secured": false,
               "optional": false,
               "subtype": "NONE",
-              "type": "service-category-id",
-              "serviceClass": "com.arassec.igor.web.test.TestServiceInterface",
+              "categoryCandidates": [
+                {
+                  "key": "service-category-id",
+                  "value": "Service Category",
+                  "typeCandidates": [
+                    {
+                      "key": "service-type-id",
+                      "value": "Service Type"
+                    }
+                  ]
+                }
+              ],
               "value": "service-id",
               "serviceName": null,
               "service": true

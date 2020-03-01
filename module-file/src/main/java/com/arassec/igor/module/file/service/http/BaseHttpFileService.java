@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.service.http;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
@@ -109,7 +109,7 @@ public abstract class BaseHttpFileService extends BaseFileService {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                throw new ServiceException(ERROR_PREFIX_STATUS + response.statusCode());
+                throw new IgorException(ERROR_PREFIX_STATUS + response.statusCode());
             }
             Document document = Jsoup.parse(response.body());
             Elements elements = document.select("a");
@@ -127,10 +127,10 @@ public abstract class BaseHttpFileService extends BaseFileService {
             // @formatter:on
 
         } catch (IOException e) {
-            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
+            throw new IgorException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
+            throw new IgorException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         }
     }
 
@@ -144,15 +144,15 @@ public abstract class BaseHttpFileService extends BaseFileService {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                throw new ServiceException(
+                throw new IgorException(
                         ERROR_PREFIX_STATUS + response.statusCode() + " (" + request.uri().toString() + ")");
             }
             return response.body();
         } catch (IOException e) {
-            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
+            throw new IgorException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
+            throw new IgorException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         }
     }
 
@@ -166,7 +166,7 @@ public abstract class BaseHttpFileService extends BaseFileService {
         try {
             HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
             if (response.statusCode() != 200) {
-                throw new ServiceException(
+                throw new IgorException(
                         ERROR_PREFIX_STATUS + response.statusCode() + " (" + request.uri().toString() + ")");
             }
 
@@ -200,10 +200,10 @@ public abstract class BaseHttpFileService extends BaseFileService {
                 return fsd;
             }
         } catch (IOException e) {
-            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
+            throw new IgorException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
+            throw new IgorException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         }
     }
 
@@ -245,7 +245,7 @@ public abstract class BaseHttpFileService extends BaseFileService {
             try {
                 fileStreamData.getData().close();
             } catch (IOException e) {
-                throw new ServiceException("Could not finalize HTTP stream!", e);
+                throw new IgorException("Could not finalize HTTP stream!", e);
             }
         }
     }
@@ -260,14 +260,14 @@ public abstract class BaseHttpFileService extends BaseFileService {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                throw new ServiceException("GET failed for URL with HTTP status: " + response.statusCode() + " (" + request.uri()
+                throw new IgorException("GET failed for URL with HTTP status: " + response.statusCode() + " (" + request.uri()
                         .toASCIIString() + ")");
             }
         } catch (IOException e) {
-            throw new ServiceException("GET failed for URL: " + request.uri().toASCIIString(), e);
+            throw new IgorException("GET failed for URL: " + request.uri().toASCIIString(), e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ServiceException("GET failed for URL: " + request.uri().toASCIIString(), e);
+            throw new IgorException("GET failed for URL: " + request.uri().toASCIIString(), e);
         }
     }
 
@@ -319,7 +319,7 @@ public abstract class BaseHttpFileService extends BaseFileService {
     }
 
     /**
-     * Sends an HTTP request and handles errors by throwing a {@link ServiceException}.
+     * Sends an HTTP request and handles errors by throwing a {@link IgorException}.
      *
      * @param client  The HTTP-Client.
      * @param request The request to send.
@@ -328,13 +328,13 @@ public abstract class BaseHttpFileService extends BaseFileService {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                throw new ServiceException(ERROR_PREFIX_STATUS + response.statusCode());
+                throw new IgorException(ERROR_PREFIX_STATUS + response.statusCode());
             }
         } catch (IOException e) {
-            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
+            throw new IgorException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ServiceException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
+            throw new IgorException(ERROR_PREFIX + e.getMessage() + " (" + request.uri().toString() + ")");
         }
     }
 

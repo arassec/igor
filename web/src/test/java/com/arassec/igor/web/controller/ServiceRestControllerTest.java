@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -81,11 +82,11 @@ class ServiceRestControllerTest extends BaseRestControllerTest {
     @SneakyThrows(Exception.class)
     void getServicesInCategory() {
         TestService testService = new TestService();
-        when(serviceManager.loadAllOfCategory(eq("category-id"), eq(666), eq(1))).thenReturn(
+        when(serviceManager.loadAllOfType(eq(Set.of("category-id")), eq(666), eq(1))).thenReturn(
                 new ModelPage<>(666, 1, 1, List.of(testService))
         );
 
-        MvcResult mvcResult = mockMvc.perform(get("/api/service/category/category-id")
+        MvcResult mvcResult = mockMvc.perform(get("/api/service/candidate/Y2F0ZWdvcnktaWQ=")
                 .queryParam("pageNumber", "666")
                 .queryParam("pageSize", "1")
         ).andExpect(status().isOk()).andReturn();

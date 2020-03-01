@@ -1,6 +1,6 @@
 package com.arassec.igor.web.controller;
 
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     public static final String NAME_ALREADY_EXISTS_ERROR = "NAME_ALREADY_EXISTS_ERROR";
 
     /**
-     * {@link ServiceException}s are converted into "INTERNAL_SERVER_ERROR", although it might not be an internal error, but e.g.
+     * {@link IgorException}s are converted into "INTERNAL_SERVER_ERROR", although it might not be an internal error, but e.g.
      * a failed service call.
      *
      * @param runtimeException The exception causing this method to handle it.
@@ -35,8 +35,8 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
      *
      * @return A {@link ResponseEntity} with an appropriate HTTP status code.
      */
-    @ExceptionHandler(value = {ServiceException.class})
-    protected ResponseEntity<Object> handleServiceException(RuntimeException runtimeException, WebRequest webRequest) {
+    @ExceptionHandler(value = {IgorException.class})
+    protected ResponseEntity<Object> handleIgorException(RuntimeException runtimeException, WebRequest webRequest) {
         String bodyOfResponse = runtimeException.getMessage();
         return handleExceptionInternal(runtimeException, bodyOfResponse,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, webRequest);

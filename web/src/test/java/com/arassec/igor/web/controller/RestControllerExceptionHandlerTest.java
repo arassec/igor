@@ -1,6 +1,6 @@
 package com.arassec.igor.web.controller;
 
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -30,14 +30,14 @@ class RestControllerExceptionHandlerTest {
     private RestControllerExceptionHandler exceptionHandler = new RestControllerExceptionHandler();
 
     /**
-     * Tests handling service exceptions.
+     * Tests handling igor exceptions.
      */
     @Test
-    @DisplayName("Tests handling service exceptions.")
-    void testHandleServiceException() {
-        ResponseEntity<Object> responseEntity = exceptionHandler.handleServiceException(new ServiceException("service-exception"), mock(WebRequest.class));
+    @DisplayName("Tests handling igor exceptions.")
+    void testHandleIgorException() {
+        ResponseEntity<Object> responseEntity = exceptionHandler.handleIgorException(new IgorException("igor-exception"), mock(WebRequest.class));
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertEquals("service-exception", responseEntity.getBody());
+        assertEquals("igor-exception", responseEntity.getBody());
     }
 
     /**

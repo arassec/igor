@@ -3,7 +3,7 @@ package com.arassec.igor.core.model.job.concurrent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -85,12 +85,12 @@ class ConcurrencyGroupTest {
 
         ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(List.of(), new LinkedBlockingQueue<>(), "group-id", jobExecution);
 
-        concurrencyGroup.uncaughtException(null, new ServiceException("test-exception"));
+        concurrencyGroup.uncaughtException(null, new IgorException("test-exception"));
 
         assertEquals(JobExecutionState.CANCELLED, concurrencyGroup.getJobExecution().getExecutionState());
 
         jobExecution.setExecutionState(JobExecutionState.RUNNING);
-        concurrencyGroup.uncaughtException(null, new ServiceException("test-exception"));
+        concurrencyGroup.uncaughtException(null, new IgorException("test-exception"));
 
         assertEquals(JobExecutionState.FAILED, concurrencyGroup.getJobExecution().getExecutionState());
     }

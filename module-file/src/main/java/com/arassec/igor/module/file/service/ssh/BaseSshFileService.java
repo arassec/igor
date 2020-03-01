@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service.ssh;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -89,7 +89,7 @@ public abstract class BaseSshFileService extends BaseFileService {
             session.connect(timeout);
             return session;
         } catch (JSchException e) {
-            throw new ServiceException("Could not connect to server " + host + ":" + port, e);
+            throw new IgorException("Could not connect to server " + host + ":" + port, e);
         }
     }
 

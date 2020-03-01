@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -98,17 +99,17 @@ class ServiceManagerTest {
     @DisplayName("Tests loading services of a category.")
     void testLoadAllOfCategory() {
         Service first = mock(Service.class);
-        when(first.getCategoryId()).thenReturn("a");
+        when(first.getTypeId()).thenReturn("a");
         Service second = mock(Service.class);
-        when(second.getCategoryId()).thenReturn("b");
+        when(second.getTypeId()).thenReturn("b");
         when(second.getName()).thenReturn("z");
         Service third = mock(Service.class);
-        when(third.getCategoryId()).thenReturn("b");
+        when(third.getTypeId()).thenReturn("b");
         when(third.getName()).thenReturn("y");
 
         when(serviceRepository.findAll()).thenReturn(List.of(first, second, third));
 
-        ModelPage<Service> modelPage = serviceManager.loadAllOfCategory("b", 0, 5);
+        ModelPage<Service> modelPage = serviceManager.loadAllOfType(Set.of("b"), 0, 5);
 
         assertEquals("y", modelPage.getItems().get(0).getName());
         assertEquals("z", modelPage.getItems().get(1).getName());

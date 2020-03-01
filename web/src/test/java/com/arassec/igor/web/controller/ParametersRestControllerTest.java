@@ -11,8 +11,10 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
@@ -31,7 +33,7 @@ class ParametersRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests retrieval of service parameters.")
     @SneakyThrows(Exception.class)
-    void getServiceParameters() {
+    void testGetServiceParameters() {
         when(igorComponentRegistry.createServiceInstance(eq("type-id"), isNull())).thenReturn(new TestService());
 
         MvcResult mvcResult = mockMvc.perform(get("/api/parameters/service/type-id")).andExpect(status().isOk()).andReturn();
@@ -64,8 +66,10 @@ class ParametersRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests retrieval of action parameters.")
     @SneakyThrows(Exception.class)
-    void getActionParameters() {
+    void testGetActionParameters() {
         when(igorComponentRegistry.createActionInstance(eq("type-id"), isNull())).thenReturn(new TestAction());
+        when(igorComponentRegistry.getParameterCategoryAndType(eq(TestServiceInterface.class))).thenReturn(
+                Map.of("two", Set.of("three", "b"), "one", Set.of("four")));
 
         MvcResult mvcResult = mockMvc.perform(get("/api/parameters/action/type-id")).andExpect(status().isOk()).andReturn();
 
@@ -75,7 +79,30 @@ class ParametersRestControllerTest extends BaseRestControllerTest {
         assertEquals(2, parameters.size());
 
         assertEquals("testService", parameters.get(0).get(WebMapperKey.NAME.getKey()));
-        assertEquals(TestServiceInterface.class.getName(), parameters.get(0).get(WebMapperKey.SERVICE_CLASS.getKey()));
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> categoryCandidates = (List<Map<String, Object>>) parameters.get(0).get(WebMapperKey.CATEGORY_CANDIDATES.getKey());
+        assertEquals(2, categoryCandidates.size());
+        assertEquals("one", categoryCandidates.get(0).get(WebMapperKey.KEY.getKey()));
+        assertEquals("alpha", categoryCandidates.get(0).get(WebMapperKey.VALUE.getKey()));
+        assertEquals("two", categoryCandidates.get(1).get(WebMapperKey.KEY.getKey()));
+        assertEquals("beta", categoryCandidates.get(1).get(WebMapperKey.VALUE.getKey()));
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> typeCandidates = (List<Map<String, Object>>) categoryCandidates.get(0).get(WebMapperKey.TYPE_CANDIDATES.getKey());
+        assertEquals(1, typeCandidates.size());
+        assertEquals("four", typeCandidates.get(0).get(WebMapperKey.KEY.getKey()));
+        assertEquals("delta", typeCandidates.get(0).get(WebMapperKey.VALUE.getKey()));
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> secondTypeCandidates =
+                (List<Map<String, Object>>) categoryCandidates.get(1).get(WebMapperKey.TYPE_CANDIDATES.getKey());
+        assertEquals(2, secondTypeCandidates.size());
+        assertEquals("b", secondTypeCandidates.get(0).get(WebMapperKey.KEY.getKey()));
+        assertEquals("b", secondTypeCandidates.get(0).get(WebMapperKey.VALUE.getKey()));
+        assertEquals("three", secondTypeCandidates.get(1).get(WebMapperKey.KEY.getKey()));
+        assertEquals("gamma", secondTypeCandidates.get(1).get(WebMapperKey.VALUE.getKey()));
+
         assertEquals(false, parameters.get(0).get(WebMapperKey.SECURED.getKey()));
         assertEquals(false, parameters.get(0).get(WebMapperKey.OPTIONAL.getKey()));
         assertEquals(true, parameters.get(0).get(WebMapperKey.SERVICE.getKey()));
@@ -90,7 +117,7 @@ class ParametersRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests retrieval of provider parameters.")
     @SneakyThrows(Exception.class)
-    void getProviderParameters() {
+    void testGetProviderParameters() {
         when(igorComponentRegistry.createProviderInstance(eq("type-id"), isNull())).thenReturn(new TestProvider());
 
         MvcResult mvcResult = mockMvc.perform(get("/api/parameters/provider/type-id")).andExpect(status().isOk()).andReturn();
@@ -126,7 +153,7 @@ class ParametersRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests retrieval of trigger parameters.")
     @SneakyThrows(Exception.class)
-    void getTriggerParameters() {
+    void testGetTriggerParameters() {
         when(igorComponentRegistry.createTriggerInstance(eq("type-id"), isNull())).thenReturn(new TestTrigger());
 
         MvcResult mvcResult = mockMvc.perform(get("/api/parameters/trigger/type-id")).andExpect(status().isOk()).andReturn();

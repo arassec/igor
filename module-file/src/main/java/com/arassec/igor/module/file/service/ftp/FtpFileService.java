@@ -1,7 +1,7 @@
 package com.arassec.igor.module.file.service.ftp;
 
 import com.arassec.igor.core.model.annotation.IgorComponent;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import org.apache.commons.net.ftp.FTPClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 
@@ -30,7 +30,7 @@ public class FtpFileService extends BaseFtpFileService {
             configureAndConnect(ftpClient);
             return ftpClient;
         } catch (IOException e) {
-            throw new ServiceException("Could not login to FTP server " + getHost() + ":" + getPort(), e);
+            throw new IgorException("Could not login to FTP server " + getHost() + ":" + getPort(), e);
         }
     }
 

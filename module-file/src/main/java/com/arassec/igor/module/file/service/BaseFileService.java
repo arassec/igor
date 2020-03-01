@@ -3,7 +3,7 @@ package com.arassec.igor.module.file.service;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.BaseService;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +68,7 @@ public abstract class BaseFileService extends BaseService implements FileService
                 foo = in.read(buf, 0, foo);
                 if (foo < 0) {
                     // A negative return value indicates an error.
-                    throw new ServiceException("Could not copy data via streams!");
+                    throw new IgorException("Could not copy data via streams!");
                 }
                 out.write(buf, 0, foo);
                 fileSize -= foo;
@@ -81,7 +81,7 @@ public abstract class BaseFileService extends BaseService implements FileService
             }
             out.flush();
         } catch (IOException e) {
-            throw new ServiceException("Could not copy data via streams!", e);
+            throw new IgorException("Could not copy data via streams!", e);
         }
     }
 

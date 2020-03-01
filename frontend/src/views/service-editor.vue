@@ -50,7 +50,7 @@
                         <td><label for="category-input">Category</label></td>
                         <td>
                             <select id="category-input" v-model="serviceConfiguration.category"
-                                    v-on:change="loadTypesOfCategory(serviceConfiguration.category.key, true).then(() => {
+                                    v-on:change="loadTypesOfCategory(serviceConfiguration.category, true).then(() => {
                                         loadParametersOfType(serviceConfiguration.type.key)})" :disabled="!newService">
                                 <option v-for="category in serviceCategories" v-bind:value="category"
                                         v-bind:key="category.key">
@@ -169,39 +169,49 @@
                     this.newService = false
                 })
             },
-            loadCategories: async function (fixedCategoryKey) {
+            loadCategories: async function () {
                 await IgorBackend.getData('/api/category/service').then((categories) => {
                     for (let i = this.serviceCategories.length; i > 0; i--) {
                         this.serviceCategories.pop()
                     }
-                    let component = this
+                    let component = this;
                     Array.from(categories).forEach(function (item) {
-                        if (fixedCategoryKey) {
-                            if (item.key === fixedCategoryKey) {
-                                component.serviceCategories.push(item)
-                            }
-                        } else {
-                            component.serviceCategories.push(item)
-                        }
-                    })
+                        component.serviceCategories.push(item)
+                    });
                     if (!('key' in this.serviceConfiguration.category)) {
                         this.serviceConfiguration.category = this.serviceCategories[0]
                     }
                 })
             },
-            loadTypesOfCategory: async function (categoryKey, selectFirst) {
-                await IgorBackend.getData('/api/type/' + categoryKey).then((types) => {
+            loadTypesOfCategory: async function (category, selectFirst) {
+                // If the category contains an array with name 'typeCandidates' the allowed types are pre-selected, because
+                // the service is created from within a job configuration:
+                if (category.hasOwnProperty('typeCandidates')) {
                     for (let i = this.serviceTypes.length; i > 0; i--) {
                         this.serviceTypes.pop()
                     }
-                    let component = this
-                    Array.from(types).forEach(function (item) {
+                    let component = this;
+                    Array.from(category.typeCandidates).forEach(function (item) {
                         component.serviceTypes.push(item)
-                    })
+                    });
                     if (selectFirst) {
                         this.serviceConfiguration.type = this.serviceTypes[0]
                     }
-                })
+                } else {
+                    // No restrictions, simply load all types of the given category:
+                    await IgorBackend.getData('/api/type/' + category.key).then((types) => {
+                        for (let i = this.serviceTypes.length; i > 0; i--) {
+                            this.serviceTypes.pop()
+                        }
+                        let component = this;
+                        Array.from(types).forEach(function (item) {
+                            component.serviceTypes.push(item)
+                        });
+                        if (selectFirst) {
+                            this.serviceConfiguration.type = this.serviceTypes[0]
+                        }
+                    })
+                }
             },
             loadParametersOfType: async function (typeKey) {
                 await IgorBackend.getData('/api/parameters/service/' + typeKey).then((parameters) => {
@@ -218,7 +228,7 @@
                 if (!(await this.validateInput())) {
                     return
                 }
-                IgorBackend.postData('/api/service/test', this.serviceConfiguration, 'Testing service', 'Test OK.', 'Testing Failed!')
+                await IgorBackend.postData('/api/service/test', this.serviceConfiguration, 'Testing service', 'Test OK.', 'Testing Failed!')
             },
             saveConfiguration: async function () {
                 if (!(await this.validateInput())) {
@@ -232,19 +242,18 @@
                             this.nameValidationError = 'A service with this name already exists!'
                         } else {
                             this.serviceConfiguration = result;
-                            this.newService = false
-                            this.originalServiceConfiguration = JSON.stringify(this.serviceConfiguration)
+                            this.newService = false;
+                            this.originalServiceConfiguration = JSON.stringify(this.serviceConfiguration);
                             this.$router.push({
                                 name: 'service-editor',
                                 params: {serviceId: this.serviceConfiguration.id}
-                            })
-                            let jobData = this.$root.$data.store.getJobData()
+                            });
+                            let jobData = this.$root.$data.store.getJobData();
                             if (jobData.jobConfiguration != null) {
-                                let serviceParameter = {
+                                jobData.serviceParameter = {
                                     name: this.serviceConfiguration.name,
                                     id: this.serviceConfiguration.id
                                 }
-                                jobData.serviceParameter = serviceParameter
                             }
                         }
                     })
@@ -257,7 +266,7 @@
                 }
             },
             cancelConfiguration: function () {
-                let jobData = this.$root.$data.store.getJobData()
+                let jobData = this.$root.$data.store.getJobData();
                 if (jobData.jobConfiguration != null) {
                     this.$router.push({name: 'job-editor'})
                 } else {
@@ -265,19 +274,19 @@
                 }
             },
             validateInput: async function () {
-                this.nameValidationError = ''
+                this.nameValidationError = '';
 
                 if (this.serviceConfiguration.name == null || this.serviceConfiguration.name === '') {
                     this.nameValidationError = 'Name must be set'
                 } else {
                     let nameAlreadyExists = await IgorBackend.getData('/api/service/check/'
-                        + btoa(this.serviceConfiguration.name) + '/' + (this.serviceConfiguration.id === undefined ? -1 : this.serviceConfiguration.id))
+                        + btoa(this.serviceConfiguration.name) + '/' + (this.serviceConfiguration.id === undefined ? -1 : this.serviceConfiguration.id));
                     if (nameAlreadyExists === true) {
                         this.nameValidationError = 'A service with this name already exists!'
                     }
                 }
 
-                let parameterValidationResult = true
+                let parameterValidationResult = true;
                 if (typeof this.$refs.parameterEditor !== 'undefined') {
                     parameterValidationResult = this.$refs.parameterEditor.validateInput()
                 }
@@ -289,38 +298,44 @@
             },
         },
         mounted() {
-            let serviceData = this.$root.$data.store.getServiceData()
+            let serviceData = this.$root.$data.store.getServiceData();
             // Service duplication: don't load type parameters because they are provided by the root service configuration
             if (serviceData.serviceConfiguration != null) {
-                this.serviceConfiguration = serviceData.serviceConfiguration
-                this.loadCategories(null).then(() => {
-                    this.loadTypesOfCategory(this.serviceConfiguration.category.key, false)
-                })
+                this.serviceConfiguration = serviceData.serviceConfiguration;
+                this.loadCategories().then(() => {
+                    this.loadTypesOfCategory(this.serviceConfiguration.category, false)
+                });
                 this.originalServiceConfiguration = JSON.stringify(serviceData.serviceConfiguration)
             } else {
                 // Load a service configuration from the backend
                 if (this.serviceId != null) {
                     this.loadService(this.serviceId).then(() => {
-                        this.originalServiceConfiguration = JSON.stringify(this.serviceConfiguration)
+                        this.originalServiceConfiguration = JSON.stringify(this.serviceConfiguration);
                         this.loadReferencingJobs(0)
                     })
                 } else {
-                    // Create a new service from within a job configuration. The category is fixed since the job requires it.
-                    let jobData = this.$root.$data.store.getJobData()
-                    if (jobData.serviceCategory != null) {
-                        let component = this
-                        this.loadCategories(jobData.serviceCategory).then(() => {
-                            component.loadTypesOfCategory(component.serviceConfiguration.category.key, true).then(() => {
-                                component.loadParametersOfType(component.serviceConfiguration.type.key).then(() => {
-                                    component.originalServiceConfiguration = JSON.stringify(component.serviceConfiguration)
-                                })
+                    // Create a new service from within a job configuration. The categories and types are fixed since the job
+                    // requires a certain set of services.
+                    let jobData = this.$root.$data.store.getJobData();
+                    if (jobData.serviceCategoryCandidates != null) {
+                        for (let i = this.serviceCategories.length; i > 0; i--) {
+                            this.serviceCategories.pop()
+                        }
+                        let component = this;
+                        Array.from(jobData.serviceCategoryCandidates).forEach(function (item) {
+                            component.serviceCategories.push(item)
+                        });
+                        this.serviceConfiguration.category = this.serviceCategories[0];
+                        component.loadTypesOfCategory(component.serviceConfiguration.category, true).then(() => {
+                            component.loadParametersOfType(component.serviceConfiguration.type.key).then(() => {
+                                component.originalServiceConfiguration = JSON.stringify(component.serviceConfiguration)
                             })
                         })
                     } else {
                         // Create a new service without restrictions:
-                        let component = this
-                        this.loadCategories(null).then(() => {
-                            component.loadTypesOfCategory(component.serviceConfiguration.category.key, true).then(() => {
+                        let component = this;
+                        this.loadCategories().then(() => {
+                            component.loadTypesOfCategory(component.serviceConfiguration.category, true).then(() => {
                                 component.loadParametersOfType(component.serviceConfiguration.type.key).then(() => {
                                     component.originalServiceConfiguration = JSON.stringify(component.serviceConfiguration)
                                 })
@@ -332,10 +347,10 @@
         },
         beforeRouteLeave(to, from, next) {
             if (this.originalServiceConfiguration) {
-                let newServiceConfiguration = JSON.stringify(this.serviceConfiguration)
-                if (!(this.originalServiceConfiguration === newServiceConfiguration)) {
-                    this.nextRoute = next
-                    this.showUnsavedValuesExistDialog = true
+                let newServiceConfiguration = JSON.stringify(this.serviceConfiguration);
+                if (this.originalServiceConfiguration !== newServiceConfiguration) {
+                    this.nextRoute = next;
+                    this.showUnsavedValuesExistDialog = true;
                     return
                 }
             }

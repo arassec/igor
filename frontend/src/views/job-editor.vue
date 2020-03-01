@@ -158,7 +158,7 @@
                     Mark this failed execution as resolved?
                 </div>
                 <div class="paragraph" v-if="numFailedExecutionsForSelectedJob > 1">
-                    Mark <b>all {{numFailedExecutionsForSelectedJob}}</b> executions of this job as resolved:
+                    Mark <strong>all {{numFailedExecutionsForSelectedJob}}</strong> executions of this job as resolved:
                     <font-awesome-icon :icon="resolveAllFailedExecutionsOfJob ? 'check-square' : 'square'"
                                        v-on:click="resolveAllFailedExecutionsOfJob = !resolveAllFailedExecutionsOfJob"/>
                 </div>
@@ -568,8 +568,8 @@
                     })
                 })
             },
-            createService: function (selectionKey, parameterIndex, serviceCategory) {
-                this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, serviceCategory)
+            createService: function (selectionKey, parameterIndex, serviceCategoryCandidates) {
+                this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, serviceCategoryCandidates)
                 this.$router.push({name: 'service-editor'})
             },
             updateOriginalJobConfiguration: function () {

@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.service.ftp;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
@@ -123,7 +123,7 @@ public abstract class BaseFtpFileService extends BaseFileService {
 
             return result;
         } catch (IOException e) {
-            throw new ServiceException("Could not list files in directory: " + directory, e);
+            throw new IgorException("Could not list files in directory: " + directory, e);
         }
     }
 
@@ -137,7 +137,7 @@ public abstract class BaseFtpFileService extends BaseFileService {
             ftpClient.retrieveFile(file, outputStream);
             return outputStream.toString();
         } catch (IOException e) {
-            throw new ServiceException("Could not read FTP file!", e);
+            throw new IgorException("Could not read FTP file!", e);
         } finally {
             disconnect(ftpClient);
         }
@@ -157,7 +157,7 @@ public abstract class BaseFtpFileService extends BaseFileService {
             result.setSourceConnectionData(ftpClient);
             return result;
         } catch (IOException e) {
-            throw new ServiceException("Could not retrieve file: " + file, e);
+            throw new IgorException("Could not retrieve file: " + file, e);
         }
     }
 
@@ -170,7 +170,7 @@ public abstract class BaseFtpFileService extends BaseFileService {
         try (BufferedOutputStream outputStream = new BufferedOutputStream(ftpClient.storeFileStream(file))) {
             copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), workInProgressMonitor);
         } catch (IOException e) {
-            throw new ServiceException("Could not store file: " + file, e);
+            throw new IgorException("Could not store file: " + file, e);
         } finally {
             disconnect(ftpClient);
         }
@@ -187,12 +187,12 @@ public abstract class BaseFtpFileService extends BaseFileService {
                 if (!ftpClient.completePendingCommand()) {
                     ftpClient.logout();
                     ftpClient.disconnect();
-                    throw new ServiceException("FTP stream handling was not finished successful!");
+                    throw new IgorException("FTP stream handling was not finished successful!");
                 } else {
                     disconnect(ftpClient);
                 }
             } catch (IOException e) {
-                throw new ServiceException("FTP stream handling was not successful!", e);
+                throw new IgorException("FTP stream handling was not successful!", e);
             }
         }
     }
@@ -205,11 +205,11 @@ public abstract class BaseFtpFileService extends BaseFileService {
         try {
             FTPClient ftpClient = connect();
             if (!ftpClient.deleteFile(file)) {
-                throw new ServiceException("Could not delete remote FTP file " + file);
+                throw new IgorException("Could not delete remote FTP file " + file);
             }
             disconnect(ftpClient);
         } catch (IOException e) {
-            throw new ServiceException("Could not delete FTP file!", e);
+            throw new IgorException("Could not delete FTP file!", e);
         }
     }
 
@@ -223,7 +223,7 @@ public abstract class BaseFtpFileService extends BaseFileService {
             ftpClient.rename(source, target);
             disconnect(ftpClient);
         } catch (IOException e) {
-            throw new ServiceException("Could not move FTP file " + source + " to " + target, e);
+            throw new IgorException("Could not move FTP file " + source + " to " + target, e);
         }
     }
 
@@ -277,7 +277,7 @@ public abstract class BaseFtpFileService extends BaseFileService {
         }
 
         if (!ftpClient.login(user, pass)) {
-            throw new ServiceException("Login to FTP server " + host + ":" + port + " failed for user: " + user);
+            throw new IgorException("Login to FTP server " + host + ":" + port + " failed for user: " + user);
         }
 
         ftpClient.setDataTimeout(dataTimeout);
@@ -294,11 +294,11 @@ public abstract class BaseFtpFileService extends BaseFileService {
         if (ftpClient.isConnected()) {
             try {
                 if (!ftpClient.logout()) {
-                    throw new ServiceException("Could not logout from FTP server " + host + ":" + port);
+                    throw new IgorException("Could not logout from FTP server " + host + ":" + port);
                 }
                 ftpClient.disconnect();
             } catch (IOException e) {
-                throw new ServiceException("Error during logout from FTP server " + host + ":" + port, e);
+                throw new IgorException("Error during logout from FTP server " + host + ":" + port, e);
             }
         }
     }

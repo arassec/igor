@@ -1,6 +1,6 @@
 package com.arassec.igor.module.file.service.ssh;
 
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,13 +67,13 @@ public class SshInputStreamWrapper extends InputStream {
         if ((fileSize - len) > 0) {
             n = inputStream.read(b, off, len);
             if (n < 0) {
-                throw new ServiceException(READ_ERROR + n);
+                throw new IgorException(READ_ERROR + n);
             }
             fileSize -= n;
         } else if ((fileSize - len) == 0) {
             n = inputStream.read(b, off, len);
             if (n < 0) {
-                throw new ServiceException(READ_ERROR + n);
+                throw new IgorException(READ_ERROR + n);
             }
             fileSize -= n;
             if (fileSize == 0) {
@@ -82,7 +82,7 @@ public class SshInputStreamWrapper extends InputStream {
         } else {
             n = inputStream.read(b, off, (int) fileSize);
             if (n < 0) {
-                throw new ServiceException(READ_ERROR + n);
+                throw new IgorException(READ_ERROR + n);
             }
             fileSize -= n;
             if (fileSize == 0) {

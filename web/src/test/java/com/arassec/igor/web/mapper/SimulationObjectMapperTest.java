@@ -5,6 +5,7 @@ import com.arassec.igor.web.simulation.ActionProxy;
 import com.arassec.igor.web.simulation.ProviderProxy;
 import com.arassec.igor.web.simulation.ServiceProxy;
 import com.arassec.igor.web.test.TestAction;
+import com.arassec.igor.web.test.TestService;
 import com.arassec.igor.web.test.TestServiceInterface;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,7 @@ import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests the web layer's ObjectMapper simulation mode.
@@ -38,10 +39,11 @@ public class SimulationObjectMapperTest extends BaseMapperTest {
 
         assertTrue(testJob.getTasks().get(0).getActions().get(0) instanceof ActionProxy);
 
-        TestServiceInterface testService = ((TestAction) ((ActionProxy) testJob.getTasks().get(0).getActions().get(0)).getDelegate()).getTestService();
+        TestService testService = (TestService) ((TestAction) ((ActionProxy) testJob.getTasks().get(0).getActions().get(0)).getDelegate()).getTestService();
 
-        assertTrue(testService instanceof Proxy);
-        assertTrue(Proxy.getInvocationHandler(testService) instanceof ServiceProxy);
+        assertEquals(666, testService.simulationSafeMethod());
+        assertNull(testService.simulationUnsafeMethod());
+        assertEquals("real-value-from-service", testService.directlyAnnotatedSimulationSafeMethod());
     }
 
 }

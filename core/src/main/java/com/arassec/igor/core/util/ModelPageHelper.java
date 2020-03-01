@@ -24,7 +24,7 @@ public class ModelPageHelper {
      * @return The {@link ModelPage}.
      */
     public static <T> ModelPage<T> getModelPage(List<T> all, int pageNumber, int pageSize) {
-        if (all != null && !all.isEmpty()) {
+        if (all != null && !all.isEmpty() && pageSize > 0) {
             long totalPages = all.size() / pageSize;
             if (all.size() % pageSize > 0) {
                 totalPages++;

@@ -102,8 +102,8 @@
       }
       return parameterValidationResult
     },
-    createService: function (parameterIndex, serviceCategory) {
-      this.$emit('create-service', this.actionKey, parameterIndex, serviceCategory)
+    createService: function (parameterIndex, serviceCategoryCandidates) {
+      this.$emit('create-service', this.actionKey, parameterIndex, serviceCategoryCandidates)
     }
   },
   watch: {

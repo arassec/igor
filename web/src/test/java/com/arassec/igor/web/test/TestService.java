@@ -1,6 +1,7 @@
 package com.arassec.igor.web.test;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.model.service.BaseService;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -96,6 +97,31 @@ public class TestService extends BaseService implements TestServiceInterface {
     @Override
     public void testConfiguration() {
         testConfigurationInvoked = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Integer simulationSafeMethod() {
+        return 666;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String simulationUnsafeMethod() {
+        return "this-should-not-be-returned-in-simulations";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @IgorSimulationSafe
+    public String directlyAnnotatedSimulationSafeMethod() {
+        return "real-value-from-service";
     }
 
 }

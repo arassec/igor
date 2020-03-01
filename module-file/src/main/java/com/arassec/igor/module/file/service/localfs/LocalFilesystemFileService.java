@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.service.localfs;
 
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.service.BaseFileService;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
@@ -58,7 +58,7 @@ public class LocalFilesystemFileService extends BaseFileService {
                 }).collect(Collectors.toList());
             }
         } catch (IOException e) {
-            throw new ServiceException("Could not list files in local directory: " + directory, e);
+            throw new IgorException("Could not list files in local directory: " + directory, e);
         }
     }
 
@@ -72,7 +72,7 @@ public class LocalFilesystemFileService extends BaseFileService {
             workInProgressMonitor.setProgressInPercent(100);
             return result;
         } catch (IOException e) {
-            throw new ServiceException("Could not read file: " + file, e);
+            throw new IgorException("Could not read file: " + file, e);
         }
     }
 
@@ -87,7 +87,7 @@ public class LocalFilesystemFileService extends BaseFileService {
             result.setData(new FileInputStream(file));
             return result;
         } catch (IOException e) {
-            throw new ServiceException("Could not read file stream: " + file, e);
+            throw new IgorException("Could not read file stream: " + file, e);
         }
     }
 
@@ -99,7 +99,7 @@ public class LocalFilesystemFileService extends BaseFileService {
         try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
             copyStream(fileStreamData.getData(), fileOutputStream, fileStreamData.getFileSize(), workInProgressMonitor);
         } catch (IOException e) {
-            throw new ServiceException("Could not write file (stream): " + file, e);
+            throw new IgorException("Could not write file (stream): " + file, e);
         }
     }
 
@@ -112,7 +112,7 @@ public class LocalFilesystemFileService extends BaseFileService {
             Files.delete(Paths.get(file));
             workInProgressMonitor.setProgressInPercent(100);
         } catch (IOException e) {
-            throw new ServiceException("Could not delete local file " + file, e);
+            throw new IgorException("Could not delete local file " + file, e);
         }
     }
 
@@ -125,7 +125,7 @@ public class LocalFilesystemFileService extends BaseFileService {
             Files.move(Paths.get(source), Paths.get(target), StandardCopyOption.REPLACE_EXISTING);
             workInProgressMonitor.setProgressInPercent(100);
         } catch (IOException e) {
-            throw new ServiceException("Could not move local file '" + source + "' to '" + target + "'!", e);
+            throw new IgorException("Could not move local file '" + source + "' to '" + target + "'!", e);
         }
     }
 

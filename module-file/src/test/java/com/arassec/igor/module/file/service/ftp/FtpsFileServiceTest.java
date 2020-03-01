@@ -1,6 +1,6 @@
 package com.arassec.igor.module.file.service.ftp;
 
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import org.apache.ftpserver.ftplet.FtpException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -59,7 +59,7 @@ public class FtpsFileServiceTest extends FtpFileServiceBaseTest {
         ftpsFileService.setPassiveMode(true);
         ftpsFileService.setWindowsFtp(true);
 
-        assertThrows(ServiceException.class, ftpsFileService::connect);
+        assertThrows(IgorException.class, ftpsFileService::connect);
     }
 
 }

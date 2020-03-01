@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.service.ssh;
 
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
 import com.jcraft.jsch.*;
@@ -55,7 +55,7 @@ public class SftpFileService extends BaseSshFileService {
             return files.stream().map(lsEntry -> new FileInfo(lsEntry.getFilename(),
                     formatInstant(Instant.ofEpochMilli(lsEntry.getAttrs().getMTime() * 1000L)))).collect(Collectors.toList());
         } catch (JSchException | SftpException e) {
-            throw new ServiceException("Could not list files via SFTP!", e);
+            throw new IgorException("Could not list files via SFTP!", e);
         }
     }
 
@@ -73,7 +73,7 @@ public class SftpFileService extends BaseSshFileService {
             session.disconnect();
             return outputStream.toString();
         } catch (IOException | JSchException | SftpException e) {
-            throw new ServiceException("Could not read file via SFTP!", e);
+            throw new IgorException("Could not read file via SFTP!", e);
         }
     }
 
@@ -102,10 +102,10 @@ public class SftpFileService extends BaseSshFileService {
 
                 return result;
             } else {
-                throw new ServiceException("File " + file + " found at the server!");
+                throw new IgorException("File " + file + " found at the server!");
             }
         } catch (SftpException | JSchException e) {
-            throw new ServiceException("Could not read file (sftp/stream)!", e);
+            throw new IgorException("Could not read file (sftp/stream)!", e);
         }
     }
 
@@ -123,7 +123,7 @@ public class SftpFileService extends BaseSshFileService {
             channel.disconnect();
             session.disconnect();
         } catch (SftpException | JSchException e) {
-            throw new ServiceException("Could not write file (sftp/stream)!", e);
+            throw new IgorException("Could not write file (sftp/stream)!", e);
         }
     }
 
@@ -152,7 +152,7 @@ public class SftpFileService extends BaseSshFileService {
             channel.disconnect();
             session.disconnect();
         } catch (SftpException | JSchException e) {
-            throw new ServiceException("Could not delete file: " + file);
+            throw new IgorException("Could not delete file: " + file);
         }
     }
 
@@ -173,7 +173,7 @@ public class SftpFileService extends BaseSshFileService {
                 log.error("Interrupted while waiting for the SFTP server!", e);
                 Thread.currentThread().interrupt();
             } catch (SftpException | JSchException e1) {
-                throw new ServiceException("Could not move file: " + source + " to " + target, e);
+                throw new IgorException("Could not move file: " + source + " to " + target, e);
             }
         }
     }

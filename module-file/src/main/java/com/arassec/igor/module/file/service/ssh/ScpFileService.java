@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.service.ssh;
 
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.service.FileInfo;
 import com.arassec.igor.module.file.service.FileStreamData;
 import com.jcraft.jsch.*;
@@ -81,7 +81,7 @@ public class ScpFileService extends BaseSshFileService {
             return Arrays.stream(result.toString().split("\n")).skip(numResultsToSkip)
                     .map(lsResult -> new FileInfo(extractFilename(lsResult), extractLastModified(lsResult)))
                     .collect(Collectors.toList());
-        } catch (ServiceException e) {
+        } catch (IgorException e) {
             if (!StringUtils.isEmpty(fileEnding) && e.getMessage().contains("No such file or directory")) {
                 return new LinkedList<>();
             } else {
@@ -101,7 +101,7 @@ public class ScpFileService extends BaseSshFileService {
             outputStream.flush();
             return outputStream.toString();
         } catch (IOException e) {
-            throw new ServiceException("Could not read file: " + file, e);
+            throw new IgorException("Could not read file: " + file, e);
         } finally {
             finalizeStream(fileStreamData);
         }
@@ -138,7 +138,7 @@ public class ScpFileService extends BaseSshFileService {
             StringBuilder log = new StringBuilder();
             int c = checkAck(sshInputStream, log);
             if (c != 'C') {
-                throw new ServiceException("Could not read remote SSH file " + file + ": " + log);
+                throw new IgorException("Could not read remote SSH file " + file + ": " + log);
             }
 
             // read '0644 '
@@ -148,7 +148,7 @@ public class ScpFileService extends BaseSshFileService {
             while (true) {
                 if (sshInputStream.read(buf, 0, 1) < 0) {
                     // error
-                    throw new ServiceException("Could not read remote SSH file's size: " + file);
+                    throw new IgorException("Could not read remote SSH file's size: " + file);
                 }
                 if (buf[0] == ' ') {
                     break;
@@ -184,7 +184,7 @@ public class ScpFileService extends BaseSshFileService {
             return result;
 
         } catch (IOException | JSchException e) {
-            throw new ServiceException("Could not read file stream via SSH!", e);
+            throw new IgorException("Could not read file stream via SSH!", e);
         }
     }
 
@@ -207,7 +207,7 @@ public class ScpFileService extends BaseSshFileService {
             StringBuilder log = new StringBuilder();
             int sshReturnCode = checkAck(sshInputStream, log);
             if (sshReturnCode != 0) {
-                throw new ServiceException("Error during SCP file transfer (" + sshReturnCode + "): " + log);
+                throw new IgorException("Error during SCP file transfer (" + sshReturnCode + "): " + log);
             }
 
             command = "C0644 " + fileStreamData.getFileSize() + " ";
@@ -223,14 +223,14 @@ public class ScpFileService extends BaseSshFileService {
             log = new StringBuilder();
             sshReturnCode = checkAck(sshInputStream, log);
             if (sshReturnCode != 0) {
-                throw new ServiceException("Error during SCP file transfer (" + sshReturnCode + "): " + log);
+                throw new IgorException("Error during SCP file transfer (" + sshReturnCode + "): " + log);
             }
 
             copyStream(fileStreamData.getData(), sshOutputStream, fileStreamData.getFileSize(), workInProgressMonitor);
 
             finalizeStreams(session, channel, sshOutputStream, sshInputStream);
         } catch (IOException | JSchException e) {
-            throw new ServiceException("Could not write file stream via SSH!", e);
+            throw new IgorException("Could not write file stream via SSH!", e);
         }
     }
 
@@ -340,14 +340,14 @@ public class ScpFileService extends BaseSshFileService {
             StringBuilder log = new StringBuilder();
             int sshReturnCode = checkAck(sshInputStream, log);
             if (sshReturnCode != 0) {
-                throw new ServiceException("SSH command not successful (" + sshReturnCode + "): " + log);
+                throw new IgorException("SSH command not successful (" + sshReturnCode + "): " + log);
             }
             sshOutputStream.close();
             sshInputStream.close();
             channel.disconnect();
             session.disconnect();
         } catch (IOException e) {
-            throw new ServiceException("Could not complete SSH streams!", e);
+            throw new IgorException("Could not complete SSH streams!", e);
         }
     }
 
@@ -366,7 +366,7 @@ public class ScpFileService extends BaseSshFileService {
         try {
             channel = (ChannelExec) session.openChannel("exec");
         } catch (JSchException e) {
-            throw new ServiceException("Could not open channel to SSH server!", e);
+            throw new IgorException("Could not open channel to SSH server!", e);
         }
         channel.setCommand(command);
         channel.setInputStream(null);
@@ -396,7 +396,7 @@ public class ScpFileService extends BaseSshFileService {
 
             return result;
         } catch (IOException | JSchException e) {
-            throw new ServiceException("Could not execute command on SSH server!", e);
+            throw new IgorException("Could not execute command on SSH server!", e);
         }
     }
 
@@ -415,7 +415,7 @@ public class ScpFileService extends BaseSshFileService {
                 return false;
             }
             if (channel.getExitStatus() != 0) {
-                throw new ServiceException(
+                throw new IgorException(
                         "Exit status != 0 received: " + channel.getExitStatus() + "\n(" + errorStream.toString()
                                 .replace("\n", "") + ")");
             }

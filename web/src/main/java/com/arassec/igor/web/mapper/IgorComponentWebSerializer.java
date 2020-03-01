@@ -5,11 +5,12 @@ import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.service.Service;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.web.model.KeyLabelStore;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.ReflectionUtils;
@@ -17,12 +18,12 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Serializer for igor components in the web layer.
  */
+@Slf4j
 public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
 
     /**
@@ -59,7 +60,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
         if (instance instanceof Action) {
             jsonGenerator.writeBooleanField(WebMapperKey.ACTIVE.getKey(), ((Action) instance).isActive());
         }
-        writeKeyLabelStore(jsonGenerator,WebMapperKey. CATEGORY.getKey(),
+        writeKeyLabelStore(jsonGenerator, WebMapperKey.CATEGORY.getKey(),
                 new KeyLabelStore(instance.getCategoryId(), messageSource.getMessage(instance.getCategoryId(), null,
                         LocaleContextHolder.getLocale())));
         writeKeyLabelStore(jsonGenerator, WebMapperKey.TYPE.getKey(),
@@ -135,7 +136,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                 }
                 jsonGenerator.writeEndObject();
             } catch (IOException | IllegalAccessException e) {
-                throw new ServiceException("Could not convert parameter to JSON!", e);
+                throw new IgorException("Could not convert parameter to JSON!", e);
             }
         });
 
@@ -152,8 +153,51 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      * @throws IOException If the parameter could not be written.
      */
     private void writeServiceParameter(JsonGenerator jsonGenerator, Field field, Object value) throws IOException {
-        jsonGenerator.writeStringField(WebMapperKey.TYPE.getKey(), igorComponentRegistry.getCagetoryOfServiceInterface(field.getType()));
-        jsonGenerator.writeStringField(WebMapperKey.SERVICE_CLASS.getKey(), field.getType().getName());
+        Map<String, Set<String>> candidates = igorComponentRegistry.getParameterCategoryAndType(field.getType());
+
+        List<KeyLabelStore> categories = new LinkedList<>();
+        candidates.keySet().forEach(candidate -> categories.add(new KeyLabelStore(candidate, messageSource.getMessage(candidate,
+                null, LocaleContextHolder.getLocale()))));
+        categories.sort(Comparator.comparing(KeyLabelStore::getValue)); // sort by label
+
+        jsonGenerator.writeArrayFieldStart(WebMapperKey.CATEGORY_CANDIDATES.getKey());
+
+        categories.forEach(category -> {
+            Set<String> typeCandidates = candidates.get(category.getKey());
+            List<KeyLabelStore> types = new LinkedList<>();
+            typeCandidates.forEach(typeCandidate -> types.add(new KeyLabelStore(typeCandidate, messageSource.getMessage(typeCandidate, null,
+                    LocaleContextHolder.getLocale()))));
+            types.sort(Comparator.comparing(KeyLabelStore::getValue));
+
+            try {
+                jsonGenerator.writeStartObject();
+
+                jsonGenerator.writeStringField(WebMapperKey.KEY.getKey(), category.getKey());
+                jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), category.getValue());
+
+                jsonGenerator.writeArrayFieldStart(WebMapperKey.TYPE_CANDIDATES.getKey());
+                types.forEach(type -> {
+                    try {
+                        jsonGenerator.writeStartObject();
+                        jsonGenerator.writeStringField(WebMapperKey.KEY.getKey(), type.getKey());
+                        jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), type.getValue());
+                        jsonGenerator.writeEndObject();
+                    } catch (IOException e) {
+                        log.error("Could not serialize type of service parameter (" + type.getKey() + " / "
+                                + type.getValue() + ")", e);
+                    }
+                });
+                jsonGenerator.writeEndArray();
+
+                jsonGenerator.writeEndObject();
+            } catch (IOException e) {
+                log.error("Could not serialize category of service parameter (" + category.getKey() + " / " + category.getValue() + ")", e);
+            }
+        });
+
+        jsonGenerator.writeEndArray();
+
+
         if (value != null) {
             jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), ((Service) value).getId());
             jsonGenerator.writeStringField(WebMapperKey.SERVICE_NAME.getKey(), ((Service) value).getName());

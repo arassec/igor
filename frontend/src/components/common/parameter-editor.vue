@@ -29,7 +29,7 @@
                                       icon="eye" v-on:clicked="toggleCleartext(index)" class="button-margin-left"/>
 
                         <input-button v-else-if="isService(param)" icon="cogs"
-                                      v-on:clicked="openServicePicker(index, param.type)"
+                                      v-on:clicked="openServicePicker(index, param.categoryCandidates)"
                                       class="button-margin-left"/>
 
                         <input-button v-else-if="param.subtype === 'CRON'" v-on:clicked="openCronPicker(index)"
@@ -56,10 +56,10 @@
                         v-on:cancel="showServicePicker = false"
                         v-on:create="createService"
                         v-on:selected="setSelectedService"
-                        v-on:first-page="loadServicePage(serviceParameterCategory, 0)"
-                        v-on:previous-page="loadServicePage(serviceParameterCategory, (servicePage.number - 1))"
-                        v-on:next-page="loadServicePage(serviceParameterCategory, (servicePage.number + 1))"
-                        v-on:last-page="loadServicePage(serviceParameterCategory, (servicePage.totalPages - 1))"
+                        v-on:first-page="loadServicePage(serviceParameterCategoryCandidates, 0)"
+                        v-on:previous-page="loadServicePage(serviceParameterCategoryCandidates, (servicePage.number - 1))"
+                        v-on:next-page="loadServicePage(serviceParameterCategoryCandidates, (servicePage.number + 1))"
+                        v-on:last-page="loadServicePage(serviceParameterCategoryCandidates, (servicePage.totalPages - 1))"
         />
 
         <cron-picker v-show="showCronPicker" v-on:selected="setCronExpression" v-on:cancel="showCronPicker = false"/>
@@ -85,7 +85,7 @@
                 showCronPicker: false,
                 showAdvancedParameters: false,
                 serviceParameterIndex: 0,
-                serviceParameterCategory: null,
+                serviceParameterCategoryCandidates: null,
                 cronParameterIndex: 0,
                 parameterValidationErrors: [],
                 parameterInputTypes: [],
@@ -170,14 +170,20 @@
                     this.$set(this.parameterInputTypes, index, 'password')
                 }
             },
-            openServicePicker: async function (index, serviceCategory) {
+            openServicePicker: async function (index, serviceCategoryCandidates) {
                 this.serviceParameterIndex = index
-                this.serviceParameterCategory = serviceCategory
-                await this.loadServicePage(serviceCategory, 0)
+                this.serviceParameterCategoryCandidates = serviceCategoryCandidates
+                await this.loadServicePage(serviceCategoryCandidates, 0)
                 this.showServicePicker = true
             },
-            loadServicePage: async function (serviceCategory, pageNumber) {
-                this.servicePage = await IgorBackend.getData('/api/service/category/' + serviceCategory + '?pageNumber=' + pageNumber +
+            loadServicePage: async function (serviceCategoryCandidates, pageNumber) {
+                let typeIds = '';
+                serviceCategoryCandidates.forEach(categoryCandidate => {
+                    categoryCandidate.typeCandidates.forEach(typeCandidate => {
+                        typeIds += btoa(typeCandidate.key) + ","
+                    })
+                });
+                this.servicePage = await IgorBackend.getData('/api/service/candidate/' + typeIds + '?pageNumber=' + pageNumber +
                     '&pageSize=' + this.servicePage.size)
             },
             setSelectedService: function (service) {
@@ -186,7 +192,7 @@
                 this.showServicePicker = false
             },
             createService: function () {
-                this.$emit('create-service', this.serviceParameterIndex, this.serviceParameterCategory)
+                this.$emit('create-service', this.serviceParameterIndex, this.serviceParameterCategoryCandidates)
             },
             openCronPicker: function (index) {
                 this.cronParameterIndex = index

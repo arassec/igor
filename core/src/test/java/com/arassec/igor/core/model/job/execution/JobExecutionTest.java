@@ -1,6 +1,6 @@
 package com.arassec.igor.core.model.job.execution;
 
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -47,8 +47,8 @@ class JobExecutionTest {
 
         jobExecution = new JobExecution();
 
-        jobExecution.fail(new ServiceException("test"));
-        assertTrue(jobExecution.getErrorCause().startsWith("com.arassec.igor.core.model.service.ServiceException: test"));
+        jobExecution.fail(new IgorException("test"));
+        assertTrue(jobExecution.getErrorCause().startsWith("com.arassec.igor.core.util.IgorException: test"));
     }
 
     /**

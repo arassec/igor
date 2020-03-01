@@ -3,6 +3,7 @@ package com.arassec.igor.web.simulation;
 import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.model.service.Service;
 import org.mockito.Mockito;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -38,7 +39,7 @@ public class ServiceProxy implements InvocationHandler {
      */
     @Override
     public Object invoke(Object o, Method method, Object[] arguments) throws Throwable {
-        if (method.isAnnotationPresent(IgorSimulationSafe.class)) {
+        if (AnnotationUtils.findAnnotation(method, IgorSimulationSafe.class) != null) {
             return method.invoke(service, arguments);
         }
         return method.invoke(serviceMock, arguments);

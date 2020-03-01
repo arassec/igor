@@ -5,7 +5,7 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
@@ -152,7 +152,7 @@ class JobManagerTest {
 
         when(jobRepository.upsert(eq(job))).thenReturn(job);
 
-        assertThrows(ServiceException.class, () -> jobManager.save(job));
+        assertThrows(IgorException.class, () -> jobManager.save(job));
 
         when(scheduledFuture.cancel(eq(true))).thenReturn(true);
 

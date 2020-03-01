@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -73,21 +74,21 @@ public class ServiceManager {
     }
 
     /**
-     * Loads all service of a given category.
+     * Loads all service of given types.
      *
-     * @param categoryId   The category to filter services with.
+     * @param typeIds    The types to filter services with.
      * @param pageNumber The page to load.
      * @param pageSize   The size of the page.
      *
      * @return List of services in the category.
      */
-    public ModelPage<Service> loadAllOfCategory(String categoryId, int pageNumber, int pageSize) {
-        if (categoryId == null) {
+    public ModelPage<Service> loadAllOfType(Set<String> typeIds, int pageNumber, int pageSize) {
+        if (typeIds == null || typeIds.isEmpty()) {
             return new ModelPage<>(0, 0, 0, List.of());
         }
         List<Service> services = serviceRepository.findAll();
         List<Service> allOfType = services.stream()
-                .filter(service -> categoryId.equals(service.getCategoryId()))
+                .filter(service -> typeIds.contains(service.getTypeId()))
                 .sorted(Comparator.comparing(Service::getName)).collect(Collectors.toList());
         return ModelPageHelper.getModelPage(allOfType, pageNumber, pageSize);
     }

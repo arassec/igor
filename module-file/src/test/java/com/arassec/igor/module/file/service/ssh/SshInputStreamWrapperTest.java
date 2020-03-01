@@ -1,6 +1,6 @@
 package com.arassec.igor.module.file.service.ssh;
 
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,9 +61,9 @@ class SshInputStreamWrapperTest {
 
         when(inputStreamMock.read(eq(buffer), eq(0), anyInt())).thenReturn(-1);
 
-        assertThrows(ServiceException.class, () -> wrapper.read(buffer, 0, 1));
-        assertThrows(ServiceException.class, () -> wrapper.read(buffer, 0, 2));
-        assertThrows(ServiceException.class, () -> wrapper.read(buffer, 0, 3));
+        assertThrows(IgorException.class, () -> wrapper.read(buffer, 0, 1));
+        assertThrows(IgorException.class, () -> wrapper.read(buffer, 0, 2));
+        assertThrows(IgorException.class, () -> wrapper.read(buffer, 0, 3));
     }
 
     /**

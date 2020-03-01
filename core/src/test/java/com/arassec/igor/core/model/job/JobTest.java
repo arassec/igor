@@ -2,7 +2,7 @@ package com.arassec.igor.core.model.job;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
-import com.arassec.igor.core.model.service.ServiceException;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.model.trigger.Trigger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -157,7 +157,7 @@ class JobTest {
 
         job.getTasks().add(taskMock);
 
-        doThrow(new ServiceException("wanted-test-exception")).when(taskMock).run(eq("job-id"), eq(jobExecution));
+        doThrow(new IgorException("wanted-test-exception")).when(taskMock).run(eq("job-id"), eq(jobExecution));
 
         job.run(jobExecution);
 
