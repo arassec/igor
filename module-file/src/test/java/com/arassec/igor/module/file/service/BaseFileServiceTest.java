@@ -1,19 +1,21 @@
 package com.arassec.igor.module.file.service;
 
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
+import com.arassec.igor.core.util.IgorException;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests the {@link BaseFileService}.
@@ -47,10 +49,69 @@ class BaseFileServiceTest {
 
         WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor("copy-stream-test");
 
+        baseFileService.setStreamCopyBufferSize(1024*1024);
+
         baseFileService.copyStream(inputStream, outputStream, 10, workInProgressMonitor);
 
         assertEquals(100, workInProgressMonitor.getProgressInPercent());
         assertEquals("1234567890", outputStream.toString());
+    }
+
+    /**
+     * Tests copying streams with content larger than the configured buffer size.
+     */
+    @Test
+    @DisplayName("Tests copying stream with a small buffer.")
+    void testCopyStreamSmallBuffer() {
+        InputStream inputStream = new ByteArrayInputStream("1234567890".getBytes());
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor("copy-stream-test");
+
+        baseFileService.setStreamCopyBufferSize(2);
+
+        baseFileService.copyStream(inputStream, outputStream, 10, workInProgressMonitor);
+
+        assertEquals(100, workInProgressMonitor.getProgressInPercent());
+        assertEquals("1234567890", outputStream.toString());
+    }
+
+    /**
+     * Tests exception handling during stream copy.
+     */
+    @Test
+    @DisplayName("Tests exception handling during stream copy.")
+    @SneakyThrows
+    void testCopyStreamFail() {
+        InputStream inputStreamMock = mock(InputStream.class);
+        when(inputStreamMock.read(any(byte[].class), eq(0), anyInt())).thenThrow(new IOException("base-file-service" +
+                "-test-exception"));
+
+        assertThrows(IgorException.class, () -> baseFileService.copyStream(inputStreamMock, null, 100,
+                new WorkInProgressMonitor("test")));
+
+        when(inputStreamMock.read(any(byte[].class), eq(0), anyInt())).thenReturn(-1);
+
+        assertThrows(IgorException.class, () -> baseFileService.copyStream(inputStreamMock, null, 100,
+                new WorkInProgressMonitor("test")));
+    }
+
+    /**
+     * Tests formatting an instance.
+     */
+    @Test
+    @DisplayName("Tests formatting an instance.")
+    void testFormatInstance() {
+        assertNull(baseFileService.formatInstant(null));
+
+        // Check that a timezone changes the formatted instance:
+        Instant now = Instant.now();
+        String formattedWithoutTimezone = baseFileService.formatInstant(now);
+
+        baseFileService.setTimezone("Pacific/Honolulu");
+        String formattedWithTimezone = baseFileService.formatInstant(now);
+
+        assertNotEquals(formattedWithoutTimezone, formattedWithTimezone);
     }
 
 }

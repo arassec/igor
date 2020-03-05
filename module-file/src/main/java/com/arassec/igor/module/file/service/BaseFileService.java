@@ -31,6 +31,11 @@ public abstract class BaseFileService extends BaseService implements FileService
     private String timezone;
 
     /**
+     * Configures the buffer size for copying streams.
+     */
+    private int streamCopyBufferSize = 1024 * 1024;
+
+    /**
      * Creates a new component instance.
      *
      * @param typeId The type ID.
@@ -57,7 +62,7 @@ public abstract class BaseFileService extends BaseService implements FileService
     protected void copyStream(InputStream in, OutputStream out, long fileSize, WorkInProgressMonitor workInProgressMonitor) {
         try {
             long totalSize = fileSize;
-            byte[] buf = new byte[1024 * 1024];
+            byte[] buf = new byte[streamCopyBufferSize];
             int foo;
             while (true) {
                 if (buf.length < fileSize) {
