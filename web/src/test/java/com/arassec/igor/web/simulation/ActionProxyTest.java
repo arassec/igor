@@ -1,5 +1,6 @@
 package com.arassec.igor.web.simulation;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import org.junit.jupiter.api.DisplayName;
@@ -46,12 +47,19 @@ class ActionProxyTest {
         List<Map<String, Object>> data = List.of(Map.of("test", "output"));
         JobExecution jobExecution = new JobExecution();
 
-        when(actionMock.process(anyMap(), eq(jobExecution))).thenReturn(data);
+        Map<String, Object> inputData = new HashMap<>();
+        inputData.put("test", "input");
+        inputData.put(DataKey.SIMULATION_LOG.getKey(), "simulation-log");
 
-        List<Map<String, Object>> resultData = actionProxy.process(Map.of("test", "input"), jobExecution);
+        when(actionMock.process(eq(inputData), eq(jobExecution))).thenReturn(data);
+
+        List<Map<String, Object>> resultData = actionProxy.process(inputData, jobExecution);
 
         assertEquals(data, resultData);
         assertEquals(actionProxy.getCollectedData(), resultData);
+
+        // simulation-log must be removed from the input data!
+        assertFalse(inputData.containsKey(DataKey.SIMULATION_LOG.getKey()));
     }
 
     /**

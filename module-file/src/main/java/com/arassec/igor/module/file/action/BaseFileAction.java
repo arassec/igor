@@ -76,7 +76,7 @@ public abstract class BaseFileAction extends BaseAction {
 
         if (resolvedFilename == null) {
             if (isSimulation(data)) {
-                data.put(DataKey.SIMULATION_LOG.getKey(), "Couldn't resolve file variable: " + filename);
+                data.put(DataKey.SIMULATION_LOG.getKey(), "Couldn't resolve variable: " + filename);
             }
             return null;
         }

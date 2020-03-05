@@ -1,8 +1,11 @@
 package com.arassec.igor.web.simulation;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.StacktraceFormatter;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,6 +29,11 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
      * The collected Data.
      */
     private List<Map<String, Object>> collectedData = new LinkedList<>();
+
+    /**
+     * Object-Mapper to create deep copies of processed data.
+     */
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Creates a new proxy instance.
@@ -59,10 +67,12 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
+        data.remove(DataKey.SIMULATION_LOG.getKey());
         try {
             List<Map<String, Object>> resultData = delegate.process(data, jobExecution);
             if (resultData != null) {
-                collectedData.addAll(resultData);
+                collectedData.addAll(objectMapper.readValue(objectMapper.writeValueAsString(resultData), new TypeReference<>() {
+                }));
             }
             return resultData;
         } catch (Exception e) {
@@ -80,8 +90,9 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
     public List<Map<String, Object>> complete() {
         try {
             List<Map<String, Object>> resultData = delegate.complete();
-            if (resultData != null && !resultData.isEmpty()) {
-                resultData.forEach(data -> collectedData.addAll(resultData));
+            if (resultData != null) {
+                collectedData.addAll(objectMapper.readValue(objectMapper.writeValueAsString(resultData), new TypeReference<>() {
+                }));
             }
             return resultData;
         } catch (Exception e) {
