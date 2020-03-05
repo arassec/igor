@@ -120,5 +120,6 @@
       ]
     }
   ],
-  "running": false
+  "running": false,
+  "faultTolerant": false
 }

@@ -49,5 +49,6 @@
         }
       ]
     }
-  ]
+  ],
+  "faultTolerant": false
 }

@@ -35,6 +35,13 @@
                                v-model.number="jobConfiguration.executionHistoryLimit"/>
                     </td>
                 </tr>
+                <tr v-show="showAdvancedParameters">
+                    <td><label for="faulttolerant-input">Fault tolerant</label></td>
+                    <td>
+                        <font-awesome-icon id="faulttolerant-input" :icon="jobConfiguration.faultTolerant ? 'check-square' : 'square'"
+                                           v-on:click="jobConfiguration.faultTolerant = !jobConfiguration.faultTolerant"/>
+                    </td>
+                </tr>
                 <tr>
                     <td>
                         <font-awesome-icon class="arrow"

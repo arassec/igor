@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.util.ModelPage;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,10 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -189,6 +187,42 @@ public class JobExecutorTest {
 
         assertNull(jobExecutor.getJobExecution("unknown-job-id"));
         assertEquals(jobExecution, jobExecutor.getJobExecution("job-id"));
+    }
+
+    /**
+     * Tests a fault-tolerant job.
+     */
+    @Test
+    @DisplayName("Tests a fault-tolerant job.")
+    @SneakyThrows
+    void testFaultTolerantJob() {
+        Job job = new Job();
+        job.setId("job-id");
+        job.setFaultTolerant(true);
+
+        JobExecution jobExecution = new JobExecution();
+        jobExecution.setExecutionState(JobExecutionState.FINISHED);
+
+        job.setCurrentJobExecution(jobExecution);
+
+        Map<String, Job> runningJobs = new HashMap<>();
+        runningJobs.put("job-id", job);
+
+        @SuppressWarnings("unchecked")
+        Future<Job> jobFuture = mock(Future.class);
+        when(jobFuture.isDone()).thenReturn(true);
+        when(jobFuture.get()).thenReturn(job);
+
+        List<Future<Job>> runningJobFutures = new LinkedList<>();
+        runningJobFutures.add(jobFuture);
+
+        ReflectionTestUtils.setField(jobExecutor, "runningJobs", runningJobs);
+        ReflectionTestUtils.setField(jobExecutor, "runningJobFutures", runningJobFutures);
+
+        jobExecutor.update();
+
+        verify(jobExecutionRepository, times(1)).updateAllJobExecutionsOfJob(eq("job-id"),
+                eq(JobExecutionState.FAILED), eq(JobExecutionState.RESOLVED));
     }
 
 }

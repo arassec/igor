@@ -82,6 +82,12 @@ public class Job {
     private boolean running = false;
 
     /**
+     * Indicates whether a successful job run compensates previous failures or not.
+     */
+    @Builder.Default
+    private boolean faultTolerant = false;
+
+    /**
      * Runs the job.
      */
     public void run(JobExecution jobExecution) {

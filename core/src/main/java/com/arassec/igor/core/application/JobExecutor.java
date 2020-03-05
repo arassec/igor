@@ -158,6 +158,10 @@ public class JobExecutor {
             if (jobFuture.isDone()) {
                 Job job = jobFuture.get();
                 JobExecution jobExecution = job.getCurrentJobExecution();
+                if (JobExecutionState.FINISHED.equals(jobExecution.getExecutionState())
+                        && job.isFaultTolerant()) {
+                    jobExecutionRepository.updateAllJobExecutionsOfJob(job.getId(), JobExecutionState.FAILED, JobExecutionState.RESOLVED);
+                }
                 jobExecutionRepository.upsert(jobExecution);
                 runningJobs.remove(job.getId());
                 return true;
