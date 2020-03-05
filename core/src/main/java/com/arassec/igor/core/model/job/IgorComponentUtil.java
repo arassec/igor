@@ -61,11 +61,11 @@ class IgorComponentUtil {
      */
     private static void processField(IgorComponent igorComponent, String jobId, String taskId, JobExecution jobExecution,
                                      Field field, boolean initialize) {
-        if (field.isAnnotationPresent(IgorParam.class) && Service.class.isAssignableFrom(field.getType())) {
+        if (field.isAnnotationPresent(IgorParam.class)) {
             try {
                 ReflectionUtils.makeAccessible(field);
                 Object value = field.get(igorComponent);
-                if (value != null) {
+                if (value instanceof Service) {
                     if (initialize) {
                         ((Service) value).initialize(jobId, taskId, jobExecution);
                     } else {

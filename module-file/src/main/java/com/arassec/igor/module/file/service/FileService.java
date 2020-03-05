@@ -2,7 +2,6 @@ package com.arassec.igor.module.file.service;
 
 import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.model.service.Service;
 
 import java.io.InputStream;
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.List;
 /**
  * Interface for file based services.
  */
-public interface FileService extends Service {
+public interface FileService {
 
     /**
      * Returns the names of all files in the specified directory, including the supplied directory in the name.

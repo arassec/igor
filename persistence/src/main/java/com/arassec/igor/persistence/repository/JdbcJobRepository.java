@@ -259,11 +259,10 @@ public class JdbcJobRepository implements JobRepository {
 
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
             if (field.isAnnotationPresent(IgorParam.class)) {
-                boolean isService = Service.class.isAssignableFrom(field.getType());
                 try {
                     ReflectionUtils.makeAccessible(field);
                     Object value = field.get(instance);
-                    if (isService && value != null) {
+                    if (value instanceof Service) {
                         result.add(((Service) value).getId());
                     }
                 } catch (IllegalAccessException e) {

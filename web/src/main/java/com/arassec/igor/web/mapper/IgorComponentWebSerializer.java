@@ -127,9 +127,10 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                 jsonGenerator.writeBooleanField(WebMapperKey.OPTIONAL.getKey(), annotation.optional());
                 jsonGenerator.writeStringField(WebMapperKey.SUBTYPE.getKey(), annotation.subtype().name());
 
-                boolean isService = Service.class.isAssignableFrom(field.getType());
-                if (isService) {
-                    writeServiceParameter(jsonGenerator, field, value);
+                Map<String, Set<String>> candidates = igorComponentRegistry.getServiceParameterCategoryAndType(field.getType());
+
+                if (!candidates.isEmpty()) {
+                    writeServiceParameter(jsonGenerator, value, candidates);
                 } else {
                     jsonGenerator.writeStringField(WebMapperKey.TYPE.getKey(), field.getType().getName());
                     if (value instanceof String && StringUtils.isEmpty(value)) {
@@ -152,14 +153,12 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      * Writes a service parameter as JSON.
      *
      * @param jsonGenerator The json generator to create the JSON.
-     * @param field         The service parameter of the component.
      * @param value         The value of the parameter.
+     * @param candidates    The possible service implementations that can be used as parameter values.
      *
      * @throws IOException If the parameter could not be written.
      */
-    private void writeServiceParameter(JsonGenerator jsonGenerator, Field field, Object value) throws IOException {
-        Map<String, Set<String>> candidates = igorComponentRegistry.getParameterCategoryAndType(field.getType());
-
+    private void writeServiceParameter(JsonGenerator jsonGenerator, Object value, Map<String, Set<String>> candidates) throws IOException {
         List<KeyLabelStore> categories = new LinkedList<>();
         candidates.keySet().forEach(candidate -> categories.add(new KeyLabelStore(candidate, messageSource.getMessage(candidate,
                 null, LocaleContextHolder.getLocale()))));

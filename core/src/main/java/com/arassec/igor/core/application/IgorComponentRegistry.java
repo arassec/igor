@@ -183,14 +183,14 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     }
 
     /**
-     * Returns all valid categories and types of components that can be used as parameter values for the supplied parameter
+     * Returns all valid categories and types of services that can be used as parameter values for the supplied parameter
      * class.
      *
      * @param parameterClass The class of the parameter.
      *
      * @return List of components that can be assigned to the parameter.
      */
-    public Map<String, Set<String>> getParameterCategoryAndType(Class<?> parameterClass) {
+    public Map<String, Set<String>> getServiceParameterCategoryAndType(Class<?> parameterClass) {
         Map<String, Set<String>> result = new HashMap<>();
         if (parameterClass != null) {
             services.stream()

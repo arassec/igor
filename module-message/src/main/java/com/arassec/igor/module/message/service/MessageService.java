@@ -1,11 +1,9 @@
 package com.arassec.igor.module.message.service;
 
-import com.arassec.igor.core.model.service.Service;
-
 /**
  * Interface for message related services.
  */
-public interface MessageService extends Service {
+public interface MessageService {
 
     /**
      * Sends the supplied message.

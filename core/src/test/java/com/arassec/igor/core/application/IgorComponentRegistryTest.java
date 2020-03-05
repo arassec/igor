@@ -167,18 +167,18 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting all component candidates for a parameter class.")
     void testGetParameterCategoryAndType() {
-        assertTrue(igorComponentRegistry.getParameterCategoryAndType(String.class).isEmpty());
+        assertTrue(igorComponentRegistry.getServiceParameterCategoryAndType(String.class).isEmpty());
 
         TestServiceImpl expected = new TestServiceImpl();
 
         // The interface works...
-        Map<String, Set<String>> candidates = igorComponentRegistry.getParameterCategoryAndType(TestService.class);
+        Map<String, Set<String>> candidates = igorComponentRegistry.getServiceParameterCategoryAndType(TestService.class);
         assertEquals(1, candidates.size());
         assertEquals(1, candidates.get(expected.getCategoryId()).size());
         assertEquals(expected.getTypeId(), candidates.get(expected.getCategoryId()).iterator().next());
 
         // ...as well as the concrete implementation.
-        candidates = igorComponentRegistry.getParameterCategoryAndType(TestServiceImpl.class);
+        candidates = igorComponentRegistry.getServiceParameterCategoryAndType(TestServiceImpl.class);
         assertEquals(1, candidates.size());
         assertEquals(1, candidates.get(expected.getCategoryId()).size());
         assertEquals(expected.getTypeId(), candidates.get(expected.getCategoryId()).iterator().next());

@@ -68,7 +68,7 @@ class ParametersRestControllerTest extends BaseRestControllerTest {
     @SneakyThrows(Exception.class)
     void testGetActionParameters() {
         when(igorComponentRegistry.createActionInstance(eq("type-id"), isNull())).thenReturn(new TestAction());
-        when(igorComponentRegistry.getParameterCategoryAndType(eq(TestServiceInterface.class))).thenReturn(
+        when(igorComponentRegistry.getServiceParameterCategoryAndType(eq(TestServiceInterface.class))).thenReturn(
                 Map.of("two", Set.of("three", "b"), "one", Set.of("four")));
 
         MvcResult mvcResult = mockMvc.perform(get("/api/parameters/action/type-id")).andExpect(status().isOk()).andReturn();

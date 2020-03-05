@@ -98,7 +98,7 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
         }
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), field.getName());
-        if (Service.class.isAssignableFrom(field.getType()) && value instanceof Service) {
+        if (value instanceof Service) {
             jsonGenerator.writeStringField(PersistenceMapperKey.VALUE.getKey(), ((Service) value).getId());
             jsonGenerator.writeBooleanField(PersistenceMapperKey.SERVICE.getKey(), true);
         } else {
