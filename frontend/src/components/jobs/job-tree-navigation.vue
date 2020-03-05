@@ -3,8 +3,8 @@
         <ul>
             <li>
                 <span class="item truncate"
-                     v-bind:class="getJobStyleClass()"
-                     v-on:click="$emit('job-is-selected')">
+                      v-bind:class="getJobStyleClass()"
+                      v-on:click="$emit('job-is-selected')">
                     <font-awesome-icon icon="toolbox"/>
                     <span>
                                 {{jobConfiguration.name.length > 0 ? jobConfiguration.name : 'Unnamed Job'}}
@@ -14,8 +14,8 @@
                     <li v-for="(task, taskIndex) in jobConfiguration.tasks"
                         v-bind:key="taskIndex">
                         <span class="item truncate width-360"
-                             v-bind:class="getTaskStyleClass(taskIndex, task)"
-                             v-on:click="$emit('task-is-selected', taskIndex)">
+                              v-bind:class="getTaskStyleClass(taskIndex, task)"
+                              v-on:click="$emit('task-is-selected', taskIndex)">
                             <font-awesome-icon icon="tasks"/>
                             <span class="width-300">
                                         {{task.name.length > 0 ? task.name : 'Unnamed Task'}}
@@ -34,12 +34,12 @@
                         <ul>
                             <li v-for="(action, actionIndex) in task.actions"
                                 v-bind:key="actionIndex">
-                                <span class="item truncate width-360"
-                                     v-bind:class="getActionStyleClass(taskIndex, actionIndex, task, action)"
-                                     v-on:click="$emit('action-is-selected', taskIndex, actionIndex)">
+                                <span class="item"
+                                      v-bind:class="getActionStyleClass(taskIndex, actionIndex, task, action)"
+                                      v-on:click="$emit('action-is-selected', taskIndex, actionIndex)">
                                     <font-awesome-icon icon="wrench"/>
                                     <span>
-                                                {{ action.type.value}}
+                                                {{ action.name.length > 0 ? action.name : action.type.value }}
                                             </span>
                                     <font-awesome-icon icon="arrow-up" class="fa-xs"
                                                        v-if="actionIndex > 0"
@@ -63,7 +63,8 @@
                         </ul>
                     </li>
                     <li>
-                        <div class="item truncate width-360" :class="getAddTaskStyleClass()" v-on:click="$emit('add-task')">
+                        <div class="item truncate width-360" :class="getAddTaskStyleClass()"
+                             v-on:click="$emit('add-task')">
                             <font-awesome-icon :icon="['fas', 'plus']"/>
                             <span>
                                         Add Task

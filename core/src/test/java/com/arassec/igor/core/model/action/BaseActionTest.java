@@ -111,4 +111,15 @@ class BaseActionTest {
         assertEquals("job-id", baseAction.getString(testData, "$." + DataKey.META.getKey() + "." + DataKey.JOB_ID.getKey()));
     }
 
+    /**
+     * Tests setting and getting the action's name.
+     */
+    @Test
+    @DisplayName("Tests setting and getting the action's name.")
+    void testSetGetName() {
+        assertNull(baseAction.getName());
+        baseAction.setName("base-action-test");
+        assertEquals("base-action-test", baseAction.getName());
+    }
+
 }

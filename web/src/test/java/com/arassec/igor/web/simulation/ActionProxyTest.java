@@ -134,4 +134,22 @@ class ActionProxyTest {
         verify(actionMock, times(1)).setActive(eq(true));
     }
 
+    /**
+     * Tests getting and setting the action's name.
+     */
+    @Test
+    @DisplayName("Tests getting and setting the action's name.")
+    void testName() {
+        Action actionMock = mock(Action.class);
+        ActionProxy actionProxy = new ActionProxy(actionMock);
+
+        actionProxy.setName("test-action-name");
+
+        verify(actionMock, times(1)).setName(eq("test-action-name"));
+
+        actionProxy.getName();
+
+        verify(actionMock, times(1)).getName();
+    }
+
 }

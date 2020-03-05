@@ -33,6 +33,7 @@
         {
           "id": "action-id",
           "typeId": "action-type-id",
+          "name": "action-name",
           "active": true,
           "parameters": [
             {

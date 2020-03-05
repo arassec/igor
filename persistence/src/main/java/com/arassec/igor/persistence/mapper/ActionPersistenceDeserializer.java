@@ -41,5 +41,8 @@ public class ActionPersistenceDeserializer extends IgorComponentPersistenceDeser
         if (map.containsKey(PersistenceMapperKey.ACTIVE.getKey())) {
             ((Action) instance).setActive((boolean) map.get(PersistenceMapperKey.ACTIVE.getKey()));
         }
+        if (map.containsKey(PersistenceMapperKey.NAME.getKey())) {
+            ((Action) instance).setName((String) map.get(PersistenceMapperKey.NAME.getKey()));
+        }
     }
 }

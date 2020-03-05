@@ -58,6 +58,7 @@ public class ObjectMapperTest extends BaseMapperTest {
 
         TestAction testAction = new TestAction();
         testAction.setId("action-id");
+        testAction.setName("action-name");
         testAction.setActive(true);
 
         TestService testService = new TestService();
@@ -122,6 +123,7 @@ public class ObjectMapperTest extends BaseMapperTest {
         TestAction testAction = (TestAction) task.getActions().get(0);
 
         assertEquals("action-id", testAction.getId());
+        assertEquals("action-name", testAction.getName());
         assertEquals(TestAction.CATEGORY_ID, testAction.getCategoryId());
         assertEquals(TestAction.TYPE_ID, testAction.getTypeId());
         assertTrue(testAction.getTestService() instanceof TestService);

@@ -30,25 +30,18 @@ public class MoveFileAction extends BaseFileAction {
     private FileService service;
 
     /**
-     * Source file to copy.
-     */
-    @NotBlank
-    @IgorParam
-    private String sourceFilename;
-
-    /**
      * Source directory to copy the file from.
      */
     @NotBlank
     @IgorParam
-    private String sourceDirectory;
+    private String sourceDirectory = DIRECTORY_QUERY;
 
     /**
-     * The target file name.
+     * Source file to copy.
      */
     @NotBlank
     @IgorParam
-    private String targetFilename;
+    private String sourceFilename = FILENAME_QUERY;
 
     /**
      * The target directory to copy/move the file to.
@@ -56,6 +49,13 @@ public class MoveFileAction extends BaseFileAction {
     @NotBlank
     @IgorParam
     private String targetDirectory;
+
+    /**
+     * The target file name.
+     */
+    @NotBlank
+    @IgorParam
+    private String targetFilename;
 
     /**
      * Creates a new component instance.

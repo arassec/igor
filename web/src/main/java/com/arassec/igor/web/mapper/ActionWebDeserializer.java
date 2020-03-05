@@ -43,6 +43,7 @@ public class ActionWebDeserializer extends IgorComponentWebDeserializer<Action> 
     protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
         super.setComponentSpecifica(instance, map);
         ((Action) instance).setActive((boolean) map.get(WebMapperKey.ACTIVE.getKey()));
+        ((Action) instance).setName((String) map.get(WebMapperKey.NAME.getKey()));
     }
 
 }

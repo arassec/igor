@@ -46,6 +46,7 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
             jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), ((Service) instance).getName());
         }
         if (instance instanceof Action) {
+            jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), ((Action) instance).getName());
             jsonGenerator.writeBooleanField(PersistenceMapperKey.ACTIVE.getKey(), ((Action) instance).isActive());
         }
         serializeParameters(instance, jsonGenerator);

@@ -155,4 +155,15 @@ class CopyFileActionTest extends FileActionBaseTest {
         assertThrows(IgorException.class, () -> action.process(createData(), new JobExecution()));
     }
 
+    /**
+     * Tests default parameter values.
+     */
+    @Test
+    @DisplayName("Tests default parameter values.")
+    void testDefaults() {
+        CopyFileAction action = new CopyFileAction();
+        assertEquals("$.data.directory", action.getSourceDirectory());
+        assertEquals("$.data.filename", action.getSourceFilename());
+    }
+
 }

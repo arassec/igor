@@ -2,6 +2,7 @@ package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.BaseAction;
+import com.arassec.igor.module.file.provider.ListFilesProvider;
 import lombok.Data;
 
 import java.util.Map;
@@ -10,6 +11,16 @@ import java.util.Map;
  * Base class for file based actions.
  */
 public abstract class BaseFileAction extends BaseAction {
+
+    /**
+     * Default-Query for the directory.
+     */
+    protected static final String DIRECTORY_QUERY = "$.data." + ListFilesProvider.DIRECTORY_KEY;
+
+    /**
+     * Default-Query for the filename.
+     */
+    protected static final String FILENAME_QUERY = "$.data." + ListFilesProvider.FILENAME_KEY;
 
     /**
      * Creates a new component instance.

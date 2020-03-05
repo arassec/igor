@@ -60,4 +60,15 @@ class DeleteFileActionTest extends FileActionBaseTest {
         assertEquals(data, processedData.get(0));
     }
 
+    /**
+     * Tests default parameter values.
+     */
+    @Test
+    @DisplayName("Tests default parameter values.")
+    void testDefaults() {
+        DeleteFileAction action = new DeleteFileAction();
+        assertEquals("$.data.directory", action.getDirectory());
+        assertEquals("$.data.filename", action.getFilename());
+    }
+
 }

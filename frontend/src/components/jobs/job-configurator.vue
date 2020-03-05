@@ -12,34 +12,35 @@
                         <font-awesome-icon :icon="jobConfiguration.active ? 'check-square' : 'square'"
                                            v-on:click="jobConfiguration.active = !jobConfiguration.active"/>
                     </td>
-                    <td/>
                 </tr>
                 <tr>
-                    <td><label>Name</label></td>
+                    <td><label>Name*</label></td>
                     <td>
-                        <input type="text" autocomplete="off" v-model="jobConfiguration.name"/>
-                    </td>
-                    <td>
-                        <validation-error v-if="nameValidationError.length > 0">
-                            {{nameValidationError}}
-                        </validation-error>
+                        <input type="text" autocomplete="off" v-model="jobConfiguration.name"
+                               :class="nameValidationError.length > 0 ? 'validation-error' : ''"
+                               :placeholder="nameValidationError.length > 0 ? nameValidationError : ''"/>
                     </td>
                 </tr>
-                <tr>
+                <tr v-show="showAdvancedParameters">
                     <td><label for="description-input">Description</label></td>
                     <td>
                         <input id="description-input" type="text" autocomplete="off"
                                v-model="jobConfiguration.description"/>
                     </td>
-                    <td/>
                 </tr>
-                <tr>
+                <tr v-show="showAdvancedParameters">
                     <td><label for="numexechistory-input">Execution-History Limit</label></td>
                     <td>
                         <input id="numexechistory-input" type="text" autocomplete="off"
                                v-model.number="jobConfiguration.executionHistoryLimit"/>
                     </td>
-                    <td/>
+                </tr>
+                <tr>
+                    <td>
+                        <font-awesome-icon class="arrow"
+                                           v-bind:icon="showAdvancedParameters ? 'chevron-up' : 'chevron-down'"
+                                           v-on:click="showAdvancedParameters = !showAdvancedParameters"/>
+                    </td>
                 </tr>
             </table>
         </core-panel>
@@ -47,7 +48,7 @@
         <core-panel>
             <h2>Trigger</h2>
             <table>
-                <tr v-if="triggerCategories.length > 1">
+                <tr>
                     <td><label>Category</label></td>
                     <td>
                         <select v-model="jobConfiguration.trigger.category"
@@ -85,17 +86,17 @@
 
 <script>
     import CorePanel from '../common/core-panel'
-    import ValidationError from '../common/validation-error'
     import ParameterEditor from '../common/parameter-editor'
     import IgorBackend from '../../utils/igor-backend.js'
 
     export default {
         name: 'job-configurator',
-        components: {ParameterEditor, ValidationError, CorePanel},
+        components: {ParameterEditor, CorePanel},
         props: ['jobConfiguration'],
         data: function () {
             return {
                 nameValidationError: '',
+                showAdvancedParameters: false,
                 triggerCategories: [],
                 triggerTypes: []
             }
@@ -143,7 +144,7 @@
                     let nameAlreadyExists = await IgorBackend.getData('/api/job/check/'
                         + btoa(this.jobConfiguration.name) + '/' + (this.jobConfiguration.id === undefined ? -1 : this.jobConfiguration.id))
                     if (nameAlreadyExists === true) {
-                        this.nameValidationError = 'A job with this name already exists!'
+                        this.nameValidationError = 'nameAlreadyExists'
                     }
                 }
 
@@ -177,5 +178,18 @@
 </script>
 
 <style scoped>
+
+    .arrow:hover {
+        cursor: pointer;
+    }
+
+    .panel .validation-error {
+        background-color: var(--alert-background-color);
+    }
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: var(--main-background-color);
+        opacity: 1; /* Firefox */
+    }
 
 </style>

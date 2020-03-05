@@ -57,4 +57,15 @@ class ReadFileActionTest extends FileActionBaseTest {
         assertEquals(data, processedData.get(0));
     }
 
+    /**
+     * Tests default parameter values.
+     */
+    @Test
+    @DisplayName("Tests default parameter values.")
+    void testDefaults() {
+        ReadFileAction action = new ReadFileAction();
+        assertEquals("$.data.directory", action.getDirectory());
+        assertEquals("$.data.filename", action.getFilename());
+    }
+
 }

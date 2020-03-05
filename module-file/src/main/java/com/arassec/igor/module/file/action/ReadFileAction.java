@@ -40,14 +40,14 @@ public class ReadFileAction extends BaseFileAction {
      */
     @NotBlank
     @IgorParam
-    private String directory;
+    private String directory = DIRECTORY_QUERY;
 
     /**
      * The name of the file.
      */
     @NotBlank
     @IgorParam
-    private String filename;
+    private String filename = FILENAME_QUERY;
 
     /**
      * Creates a new component instance.

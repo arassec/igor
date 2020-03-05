@@ -94,6 +94,22 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
      * {@inheritDoc}
      */
     @Override
+    public String getName() {
+        return delegate.getName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setName(String name) {
+        delegate.setName(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getNumThreads() {
         return delegate.getNumThreads();
     }

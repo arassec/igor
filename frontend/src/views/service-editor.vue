@@ -39,11 +39,9 @@
                     <tr>
                         <td><label>Name</label></td>
                         <td><input type="text" autocomplete="off"
-                                   v-model="serviceConfiguration.name"/></td>
-                        <td>
-                            <validation-error v-if="nameValidationError.length > 0">
-                                {{nameValidationError}}
-                            </validation-error>
+                                   v-model="serviceConfiguration.name"
+                                   :class="nameValidationError.length > 0 ? 'validation-error' : ''"
+                                   :placeholder="nameValidationError.length > 0 ? nameValidationError : ''"/>
                         </td>
                     </tr>
                     <tr>
@@ -58,7 +56,6 @@
                                 </option>
                             </select>
                         </td>
-                        <td></td>
                     </tr>
                     <tr>
                         <td><label for="type-input">Type</label></td>
@@ -71,7 +68,6 @@
                                 </option>
                             </select>
                         </td>
-                        <td></td>
                     </tr>
                 </table>
             </core-panel>
@@ -110,7 +106,6 @@
     import CoreContainer from '../components/common/core-container'
     import CoreContent from '../components/common/core-content'
     import LayoutRow from '../components/common/layout-row'
-    import ValidationError from '../components/common/validation-error'
     import SideMenu from '../components/common/side-menu'
     import FormatUtils from '../utils/format-utils.js'
     import IgorBackend from '../utils/igor-backend.js'
@@ -118,6 +113,7 @@
     import ModalDialog from "../components/common/modal-dialog";
     import FeedbackBox from "../components/common/feedback-box";
     import ListPager from "../components/common/list-pager";
+    import {store} from "../main";
 
     export default {
         name: 'service-editor',
@@ -127,7 +123,6 @@
             ModalDialog,
             BackgroundIcon,
             SideMenu,
-            ValidationError,
             LayoutRow,
             CoreContent,
             CoreContainer,
@@ -239,7 +234,7 @@
                         'Service \'' + FormatUtils.formatNameForSnackbar(this.serviceConfiguration.name) + '\' saved.',
                         'Saving failed!').then((result) => {
                         if (result === 'NAME_ALREADY_EXISTS_ERROR') {
-                            this.nameValidationError = 'A service with this name already exists!'
+                            this.nameValidationError = 'nameAlreadyExists'
                         } else {
                             this.serviceConfiguration = result;
                             this.newService = false;
@@ -282,7 +277,8 @@
                     let nameAlreadyExists = await IgorBackend.getData('/api/service/check/'
                         + btoa(this.serviceConfiguration.name) + '/' + (this.serviceConfiguration.id === undefined ? -1 : this.serviceConfiguration.id));
                     if (nameAlreadyExists === true) {
-                        this.nameValidationError = 'A service with this name already exists!'
+                        store.setFeedback('A service with this name already exists!', true)
+                        this.nameValidationError = 'nameAlreadyExists'
                     }
                 }
 
@@ -368,6 +364,15 @@
     .list-label {
         margin-bottom: 5px;
         display: inline-block;
+    }
+
+    .panel .validation-error {
+        background-color: var(--alert-background-color);
+    }
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: var(--main-background-color);
+        opacity: 1; /* Firefox */
     }
 
 </style>

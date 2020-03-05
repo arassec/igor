@@ -382,6 +382,7 @@
             addAction: function (taskIndex) {
                 let action = {
                     active: true,
+                    name: '',
                     category: this.initialActionCategory,
                     type: this.initialActionType,
                     parameters: []
@@ -513,13 +514,13 @@
                 return taskIndex == this.selectedTaskIndex && actionIndex == this.selectedActionIndex
             },
             runJob: async function () {
-                this.showRunDialog = false
-                if (!this.validateInput()) {
-                    return
+                this.showRunDialog = false;
+                let validationOk = await this.validateInput();
+                if (validationOk) {
+                    this.jobConfiguration = await IgorBackend.postData('/api/job/run', this.jobConfiguration, 'Starting job', 'Job \'' +
+                        FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' started manually.', 'Job \'' +
+                        FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' startup failed!')
                 }
-                this.jobConfiguration = await IgorBackend.postData('/api/job/run', this.jobConfiguration, 'Starting job', 'Job \'' +
-                    FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' started manually.', 'Job \'' +
-                    FormatUtils.formatNameForSnackbar(this.jobConfiguration.name) + '\' startup failed!')
             },
             updateJobExecutions: async function () {
                 if (this.jobConfiguration.id) {

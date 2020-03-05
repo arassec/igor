@@ -74,6 +74,7 @@
       "actions": [
         {
           "id": "action-id",
+          "name": "action-name",
           "active": true,
           "category": {
             "key": "action-category-id",

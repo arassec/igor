@@ -13,32 +13,27 @@
                         <font-awesome-icon :icon="task.active ? 'check-square' : 'square'"
                                            v-on:click="task.active = !task.active"/>
                     </td>
-                    <td/>
                 </tr>
                 <tr>
-                    <td><label>Name</label></td>
+                    <td><label>Name*</label></td>
                     <td>
-                        <input type="text" autocomplete="off" v-model="task.name"/>
-                    </td>
-                    <td>
-                        <validation-error v-if="nameValidationError.length > 0">
-                            {{nameValidationError}}
-                        </validation-error>
+                        <input type="text" autocomplete="off" v-model="task.name"
+                               :class="nameValidationError.length > 0 ? 'validation-error' : ''"
+                               :placeholder="nameValidationError.length > 0 ? nameValidationError : ''"/>
                     </td>
                 </tr>
-                <tr>
+                <tr v-show="showAdvancedParameters">
                     <td><label>Description</label></td>
                     <td>
                         <input type="text" autocomplete="off" v-model="task.description"/>
                     </td>
-                    <td/>
                 </tr>
                 <tr>
-                    <td><label>Simulation limit</label></td>
                     <td>
-                        <input type="text" autocomplete="off" v-model.number="task.simulationLimit"/>
+                        <font-awesome-icon class="arrow"
+                                           v-bind:icon="showAdvancedParameters ? 'chevron-up' : 'chevron-down'"
+                                           v-on:click="showAdvancedParameters = !showAdvancedParameters"/>
                     </td>
-                    <td/>
                 </tr>
             </table>
         </core-panel>
@@ -83,94 +78,107 @@
 </template>
 
 <script>
-    import ValidationError from '../common/validation-error'
     import ParameterEditor from '../common/parameter-editor'
     import CorePanel from '../common/core-panel'
     import IgorBackend from '../../utils/igor-backend.js'
 
     export default {
-  name: 'task-configurator',
-  components: {CorePanel, ParameterEditor, ValidationError},
-  props: ['task', 'taskKey'],
-  data: function () {
-    return {
-      nameValidationError: '',
-      providerCategories: [],
-      providerTypes: []
-    }
-  },
-  methods: {
-    loadCategories: async function () {
-      await IgorBackend.getData('/api/category/provider').then((categories) => {
-        for (let i = this.providerCategories.length; i > 0; i--) {
-          this.providerCategories.pop()
-        }
-        let component = this
-        Array.from(categories).forEach(function (item) {
-          component.providerCategories.push(item)
-        })
-      })
-    },
-    loadTypesOfCategory: async function (categoryKey, selectFirst) {
-      await IgorBackend.getData('/api/type/' + categoryKey).then((types) => {
-        for (let i = this.providerTypes.length; i > 0; i--) {
-          this.providerTypes.pop()
-        }
-        let component = this
-        Array.from(types).forEach(function (item) {
-          component.providerTypes.push(item)
-        })
-        if (selectFirst) {
-          this.task.provider.type = this.providerTypes[0]
-        }
-      })
-    },
-    loadParametersOfType: function (typeKey) {
-      IgorBackend.getData('/api/parameters/provider/' + typeKey).then((parameters) => {
-        this.task.provider.parameters = parameters
-      })
-    },
-    validateInput: function () {
-      this.nameValidationError = ''
+        name: 'task-configurator',
+        components: {CorePanel, ParameterEditor},
+        props: ['task', 'taskKey'],
+        data: function () {
+            return {
+                nameValidationError: '',
+                showAdvancedParameters: false,
+                providerCategories: [],
+                providerTypes: []
+            }
+        },
+        methods: {
+            loadCategories: async function () {
+                await IgorBackend.getData('/api/category/provider').then((categories) => {
+                    for (let i = this.providerCategories.length; i > 0; i--) {
+                        this.providerCategories.pop()
+                    }
+                    let component = this
+                    Array.from(categories).forEach(function (item) {
+                        component.providerCategories.push(item)
+                    })
+                })
+            },
+            loadTypesOfCategory: async function (categoryKey, selectFirst) {
+                await IgorBackend.getData('/api/type/' + categoryKey).then((types) => {
+                    for (let i = this.providerTypes.length; i > 0; i--) {
+                        this.providerTypes.pop()
+                    }
+                    let component = this
+                    Array.from(types).forEach(function (item) {
+                        component.providerTypes.push(item)
+                    })
+                    if (selectFirst) {
+                        this.task.provider.type = this.providerTypes[0]
+                    }
+                })
+            },
+            loadParametersOfType: function (typeKey) {
+                IgorBackend.getData('/api/parameters/provider/' + typeKey).then((parameters) => {
+                    this.task.provider.parameters = parameters
+                })
+            },
+            validateInput: function () {
+                this.nameValidationError = ''
 
-      let nameValidationResult = true
-      if (this.task.name == null || this.task.name === '') {
-        this.nameValidationError = 'Name must be set'
-        nameValidationResult = false
-      }
+                let nameValidationResult = true
+                if (this.task.name == null || this.task.name === '') {
+                    this.nameValidationError = 'Name must be set'
+                    nameValidationResult = false
+                }
 
-      let parameterValidationResult = true
-      if (typeof this.$refs.parameterEditor !== 'undefined') {
-        parameterValidationResult = this.$refs.parameterEditor.validateInput()
-      }
+                let parameterValidationResult = true
+                if (typeof this.$refs.parameterEditor !== 'undefined') {
+                    parameterValidationResult = this.$refs.parameterEditor.validateInput()
+                }
 
-      return (nameValidationResult && parameterValidationResult)
-    },
-    createService: function (parameterIndex, serviceCategoryCandidates) {
-      this.$emit('create-service', this.taskKey, parameterIndex, serviceCategoryCandidates)
-    }
-  },
-  watch: {
-    task: function() {
-      // When an action is moved in the tree-navigation, the vue-model changes for the component!
-      this.loadCategories().then(() => {
-        this.loadTypesOfCategory(this.task.provider.category.key, false)
-      })
-    }
-  },
-  mounted () {
-    this.loadCategories().then(() => {
-      this.loadTypesOfCategory(this.task.provider.category.key, false).then(() => {
-        // Don't load type parameters if they are provided within the component's model:
-        if (!(Array.isArray(this.task.provider.parameters) && this.task.provider.parameters.length)) {
-          this.loadParametersOfType(this.task.provider.type.key)
+                return (nameValidationResult && parameterValidationResult)
+            },
+            createService: function (parameterIndex, serviceCategoryCandidates) {
+                this.$emit('create-service', this.taskKey, parameterIndex, serviceCategoryCandidates)
+            }
+        },
+        watch: {
+            task: function () {
+                // When an action is moved in the tree-navigation, the vue-model changes for the component!
+                this.loadCategories().then(() => {
+                    this.loadTypesOfCategory(this.task.provider.category.key, false)
+                })
+            }
+        },
+        mounted() {
+            this.loadCategories().then(() => {
+                this.loadTypesOfCategory(this.task.provider.category.key, false).then(() => {
+                    // Don't load type parameters if they are provided within the component's model:
+                    if (!(Array.isArray(this.task.provider.parameters) && this.task.provider.parameters.length)) {
+                        this.loadParametersOfType(this.task.provider.type.key)
+                    }
+                })
+            })
         }
-      })
-    })
-  }
-}
+    }
 </script>
 
 <style scoped>
+
+    .arrow:hover {
+        cursor: pointer;
+    }
+
+    .panel .validation-error {
+        background-color: var(--alert-background-color);
+    }
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: var(--main-background-color);
+        opacity: 1; /* Firefox */
+    }
 
 </style>

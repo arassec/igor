@@ -50,6 +50,8 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      */
     protected boolean active = true;
 
+    private String name;
+
     /**
      * Defines the number of threads the action should be processed with.
      */
@@ -81,6 +83,22 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     public List<Map<String, Object>> complete() {
         // Nothing to do here...
         return List.of();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**

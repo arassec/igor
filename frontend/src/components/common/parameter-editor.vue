@@ -12,18 +12,22 @@
                     <td>
                         <input v-if="isNumber(param.type)" type="text" autocomplete="off"
                                v-model.number="param.value"
-                               :class="checkValidationError(index) ? 'validation-error' : ''"/>
+                               :class="checkValidationError(index) ? 'validation-error' : ''"
+                               :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
                         <font-awesome-icon v-else-if="isBoolean(param.type)"
                                            :icon="param.value ? 'check-square' : 'square'"
                                            v-on:click="param.value = !param.value"/>
                         <input v-else-if="isService(param)" :disabled="true" class="truncate"
                                v-model="param.serviceName"
-                               :class="checkValidationError(index) ? 'validation-error' : ''"/>
+                               :class="checkValidationError(index) ? 'validation-error' : ''"
+                               :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
                         <textarea v-else-if="param.subtype === 'MULTI_LINE'" v-model="param.value" rows="8" cols="41"
-                                  :class="checkValidationError(index) ? 'validation-error' : ''"/>
+                                  :class="checkValidationError(index) ? 'validation-error' : ''"
+                                  :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
                         <input v-else autocomplete="off"
                                :type="parameterInputTypes[index]" v-model.trim="param.value"
-                               :class="checkValidationError(index) ? 'validation-error' : ''"/>
+                               :class="checkValidationError(index) ? 'validation-error' : ''"
+                               :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
 
                         <input-button v-if="!isNumber(param.type) && !isBoolean(param.type) && param.secured"
                                       icon="eye" v-on:clicked="toggleCleartext(index)" class="button-margin-left"/>
@@ -35,10 +39,6 @@
                         <input-button v-else-if="param.subtype === 'CRON'" v-on:clicked="openCronPicker(index)"
                                       icon="clock"
                                       class="button-margin-left"/>
-
-                        <validation-error v-if="checkValidationError(index)">
-                            {{parameterValidationErrors[index]}}
-                        </validation-error>
 
                     </td>
                 </tr>
@@ -68,7 +68,6 @@
 </template>
 
 <script>
-    import ValidationError from './validation-error'
     import InputButton from './input-button'
     import ServicePicker from '../services/service-picker'
     import CronPicker from "./cron-picker";
@@ -76,7 +75,7 @@
 
     export default {
         name: 'parameter-editor',
-        components: {CronPicker, ServicePicker, InputButton, ValidationError},
+        components: {CronPicker, ServicePicker, InputButton},
         props: ['parameters'],
         data: function () {
             return {
@@ -252,6 +251,11 @@
         background-color: var(--element-background-color);
         border: none;
         max-width: 280px;
+    }
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: var(--main-background-color);
+        opacity: 1; /* Firefox */
     }
 
 </style>

@@ -1,9 +1,9 @@
 <template>
     <div class="sticky max-width">
-        <core-panel>
+        <core-panel class="min-height">
             <h1 class="truncate">
                 <font-awesome-icon icon="wrench"/>
-                {{ action.type.value }}
+                {{ action.name.length > 0 ? action.name : action.type.value }}
             </h1>
 
             <table>
@@ -15,6 +15,19 @@
                     </td>
                     <td/>
                 </tr>
+                <tr>
+                    <td><label>Name</label></td>
+                    <td>
+                        <input type="text" autocomplete="off" v-model="action.name"/>
+                    </td>
+                    <td/>
+                </tr>
+            </table>
+        </core-panel>
+
+        <core-panel>
+            <h2>Action</h2>
+            <table>
                 <tr>
                     <td><label>Category</label></td>
                     <td>
@@ -128,5 +141,9 @@
 </script>
 
 <style scoped>
+
+    .min-height {
+        min-height: 168px;
+    }
 
 </style>

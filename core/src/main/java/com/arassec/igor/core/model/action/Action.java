@@ -29,6 +29,20 @@ public interface Action extends IgorComponent {
     List<Map<String, Object>> complete();
 
     /**
+     * An optional name of the action.
+     *
+     * @return The action's name.
+     */
+    String getName();
+
+    /**
+     * Gives the action a name.
+     *
+     * @param name The name of the action.
+     */
+    void setName(String name);
+
+    /**
      * Returns the number of threads this action should be executed with.
      *
      * @return The number of threads.
