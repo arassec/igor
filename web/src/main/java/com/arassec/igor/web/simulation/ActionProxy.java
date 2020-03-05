@@ -67,8 +67,8 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
-        data.remove(DataKey.SIMULATION_LOG.getKey());
         try {
+            data.remove(DataKey.SIMULATION_LOG.getKey());
             List<Map<String, Object>> resultData = delegate.process(data, jobExecution);
             if (resultData != null) {
                 collectedData.addAll(objectMapper.readValue(objectMapper.writeValueAsString(resultData), new TypeReference<>() {
