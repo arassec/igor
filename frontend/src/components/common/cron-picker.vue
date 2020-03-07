@@ -12,9 +12,9 @@
             <div slot="right">The top of every hour of every day.</div>
         </feedback-box>
 
-        <feedback-box :clickable="true" v-on:feedback-clicked="$emit('selected', '*/10 * * * * *')" :align-left="true">
-            <div slot="left" class="cron-expression">"*/10 * * * * *"</div>
-            <div slot="right">Every ten seconds.</div>
+        <feedback-box :clickable="true" v-on:feedback-clicked="$emit('selected', '*/30 * * * * *')" :align-left="true">
+            <div slot="left" class="cron-expression">"*/30 * * * * *"</div>
+            <div slot="right">Every thirty seconds.</div>
         </feedback-box>
 
         <feedback-box :clickable="true" v-on:feedback-clicked="$emit('selected', '0 */15 * * * *')" :align-left="true">
