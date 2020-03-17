@@ -66,16 +66,19 @@ public class JdbcServiceRepository implements ServiceRepository {
      */
     @Override
     public Service upsert(Service service) {
-        ServiceEntity serviceEntity;
+        ServiceEntity serviceEntity = null;
 
         if (service.getId() == null) {
             service.setId(UUID.randomUUID().toString());
+        } else {
+            serviceEntity = serviceDao.findById(service.getId()).orElse(null);
+        }
+
+        if (serviceEntity == null) {
             serviceEntity = new ServiceEntity();
             serviceEntity.setId(service.getId());
-        } else {
-            serviceEntity = serviceDao.findById(service.getId())
-                    .orElseThrow(() -> new IllegalStateException("No service with " + "ID " + service.getId() + " available!"));
         }
+
         serviceEntity.setName(service.getName());
 
         try {

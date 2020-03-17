@@ -116,4 +116,22 @@
     margin: 10px;
   }
 
+  .paragraph {
+    margin-bottom: 20px;
+  }
+
+  .paragraph ul {
+    margin-top: 10px;
+    list-style-type: square;
+  }
+
+  .paragraph ul li {
+    margin-left: 45px;
+  }
+
+  .alert {
+    padding: 5px;
+    background-color: var(--alert-background-color);
+  }
+
 </style>

@@ -69,15 +69,18 @@ public class JdbcJobRepository implements JobRepository {
     public Job upsert(Job job) {
 
         // Process the job itself:
-        JobEntity jobEntity;
+        JobEntity jobEntity = null;
         if (job.getId() == null) {
             job.setId(UUID.randomUUID().toString());
+        } else {
+            jobEntity = jobDao.findById(job.getId()).orElse(null);
+        }
+
+        if (jobEntity == null) {
             jobEntity = new JobEntity();
             jobEntity.setId(job.getId());
-        } else {
-            jobEntity = jobDao.findById(job.getId()).orElseThrow(
-                    () -> new IllegalStateException("No job with ID " + job.getId() + " available!"));
         }
+
         jobEntity.setName(job.getName());
 
         // Generate IDs if necessary:

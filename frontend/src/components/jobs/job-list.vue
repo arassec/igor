@@ -1,7 +1,7 @@
 <template>
     <core-content overflow-hidden="true">
         <list-header :addButtonTarget="'job-editor'" :addButtonText="'Add Job'" :filter="filter"
-                     :filter-key="'job-list-filter'">
+                     :filter-key="'job-list-filter'" v-on:import="showImportDialog = true">
             <p slot="title">
                 <font-awesome-icon icon="toolbox"/>
                 Available Jobs
@@ -14,7 +14,11 @@
                     {{ job.name }}
                 </list-name>
                 <p slot="right" :class="!job.active ? 'inactive' : ''">
-                    <input-button v-on:clicked="duplicateJob(job.id)" icon="clone" class="button-margin-right button-margin-left"/>
+                    <input-button v-on:clicked="openExportDialog(job.id, job.name)"
+                                  class="button-margin-right button-margin-left"
+                                  icon="file-download"/>
+                    <input-button v-on:clicked="duplicateJob(job.id)" icon="clone"
+                                  class="button-margin-right"/>
                     <input-button v-on:clicked="openDeleteJobDialog(job.id, job.name)" class="button-margin-right"
                                   icon="trash-alt"/>
                     <input-button v-on:clicked="openRunJobDialog(job.id, job.name)" icon="play"
@@ -41,11 +45,31 @@
                       v-on:cancel="showRunDialog = false">
             <h1 slot="header">Start job?</h1>
             <div slot="body">
-                Manually start job <div class="truncate highlight">{{selectedJobName}}</div>now?
+                Manually start job
+                <div class="truncate highlight">{{selectedJobName}}</div>
+                now?
             </div>
             <layout-row slot="footer">
                 <input-button slot="left" v-on:clicked="showRunDialog = false" icon="times"/>
                 <input-button slot="right" v-on:clicked="runJob()" icon="check"/>
+            </layout-row>
+        </modal-dialog>
+
+        <modal-dialog v-if="showExportDialog" @close="showExportDialog = false" v-on:cancel="showExportDialog = false">
+            <h1 slot="header">Export job?</h1>
+            <div slot="body">
+                <div class="paragraph">
+                    Export job
+                    <div class="truncate highlight">{{selectedJobName}}</div>
+                    to file?
+                </div>
+                <div class="paragraph alert">
+                    WARNING: the created file will contain passwords and other sensitive information in cleartext!
+                </div>
+            </div>
+            <layout-row slot="footer">
+                <input-button slot="left" v-on:clicked="showExportDialog = false" icon="times"/>
+                <input-button slot="right" v-on:clicked="exportJob()" icon="check"/>
             </layout-row>
         </modal-dialog>
 
@@ -90,6 +114,7 @@
                 filterText: '',
                 showDeleteDialog: false,
                 showRunDialog: false,
+                showExportDialog: false,
                 selectedJobId: null,
                 selectedJobName: null
             }
@@ -128,6 +153,11 @@
                 this.selectedJobName = jobName
                 this.showRunDialog = true
             },
+            openExportDialog: function (jobId, jobName) {
+                this.selectedJobId = jobId
+                this.selectedJobName = jobName
+                this.showExportDialog = true
+            },
             deleteJob: function (deleteExclusiveServices) {
                 this.showDeleteDialog = false
                 IgorBackend.deleteData('/api/job/' + this.selectedJobId + '?deleteExclusiveServices=' + deleteExclusiveServices,
@@ -138,6 +168,18 @@
                         this.$root.$emit('reload-services')
                     }
                 })
+            },
+            exportJob: function () {
+                this.showExportDialog = false;
+                IgorBackend.getResponse('/api/transfer/job/' + this.selectedJobId).then((response) => {
+                    const url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)]))
+                    const link = document.createElement('a');
+                    link.href = url;
+                    let fileName = response.headers['content-disposition'].split("filename=")[1];
+                    link.setAttribute('download', fileName);
+                    document.body.appendChild(link);
+                    link.click();
+                });
             },
             duplicateJob: async function (id) {
                 let jobConfiguration = await IgorBackend.getData('/api/job/' + id)

@@ -16,15 +16,15 @@
             </div>
             <div class="paragraph" v-if="exclusiveServices.length > 0">
                 Delete unused services, too:
-                <font-awesome-icon :icon="deleteServices ? 'check-square' : 'square'"
-                                   v-on:click="deleteServices = !deleteServices"/>
+                <font-awesome-icon :icon="deleteJob ? 'check-square' : 'square'"
+                                   v-on:click="deleteJob = !deleteJob"/>
             </div>
         </div>
 
         <div slot="footer">
             <layout-row>
                 <input-button slot="left" v-on:clicked="$emit('cancel')" icon="times"/>
-                <input-button slot="right" v-on:clicked="deleteServices ? $emit('delete-plus') : $emit('delete')"
+                <input-button slot="right" v-on:clicked="deleteJob ? $emit('delete-plus') : $emit('delete')"
                               icon="check"/>
             </layout-row>
         </div>
@@ -44,7 +44,7 @@
         data: function () {
             return {
                 exclusiveServices: [],
-                deleteServices: false
+                deleteJob: false
             }
         },
         mounted: function () {

@@ -37,7 +37,7 @@ class ServiceRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests getting Services.")
     @SneakyThrows(Exception.class)
-    void getServices() {
+    void testGetServices() {
         MvcResult mvcResult = mockMvc.perform(get("/api/service")).andExpect(status().isOk()).andReturn();
 
         ModelPage<ServiceListEntry> result = convert(mvcResult, new TypeReference<>() {
@@ -80,7 +80,7 @@ class ServiceRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests getting all services of a certain category.")
     @SneakyThrows(Exception.class)
-    void getServicesInCategory() {
+    void testGetServicesInCategory() {
         TestService testService = new TestService();
         when(serviceManager.loadAllOfType(eq(Set.of("category-id")), eq(666), eq(1))).thenReturn(
                 new ModelPage<>(666, 1, 1, List.of(testService))
@@ -107,7 +107,7 @@ class ServiceRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Test getting a specific service.")
     @SneakyThrows(Exception.class)
-    void getService() {
+    void testGetService() {
         mockMvc.perform(get("/api/service/service-id")).andExpect(status().isNotFound());
 
         TestService testService = new TestService();
@@ -126,7 +126,7 @@ class ServiceRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests deleting a service.")
     @SneakyThrows(Exception.class)
-    void deleteService() {
+    void testDeleteService() {
         // Unused Service:
         mockMvc.perform(delete("/api/service/serviceA-id")).andExpect(status().isNoContent());
         verify(serviceManager, times(1)).deleteService(eq("serviceA-id"));
@@ -159,7 +159,7 @@ class ServiceRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests creating a service.")
     @SneakyThrows(Exception.class)
-    void createService() {
+    void testCreateService() {
         when(igorComponentRegistry.createServiceInstance(anyString(), anyMap())).thenReturn(new TestService());
 
         TestService testService = new TestService();
@@ -194,7 +194,7 @@ class ServiceRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests updating a service.")
     @SneakyThrows(Exception.class)
-    void updateService() {
+    void testUpdateService() {
         when(igorComponentRegistry.createServiceInstance(anyString(), anyMap())).thenReturn(new TestService());
 
         TestService testService = new TestService();
@@ -234,7 +234,7 @@ class ServiceRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests testing a service.")
     @SneakyThrows(Exception.class)
-    void testService() {
+    void testTestService() {
         when(igorComponentRegistry.createServiceInstance(anyString(), anyMap())).thenReturn(new TestService());
 
         mockMvc.perform(post("/api/service/test")
@@ -258,7 +258,7 @@ class ServiceRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests checking a service's name for usage by another.")
     @SneakyThrows(Exception.class)
-    void checkServiceName() {
+    void testCheckServiceName() {
         mockMvc.perform(get("/api/service/check/" + Base64.getEncoder().encodeToString("service-name".getBytes()) + "/service-id"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("false"));
@@ -284,7 +284,7 @@ class ServiceRestControllerTest extends BaseRestControllerTest {
     @Test
     @DisplayName("Tests getting all jobs that use a certain service.")
     @SneakyThrows(Exception.class)
-    void getReferencingJobs() {
+    void testGetReferencingJobs() {
         mockMvc.perform(get("/api/service/service-id/job-references")).andExpect(status().isOk())
                 .andExpect(content().string("{\"number\":0,\"size\":2147483647,\"totalPages\":0,\"items\":[]}"));
 
@@ -318,6 +318,7 @@ class ServiceRestControllerTest extends BaseRestControllerTest {
         public void testConfiguration() {
             throw new IllegalStateException("test-exception", new IllegalStateException("exception-cause"));
         }
+
     }
 
 }

@@ -13,21 +13,32 @@ export default {
       }
     }
   },
+  getResponse: async function (url) {
+    try {
+      return await window.axios.get(url)
+    } catch (error) {
+      if (error.response.data) {
+        store.setFeedback('Backend request failed! (' + error.response.data + ')', true)
+      } else {
+        store.setFeedback('Backend request failed! (' + error + ')', true)
+      }
+    }
+  },
   postData: async function (url, payload, wipMessage, successMessage, errorMessage) {
     if (wipMessage) {
       store.setWip(wipMessage)
     }
     try {
-      let response = await window.axios.post(url, payload)
-      store.setFeedback(successMessage, false)
+      let response = await window.axios.post(url, payload);
+      store.setFeedback(successMessage, false);
       return response.data
     } catch (error) {
       if (error.response.data) {
-        store.setFeedback(errorMessage + '(' + error.response.data + ')', true)
+        store.setFeedback(errorMessage + ' (' + error.response.data + ')', true)
       } else {
-        store.setFeedback(errorMessage + '(' + error + ')', true)
+        store.setFeedback(errorMessage + ' (' + error + ')', true)
       }
-      if (error.response.data === 'NAME_ALREADY_EXISTS_ERROR') {
+      if (error.response.data === "NAME_ALREADY_EXISTS_ERROR") {
         return error.response.data
       }
     } finally {

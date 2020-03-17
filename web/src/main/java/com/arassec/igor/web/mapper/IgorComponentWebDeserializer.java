@@ -73,6 +73,10 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
 
         T instance = createInstance(typeId, parameters, simulationMode);
 
+        if (instance == null) {
+            throw new IllegalStateException("Could not create instance for type-id: " + typeId);
+        }
+
         setComponentSpecifica(instance, map);
 
         return instance;

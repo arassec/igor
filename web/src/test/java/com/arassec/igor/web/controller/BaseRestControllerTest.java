@@ -62,7 +62,6 @@ public abstract class BaseRestControllerTest {
      * The {@link ObjectMapper} to convert JSON.
      */
     @Autowired
-    @Qualifier("objectMapper")
     protected ObjectMapper objectMapper;
 
     /**

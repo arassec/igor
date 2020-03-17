@@ -106,11 +106,23 @@ class JdbcServiceRepositoryTest {
         service.setId("service-id");
         service.setName("service-name");
 
-        when(serviceDao.findById(eq("service-id"))).thenReturn(Optional.empty());
-        assertThrows(IllegalStateException.class, () -> repository.upsert(service));
-
         when(persistenceServiceMapper.writeValueAsString(eq(service))).thenReturn("service-json");
 
+        // With Service-ID but without persisted service (i.e. upsert during import)
+        when(serviceDao.findById(eq("service-id"))).thenReturn(Optional.empty());
+        Service upsertedService = repository.upsert(service);
+
+        assertEquals("service-id", upsertedService.getId());
+        assertEquals("service-name", upsertedService.getName());
+
+        ArgumentCaptor<ServiceEntity> argCap = ArgumentCaptor.forClass(ServiceEntity.class);
+        verify(serviceDao, times(1)).save(argCap.capture());
+
+        assertEquals("service-id", argCap.getValue().getId());
+        assertEquals("service-name", argCap.getValue().getName());
+        assertEquals("service-json", argCap.getValue().getContent());
+
+        // "normal" upsert: provided ID and existing, persisted service:
         ServiceEntity serviceEntity = new ServiceEntity();
         when(serviceDao.findById(eq("service-id"))).thenReturn(Optional.of(serviceEntity));
 

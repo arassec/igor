@@ -128,15 +128,28 @@ class JdbcJobRepositoryTest {
 
         when(persistenceJobMapper.writeValueAsString(eq(job))).thenReturn("job-json");
 
+        // With Job-ID but without persisted job (i.e. upsert during import)
         when(jobDao.findById(eq("job-id"))).thenReturn(Optional.empty());
-        assertThrows(IllegalStateException.class, () -> repository.upsert(job));
 
+        Job upsertedJob = repository.upsert(job);
+
+        ArgumentCaptor<JobEntity> argCap = ArgumentCaptor.forClass(JobEntity.class);
+        verify(jobDao, times(1)).save(argCap.capture());
+
+        assertEquals("job-id", argCap.getValue().getId());
+        assertEquals(job.getName(), argCap.getValue().getName());
+        assertEquals("job-json", argCap.getValue().getContent());
+
+        assertEquals("job-id", upsertedJob.getId());
+        assertEquals(job.getName(), upsertedJob.getName());
+
+        // "normal" upsert: provided ID and existing, persisted job:
         when(jobDao.findById(eq("job-id"))).thenReturn(Optional.of(new JobEntity()));
 
         repository.upsert(job);
 
-        ArgumentCaptor<JobEntity> argCap = ArgumentCaptor.forClass(JobEntity.class);
-        verify(jobDao, times(1)).save(argCap.capture());
+        argCap = ArgumentCaptor.forClass(JobEntity.class);
+        verify(jobDao, times(2)).save(argCap.capture());
 
         assertEquals(job.getName(), argCap.getValue().getName());
         assertEquals("job-json", argCap.getValue().getContent());
