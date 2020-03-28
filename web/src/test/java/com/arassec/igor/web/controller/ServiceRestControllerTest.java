@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests the {@link ServiceRestController}.
  */
 @DisplayName("Service-Controller Tests")
-class ServiceRestControllerTest extends BaseRestControllerTest {
+class ServiceRestControllerTest extends RestControllerBaseTest {
 
     /**
      * Tests getting Services.

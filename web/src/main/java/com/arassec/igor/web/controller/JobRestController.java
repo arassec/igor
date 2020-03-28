@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.ModelPageHelper;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/job")
 @RequiredArgsConstructor
 @Slf4j
-public class JobRestController {
+public class JobRestController extends BaseRestController {
 
     /**
      * Manager for Jobs.
@@ -65,14 +66,30 @@ public class JobRestController {
     public ModelPage<JobListEntry> getJobs(
             @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize,
-            @RequestParam(value = "nameFilter", required = false) String nameFilter) {
+            @RequestParam(value = "nameFilter", required = false) String nameFilter,
+            @RequestParam(value = "stateFilter", required = false) JobExecutionState[] stateFilter) {
 
-        ModelPage<Job> jobsPage = jobManager.loadPage(pageNumber, pageSize, nameFilter);
+        Set<JobExecutionState> jobExecutionStateFilter = new HashSet<>();
+        if (stateFilter != null && stateFilter.length > 0) {
+            jobExecutionStateFilter = Set.of(stateFilter);
+        }
+
+        ModelPage<Job> jobsPage = jobManager.loadPage(pageNumber, pageSize, nameFilter, jobExecutionStateFilter);
         if (jobsPage != null && !jobsPage.getItems().isEmpty()) {
             ModelPage<JobListEntry> result = new ModelPage<>(pageNumber, pageSize, jobsPage.getTotalPages(), null);
 
-            result.setItems(jobsPage.getItems().stream().map(job -> new JobListEntry(job.getId(), job.getName(), job.isActive()))
-                    .collect(Collectors.toList()));
+            result.setItems(jobsPage.getItems().stream().map(job -> {
+
+                JobExecution jobExecution = job.getCurrentJobExecution();
+                if (jobExecution == null) {
+                    ModelPage<JobExecution> jobExecutionsOfJob = jobManager.getJobExecutionsOfJob(job.getId(), 0, 1);
+                    if (jobExecutionsOfJob != null && !jobExecutionsOfJob.getItems().isEmpty()) {
+                        jobExecution = jobExecutionsOfJob.getItems().get(0);
+                    }
+                }
+
+                return new JobListEntry(job.getId(), job.getName(), job.isActive(), convert(jobExecution, null));
+            }).collect(Collectors.toList()));
 
             return result;
         }

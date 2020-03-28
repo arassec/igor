@@ -1,13 +1,9 @@
-package com.arassec.igor.web.mapper;
+package com.arassec.igor.persistence.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.repository.ServiceRepository;
-import com.arassec.igor.core.util.IgorConfigHelper;
-import com.arassec.igor.web.WebConfiguration;
-import com.arassec.igor.web.test.TestAction;
-import com.arassec.igor.web.test.TestProvider;
-import com.arassec.igor.web.test.TestService;
-import com.arassec.igor.web.test.TestTrigger;
+import com.arassec.igor.persistence.PersistenceConfiguration;
+import com.arassec.igor.persistence.test.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,17 +19,17 @@ import static org.mockito.Mockito.when;
 /**
  * Base class for mapping tests.
  */
-public abstract class BaseMapperTest {
+public abstract class MapperBaseTest {
 
     /**
-     * {@link ObjectMapper} for the web layer.
+     * {@link ObjectMapper} for {@link com.arassec.igor.core.model.service.Service}s.
      */
-    protected ObjectMapper objectMapper;
+    protected ObjectMapper serviceObjectMapper;
 
     /**
-     * {@link ObjectMapper} for simulated job runs.
+     * {@link ObjectMapper} for {@link com.arassec.igor.core.model.job.Job}s.
      */
-    protected ObjectMapper simulationObjectMapper;
+    protected ObjectMapper jobObjectMapper;
 
     /**
      * Initializes the test environment.
@@ -51,16 +47,14 @@ public abstract class BaseMapperTest {
         igorComponentRegistry.setApplicationContext(applicationContextMock);
         igorComponentRegistry.afterPropertiesSet();
 
+        PersistenceConfiguration persistenceConfiguration = new PersistenceConfiguration();
+
+        serviceObjectMapper = persistenceConfiguration.persistenceServiceMapper(igorComponentRegistry, new TestSecurityProvider());
+
         ServiceRepository serviceRepositoryMock = mock(ServiceRepository.class);
         when(serviceRepositoryMock.findById(eq(TestService.SERVICE_ID))).thenReturn(new TestService());
 
-        WebConfiguration webConfiguration = new WebConfiguration();
-
-        objectMapper = webConfiguration.objectMapper(igorComponentRegistry, serviceRepositoryMock,
-                webConfiguration.messageSource(List.of(IgorConfigHelper.createMessageSource("i18n/mapper"))));
-
-        simulationObjectMapper = webConfiguration.simulationObjectMapper(igorComponentRegistry, serviceRepositoryMock,
-                webConfiguration.messageSource(List.of(IgorConfigHelper.createMessageSource("i18n/mapper"))));
+        jobObjectMapper = persistenceConfiguration.persistenceJobMapper(igorComponentRegistry, serviceRepositoryMock, new TestSecurityProvider());
     }
 
     /**

@@ -5,11 +5,11 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.repository.PersistentValueRepository;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -253,9 +253,7 @@ class JobManagerTest {
     @Test
     @DisplayName("Tests enqueueing an already running job.")
     void testEnqueueRunningJob() {
-        Job job = new Job();
-        job.setId("job-id");
-        job.setExecutionHistoryLimit(666);
+        Job job = Job.builder().id("job-id").executionHistoryLimit(666).build();
 
         // A running job blocks enqueueing the job again:
         reset(jobExecutionRepository);
@@ -272,6 +270,20 @@ class JobManagerTest {
 
         jobManager.enqueue(job);
 
+        verify(jobExecutionRepository, times(0)).upsert(any(JobExecution.class));
+    }
+
+    /**
+     * Tests enqueuing a fault intolerant job.
+     */
+    @Test
+    @DisplayName("Tests enqueuing a fault intolerant job.")
+    void testEnqueueFaultIntolerantJob() {
+        Job job = Job.builder().id("job-id").faultTolerant(false).build();
+        when(jobExecutionRepository.findAllOfJobInState(eq("job-id"), eq(JobExecutionState.RUNNING))).thenReturn(List.of());
+        when(jobExecutionRepository.findAllOfJobInState(eq("job-id"), eq(JobExecutionState.WAITING))).thenReturn(List.of());
+        when(jobExecutionRepository.findAllOfJobInState(eq("job-id"), eq(JobExecutionState.FAILED))).thenReturn(List.of(new JobExecution()));
+        jobManager.enqueue(job);
         verify(jobExecutionRepository, times(0)).upsert(any(JobExecution.class));
     }
 
@@ -361,9 +373,44 @@ class JobManagerTest {
     @Test
     @DisplayName("Tests loading a page of jobs.")
     void testLoadPage() {
-        ModelPage<Job> jobModelPage = new ModelPage<>(1, 2, 3, List.of());
-        when(jobRepository.findPage(eq(1), eq(2), eq("job-name-filter"))).thenReturn(jobModelPage);
-        assertEquals(jobModelPage, jobManager.loadPage(1, 2, "job-name-filter"));
+        ModelPage<Job> jobModelPage = new ModelPage<>(0, 2, 1, List.of(Job.builder().build(), Job.builder().build()));
+        when(jobRepository.findPage(eq(0), eq(Integer.MAX_VALUE), eq("job-name-filter"))).thenReturn(jobModelPage);
+        assertEquals(jobModelPage, jobManager.loadPage(0, 2, "job-name-filter", null));
+    }
+
+    /**
+     * Tests loading a page of jobs with state filter.
+     */
+    @Test
+    @DisplayName("Tests loading a page of jobs with state filter.")
+    void testLoadPageWithStateFilter() {
+        Job running = Job.builder().currentJobExecution(
+                        JobExecution.builder().executionState(JobExecutionState.RUNNING).build()).build();
+        Job failed = Job.builder().currentJobExecution(
+                        JobExecution.builder().executionState(JobExecutionState.FAILED).build()).build();
+        Job runningHistory = Job.builder().id("runningHistory").build();
+        Job failedHistory = Job.builder().id("failedHistory").build();
+
+        ModelPage<Job> jobModelPage = new ModelPage<>(0, 4, 1, List.of(
+                running, failed, runningHistory, failedHistory
+        ));
+
+        when(jobRepository.findPage(eq(0), eq(Integer.MAX_VALUE), eq("job-name-filter"))).thenReturn(jobModelPage);
+
+        when(jobExecutionRepository.findAllOfJob(eq("runningHistory"), eq(0), eq(1))).thenReturn(
+                new ModelPage<>(0, 1, 1, List.of(JobExecution.builder().executionState(JobExecutionState.RUNNING).build()))
+        );
+        when(jobExecutionRepository.findAllOfJob(eq("failedHistory"), eq(0), eq(1))).thenReturn(
+                new ModelPage<>(0, 1, 1, List.of(JobExecution.builder().executionState(JobExecutionState.FAILED).build()))
+        );
+
+        ModelPage<Job> resultPage = jobManager.loadPage(0, 2, "job-name-filter", Set.of(JobExecutionState.RUNNING));
+
+        assertEquals(0, resultPage.getNumber());
+        assertEquals(2, resultPage.getSize());
+        assertEquals(1, resultPage.getTotalPages());
+        assertEquals(running, resultPage.getItems().get(0));
+        assertEquals(runningHistory, resultPage.getItems().get(1));
     }
 
     /**
@@ -499,6 +546,16 @@ class JobManagerTest {
         Set<Pair<String, String>> result = new HashSet<>();
         when(jobRepository.findReferencedServices(eq("job-id"))).thenReturn(result);
         assertEquals(result, jobManager.getReferencedServices("job-id"));
+    }
+
+    /**
+     * Tests counting job executions.
+     */
+    @Test
+    @DisplayName("Tests counting job executions.")
+    void testCountJobExecutions() {
+        when(jobExecutionRepository.countJobsWithState(eq(JobExecutionState.FAILED))).thenReturn(666);
+        assertEquals(666, jobManager.countJobExecutions(JobExecutionState.FAILED));
     }
 
     /**

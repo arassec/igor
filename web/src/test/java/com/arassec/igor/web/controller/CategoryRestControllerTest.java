@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests the {@link CategoryRestController}.
  */
 @DisplayName("Category-Controller Tests")
-class CategoryRestControllerTest extends BaseRestControllerTest {
+class CategoryRestControllerTest extends RestControllerBaseTest {
 
     /**
      * Tests retrieval of service categories.

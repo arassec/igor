@@ -1,132 +1,83 @@
 package com.arassec.igor.web.controller;
 
-import com.arassec.igor.core.application.IgorComponentRegistry;
-import com.arassec.igor.core.application.JobManager;
-import com.arassec.igor.core.application.ServiceManager;
-import com.arassec.igor.core.repository.ServiceRepository;
-import com.arassec.igor.core.util.IgorConfigHelper;
-import com.arassec.igor.web.WebConfiguration;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.web.model.JobExecutionListEntry;
+import com.arassec.igor.web.model.KeyLabelStore;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import java.io.UnsupportedEncodingException;
+import javax.print.DocFlavor;
+import java.time.Instant;
 import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mock;
 
 /**
- * Base class for Rest-Controller tests.
+ * Tests the {@link BaseRestController}.
  */
-@WebMvcTest
-@ContextConfiguration(classes = BaseRestControllerTest.RestControllerTestConfiguration.class)
-@ComponentScan("com.arassec.igor.web")
-public abstract class BaseRestControllerTest {
+@DisplayName("Base-Controller Tests")
+public class BaseRestControllerTest {
 
     /**
-     * Context configuration for REST-Controller tests. Provides message sources to test I18N during controller tests.
+     * The class under test.
      */
-    @Configuration
-    @Import(WebConfiguration.class)
-    public static class RestControllerTestConfiguration {
+    private static final BaseRestController controller = mock(BaseRestController.class, CALLS_REAL_METHODS);
 
-        /**
-         * Provides the message sources for testing.
-         *
-         * @return A list of {@link MessageSource}s configured for testing.
-         */
-        @Bean
-        public List<MessageSource> messageSources() {
-            return List.of(IgorConfigHelper.createMessageSource("i18n/mapper"));
-        }
-
+    /**
+     * Tests sorting a key-label-store list by label.
+     */
+    @Test
+    @DisplayName("Tests sorting a key-label-store list by label.")
+    void testSortByLabel() {
+        List<KeyLabelStore> sortedList = controller.sortByLabel(Set.of(new KeyLabelStore("keyB", "labelB"),
+                new KeyLabelStore("keyC", "labelC"), new KeyLabelStore("keyA", "labelA")));
+        assertEquals("keyA", sortedList.get(0).getKey());
+        assertEquals("keyB", sortedList.get(1).getKey());
+        assertEquals("keyC", sortedList.get(2).getKey());
     }
 
     /**
-     * MVC-Mock for testing.
+     * Tests converting a job execution into a list entry.
      */
-    @Autowired
-    protected MockMvc mockMvc;
+    @Test
+    @DisplayName("Tests converting a job execution into a list entry.")
+    void testConvert() {
+        assertNull(controller.convert(null, null));
 
-    /**
-     * The {@link ObjectMapper} to convert JSON.
-     */
-    @Autowired
-    protected ObjectMapper objectMapper;
+        Instant created = Instant.now();
+        Instant started = Instant.now();
+        Instant finished = Instant.now();
 
-    /**
-     * Mock of the {@link ObjectMapper} to convert JSON for simulated job executions.
-     */
-    @MockBean
-    @Qualifier("simulationObjectMapper")
-    protected ObjectMapper simulationObjectMapper;
+        JobExecution execution = JobExecution.builder().id(123L).jobId("job-id").executionState(JobExecutionState.RUNNING)
+                .created(created).started(started).build();
+        JobExecutionListEntry result = controller.convert(execution, null);
+        assertEquals(123L, result.getId());
+        assertEquals("job-id", result.getJobId());
+        assertEquals(JobExecutionState.RUNNING.name(), result.getState());
+        assertNull(result.getJobName());
+        assertEquals(created, result.getCreated());
+        assertEquals(started, result.getStarted());
+        assertFalse(result.getDuration().isBlank());
 
-    /**
-     * Mock of the igor component registry.
-     */
-    @MockBean
-    protected IgorComponentRegistry igorComponentRegistry;
+        execution = JobExecution.builder().id(123L).jobId("job-id").executionState(JobExecutionState.WAITING)
+                .created(created).started(started).build();
+        result = controller.convert(execution, "job-name");
+        assertEquals("job-name", result.getJobName());
+        assertFalse(result.getDuration().isBlank());
 
-    /**
-     * Mock of the service repository.
-     */
-    @MockBean
-    protected ServiceRepository serviceRepository;
+        execution = JobExecution.builder().id(123L).jobId("job-id").executionState(JobExecutionState.FAILED)
+                .started(Instant.now()).finished(finished).build();
+        result = controller.convert(execution, "job-name");
+        assertEquals(finished, result.getFinished());
 
-    /**
-     * Mocked manager for Jobs.
-     */
-    @MockBean
-    protected JobManager jobManager;
-
-    /**
-     * Manager for Services.
-     */
-    @MockBean
-    protected ServiceManager serviceManager;
-
-    /**
-     * Converts the web response into the desired object.
-     *
-     * @param mvcResult The {@link MvcResult} to use as JSON source.
-     * @param clazz     The target clazz to deserialize the response into.
-     * @param <T>       The type of the target class.
-     *
-     * @return The converted object.
-     */
-    protected <T> T convert(MvcResult mvcResult, Class<T> clazz) {
-        try {
-            return objectMapper.readValue(mvcResult.getResponse().getContentAsString(), clazz);
-        } catch (JsonProcessingException | UnsupportedEncodingException e) {
-            throw new IllegalStateException("Exception during response conversion!", e);
-        }
-    }
-
-    /**
-     * Converts the web response into the desired object.
-     *
-     * @param mvcResult     The {@link MvcResult} to use as JSON source.
-     * @param typeReference The target clazz to deserialize the response into.
-     * @param <T>           The type of the target class.
-     *
-     * @return The converted object.
-     */
-    protected <T> T convert(MvcResult mvcResult, TypeReference<T> typeReference) {
-        try {
-            return objectMapper.readValue(mvcResult.getResponse().getContentAsString(), typeReference);
-        } catch (JsonProcessingException | UnsupportedEncodingException e) {
-            throw new IllegalStateException("Exception during response conversion!", e);
-        }
+        execution = JobExecution.builder().id(123L).jobId("job-id").executionState(JobExecutionState.RESOLVED)
+                .started(Instant.now()).build();
+        result = controller.convert(execution, "job-name");
+        assertEquals("", result.getDuration());
     }
 
 }

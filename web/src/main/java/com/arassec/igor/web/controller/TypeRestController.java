@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RestController()
 @RequestMapping("/api/type")
 @RequiredArgsConstructor
-public class TypeRestController implements BaseRestController {
+public class TypeRestController extends BaseRestController {
 
     /**
      * The message source with translations.

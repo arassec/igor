@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests the {@link ParametersRestController}.
  */
 @DisplayName("Parameters-Controller Tests")
-class ParametersRestControllerTest extends BaseRestControllerTest {
+class ParametersRestControllerTest extends RestControllerBaseTest {
 
     /**
      * Tests retrieval of service parameters.

@@ -7,9 +7,13 @@
             <div class="header sticky">
                 <slot name="header"/>
             </div>
-            <div class="content" v-if="hasContentSlot">
+        </core-panel>
+        <core-panel v-if="hasContentSlot">
+            <div class="content">
                 <slot name="content"/>
             </div>
+        </core-panel>
+        <core-panel>
             <div class="footer">
                 <slot name="footer"/>
             </div>
@@ -35,27 +39,19 @@
 <style scoped>
 
     .side-menu {
-        min-width: 450px;
+        margin-top: 1em;
+        min-width: 25em;
         flex-shrink: 0;
     }
 
     .no-margin {
-        margin-bottom: 0px;
+        margin-bottom: 0;
     }
 
     .header {
         padding-top: 15px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid var(--font-color-light);
-        margin-bottom: 15px;
         z-index: 666;
-        background-color: var(--panel-background-color);
-    }
-
-    .content {
-        padding-bottom: 15px;
-        border-bottom: 1px solid var(--font-color-light);
-        margin-bottom: 15px;
+        background-color: var(--color-background);
     }
 
     .sticky {

@@ -6,17 +6,13 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.web.model.JobExecutionListEntry;
+import com.arassec.igor.web.model.JobExecutionOverview;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -25,7 +21,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/execution")
 @RequiredArgsConstructor
-public class ExecutionRestController {
+public class ExecutionRestController extends BaseRestController {
 
     /**
      * Manager for Jobs.
@@ -33,13 +29,29 @@ public class ExecutionRestController {
     private final JobManager jobManager;
 
     /**
+     * Returns an overview of the job executions.
+     *
+     * @return A {@link JobExecutionOverview}.
+     */
+    @GetMapping("overview")
+    public JobExecutionOverview getJobExecutionOverview() {
+        JobExecutionOverview result = new JobExecutionOverview();
+        result.setNumSlots(jobManager.getNumSlots());
+        result.setNumRunning(jobManager.countJobExecutions(JobExecutionState.RUNNING));
+        result.setNumWaiting(jobManager.countJobExecutions(JobExecutionState.WAITING));
+        result.setNumFailed(jobManager.countJobExecutions(JobExecutionState.FAILED));
+        return result;
+    }
+
+    /**
      * Returns the execution states of a certain job.
      *
      * @param jobId      The job's ID.
      * @param pageNumber The number of the page to load.
      * @param pageSize   The number of elements in one page.
-     * @return The saved {@link JobExecution}s with information about their state or {@code null}, if the job has never
-     * been executed.
+     *
+     * @return The saved {@link JobExecution}s with information about their state or {@code null}, if the job has never been
+     * executed.
      */
     @GetMapping("job/{jobId}")
     public ModelPage<JobExecutionListEntry> getExecutionsOfJob(@PathVariable("jobId") String jobId,
@@ -68,8 +80,9 @@ public class ExecutionRestController {
      *
      * @param jobId The job's ID.
      * @param state The execution's state.
-     * @return The saved {@link JobExecution}s with information about their state or {@code null}, if the job has never
-     * been executed.
+     *
+     * @return The saved {@link JobExecution}s with information about their state or {@code null}, if the job has never been
+     * executed.
      */
     @GetMapping("job/{jobId}/{state}/count")
     public Long countExecutionsOfJobInState(@PathVariable("jobId") String jobId, @PathVariable("state") JobExecutionState state) {
@@ -82,29 +95,10 @@ public class ExecutionRestController {
     }
 
     /**
-     * Returns the job IDs of those jobs, which are in one of the requested states (e.g. RUNNING or WAITING).
-     *
-     * @param states The states to get job IDs for.
-     * @return List of Job IDs.
-     */
-    @GetMapping("jobs")
-    public List<String> getJobIdsInState(@RequestParam("states") Set<JobExecutionState> states) {
-        List<JobExecution> executions = new LinkedList<>();
-        if (states != null && !states.isEmpty()) {
-            states.forEach(state -> {
-                ModelPage<JobExecution> jobExecutionsInState = jobManager.getJobExecutionsInState(state, 0, Integer.MAX_VALUE);
-                if (jobExecutionsInState != null && jobExecutionsInState.getItems() != null) {
-                    executions.addAll(jobExecutionsInState.getItems());
-                }
-            });
-        }
-        return executions.stream().map(JobExecution::getJobId).collect(Collectors.toList());
-    }
-
-    /**
      * Returns the execution details with the given ID.
      *
      * @param id The execution details' ID.
+     *
      * @return The details.
      */
     @GetMapping("details/{id}")
@@ -115,47 +109,6 @@ public class ExecutionRestController {
         }
         throw new IllegalArgumentException("No job-execution with the requested ID available.");
     }
-
-    /**
-     * Returns the number of available slots for parallel job execution.
-     *
-     * @return The number of slots.
-     */
-    @GetMapping("numSlots")
-    public int getNumSlots() {
-        return jobManager.getNumSlots();
-    }
-
-    /**
-     * Returns the execution states which are in the specified state.
-     *
-     * @param state      The desired state of the job executions.
-     * @param pageNumber The number of the page to load.
-     * @param pageSize   The number of elements in one page.
-     * @return A list with all executions in the specified state.
-     */
-    @GetMapping(value = "{state}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ModelPage<JobExecutionListEntry> getExecutionsByState(@PathVariable("state") JobExecutionState state,
-                                                                 @RequestParam(value = "pageNumber", required = false,
-                                                                         defaultValue = "0") int pageNumber,
-                                                                 @RequestParam(value = "pageSize", required = false,
-                                                                         defaultValue = "2147483647") int pageSize) {
-        ModelPage<JobExecution> jobExecutions = jobManager.getJobExecutionsInState(state, pageNumber, pageSize);
-
-        if (jobExecutions != null && jobExecutions.getItems() != null && !jobExecutions.getItems().isEmpty()) {
-            ModelPage<JobExecutionListEntry> result = new ModelPage<>(pageNumber, pageSize, jobExecutions.getTotalPages(), null);
-
-            result.setItems(jobExecutions.getItems().stream().map(jobExecution -> {
-                Job job = jobManager.load(jobExecution.getJobId());
-                return convert(jobExecution, job.getName());
-            }).collect(Collectors.toList()));
-
-            return result;
-        }
-
-        return new ModelPage<>(pageNumber, pageSize, 0, List.of());
-    }
-
 
     /**
      * Cancels a running or waiting job execution.
@@ -192,42 +145,6 @@ public class ExecutionRestController {
             jobManager.updateJobExecutionState(id, newState);
         }
 
-    }
-
-    /**
-     * Converts a job-execution into a list entry for the UI.
-     *
-     * @param jobExecution The job-execution.
-     * @return The {@link JobExecutionListEntry} for the UI.
-     */
-    private JobExecutionListEntry convert(JobExecution jobExecution, String jobName) {
-        JobExecutionListEntry listEntry = new JobExecutionListEntry();
-        listEntry.setId(jobExecution.getId());
-        listEntry.setJobId(jobExecution.getJobId());
-        listEntry.setJobName(jobName);
-        listEntry.setState(jobExecution.getExecutionState().name());
-        listEntry.setCreated(jobExecution.getCreated());
-        if (JobExecutionState.RUNNING.equals(jobExecution.getExecutionState()) && (jobExecution.getStarted() != null)) {
-            listEntry.setDuration(formatDuration(Duration.between(jobExecution.getStarted(), Instant.now()).toSeconds()));
-        } else if (JobExecutionState.WAITING.equals(jobExecution.getExecutionState())) {
-            listEntry.setDuration(formatDuration(Duration.between(jobExecution.getCreated(), Instant.now()).toSeconds()));
-        } else if (jobExecution.getStarted() != null && jobExecution.getFinished() != null) {
-            listEntry.setDuration(
-                    formatDuration(Duration.between(jobExecution.getStarted(), jobExecution.getFinished()).toSeconds()));
-        } else {
-            listEntry.setDuration("");
-        }
-        return listEntry;
-    }
-
-    /**
-     * Formats the supplied time in milliseconds as HH:MM:SS.
-     *
-     * @param timeInMillis The time in milliseconds.
-     * @return The formatted time.
-     */
-    private String formatDuration(Long timeInMillis) {
-        return String.format("(%02d:%02d:%02d)", timeInMillis / 3600, (timeInMillis % 3600) / 60, (timeInMillis % 60));
     }
 
 }

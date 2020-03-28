@@ -1,5 +1,5 @@
 <template>
-    <modal-dialog>
+    <modal-dialog  @close="$emit('close')" v-on:cancel="$emit('close')">
         <p slot="header">
             <layout-row>
                 <h1 slot="left">Job Execution Details</h1>
@@ -76,17 +76,17 @@
         return input.toFixed(2) + '%'
       },
       calculateDuration: function (from, till) {
-        let start = new Date(from).getTime()
-        let end = Date.now()
+        let start = new Date(from).getTime();
+        let end = Date.now();
         if (till != null) {
           end = new Date(till).getTime()
         }
-        let delta = Math.floor((end - start) / 1000)
-        let hours = Math.floor(delta / 3600) % 24
-        delta -= hours * 3600
-        let minutes = Math.floor(delta / 60) % 60
-        delta -= minutes * 60
-        let seconds = Math.floor(delta % 60)
+        let delta = Math.floor((end - start) / 1000);
+        let hours = Math.floor(delta / 3600) % 24;
+        delta -= hours * 3600;
+        let minutes = Math.floor(delta / 60) % 60;
+        delta -= minutes * 60;
+        let seconds = Math.floor(delta % 60);
         return hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0')
       }
     }
@@ -107,7 +107,7 @@
         word-break: normal !important;
         word-wrap: normal !important;
         white-space: pre !important;
-        background-color: var(--alert-background-color)
+        background-color: var(--color-alert)
     }
 
     .margin-right {

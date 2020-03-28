@@ -121,5 +121,5 @@
     }
   ],
   "running": false,
-  "faultTolerant": false
+  "faultTolerant": true
 }

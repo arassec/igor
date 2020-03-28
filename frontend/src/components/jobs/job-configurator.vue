@@ -191,11 +191,11 @@
     }
 
     .panel .validation-error {
-        background-color: var(--alert-background-color);
+        background-color: var(--color-alert);
     }
 
     ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-        color: var(--main-background-color);
+        color: var(--color-font);
         opacity: 1; /* Firefox */
     }
 

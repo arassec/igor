@@ -62,7 +62,7 @@
   }
 
   .filter >>> input:focus + .fa-search {
-    color: var(--panel-background-color);
+    color: var(--color-background);
   }
 
   .filter .fa-search {
@@ -73,16 +73,16 @@
   }
 
   ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-    color: var(--font-color-light);
+    color: var(--color-font);
     opacity: 1; /* Firefox */
   }
 
   :-ms-input-placeholder { /* Internet Explorer 10-11 */
-    color: var(--font-color-light);
+    color: var(--color-font);
   }
 
   ::-ms-input-placeholder { /* Microsoft Edge */
-    color: var(--font-color-light);
+    color: var(--color-font);
   }
 
 </style>

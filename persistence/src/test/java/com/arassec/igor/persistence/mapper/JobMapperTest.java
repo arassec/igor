@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests {@link com.arassec.igor.core.model.job.Job} mapping.
  */
 @DisplayName("Tests mapping a job.")
-public class JobMapperTest extends BaseMapperTest {
+public class JobMapperTest extends MapperBaseTest {
 
     /**
      * Tests serializing a job.

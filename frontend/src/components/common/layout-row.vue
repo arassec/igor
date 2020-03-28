@@ -25,7 +25,7 @@
 
     .scroll {
         overflow-x: auto;
-        margin-right: 15px;
+        margin-right: 1em;
         flex: 1 1 auto;
     }
 
@@ -40,26 +40,26 @@
 
     .clickable:hover {
         cursor: pointer;
-        background-color: var(--main-background-color);
-        color: var(--panel-background-color);
+        background-color: var(--color-font);
+        color: var(--color-background);
     }
 
     .clickable:hover * {
         cursor: pointer;
-        color: var(--panel-background-color);
-        border-color: var(--panel-background-color);
+        color: var(--color-background);
+        border-color: var(--color-background);
     }
 
     .clickable:hover * .button {
         cursor: pointer;
-        color: var(--panel-background-color);
-        border-color: var(--panel-background-color);
+        color: var(--color-background);
+        border-color: var(--color-background);
     }
 
     .clickable:hover * .button:hover {
         cursor: pointer;
-        color: var(--font-color-light);
-        background-color: var(--panel-background-color);
+        color: var(--color-font);
+        background-color: var(--color-background);
     }
 
 

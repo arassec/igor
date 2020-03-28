@@ -51,7 +51,7 @@ public class PauseAction extends BaseUtilAction {
             try {
                 Thread.sleep(milliseconds);
             } catch (InterruptedException e) {
-                log.error("Interrupted during pause action!", e);
+                log.debug("Interrupted during pause action!", e);
                 Thread.currentThread().interrupt();
             }
         }

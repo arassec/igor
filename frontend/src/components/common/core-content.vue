@@ -14,7 +14,7 @@
 <style scoped>
 
     .content {
-        margin-right: 25px;
+        margin: 1em 1em 0 0;
         flex-shrink: 1;
     }
 

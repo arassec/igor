@@ -27,4 +27,9 @@ public class JobListEntry {
      */
     private boolean active;
 
+    /**
+     * Information about the last execution of this job.
+     */
+    private JobExecutionListEntry execution;
+
 }

@@ -65,7 +65,7 @@ export default {
         min-width: 500px;
         max-width: 75%;
         padding: 15px;
-        background-color: var(--panel-background-color);
+        background-color: var(--color-background);
         transition: all .3s ease;
         display: flex;
         flex-direction: column;
@@ -81,12 +81,12 @@ export default {
         margin-bottom: 20px;
         overflow: hidden;
         width: 100%;
-        color: var(--font-color-light);
+        color: var(--color-font);
     }
 
     .modal-footer {
         width: 100%;
-        color: var(--font-color-light);
+        color: var(--color-font);
     }
 
     .modal-enter {

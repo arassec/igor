@@ -15,6 +15,7 @@ public interface JobExecutionRepository {
      * Saves a new job-execution or updates an existing one.
      *
      * @param jobExecution The job-execution to save.
+     *
      * @return The updated job-execution.
      */
     JobExecution upsert(JobExecution jobExecution);
@@ -23,6 +24,7 @@ public interface JobExecutionRepository {
      * Finds the job-execution with the given ID.
      *
      * @param id The job-execution's ID.
+     *
      * @return The {@link JobExecution} or {@code null}, if none exists with the given ID.
      */
     JobExecution findById(Long id);
@@ -33,6 +35,7 @@ public interface JobExecutionRepository {
      * @param jobId      The job's ID.
      * @param pageNumber The page number.
      * @param pageSize   The size of the page.
+     *
      * @return List of executions of this job.
      */
     ModelPage<JobExecution> findAllOfJob(String jobId, int pageNumber, int pageSize);
@@ -42,6 +45,7 @@ public interface JobExecutionRepository {
      *
      * @param jobId The job's ID.
      * @param state The state the job-execution should be in.
+     *
      * @return List of executions.
      */
     List<JobExecution> findAllOfJobInState(String jobId, JobExecutionState state);
@@ -52,6 +56,7 @@ public interface JobExecutionRepository {
      * @param state      The state of the job-exeuctions.
      * @param pageNumber The page number.
      * @param pageSize   The size of the page.
+     *
      * @return List of {@link JobExecution}s.
      */
     ModelPage<JobExecution> findInState(JobExecutionState state, int pageNumber, int pageSize);
@@ -87,5 +92,14 @@ public interface JobExecutionRepository {
      * @param newState The new state to set.
      */
     void updateAllJobExecutionsOfJob(String jobId, JobExecutionState oldState, JobExecutionState newState);
+
+    /**
+     * Counts jobs with executions in the given state.
+     *
+     * @param state The desired state.
+     *
+     * @return The number of executions in the given state.
+     */
+    int countJobsWithState(JobExecutionState state);
 
 }

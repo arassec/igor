@@ -243,18 +243,18 @@
     }
 
     .panel .validation-error {
-        background-color: var(--alert-background-color);
+        background-color: var(--color-alert);
     }
 
     textarea {
-        color: var(--font-color-light);
-        background-color: var(--element-background-color);
+        color: var(--color-font);
+        background-color: var(--color-foreground);
         border: none;
         max-width: 280px;
     }
 
     ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-        color: var(--main-background-color);
+        color: var(--color-font);
         opacity: 1; /* Firefox */
     }
 

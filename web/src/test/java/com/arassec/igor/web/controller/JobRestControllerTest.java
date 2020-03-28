@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.model.JobListEntry;
@@ -29,26 +30,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Tests the {@link JobRestController}.
  */
 @DisplayName("Job-Controller Tests")
-class JobRestControllerTest extends BaseRestControllerTest {
+class JobRestControllerTest extends RestControllerBaseTest {
 
     /**
      * Tests reading job list entries.
      */
     @Test
     @DisplayName("Tests reading job list entries.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testGetJobs() {
         mockMvc.perform(get("/api/job")).andExpect(status().isOk())
                 .andExpect(content().string("{\"number\":0,\"size\":2147483647,\"totalPages\":0,\"items\":[]}"));
 
-        when(jobManager.loadPage(eq(1), eq(2), eq("name-filter"))).thenReturn(
+        when(jobManager.loadPage(eq(1), eq(2), eq("name-filter"), anySet())).thenReturn(
                 new ModelPage<>(1, 2, 3, List.of(
                         Job.builder().id("job-id").name("job-name").active(true).build()
                 )));
@@ -72,11 +72,39 @@ class JobRestControllerTest extends BaseRestControllerTest {
     }
 
     /**
+     * Tests reading job list entries with state filter.
+     */
+    @Test
+    @DisplayName("Tests reading job list entries with state filter.")
+    @SneakyThrows
+    void testGetJobsWithStateFilter() {
+        mockMvc.perform(get("/api/job")).andExpect(status().isOk())
+                .andExpect(content().string("{\"number\":0,\"size\":2147483647,\"totalPages\":0,\"items\":[]}"));
+
+        when(jobManager.loadPage(eq(1), eq(2), eq("name-filter"), anySet())).thenReturn(
+                new ModelPage<>(1, 2, 3, List.of(
+                        Job.builder().id("job-id").name("job-name").currentJobExecution(
+                                JobExecution.builder().executionState(JobExecutionState.RUNNING).id(123L).build()
+                        ).active(true).build()
+                )));
+
+        mockMvc.perform(get("/api/job")
+                .queryParam("pageNumber", "1")
+                .queryParam("pageSize", "2")
+                .queryParam("nameFilter", "name-filter")
+                .queryParam("stateFilter", JobExecutionState.RUNNING.name()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].execution.id").value(123L))
+                .andExpect(jsonPath("$.items[0].execution.state").value(JobExecutionState.RUNNING.name()))
+                .andExpect(jsonPath("$.items[0].execution.duration").value(""));
+    }
+
+    /**
      * Tests reading a job.
      */
     @Test
     @DisplayName("Tests reading a job.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testGetJob() {
         mockMvc.perform(get("/api/job/job-id")).andExpect(status().isNotFound());
 
@@ -95,7 +123,7 @@ class JobRestControllerTest extends BaseRestControllerTest {
      */
     @Test
     @DisplayName("Tests creating a job.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testCreateJob() {
         when(jobManager.save(any(Job.class))).thenReturn(Job.builder().id("job-id").name("saved-job").build());
 
@@ -123,7 +151,7 @@ class JobRestControllerTest extends BaseRestControllerTest {
      */
     @Test
     @DisplayName("Tests updating a job.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testUpdateJob() {
         when(jobManager.save(any(Job.class))).thenReturn(Job.builder().id("job-id").name("saved-job").build());
 
@@ -151,7 +179,7 @@ class JobRestControllerTest extends BaseRestControllerTest {
      */
     @Test
     @DisplayName("Tests simulating a job execution.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testSimulateJob() {
         Job jobSpy = spy(Job.class);
         when(jobSpy.getId()).thenReturn("job-id");
@@ -203,7 +231,7 @@ class JobRestControllerTest extends BaseRestControllerTest {
      */
     @Test
     @DisplayName("Tests checking a job name for already existing jobs with the same name.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testCheckJobName() {
         mockMvc.perform(get("/api/job/check/" + Base64.getEncoder().encodeToString("job-name".getBytes()) + "/job-id"))
                 .andExpect(status().isOk())
@@ -227,7 +255,7 @@ class JobRestControllerTest extends BaseRestControllerTest {
      */
     @Test
     @DisplayName("Tests deleting a job.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testDeleteJob() {
         mockMvc.perform(delete("/api/job/job-id").queryParam("deleteExclusiveServices", "false"))
                 .andExpect(status().isNoContent());
@@ -257,7 +285,7 @@ class JobRestControllerTest extends BaseRestControllerTest {
      */
     @Test
     @DisplayName("Tests manually starting a job.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testRunJob() {
         Job savedJob = Job.builder().name("saved-job-name").active(false).build();
         when(jobManager.save(any(Job.class))).thenReturn(savedJob);
@@ -283,7 +311,7 @@ class JobRestControllerTest extends BaseRestControllerTest {
      */
     @Test
     @DisplayName("Tests running a job by ID.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testRunJobFromId() {
         mockMvc.perform(post("/api/job/run/job-id"))
                 .andExpect(status().isBadRequest());
@@ -302,7 +330,7 @@ class JobRestControllerTest extends BaseRestControllerTest {
      */
     @Test
     @DisplayName("Tests retrieving the current job schedule.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testGetSchedule() {
         when(jobManager.loadScheduled()).thenReturn(List.of(
                 Job.builder().id("id1").name("name1").trigger(new TestTrigger()).build(),
@@ -327,7 +355,7 @@ class JobRestControllerTest extends BaseRestControllerTest {
      */
     @Test
     @DisplayName("Tests getting exclusive services of a job.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testGetExclusiveServices() {
         when(jobManager.getReferencedServices(eq("test-job-id"))).thenReturn(Set.of(
                 new Pair<>("serviceC-id", "serviceC"),

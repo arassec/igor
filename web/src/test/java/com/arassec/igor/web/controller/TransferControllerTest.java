@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests the {@link TransferController}.
  */
 @DisplayName("Transfer-Controller tests")
-public class TransferControllerTest extends BaseRestControllerTest {
+public class TransferControllerTest extends RestControllerBaseTest {
 
     /**
      * Tests exporting a job.
@@ -57,7 +57,7 @@ public class TransferControllerTest extends BaseRestControllerTest {
 
         assertEquals(1, transferData.getJobJsons().size());
         assertEquals("{\"id\":\"job-id\",\"active\":false,\"executionHistoryLimit\":5,\"tasks\":[],\"running\":false," +
-                "\"faultTolerant\":false}", transferData.getJobJsons().get(0));
+                "\"faultTolerant\":true}", transferData.getJobJsons().get(0));
 
         assertEquals(1, transferData.getServiceJsons().size());
         assertNotNull(transferData.getServiceJsons().get(0));

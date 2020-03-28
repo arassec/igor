@@ -20,7 +20,7 @@
 <style scoped>
 
   div {
-    color: var(--font-color-light);
+    color: var(--color-font);
     line-height: 25px;
     padding: 5px;
   }
@@ -30,11 +30,11 @@
   }
 
   .info {
-    background-color: var(--info-background-color);
+    background-color: var(--color-foreground);
   }
 
   .alert {
-    background-color: var(--alert-background-color);
+    background-color: var(--color-alert);
   }
 
 </style>

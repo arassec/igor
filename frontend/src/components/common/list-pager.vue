@@ -5,7 +5,7 @@
         <input-button icon="angle-left" v-on:clicked="$emit('previous')" class="pager-button margin"
                       :disabled="page.number == 0"/>
         {{(page.number + 1)}}/{{page.totalPages}}
-        <input-button icon="angle-right" v-on:clicked="$emit('next')" class="pager-button margin"
+        <input-button icon="angle-right" v-on:clicked="$emit('next')" class="pager-button margin button-margin-left"
                       :disabled="page.number == (page.totalPages -1)"/>
         <input-button icon="angle-double-right" v-on:clicked="$emit('last')" class="pager-button"
                       :disabled="page.number == (page.totalPages -1)"/>
@@ -25,28 +25,28 @@
 <style scoped>
 
     .list-pager {
-        margin: 10px;
+        margin: 1em;
         text-align: center;
     }
 
     .margin {
-        margin-right: 5px;
+        margin-right: .5em;
     }
 
     .dark .pager-button {
-        border: 1px solid var(--panel-background-color);
-        background-color: var(--panel-background-color);
-        color: var(--main-background-color);
+        border: 1px solid var(--color-background);
+        background-color: var(--color-background);
+        color: var(--color-font);
     }
 
     .dark .pager-button:hover {
-        border: 1px solid var(--info-background-color);
-        background-color: var(--info-background-color);
+        border: 1px solid var(--color-foreground);
+        background-color: var(--color-foreground);
     }
 
     .dark .disabled:hover {
-        border: 1px solid var(--panel-background-color);
-        background-color: var(--panel-background-color);
+        border: 1px solid var(--color-background);
+        background-color: var(--color-background);
     }
 
 </style>

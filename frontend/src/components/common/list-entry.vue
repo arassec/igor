@@ -27,7 +27,7 @@
 
     .list-entry:hover {
         cursor: pointer;
-        background-color: var(--nav-background-color);
+        background-color: var(--color-foreground);
     }
 
     .list-row {

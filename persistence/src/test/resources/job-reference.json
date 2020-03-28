@@ -50,5 +50,5 @@
       ]
     }
   ],
-  "faultTolerant": false
+  "faultTolerant": true
 }

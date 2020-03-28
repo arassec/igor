@@ -12,5 +12,8 @@ export default {
     let options = {year: 'numeric', month: '2-digit', day: '2-digit'};
     let date = new Date(instant)
     return date.toLocaleTimeString(undefined, options)
+  },
+  capitalize: function (text) {
+    return text.charAt(0).toUpperCase() + text.slice(1)
   }
 }

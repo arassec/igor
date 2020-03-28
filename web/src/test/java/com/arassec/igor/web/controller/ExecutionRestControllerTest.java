@@ -10,7 +10,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.ui.Model;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,21 +19,40 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Tests the {@link ExecutionRestController}.
  */
 @DisplayName("Execution-Controller Tests")
-class ExecutionRestControllerTest extends BaseRestControllerTest {
+class ExecutionRestControllerTest extends RestControllerBaseTest {
 
+    /**
+     * Tests getting an execution overview.
+     */
+    @Test
+    @DisplayName("Tests getting an execution overview.")
+    @SneakyThrows
+    void testGetJobExecutionOverview() {
+        when(jobManager.getNumSlots()).thenReturn(1);
+        when(jobManager.countJobExecutions(eq(JobExecutionState.RUNNING))).thenReturn(2);
+        when(jobManager.countJobExecutions(eq(JobExecutionState.WAITING))).thenReturn(3);
+        when(jobManager.countJobExecutions(eq(JobExecutionState.FAILED))).thenReturn(4);
+
+        mockMvc.perform(get("/api/execution/overview")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.numSlots").value("1"))
+                .andExpect(jsonPath("$.numRunning").value("2"))
+                .andExpect(jsonPath("$.numWaiting").value("3"))
+                .andExpect(jsonPath("$.numFailed").value("4"));
+    }
+    
+    
     /**
      * Tests getting executions of a job.
      */
     @Test
     @DisplayName("Tests getting executions of a job.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testGetExecutionsOfJob() {
         // Test empty page:
         MvcResult mvcResult = mockMvc.perform(get("/api/execution/job/job-id")).andExpect(status().isOk()).andReturn();
@@ -100,7 +118,7 @@ class ExecutionRestControllerTest extends BaseRestControllerTest {
      */
     @Test
     @DisplayName("Tests counting executions in a certain state of a job.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testCountExecutionsOfJobInState() {
         mockMvc.perform(get("/api/execution/job/job-id/WAITING/count")).andExpect(status().isOk())
                 .andExpect(content().string("0"));
@@ -120,42 +138,11 @@ class ExecutionRestControllerTest extends BaseRestControllerTest {
     }
 
     /**
-     * Tests getting job IDs with executions in a certain state.
-     */
-    @Test
-    @DisplayName("Tests getting job IDs with executions in a certain state.")
-    @SneakyThrows(Exception.class)
-    void testGetJobIdsInState() {
-        mockMvc.perform(get("/api/execution/jobs").queryParam("states", "")).andExpect(status().isOk());
-
-        mockMvc.perform(get("/api/execution/jobs").queryParam("states", JobExecutionState.RUNNING.name()))
-                .andExpect(status().isOk());
-
-        when(jobManager.getJobExecutionsInState(eq(JobExecutionState.RUNNING), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
-                new ModelPage<>(1, 2, 3, List.of(JobExecution.builder().id(123L).jobId("job-id-running")
-                        .executionState(JobExecutionState.RUNNING).created(Instant.now()).build())));
-
-        when(jobManager.getJobExecutionsInState(eq(JobExecutionState.WAITING), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
-                new ModelPage<>(1, 2, 3, List.of(JobExecution.builder().id(456L).jobId("job-id-waiting")
-                        .executionState(JobExecutionState.WAITING).created(Instant.now()).build())));
-
-        MvcResult mvcResult = mockMvc.perform(get("/api/execution/jobs").queryParam("states", JobExecutionState.RUNNING.name()
-                + "," + JobExecutionState.WAITING.name())).andExpect(status().isOk()).andReturn();
-
-        List<String> result = convert(mvcResult, new TypeReference<>() {
-        });
-
-        assertEquals(2, result.size());
-        assertEquals("job-id-running", result.get(0));
-        assertEquals("job-id-waiting", result.get(1));
-    }
-
-    /**
      * Tests getting execution details.
      */
     @Test
     @DisplayName("Tests getting execution details.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testGetDetailedExecution() {
         mockMvc.perform(get("/api/execution/details/123")).andExpect(status().isBadRequest());
 
@@ -168,45 +155,11 @@ class ExecutionRestControllerTest extends BaseRestControllerTest {
     }
 
     /**
-     * Tests getting the number of execution slots.
-     */
-    @Test
-    @DisplayName("Tests getting the number of execution slots.")
-    @SneakyThrows(Exception.class)
-    void testGetNumSlots() {
-        when(jobManager.getNumSlots()).thenReturn(666);
-        mockMvc.perform(get("/api/execution/numSlots")).andExpect(status().isOk()).andExpect(content().string("666"));
-    }
-
-    /**
-     * Tests getting executions in a certain state.
-     */
-    @Test
-    @DisplayName("Tests getting executions in a certain state.")
-    @SneakyThrows(Exception.class)
-    void testGetExecutionsByState() {
-        mockMvc.perform(get("/api/execution/FAILED")).andExpect(status().isOk()).andReturn();
-
-        when(jobManager.getJobExecutionsInState(eq(JobExecutionState.RUNNING), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
-                new ModelPage<>(1, 2, 3, List.of(JobExecution.builder().id(123L).jobId("job-id")
-                        .executionState(JobExecutionState.RUNNING).created(Instant.now()).build())));
-
-        when(jobManager.load(eq("job-id"))).thenReturn(Job.builder().name("job-name").build());
-
-        MvcResult mvcResult = mockMvc.perform(get("/api/execution/RUNNING")).andExpect(status().isOk()).andReturn();
-
-        ModelPage<JobExecutionListEntry> result = convert(mvcResult, new TypeReference<>() {
-        });
-
-        assertEquals("job-name", result.getItems().get(0).getJobName());
-    }
-
-    /**
      * Tests cancelling a certain execution.
      */
     @Test
     @DisplayName("Tests cancelling a certain execution.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testCancelExecution() {
         mockMvc.perform(post("/api/execution/-123/cancel")).andExpect(status().isBadRequest());
         mockMvc.perform(post("/api/execution/123/cancel")).andExpect(status().isNoContent());
@@ -218,7 +171,7 @@ class ExecutionRestControllerTest extends BaseRestControllerTest {
      */
     @Test
     @DisplayName("Tests updating an execution's state.")
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     void testUpdateExecutionState() {
         mockMvc.perform(
                 put("/api/execution/123/job-id/" + JobExecutionState.FAILED.name() + "/" + JobExecutionState.CANCELLED.name()))

@@ -324,7 +324,7 @@
                 this.updateSelectedTestResult()
             },
             cancelConfiguration: function () {
-                this.$router.push({name: 'app-status'})
+                this.$router.push({name: 'job-overview'})
             },
             selectJob: function () {
                 this.selectedTaskIndex = -1

@@ -7,8 +7,7 @@ import com.arassec.igor.core.model.trigger.Trigger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -177,6 +176,18 @@ class JobTest {
         assertEquals(JobExecutionState.FINISHED, job.getCurrentJobExecution().getExecutionState());
         assertNotNull(job.getCurrentJobExecution().getStarted());
         assertNotNull(job.getCurrentJobExecution().getFinished());
+    }
+
+    /**
+     * Tests default properties.
+     */
+    @Test
+    @DisplayName("Tests default properties.")
+    void testDefaultProperties() {
+        Job job = new Job();
+        assertEquals(5, job.getExecutionHistoryLimit());
+        assertFalse(job.isRunning());
+        assertTrue(job.isFaultTolerant());
     }
 
 }

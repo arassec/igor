@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests {@link Service} mapping.
  */
 @DisplayName("Tests mapping a service.")
-public class ServiceMapperTest extends BaseMapperTest {
+public class ServiceMapperTest extends MapperBaseTest {
 
     /**
      * Tests serializing a service.

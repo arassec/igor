@@ -3,6 +3,7 @@ package com.arassec.igor.persistence.dao;
 import com.arassec.igor.persistence.entity.JobExecutionEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
@@ -59,5 +60,15 @@ public interface JobExecutionDao extends PagingAndSortingRepository<JobExecution
      * @param jobId The job's ID.
      */
     void deleteByJobId(String jobId);
+
+    /**
+     * Counts job executions in the given state.
+     *
+     * @param state The state a job execution has to be in to count.
+     *
+     * @return The number of executions in the given state.
+     */
+    @Query(value = "SELECT COUNT(DISTINCT (job_id)) FROM job_execution WHERE state = :state", nativeQuery = true)
+    int countDistinctJobIdByState(String state);
 
 }

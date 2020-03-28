@@ -354,4 +354,14 @@ class JdbcJobExecutionRepositoryTest {
         entities.forEach(entity -> assertEquals(JobExecutionState.RESOLVED.name(), entity.getState()));
     }
 
+    /**
+     * Tests counting jobs with a given state.
+     */
+    @Test
+    @DisplayName("Tests counting jobs with a given state.")
+    void testCoutJobWithState() {
+        when(jobExecutionDao.countDistinctJobIdByState(eq(JobExecutionState.RUNNING.name()))).thenReturn(42);
+        assertEquals(42, repository.countJobsWithState(JobExecutionState.RUNNING));
+    }
+
 }

@@ -19,7 +19,6 @@
   /* reset css */
   html {
     box-sizing: border-box;
-    font-size: 16px;
   }
 
   *, *:before, *:after {
@@ -43,52 +42,46 @@
 
   /* igor css */
   :root {
-    --main-background-color: #FDFDFF;
-    --nav-background-color: #62929E;
-    --panel-background-color: #546A7B;
-    --font-color-light: #FDFDFF;
-    --font-color-dark: #546A7B;
-    --font-color-opaque: #FDFDFF80;
-    --element-background-color: #62929E;
-    --element-background-color-focus: #FDFDFF;
-    --info-background-color: #62929E;
-    --alert-background-color: #DF6A7C;
+    --color-font: #FDFDFF;
+    --color-foreground: #62929E;
+    --color-background: #546A7B;
+    --color-alert: #DF6A7C;
   }
 
   body {
-    background-color: var(--main-background-color);
-    font-family: "Courier New", Courier, monospace;
+    background-color: var(--color-font);
+    font-family: 'Roboto', sans-serif;
   }
 
   h1 {
     font-size: 150%;
-    color: var(--font-color-light);
-    margin-bottom: 20px;
+    color: var(--color-font);
+    margin-bottom: 1em;
   }
 
   h2 {
     font-size: 125%;
-    color: var(--font-color-light);
-    margin-bottom: 15px;
+    color: var(--color-font);
+    margin-bottom: .5em;
   }
 
   h3 {
     font-size: 110%;
-    color: var(--font-color-light);
-    margin-bottom: 10px;
+    color: var(--color-font);
+    margin-bottom: .25em;
   }
 
   select option {
-    background-color: var(--panel-background-color);
-    color: var(--font-color-light);
+    background-color: var(--color-background);
+    color: var(--color-font);
   }
 
   .button-margin-right {
-    margin-right: 5px;
+    margin-right: .5em;
   }
 
   .button-margin-left {
-    margin-left: 5px;
+    margin-left: .5em;
   }
 
   .inactive {
@@ -98,7 +91,7 @@
   .sticky {
     z-index: 5;
     position: sticky;
-    top: 15px;
+    top: 1em;
   }
 
   .truncate {
@@ -108,30 +101,39 @@
   }
 
   .max-width {
-    max-width: 650px;
+    max-width: 60em;
   }
 
   .highlight {
-    max-width: 500px;
-    margin: 10px;
+    max-width: 50em;
+    margin: .5em;
   }
 
   .paragraph {
-    margin-bottom: 20px;
+    margin-bottom: .75em;
   }
 
   .paragraph ul {
-    margin-top: 10px;
+    margin-top: .5em;
     list-style-type: square;
   }
 
   .paragraph ul li {
-    margin-left: 45px;
+    margin-left: 2em;
+  }
+
+  .info {
+    padding: .25em;
+    background-color: var(--color-foreground);
   }
 
   .alert {
-    padding: 5px;
-    background-color: var(--alert-background-color);
+    padding: .25em;
+    background-color: var(--color-alert);
+  }
+
+  .shadow {
+    box-shadow: .1em .1em .25em 0 rgba(163, 163, 163, 0.75);
   }
 
 </style>

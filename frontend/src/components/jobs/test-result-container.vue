@@ -46,18 +46,15 @@
     .content {
         z-index: 2;
         flex: 2;
-        margin-right: 0px;
+        margin-right: 0;
         overflow: hidden;
         max-height: calc(100vh - 20px);
     }
 
     .test-result-container {
-        color: var(--font-color-light);
-        background-color: var(--panel-background-color);
+        color: var(--color-font);
+        background-color: var(--color-background);
         padding: 15px;
-        -webkit-box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
-        -moz-box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
-        box-shadow: 2px 2px 5px 0px rgba(163, 163, 163, 0.75);
     }
 
     pre {
@@ -70,11 +67,11 @@
     }
 
     .normal-bg {
-        background-color: var(--info-background-color)
+        background-color: var(--color-foreground)
     }
 
     .error-bg {
-        background-color: var(--alert-background-color)
+        background-color: var(--color-alert)
     }
 
     .slide-fade-enter-active {

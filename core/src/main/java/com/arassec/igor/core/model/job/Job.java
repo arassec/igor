@@ -85,7 +85,7 @@ public class Job {
      * Indicates whether a successful job run compensates previous failures or not.
      */
     @Builder.Default
-    private boolean faultTolerant = false;
+    private boolean faultTolerant = true;
 
     /**
      * Runs the job.

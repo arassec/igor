@@ -10,6 +10,7 @@ import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.repository.PersistentValueRepository;
 import com.arassec.igor.core.util.ModelPage;
+import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -148,13 +149,17 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
         if (job == null || job.getId() == null) {
             throw new IllegalArgumentException("Job with ID required for run!");
         }
-        log.info("Trying to manually enqueue job: {} ({})", job.getName(), job.getId());
         List<JobExecution> runningJobExecutions = jobExecutionRepository
                 .findAllOfJobInState(job.getId(), JobExecutionState.RUNNING);
         List<JobExecution> waitingJobExecutions = jobExecutionRepository
                 .findAllOfJobInState(job.getId(), JobExecutionState.WAITING);
-        if ((runningJobExecutions == null || runningJobExecutions
+        List<JobExecution> failedJobExecutions = jobExecutionRepository
+                .findAllOfJobInState(job.getId(), JobExecutionState.FAILED);
+        if (failedJobExecutions != null && !failedJobExecutions.isEmpty() && !job.isFaultTolerant()) {
+            log.info("Job not enqueued due to previously failed executions and job's fault intolerance.");
+        } else if ((runningJobExecutions == null || runningJobExecutions
                 .isEmpty()) && (waitingJobExecutions == null || waitingJobExecutions.isEmpty())) {
+            log.info("Enqueueing job: {} ({})", job.getName(), job.getId());
             JobExecution jobExecution = new JobExecution();
             jobExecution.setJobId(job.getId());
             jobExecution.setCreated(Instant.now());
@@ -217,11 +222,24 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      * @param pageNumber The page number.
      * @param pageSize   The page size.
      * @param nameFilter An optional name filter for the jobs.
+     * @param stateFilter An optional state filter for the jobs.
      *
      * @return The page with jobs matching the criteria.
      */
-    public ModelPage<Job> loadPage(int pageNumber, int pageSize, String nameFilter) {
-        return jobRepository.findPage(pageNumber, pageSize, nameFilter);
+    public ModelPage<Job> loadPage(int pageNumber, int pageSize, String nameFilter, Set<JobExecutionState> stateFilter) {
+        ModelPage<Job> nameFilteredPage = jobRepository.findPage(0, Integer.MAX_VALUE, nameFilter);
+        List<Job> filteredList = nameFilteredPage.getItems().stream().filter(job -> {
+            if (stateFilter == null || stateFilter.isEmpty()) {
+                return true;
+            }
+            if (job.getCurrentJobExecution() != null) {
+                return stateFilter.contains(job.getCurrentJobExecution().getExecutionState());
+            } else {
+                ModelPage<JobExecution> lastJobExecution = jobExecutionRepository.findAllOfJob(job.getId(), 0, 1);
+                return !lastJobExecution.getItems().isEmpty() && stateFilter.contains(lastJobExecution.getItems().get(0).getExecutionState());
+            }
+        }).collect(Collectors.toList());
+        return ModelPageHelper.getModelPage(filteredList, pageNumber, pageSize);
     }
 
     /**
@@ -332,6 +350,16 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     }
 
     /**
+     * Counts the job executions that are in the given state.
+     *
+     * @param jobExecutionState The state to count executions for.
+     * @return The number of executions in the requested state.
+     */
+    public int countJobExecutions(JobExecutionState jobExecutionState) {
+        return jobExecutionRepository.countJobsWithState(jobExecutionState);
+    }
+
+    /**
      * Schedules the given job according to its trigger configuration.
      *
      * @param job The job to schedule.
@@ -349,7 +377,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             String cronExpression = ((ScheduledTrigger) job.getTrigger()).getCronExpression();
             try {
                 scheduledJobs.put(job.getId(), taskScheduler.schedule(() -> {
-                    log.info("Trying to automatically enqueue job: {} ({})", job.getName(), job.getId());
+                    log.info("Job triggered for execution: {} ({})", job.getName(), job.getId());
                     enqueue(job);
                 }, new CronTrigger(cronExpression)));
                 log.info("Scheduled job: {} ({}).", job.getName(), job.getId());

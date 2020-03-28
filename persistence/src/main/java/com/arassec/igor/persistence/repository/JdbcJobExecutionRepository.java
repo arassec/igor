@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -104,7 +103,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
         if (jobExecutionEntities != null) {
             return jobExecutionEntities.stream().map(this::convert).collect(Collectors.toList());
         }
-        return new LinkedList<>();
+        return List.of();
     }
 
     /**
@@ -168,6 +167,14 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
                 executionEntities.forEach(executionEntity -> executionEntity.setState(newState.name()));
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int countJobsWithState(JobExecutionState state) {
+        return jobExecutionDao.countDistinctJobIdByState(state.name());
     }
 
     /**

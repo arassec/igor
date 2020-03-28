@@ -153,7 +153,7 @@
     }
 
     .treeview {
-        color: var(--font-color-light);
+        color: var(--color-font);
         overflow: hidden;
     }
 
@@ -177,7 +177,7 @@
 
     .selected {
         font-weight: bold;
-        background-color: var(--info-background-color);
+        background-color: var(--color-foreground);
     }
 
     .validation-error {
@@ -192,8 +192,8 @@
         height: 18px;
 
         background: transparent;
-        border: 1px solid var(--font-color-light);
-        color: var(--font-color-light);
+        border: 1px solid var(--color-font);
+        color: var(--color-font);
 
         text-align: center;
         line-height: 16px;
@@ -212,8 +212,8 @@
     ul.tree li {
         margin: 0;
         padding: 0 7px;
-        color: var(--font-color-light);
-        border-left: 1px solid var(--font-color-light);
+        color: var(--color-font);
+        border-left: 1px solid var(--color-font);
     }
 
     ul.tree li:last-child {
@@ -226,14 +226,14 @@
         height: 1em;
         width: 12px;
         color: white;
-        border-bottom: 1px solid var(--font-color-light);
+        border-bottom: 1px solid var(--color-font);
         content: "";
         display: inline-block;
         left: -7px;
     }
 
     ul.tree li:last-child:before {
-        border-left: 1px solid var(--font-color-light);
+        border-left: 1px solid var(--color-font);
     }
 
 

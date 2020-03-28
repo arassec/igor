@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests the {@link TypeRestController}.
  */
 @DisplayName("Type-Controller Tests")
-class TypeRestControllerTest extends BaseRestControllerTest {
+class TypeRestControllerTest extends RestControllerBaseTest {
 
     /**
      * Tests retrieval of types.

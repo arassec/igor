@@ -38,7 +38,7 @@
         overflow: hidden;
         max-width: 400px;
         width: 400px;
-        color: var(--font-color-light);
+        color: var(--color-font);
         padding: 15px;
         display: block;
         position: fixed;
@@ -50,11 +50,11 @@
     }
 
     .feedback {
-        background-color: var(--nav-background-color);
+        background-color: var(--color-foreground);
     }
 
     .alert {
-        background-color: var(--alert-background-color);
+        background-color: var(--color-alert);
     }
 
     .snackbar-enter-active, .snackbar-leave-active {

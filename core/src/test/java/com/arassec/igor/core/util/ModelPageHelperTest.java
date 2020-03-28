@@ -80,4 +80,17 @@ class ModelPageHelperTest {
         assertEquals(0, page.getItems().size());
     }
 
+    /**
+     * Tests getting a model page mit exactly the right amount of items.
+     */
+    @Test
+    @DisplayName("Tests getting a model page mit exactly the right amount of items")
+    void testGetRightAmount() {
+        ModelPage<String> modelPage = ModelPageHelper.getModelPage(List.of("a", "b"), 0, 2);
+        assertEquals(0, modelPage.getNumber());
+        assertEquals(2, modelPage.getSize());
+        assertEquals(1, modelPage.getTotalPages());
+        assertEquals("a", modelPage.getItems().get(0));
+        assertEquals("b", modelPage.getItems().get(1));
+    }
 }
