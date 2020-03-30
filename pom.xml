@@ -124,7 +124,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.10.8</version>
+                <version>1.10.9</version>
             </dependency>
 
             <!-- for testing bean validation annotations -->
