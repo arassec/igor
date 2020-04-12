@@ -30,15 +30,15 @@
                                :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
 
                         <input-button v-if="!isNumber(param.type) && !isBoolean(param.type) && param.secured"
-                                      icon="eye" v-on:clicked="toggleCleartext(index)" class="button-margin-left"/>
+                                      icon="eye" v-on:clicked="toggleCleartext(index)" class="margin-left"/>
 
                         <input-button v-else-if="isService(param)" icon="cogs"
                                       v-on:clicked="openServicePicker(index, param.categoryCandidates)"
-                                      class="button-margin-left"/>
+                                      class="margin-left"/>
 
                         <input-button v-else-if="param.subtype === 'CRON'" v-on:clicked="openCronPicker(index)"
                                       icon="clock"
-                                      class="button-margin-left"/>
+                                      class="margin-left"/>
 
                     </td>
                 </tr>

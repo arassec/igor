@@ -5,28 +5,30 @@
             <p slot="title">Service Configuration</p>
             <layout-row slot="header">
                 <p slot="left">
-                    <input-button v-on:clicked="cancelConfiguration()" icon="arrow-left" class="button-margin-right"/>
-                    <input-button v-on:clicked="testConfiguration()" icon="plug" class="button-margin-right"/>
+                    <input-button v-on:clicked="cancelConfiguration()" icon="arrow-left" class="margin-right"/>
+                    <input-button v-on:clicked="testConfiguration()" icon="plug" class="margin-right"/>
                     <input-button v-on:clicked="saveConfiguration()" icon="save"/>
                 </p>
             </layout-row>
-            <p slot="footer"
-               v-if="referencingJobsPage && referencingJobsPage.items && referencingJobsPage.items.length > 0">
-                <label class="list-label">Used by the following jobs:</label>
-                <feedback-box v-for="(referencingJob, index) in referencingJobsPage.items" :key="index"
-                              class="list-entry"
-                              :clickable="true"
-                              v-on:feedback-clicked="editJob(referencingJob.key)">
-                    <div slot="left" class="width-restricted truncate">{{referencingJob.value}}</div>
-                </feedback-box>
-                <list-pager :page="referencingJobsPage" v-if="referencingJobsPage.totalPages > 1"
-                            v-on:first="loadReferencingJobs(0)"
-                            v-on:previous="loadReferencingJobs(referencingJobsPage.number - 1)"
-                            v-on:next="loadReferencingJobs(referencingJobsPage.number + 1)"
-                            v-on:last="loadReferencingJobs(referencingJobsPage.totalPages -1)"/>
-            </p>
-            <label slot="footer" v-if="!referencingJobsPage || !referencingJobsPage.items || referencingJobsPage.items.length
+            <core-panel slot="footer">
+                <p
+                   v-if="referencingJobsPage && referencingJobsPage.items && referencingJobsPage.items.length > 0">
+                    <label class="list-label">Used by the following jobs:</label>
+                    <feedback-box v-for="(referencingJob, index) in referencingJobsPage.items" :key="index"
+                                  class="list-entry"
+                                  :clickable="true"
+                                  v-on:feedback-clicked="editJob(referencingJob.key)">
+                        <div slot="left" class="width-restricted truncate">{{referencingJob.value}}</div>
+                    </feedback-box>
+                    <list-pager :page="referencingJobsPage" v-if="referencingJobsPage.totalPages > 1"
+                                v-on:first="loadReferencingJobs(0)"
+                                v-on:previous="loadReferencingJobs(referencingJobsPage.number - 1)"
+                                v-on:next="loadReferencingJobs(referencingJobsPage.number + 1)"
+                                v-on:last="loadReferencingJobs(referencingJobsPage.totalPages -1)"/>
+                </p>
+                <label v-if="!referencingJobsPage || !referencingJobsPage.items || referencingJobsPage.items.length
              === 0">No jobs are using this service.</label>
+            </core-panel>
         </side-menu>
 
         <core-content>
@@ -107,7 +109,7 @@
     import CoreContent from '../components/common/core-content'
     import LayoutRow from '../components/common/layout-row'
     import SideMenu from '../components/common/side-menu'
-    import FormatUtils from '../utils/format-utils.js'
+    import FormatUtils from '../utils/utils.js'
     import IgorBackend from '../utils/igor-backend.js'
     import BackgroundIcon from "../components/common/background-icon";
     import ModalDialog from "../components/common/modal-dialog";

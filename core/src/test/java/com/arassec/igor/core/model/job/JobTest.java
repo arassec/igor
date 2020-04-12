@@ -185,7 +185,7 @@ class JobTest {
     @DisplayName("Tests default properties.")
     void testDefaultProperties() {
         Job job = new Job();
-        assertEquals(5, job.getExecutionHistoryLimit());
+        assertEquals(5, job.getHistoryLimit());
         assertFalse(job.isRunning());
         assertTrue(job.isFaultTolerant());
     }

@@ -112,6 +112,17 @@ public class FtpFileServiceTest extends FtpFileServiceBaseTest {
     }
 
     /**
+     * "Tests reading a file that doesn't exist. An {@link IgorException} must be thrown to indicate the missing file.
+     */
+    @Test
+    @DisplayName("Tests reading a file that doesn't exist.")
+    void testReadStreamFailSafe() {
+        IgorException igorException = assertThrows(IgorException.class, () -> service.readStream("invalid/not-existing.file",
+                new WorkInProgressMonitor("ftp-readstream-test")));
+        assertEquals("Could not retrieve file: invalid/not-existing.file", igorException.getMessage());
+    }
+
+    /**
      * Tests writing a file as stream.
      */
     @Test

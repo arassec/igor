@@ -21,6 +21,7 @@
     .row {
         display: flex;
         flex-direction: row;
+        padding: .25em;
     }
 
     .scroll {

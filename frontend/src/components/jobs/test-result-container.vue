@@ -1,25 +1,26 @@
 <template>
-    <core-content class="sticky">
+    <core-content class="sticky ">
         <div class="test-result-container">
 
             <layout-row>
                 <div slot="left">
-                    <h1>Dry run results</h1>
+                    <h1>Simulation results</h1>
                 </div>
                 <input-button slot="right" icon="times" v-on:clicked="$emit('close')"/>
             </layout-row>
 
             <p v-if="!selectedTestResults">
-                Please select a <b>Task</b> or <b>Action</b> to see detailed dry-run results.
+                No simulation results available.
             </p>
-            <p v-else-if="selectedTestResults.results.length == 0 && !selectedTestResults.errorCause">
-                No test data available.
+            <p v-else-if="selectedTestResults.results.length === 0 && !selectedTestResults.errorCause">
+                No simulation results available.
             </p>
-            <pre v-else-if="selectedTestResults.results.length > 0 && !selectedTestResults.errorCause" class="normal-bg">
-<code>{{ format(selectedTestResults.results) }}</code></pre>
+            <pre v-else-if="selectedTestResults.results.length > 0 && !selectedTestResults.errorCause"
+                 v-for="(result, index) in selectedTestResults.results" v-bind:key="index"
+                 class="normal-bg">
+<code>{{ format(result) }}</code></pre>
             <pre v-else-if="selectedTestResults.errorCause" class="error-bg">
 <code>{{ selectedTestResults.errorCause }}</code></pre>
-
         </div>
     </core-content>
 </template>
@@ -48,19 +49,17 @@
         flex: 2;
         margin-right: 0;
         overflow: hidden;
-        max-height: calc(100vh - 20px);
     }
 
     .test-result-container {
         color: var(--color-font);
         background-color: var(--color-background);
-        padding: 15px;
+        padding: 1em;
     }
 
     pre {
         overflow: auto;
         height: auto;
-        max-height: calc(100vh / 1.5);
         word-break: normal !important;
         word-wrap: normal !important;
         white-space: pre !important;
@@ -72,18 +71,6 @@
 
     .error-bg {
         background-color: var(--color-alert)
-    }
-
-    .slide-fade-enter-active {
-        transition: all .5s ease;
-    }
-
-    .slide-fade-leave-active {
-        transition: all .5s ease;
-    }
-
-    .slide-fade-enter, .slide-fade-leave-to {
-        opacity: 0;
     }
 
 </style>

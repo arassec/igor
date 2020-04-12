@@ -2,8 +2,7 @@
     <div class="sticky max-width">
         <core-panel class="min-height">
             <h1 class="truncate">
-                <font-awesome-icon icon="wrench"/>
-                {{ action.name.length > 0 ? action.name : action.type.value }}
+                <font-awesome-icon icon="wrench" class="margin-right"/>{{ action.name.length > 0 ? action.name : action.type.value }}
             </h1>
 
             <table>
@@ -55,7 +54,7 @@
         </core-panel>
 
         <core-panel>
-            <h2>Action Parameters</h2>
+            <h2>Action Configuration</h2>
             <parameter-editor :parameters="action.parameters" ref="parameterEditor"
                 v-on:create-service="createService"/>
         </core-panel>
@@ -70,7 +69,7 @@
     export default {
   name: 'action-configurator',
   components: {CorePanel, ParameterEditor},
-  props: ['action', 'actionKey'],
+  props: ['action'],
   data: function () {
     return {
       actionCategories: [],
@@ -116,7 +115,7 @@
       return parameterValidationResult
     },
     createService: function (parameterIndex, serviceCategoryCandidates) {
-      this.$emit('create-service', this.actionKey, parameterIndex, serviceCategoryCandidates)
+      this.$emit('create-service', this.action.id, parameterIndex, serviceCategoryCandidates)
     }
   },
   watch: {

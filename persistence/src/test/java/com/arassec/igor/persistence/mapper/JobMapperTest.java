@@ -37,7 +37,7 @@ public class JobMapperTest extends MapperBaseTest {
         job.setName("job-name");
         job.setDescription("job-description");
         job.setActive(true);
-        job.setExecutionHistoryLimit(666);
+        job.setHistoryLimit(666);
 
         TestTrigger testTrigger = new TestTrigger();
         testTrigger.setId("trigger-id");
@@ -95,7 +95,7 @@ public class JobMapperTest extends MapperBaseTest {
         assertEquals("job-name", testJob.getName());
         assertEquals("job-description", testJob.getDescription());
         assertTrue(testJob.isActive());
-        assertEquals(666, testJob.getExecutionHistoryLimit());
+        assertEquals(666, testJob.getHistoryLimit());
 
         TestTrigger testTrigger = (TestTrigger) testJob.getTrigger();
 

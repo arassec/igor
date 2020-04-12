@@ -232,7 +232,7 @@ class JobManagerTest {
 
         Job job = new Job();
         job.setId("job-id");
-        job.setExecutionHistoryLimit(666);
+        job.setHistoryLimit(666);
 
         jobManager.enqueue(job);
 
@@ -253,7 +253,7 @@ class JobManagerTest {
     @Test
     @DisplayName("Tests enqueueing an already running job.")
     void testEnqueueRunningJob() {
-        Job job = Job.builder().id("job-id").executionHistoryLimit(666).build();
+        Job job = Job.builder().id("job-id").historyLimit(666).build();
 
         // A running job blocks enqueueing the job again:
         reset(jobExecutionRepository);

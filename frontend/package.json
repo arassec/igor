@@ -18,12 +18,13 @@
     "ajv-keywords": "^3.4.0",
     "axios": "^0.19.0",
     "vue": "^2.5.22",
-    "vue-router": "^3.0.2"
+    "vue-router": "^3.0.2",
+    "vuedraggable": "^2.23.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.3.0",
-    "@vue/cli-plugin-eslint": "^3.3.0",
-    "@vue/cli-service": "^4.2.2",
+    "@vue/cli-plugin-eslint": "^4.3.1",
+    "@vue/cli-service": "^4.3.1",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.12.1",
     "eslint-plugin-vue": "^5.1.0",

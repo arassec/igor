@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="app-content">
         <nav>
             <ul>
                 <li>
@@ -54,6 +54,7 @@
 <style scoped>
 
     nav {
+        flex: 1;
         display: flex;
         flex-direction: row;
         background-color: var(--color-background);

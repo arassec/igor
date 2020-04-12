@@ -2,8 +2,7 @@
     <div class="sticky max-width">
         <core-panel>
             <h1 class="truncate">
-                <font-awesome-icon icon="tasks"/>
-                {{ task.name.length > 0 ? task.name : 'New Task' }}
+                <font-awesome-icon icon="tasks" class="margin-right"/>{{ task.name.length > 0 ? task.name : 'Task' }}
             </h1>
 
             <table>
@@ -15,17 +14,17 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label>Name*</label></td>
+                    <td><label for="name">Name*</label></td>
                     <td>
-                        <input type="text" autocomplete="off" v-model="task.name"
+                        <input id="name" type="text" autocomplete="off" v-model="task.name"
                                :class="nameValidationError.length > 0 ? 'validation-error' : ''"
                                :placeholder="nameValidationError.length > 0 ? nameValidationError : ''"/>
                     </td>
                 </tr>
-                <tr v-show="showAdvancedParameters">
-                    <td><label>Description</label></td>
+                <tr v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
+                    <td><label for="description">Description</label></td>
                     <td>
-                        <input type="text" autocomplete="off" v-model="task.description"/>
+                        <input id="description" type="text" autocomplete="off" v-model="task.description"/>
                     </td>
                 </tr>
                 <tr>
@@ -42,9 +41,9 @@
             <h2>Provider</h2>
             <table>
                 <tr v-if="providerCategories.length > 1">
-                    <td><label>Category</label></td>
+                    <td><label for="category-selection">Category</label></td>
                     <td>
-                        <select v-model="task.provider.category"
+                        <select id="category-selection" v-model="task.provider.category"
                                 v-on:change="loadTypesOfCategory(task.provider.category.key, true).then(() => {
                                         loadParametersOfType(task.provider.type.key)})">
                             <option v-for="providerCategory in providerCategories" v-bind:value="providerCategory"
@@ -55,9 +54,10 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label>Type</label></td>
+                    <td><label for="type-selection">Type</label></td>
                     <td>
-                        <select v-model="task.provider.type" v-on:change="loadParametersOfType(task.provider.type.key)">
+                        <select id="type-selection" v-model="task.provider.type"
+                                v-on:change="loadParametersOfType(task.provider.type.key)">
                             <option v-for="providerType in providerTypes" v-bind:value="providerType"
                                     v-bind:key="providerType.key">
                                 {{providerType.value}}
@@ -69,7 +69,7 @@
         </core-panel>
 
         <core-panel v-if="task.provider.parameters.length">
-            <h2>Provider Parameters</h2>
+            <h2>Provider Configuration</h2>
             <parameter-editor v-bind:parameters="task.provider.parameters" ref="parameterEditor"
                               v-on:create-service="createService"/>
         </core-panel>
@@ -85,7 +85,7 @@
     export default {
         name: 'task-configurator',
         components: {CorePanel, ParameterEditor},
-        props: ['task', 'taskKey'],
+        props: ['task'],
         data: function () {
             return {
                 nameValidationError: '',
@@ -100,7 +100,7 @@
                     for (let i = this.providerCategories.length; i > 0; i--) {
                         this.providerCategories.pop()
                     }
-                    let component = this
+                    let component = this;
                     Array.from(categories).forEach(function (item) {
                         component.providerCategories.push(item)
                     })
@@ -111,10 +111,10 @@
                     for (let i = this.providerTypes.length; i > 0; i--) {
                         this.providerTypes.pop()
                     }
-                    let component = this
+                    let component = this;
                     Array.from(types).forEach(function (item) {
                         component.providerTypes.push(item)
-                    })
+                    });
                     if (selectFirst) {
                         this.task.provider.type = this.providerTypes[0]
                     }
@@ -126,15 +126,15 @@
                 })
             },
             validateInput: function () {
-                this.nameValidationError = ''
+                this.nameValidationError = '';
 
-                let nameValidationResult = true
+                let nameValidationResult = true;
                 if (this.task.name == null || this.task.name === '') {
-                    this.nameValidationError = 'Name must be set'
+                    this.nameValidationError = 'Name must be set';
                     nameValidationResult = false
                 }
 
-                let parameterValidationResult = true
+                let parameterValidationResult = true;
                 if (typeof this.$refs.parameterEditor !== 'undefined') {
                     parameterValidationResult = this.$refs.parameterEditor.validateInput()
                 }
@@ -142,7 +142,7 @@
                 return (nameValidationResult && parameterValidationResult)
             },
             createService: function (parameterIndex, serviceCategoryCandidates) {
-                this.$emit('create-service', this.taskKey, parameterIndex, serviceCategoryCandidates)
+                this.$emit('create-service', this.task.id, parameterIndex, serviceCategoryCandidates)
             }
         },
         watch: {

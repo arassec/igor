@@ -22,8 +22,6 @@
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
-        flex-wrap: nowrap;
-        width: 100vw;
     }
 
 </style>

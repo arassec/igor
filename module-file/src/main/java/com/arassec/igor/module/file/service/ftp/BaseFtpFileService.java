@@ -152,6 +152,9 @@ public abstract class BaseFtpFileService extends BaseFileService {
             FTPClient ftpClient = connect();
             FileStreamData result = new FileStreamData();
             FTPFile[] list = ftpClient.listFiles(file);
+            if (list.length == 0) {
+                throw new IgorException("Could not retrieve file: " + file);
+            }
             result.setFileSize(list[0].getSize());
             result.setData(ftpClient.retrieveFileStream(file));
             result.setSourceConnectionData(ftpClient);

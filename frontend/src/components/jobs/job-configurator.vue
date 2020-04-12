@@ -2,8 +2,7 @@
     <div class="sticky max-width" v-if="jobConfiguration">
         <core-panel>
             <h1 class="truncate">
-                <font-awesome-icon icon="toolbox"/>
-                {{ jobConfiguration.name.length > 0 ? jobConfiguration.name : 'Unnamed Job' }}
+                    <font-awesome-icon icon="toolbox" class="margin-right"/>{{ jobConfiguration.name.length > 0 ? jobConfiguration.name : 'Job' }}
             </h1>
             <table>
                 <tr>
@@ -14,28 +13,28 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label>Name*</label></td>
+                    <td><label for="name">Name*</label></td>
                     <td>
-                        <input type="text" autocomplete="off" v-model="jobConfiguration.name"
+                        <input id="name" type="text" autocomplete="off" v-model="jobConfiguration.name"
                                :class="nameValidationError.length > 0 ? 'validation-error' : ''"
                                :placeholder="nameValidationError.length > 0 ? nameValidationError : ''"/>
                     </td>
                 </tr>
-                <tr v-show="showAdvancedParameters">
+                <tr v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
                     <td><label for="description-input">Description</label></td>
                     <td>
                         <input id="description-input" type="text" autocomplete="off"
                                v-model="jobConfiguration.description"/>
                     </td>
                 </tr>
-                <tr v-show="showAdvancedParameters">
+                <tr v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
                     <td><label for="numexechistory-input">Execution-History Limit</label></td>
                     <td>
                         <input id="numexechistory-input" type="text" autocomplete="off"
                                v-model.number="jobConfiguration.executionHistoryLimit"/>
                     </td>
                 </tr>
-                <tr v-show="showAdvancedParameters">
+                <tr v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
                     <td><label for="faulttolerant-input">Fault tolerant</label></td>
                     <td>
                         <font-awesome-icon id="faulttolerant-input" :icon="jobConfiguration.faultTolerant ? 'check-square' : 'square'"
@@ -56,9 +55,9 @@
             <h2>Trigger</h2>
             <table>
                 <tr>
-                    <td><label>Category</label></td>
+                    <td><label for="category">Category</label></td>
                     <td>
-                        <select v-model="jobConfiguration.trigger.category"
+                        <select id="category" v-model="jobConfiguration.trigger.category"
                                 v-on:change="loadTypesOfCategory(jobConfiguration.trigger.category.key)">
                             <option v-for="triggerCategory in triggerCategories" v-bind:value="triggerCategory"
                                     v-bind:key="triggerCategory.key">
@@ -68,9 +67,9 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label>Type</label></td>
+                    <td><label for="type">Type</label></td>
                     <td>
-                        <select v-model="jobConfiguration.trigger.type"
+                        <select id="type" v-model="jobConfiguration.trigger.type"
                                 v-on:change="loadParametersOfType(jobConfiguration.trigger.type.key)">
                             <option v-for="triggerType in triggerTypes" v-bind:value="triggerType"
                                     v-bind:key="triggerType.key">
@@ -83,7 +82,7 @@
         </core-panel>
 
         <core-panel v-if="jobConfiguration.trigger.parameters.length">
-            <h2>Trigger Parameters</h2>
+            <h2>Trigger Configuration</h2>
             <parameter-editor v-bind:parameters="jobConfiguration.trigger.parameters" ref="parameterEditor"
                               v-on:create-service="createService"/>
         </core-panel>
@@ -114,10 +113,10 @@
                     for (let i = this.triggerCategories.length; i > 0; i--) {
                         this.triggerCategories.pop()
                     }
-                    let component = this
+                    let component = this;
                     Array.from(categories).forEach(function (item) {
                         component.triggerCategories.push(item)
-                    })
+                    });
                     if (this.jobConfiguration.trigger.category == null) {
                         this.jobConfiguration.trigger.category = this.triggerCategories[0]
                     }
@@ -128,10 +127,10 @@
                     for (let i = this.triggerTypes.length; i > 0; i--) {
                         this.triggerTypes.pop()
                     }
-                    let component = this
+                    let component = this;
                     Array.from(types).forEach(function (item) {
                         component.triggerTypes.push(item)
-                    })
+                    });
                     if (this.jobConfiguration.trigger.type == null) {
                         this.jobConfiguration.trigger.type = component.triggerTypes[0]
                     }
@@ -149,13 +148,13 @@
                     this.nameValidationError = 'Name must be set'
                 } else {
                     let nameAlreadyExists = await IgorBackend.getData('/api/job/check/'
-                        + btoa(this.jobConfiguration.name) + '/' + (this.jobConfiguration.id === undefined ? -1 : this.jobConfiguration.id))
+                        + btoa(this.jobConfiguration.name) + '/' + (this.jobConfiguration.id === undefined ? -1 : this.jobConfiguration.id));
                     if (nameAlreadyExists === true) {
                         this.nameValidationError = 'nameAlreadyExists'
                     }
                 }
 
-                let parameterValidationResult = true
+                let parameterValidationResult = true;
                 if (typeof this.$refs.parameterEditor !== 'undefined') {
                     parameterValidationResult = this.$refs.parameterEditor.validateInput()
                 }
@@ -170,7 +169,7 @@
             }
         },
         mounted() {
-            let loadParameters = (this.jobConfiguration.trigger.type === null)
+            let loadParameters = (this.jobConfiguration.trigger.type === null);
             this.loadCategories().then(() => {
                 this.loadTypesOfCategory(this.jobConfiguration.trigger.category.key).then(() => {
                     if (loadParameters) {

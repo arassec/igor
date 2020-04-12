@@ -73,8 +73,4 @@
         height: 100%;
     }
 
-    .disabled {
-        opacity: 50%;
-    }
-
 </style>

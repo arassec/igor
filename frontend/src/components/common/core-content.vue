@@ -1,13 +1,12 @@
 <template>
-    <div class="content" :class="{'overflow-hidden': overflowHidden}">
+    <div class="content">
         <slot/>
     </div>
 </template>
 
 <script>
     export default {
-        name: 'core-content',
-        props: ['overflowHidden']
+        name: 'core-content'
     }
 </script>
 
@@ -16,10 +15,6 @@
     .content {
         margin: 1em 1em 0 0;
         flex-shrink: 1;
-    }
-
-    .overflow-hidden {
-        overflow: hidden;
     }
 
 </style>

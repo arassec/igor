@@ -61,7 +61,7 @@ public class Job {
      */
     @Builder.Default
     @PositiveOrZero
-    private int executionHistoryLimit = 5;
+    private int historyLimit = 5;
 
     /**
      * The tasks this job will perform.

@@ -7,18 +7,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Contains the simulation result of an action.
+ * Contains the results of a simulated job execution.
  */
 @Data
-public class SimulationActionResult {
+public class SimulationResult {
 
     /**
-     * The data after the action's processing.
+     * The simulation results of every task of the job.
      */
     private List<Map<String, Object>> results = new LinkedList<>();
 
     /**
-     * Might contain an error cause if the action finished abnormally.
+     * Might contain an error cause if the job finished abnormally.
      */
     private String errorCause;
 

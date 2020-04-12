@@ -165,7 +165,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             jobExecution.setCreated(Instant.now());
             jobExecution.setExecutionState(JobExecutionState.WAITING);
             jobExecutionRepository.upsert(jobExecution);
-            jobExecutionRepository.cleanup(job.getId(), job.getExecutionHistoryLimit());
+            jobExecutionRepository.cleanup(job.getId(), job.getHistoryLimit());
         } else {
             log.info("Job '{}' ({}) already executing or waiting for execution. Skipped execution until next time.",
                     job.getName(), job.getId());

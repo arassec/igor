@@ -13,9 +13,7 @@ import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.model.JobListEntry;
 import com.arassec.igor.web.model.ScheduleEntry;
-import com.arassec.igor.web.model.simulation.SimulationActionResult;
-import com.arassec.igor.web.model.simulation.SimulationJobResult;
-import com.arassec.igor.web.model.simulation.SimulationTaskResult;
+import com.arassec.igor.web.model.simulation.SimulationResult;
 import com.arassec.igor.web.simulation.ActionProxy;
 import com.arassec.igor.web.simulation.ProviderProxy;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -152,10 +150,12 @@ public class JobRestController extends BaseRestController {
      *
      * @param jobJson The job in JSON form as String.
      *
-     * @return Test results of the simulated job run.
+     * @return Test results of the simulated job execution.
      */
     @PostMapping("simulate")
-    public SimulationJobResult simulateJob(@Valid @RequestBody String jobJson) {
+    public Map<String, SimulationResult> simulateJob(@Valid @RequestBody String jobJson) {
+
+        Map<String, SimulationResult> result = new HashMap<>();
 
         Job job;
         try {
@@ -168,15 +168,16 @@ public class JobRestController extends BaseRestController {
 
         job.run(jobExecution);
 
-        SimulationJobResult jobResult = new SimulationJobResult();
+        SimulationResult jobResult = new SimulationResult();
         if (jobExecution.getErrorCause() != null) {
             jobResult.setErrorCause(jobExecution.getErrorCause());
+            result.put("job-result", jobResult);
         }
 
         job.getTasks().forEach(task -> {
             ProviderProxy providerProxy = (ProviderProxy) task.getProvider();
 
-            SimulationTaskResult taskResult = new SimulationTaskResult();
+            SimulationResult taskResult = new SimulationResult();
             taskResult.setErrorCause(providerProxy.getErrorCause());
             providerProxy.getCollectedData()
                     .forEach(jsonObject -> {
@@ -185,19 +186,22 @@ public class JobRestController extends BaseRestController {
                         item.put(DataKey.META.getKey(), Task.createMetaData(job.getId(), task.getId()));
                         taskResult.getResults().add(item);
                     });
+            if (task.getId() != null) {
+                result.put(task.getId(), taskResult);
+            }
 
             task.getActions().forEach(action -> {
                 ActionProxy actionProxy = (ActionProxy) action;
-                SimulationActionResult actionResult = new SimulationActionResult();
+                SimulationResult actionResult = new SimulationResult();
                 actionResult.setErrorCause(actionProxy.getErrorCause());
                 actionProxy.getCollectedData().forEach(jsonObject -> actionResult.getResults().add(jsonObject));
-                taskResult.getActionResults().add(actionResult);
+                if (action.getId() != null) {
+                    result.put(action.getId(), actionResult);
+                }
             });
-
-            jobResult.getTaskResults().add(taskResult);
         });
 
-        return jobResult;
+        return result;
     }
 
     /**

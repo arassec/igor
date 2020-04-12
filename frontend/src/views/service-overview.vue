@@ -7,7 +7,7 @@
             </div>
             <div slot="right">
                 <router-link :to="'service-editor'">
-                    <input-button icon="plus" label="Add service" class="button-margin-right"/>
+                    <input-button icon="plus" label="Add service" class="margin-right"/>
                 </router-link>
                 <input-button icon="file-upload" label="Import service"/>
             </div>
@@ -20,12 +20,12 @@
                         <div slot="title">{{service.name}}</div>
                         <layout-row slot="menu">
                             <div slot="left">
-                                <input-button icon="trash-alt" v-on:clicked="openDeleteServiceDialog(service.id, service.name)"
-                                              class="button-margin-right"/>
+                                <input-button icon="trash" v-on:clicked="openDeleteServiceDialog(service.id, service.name)"
+                                              class="margin-right"/>
                                 <input-button icon="file-download" v-on:clicked="openExportDialog(service.id, service.name)"
-                                              class="button-margin-right"/>
+                                              class="margin-right"/>
                                 <input-button icon="clone" v-on:clicked="duplicateService(service.id)"
-                                              class="button-margin-right"/>
+                                              class="margin-right"/>
                             </div>
                         </layout-row>
                     </overview-tile>
@@ -77,7 +77,7 @@
     import DeleteServiceDialog from "../components/services/delete-service-dialog";
     import ModalDialog from "../components/common/modal-dialog";
     import LayoutRow from "../components/common/layout-row";
-    import FormatUtils from "../utils/format-utils";
+    import FormatUtils from "../utils/utils";
     import ListPager from "../components/common/list-pager";
 
     export default {

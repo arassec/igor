@@ -20,44 +20,44 @@ export default {
   }
 
   .core-panel-small {
-    padding: 5px 15px 5px 15px;
+    padding: .1em .5em .1em .5em;
   }
 
   .core-panel-normal {
-    padding: 15px;
+    padding: .5em;
   }
 
   .panel >>> table tr {
-    line-height: 25px;
+    line-height: 1.5em;
   }
 
   .panel >>> table tr td {
     text-align: left;
-    padding-right: 15px;
+    padding-right: 1em;
   }
 
   .panel >>> label {
     color: var(--color-font);
-    margin-right: 15px;
+    margin-right: 1em;
   }
 
   .panel >>> input, select {
     border: none;
     background-color: var(--color-foreground);
-    height: 25px;
-    min-width: 280px;
+    height: 2em;
+    min-width: 25em;
     color: var(--color-font);
   }
 
   .panel >>> input {
-    text-indent: 5px;
+    text-indent: .2em;
   }
 
   .panel >>> select option {
     border: none;
     outline: none;
     background-color: var(--color-foreground);
-    height: 25px;
+    height: 2em;
   }
 
   .panel >>> select:focus,

@@ -6,7 +6,7 @@
 
 <script>
     export default {
-        name: 'input-button',
+        name: 'add-item-button',
         props: ['icon', 'disabled', 'label'],
         methods: {
             fire: function () {
@@ -20,8 +20,8 @@
 
 <style scoped>
     button {
-        border: 1px solid var(--color-font);
-        color: var(--color-font);
+        border: 1px solid var(--color-background);
+        color: var(--color-background);
         background-color: Transparent;
         cursor: pointer;
         padding: .25em;
@@ -32,8 +32,9 @@
     }
 
     button:hover:not(.disabled)  {
-        background-color: var(--color-font);
-        color: var(--color-background);
+        background-color: var(--color-foreground);
+        border: 1px solid var(--color-foreground);
+        color: var(--color-font);
         cursor: pointer;
     }
 

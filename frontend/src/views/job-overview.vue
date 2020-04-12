@@ -7,23 +7,23 @@
                 <label id="state-filter-label">State filter:</label>
                 <toggle-button icon="spinner"
                                :label="'(' + executionsOverview.numRunning + '/' + executionsOverview.numSlots + ') Running'"
-                               bgcolor="var(--color-foreground)" class="button-margin-right"
+                               bgcolor="var(--color-foreground)" class="margin-right"
                                fontcolor="var(--color-font)" v-on:selected="filterJobStateRunning"
                                :selected="stateFilter.running"/>
                 <toggle-button icon="hourglass" :label="'(' + executionsOverview.numWaiting + ') Waiting'"
-                               bgcolor="var(--color-foreground)" class="button-margin-right"
+                               bgcolor="var(--color-foreground)" class="margin-right"
                                fontcolor="var(--color-font)" v-on:selected="filterJobStateWaiting"
                                :selected="stateFilter.waiting"/>
                 <toggle-button icon="bolt" :label="'(' + executionsOverview.numFailed + ') Failed'"
-                               bgcolor="var(--color-alert)" class="button-margin-right"
+                               bgcolor="var(--color-alert)" class="margin-right"
                                fontcolor="var(--color-font)" v-on:selected="filterJobStateFailed"
                                :selected="stateFilter.failed"/>
             </div>
             <div slot="right">
                 <router-link :to="'job-editor'">
-                    <input-button icon="plus" label="Add job" class="button-margin-right"/>
+                    <input-button icon="plus" label="Add job" class="margin-right"/>
                 </router-link>
-                <input-button icon="file-upload" label="Import job" class="button-margin-right"
+                <input-button icon="file-upload" label="Import job" class="margin-right"
                               v-on:clicked="openShowImportDialog"/>
                 <input-button icon="clipboard" label="Show schedule" v-on:clicked="openScheduleDialog"/>
             </div>
@@ -37,12 +37,12 @@
                         <div slot="title">{{job.name}}</div>
                         <layout-row slot="menu">
                             <div slot="left">
-                                <input-button icon="trash-alt" v-on:clicked="openDeleteJobDialog(job.id, job.name)"
-                                              class="button-margin-right"/>
+                                <input-button icon="trash" v-on:clicked="openDeleteJobDialog(job.id, job.name)"
+                                              class="margin-right"/>
                                 <input-button icon="file-download" v-on:clicked="openExportDialog(job.id, job.name)"
-                                              class="button-margin-right"/>
+                                              class="margin-right"/>
                                 <input-button icon="clone" v-on:clicked="duplicateJob(job.id)"
-                                              class="button-margin-right"/>
+                                              class="margin-right"/>
                             </div>
                             <div slot="right">
                                 <input-button icon="play" v-on:clicked="openRunJobDialog(job.id, job.name)"
@@ -156,7 +156,7 @@
             </label>
 
             <div class="schedule-box" slot="body">
-                <feedback-box slot="body" v-for="scheduledJob in schedulePage.items" :key="scheduledJob.jobId"
+                <feedback-box v-for="scheduledJob in schedulePage.items" :key="scheduledJob.jobId"
                               :clickable="true"
                               v-on:feedback-clicked="editJob(scheduledJob.jobId)">
                     <div slot="left" class="margin-right truncate">{{scheduledJob.jobName}}</div>
@@ -212,7 +212,7 @@
     import CoreContainer from "../components/common/core-container";
     import OverviewTile from "../components/common/overview-tile";
     import IgorBackend from "../utils/igor-backend";
-    import FormatUtils from "../utils/format-utils";
+    import FormatUtils from "../utils/utils";
     import DeleteJobDialog from "../components/jobs/delete-job-dialog";
     import LayoutRow from "../components/common/layout-row";
     import ModalDialog from "../components/common/modal-dialog";
@@ -242,7 +242,7 @@
             return {
                 jobsPage: {
                     number: 0,
-                    size: 20,
+                    size: 15,
                     totalPages: 0,
                     items: []
                 },

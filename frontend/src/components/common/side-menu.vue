@@ -1,6 +1,6 @@
 <template>
     <core-content class="side-menu">
-        <core-panel>
+        <core-panel v-if="hasHeaderSlot">
             <h1 class="no-margin">
                 <slot name="title"/>
             </h1>
@@ -8,16 +8,8 @@
                 <slot name="header"/>
             </div>
         </core-panel>
-        <core-panel v-if="hasContentSlot">
-            <div class="content">
-                <slot name="content"/>
-            </div>
-        </core-panel>
-        <core-panel>
-            <div class="footer">
-                <slot name="footer"/>
-            </div>
-        </core-panel>
+        <slot name="content"/>
+        <slot name="footer"/>
     </core-content>
 </template>
 
@@ -29,8 +21,8 @@
         name: 'side-menu',
         components: {CorePanel, CoreContent},
         computed: {
-            hasContentSlot: function () {
-                return !!this.$slots['content']
+            hasHeaderSlot: function () {
+                return !!this.$slots['header']
             }
         }
     }
@@ -49,7 +41,7 @@
     }
 
     .header {
-        padding-top: 15px;
+        padding-top: 1.5em;
         z-index: 666;
         background-color: var(--color-background);
     }
@@ -57,7 +49,7 @@
     .sticky {
         z-index: 5;
         position: sticky;
-        top: 0px;
+        top: 0;
     }
 
 </style>

@@ -1,6 +1,5 @@
 package com.arassec.igor.web.controller;
 
-import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.job.execution.JobExecution;
@@ -9,7 +8,7 @@ import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.model.JobListEntry;
 import com.arassec.igor.web.model.ScheduleEntry;
-import com.arassec.igor.web.model.simulation.SimulationJobResult;
+import com.arassec.igor.web.model.simulation.SimulationResult;
 import com.arassec.igor.web.simulation.ActionProxy;
 import com.arassec.igor.web.simulation.ProviderProxy;
 import com.arassec.igor.web.test.TestTrigger;
@@ -182,13 +181,13 @@ class JobRestControllerTest extends RestControllerBaseTest {
     @SneakyThrows
     void testSimulateJob() {
         Job jobSpy = spy(Job.class);
-        when(jobSpy.getId()).thenReturn("job-id");
 
         ProviderProxy providerProxyMock = mock(ProviderProxy.class);
         when(providerProxyMock.getErrorCause()).thenReturn("provider-error-cause");
         when(providerProxyMock.getCollectedData()).thenReturn(List.of(Map.of("provider-key", "provider-value")));
 
         ActionProxy actionProxyMock = mock(ActionProxy.class);
+        when(actionProxyMock.getId()).thenReturn("action-id");
         when(actionProxyMock.getErrorCause()).thenReturn("action-error-cause");
         when(actionProxyMock.getCollectedData()).thenReturn(List.of(Map.of("action-key", "action-value")));
 
@@ -203,27 +202,45 @@ class JobRestControllerTest extends RestControllerBaseTest {
             return null;
         }).when(jobSpy).run(any(JobExecution.class));
 
-        MvcResult mvcResult = mockMvc.perform(post("/api/job/simulate")
+        mockMvc.perform(post("/api/job/simulate")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(Job.builder().id("job-id").build())))
-                .andExpect(status().isOk()).andReturn();
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.job-result.errorCause").value("job-error-cause"))
+                .andExpect(jsonPath("$.action-id.errorCause").value("action-error-cause"))
+                .andExpect(jsonPath("$.task-id.errorCause").value("provider-error-cause"))
+                .andExpect(jsonPath("$.action-id.results[0].action-key").value("action-value"))
+                .andExpect(jsonPath("$.task-id.results[0].data.provider-key").value("provider-value"))
+                .andExpect(jsonPath("$.task-id.results[0].meta.taskId").value("task-id"));
+    }
 
-        SimulationJobResult result = convert(mvcResult, SimulationJobResult.class);
+    /**
+     * Tests simulating a job execution with missing IDs on the job's components.
+     */
+    @Test
+    @DisplayName("Tests simulating a job execution with missing IDs on the job's components.")
+    @SneakyThrows
+    void testSimulateJobNoIds() {
+        Job jobSpy = spy(Job.class);
 
-        assertEquals("job-error-cause", result.getErrorCause());
-        assertEquals("provider-error-cause", result.getTaskResults().get(0).getErrorCause());
-        assertEquals("action-error-cause", result.getTaskResults().get(0).getActionResults().get(0).getErrorCause());
+        ProviderProxy providerProxyMock = mock(ProviderProxy.class);
+        when(providerProxyMock.getErrorCause()).thenReturn("provider-error-cause");
+        when(providerProxyMock.getCollectedData()).thenReturn(List.of(Map.of("provider-key", "provider-value")));
 
-        Map<String, Object> providerData = result.getTaskResults().get(0).getResults().get(0);
-        assertTrue(providerData.containsKey(DataKey.DATA.getKey()));
-        assertTrue(providerData.containsKey(DataKey.META.getKey()));
+        ActionProxy actionProxyMock = mock(ActionProxy.class);
+        when(actionProxyMock.getErrorCause()).thenReturn("action-error-cause");
+        when(actionProxyMock.getCollectedData()).thenReturn(List.of(Map.of("action-key", "action-value")));
 
-        @SuppressWarnings("unchecked")
-        Map<String, Object> providerDataItem = (Map<String, Object>) providerData.get(DataKey.DATA.getKey());
-        assertEquals("provider-value", providerDataItem.get("provider-key"));
+        when(jobSpy.getTasks()).thenReturn(List.of(
+                Task.builder().provider(providerProxyMock).actions(List.of(actionProxyMock)).build()));
 
-        Map<String, Object> actionDataItem = result.getTaskResults().get(0).getActionResults().get(0).getResults().get(0);
-        assertEquals("action-value", actionDataItem.get("action-key"));
+        when(simulationObjectMapper.readValue(anyString(), eq(Job.class))).thenReturn(jobSpy);
+
+        mockMvc.perform(post("/api/job/simulate")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(Job.builder().id("job-id").build())))
+                .andExpect(status().isOk())
+                .andExpect(content().string("{}"));
     }
 
     /**

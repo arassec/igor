@@ -51,10 +51,6 @@
         cursor: pointer;
     }
 
-    .disabled {
-        opacity: 0.5;
-    }
-
     .selected:not(.disabled) {
         color: var(--set-font-color);
         background-color: var(--set-background-color);

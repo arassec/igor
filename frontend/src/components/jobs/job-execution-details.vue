@@ -3,7 +3,7 @@
         <p slot="header">
             <layout-row>
                 <h1 slot="left">Job Execution Details</h1>
-                <input-button slot="right" icon="times" v-on:clicked="$emit('close')" class="button-margin-right"/>
+                <input-button slot="right" icon="times" v-on:clicked="$emit('close')" />
             </layout-row>
         </p>
 

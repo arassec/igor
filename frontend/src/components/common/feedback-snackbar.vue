@@ -42,7 +42,7 @@
         padding: 15px;
         display: block;
         position: fixed;
-        z-index: 1;
+        z-index: 999;
         right: 25%;
         left: 50%;
         margin-left: -200px;
