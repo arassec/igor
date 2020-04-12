@@ -31,7 +31,7 @@
                     <td><label for="numexechistory-input">Execution-History Limit</label></td>
                     <td>
                         <input id="numexechistory-input" type="text" autocomplete="off"
-                               v-model.number="jobConfiguration.executionHistoryLimit"/>
+                               v-model.number="jobConfiguration.historyLimit"/>
                     </td>
                 </tr>
                 <tr v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">

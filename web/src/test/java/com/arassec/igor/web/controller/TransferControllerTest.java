@@ -56,7 +56,7 @@ public class TransferControllerTest extends RestControllerBaseTest {
         TransferData transferData = convert(mvcResult, TransferData.class);
 
         assertEquals(1, transferData.getJobJsons().size());
-        assertEquals("{\"id\":\"job-id\",\"active\":false,\"executionHistoryLimit\":5,\"tasks\":[],\"running\":false," +
+        assertEquals("{\"id\":\"job-id\",\"active\":false,\"historyLimit\":5,\"tasks\":[],\"running\":false," +
                 "\"faultTolerant\":true}", transferData.getJobJsons().get(0));
 
         assertEquals(1, transferData.getServiceJsons().size());

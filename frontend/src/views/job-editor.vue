@@ -277,7 +277,7 @@
                         parameters: []
                     },
                     description: '',
-                    executionHistoryLimit: 5,
+                    historyLimit: 5,
                     active: true,
                     tasks: []
                 }

@@ -8,7 +8,7 @@
     "parameters": []
   },
   "active": true,
-  "executionHistoryLimit": 666,
+  "historyLimit": 666,
   "tasks": [
     {
       "id": "task-id",
