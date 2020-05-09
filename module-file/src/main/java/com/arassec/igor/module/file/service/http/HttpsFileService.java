@@ -33,7 +33,7 @@ public class HttpsFileService extends BaseHttpFileService {
      * Creates a new Instance.
      */
     public HttpsFileService() {
-        super("7244c422-84f5-4ead-a3a9-73df49b1910a");
+        super("https-file-connector");
         this.port = 443;
         this.protocol = "https";
     }

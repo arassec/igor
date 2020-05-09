@@ -48,7 +48,7 @@ public class DeleteFileAction extends BaseFileAction {
      * Creates a new component instance.
      */
     public DeleteFileAction() {
-        super("f83ed584-a6a2-458f-86bd-aaaae347227b");
+        super("delete-file-action");
         service = new FallbackFileService();
     }
 

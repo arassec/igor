@@ -14,7 +14,7 @@ public abstract class BasePersistenceAction extends BaseAction {
     final PersistentValueRepository persistentValueRepository;
 
     public BasePersistenceAction(String typeId, PersistentValueRepository persistentValueRepository) {
-        super("69b6ab78-9ab4-4282-91bd-8a78bff1aa7b", typeId);
+        super("persistence-actions", typeId);
         this.persistentValueRepository = persistentValueRepository;
     }
 

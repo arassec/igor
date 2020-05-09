@@ -34,7 +34,7 @@ public class EmptyInputProvider extends BaseUtilProvider {
      * Creates a new component instance.
      */
     public EmptyInputProvider() {
-        super("5e1969ae-fd31-47f5-9194-1b58546d129c");
+        super("empty-input-provider");
     }
 
     /**

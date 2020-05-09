@@ -117,7 +117,7 @@ public class RabbitMqMessageService extends BaseMessageService {
      * Creates a new component instance.
      */
     public RabbitMqMessageService() {
-        super("481df4ed-008f-4d6e-a186-76b71325f362");
+        super("rabbitmq-message-connector");
     }
 
     /**

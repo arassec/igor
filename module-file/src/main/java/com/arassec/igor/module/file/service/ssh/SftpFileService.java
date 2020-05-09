@@ -30,7 +30,7 @@ public class SftpFileService extends BaseSshFileService {
      * Creates a new component instance.
      */
     public SftpFileService() {
-        super("bf63c188-b930-4920-bb93-4da49db21eea");
+        super("sftp-file-connector");
     }
 
     /**

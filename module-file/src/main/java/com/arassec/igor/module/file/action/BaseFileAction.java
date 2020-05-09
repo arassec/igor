@@ -28,7 +28,7 @@ public abstract class BaseFileAction extends BaseAction {
      * @param typeId The type ID.
      */
     public BaseFileAction(String typeId) {
-        super("28ac6145-b4d8-4d09-8e99-b35ac24aae22", typeId);
+        super("file-actions", typeId);
     }
 
     /**

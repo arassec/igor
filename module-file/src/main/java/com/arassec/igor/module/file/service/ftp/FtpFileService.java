@@ -18,7 +18,7 @@ public class FtpFileService extends BaseFtpFileService {
      * Creates a new component instance.
      */
     public FtpFileService() {
-        super("b0b068a5-2f4f-46e5-8098-464e323b538b");
+        super("ftp-file-connector");
     }
 
     /**

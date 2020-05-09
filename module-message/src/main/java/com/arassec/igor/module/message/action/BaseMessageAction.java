@@ -13,7 +13,7 @@ abstract class BaseMessageAction extends BaseAction {
      * @param typeId The type ID.
      */
     public BaseMessageAction(String typeId) {
-        super("02e1da3f-cdaa-4b4b-9a60-460480c7b87d", typeId);
+        super("message-actions", typeId);
     }
 
 }

@@ -38,7 +38,7 @@ public class FilterByRegExpAction extends BaseUtilAction {
      * Creates a new component instance.
      */
     public FilterByRegExpAction() {
-        super("b404544a-a145-440c-80a3-1017e2b193cf");
+        super("filter-by-regexp-action");
     }
 
     /**

@@ -53,7 +53,7 @@ public class ReadFileAction extends BaseFileAction {
      * Creates a new component instance.
      */
     public ReadFileAction() {
-        super("52256687-b1e4-438d-b2f1-e077d1c86193");
+        super("read-file-action");
         service = new FallbackFileService();
     }
 

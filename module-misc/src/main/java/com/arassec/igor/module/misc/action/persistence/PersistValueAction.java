@@ -44,7 +44,7 @@ public class PersistValueAction extends BasePersistenceAction {
      * @param persistentValueRepository The repository for persisted values.
      */
     public PersistValueAction(PersistentValueRepository persistentValueRepository) {
-        super("6d768a9f-8f25-4ac1-ad8a-f825fbd1465c", persistentValueRepository);
+        super("persist-value-action", persistentValueRepository);
     }
 
     /**

@@ -13,7 +13,7 @@ public abstract class BaseFileProvider extends BaseProvider {
      * @param typeId     The type ID.
      */
     public BaseFileProvider(String typeId) {
-        super("5f15dc47-94b2-46df-b1ee-0f05293c8e73", typeId);
+        super("file-providers", typeId);
     }
 
 }

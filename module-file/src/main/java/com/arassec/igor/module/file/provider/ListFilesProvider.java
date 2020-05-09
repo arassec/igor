@@ -73,7 +73,7 @@ public class ListFilesProvider extends BaseFileProvider {
      * Creates a new component instance.
      */
     public ListFilesProvider() {
-        super("ac6ff9d1-7003-49cc-85b8-7be305fd90a4");
+        super("list-files-provider");
         service = new FallbackFileService();
     }
 

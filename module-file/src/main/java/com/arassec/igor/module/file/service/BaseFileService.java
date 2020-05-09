@@ -33,7 +33,7 @@ public abstract class BaseFileService extends BaseService implements FileService
      * @param typeId The type ID.
      */
     public BaseFileService(String typeId) {
-        super("ead60d29-bc68-42bf-93fb-95d5f9a7effd", typeId);
+        super("file-connectors", typeId);
     }
 
     /**

@@ -52,7 +52,7 @@ public class FixedInputProvider extends BaseUtilProvider {
      * Creates a new component instance.
      */
     public FixedInputProvider() {
-        super("6b0cdf46-1412-43c0-8b8a-467ea3a60796");
+        super("fixed-input-provider");
     }
 
     /**

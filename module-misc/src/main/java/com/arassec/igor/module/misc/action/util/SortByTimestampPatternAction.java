@@ -65,7 +65,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * Creates a new instance.
      */
     public SortByTimestampPatternAction() {
-        super("e43efa64-d1a3-422f-ac6c-f34cd56be0c2");
+        super("sort-by-timestamp-pattern-action");
         // This action requires to be run in a single thread!
         getUnEditableProperties().add("numThreads");
     }

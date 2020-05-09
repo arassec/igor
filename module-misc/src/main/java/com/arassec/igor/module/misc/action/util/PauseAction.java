@@ -32,7 +32,7 @@ public class PauseAction extends BaseUtilAction {
      * Creates a new component instance.
      */
     public PauseAction()  {
-        super("a8a0bd17-5ee7-48bd-8df1-5fe898e1d38a");
+        super("pause-action");
     }
 
     /**

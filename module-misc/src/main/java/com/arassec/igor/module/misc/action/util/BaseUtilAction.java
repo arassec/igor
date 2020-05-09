@@ -18,7 +18,7 @@ public abstract class BaseUtilAction extends BaseAction {
      * @param typeId     The type ID.
      */
     public BaseUtilAction(String typeId) {
-        super("c2ff4c41-fae4-4b9b-98a8-1d5d1ce6e0be", typeId);
+        super("util-actions", typeId);
     }
 
 }

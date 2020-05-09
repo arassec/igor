@@ -13,7 +13,7 @@ abstract class BaseUtilProvider extends BaseProvider {
      * @param typeId     The type ID.
      */
     public BaseUtilProvider(String typeId) {
-        super("7a64ccf8-9b97-47b4-914f-e8aea9cbf0a2", typeId);
+        super("util-providers", typeId);
     }
 
 }

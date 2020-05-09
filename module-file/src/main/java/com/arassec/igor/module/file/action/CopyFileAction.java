@@ -117,7 +117,7 @@ public class CopyFileAction extends BaseFileAction {
      * Creates a new component instance.
      */
     public CopyFileAction() {
-        super("d8564415-7dd9-4814-9b46-c2c5b56ed5cc");
+        super("copy-file-action");
         sourceService = new FallbackFileService();
         targetService = new FallbackFileService();
     }

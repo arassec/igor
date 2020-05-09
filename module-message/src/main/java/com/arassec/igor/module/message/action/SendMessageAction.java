@@ -51,7 +51,7 @@ public class SendMessageAction extends BaseMessageAction {
      * Creates a new component instance.
      */
     public SendMessageAction() {
-        super("88a0e988-d3ec-4b91-b98c-92d99c09ba33");
+        super("send-message-action");
         messageService = new FallbackMessageService();
         messageTemplate = "";
     }

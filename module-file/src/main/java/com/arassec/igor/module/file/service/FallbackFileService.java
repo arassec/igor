@@ -12,13 +12,13 @@ public class FallbackFileService extends BaseFileService {
     /**
      * The exception message to use.
      */
-    private static final String ERROR_MESSAGE = "Configure a real file service!";
+    private static final String ERROR_MESSAGE = "Configure a real file connector!";
 
     /**
      * Creates a new instance.
      */
     public FallbackFileService() {
-        super("fallback-file-service");
+        super("fallback-file-connector");
     }
 
     /**

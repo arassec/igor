@@ -31,7 +31,7 @@ public class ScpFileService extends BaseSshFileService {
      * Creates a new component instance.
      */
     public ScpFileService() {
-        super("b2213d4e-db92-4e87-9fea-882b71385ae4");
+        super("scp-file-connector");
     }
 
     /**

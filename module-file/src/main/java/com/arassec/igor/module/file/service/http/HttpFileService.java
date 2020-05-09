@@ -18,7 +18,7 @@ public class HttpFileService extends BaseHttpFileService {
      * Creates a new component instance.
      */
     public HttpFileService() {
-        super("425e739c-8250-493b-a238-05f984195978");
+        super("http-file-connector");
     }
 
     /**

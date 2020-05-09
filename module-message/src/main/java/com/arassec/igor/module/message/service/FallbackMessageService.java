@@ -8,13 +8,13 @@ public class FallbackMessageService extends BaseMessageService {
     /**
      * The exception message to use.
      */
-    private static final String ERROR_MESSAGE = "Configure a real message service!";
+    private static final String ERROR_MESSAGE = "Configure a real message connector!";
 
     /**
      * Creates a new component instance.
      */
     public FallbackMessageService() {
-        super("fallback-message-service");
+        super("fallback-message-connector");
     }
 
     /**

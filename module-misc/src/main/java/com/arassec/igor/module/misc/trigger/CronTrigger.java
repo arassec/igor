@@ -12,7 +12,7 @@ import javax.validation.constraints.Pattern;
  * Triggers jobs according to a configurable CRON expression.
  */
 @IgorComponent
-public class CronTrigger extends BaseMiscTrigger implements ScheduledTrigger {
+public class CronTrigger extends BaseUtilTrigger implements ScheduledTrigger {
 
     /**
      * The CRON expression that is used to trigger the job.
@@ -29,7 +29,7 @@ public class CronTrigger extends BaseMiscTrigger implements ScheduledTrigger {
      * Creates a new component instance.
      */
     public CronTrigger() {
-        super("c0f762f1-b192-4de1-8acd-b03f09262865");
+        super("cron-trigger");
     }
 
     /**

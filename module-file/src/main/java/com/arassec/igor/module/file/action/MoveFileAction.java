@@ -5,7 +5,8 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.service.FallbackFileService;
 import com.arassec.igor.module.file.service.FileService;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
@@ -61,7 +62,7 @@ public class MoveFileAction extends BaseFileAction {
      * Creates a new component instance.
      */
     public MoveFileAction() {
-        super("a3b7f9e9-9eea-4944-a867-62cdab3ddc07");
+        super("move-file-action");
         service = new FallbackFileService();
     }
 

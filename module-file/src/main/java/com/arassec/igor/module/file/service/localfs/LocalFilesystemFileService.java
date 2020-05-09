@@ -30,7 +30,7 @@ public class LocalFilesystemFileService extends BaseFileService {
      * Creates a new component instance.
      */
     public LocalFilesystemFileService() {
-        super("eead09e7-7144-42b8-a969-e0d61ff5e28f");
+        super("localfs-file-connector");
     }
 
     /**

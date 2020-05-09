@@ -63,7 +63,7 @@ public class FilterByTimestampAction extends BaseUtilAction {
      * Creates a new component instance.
      */
     public FilterByTimestampAction() {
-        super("aca4d78f-ad37-451c-baab-0533c5735333");
+        super("filter-by-timestamp-action");
     }
 
     /**

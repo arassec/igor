@@ -35,7 +35,7 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
      * @param persistentValueRepository The repository for persisted values.
      */
     public FilterPersistedValueAction(PersistentValueRepository persistentValueRepository) {
-        super("e9579cb0-9581-42a0-a295-f169b9bd8aec", persistentValueRepository);
+        super("filter-persisted-value-action", persistentValueRepository);
     }
 
     /**
