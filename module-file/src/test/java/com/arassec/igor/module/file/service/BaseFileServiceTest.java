@@ -101,9 +101,10 @@ class BaseFileServiceTest {
     @DisplayName("Tests formatting an instance.")
     void testFormatInstance() {
         assertNull(baseFileService.formatInstant(null));
-
         Instant instant = Instant.ofEpochMilli(1234567890);
-        assertEquals("1970-01-15T07:56:07.89+01:00", baseFileService.formatInstant(instant));
+        String formattedInstant = baseFileService.formatInstant(instant);
+        assertTrue(formattedInstant.startsWith("1970-01-15"));
+        assertTrue(formattedInstant.contains(":56:07.89"));
     }
 
 }
