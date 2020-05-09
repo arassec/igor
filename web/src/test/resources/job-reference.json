@@ -38,8 +38,9 @@
           {
             "name": "testProviderParam",
             "secured": false,
-            "optional": false,
+            "advanced": false,
             "subtype": "MULTI_LINE",
+            "required": false,
             "type": "java.lang.String",
             "value": "test-provider-param",
             "service": false
@@ -47,8 +48,9 @@
           {
             "name": "emptyStringParam",
             "secured": false,
-            "optional": false,
+            "advanced": false,
             "subtype": "CRON",
+            "required": false,
             "type": "java.lang.String",
             "value": null,
             "service": false
@@ -56,8 +58,9 @@
           {
             "name": "nullInteger",
             "secured": false,
-            "optional": false,
+            "advanced": false,
             "subtype": "NONE",
+            "required": false,
             "type": "java.lang.Integer",
             "value": null,
             "service": false
@@ -65,8 +68,9 @@
           {
             "name": "simulationLimit",
             "secured": false,
-            "optional": true,
+            "advanced": true,
             "subtype": "NONE",
+            "required": true,
             "type": "int",
             "value": 456,
             "service": false
@@ -91,8 +95,9 @@
             {
               "name": "testService",
               "secured": false,
-              "optional": false,
+              "advanced": false,
               "subtype": "NONE",
+              "required": false,
               "categoryCandidates": [
                 {
                   "key": "service-category-id",
@@ -112,8 +117,9 @@
             {
               "name": "numThreads",
               "secured": false,
-              "optional": false,
+              "advanced": true,
               "subtype": "NONE",
+              "required": true,
               "type": "int",
               "value": 1,
               "service": false

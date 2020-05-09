@@ -70,19 +70,19 @@ public abstract class BaseHttpFileService extends BaseFileService {
     /**
      * A username for authentication.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     protected String username;
 
     /**
      * The password for authentication.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     protected String password;
 
     /**
      * A timeout for the HTTP operations.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     protected long timeout = 3600;
 
     /**
@@ -121,7 +121,6 @@ public abstract class BaseHttpFileService extends BaseFileService {
                     .filter(file -> !"..".equals(file))
                     .filter(file -> !".".equals(file))
                     .filter(file -> !directory.startsWith(file))
-                    .filter(file -> !directory.equals(file))
                     .map(file -> new FileInfo(file, null))
                     .collect(Collectors.toList());
             // @formatter:on

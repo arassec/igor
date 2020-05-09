@@ -26,7 +26,7 @@ public class HttpsFileService extends BaseHttpFileService {
      */
     @Getter
     @Setter
-    @IgorParam(optional = true, value = 2)
+    @IgorParam(advanced = true, value = 2)
     private boolean certificateVerification = true;
 
     /**

@@ -50,19 +50,19 @@ public abstract class BaseSshFileService extends BaseFileService {
     /**
      * Enables or disables strict host-key checking.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private boolean strictHostkeyChecking = false;
 
     /**
      * Preferred authentications.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private String preferredAuthentications = "publickey,keyboard-interactive,password";
 
     /**
      * Connection timeout.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private int timeout = 30000;
 
     /**

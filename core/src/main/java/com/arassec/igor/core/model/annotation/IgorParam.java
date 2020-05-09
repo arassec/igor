@@ -31,12 +31,12 @@ public @interface IgorParam {
     boolean secured() default false;
 
     /**
-     * Indicates whether a parameter is optional and must not be set in the UI by the user.
+     * Indicates whether a parameter should be displayed in the advanced section of the parameter configuration UI.
      *
-     * @return {@code true}, if the parameter is optional and not needed for providing the service of the containing class. {@code
-     * false}, if the parameter must be set.
+     * @return {@code true}, if the parameter is advanced and can be hidden by default in the UI. {@code
+     * false}, if the parameter must always be shown to the user in the UI.
      */
-    boolean optional() default false;
+    boolean advanced() default false;
 
     /**
      * Further specifies the type of parameter, additionally to the java data type.

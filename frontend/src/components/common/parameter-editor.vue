@@ -4,10 +4,9 @@
         <div class="table">
             <template v-for="(param, index) in parameters" v-bind:id="param.name" v-bind:index="index">
                 <div class="tr" v-bind:key="param.name"
-                     v-bind:style="(!showAdvancedParameters && isAdvancedParameter(param)) ? 'visibility: collapse' : ''">
+                     v-bind:style="(!showAdvancedParameters && param.advanced) ? 'visibility: collapse' : ''">
                     <div class="text-top td">
-                        <label v-if="param.optional" :for="'paramlabel_' + param.name + '_' + index">{{formatParameterName(param.name)}}</label>
-                        <label v-if="!param.optional" :for="'paramlabel_' + param.name + '_' + index">{{formatParameterName(param.name)}}*</label>
+                        <label :for="'paramlabel_' + param.name + '_' + index">{{formatParameterName(param)}}</label>
                     </div>
                     <div class="td">
                         <input :id="'paramlabel_' + param.name + '_' + index"
@@ -117,11 +116,15 @@
             isService: function (parameter) {
                 return !!parameter.service;
             },
-            formatParameterName: function (string) {
-                string = string.replace(/\.?([A-Z])/g, function (x, y) {
+            formatParameterName: function (parameter) {
+                let string = parameter.name.replace(/\.?([A-Z])/g, function (x, y) {
                     return ' ' + y.toLowerCase()
                 }).replace(/^_/, '')
-                return string.charAt(0).toUpperCase() + string.slice(1)
+                let star = "";
+                if (parameter.required) {
+                    star = "*";
+                }
+                return string.charAt(0).toUpperCase() + string.slice(1) + star
             },
             validateInput: function () {
                 for (let i = this.parameterValidationErrors.length; i > 0; i--) {
@@ -134,7 +137,7 @@
                 })
 
                 this.parameters.forEach(function (param, index) {
-                    if (!param.optional && (param.value == null || param.value === '')) {
+                    if (!param.advanced && (param.value == null || param.value === '')) {
                         component.parameterValidationErrors[index] = 'Value required'
                         component.validationOk = false
                     }
@@ -198,15 +201,9 @@
                 this.parameters[this.cronParameterIndex].value = value
                 this.showCronPicker = false
             },
-            isAdvancedParameter: function (parameter) {
-                if (parameter.name === 'dataKey' || parameter.name === 'numThreads' || parameter.name === 'directoryKey') {
-                    return true
-                }
-                return parameter.optional
-            },
             advancedParametersExist: function () {
                 for (let index = 0; index < this.parameters.length; index++) {
-                    if (this.isAdvancedParameter(this.parameters[index])) {
+                    if (this.parameters[index].advanced) {
                         return true
                     }
                 }

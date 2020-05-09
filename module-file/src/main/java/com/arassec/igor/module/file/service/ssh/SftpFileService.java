@@ -86,7 +86,7 @@ public class SftpFileService extends BaseSshFileService {
             Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
-            @SuppressWarnings("squid:S1149") // Don't change JSCH code.
+            @SuppressWarnings({"squid:S1149", "java:S3740"}) // Don't change JSCH code.
             Vector lsEntries = channel.ls(file);
             if (lsEntries != null && !lsEntries.isEmpty() && lsEntries.firstElement() instanceof ChannelSftp.LsEntry) {
                 FileStreamData result = new FileStreamData();

@@ -56,7 +56,7 @@ public class ListFilesProvider extends BaseFileProvider {
     /**
      * An optional file ending to filter provided files by their extension.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private String fileEnding;
 
     /**

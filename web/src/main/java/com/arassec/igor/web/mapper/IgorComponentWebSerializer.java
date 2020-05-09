@@ -17,6 +17,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -145,8 +147,10 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), field.getName());
                 jsonGenerator.writeBooleanField(WebMapperKey.SECURED.getKey(), annotation.secured());
-                jsonGenerator.writeBooleanField(WebMapperKey.OPTIONAL.getKey(), annotation.optional());
+                jsonGenerator.writeBooleanField(WebMapperKey.ADVANCED.getKey(), annotation.advanced());
                 jsonGenerator.writeStringField(WebMapperKey.SUBTYPE.getKey(), annotation.subtype().name());
+                jsonGenerator.writeBooleanField(WebMapperKey.REQUIRED.getKey(), (field.isAnnotationPresent(NotNull.class)
+                        || field.isAnnotationPresent(NotBlank.class) || field.getType().isPrimitive()));
 
                 Map<String, Set<String>> candidates = igorComponentRegistry.getServiceParameterCategoryAndType(field.getType());
 

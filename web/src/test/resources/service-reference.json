@@ -14,8 +14,9 @@
     {
       "name": "intParam",
       "secured": false,
-      "optional": false,
+      "advanced": false,
       "subtype": "NONE",
+      "required": true,
       "type": "int",
       "value": 0,
       "service": false
@@ -23,8 +24,9 @@
     {
       "name": "integerParam",
       "secured": false,
-      "optional": false,
+      "advanced": false,
       "subtype": "NONE",
+      "required": false,
       "type": "java.lang.Integer",
       "value": null,
       "service": false
@@ -32,8 +34,9 @@
     {
       "name": "longParam",
       "secured": false,
-      "optional": false,
+      "advanced": false,
       "subtype": "NONE",
+      "required": true,
       "type": "long",
       "value": 0,
       "service": false
@@ -41,8 +44,9 @@
     {
       "name": "longObjectParam",
       "secured": false,
-      "optional": false,
+      "advanced": false,
       "subtype": "NONE",
+      "required": false,
       "type": "java.lang.Long",
       "value": null,
       "service": false
@@ -50,8 +54,9 @@
     {
       "name": "booleanParam",
       "secured": false,
-      "optional": false,
+      "advanced": false,
       "subtype": "NONE",
+      "required": true,
       "type": "boolean",
       "value": false,
       "service": false
@@ -59,8 +64,9 @@
     {
       "name": "booleanObjectParam",
       "secured": false,
-      "optional": false,
+      "advanced": false,
       "subtype": "NONE",
+      "required": false,
       "type": "java.lang.Boolean",
       "value": null,
       "service": false
@@ -68,8 +74,9 @@
     {
       "name": "stringParam",
       "secured": false,
-      "optional": false,
+      "advanced": false,
       "subtype": "NONE",
+      "required": false,
       "type": "java.lang.String",
       "value": null,
       "service": false
@@ -77,8 +84,9 @@
     {
       "name": "securedStringParam",
       "secured": true,
-      "optional": false,
+      "advanced": false,
       "subtype": "NONE",
+      "required": false,
       "type": "java.lang.String",
       "value": null,
       "service": false

@@ -64,43 +64,43 @@ public class RabbitMqMessageService extends BaseMessageService {
     /**
      * The optional routing key for messages.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private String routingKey;
 
     /**
      * The virtual host.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private String virtualHost = "/";
 
     /**
      * The message encoding.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private String contentEncoding = "UTF-8";
 
     /**
      * The message's content type.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private String contentType = "application/json";
 
     /**
      * Optional message headers.
      */
-    @IgorParam(optional = true, subtype = ParameterSubtype.MULTI_LINE)
+    @IgorParam(advanced = true, subtype = ParameterSubtype.MULTI_LINE)
     private String headers;
 
     /**
      * Optional heartbeat for connections to the RabbitMQ server.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private int heartBeat = 30;
 
     /**
      * Optional connection timeout.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private int connectionTimeout = 60000;
 
     /**

@@ -55,7 +55,7 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
         assertEquals("java.lang.String", parameters.get(7).get(WebMapperKey.TYPE.getKey()));
         assertNull(parameters.get(7).get(WebMapperKey.VALUE.getKey()));
         assertEquals(true, parameters.get(7).get(WebMapperKey.SECURED.getKey()));
-        assertEquals(false, parameters.get(7).get(WebMapperKey.OPTIONAL.getKey()));
+        assertEquals(false, parameters.get(7).get(WebMapperKey.ADVANCED.getKey()));
         assertEquals(false, parameters.get(7).get(WebMapperKey.SERVICE.getKey()));
         assertEquals(ParameterSubtype.NONE.name(), parameters.get(7).get(WebMapperKey.SUBTYPE.getKey()));
     }
@@ -104,11 +104,18 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
         assertEquals("gamma", secondTypeCandidates.get(1).get(WebMapperKey.VALUE.getKey()));
 
         assertEquals(false, parameters.get(0).get(WebMapperKey.SECURED.getKey()));
-        assertEquals(false, parameters.get(0).get(WebMapperKey.OPTIONAL.getKey()));
+        assertEquals(false, parameters.get(0).get(WebMapperKey.ADVANCED.getKey()));
         assertEquals(true, parameters.get(0).get(WebMapperKey.SERVICE.getKey()));
         assertEquals(ParameterSubtype.NONE.name(), parameters.get(0).get(WebMapperKey.SUBTYPE.getKey()));
 
-        verifyParameter(parameters.get(1), "numThreads", "int", 1);
+        assertEquals("numThreads", parameters.get(1).get(WebMapperKey.NAME.getKey()));
+        assertEquals("int", parameters.get(1).get(WebMapperKey.TYPE.getKey()));
+        assertEquals(1, parameters.get(1).get(WebMapperKey.VALUE.getKey()));
+        assertEquals(false, parameters.get(1).get(WebMapperKey.SECURED.getKey()));
+        assertEquals(true, parameters.get(1).get(WebMapperKey.ADVANCED.getKey()));
+        assertEquals(false, parameters.get(1).get(WebMapperKey.SERVICE.getKey()));
+        assertEquals(true, parameters.get(1).get(WebMapperKey.REQUIRED.getKey()));
+        assertEquals(ParameterSubtype.NONE.name(), parameters.get(1).get(WebMapperKey.SUBTYPE.getKey()));
     }
 
     /**
@@ -131,16 +138,18 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
         assertEquals("java.lang.String", parameters.get(0).get(WebMapperKey.TYPE.getKey()));
         assertEquals("provider-test-param", parameters.get(0).get(WebMapperKey.VALUE.getKey()));
         assertEquals(false, parameters.get(0).get(WebMapperKey.SECURED.getKey()));
-        assertEquals(false, parameters.get(0).get(WebMapperKey.OPTIONAL.getKey()));
+        assertEquals(false, parameters.get(0).get(WebMapperKey.ADVANCED.getKey()));
         assertEquals(false, parameters.get(0).get(WebMapperKey.SERVICE.getKey()));
+        assertEquals(false, parameters.get(1).get(WebMapperKey.REQUIRED.getKey()));
         assertEquals(ParameterSubtype.MULTI_LINE.name(), parameters.get(0).get(WebMapperKey.SUBTYPE.getKey()));
 
         assertEquals("emptyStringParam", parameters.get(1).get(WebMapperKey.NAME.getKey()));
         assertEquals("java.lang.String", parameters.get(1).get(WebMapperKey.TYPE.getKey()));
         assertNull(parameters.get(1).get(WebMapperKey.VALUE.getKey()));
         assertEquals(false, parameters.get(1).get(WebMapperKey.SECURED.getKey()));
-        assertEquals(false, parameters.get(1).get(WebMapperKey.OPTIONAL.getKey()));
+        assertEquals(false, parameters.get(1).get(WebMapperKey.ADVANCED.getKey()));
         assertEquals(false, parameters.get(1).get(WebMapperKey.SERVICE.getKey()));
+        assertEquals(false, parameters.get(1).get(WebMapperKey.REQUIRED.getKey()));
         assertEquals(ParameterSubtype.CRON.name(), parameters.get(1).get(WebMapperKey.SUBTYPE.getKey()));
 
         verifyParameter(parameters.get(2), "nullInteger", "java.lang.Integer", null);
@@ -149,8 +158,9 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
         assertEquals("int", parameters.get(3).get(WebMapperKey.TYPE.getKey()));
         assertEquals(25, parameters.get(3).get(WebMapperKey.VALUE.getKey()));
         assertEquals(false, parameters.get(3).get(WebMapperKey.SECURED.getKey()));
-        assertEquals(true, parameters.get(3).get(WebMapperKey.OPTIONAL.getKey()));
+        assertEquals(true, parameters.get(3).get(WebMapperKey.ADVANCED.getKey()));
         assertEquals(false, parameters.get(3).get(WebMapperKey.SERVICE.getKey()));
+        assertEquals(true, parameters.get(3).get(WebMapperKey.REQUIRED.getKey()));
         assertEquals(ParameterSubtype.NONE.name(), parameters.get(3).get(WebMapperKey.SUBTYPE.getKey()));
     }
 
@@ -184,7 +194,7 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
         assertEquals(type, parameter.get(WebMapperKey.TYPE.getKey()));
         assertEquals(value, parameter.get(WebMapperKey.VALUE.getKey()));
         assertEquals(false, parameter.get(WebMapperKey.SECURED.getKey()));
-        assertEquals(false, parameter.get(WebMapperKey.OPTIONAL.getKey()));
+        assertEquals(false, parameter.get(WebMapperKey.ADVANCED.getKey()));
         assertEquals(false, parameter.get(WebMapperKey.SERVICE.getKey()));
         assertEquals(ParameterSubtype.NONE.name(), parameter.get(WebMapperKey.SUBTYPE.getKey()));
     }

@@ -50,43 +50,43 @@ public abstract class BaseFtpFileService extends BaseFileService {
     /**
      * The username to login with.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private String username;
 
     /**
      * The password used for authentication.
      */
-    @IgorParam(optional = true, secured = true)
+    @IgorParam(advanced = true, secured = true)
     private String password;
 
     /**
      * Activates active or passive FTP mode.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private boolean passiveMode = true;
 
     /**
      * Buffer size for copying data.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private int bufferSize = 1024 * 1024;
 
     /**
      * Timeout for the data connection.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private int dataTimeout = 60 * 5 * 1000;
 
     /**
      * Keepalive timeout for the control connection.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private int keepAliveTimeout = 60 * 15;
 
     /**
      * Set to {@code true}, if it's a Windows FTP server.
      */
-    @IgorParam(optional = true)
+    @IgorParam(advanced = true)
     private boolean windowsFtp = false;
 
     /**

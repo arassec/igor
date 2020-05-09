@@ -70,7 +70,12 @@ public enum WebMapperKey {
     /**
      * The optional key.
      */
-    OPTIONAL("optional"),
+    ADVANCED("advanced"),
+
+    /**
+     * The required key.
+     */
+    REQUIRED("required"),
 
     /**
      * The configurable key.
