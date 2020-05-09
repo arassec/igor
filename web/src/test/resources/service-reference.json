@@ -7,7 +7,8 @@
   },
   "type": {
     "key": "service-type-id",
-    "value": "Service Type"
+    "value": "Service Type",
+    "documentationAvailable": false
   },
   "parameters": [
     {

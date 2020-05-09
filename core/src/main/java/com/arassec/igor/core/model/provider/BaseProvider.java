@@ -34,7 +34,7 @@ public abstract class BaseProvider extends BaseIgorComponent implements Provider
      */
     @Setter
     @PositiveOrZero
-    @IgorParam
+    @IgorParam(value = 100, optional = true)
     private int simulationLimit = 25;
 
     /**

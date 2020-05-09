@@ -54,6 +54,9 @@
                     v-show="selectedTaskId === null && selectedActionId === null"
                     v-bind:job-configuration="jobConfiguration"
                     v-on:update-original-job-configuration="updateOriginalJobConfiguration()"
+                    v-on:open-documentation="openDocumentation"
+                    v-on:switch-documentation="switchDocumentation"
+                    v-on:close-documentation="showDocumentation = false"
                     ref="jobConfigurator"/>
 
             <task-configurator v-for="task in jobConfiguration.tasks"
@@ -61,6 +64,9 @@
                                v-bind:key="task.id"
                                v-bind:task="task"
                                v-on:create-service="createService"
+                               v-on:open-documentation="openDocumentation"
+                               v-on:switch-documentation="switchDocumentation"
+                               v-on:close-documentation="showDocumentation = false"
                                ref="taskConfigurators"/>
 
             <template v-for="task in jobConfiguration.tasks">
@@ -69,6 +75,9 @@
                                      v-bind:key="action.id"
                                      v-bind:action="action"
                                      v-on:create-service="createService"
+                                     v-on:open-documentation="openDocumentation"
+                                     v-on:switch-documentation="switchDocumentation"
+                                     v-on:close-documentation="showDocumentation = false"
                                      ref="actionConfigurators"/>
             </template>
 
@@ -164,6 +173,8 @@
             </layout-row>
         </modal-dialog>
 
+        <documentation-container :documentation="documentation" v-show="showDocumentation" v-on:close="showDocumentation = false"/>
+
         <background-icon right="true" icon-one="toolbox"/>
 
     </core-container>
@@ -188,10 +199,12 @@
     import JobNavigation from "../components/jobs/job-navigation";
     import CorePanel from "../components/common/core-panel";
     import FormatUtils from "../utils/utils";
+    import DocumentationContainer from "../components/common/documentation-container";
 
     export default {
         name: 'job-editor',
         components: {
+            DocumentationContainer,
             CorePanel,
             JobNavigation,
             ListPager,
@@ -241,9 +254,11 @@
                 selectedJobExecutionId: null,
                 showUnsavedValuesExistDialog: false,
                 showMarkJobExecutionResolvedDialog: false,
+                showDocumentation: false,
                 nextRoute: null,
                 resolveAllFailedExecutionsOfJob: false,
-                numFailedExecutionsForSelectedJob: 0
+                numFailedExecutionsForSelectedJob: 0,
+                documentation: null
             }
         },
         computed: {
@@ -319,6 +334,7 @@
                     return
                 }
 
+                this.showDocumentation = false;
                 this.testResults = null;
                 this.selectedTestResults = null;
 
@@ -333,16 +349,19 @@
             selectJob: function () {
                 this.selectedTaskId = null;
                 this.selectedActionId = null;
+                this.showDocumentation = false;
                 this.updateSelectedTestResult()
             },
             selectTask: function (taskId) {
                 this.selectedTaskId = taskId;
                 this.selectedActionId = null;
+                this.showDocumentation = false;
                 this.updateSelectedTestResult()
             },
             selectAction: function (actionId) {
                 this.selectedTaskId = null;
                 this.selectedActionId = actionId;
+                this.showDocumentation = false;
                 this.updateSelectedTestResult()
             },
             addTask: function () {
@@ -554,6 +573,17 @@
                 this.resolveAllFailedExecutionsOfJob = false;
                 this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000);
                 this.showMarkJobExecutionResolvedDialog = false
+            },
+            openDocumentation: async function (filename) {
+                this.documentation = await IgorBackend.getData('/api/doc/' + filename);
+                this.showDocumentation = true;
+                this.testResults = null;
+            },
+            switchDocumentation: async function (filename) {
+                if (this.showDocumentation) {
+                    this.documentation = await IgorBackend.getData('/api/doc/' + filename);
+                    this.testResults = null;
+                }
             }
         },
         mounted() {

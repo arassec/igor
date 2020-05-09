@@ -10,7 +10,8 @@
     },
     "type": {
       "key": "trigger-type-id",
-      "value": "Trigger Type"
+      "value": "Trigger Type",
+      "documentationAvailable": false
     },
     "parameters": []
   },
@@ -30,7 +31,8 @@
         },
         "type": {
           "key": "provider-type-id",
-          "value": "Provider Type"
+          "value": "Provider Type",
+          "documentationAvailable": false
         },
         "parameters": [
           {
@@ -63,7 +65,7 @@
           {
             "name": "simulationLimit",
             "secured": false,
-            "optional": false,
+            "optional": true,
             "subtype": "NONE",
             "type": "int",
             "value": 456,
@@ -82,7 +84,8 @@
           },
           "type": {
             "key": "action-type-id",
-            "value": "Action Type"
+            "value": "Action Type",
+            "documentationAvailable": false
           },
           "parameters": [
             {

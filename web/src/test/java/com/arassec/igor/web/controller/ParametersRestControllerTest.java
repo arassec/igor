@@ -144,7 +144,14 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
         assertEquals(ParameterSubtype.CRON.name(), parameters.get(1).get(WebMapperKey.SUBTYPE.getKey()));
 
         verifyParameter(parameters.get(2), "nullInteger", "java.lang.Integer", null);
-        verifyParameter(parameters.get(3), "simulationLimit", "int", 25);
+
+        assertEquals("simulationLimit", parameters.get(3).get(WebMapperKey.NAME.getKey()));
+        assertEquals("int", parameters.get(3).get(WebMapperKey.TYPE.getKey()));
+        assertEquals(25, parameters.get(3).get(WebMapperKey.VALUE.getKey()));
+        assertEquals(false, parameters.get(3).get(WebMapperKey.SECURED.getKey()));
+        assertEquals(true, parameters.get(3).get(WebMapperKey.OPTIONAL.getKey()));
+        assertEquals(false, parameters.get(3).get(WebMapperKey.SERVICE.getKey()));
+        assertEquals(ParameterSubtype.NONE.name(), parameters.get(3).get(WebMapperKey.SUBTYPE.getKey()));
     }
 
     /**

@@ -99,31 +99,4 @@ class FilterByTimestampActionTest extends MiscActionBaseTest {
         assertEquals(data, processedData.get(0));
     }
 
-    /**
-     * Tests filtering within a configured timezone.
-     */
-    @Test
-    @DisplayName("Tests filtering with timeszone data.")
-    void testWithTimezone() {
-        FilterByTimestampAction action = new FilterByTimestampAction();
-        action.setInput("$.timestamp");
-        action.setAmount(2);
-        action.setTimeUnit(ChronoUnit.HOURS.name());
-        action.setTimestampFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-        action.setTimezone("$.timezone");
-
-        Map<String, Object> data = createData();
-        data.put("timezone", "-02:00");
-        data.put("timestamp", DateTimeFormatter.ofPattern(action.getTimestampFormat()).format(ZonedDateTime.now()));
-
-        List<Map<String, Object>> processedData = action.process(data, new JobExecution());
-        assertEquals(data, processedData.get(0));
-
-        data.put("timestamp",
-                DateTimeFormatter.ofPattern(action.getTimestampFormat()).format(ZonedDateTime.now(ZoneId.of("-02:00"))
-                        .minus(action.getAmount() + 1, ChronoUnit.HOURS)));
-        processedData = action.process(data, new JobExecution());
-        assertTrue(processedData.isEmpty());
-    }
-
 }

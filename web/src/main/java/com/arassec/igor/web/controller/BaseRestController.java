@@ -3,31 +3,14 @@ package com.arassec.igor.web.controller;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.web.model.JobExecutionListEntry;
-import com.arassec.igor.web.model.KeyLabelStore;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Base class for REST-Controllers.
  */
 public abstract class BaseRestController {
-
-    /**
-     * Sorts the supplied {@link KeyLabelStore} items by their label.
-     *
-     * @param input The {@link KeyLabelStore}s to sort.
-     * @return The sorted list.
-     */
-    protected List<KeyLabelStore> sortByLabel(Set<KeyLabelStore> input) {
-        List<KeyLabelStore> result = new LinkedList<>(input);
-        result.sort(Comparator.comparing(KeyLabelStore::getValue));
-        return result;
-    }
 
     /**
      * Converts a job-execution into a list entry for the UI.

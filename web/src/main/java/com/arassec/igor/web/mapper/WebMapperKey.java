@@ -90,7 +90,12 @@ public enum WebMapperKey {
     /**
      * The service-class key.
      */
-    SERVICE_CLASS("serviceClass");
+    SERVICE_CLASS("serviceClass"),
+
+    /**
+     * Indicates whether documentation is available or not.
+     */
+    DOCUMENTATION_AVAILABLE("documentationAvailable");
 
     /**
      * Contains the key as String.

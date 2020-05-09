@@ -1,10 +1,13 @@
 <template>
     <div class="sticky max-width">
         <core-panel class="min-height">
-            <h1 class="truncate">
-                <font-awesome-icon icon="wrench" class="margin-right"/>{{ action.name.length > 0 ? action.name : action.type.value }}
-            </h1>
-
+            <layout-row>
+                <h1 slot="left" class="truncate">
+                    <font-awesome-icon icon="wrench" class="margin-right"/>
+                    {{ action.name.length > 0 ? action.name : action.type.value }}
+                </h1>
+                <icon-button slot="right" icon="question" v-on:clicked="$emit('open-documentation', 'action')"/>
+            </layout-row>
             <table>
                 <tr>
                     <td><label>Active</label></td>
@@ -25,7 +28,11 @@
         </core-panel>
 
         <core-panel>
-            <h2>Action</h2>
+            <layout-row>
+                <h2 slot="left">Action</h2>
+                <icon-button slot="right" icon="question" v-show="hasDocumentation(action.type.key)"
+                             v-on:clicked="$emit('open-documentation', action.type.key)"/>
+            </layout-row>
             <table>
                 <tr>
                     <td><label>Category</label></td>
@@ -56,7 +63,7 @@
         <core-panel>
             <h2>Action Configuration</h2>
             <parameter-editor :parameters="action.parameters" ref="parameterEditor"
-                v-on:create-service="createService"/>
+                              v-on:create-service="createService"/>
         </core-panel>
     </div>
 </template>
@@ -65,78 +72,93 @@
     import CorePanel from '../common/core-panel'
     import ParameterEditor from '../common/parameter-editor'
     import IgorBackend from '../../utils/igor-backend.js'
+    import IconButton from "../common/icon-button";
+    import LayoutRow from "../common/layout-row";
 
     export default {
-  name: 'action-configurator',
-  components: {CorePanel, ParameterEditor},
-  props: ['action'],
-  data: function () {
-    return {
-      actionCategories: [],
-      actionTypes: []
+        name: 'action-configurator',
+        components: {LayoutRow, IconButton, CorePanel, ParameterEditor},
+        props: ['action'],
+        data: function () {
+            return {
+                actionCategories: [],
+                actionTypes: []
+            }
+        },
+        methods: {
+            loadCategories: async function () {
+                await IgorBackend.getData('/api/category/action').then((categories) => {
+                    for (let i = this.actionCategories.length; i > 0; i--) {
+                        this.actionCategories.pop()
+                    }
+                    let component = this
+                    Array.from(categories).forEach(function (item) {
+                        component.actionCategories.push(item)
+                    })
+                })
+            },
+            loadTypesOfCategory: async function (categoryKey, selectFirst) {
+                await IgorBackend.getData('/api/type/' + categoryKey).then((types) => {
+                    for (let i = this.actionTypes.length; i > 0; i--) {
+                        this.actionTypes.pop()
+                    }
+                    let component = this
+                    Array.from(types).forEach(function (item) {
+                        component.actionTypes.push(item)
+                    })
+                    if (selectFirst) {
+                        this.action.type = this.actionTypes[0]
+                    }
+                })
+            },
+            loadParametersOfType: function (typeKey) {
+                if (this.hasDocumentation(typeKey)) {
+                    this.$emit('switch-documentation', typeKey);
+                } else {
+                    this.$emit('close-documentation');
+                }
+                IgorBackend.getData('/api/parameters/action/' + typeKey).then((parameters) => {
+                    this.action.parameters = parameters
+                })
+            },
+            validateInput: function () {
+                let parameterValidationResult = true
+                if (typeof this.$refs.parameterEditor !== 'undefined') {
+                    parameterValidationResult = this.$refs.parameterEditor.validateInput()
+                }
+                return parameterValidationResult
+            },
+            createService: function (parameterIndex, serviceCategoryCandidates) {
+                this.$emit('create-service', this.action.id, parameterIndex, serviceCategoryCandidates)
+            },
+            hasDocumentation: function (typeId) {
+                for (let i = 0; i < this.actionTypes.length; i++) {
+                    if (this.actionTypes[i].key === typeId) {
+                        return this.actionTypes[i].documentationAvailable;
+                    }
+                }
+                return false;
+            }
+        },
+        watch: {
+            action: function () {
+                // When an action is moved in the tree-navigation, the vue-model changes for the component!
+                this.loadCategories().then(() => {
+                    this.loadTypesOfCategory(this.action.category.key, false)
+                })
+            }
+        },
+        mounted: function () {
+            this.loadCategories().then(() => {
+                this.loadTypesOfCategory(this.action.category.key, false).then(() => {
+                    // Don't load type parameters as they are already provided within the component's model:
+                    if (!(Array.isArray(this.action.parameters) && this.action.parameters.length)) {
+                        this.loadParametersOfType(this.action.type.key)
+                    }
+                })
+            })
+        }
     }
-  },
-  methods: {
-    loadCategories: async function () {
-      await IgorBackend.getData('/api/category/action').then((categories) => {
-        for (let i = this.actionCategories.length; i > 0; i--) {
-          this.actionCategories.pop()
-        }
-        let component = this
-        Array.from(categories).forEach(function (item) {
-          component.actionCategories.push(item)
-        })
-      })
-    },
-    loadTypesOfCategory: async function (categoryKey, selectFirst) {
-      await IgorBackend.getData('/api/type/' + categoryKey).then((types) => {
-        for (let i = this.actionTypes.length; i > 0; i--) {
-          this.actionTypes.pop()
-        }
-        let component = this
-        Array.from(types).forEach(function (item) {
-          component.actionTypes.push(item)
-        })
-        if (selectFirst) {
-          this.action.type = this.actionTypes[0]
-        }
-      })
-    },
-    loadParametersOfType: function (typeKey) {
-      IgorBackend.getData('/api/parameters/action/' + typeKey).then((parameters) => {
-        this.action.parameters = parameters
-      })
-    },
-    validateInput: function () {
-      let parameterValidationResult = true
-      if (typeof this.$refs.parameterEditor !== 'undefined') {
-        parameterValidationResult = this.$refs.parameterEditor.validateInput()
-      }
-      return parameterValidationResult
-    },
-    createService: function (parameterIndex, serviceCategoryCandidates) {
-      this.$emit('create-service', this.action.id, parameterIndex, serviceCategoryCandidates)
-    }
-  },
-  watch: {
-    action: function() {
-      // When an action is moved in the tree-navigation, the vue-model changes for the component!
-      this.loadCategories().then(() => {
-        this.loadTypesOfCategory(this.action.category.key, false)
-      })
-    }
-  },
-  mounted: function () {
-    this.loadCategories().then(() => {
-      this.loadTypesOfCategory(this.action.category.key, false).then(() => {
-        // Don't load type parameters as they are already provided within the component's model:
-        if (!(Array.isArray(this.action.parameters) && this.action.parameters.length)) {
-          this.loadParametersOfType(this.action.type.key)
-        }
-      })
-    })
-  }
-}
 </script>
 
 <style scoped>

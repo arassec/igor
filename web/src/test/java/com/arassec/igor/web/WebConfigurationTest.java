@@ -28,7 +28,7 @@ public class WebConfigurationTest {
     /**
      * The configuration under test.
      */
-    private WebConfiguration webConfiguration = new WebConfiguration();
+    private final WebConfiguration webConfiguration = new WebConfiguration();
 
     /**
      * Tests creation of a locale-resolver.

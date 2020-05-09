@@ -58,6 +58,10 @@
         font-family: 'Roboto', sans-serif;
     }
 
+    a {
+        color: var(--color-font);
+    }
+
     h1 {
         font-size: 150%;
         color: var(--color-font);
@@ -143,6 +147,20 @@
 
     .disabled {
         opacity: .5;
+    }
+
+    div.table {
+        display: table;
+        border-collapse: collapse;
+    }
+
+    div.tr {
+        display: table-row;
+    }
+
+    div.td {
+        display: table-cell;
+        padding: 0 0 .25em .25em;
     }
 
 </style>

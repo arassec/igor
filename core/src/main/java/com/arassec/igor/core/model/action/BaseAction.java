@@ -211,7 +211,15 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
             return query;
         }
 
-        return JsonPath.using(jsonPathConfiguration).parse(data).read(query);
+        Object result = JsonPath.using(jsonPathConfiguration).parse(data).read(query);
+
+        if (result instanceof String) {
+            return (String) result;
+        } else if (result != null) {
+            return String.valueOf(result);
+        }
+
+        return null;
     }
 
 }

@@ -2,13 +2,17 @@ package com.arassec.igor.web.controller;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.web.model.KeyLabelStore;
+import com.arassec.igor.web.model.TypeData;
+import com.arassec.igor.web.util.DocumentationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -39,10 +43,24 @@ public class TypeRestController extends BaseRestController {
      * @return Set of types.
      */
     @GetMapping("{category}")
-    public List<KeyLabelStore> getTypes(Locale locale, @PathVariable("category") String category) {
-        return sortByLabel(igorComponentRegistry.getTypesOfCategory(category).stream()
-                .map(typeId -> new KeyLabelStore(typeId, messageSource.getMessage(typeId, null, locale)))
-                .collect(Collectors.toSet()));
+    public List<TypeData> getTypes(Locale locale, @PathVariable("category") String category) {
+        return igorComponentRegistry.getTypesOfCategory(category).stream()
+                .map(typeId -> createTypeData(locale, typeId))
+                .sorted(Comparator.comparing(TypeData::getValue))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Creates the type data for the required type.
+     *
+     * @param locale The user's locale for I18N.
+     * @param typeId The type's ID.
+     *
+     * @return a newly created {@link TypeData}.
+     */
+    private TypeData createTypeData(Locale locale, String typeId) {
+        return new TypeData(typeId, messageSource.getMessage(typeId, null, locale),
+                DocumentationUtil.isDocumentationAvailable(typeId, LocaleContextHolder.getLocale()));
     }
 
 }

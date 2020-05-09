@@ -45,6 +45,7 @@ class BaseActionTest {
 
         testData.put(DataKey.META.getKey(), meta);
         testData.put(DataKey.DATA.getKey(), data);
+        testData.put(DataKey.TIMESTAMP.getKey(), 1234567890);
 
         wrongData.put("foo", "bar");
 
@@ -109,6 +110,7 @@ class BaseActionTest {
         assertNull(baseAction.getString(testData, null));
         assertEquals("original-input", baseAction.getString(testData, "original-input"));
         assertEquals("job-id", baseAction.getString(testData, "$." + DataKey.META.getKey() + "." + DataKey.JOB_ID.getKey()));
+        assertEquals("1234567890", baseAction.getString(testData, "$." + DataKey.TIMESTAMP.getKey()));
     }
 
     /**

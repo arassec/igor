@@ -1,10 +1,13 @@
 <template>
     <div class="sticky max-width">
         <core-panel>
-            <h1 class="truncate">
-                <font-awesome-icon icon="tasks" class="margin-right"/>{{ task.name.length > 0 ? task.name : 'Task' }}
-            </h1>
-
+            <layout-row>
+                <h1 slot="left" class="truncate">
+                    <font-awesome-icon icon="tasks" class="margin-right"/>
+                    {{ task.name.length > 0 ? task.name : 'Task' }}
+                </h1>
+                <icon-button slot="right" icon="question" v-on:clicked="$emit('open-documentation', 'task')"/>
+            </layout-row>
             <table>
                 <tr>
                     <td><label>Active</label></td>
@@ -38,7 +41,11 @@
         </core-panel>
 
         <core-panel>
-            <h2>Provider</h2>
+            <layout-row>
+                <h2 slot="left">Provider</h2>
+                <icon-button slot="right" icon="question" v-show="hasDocumentation(task.provider.type.key)"
+                             v-on:clicked="$emit('open-documentation', task.provider.type.key)"/>
+            </layout-row>
             <table>
                 <tr v-if="providerCategories.length > 1">
                     <td><label for="category-selection">Category</label></td>
@@ -81,10 +88,12 @@
     import ParameterEditor from '../common/parameter-editor'
     import CorePanel from '../common/core-panel'
     import IgorBackend from '../../utils/igor-backend.js'
+    import LayoutRow from "../common/layout-row";
+    import IconButton from "../common/icon-button";
 
     export default {
         name: 'task-configurator',
-        components: {CorePanel, ParameterEditor},
+        components: {IconButton, LayoutRow, CorePanel, ParameterEditor},
         props: ['task'],
         data: function () {
             return {
@@ -121,6 +130,11 @@
                 })
             },
             loadParametersOfType: function (typeKey) {
+                if (this.hasDocumentation(typeKey)) {
+                    this.$emit('switch-documentation', typeKey);
+                } else {
+                    this.$emit('close-documentation');
+                }
                 IgorBackend.getData('/api/parameters/provider/' + typeKey).then((parameters) => {
                     this.task.provider.parameters = parameters
                 })
@@ -143,6 +157,14 @@
             },
             createService: function (parameterIndex, serviceCategoryCandidates) {
                 this.$emit('create-service', this.task.id, parameterIndex, serviceCategoryCandidates)
+            },
+            hasDocumentation: function (typeId) {
+                for (let i = 0; i < this.providerTypes.length; i++) {
+                    if (this.providerTypes[i].key === typeId) {
+                        return this.providerTypes[i].documentationAvailable;
+                    }
+                }
+                return false;
             }
         },
         watch: {

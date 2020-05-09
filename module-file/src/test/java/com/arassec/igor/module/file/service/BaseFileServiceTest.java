@@ -11,8 +11,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -104,14 +102,8 @@ class BaseFileServiceTest {
     void testFormatInstance() {
         assertNull(baseFileService.formatInstant(null));
 
-        // Check that a timezone changes the formatted instance:
-        Instant now = Instant.now();
-        String formattedWithoutTimezone = baseFileService.formatInstant(now);
-
-        baseFileService.setTimezone("Pacific/Honolulu");
-        String formattedWithTimezone = baseFileService.formatInstant(now);
-
-        assertNotEquals(formattedWithoutTimezone, formattedWithTimezone);
+        Instant instant = Instant.ofEpochMilli(1234567890);
+        assertEquals("1970-01-15T07:56:07.89+01:00", baseFileService.formatInstant(instant));
     }
 
 }

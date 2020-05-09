@@ -3,14 +3,10 @@ package com.arassec.igor.web.controller;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.web.model.JobExecutionListEntry;
-import com.arassec.igor.web.model.KeyLabelStore;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import javax.print.DocFlavor;
 import java.time.Instant;
-import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
@@ -26,19 +22,6 @@ public class BaseRestControllerTest {
      * The class under test.
      */
     private static final BaseRestController controller = mock(BaseRestController.class, CALLS_REAL_METHODS);
-
-    /**
-     * Tests sorting a key-label-store list by label.
-     */
-    @Test
-    @DisplayName("Tests sorting a key-label-store list by label.")
-    void testSortByLabel() {
-        List<KeyLabelStore> sortedList = controller.sortByLabel(Set.of(new KeyLabelStore("keyB", "labelB"),
-                new KeyLabelStore("keyC", "labelC"), new KeyLabelStore("keyA", "labelA")));
-        assertEquals("keyA", sortedList.get(0).getKey());
-        assertEquals("keyB", sortedList.get(1).getKey());
-        assertEquals("keyC", sortedList.get(2).getKey());
-    }
 
     /**
      * Tests converting a job execution into a list entry.

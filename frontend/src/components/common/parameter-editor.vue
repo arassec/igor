@@ -1,30 +1,34 @@
 <template>
     <div>
 
-        <table>
+        <div class="table">
             <template v-for="(param, index) in parameters" v-bind:id="param.name" v-bind:index="index">
-                <tr v-bind:key="param.name"
-                    v-bind:style="(!showAdvancedParameters && isAdvancedParameter(param)) ? 'visibility: collapse' : ''">
-                    <td class="text-top">
-                        <label v-if="param.optional">{{formatParameterName(param.name)}}</label>
-                        <label v-if="!param.optional">{{formatParameterName(param.name)}}*</label>
-                    </td>
-                    <td>
-                        <input v-if="isNumber(param.type)" type="text" autocomplete="off"
+                <div class="tr" v-bind:key="param.name"
+                     v-bind:style="(!showAdvancedParameters && isAdvancedParameter(param)) ? 'visibility: collapse' : ''">
+                    <div class="text-top td">
+                        <label v-if="param.optional" :for="'paramlabel_' + param.name + '_' + index">{{formatParameterName(param.name)}}</label>
+                        <label v-if="!param.optional" :for="'paramlabel_' + param.name + '_' + index">{{formatParameterName(param.name)}}*</label>
+                    </div>
+                    <div class="td">
+                        <input :id="'paramlabel_' + param.name + '_' + index"
+                               v-if="isNumber(param.type)" type="text" autocomplete="off"
                                v-model.number="param.value"
                                :class="checkValidationError(index) ? 'validation-error' : ''"
                                :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
                         <font-awesome-icon v-else-if="isBoolean(param.type)"
                                            :icon="param.value ? 'check-square' : 'square'"
                                            v-on:click="param.value = !param.value"/>
-                        <input v-else-if="isService(param)" :disabled="true" class="truncate"
+                        <input :id="'paramlabel_' + param.name + '_' + index"
+                               v-else-if="isService(param)" :disabled="true" class="truncate"
                                v-model="param.serviceName"
                                :class="checkValidationError(index) ? 'validation-error' : ''"
                                :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
-                        <textarea v-else-if="param.subtype === 'MULTI_LINE'" v-model="param.value" rows="8" cols="41"
+                        <textarea :id="'paramlabel_' + param.name + '_' + index"
+                                  v-else-if="param.subtype === 'MULTI_LINE'" v-model="param.value" rows="8" cols="41"
                                   :class="checkValidationError(index) ? 'validation-error' : ''"
                                   :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
-                        <input v-else autocomplete="off"
+                        <input :id="'paramlabel_' + param.name + '_' + index"
+                               v-else autocomplete="off"
                                :type="parameterInputTypes[index]" v-model.trim="param.value"
                                :class="checkValidationError(index) ? 'validation-error' : ''"
                                :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
@@ -32,7 +36,7 @@
                         <input-button v-if="!isNumber(param.type) && !isBoolean(param.type) && param.secured"
                                       icon="eye" v-on:clicked="toggleCleartext(index)" class="margin-left"/>
 
-                        <input-button v-else-if="isService(param)" icon="cogs"
+                        <input-button v-else-if="isService(param)" icon="link"
                                       v-on:clicked="openServicePicker(index, param.categoryCandidates)"
                                       class="margin-left"/>
 
@@ -40,17 +44,15 @@
                                       icon="clock"
                                       class="margin-left"/>
 
-                    </td>
-                </tr>
+                    </div>
+                </div>
             </template>
-            <tr v-if="advancedParametersExist()">
-                <td colspan="2">
-                    <font-awesome-icon class="arrow"
-                                       v-bind:icon="showAdvancedParameters ? 'chevron-up' : 'chevron-down'"
-                                       v-on:click="showAdvancedParameters = !showAdvancedParameters"/>
-                </td>
-            </tr>
-        </table>
+            <div v-if="advancedParametersExist()" class="arrow-container">
+                <font-awesome-icon class="arrow"
+                                   v-bind:icon="showAdvancedParameters ? 'chevron-up' : 'chevron-down'"
+                                   v-on:click="showAdvancedParameters = !showAdvancedParameters"/>
+            </div>
+        </div>
 
         <service-picker v-show="showServicePicker" :services="servicePage.items" :page="servicePage"
                         v-on:cancel="showServicePicker = false"
@@ -103,22 +105,17 @@
         },
         methods: {
             isNumber: function (parameter) {
-                let result = (parameter === 'int' ||
+                return (parameter === 'int' ||
                     parameter === 'java.lang.Integer' ||
                     parameter === 'long' ||
                     parameter === 'java.lang.Long')
-                return result
             },
             isBoolean: function (parameter) {
-                let result = (parameter === 'boolean' ||
+                return (parameter === 'boolean' ||
                     parameter === 'java.lang.Boolean')
-                return result
             },
             isService: function (parameter) {
-                if (parameter.service) {
-                    return true
-                }
-                return false
+                return !!parameter.service;
             },
             formatParameterName: function (string) {
                 string = string.replace(/\.?([A-Z])/g, function (x, y) {
@@ -219,12 +216,14 @@
         created: function () {
             let component = this
             for (let i in this.parameters) {
-                let param = this.parameters[i]
-                if (!component.isNumber(param.type) && !component.isBoolean(param.type)) {
-                    if (param.secured) {
-                        component.$set(component.parameterInputTypes, i, 'password')
-                    } else {
-                        component.$set(component.parameterInputTypes, i, 'text')
+                if (this.parameters.hasOwnProperty(i)) {
+                    let param = this.parameters[i]
+                    if (!component.isNumber(param.type) && !component.isBoolean(param.type)) {
+                        if (param.secured) {
+                            component.$set(component.parameterInputTypes, i, 'password')
+                        } else {
+                            component.$set(component.parameterInputTypes, i, 'text')
+                        }
                     }
                 }
             }
@@ -233,6 +232,10 @@
 </script>
 
 <style scoped>
+
+    .arrow-container {
+        margin: 0 0 0 .25em;
+    }
 
     .arrow:hover {
         cursor: pointer;

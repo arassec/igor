@@ -9,7 +9,7 @@
                 </li>
                 <li>
                     <router-link to="/service-overview">
-                        <font-awesome-icon icon="cogs"/> Services
+                        <font-awesome-icon icon="link"/> Services
                     </router-link>
                 </li>
             </ul>

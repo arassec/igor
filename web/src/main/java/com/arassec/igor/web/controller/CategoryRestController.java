@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -41,9 +42,10 @@ public class CategoryRestController extends BaseRestController {
      */
     @GetMapping("service")
     public List<KeyLabelStore> getServiceCategories(Locale locale) {
-        return sortByLabel(igorComponentRegistry.getCategoriesOfComponentType(Service.class).stream()
+        return igorComponentRegistry.getCategoriesOfComponentType(Service.class).stream()
                 .map(categoryId -> new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, locale)))
-                .collect(Collectors.toSet()));
+                .sorted(Comparator.comparing(KeyLabelStore::getValue))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -53,9 +55,10 @@ public class CategoryRestController extends BaseRestController {
      */
     @GetMapping("provider")
     public List<KeyLabelStore> getProviderCategories(Locale locale) {
-        return sortByLabel(igorComponentRegistry.getCategoriesOfComponentType(Provider.class).stream()
+        return igorComponentRegistry.getCategoriesOfComponentType(Provider.class).stream()
                 .map(categoryId -> new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, locale)))
-                .collect(Collectors.toSet()));
+                .sorted(Comparator.comparing(KeyLabelStore::getValue))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -65,9 +68,10 @@ public class CategoryRestController extends BaseRestController {
      */
     @GetMapping("action")
     public List<KeyLabelStore> getActionCategories(Locale locale) {
-        return sortByLabel(igorComponentRegistry.getCategoriesOfComponentType(Action.class).stream()
+        return igorComponentRegistry.getCategoriesOfComponentType(Action.class).stream()
                 .map(categoryId -> new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, locale)))
-                .collect(Collectors.toSet()));
+                .sorted(Comparator.comparing(KeyLabelStore::getValue))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -77,9 +81,10 @@ public class CategoryRestController extends BaseRestController {
      */
     @GetMapping("trigger")
     public List<KeyLabelStore> getTriggerCategories(Locale locale) {
-        return sortByLabel(igorComponentRegistry.getCategoriesOfComponentType(Trigger.class).stream()
+        return igorComponentRegistry.getCategoriesOfComponentType(Trigger.class).stream()
                 .map(categoryId -> new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, locale)))
-                .collect(Collectors.toSet()));
+                .sorted(Comparator.comparing(KeyLabelStore::getValue))
+                .collect(Collectors.toList());
     }
 
 }

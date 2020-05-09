@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.web.model.KeyLabelStore;
+import com.arassec.igor.web.util.DocumentationUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -39,7 +40,8 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
     /**
      * Creates a new serializer instance.
      *
-     * @param messageSource The message source for I18N.
+     * @param messageSource         The message source for I18N.
+     * @param igorComponentRegistry The registry for igor components.
      */
     public IgorComponentWebSerializer(MessageSource messageSource, IgorComponentRegistry igorComponentRegistry) {
         super(IgorComponent.class);
@@ -68,9 +70,9 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
         writeKeyLabelStore(jsonGenerator, WebMapperKey.CATEGORY.getKey(),
                 new KeyLabelStore(instance.getCategoryId(), messageSource.getMessage(instance.getCategoryId(), null,
                         LocaleContextHolder.getLocale())));
-        writeKeyLabelStore(jsonGenerator, WebMapperKey.TYPE.getKey(),
-                new KeyLabelStore(instance.getTypeId(), messageSource.getMessage(instance.getTypeId(), null,
-                        LocaleContextHolder.getLocale())));
+        writeTypeData(jsonGenerator, WebMapperKey.TYPE.getKey(),
+                instance.getTypeId(), messageSource.getMessage(instance.getTypeId(), null,
+                        LocaleContextHolder.getLocale()));
         writeParameters(jsonGenerator, instance);
         jsonGenerator.writeEndObject();
     }
@@ -88,6 +90,25 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
         jsonGenerator.writeObjectFieldStart(name);
         jsonGenerator.writeStringField(WebMapperKey.KEY.getKey(), keyLabelStore.getKey());
         jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), keyLabelStore.getValue());
+        jsonGenerator.writeEndObject();
+    }
+
+    /**
+     * Writes a {@link KeyLabelStore} to the serialized json.
+     *
+     * @param jsonGenerator The json generator.
+     * @param name          The name of the key-label-store.
+     * @param key           The key.
+     * @param label         The label.
+     *
+     * @throws IOException In case of serialization problems.
+     */
+    private void writeTypeData(JsonGenerator jsonGenerator, String name, String key, String label) throws IOException {
+        jsonGenerator.writeObjectFieldStart(name);
+        jsonGenerator.writeStringField(WebMapperKey.KEY.getKey(), key);
+        jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), label);
+        jsonGenerator.writeBooleanField(WebMapperKey.DOCUMENTATION_AVAILABLE.getKey(),
+                DocumentationUtil.isDocumentationAvailable(key, LocaleContextHolder.getLocale()));
         jsonGenerator.writeEndObject();
     }
 

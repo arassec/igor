@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -61,12 +60,6 @@ public class FilterByTimestampAction extends BaseUtilAction {
     private String timestampFormat = defaultTimeFormat;
 
     /**
-     * The optional time zone of the timestamp.
-     */
-    @IgorParam(optional = true)
-    private String timezone;
-
-    /**
      * Creates a new component instance.
      */
     public FilterByTimestampAction() {
@@ -88,20 +81,13 @@ public class FilterByTimestampAction extends BaseUtilAction {
         String resolvedInput = getString(data, input);
         String resolvedTimeUnit = getString(data, timeUnit);
         String resolvedTimestampFormat = getString(data, timestampFormat);
-        String resolvedTimezone = getString(data, timezone);
 
         if (resolvedInput == null || resolvedTimeUnit == null || resolvedTimestampFormat == null) {
             log.debug("Missing required data for filtering: {} / {} / {}", resolvedInput, resolvedTimeUnit, resolvedTimestampFormat);
             return List.of();
         }
 
-        LocalDateTime target;
-        if (resolvedTimezone != null) {
-            target = LocalDateTime.now(ZoneId.of(resolvedTimezone));
-        } else {
-            target = LocalDateTime.now();
-        }
-
+        LocalDateTime target = LocalDateTime.now();
         target = target.minus(amount, ChronoUnit.valueOf(resolvedTimeUnit));
 
         LocalDateTime actual = LocalDateTime.parse(resolvedInput, DateTimeFormatter.ofPattern(resolvedTimestampFormat));

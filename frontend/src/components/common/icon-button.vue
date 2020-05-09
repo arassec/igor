@@ -37,4 +37,8 @@
         opacity: 0.5;
     }
 
+    button::-moz-focus-inner {
+        border: 0;
+    }
+
 </style>

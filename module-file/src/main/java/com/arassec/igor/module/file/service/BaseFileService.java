@@ -1,6 +1,5 @@
 package com.arassec.igor.module.file.service;
 
-import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.service.BaseService;
 import com.arassec.igor.core.util.IgorException;
@@ -13,7 +12,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -23,12 +21,6 @@ import java.time.format.DateTimeFormatter;
 @Setter
 @Slf4j
 public abstract class BaseFileService extends BaseService implements FileService {
-
-    /**
-     * Configures a timezone for the file service as String.
-     */
-    @IgorParam(optional = true)
-    private String timezone;
 
     /**
      * Configures the buffer size for copying streams.
@@ -101,15 +93,7 @@ public abstract class BaseFileService extends BaseService implements FileService
         if (instant == null) {
             return null;
         }
-
-        ZonedDateTime zonedDateTime;
-        if (timezone != null && !timezone.isEmpty()) {
-            zonedDateTime = instant.atZone(ZoneId.of(timezone));
-        } else {
-            zonedDateTime = instant.atZone(ZoneId.systemDefault());
-        }
-
-        return zonedDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        return instant.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
     /**

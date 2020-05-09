@@ -1,9 +1,13 @@
 <template>
     <div class="sticky max-width" v-if="jobConfiguration">
         <core-panel>
-            <h1 class="truncate">
-                    <font-awesome-icon icon="toolbox" class="margin-right"/>{{ jobConfiguration.name.length > 0 ? jobConfiguration.name : 'Job' }}
-            </h1>
+            <layout-row>
+                <h1 slot="left" class="truncate">
+                    <font-awesome-icon icon="toolbox" class="margin-right"/>
+                    {{ jobConfiguration.name.length > 0 ? jobConfiguration.name : 'Job' }}
+                </h1>
+                <icon-button slot="right" icon="question" v-on:clicked="$emit('open-documentation', 'job')"/>
+            </layout-row>
             <table>
                 <tr>
                     <td><label>Active</label></td>
@@ -28,7 +32,7 @@
                     </td>
                 </tr>
                 <tr v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
-                    <td><label for="numexechistory-input">Execution-History Limit</label></td>
+                    <td><label for="numexechistory-input">History Limit</label></td>
                     <td>
                         <input id="numexechistory-input" type="text" autocomplete="off"
                                v-model.number="jobConfiguration.historyLimit"/>
@@ -37,7 +41,8 @@
                 <tr v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
                     <td><label for="faulttolerant-input">Fault tolerant</label></td>
                     <td>
-                        <font-awesome-icon id="faulttolerant-input" :icon="jobConfiguration.faultTolerant ? 'check-square' : 'square'"
+                        <font-awesome-icon id="faulttolerant-input"
+                                           :icon="jobConfiguration.faultTolerant ? 'check-square' : 'square'"
                                            v-on:click="jobConfiguration.faultTolerant = !jobConfiguration.faultTolerant"/>
                     </td>
                 </tr>
@@ -52,7 +57,11 @@
         </core-panel>
 
         <core-panel>
-            <h2>Trigger</h2>
+            <layout-row>
+                <h2 slot="left">Trigger</h2>
+                <icon-button slot="right" icon="question" v-show="hasDocumentation(jobConfiguration.trigger.type.key)"
+                             v-on:clicked="$emit('open-documentation', jobConfiguration.trigger.type.key)"/>
+            </layout-row>
             <table>
                 <tr>
                     <td><label for="category">Category</label></td>
@@ -94,10 +103,12 @@
     import CorePanel from '../common/core-panel'
     import ParameterEditor from '../common/parameter-editor'
     import IgorBackend from '../../utils/igor-backend.js'
+    import IconButton from "../common/icon-button";
+    import LayoutRow from "../common/layout-row";
 
     export default {
         name: 'job-configurator',
-        components: {ParameterEditor, CorePanel},
+        components: {LayoutRow, IconButton, ParameterEditor, CorePanel},
         props: ['jobConfiguration'],
         data: function () {
             return {
@@ -137,6 +148,11 @@
                 })
             },
             loadParametersOfType: async function (typeKey) {
+                if (this.hasDocumentation(typeKey)) {
+                    this.$emit('switch-documentation', typeKey);
+                } else {
+                    this.$emit('close-documentation');
+                }
                 await IgorBackend.getData('/api/parameters/trigger/' + typeKey).then((parameters) => {
                     this.jobConfiguration.trigger.parameters = parameters
                 })
@@ -166,6 +182,14 @@
             },
             createService: function (parameterIndex, serviceCategoryCandidates) {
                 this.$emit('create-service', this.taskKey, parameterIndex, serviceCategoryCandidates)
+            },
+            hasDocumentation: function (typeId) {
+                for (let i = 0; i < this.triggerTypes.length; i++) {
+                    if (this.triggerTypes[i].key === typeId) {
+                        return this.triggerTypes[i].documentationAvailable;
+                    }
+                }
+                return false;
             }
         },
         mounted() {

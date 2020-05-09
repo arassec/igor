@@ -12,7 +12,7 @@
             </layout-row>
             <core-panel slot="footer">
                 <p
-                   v-if="referencingJobsPage && referencingJobsPage.items && referencingJobsPage.items.length > 0">
+                        v-if="referencingJobsPage && referencingJobsPage.items && referencingJobsPage.items.length > 0">
                     <label class="list-label">Used by the following jobs:</label>
                     <feedback-box v-for="(referencingJob, index) in referencingJobsPage.items" :key="index"
                                   class="list-entry"
@@ -33,22 +33,35 @@
 
         <core-content>
             <core-panel>
-                <h1 class="truncate width-restricted">
-                    <font-awesome-icon icon="cogs"/>
-                    {{ serviceConfiguration.name.length > 0 ? serviceConfiguration.name : 'Unnamed Service' }}
-                </h1>
-                <table>
-                    <tr>
-                        <td><label>Name</label></td>
-                        <td><input type="text" autocomplete="off"
-                                   v-model="serviceConfiguration.name"
-                                   :class="nameValidationError.length > 0 ? 'validation-error' : ''"
-                                   :placeholder="nameValidationError.length > 0 ? nameValidationError : ''"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for="category-input">Category</label></td>
-                        <td>
+                <layout-row>
+                    <h1 slot="left" class="truncate width-restricted">
+                        <font-awesome-icon icon="link"/>
+                        {{ serviceConfiguration.name.length > 0 ? serviceConfiguration.name : 'Unnamed Service' }}
+                    </h1>
+                    <icon-button slot="right" icon="question" v-on:clicked="openDocumentation('service')"/>
+                </layout-row>
+                <div class="table">
+                    <div class="tr">
+                        <div class="td"><label for="service-name">Name</label></div>
+                        <div class="td"><input id="service-name" type="text" autocomplete="off"
+                                               v-model="serviceConfiguration.name"
+                                               :class="nameValidationError.length > 0 ? 'validation-error' : ''"
+                                               :placeholder="nameValidationError.length > 0 ? nameValidationError : ''"/>
+                        </div>
+                    </div>
+                </div>
+            </core-panel>
+
+            <core-panel>
+                <layout-row>
+                    <h2 slot="left">Service</h2>
+                    <icon-button slot="right" icon="question" v-show="hasDocumentation(serviceConfiguration.type.key)"
+                                 v-on:clicked="openDocumentation(serviceConfiguration.type.key)"/>
+                </layout-row>
+                <div class="table">
+                    <div class="tr">
+                        <div class="td"><label for="category-input">Category</label></div>
+                        <div class="td">
                             <select id="category-input" v-model="serviceConfiguration.category"
                                     v-on:change="loadTypesOfCategory(serviceConfiguration.category, true).then(() => {
                                         loadParametersOfType(serviceConfiguration.type.key)})" :disabled="!newService">
@@ -57,11 +70,11 @@
                                     {{category.value}}
                                 </option>
                             </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for="type-input">Type</label></td>
-                        <td>
+                        </div>
+                    </div>
+                    <div class="tr">
+                        <div class="td"><label for="type-input">Type</label></div>
+                        <div class="td">
                             <select id="type-input" v-model="serviceConfiguration.type"
                                     v-on:change="loadParametersOfType(serviceConfiguration.type.key)"
                                     :disabled="!newService">
@@ -69,9 +82,9 @@
                                     {{type.value}}
                                 </option>
                             </select>
-                        </td>
-                    </tr>
-                </table>
+                        </div>
+                    </div>
+                </div>
             </core-panel>
 
             <core-panel>
@@ -96,7 +109,10 @@
 
         </core-content>
 
-        <background-icon right="true" icon-one="cogs"/>
+        <documentation-container :documentation="documentation" v-show="showDocumentation"
+                                 v-on:close="showDocumentation = false"/>
+
+        <background-icon right="true" icon-one="link"/>
 
     </core-container>
 </template>
@@ -116,10 +132,14 @@
     import FeedbackBox from "../components/common/feedback-box";
     import ListPager from "../components/common/list-pager";
     import {store} from "../main";
+    import IconButton from "../components/common/icon-button";
+    import DocumentationContainer from "../components/common/documentation-container";
 
     export default {
         name: 'service-editor',
         components: {
+            DocumentationContainer,
+            IconButton,
             ListPager,
             FeedbackBox,
             ModalDialog,
@@ -154,7 +174,9 @@
                     items: []
                 },
                 showUnsavedValuesExistDialog: false,
-                nextRoute: null
+                nextRoute: null,
+                showDocumentation: false,
+                documentation: null
             }
         },
         methods: {
@@ -210,8 +232,13 @@
                     })
                 }
             },
-            loadParametersOfType: async function (typeKey) {
-                await IgorBackend.getData('/api/parameters/service/' + typeKey).then((parameters) => {
+            loadParametersOfType: function (typeKey) {
+                if (this.hasDocumentation(typeKey)) {
+                    this.switchDocumentation(typeKey);
+                } else {
+                    this.showDocumentation = false
+                }
+                IgorBackend.getData('/api/parameters/service/' + typeKey).then((parameters) => {
                     this.serviceConfiguration.parameters = parameters
                 })
             },
@@ -294,6 +321,25 @@
             editJob: function (jobId) {
                 this.$router.push({name: 'job-editor', params: {jobId: jobId}})
             },
+            hasDocumentation: function (typeId) {
+                for (let i = 0; i < this.serviceTypes.length; i++) {
+                    if (this.serviceTypes[i].key === typeId) {
+                        return this.serviceTypes[i].documentationAvailable;
+                    }
+                }
+                return false;
+            },
+            openDocumentation: async function (key) {
+                this.documentation = await IgorBackend.getData('/api/doc/' + key);
+                this.showDocumentation = true;
+                this.testResults = null;
+            },
+            switchDocumentation: async function (key) {
+                if (this.showDocumentation) {
+                    this.documentation = await IgorBackend.getData('/api/doc/' + key);
+                    this.testResults = null;
+                }
+            }
         },
         mounted() {
             let serviceData = this.$root.$data.store.getServiceData();
