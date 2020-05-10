@@ -1,1 +1,1 @@
-GAMMA-igor-ftp-service-tests
+GAMMA-igor-ftp-connector-tests

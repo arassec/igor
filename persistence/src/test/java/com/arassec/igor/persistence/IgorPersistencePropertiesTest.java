@@ -1,10 +1,8 @@
 package com.arassec.igor.persistence;
 
-import com.arassec.igor.core.IgorCoreProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**

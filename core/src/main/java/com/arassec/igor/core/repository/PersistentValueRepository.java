@@ -13,6 +13,7 @@ public interface PersistentValueRepository {
      * @param jobId  The job's ID.
      * @param taskId The task's ID.
      * @param value  The value to save.
+     *
      * @return The persisted value.
      */
     PersistentValue upsert(String jobId, String taskId, PersistentValue value);
@@ -23,6 +24,7 @@ public interface PersistentValueRepository {
      * @param jobId  The job's ID.
      * @param taskId The task's ID.
      * @param value  The value to check.
+     *
      * @return {@code true} if the value is persisted, {@code false} otherwise.
      */
     boolean isPersisted(String jobId, String taskId, PersistentValue value);

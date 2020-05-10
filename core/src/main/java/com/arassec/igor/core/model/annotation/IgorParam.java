@@ -33,8 +33,8 @@ public @interface IgorParam {
     /**
      * Indicates whether a parameter should be displayed in the advanced section of the parameter configuration UI.
      *
-     * @return {@code true}, if the parameter is advanced and can be hidden by default in the UI. {@code
-     * false}, if the parameter must always be shown to the user in the UI.
+     * @return {@code true}, if the parameter is advanced and can be hidden by default in the UI. {@code false}, if the parameter
+     * must always be shown to the user in the UI.
      */
     boolean advanced() default false;
 

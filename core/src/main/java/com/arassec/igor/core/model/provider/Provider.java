@@ -36,5 +36,5 @@ public interface Provider extends IgorComponent {
      * @param limit The new limit to set.
      */
     void setSimulationLimit(int limit);
-    
+
 }

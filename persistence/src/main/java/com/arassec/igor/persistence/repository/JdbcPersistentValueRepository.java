@@ -30,6 +30,7 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
      * @param jobId  The job's ID.
      * @param taskId The task's ID.
      * @param value  The value to save.
+     *
      * @return The persisted value. An ID is added if required.
      */
     @Override
@@ -60,6 +61,7 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
      * @param jobId  The job's ID.
      * @param taskId The task's ID.
      * @param value  The value to check.
+     *
      * @return {@code true} if the value is persisted, {@code false} otherwise.
      */
     @Override

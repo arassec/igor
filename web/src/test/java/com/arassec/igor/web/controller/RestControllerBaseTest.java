@@ -1,9 +1,9 @@
 package com.arassec.igor.web.controller;
 
+import com.arassec.igor.core.application.ConnectorManager;
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.application.JobManager;
-import com.arassec.igor.core.application.ServiceManager;
-import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.core.util.IgorConfigHelper;
 import com.arassec.igor.web.WebConfiguration;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -78,10 +78,10 @@ public abstract class RestControllerBaseTest {
     protected IgorComponentRegistry igorComponentRegistry;
 
     /**
-     * Mock of the service repository.
+     * Mock of the connector repository.
      */
     @MockBean
-    protected ServiceRepository serviceRepository;
+    protected ConnectorRepository connectorRepository;
 
     /**
      * Mocked manager for Jobs.
@@ -90,10 +90,10 @@ public abstract class RestControllerBaseTest {
     protected JobManager jobManager;
 
     /**
-     * Manager for Services.
+     * Manager for connectors.
      */
     @MockBean
-    protected ServiceManager serviceManager;
+    protected ConnectorManager connectorManager;
 
     /**
      * Converts the web response into the desired object.

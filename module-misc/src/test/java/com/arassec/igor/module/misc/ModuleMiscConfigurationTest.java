@@ -6,7 +6,7 @@ import org.springframework.context.MessageSource;
 
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the {@link ModuleMiscConfiguration}.
@@ -22,7 +22,8 @@ class ModuleMiscConfigurationTest {
     void testI18n() {
         ModuleMiscConfiguration configuration = new ModuleMiscConfiguration();
         MessageSource messageSource = configuration.miscMessageSource();
-        assertEquals("Sort by timestamp pattern", messageSource.getMessage("e43efa64-d1a3-422f-ac6c-f34cd56be0c2", null, Locale.getDefault()));
+        assertEquals("Sort by timestamp pattern", messageSource.getMessage("sort-by-timestamp-pattern-action", null,
+                Locale.getDefault()));
     }
 
 }

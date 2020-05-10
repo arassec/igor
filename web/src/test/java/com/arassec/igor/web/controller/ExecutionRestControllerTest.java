@@ -45,8 +45,8 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
                 .andExpect(jsonPath("$.numWaiting").value("3"))
                 .andExpect(jsonPath("$.numFailed").value("4"));
     }
-    
-    
+
+
     /**
      * Tests getting executions of a job.
      */

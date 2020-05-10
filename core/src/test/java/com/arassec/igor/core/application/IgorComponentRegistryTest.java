@@ -2,11 +2,11 @@ package com.arassec.igor.core.application;
 
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.connector.BaseConnector;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.provider.Provider;
-import com.arassec.igor.core.model.service.BaseService;
-import com.arassec.igor.core.model.service.Service;
-import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.model.trigger.Trigger;
+import com.arassec.igor.core.util.IgorException;
 import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -76,7 +76,7 @@ class IgorComponentRegistryTest {
         applicationContextMock = mock(ApplicationContext.class);
 
         igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock), List.of(providerMock), List.of(triggerMock),
-                List.of(new TestServiceImpl()));
+                List.of(new TestConnectorImpl()));
         igorComponentRegistry.afterPropertiesSet();
         igorComponentRegistry.setApplicationContext(applicationContextMock);
     }
@@ -119,24 +119,24 @@ class IgorComponentRegistryTest {
      * Tests getting a component instance.
      */
     @Test
-    @DisplayName("Tests getting a Service instance.")
-    void testGetServiceInstance() {
-        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.createServiceInstance("unknown-type-id", null));
-        igorComponentRegistry.createServiceInstance("service-type-id", null);
-        verify(applicationContextMock, times(1)).getBean(eq(TestServiceImpl.class));
+    @DisplayName("Tests getting a Connector instance.")
+    void testGetConnectorInstance() {
+        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.createConnectorInstance("unknown-type-id", null));
+        igorComponentRegistry.createConnectorInstance("connector-type-id", null);
+        verify(applicationContextMock, times(1)).getBean(eq(TestConnectorImpl.class));
     }
 
     /**
-     * Tests getting a service instance with parameters that must be applied to the new instance.
+     * Tests getting a connector instance with parameters that must be applied to the new instance.
      */
     @Test
-    @DisplayName("Tests getting a Service instance with parameters.")
-    void testGetServiceInstanceWithParameters() {
+    @DisplayName("Tests getting a Connector instance with parameters.")
+    void testGetConnectorInstanceWithParameters() {
         Map<String, Object> params = new HashMap<>();
         params.put("testParam", 666);
-        when(applicationContextMock.getBean(eq(TestServiceImpl.class))).thenReturn(new TestServiceImpl());
-        TestServiceImpl serviceInstance = (TestServiceImpl) igorComponentRegistry.createServiceInstance("service-type-id", params);
-        assertEquals(666, serviceInstance.getTestParam());
+        when(applicationContextMock.getBean(eq(TestConnectorImpl.class))).thenReturn(new TestConnectorImpl());
+        TestConnectorImpl connectorInstance = (TestConnectorImpl) igorComponentRegistry.createConnectorInstance("connector-type-id", params);
+        assertEquals(666, connectorInstance.getTestParam());
     }
 
     /**
@@ -167,33 +167,33 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting all component candidates for a parameter class.")
     void testGetParameterCategoryAndType() {
-        assertTrue(igorComponentRegistry.getServiceParameterCategoryAndType(String.class).isEmpty());
+        assertTrue(igorComponentRegistry.getConnectorParameterCategoryAndType(String.class).isEmpty());
 
-        TestServiceImpl expected = new TestServiceImpl();
+        TestConnectorImpl expected = new TestConnectorImpl();
 
         // The interface works...
-        Map<String, Set<String>> candidates = igorComponentRegistry.getServiceParameterCategoryAndType(TestService.class);
+        Map<String, Set<String>> candidates = igorComponentRegistry.getConnectorParameterCategoryAndType(TestConnector.class);
         assertEquals(1, candidates.size());
         assertEquals(1, candidates.get(expected.getCategoryId()).size());
         assertEquals(expected.getTypeId(), candidates.get(expected.getCategoryId()).iterator().next());
 
         // ...as well as the concrete implementation.
-        candidates = igorComponentRegistry.getServiceParameterCategoryAndType(TestServiceImpl.class);
+        candidates = igorComponentRegistry.getConnectorParameterCategoryAndType(TestConnectorImpl.class);
         assertEquals(1, candidates.size());
         assertEquals(1, candidates.get(expected.getCategoryId()).size());
         assertEquals(expected.getTypeId(), candidates.get(expected.getCategoryId()).iterator().next());
     }
 
     /**
-     * Service-Interface for testing.
+     * Connector-Interface for testing.
      */
-    private interface TestService extends Service {
+    private interface TestConnector extends Connector {
     }
 
     /**
-     * Service-Implementation for testing.
+     * Connector-Implementation for testing.
      */
-    private static class TestServiceImpl extends BaseService implements TestService {
+    private static class TestConnectorImpl extends BaseConnector implements TestConnector {
 
         @Getter
         @IgorParam
@@ -202,8 +202,8 @@ class IgorComponentRegistryTest {
         /**
          * Creates a new component instance.
          */
-        TestServiceImpl() {
-            super("service-category-id", "service-type-id");
+        TestConnectorImpl() {
+            super("connector-category-id", "connector-type-id");
         }
 
         /**

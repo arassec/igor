@@ -2,7 +2,7 @@ package com.arassec.igor.persistence;
 
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
-import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.persistence.security.SecurityProvider;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,10 +27,10 @@ public class PersistenceConfigurationTest {
     private IgorComponentRegistry igorComponentRegistry;
 
     /**
-     * Mock of the service repository.
+     * Mock of the connector repository.
      */
     @Mock
-    private ServiceRepository serviceRepository;
+    private ConnectorRepository connectorRepository;
 
     /**
      * Mock of the security provider.
@@ -45,7 +45,7 @@ public class PersistenceConfigurationTest {
     @DisplayName("Tests the job-mapper configuration.")
     void testJobMapperConfiguration() {
         PersistenceConfiguration persistenceConfiguration = new PersistenceConfiguration();
-        ObjectMapper jobMapper = persistenceConfiguration.persistenceJobMapper(igorComponentRegistry, serviceRepository, securityProvider);
+        ObjectMapper jobMapper = persistenceConfiguration.persistenceJobMapper(igorComponentRegistry, connectorRepository, securityProvider);
         assertFalse(jobMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
         assertFalse(jobMapper.isEnabled(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS));
         assertFalse(jobMapper.isEnabled(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS));
@@ -53,15 +53,15 @@ public class PersistenceConfigurationTest {
     }
 
     /**
-     * Tests the service-mapper configuration.
+     * Tests the connector-mapper configuration.
      */
     @Test
-    @DisplayName("Tests the service-mapper configuration.")
-    void testServiceMapperConfiguration() {
+    @DisplayName("Tests the connector-mapper configuration.")
+    void testConnectorMapperConfiguration() {
         PersistenceConfiguration persistenceConfiguration = new PersistenceConfiguration();
-        ObjectMapper serviceMapper = persistenceConfiguration.persistenceServiceMapper(igorComponentRegistry, securityProvider);
-        assertFalse(serviceMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
-        assertTrue(serviceMapper.getRegisteredModuleIds().contains("com.fasterxml.jackson.datatype.jsr310.JavaTimeModule"));
+        ObjectMapper connectorMapper = persistenceConfiguration.persistenceConnectorMapper(igorComponentRegistry, securityProvider);
+        assertFalse(connectorMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
+        assertTrue(connectorMapper.getRegisteredModuleIds().contains("com.fasterxml.jackson.datatype.jsr310.JavaTimeModule"));
     }
 
 }

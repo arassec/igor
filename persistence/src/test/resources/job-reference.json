@@ -37,9 +37,9 @@
           "active": true,
           "parameters": [
             {
-              "name": "testService",
-              "value": "service-id",
-              "service": true
+              "name": "testConnector",
+              "value": "connector-id",
+              "connector": true
             },
             {
               "name": "numThreads",

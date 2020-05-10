@@ -15,7 +15,7 @@ public abstract class BaseUtilAction extends BaseAction {
     /**
      * Creates a new component instance.
      *
-     * @param typeId     The type ID.
+     * @param typeId The type ID.
      */
     public BaseUtilAction(String typeId) {
         super("util-actions", typeId);

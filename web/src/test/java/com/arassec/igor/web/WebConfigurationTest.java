@@ -1,7 +1,7 @@
 package com.arassec.igor.web;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
-import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.core.util.IgorConfigHelper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -69,10 +69,10 @@ public class WebConfigurationTest {
     @DisplayName("Tests getting the web layer's object-mappers.")
     void testObjectMapperCreation() {
         IgorComponentRegistry igorComponentRegistryMock = mock(IgorComponentRegistry.class);
-        ServiceRepository serviceRepositoryMock = mock(ServiceRepository.class);
+        ConnectorRepository connectorRepositoryMock = mock(ConnectorRepository.class);
         MessageSource messageSourceMock = mock(MessageSource.class);
 
-        ObjectMapper objectMapper = webConfiguration.objectMapper(igorComponentRegistryMock, serviceRepositoryMock, messageSourceMock);
+        ObjectMapper objectMapper = webConfiguration.objectMapper(igorComponentRegistryMock, connectorRepositoryMock, messageSourceMock);
 
         assertFalse(objectMapper.isEnabled(MapperFeature.DEFAULT_VIEW_INCLUSION));
         assertFalse(objectMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
@@ -80,7 +80,7 @@ public class WebConfigurationTest {
         assertFalse(objectMapper.isEnabled(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS));
         assertTrue(objectMapper.getRegisteredModuleIds().contains("com.fasterxml.jackson.datatype.jsr310.JavaTimeModule"));
 
-        objectMapper = webConfiguration.simulationObjectMapper(igorComponentRegistryMock, serviceRepositoryMock, messageSourceMock);
+        objectMapper = webConfiguration.simulationObjectMapper(igorComponentRegistryMock, connectorRepositoryMock, messageSourceMock);
 
         assertFalse(objectMapper.isEnabled(MapperFeature.DEFAULT_VIEW_INCLUSION));
         assertFalse(objectMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));

@@ -2,7 +2,7 @@ package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.provider.Provider;
-import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.web.simulation.ProviderProxy;
 
 import java.util.Map;
@@ -15,11 +15,11 @@ public class ProviderWebDeserializer extends IgorComponentWebDeserializer<Provid
      * Creates a new deserializer instance.
      *
      * @param igorComponentRegistry The component registry.
-     * @param serviceRepository     The service repository to load services from.
+     * @param connectorRepository   The connector repository to load connectors from.
      * @param simulationMode        Set to {@code true} if the resulting  components are used during simulated job runs.
      */
-    public ProviderWebDeserializer(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository, boolean simulationMode) {
-        super(Provider.class, igorComponentRegistry, serviceRepository, simulationMode);
+    public ProviderWebDeserializer(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository, boolean simulationMode) {
+        super(Provider.class, igorComponentRegistry, connectorRepository, simulationMode);
     }
 
     /**

@@ -3,8 +3,8 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.module.file.service.FileService;
-import com.arassec.igor.module.file.service.FileStreamData;
+import com.arassec.igor.module.file.connector.FileConnector;
+import com.arassec.igor.module.file.connector.FileStreamData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,15 +32,15 @@ class CopyFileActionTest extends FileActionBaseTest {
         FileStreamData fileStreamData = new FileStreamData();
         fileStreamData.setData(new ByteArrayInputStream("test".getBytes()));
 
-        FileService sourceFileServiceMock = mock(FileService.class);
-        when(sourceFileServiceMock.readStream(eq("/directory/test/filename.txt"), any(WorkInProgressMonitor.class))).thenReturn(fileStreamData);
-        FileService targetFileServiceMock = mock(FileService.class);
+        FileConnector sourceFileConnectorMock = mock(FileConnector.class);
+        when(sourceFileConnectorMock.readStream(eq("/directory/test/filename.txt"), any(WorkInProgressMonitor.class))).thenReturn(fileStreamData);
+        FileConnector targetFileConnectorMock = mock(FileConnector.class);
 
         CopyFileAction action = new CopyFileAction();
-        action.setSourceService(sourceFileServiceMock);
+        action.setSource(sourceFileConnectorMock);
         action.setSourceDirectory("$.data.directory");
         action.setSourceFilename("$.data.filename");
-        action.setTargetService(targetFileServiceMock);
+        action.setTarget(targetFileConnectorMock);
         action.setTargetDirectory("target");
         action.setTargetFilename("copy-file-action-alpha.txt");
 
@@ -58,12 +58,12 @@ class CopyFileActionTest extends FileActionBaseTest {
                 () -> assertEquals("copy-file-action-alpha.txt", data.get(CopyFileAction.KEY_TARGET_FILENAME))
         );
 
-        verify(targetFileServiceMock, times(1)).writeStream(eq("target/copy-file-action-alpha.txt.igor"),
+        verify(targetFileConnectorMock, times(1)).writeStream(eq("target/copy-file-action-alpha.txt.igor"),
                 eq(fileStreamData), any(WorkInProgressMonitor.class));
 
-        verify(sourceFileServiceMock, times(1)).finalizeStream(eq(fileStreamData));
+        verify(sourceFileConnectorMock, times(1)).finalizeStream(eq(fileStreamData));
 
-        verify(targetFileServiceMock, times(1)).move(eq("target/copy-file-action-alpha.txt.igor"),
+        verify(targetFileConnectorMock, times(1)).move(eq("target/copy-file-action-alpha.txt.igor"),
                 eq("target/copy-file-action-alpha.txt"), any(WorkInProgressMonitor.class));
     }
 
@@ -77,15 +77,15 @@ class CopyFileActionTest extends FileActionBaseTest {
         fileStreamData.setData(new ByteArrayInputStream("test".getBytes()));
         fileStreamData.setFilenameSuffix("jpeg");
 
-        FileService sourceFileServiceMock = mock(FileService.class);
-        when(sourceFileServiceMock.readStream(eq("/slashes"), any(WorkInProgressMonitor.class))).thenReturn(fileStreamData);
-        FileService targetFileServiceMock = mock(FileService.class);
+        FileConnector sourceFileConnectorMock = mock(FileConnector.class);
+        when(sourceFileConnectorMock.readStream(eq("/slashes"), any(WorkInProgressMonitor.class))).thenReturn(fileStreamData);
+        FileConnector targetFileConnectorMock = mock(FileConnector.class);
 
         CopyFileAction action = new CopyFileAction();
-        action.setSourceService(sourceFileServiceMock);
+        action.setSource(sourceFileConnectorMock);
         action.setSourceDirectory(null);
         action.setSourceFilename("file/with/slashes");
-        action.setTargetService(targetFileServiceMock);
+        action.setTarget(targetFileConnectorMock);
         action.setTargetDirectory("target");
         action.setTargetFilename("copy-file-action-test");
         action.setAppendTransferSuffix(false);
@@ -105,12 +105,12 @@ class CopyFileActionTest extends FileActionBaseTest {
                 () -> assertEquals("copy-file-action-test.jpeg", data.get(CopyFileAction.KEY_TARGET_FILENAME))
         );
 
-        verify(targetFileServiceMock, times(1)).writeStream(eq("target/copy-file-action-test.jpeg"),
+        verify(targetFileConnectorMock, times(1)).writeStream(eq("target/copy-file-action-test.jpeg"),
                 eq(fileStreamData), any(WorkInProgressMonitor.class));
 
-        verify(sourceFileServiceMock, times(1)).finalizeStream(eq(fileStreamData));
+        verify(sourceFileConnectorMock, times(1)).finalizeStream(eq(fileStreamData));
 
-        verify(targetFileServiceMock, times(0)).move(anyString(), anyString(), any(WorkInProgressMonitor.class));
+        verify(targetFileConnectorMock, times(0)).move(anyString(), anyString(), any(WorkInProgressMonitor.class));
     }
 
     /**
@@ -119,10 +119,10 @@ class CopyFileActionTest extends FileActionBaseTest {
     @Test
     @DisplayName("Tests the action with unresolved parameters.")
     void testProcessUnresolvedParameters() {
-        FileService sourceFileServiceMock = mock(FileService.class);
+        FileConnector sourceFileConnectorMock = mock(FileConnector.class);
 
         CopyFileAction action = new CopyFileAction();
-        action.setSourceService(sourceFileServiceMock);
+        action.setSource(sourceFileConnectorMock);
         action.setSourceDirectory("$.INVALID");
         action.setSourceFilename("$.INVALID");
         action.setTargetDirectory("target");
@@ -143,10 +143,10 @@ class CopyFileActionTest extends FileActionBaseTest {
     @DisplayName("Tests the action with an invalid file.")
     void testProcessInvalidFile() {
         // The mock doesn't return a FileStreamData-Object because the "file" is invalid.
-        FileService sourceFileServiceMock = mock(FileService.class);
+        FileConnector sourceFileConnectorMock = mock(FileConnector.class);
 
         CopyFileAction action = new CopyFileAction();
-        action.setSourceService(sourceFileServiceMock);
+        action.setSource(sourceFileConnectorMock);
         action.setSourceDirectory("$.data.directory");
         action.setSourceFilename("$.data.filename");
         action.setTargetDirectory("target");

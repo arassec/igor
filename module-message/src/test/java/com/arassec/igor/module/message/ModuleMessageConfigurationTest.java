@@ -22,7 +22,7 @@ public class ModuleMessageConfigurationTest {
     void testI18n() {
         ModuleMessageConfiguration configuration = new ModuleMessageConfiguration();
         MessageSource messageSource = configuration.messageMessageSource();
-        assertEquals("Send message", messageSource.getMessage("88a0e988-d3ec-4b91-b98c-92d99c09ba33", null, Locale.getDefault()));
+        assertEquals("Send message", messageSource.getMessage("send-message-action", null, Locale.getDefault()));
     }
 
 }

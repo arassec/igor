@@ -44,9 +44,9 @@ public class JobExecutor {
     private final JobExecutionRepository jobExecutionRepository;
 
     /**
-     * The executor service to run the jobs.
+     * The {@link ThreadPoolExecutor} to run the jobs.
      */
-    private final ThreadPoolExecutor executorService;
+    private final ThreadPoolExecutor threadPoolExecutor;
 
     /**
      * Contains the futures of currently running jobs.
@@ -66,7 +66,7 @@ public class JobExecutor {
         this.igorCoreProperties = igorCoreProperties;
         this.jobRepository = jobRepository;
         this.jobExecutionRepository = jobExecutionRepository;
-        executorService = (ThreadPoolExecutor) Executors
+        threadPoolExecutor = (ThreadPoolExecutor) Executors
                 .newFixedThreadPool(igorCoreProperties.getJobQueueSize(), runnable -> new Thread(runnable, "job-executor-thread"));
     }
 
@@ -97,7 +97,7 @@ public class JobExecutor {
                         jobExecution.setExecutionState(JobExecutionState.RUNNING);
                         jobExecution.setStarted(Instant.now());
                         runningJobs.put(job.getId(), job);
-                        runningJobFutures.add(executorService.submit(new JobRunningCallable(job, jobExecution)));
+                        runningJobFutures.add(threadPoolExecutor.submit(new JobRunningCallable(job, jobExecution)));
                         jobExecutionRepository.upsert(jobExecution);
                         freeSlots--;
                     }

@@ -4,7 +4,7 @@ import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.annotation.IgorParam;
-import com.arassec.igor.core.model.service.Service;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.web.model.KeyLabelStore;
 import com.arassec.igor.web.util.DocumentationUtil;
@@ -58,8 +58,8 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
     public void serialize(IgorComponent instance, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField(WebMapperKey.ID.getKey(), instance.getId());
-        if (instance instanceof Service && ((Service) instance).getName() != null) {
-            jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), ((Service) instance).getName());
+        if (instance instanceof Connector && ((Connector) instance).getName() != null) {
+            jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), ((Connector) instance).getName());
         }
         if (instance instanceof Action) {
             if (((Action) instance).getName() != null) {
@@ -152,10 +152,10 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                 jsonGenerator.writeBooleanField(WebMapperKey.REQUIRED.getKey(), (field.isAnnotationPresent(NotNull.class)
                         || field.isAnnotationPresent(NotBlank.class) || field.getType().isPrimitive()));
 
-                Map<String, Set<String>> candidates = igorComponentRegistry.getServiceParameterCategoryAndType(field.getType());
+                Map<String, Set<String>> candidates = igorComponentRegistry.getConnectorParameterCategoryAndType(field.getType());
 
                 if (!candidates.isEmpty()) {
-                    writeServiceParameter(jsonGenerator, value, candidates);
+                    writeConnectorParameter(jsonGenerator, value, candidates);
                 } else {
                     jsonGenerator.writeStringField(WebMapperKey.TYPE.getKey(), field.getType().getName());
                     if (value instanceof String && StringUtils.isEmpty(value)) {
@@ -163,7 +163,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                     } else {
                         jsonGenerator.writeObjectField(WebMapperKey.VALUE.getKey(), value);
                     }
-                    jsonGenerator.writeBooleanField(WebMapperKey.SERVICE.getKey(), false);
+                    jsonGenerator.writeBooleanField(WebMapperKey.CONNECTOR.getKey(), false);
                 }
                 jsonGenerator.writeEndObject();
             } catch (IOException | IllegalAccessException e) {
@@ -175,15 +175,15 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
     }
 
     /**
-     * Writes a service parameter as JSON.
+     * Writes a connector parameter as JSON.
      *
      * @param jsonGenerator The json generator to create the JSON.
      * @param value         The value of the parameter.
-     * @param candidates    The possible service implementations that can be used as parameter values.
+     * @param candidates    The possible connector implementations that can be used as parameter values.
      *
      * @throws IOException If the parameter could not be written.
      */
-    private void writeServiceParameter(JsonGenerator jsonGenerator, Object value, Map<String, Set<String>> candidates) throws IOException {
+    private void writeConnectorParameter(JsonGenerator jsonGenerator, Object value, Map<String, Set<String>> candidates) throws IOException {
         List<KeyLabelStore> categories = new LinkedList<>();
         candidates.keySet().forEach(candidate -> categories.add(new KeyLabelStore(candidate, messageSource.getMessage(candidate,
                 null, LocaleContextHolder.getLocale()))));
@@ -212,7 +212,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                         jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), type.getValue());
                         jsonGenerator.writeEndObject();
                     } catch (IOException e) {
-                        log.error("Could not serialize type of service parameter (" + type.getKey() + " / "
+                        log.error("Could not serialize type of connector parameter (" + type.getKey() + " / "
                                 + type.getValue() + ")", e);
                     }
                 });
@@ -220,7 +220,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
 
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
-                log.error("Could not serialize category of service parameter (" + category.getKey() + " / " + category.getValue() + ")", e);
+                log.error("Could not serialize category of connector parameter (" + category.getKey() + " / " + category.getValue() + ")", e);
             }
         });
 
@@ -228,13 +228,13 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
 
 
         if (value != null) {
-            jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), ((Service) value).getId());
-            jsonGenerator.writeStringField(WebMapperKey.SERVICE_NAME.getKey(), ((Service) value).getName());
+            jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), ((Connector) value).getId());
+            jsonGenerator.writeStringField(WebMapperKey.CONNECTOR_NAME.getKey(), ((Connector) value).getName());
         } else {
             jsonGenerator.writeObjectField(WebMapperKey.VALUE.getKey(), null);
-            jsonGenerator.writeStringField(WebMapperKey.SERVICE_NAME.getKey(), "");
+            jsonGenerator.writeStringField(WebMapperKey.CONNECTOR_NAME.getKey(), "");
         }
-        jsonGenerator.writeBooleanField(WebMapperKey.SERVICE.getKey(), true);
+        jsonGenerator.writeBooleanField(WebMapperKey.CONNECTOR.getKey(), true);
     }
 
 }

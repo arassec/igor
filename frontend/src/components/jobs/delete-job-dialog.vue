@@ -6,16 +6,16 @@
                 Do you really want to delete job:
                 <div class="truncate highlight">{{jobName}}</div>
             </div>
-            <div class="paragraph" v-if="exclusiveServices.length > 0">
-                The following services are only used by this job:
+            <div class="paragraph" v-if="exclusiveConnectors.length > 0">
+                The following connectors are only used by this job:
                 <ul class="a">
-                    <li v-for="exclusiveService in exclusiveServices" :key="exclusiveService.key">
-                        <div class="truncate highlight">{{exclusiveService.value}}</div>
+                    <li v-for="exclusiveConnector in exclusiveConnectors" :key="exclusiveConnector.key">
+                        <div class="truncate highlight">{{exclusiveConnector.value}}</div>
                     </li>
                 </ul>
             </div>
-            <div class="paragraph" v-if="exclusiveServices.length > 0">
-                Delete unused services, too:
+            <div class="paragraph" v-if="exclusiveConnectors.length > 0">
+                Delete unused connectors, too:
                 <font-awesome-icon :icon="deleteJob ? 'check-square' : 'square'"
                                    v-on:click="deleteJob = !deleteJob"/>
             </div>
@@ -43,13 +43,13 @@
         props: ['jobId', 'jobName'],
         data: function () {
             return {
-                exclusiveServices: [],
+                exclusiveConnectors: [],
                 deleteJob: false
             }
         },
         mounted: function () {
-            IgorBackend.getData('/api/job/' + this.jobId + "/exclusive-service-references").then((data) => {
-                this.exclusiveServices = Array.from(data)
+            IgorBackend.getData('/api/job/' + this.jobId + "/exclusive-connector-references").then((data) => {
+                this.exclusiveConnectors = Array.from(data)
             })
         }
     }

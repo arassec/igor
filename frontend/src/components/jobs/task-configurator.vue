@@ -78,7 +78,7 @@
         <core-panel v-if="task.provider.parameters.length">
             <h2>Provider Configuration</h2>
             <parameter-editor v-bind:parameters="task.provider.parameters" ref="parameterEditor"
-                              v-on:create-service="createService"/>
+                              v-on:create-connector="createConnector"/>
         </core-panel>
 
     </div>
@@ -155,8 +155,8 @@
 
                 return (nameValidationResult && parameterValidationResult)
             },
-            createService: function (parameterIndex, serviceCategoryCandidates) {
-                this.$emit('create-service', this.task.id, parameterIndex, serviceCategoryCandidates)
+            createConnector: function (parameterIndex, connectorCategoryCandidates) {
+                this.$emit('create-connector', this.task.id, parameterIndex, connectorCategoryCandidates)
             },
             hasDocumentation: function (typeId) {
                 for (let i = 0; i < this.providerTypes.length; i++) {

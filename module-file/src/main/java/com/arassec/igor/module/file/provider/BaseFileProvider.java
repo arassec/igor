@@ -10,7 +10,7 @@ public abstract class BaseFileProvider extends BaseProvider {
     /**
      * Creates a new component instance.
      *
-     * @param typeId     The type ID.
+     * @param typeId The type ID.
      */
     public BaseFileProvider(String typeId) {
         super("file-providers", typeId);

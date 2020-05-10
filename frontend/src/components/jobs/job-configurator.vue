@@ -93,7 +93,7 @@
         <core-panel v-if="jobConfiguration.trigger.parameters.length">
             <h2>Trigger Configuration</h2>
             <parameter-editor v-bind:parameters="jobConfiguration.trigger.parameters" ref="parameterEditor"
-                              v-on:create-service="createService"/>
+                              v-on:create-connector="createConnector"/>
         </core-panel>
 
     </div>
@@ -180,8 +180,8 @@
             setNameValidationError: function (errorMessage) {
                 this.nameValidationError = errorMessage
             },
-            createService: function (parameterIndex, serviceCategoryCandidates) {
-                this.$emit('create-service', this.taskKey, parameterIndex, serviceCategoryCandidates)
+            createConnector: function (parameterIndex, connectorCategoryCandidates) {
+                this.$emit('create-connector', this.taskKey, parameterIndex, connectorCategoryCandidates)
             },
             hasDocumentation: function (typeId) {
                 for (let i = 0; i < this.triggerTypes.length; i++) {

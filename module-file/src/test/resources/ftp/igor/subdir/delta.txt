@@ -1,1 +1,1 @@
-DELTA-igor-ftp-service-tests
+DELTA-igor-ftp-connector-tests

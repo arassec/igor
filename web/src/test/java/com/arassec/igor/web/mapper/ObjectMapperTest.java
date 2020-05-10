@@ -1,11 +1,11 @@
 package com.arassec.igor.web.mapper;
 
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.Task;
-import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.web.test.TestAction;
+import com.arassec.igor.web.test.TestConnector;
 import com.arassec.igor.web.test.TestProvider;
-import com.arassec.igor.web.test.TestService;
 import com.arassec.igor.web.test.TestTrigger;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
@@ -61,9 +61,9 @@ public class ObjectMapperTest extends MapperBaseTest {
         testAction.setName("action-name");
         testAction.setActive(true);
 
-        TestService testService = new TestService();
-        testService.setId(TestService.SERVICE_ID);
-        testAction.setTestService(testService);
+        TestConnector testConnector = new TestConnector();
+        testConnector.setId(TestConnector.CONNECTOR_ID);
+        testAction.setTestConnector(testConnector);
 
         task.getActions().add(testAction);
 
@@ -126,47 +126,47 @@ public class ObjectMapperTest extends MapperBaseTest {
         assertEquals("action-name", testAction.getName());
         assertEquals(TestAction.CATEGORY_ID, testAction.getCategoryId());
         assertEquals(TestAction.TYPE_ID, testAction.getTypeId());
-        assertTrue(testAction.getTestService() instanceof TestService);
+        assertTrue(testAction.getTestConnector() instanceof TestConnector);
     }
 
     /**
-     * Tests serializing a service.
+     * Tests serializing a connector.
      */
     @Test
-    @DisplayName("Tests serializing a service.")
+    @DisplayName("Tests serializing a connector.")
     @SneakyThrows(IOException.class)
-    void testServiceSerialization() {
-        TestService testService = new TestService();
-        testService.setId(TestService.SERVICE_ID);
-        testService.setName("service-name");
+    void testConnectorSerialization() {
+        TestConnector testConnector = new TestConnector();
+        testConnector.setId(TestConnector.CONNECTOR_ID);
+        testConnector.setName("connector-name");
 
-        Writer serializedService = new StringWriter();
+        Writer serializedConnector = new StringWriter();
 
-        objectMapper.writeValue(serializedService, testService);
+        objectMapper.writeValue(serializedConnector, testConnector);
 
-        Files.writeString(Paths.get("target/service-reference.json"), serializedService.toString());
+        Files.writeString(Paths.get("target/connector-reference.json"), serializedConnector.toString());
 
-        String serializedJson = serializedService.toString();
-        String referenceJson = Files.readString(Paths.get("src/test/resources/service-reference.json"));
+        String serializedJson = serializedConnector.toString();
+        String referenceJson = Files.readString(Paths.get("src/test/resources/connector-reference.json"));
 
         assertTrue(isJsonEqual(referenceJson, serializedJson));
     }
 
     /**
-     * Tests deserializing a service.
+     * Tests deserializing a connector.
      */
     @Test
-    @DisplayName("Tests deserializing a service.")
+    @DisplayName("Tests deserializing a connector.")
     @SneakyThrows(IOException.class)
-    void testServiceDeserialization() {
-        String serviceJson = Files.readString(Paths.get("src/test/resources/service-reference.json"));
+    void testConnectorDeserialization() {
+        String connectorJson = Files.readString(Paths.get("src/test/resources/connector-reference.json"));
 
-        Service testService = objectMapper.readValue(serviceJson, Service.class);
+        Connector testConnector = objectMapper.readValue(connectorJson, Connector.class);
 
-        assertTrue(testService instanceof TestService);
+        assertTrue(testConnector instanceof TestConnector);
 
-        assertEquals(TestService.SERVICE_ID, testService.getId());
-        assertEquals("service-name", testService.getName());
+        assertEquals(TestConnector.CONNECTOR_ID, testConnector.getId());
+        assertEquals("connector-name", testConnector.getName());
     }
 
 }

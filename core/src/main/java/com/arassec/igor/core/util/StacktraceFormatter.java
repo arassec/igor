@@ -18,6 +18,7 @@ public class StacktraceFormatter {
      * Formats the parameter's stacktrace as String.
      *
      * @param throwable The throwable to format.
+     *
      * @return The stacktrace as String.
      */
     public static String format(Throwable throwable) {

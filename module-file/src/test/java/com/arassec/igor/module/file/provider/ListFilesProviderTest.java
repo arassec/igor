@@ -1,9 +1,9 @@
 package com.arassec.igor.module.file.provider;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.file.service.FallbackFileService;
-import com.arassec.igor.module.file.service.FileInfo;
-import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.connector.FallbackFileConnector;
+import com.arassec.igor.module.file.connector.FileConnector;
+import com.arassec.igor.module.file.connector.FileInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +28,9 @@ class ListFilesProviderTest {
     @DisplayName("Tests default values on instance creation.")
     void testCreation() {
         ListFilesProvider provider = new ListFilesProvider();
-        assertEquals("5f15dc47-94b2-46df-b1ee-0f05293c8e73", provider.getCategoryId());
-        assertEquals("ac6ff9d1-7003-49cc-85b8-7be305fd90a4", provider.getTypeId());
-        assertTrue(provider.getService() instanceof FallbackFileService);
+        assertEquals("file-providers", provider.getCategoryId());
+        assertEquals("list-files-provider", provider.getTypeId());
+        assertTrue(provider.getSource() instanceof FallbackFileConnector);
     }
 
     /**
@@ -39,12 +39,12 @@ class ListFilesProviderTest {
     @Test
     @DisplayName("Tests the provider.")
     void testProvider() {
-        FileService fileServiceMock = mock(FileService.class);
-        when(fileServiceMock.listFiles(eq("/tmp"), eq("jpg"))).thenReturn(List.of(
+        FileConnector fileConnectorMock = mock(FileConnector.class);
+        when(fileConnectorMock.listFiles(eq("/tmp"), eq("jpg"))).thenReturn(List.of(
                 new FileInfo("/tmp/fileA", "now"), new FileInfo("fileB", null)));
 
         ListFilesProvider provider = new ListFilesProvider();
-        provider.setService(fileServiceMock);
+        provider.setSource(fileConnectorMock);
         provider.setDirectory("/tmp");
         provider.setFileEnding("jpg");
 

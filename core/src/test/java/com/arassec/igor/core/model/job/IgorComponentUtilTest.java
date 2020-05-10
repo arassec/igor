@@ -3,8 +3,8 @@ package com.arassec.igor.core.model.job;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.service.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,9 +28,9 @@ class IgorComponentUtilTest {
     private Action testAction;
 
     /**
-     * A service for testing.
+     * A connector for testing.
      */
-    private Service testService;
+    private Connector testConnector;
 
     /**
      * A {@link JobExecution} for testing.
@@ -42,35 +42,35 @@ class IgorComponentUtilTest {
      */
     @BeforeEach
     void initialize() {
-        testService = mock(Service.class);
+        testConnector = mock(Connector.class);
         testAction = new TestAction();
-        ReflectionTestUtils.setField(testAction, "testService", testService);
+        ReflectionTestUtils.setField(testAction, "testConnector", testConnector);
     }
 
     /**
-     *
+     * Tests connector shutdown
      */
     @Test
-    @DisplayName("Tests service shutdown")
-    void testShutdownServices() {
+    @DisplayName("Tests connector shutdown")
+    void testShutdownConnectors() {
         // Initialize should handle null-input:
-        IgorComponentUtil.initializeServices(null, "job-id", "task-id", jobExecution);
+        IgorComponentUtil.initializeConnectors(null, "job-id", "task-id", jobExecution);
 
-        IgorComponentUtil.initializeServices(testAction, "job-id", "task-id", jobExecution);
-        verify(testService, times(1)).initialize(eq("job-id"), eq("task-id"), eq(jobExecution));
+        IgorComponentUtil.initializeConnectors(testAction, "job-id", "task-id", jobExecution);
+        verify(testConnector, times(1)).initialize(eq("job-id"), eq("task-id"), eq(jobExecution));
     }
 
     /**
-     *
+     * Tests connector initialization
      */
     @Test
-    @DisplayName("Tests service initialization")
-    void testInitializeServices() {
+    @DisplayName("Tests connector initialization")
+    void testInitializeConnector() {
         // Shutdown should handle null-input:
-        IgorComponentUtil.shutdownServices(null, "job-id", "task-id", jobExecution);
+        IgorComponentUtil.shutdownConnectors(null, "job-id", "task-id", jobExecution);
 
-        IgorComponentUtil.shutdownServices(testAction, "job-id", "task-id", jobExecution);
-        verify(testService, times(1)).shutdown(eq("job-id"), eq("task-id"), eq(jobExecution));
+        IgorComponentUtil.shutdownConnectors(testAction, "job-id", "task-id", jobExecution);
+        verify(testConnector, times(1)).shutdown(eq("job-id"), eq("task-id"), eq(jobExecution));
     }
 
     /**
@@ -79,10 +79,10 @@ class IgorComponentUtilTest {
     private class TestAction extends BaseAction {
 
         /**
-         * Test service.
+         * Test connector.
          */
         @IgorParam
-        private Service testService;
+        private Connector testConnector;
 
         /**
          * Creates a new component instance.

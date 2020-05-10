@@ -177,7 +177,7 @@
                     Select a previously exported JSON file to import.
                 </div>
                 <div class="paragraph alert">
-                    WARNING: existing services and jobs will be overwritten by the import!
+                    WARNING: existing connectors and jobs will be overwritten by the import!
                 </div>
                 <div class="paragraph margin-top">
                     <label for="import-file-selector" id="import-file-select">
@@ -345,9 +345,9 @@
                 this.selectedJobName = jobName;
                 this.showDeleteDialog = true
             },
-            deleteJob: function (deleteExclusiveServices) {
+            deleteJob: function (deleteExclusiveConnectors) {
                 this.showDeleteDialog = false;
-                IgorBackend.deleteData('/api/job/' + this.selectedJobId + '?deleteExclusiveServices=' + deleteExclusiveServices,
+                IgorBackend.deleteData('/api/job/' + this.selectedJobId + '?deleteExclusiveConnectors=' + deleteExclusiveConnectors,
                     'Deleting job', 'Job \'' + FormatUtils.formatNameForSnackbar(this.selectedJobName) + '\' has been deleted.',
                     'Job \'' + FormatUtils.formatNameForSnackbar(this.selectedJobName) + '\' could not be deleted!').then(() => {
                     this.loadJobs()
@@ -513,7 +513,7 @@
             if (this.$root.$data.store.getValue('job-state-filter')) {
                 this.stateFilter = this.$root.$data.store.getValue('job-state-filter')
             }
-            this.$root.$data.store.clearServiceData();
+            this.$root.$data.store.clearConnectorData();
             this.$root.$data.store.clearJobData();
             this.loadJobs().then(() => {
                 this.enableRefreshTimer()

@@ -3,8 +3,8 @@ package com.arassec.igor.persistence.mapper;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.persistence.test.TestAction;
+import com.arassec.igor.persistence.test.TestConnector;
 import com.arassec.igor.persistence.test.TestProvider;
-import com.arassec.igor.persistence.test.TestService;
 import com.arassec.igor.persistence.test.TestTrigger;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
@@ -60,9 +60,9 @@ public class JobMapperTest extends MapperBaseTest {
         testAction.setName("action-name");
         testAction.setActive(true);
 
-        TestService testService = new TestService();
-        testService.setId(TestService.SERVICE_ID);
-        testAction.setTestService(testService);
+        TestConnector testConnector = new TestConnector();
+        testConnector.setId(TestConnector.CONNECTOR_ID);
+        testAction.setTestConnector(testConnector);
 
         task.getActions().add(testAction);
 
@@ -125,7 +125,7 @@ public class JobMapperTest extends MapperBaseTest {
         assertEquals("action-name", testAction.getName());
         assertEquals(TestAction.CATEGORY_ID, testAction.getCategoryId());
         assertEquals(TestAction.TYPE_ID, testAction.getTypeId());
-        assertTrue(testAction.getTestService() instanceof TestService);
+        assertTrue(testAction.getTestConnector() instanceof TestConnector);
     }
 
 }

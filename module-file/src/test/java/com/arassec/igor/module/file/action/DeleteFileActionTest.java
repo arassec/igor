@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.connector.FileConnector;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -24,10 +24,10 @@ class DeleteFileActionTest extends FileActionBaseTest {
     @Test
     @DisplayName("Tests the action with JSON-Path parameters.")
     void process() {
-        FileService fileServiceMock = mock(FileService.class);
+        FileConnector fileConnectorMock = mock(FileConnector.class);
 
         DeleteFileAction action = new DeleteFileAction();
-        action.setService(fileServiceMock);
+        action.setSource(fileConnectorMock);
         action.setDirectory("$.data.directory");
         action.setFilename("$.data.filename");
 
@@ -38,7 +38,7 @@ class DeleteFileActionTest extends FileActionBaseTest {
         assertEquals(1, processedData.size());
         assertEquals(data, processedData.get(0));
 
-        verify(fileServiceMock, times(1))
+        verify(fileConnectorMock, times(1))
                 .delete(eq("/directory/test/filename.txt"), any(WorkInProgressMonitor.class));
     }
 

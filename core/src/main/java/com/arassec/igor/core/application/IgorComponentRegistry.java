@@ -2,8 +2,8 @@ package com.arassec.igor.core.application;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.provider.Provider;
-import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,13 +45,13 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     private final List<Trigger> triggers;
 
     /**
-     * All available services.
+     * All available connectors.
      */
-    private final List<Service> services;
+    private final List<Connector> connectors;
 
     /**
-     * Contains the categories of a certain component type (e.g. Action.class -> Action-Categories or Service.class ->
-     * Service-Categories etc.).
+     * Contains the categories of a certain component type (e.g. Action.class -> Action-Categories or Connector.class ->
+     * Connector-Categories etc.).
      */
     private final Map<Class<? extends IgorComponent>, Set<String>> categoriesByComponentType = new HashMap<>();
 
@@ -69,7 +69,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
         initializeComponent(Action.class, actions);
         initializeComponent(Provider.class, providers);
         initializeComponent(Trigger.class, triggers);
-        initializeComponent(Service.class, services);
+        initializeComponent(Connector.class, connectors);
     }
 
     /**
@@ -129,21 +129,21 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     }
 
     /**
-     * Returns a new {@link Service} instance for the given type ID.
+     * Returns a new {@link Connector} instance for the given type ID.
      *
-     * @param typeId     The service's type ID.
+     * @param typeId     The connector's type ID.
      * @param parameters The parameters of the newly created action.
      *
-     * @return The new {@link Service} instance.
+     * @return The new {@link Connector} instance.
      */
-    public Service createServiceInstance(String typeId, Map<String, Object> parameters) {
-        Optional<Service> optional = services.stream().filter(service -> service.getTypeId().equals(typeId)).findFirst();
+    public Connector createConnectorInstance(String typeId, Map<String, Object> parameters) {
+        Optional<Connector> optional = connectors.stream().filter(connector -> connector.getTypeId().equals(typeId)).findFirst();
         if (optional.isPresent()) {
-            Service service = applicationContext.getBean(optional.get().getClass());
-            applyParameters(service, parameters);
-            return service;
+            Connector connector = applicationContext.getBean(optional.get().getClass());
+            applyParameters(connector, parameters);
+            return connector;
         }
-        throw new IllegalArgumentException("No service found for type ID: " + typeId);
+        throw new IllegalArgumentException("No connector found for type ID: " + typeId);
     }
 
     /**
@@ -183,30 +183,30 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     }
 
     /**
-     * Returns all valid categories and types of services that can be used as parameter values for the supplied parameter
+     * Returns all valid categories and types of connectors that can be used as parameter values for the supplied parameter
      * class.
      *
      * @param parameterClass The class of the parameter.
      *
      * @return List of components that can be assigned to the parameter.
      */
-    public Map<String, Set<String>> getServiceParameterCategoryAndType(Class<?> parameterClass) {
+    public Map<String, Set<String>> getConnectorParameterCategoryAndType(Class<?> parameterClass) {
         Map<String, Set<String>> result = new HashMap<>();
         if (parameterClass != null) {
-            services.stream()
-                    .filter(service -> parameterClass.isAssignableFrom(service.getClass()))
-                    .forEach(service -> {
-                        if (!result.containsKey(service.getCategoryId())) {
-                            result.put(service.getCategoryId(), new HashSet<>());
+            connectors.stream()
+                    .filter(connector -> parameterClass.isAssignableFrom(connector.getClass()))
+                    .forEach(connector -> {
+                        if (!result.containsKey(connector.getCategoryId())) {
+                            result.put(connector.getCategoryId(), new HashSet<>());
                         }
-                        result.get(service.getCategoryId()).add(service.getTypeId());
+                        result.get(connector.getCategoryId()).add(connector.getTypeId());
                     });
         }
         return result;
     }
 
     /**
-     * Initializes categories and types of a specific igor component, e.g. {@link Service}.
+     * Initializes categories and types of a specific igor component, e.g. {@link Connector}.
      *
      * @param componentType The type of the component to initialize.
      */

@@ -63,7 +63,7 @@
         <core-panel>
             <h2>Action Configuration</h2>
             <parameter-editor :parameters="action.parameters" ref="parameterEditor"
-                              v-on:create-service="createService"/>
+                              v-on:create-connector="createConnector"/>
         </core-panel>
     </div>
 </template>
@@ -128,8 +128,8 @@
                 }
                 return parameterValidationResult
             },
-            createService: function (parameterIndex, serviceCategoryCandidates) {
-                this.$emit('create-service', this.action.id, parameterIndex, serviceCategoryCandidates)
+            createConnector: function (parameterIndex, connectorCategoryCandidates) {
+                this.$emit('create-connector', this.action.id, parameterIndex, connectorCategoryCandidates)
             },
             hasDocumentation: function (typeId) {
                 for (let i = 0; i < this.actionTypes.length; i++) {

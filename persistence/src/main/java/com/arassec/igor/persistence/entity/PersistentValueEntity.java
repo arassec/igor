@@ -14,7 +14,7 @@ import java.time.Instant;
 public class PersistentValueEntity {
 
     /**
-     * The service's ID.
+     * The connector's ID.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

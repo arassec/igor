@@ -3,8 +3,8 @@ package com.arassec.igor.web.controller;
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.provider.Provider;
-import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.web.mapper.WebMapperKey;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,15 +38,15 @@ public class ParametersRestController {
     private final ObjectMapper objectMapper;
 
     /**
-     * Returns all configuration parameters of a service type.
+     * Returns all configuration parameters of a connector type.
      *
      * @param type The type to get parameters for.
      *
      * @return List of parameters.
      */
-    @GetMapping(value = "service/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Object getServiceParameters(@PathVariable("type") String type) {
-        return serializeParameters(Service.class, type);
+    @GetMapping(value = "connector/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Object getConnectorParameters(@PathVariable("type") String type) {
+        return serializeParameters(Connector.class, type);
     }
 
     /**
@@ -97,8 +97,8 @@ public class ParametersRestController {
             IgorComponent igorComponent;
             if (clazz.equals(Action.class)) {
                 igorComponent = igorComponentRegistry.createActionInstance(typeId, null);
-            } else if (clazz.equals(Service.class)) {
-                igorComponent = igorComponentRegistry.createServiceInstance(typeId, null);
+            } else if (clazz.equals(Connector.class)) {
+                igorComponent = igorComponentRegistry.createConnectorInstance(typeId, null);
             } else if (clazz.equals(Provider.class)) {
                 igorComponent = igorComponentRegistry.createProviderInstance(typeId, null);
             } else if (clazz.equals(Trigger.class)) {

@@ -3,15 +3,15 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
+import com.arassec.igor.module.file.connector.FileConnector;
 import com.arassec.igor.module.file.provider.ListFilesProvider;
-import com.arassec.igor.module.file.service.FileService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -28,10 +28,10 @@ class MoveFileActionTest extends FileActionBaseTest {
     @Test
     @DisplayName("Tests the action with JSON-Path parameters.")
     void testProcess() {
-        FileService fileServiceMock = mock(FileService.class);
+        FileConnector fileConnectorMock = mock(FileConnector.class);
 
         MoveFileAction moveFileAction = new MoveFileAction();
-        moveFileAction.setService(fileServiceMock);
+        moveFileAction.setSource(fileConnectorMock);
         moveFileAction.setSourceDirectory("$." + DataKey.DATA.getKey() + "." + ListFilesProvider.DIRECTORY_KEY);
         moveFileAction.setSourceFilename("$." + DataKey.DATA.getKey() + "." + ListFilesProvider.FILENAME_KEY);
         moveFileAction.setTargetDirectory("/dev/null");
@@ -39,7 +39,7 @@ class MoveFileActionTest extends FileActionBaseTest {
 
         moveFileAction.process(createData(), new JobExecution());
 
-        verify(fileServiceMock, times(1)).move(eq("/directory/test/filename.txt"), eq("/dev/null/deleted.txt"),
+        verify(fileConnectorMock, times(1)).move(eq("/directory/test/filename.txt"), eq("/dev/null/deleted.txt"),
                 any(WorkInProgressMonitor.class));
     }
 

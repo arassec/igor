@@ -1,8 +1,8 @@
-# HTTPS Service
-A service that connects to an HTTPS server.
+# HTTPS Connector
+A file-connector that connects to an HTTPS server.
 
 # Parameters
-The service can be configured by the following parameters:
+The connector can be configured by the following parameters:
 
 Parameter | Description
 ---|:---|

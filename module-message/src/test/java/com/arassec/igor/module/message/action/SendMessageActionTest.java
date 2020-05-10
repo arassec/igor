@@ -1,8 +1,8 @@
 package com.arassec.igor.module.message.action;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.message.service.Message;
-import com.arassec.igor.module.message.service.MessageService;
+import com.arassec.igor.module.message.connector.Message;
+import com.arassec.igor.module.message.connector.MessageConnector;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,17 +29,17 @@ class SendMessageActionTest extends MessageActionBaseTest {
     @Test
     @DisplayName("Tests the action with JSON-Path parameters.")
     void testProcess() {
-        MessageService messageServiceMock = mock(MessageService.class);
+        MessageConnector messageConnectorMock = mock(MessageConnector.class);
 
         SendMessageAction action = new SendMessageAction();
-        action.setMessageService(messageServiceMock);
+        action.setMessageConnector(messageConnectorMock);
         action.setMessageTemplate("{'key': '##$.data." + PARAM_KEY + "##'}");
 
         ArgumentCaptor<Message> argCap = ArgumentCaptor.forClass(Message.class);
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
-        verify(messageServiceMock, times(1)).sendMessage(argCap.capture());
+        verify(messageConnectorMock, times(1)).sendMessage(argCap.capture());
 
         assertEquals(1, result.size());
         assertEquals("{'key': '" + PARAM_VALUE + "'}", argCap.getValue().getContent());

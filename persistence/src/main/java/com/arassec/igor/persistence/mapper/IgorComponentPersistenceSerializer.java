@@ -3,7 +3,7 @@ package com.arassec.igor.persistence.mapper;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.annotation.IgorParam;
-import com.arassec.igor.core.model.service.Service;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.persistence.security.SecurityProvider;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -42,8 +42,8 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField(PersistenceMapperKey.ID.getKey(), instance.getId());
         jsonGenerator.writeStringField(PersistenceMapperKey.TYPE_ID.getKey(), instance.getTypeId());
-        if (instance instanceof Service) {
-            jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), ((Service) instance).getName());
+        if (instance instanceof Connector) {
+            jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), ((Connector) instance).getName());
         }
         if (instance instanceof Action) {
             jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), ((Action) instance).getName());
@@ -98,9 +98,9 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
         }
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), field.getName());
-        if (value instanceof Service) {
-            jsonGenerator.writeStringField(PersistenceMapperKey.VALUE.getKey(), ((Service) value).getId());
-            jsonGenerator.writeBooleanField(PersistenceMapperKey.SERVICE.getKey(), true);
+        if (value instanceof Connector) {
+            jsonGenerator.writeStringField(PersistenceMapperKey.VALUE.getKey(), ((Connector) value).getId());
+            jsonGenerator.writeBooleanField(PersistenceMapperKey.CONNECTOR.getKey(), true);
         } else {
             jsonGenerator.writeObjectField(PersistenceMapperKey.VALUE.getKey(), value);
             if (value instanceof String && isSecured(field)) {

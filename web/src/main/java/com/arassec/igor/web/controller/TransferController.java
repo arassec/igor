@@ -1,9 +1,9 @@
 package com.arassec.igor.web.controller;
 
+import com.arassec.igor.core.application.ConnectorManager;
 import com.arassec.igor.core.application.JobManager;
-import com.arassec.igor.core.application.ServiceManager;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.model.TransferData;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,9 +35,9 @@ public class TransferController {
     private final JobManager jobManager;
 
     /**
-     * Manager for services.
+     * Manager for connectors.
      */
-    private final ServiceManager serviceManager;
+    private final ConnectorManager connectorManager;
 
     /**
      * Object-Mapper for igor data.
@@ -60,13 +60,13 @@ public class TransferController {
 
             transferData.getJobJsons().add(objectMapper.writeValueAsString(job));
 
-            Set<Pair<String, String>> referencedServices = jobManager.getReferencedServices(id);
-            referencedServices.forEach(referencedService -> {
+            Set<Pair<String, String>> referencedConnectors = jobManager.getReferencedConnectors(id);
+            referencedConnectors.forEach(referencedConnector -> {
                 try {
-                    transferData.getServiceJsons().add(
-                            objectMapper.writeValueAsString(serviceManager.load(referencedService.getKey())));
+                    transferData.getConnectorJsons().add(
+                            objectMapper.writeValueAsString(connectorManager.load(referencedConnector.getKey())));
                 } catch (JsonProcessingException e) {
-                    throw new IllegalStateException("Could not convert service to JSON!", e);
+                    throw new IllegalStateException("Could not convert connector to JSON!", e);
                 }
             });
 
@@ -81,29 +81,29 @@ public class TransferController {
     }
 
     /**
-     * Exports the service with the given ID.
+     * Exports the connector with the given ID.
      *
-     * @param id The service's ID.
+     * @param id The connector's ID.
      */
-    @GetMapping(value = "service/{id}")
-    public void exportService(@PathVariable("id") String id, HttpServletResponse response) {
-        Service service = serviceManager.load(id);
-        if (service == null) {
-            throw new IllegalArgumentException("No service with ID '" + id + "' found!");
+    @GetMapping(value = "connector/{id}")
+    public void exportConnector(@PathVariable("id") String id, HttpServletResponse response) {
+        Connector connector = connectorManager.load(id);
+        if (connector == null) {
+            throw new IllegalArgumentException("No connector with ID '" + id + "' found!");
         }
 
         try {
             TransferData transferData = new TransferData();
 
-            transferData.getServiceJsons().add(objectMapper.writeValueAsString(service));
+            transferData.getConnectorJsons().add(objectMapper.writeValueAsString(connector));
 
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + service.getId() + ".igor.json");
+            response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + connector.getId() + ".igor.json");
 
             response.getOutputStream().write(objectMapper.writeValueAsBytes(transferData));
             response.getOutputStream().flush();
         } catch (IOException e) {
-            throw new IllegalStateException("Could not convert service to JSON!", e);
+            throw new IllegalStateException("Could not convert connector to JSON!", e);
         }
     }
 
@@ -115,11 +115,11 @@ public class TransferController {
     @PostMapping
     public ResponseEntity<String> importTransferData(@RequestBody TransferData transferData) {
 
-        transferData.getServiceJsons().forEach(serviceJson -> {
+        transferData.getConnectorJsons().forEach(connectorJson -> {
             try {
-                serviceManager.save(objectMapper.readValue(serviceJson, Service.class));
+                connectorManager.save(objectMapper.readValue(connectorJson, Connector.class));
             } catch (JsonProcessingException e) {
-                throw new IllegalStateException("Could not import service data!", e);
+                throw new IllegalStateException("Could not import connector data!", e);
             }
         });
 

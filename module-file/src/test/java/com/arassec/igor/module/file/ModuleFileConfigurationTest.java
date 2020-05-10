@@ -22,7 +22,7 @@ public class ModuleFileConfigurationTest {
     void testI18n() {
         ModuleFileConfiguration configuration = new ModuleFileConfiguration();
         MessageSource messageSource = configuration.fileMessageSource();
-        assertEquals("Copy file", messageSource.getMessage("d8564415-7dd9-4814-9b46-c2c5b56ed5cc", null, Locale.getDefault()));
+        assertEquals("Copy file", messageSource.getMessage("copy-file-action", null, Locale.getDefault()));
     }
 
 }

@@ -3,8 +3,8 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.file.service.FallbackFileService;
-import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.connector.FallbackFileConnector;
+import com.arassec.igor.module.file.connector.FileConnector;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +24,11 @@ import java.util.Map;
 public class MoveFileAction extends BaseFileAction {
 
     /**
-     * Service where the file can be found.
+     * Connector where the file can be found.
      */
     @NotNull
     @IgorParam
-    private FileService service;
+    private FileConnector source;
 
     /**
      * Source directory to copy the file from.
@@ -63,7 +63,7 @@ public class MoveFileAction extends BaseFileAction {
      */
     public MoveFileAction() {
         super("move-file-action");
-        service = new FallbackFileService();
+        source = new FallbackFileConnector();
     }
 
     /**
@@ -81,7 +81,7 @@ public class MoveFileAction extends BaseFileAction {
         String targetFilePath = resolvedData.getTargetDirectory() + resolvedData.getTargetFilename();
 
         log.debug("Moving file '{}' to '{}'", sourceFilePath, targetFilePath);
-        service.move(sourceFilePath, targetFilePath, VOID_WIP_MONITOR);
+        source.move(sourceFilePath, targetFilePath, VOID_WIP_MONITOR);
         log.debug("File '{}' moved to '{}'", sourceFilePath, targetFilePath);
 
         return List.of(data);

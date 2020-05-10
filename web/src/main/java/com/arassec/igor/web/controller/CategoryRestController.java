@@ -2,8 +2,8 @@ package com.arassec.igor.web.controller;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.provider.Provider;
-import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.web.model.KeyLabelStore;
 import lombok.RequiredArgsConstructor;
@@ -36,13 +36,13 @@ public class CategoryRestController extends BaseRestController {
     private final IgorComponentRegistry igorComponentRegistry;
 
     /**
-     * Returns all service categories as {@link KeyLabelStore}s.
+     * Returns all connector categories as {@link KeyLabelStore}s.
      *
-     * @return Set of all available service categories.
+     * @return Set of all available connector categories.
      */
-    @GetMapping("service")
-    public List<KeyLabelStore> getServiceCategories(Locale locale) {
-        return igorComponentRegistry.getCategoriesOfComponentType(Service.class).stream()
+    @GetMapping("connector")
+    public List<KeyLabelStore> getConnectorCategories(Locale locale) {
+        return igorComponentRegistry.getCategoriesOfComponentType(Connector.class).stream()
                 .map(categoryId -> new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, locale)))
                 .sorted(Comparator.comparing(KeyLabelStore::getValue))
                 .collect(Collectors.toList());

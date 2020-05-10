@@ -1,8 +1,8 @@
-# HTTP Service
-A service that connects to an HTTP server.
+# HTTP Connector
+A file-connector that connects to an HTTP server.
 
 # Parameters
-The service can be configured by the following parameters:
+The connector can be configured by the following parameters:
 
 Parameter | Description
 ---|:---|

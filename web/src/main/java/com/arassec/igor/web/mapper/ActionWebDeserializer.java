@@ -3,7 +3,7 @@ package com.arassec.igor.web.mapper;
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
-import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.web.simulation.ActionProxy;
 
 import java.util.Map;
@@ -16,11 +16,11 @@ public class ActionWebDeserializer extends IgorComponentWebDeserializer<Action> 
      * Creates a new deserializer instance.
      *
      * @param igorComponentRegistry The component registry.
-     * @param serviceRepository     The service repository to load services from.
+     * @param connectorRepository   The connector repository to load connectors from.
      * @param simulationMode        Set to {@code true} if the resulting  components are used during simulated job runs.
      */
-    public ActionWebDeserializer(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository, boolean simulationMode) {
-        super(Action.class, igorComponentRegistry, serviceRepository, simulationMode);
+    public ActionWebDeserializer(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository, boolean simulationMode) {
+        super(Action.class, igorComponentRegistry, connectorRepository, simulationMode);
     }
 
     /**

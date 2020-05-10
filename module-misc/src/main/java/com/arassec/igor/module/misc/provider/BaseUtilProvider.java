@@ -10,7 +10,7 @@ abstract class BaseUtilProvider extends BaseProvider {
     /**
      * Creates a new component instance.
      *
-     * @param typeId     The type ID.
+     * @param typeId The type ID.
      */
     public BaseUtilProvider(String typeId) {
         super("util-providers", typeId);

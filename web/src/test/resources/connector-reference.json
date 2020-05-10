@@ -1,0 +1,95 @@
+{
+  "id": "connector-id",
+  "name": "connector-name",
+  "category": {
+    "key": "connector-category-id",
+    "value": "Connector Category"
+  },
+  "type": {
+    "key": "connector-type-id",
+    "value": "Connector Type",
+    "documentationAvailable": false
+  },
+  "parameters": [
+    {
+      "name": "intParam",
+      "secured": false,
+      "advanced": false,
+      "subtype": "NONE",
+      "required": true,
+      "type": "int",
+      "value": 0,
+      "connector": false
+    },
+    {
+      "name": "integerParam",
+      "secured": false,
+      "advanced": false,
+      "subtype": "NONE",
+      "required": false,
+      "type": "java.lang.Integer",
+      "value": null,
+      "connector": false
+    },
+    {
+      "name": "longParam",
+      "secured": false,
+      "advanced": false,
+      "subtype": "NONE",
+      "required": true,
+      "type": "long",
+      "value": 0,
+      "connector": false
+    },
+    {
+      "name": "longObjectParam",
+      "secured": false,
+      "advanced": false,
+      "subtype": "NONE",
+      "required": false,
+      "type": "java.lang.Long",
+      "value": null,
+      "connector": false
+    },
+    {
+      "name": "booleanParam",
+      "secured": false,
+      "advanced": false,
+      "subtype": "NONE",
+      "required": true,
+      "type": "boolean",
+      "value": false,
+      "connector": false
+    },
+    {
+      "name": "booleanObjectParam",
+      "secured": false,
+      "advanced": false,
+      "subtype": "NONE",
+      "required": false,
+      "type": "java.lang.Boolean",
+      "value": null,
+      "connector": false
+    },
+    {
+      "name": "stringParam",
+      "secured": false,
+      "advanced": false,
+      "subtype": "NONE",
+      "required": false,
+      "type": "java.lang.String",
+      "value": null,
+      "connector": false
+    },
+    {
+      "name": "securedStringParam",
+      "secured": true,
+      "advanced": false,
+      "subtype": "NONE",
+      "required": false,
+      "type": "java.lang.String",
+      "value": null,
+      "connector": false
+    }
+  ]
+}

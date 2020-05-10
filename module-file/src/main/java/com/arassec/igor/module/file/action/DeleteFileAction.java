@@ -3,8 +3,8 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.file.service.FallbackFileService;
-import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.connector.FallbackFileConnector;
+import com.arassec.igor.module.file.connector.FileConnector;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +24,11 @@ import java.util.Map;
 public class DeleteFileAction extends BaseFileAction {
 
     /**
-     * The service providing the file to delete.
+     * The connector providing the file to delete.
      */
     @NotNull
     @IgorParam
-    private FileService service;
+    private FileConnector source;
 
     /**
      * The directory the file is in.
@@ -49,11 +49,11 @@ public class DeleteFileAction extends BaseFileAction {
      */
     public DeleteFileAction() {
         super("delete-file-action");
-        service = new FallbackFileService();
+        source = new FallbackFileConnector();
     }
 
     /**
-     * Deletes the configured file from the configured service.
+     * Deletes the configured file from the configured connector.
      *
      * @param data         The data to process.
      * @param jobExecution The job execution log.
@@ -69,7 +69,7 @@ public class DeleteFileAction extends BaseFileAction {
         }
 
         log.debug("Deleting file: '{}'", filePath);
-        service.delete(filePath, VOID_WIP_MONITOR);
+        source.delete(filePath, VOID_WIP_MONITOR);
         log.debug("File '{}' deleted", filePath);
 
         return List.of(data);

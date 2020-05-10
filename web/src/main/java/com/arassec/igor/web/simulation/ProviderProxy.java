@@ -56,8 +56,8 @@ public class ProviderProxy extends BaseProxy<Provider> implements Provider {
     }
 
     /**
-     * Returns {@code true}, if the {@link #getSimulationLimit()} simulationLimit} has not been hit and the proxied provider
-     * has more data to provide.
+     * Returns {@code true}, if the {@link #getSimulationLimit()} simulationLimit} has not been hit and the proxied provider has
+     * more data to provide.
      *
      * @return {@code true} if more data is available, {@code false} otherwise.
      */

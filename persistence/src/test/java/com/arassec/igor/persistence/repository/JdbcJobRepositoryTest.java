@@ -4,15 +4,15 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
+import com.arassec.igor.persistence.dao.ConnectorDao;
+import com.arassec.igor.persistence.dao.JobConnectorReferenceDao;
 import com.arassec.igor.persistence.dao.JobDao;
-import com.arassec.igor.persistence.dao.JobServiceReferenceDao;
-import com.arassec.igor.persistence.dao.ServiceDao;
+import com.arassec.igor.persistence.entity.JobConnectorReferenceEntity;
+import com.arassec.igor.persistence.entity.JobConnectorReferenceIdentity;
 import com.arassec.igor.persistence.entity.JobEntity;
-import com.arassec.igor.persistence.entity.JobServiceReferenceEntity;
-import com.arassec.igor.persistence.entity.JobServiceReferenceIdentity;
 import com.arassec.igor.persistence.test.TestAction;
+import com.arassec.igor.persistence.test.TestConnector;
 import com.arassec.igor.persistence.test.TestProvider;
-import com.arassec.igor.persistence.test.TestService;
 import com.arassec.igor.persistence.test.TestTrigger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,14 +49,14 @@ class JdbcJobRepositoryTest {
     private JobDao jobDao;
 
     /**
-     * DAO for service entities.
+     * DAO for connector entities.
      */
-    private ServiceDao serviceDao;
+    private ConnectorDao connectorDao;
 
     /**
-     * DAO for job-service-references.
+     * DAO for job-connector-references.
      */
-    private JobServiceReferenceDao jobServiceReferenceDao;
+    private JobConnectorReferenceDao jobConnectorReferenceDao;
 
     /**
      * ObjectMapper for JSON conversion.
@@ -69,10 +69,10 @@ class JdbcJobRepositoryTest {
     @BeforeEach
     void initialize() {
         jobDao = mock(JobDao.class);
-        serviceDao = mock(ServiceDao.class);
-        jobServiceReferenceDao = mock(JobServiceReferenceDao.class);
+        connectorDao = mock(ConnectorDao.class);
+        jobConnectorReferenceDao = mock(JobConnectorReferenceDao.class);
         persistenceJobMapper = mock(ObjectMapper.class);
-        repository = new JdbcJobRepository(jobDao, serviceDao, jobServiceReferenceDao, persistenceJobMapper);
+        repository = new JdbcJobRepository(jobDao, connectorDao, jobConnectorReferenceDao, persistenceJobMapper);
     }
 
     /**
@@ -88,8 +88,8 @@ class JdbcJobRepositoryTest {
         job.getTasks().add(new Task());
         job.getTasks().get(0).setProvider(new TestProvider());
         TestAction testAction = new TestAction();
-        testAction.setTestService(new TestService());
-        testAction.getTestService().setId("service-id");
+        testAction.setTestConnector(new TestConnector());
+        testAction.getTestConnector().setId("connector-id");
         job.getTasks().get(0).getActions().add(testAction);
 
         when(persistenceJobMapper.writeValueAsString(any(Job.class))).thenReturn("job-json");
@@ -106,13 +106,13 @@ class JdbcJobRepositoryTest {
         verify(jobDao, times(1)).save(argCap.capture());
         assertEquals("job-json", argCap.getValue().getContent());
 
-        verify(jobServiceReferenceDao, times(1)).deleteByJobId(eq(savedJob.getId()));
+        verify(jobConnectorReferenceDao, times(1)).deleteByJobId(eq(savedJob.getId()));
 
-        ArgumentCaptor<JobServiceReferenceEntity> argCapTwo = ArgumentCaptor.forClass(JobServiceReferenceEntity.class);
-        verify(jobServiceReferenceDao, times(1)).save(argCapTwo.capture());
+        ArgumentCaptor<JobConnectorReferenceEntity> argCapTwo = ArgumentCaptor.forClass(JobConnectorReferenceEntity.class);
+        verify(jobConnectorReferenceDao, times(1)).save(argCapTwo.capture());
 
-        assertEquals(savedJob.getId(), argCapTwo.getValue().getJobServiceReferenceIdentity().getJobId());
-        assertEquals("service-id", argCapTwo.getValue().getJobServiceReferenceIdentity().getServiceId());
+        assertEquals(savedJob.getId(), argCapTwo.getValue().getJobConnectorReferenceIdentity().getJobId());
+        assertEquals("connector-id", argCapTwo.getValue().getJobConnectorReferenceIdentity().getConnectorId());
     }
 
     /**
@@ -270,29 +270,29 @@ class JdbcJobRepositoryTest {
     void testDeleteById() {
         repository.deleteById("job-id");
         verify(jobDao, times(1)).deleteById(eq("job-id"));
-        verify(jobServiceReferenceDao, times(1)).deleteByJobId(eq("job-id"));
+        verify(jobConnectorReferenceDao, times(1)).deleteByJobId(eq("job-id"));
     }
 
     /**
-     * Tests finding the services referenced by a job.
+     * Tests finding the connectors referenced by a job.
      */
     @Test
-    @DisplayName("Tests finding the services referenced by a job.")
-    void testFindReferencedServices() {
-        assertTrue(repository.findReferencedServices(null).isEmpty());
+    @DisplayName("Tests finding the connectors referenced by a job.")
+    void testFindReferencedConnectors() {
+        assertTrue(repository.findReferencedConnectors(null).isEmpty());
 
-        JobServiceReferenceEntity entity = new JobServiceReferenceEntity();
-        entity.setJobServiceReferenceIdentity(new JobServiceReferenceIdentity("job-id", "service-id"));
+        JobConnectorReferenceEntity entity = new JobConnectorReferenceEntity();
+        entity.setJobConnectorReferenceIdentity(new JobConnectorReferenceIdentity("job-id", "connector-id"));
 
-        when(jobServiceReferenceDao.findByJobId(eq("job-id"))).thenReturn(List.of(entity));
+        when(jobConnectorReferenceDao.findByJobId(eq("job-id"))).thenReturn(List.of(entity));
 
-        when(serviceDao.findNameById(eq("service-id"))).thenReturn("service-name");
+        when(connectorDao.findNameById(eq("connector-id"))).thenReturn("connector-name");
 
-        Set<Pair<String, String>> referencedServices = repository.findReferencedServices("job-id");
+        Set<Pair<String, String>> referencedConnectors = repository.findReferencedConnectors("job-id");
 
-        assertEquals(1, referencedServices.size());
-        assertEquals("service-id", referencedServices.iterator().next().getKey());
-        assertEquals("service-name", referencedServices.iterator().next().getValue());
+        assertEquals(1, referencedConnectors.size());
+        assertEquals("connector-id", referencedConnectors.iterator().next().getKey());
+        assertEquals("connector-name", referencedConnectors.iterator().next().getValue());
     }
 
 }

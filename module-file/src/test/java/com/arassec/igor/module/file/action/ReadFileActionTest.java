@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
-import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.connector.FileConnector;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,11 +27,11 @@ class ReadFileActionTest extends FileActionBaseTest {
     @Test
     @DisplayName("Tests the action with JSON-Path parameters.")
     void testProcess() {
-        FileService fileServiceMock = mock(FileService.class);
-        when(fileServiceMock.read(eq("/directory/test/filename.txt"), any(WorkInProgressMonitor.class))).thenReturn("igor-junit-test");
+        FileConnector fileConnectorMock = mock(FileConnector.class);
+        when(fileConnectorMock.read(eq("/directory/test/filename.txt"), any(WorkInProgressMonitor.class))).thenReturn("igor-junit-test");
 
         ReadFileAction action = new ReadFileAction();
-        action.setService(fileServiceMock);
+        action.setSource(fileConnectorMock);
         action.setDirectory("$.data.directory");
         action.setFilename("$.data.filename");
 

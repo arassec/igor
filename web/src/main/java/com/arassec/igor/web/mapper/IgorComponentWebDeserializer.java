@@ -2,10 +2,10 @@ package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
-import com.arassec.igor.core.model.service.Service;
-import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.model.connector.Connector;
+import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.web.simulation.ServiceProxy;
+import com.arassec.igor.web.simulation.ConnectorProxy;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -31,9 +31,9 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
     final transient IgorComponentRegistry igorComponentRegistry;
 
     /**
-     * The {@link ServiceRepository} to load services as parameter values.
+     * The {@link ConnectorRepository} to load connectors as parameter values.
      */
-    private final transient ServiceRepository serviceRepository;
+    private final transient ConnectorRepository connectorRepository;
 
     /**
      * Can be set to {@code true} to deserialize components in simulation mode, i.e. wrap proxies around them for job
@@ -44,15 +44,15 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
     /**
      * Creates a new deserializer instance.
      *
-     * @param serviceRepository The service repository to load services from.
-     * @param simulationMode    Set to {@code true} if the resulting  components are used during simulated job runs.
+     * @param connectorRepository The connector repository to load connectors from.
+     * @param simulationMode      Set to {@code true} if the resulting  components are used during simulated job runs.
      */
     IgorComponentWebDeserializer(Class<T> clazz, IgorComponentRegistry igorComponentRegistry,
-                                 ServiceRepository serviceRepository,
+                                 ConnectorRepository connectorRepository,
                                  boolean simulationMode) {
         super(clazz);
         this.igorComponentRegistry = igorComponentRegistry;
-        this.serviceRepository = serviceRepository;
+        this.connectorRepository = connectorRepository;
         this.simulationMode = simulationMode;
     }
 
@@ -108,8 +108,8 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
         Map<String, Object> result = new HashMap<>();
         parameters.forEach(jsonParameter -> {
             String parameterName = String.valueOf(jsonParameter.get(WebMapperKey.NAME.getKey()));
-            if (jsonParameter.containsKey(WebMapperKey.SERVICE.getKey()) && (boolean) jsonParameter.get(WebMapperKey.SERVICE.getKey()) && serviceRepository != null) {
-                result.put(parameterName, deserializeServiceParameter(jsonParameter));
+            if (jsonParameter.containsKey(WebMapperKey.CONNECTOR.getKey()) && (boolean) jsonParameter.get(WebMapperKey.CONNECTOR.getKey()) && connectorRepository != null) {
+                result.put(parameterName, deserializeConnectorParameter(jsonParameter));
             } else {
                 Object value = jsonParameter.get(WebMapperKey.VALUE.getKey());
                 if (value != null) {
@@ -124,34 +124,34 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
     }
 
     /**
-     * Deserializes a service parameter.
+     * Deserializes a connector parameter.
      *
      * @param jsonParameter The parameter in JSON form.
      *
-     * @return The newly created service instance.
+     * @return The newly created connector instance.
      */
-    private Object deserializeServiceParameter(Map<String, Object> jsonParameter) {
+    private Object deserializeConnectorParameter(Map<String, Object> jsonParameter) {
         if (simulationMode) {
-            String serviceId = String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey()));
-            Service service = serviceRepository.findById(serviceId);
-            if (service == null) {
-                throw new IllegalArgumentException("No service with ID " + serviceId + " found!");
+            String connectorId = String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey()));
+            Connector connector = connectorRepository.findById(connectorId);
+            if (connector == null) {
+                throw new IllegalArgumentException("No connector with ID " + connectorId + " found!");
             }
             try {
                 return new ByteBuddy()
-                        .subclass(service.getClass())
+                        .subclass(connector.getClass())
                         .method(ElementMatchers.any())
-                        .intercept(InvocationHandlerAdapter.of(new ServiceProxy(service)))
+                        .intercept(InvocationHandlerAdapter.of(new ConnectorProxy(connector)))
                         .make()
-                        .load(service.getClass().getClassLoader())
+                        .load(connector.getClass().getClassLoader())
                         .getLoaded()
                         .getDeclaredConstructor()
                         .newInstance();
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new IgorException("Could not create service proxy!", e);
+                throw new IgorException("Could not create connector proxy!", e);
             }
         } else {
-            return serviceRepository.findById(String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey())));
+            return connectorRepository.findById(String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey())));
         }
     }
 

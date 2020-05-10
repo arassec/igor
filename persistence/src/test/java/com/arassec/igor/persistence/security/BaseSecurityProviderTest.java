@@ -1,6 +1,6 @@
 package com.arassec.igor.persistence.security;
 
-import com.arassec.igor.persistence.test.TestService;
+import com.arassec.igor.persistence.test.TestConnector;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ public class BaseSecurityProviderTest {
     @DisplayName("Tests the fallback cleanup method.")
     void testCleanup() {
         assertDoesNotThrow(() -> baseSecurityProvider.cleanup(null));
-        assertDoesNotThrow(() -> baseSecurityProvider.cleanup(new TestService()));
+        assertDoesNotThrow(() -> baseSecurityProvider.cleanup(new TestConnector()));
     }
 
 }

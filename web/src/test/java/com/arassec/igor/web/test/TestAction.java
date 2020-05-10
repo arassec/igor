@@ -3,7 +3,6 @@ package com.arassec.igor.web.test;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.service.Service;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,10 +27,10 @@ public class TestAction extends BaseAction {
     public static final String TYPE_ID = "action-type-id";
 
     /**
-     * A service as parameter.
+     * A connector as parameter.
      */
     @IgorParam
-    private TestServiceInterface testService;
+    private TestConnectorInterface testConnector;
 
     /**
      * Creates a new component instance.

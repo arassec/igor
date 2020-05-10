@@ -8,8 +8,8 @@
                     </router-link>
                 </li>
                 <li>
-                    <router-link to="/service-overview">
-                        <font-awesome-icon icon="link"/> Services
+                    <router-link to="/connector-overview">
+                        <font-awesome-icon icon="link"/> Connectors
                     </router-link>
                 </li>
             </ul>
@@ -39,10 +39,10 @@
                     return 'Job Overview'
                 } else if (this.$route.name === 'job-editor') {
                     return 'Job-Editor'
-                } else if (this.$route.name === 'service-overview') {
-                    return 'Service Overview'
-                } else if (this.$route.name === 'service-editor') {
-                    return 'Service-Editor'
+                } else if (this.$route.name === 'connector-overview') {
+                    return 'Connector Overview'
+                } else if (this.$route.name === 'connector-editor') {
+                    return 'Connector-Editor'
                 } else {
                     return 'Undefined'
                 }

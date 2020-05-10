@@ -22,13 +22,13 @@ import java.util.List;
 public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
-     * Error indicating that a name for a service or job already exists.
+     * Error indicating that a name for a connector or job already exists.
      */
     public static final String NAME_ALREADY_EXISTS_ERROR = "NAME_ALREADY_EXISTS_ERROR";
 
     /**
-     * {@link IgorException}s are converted into "INTERNAL_SERVER_ERROR", although it might not be an internal error, but e.g.
-     * a failed service call.
+     * {@link IgorException}s are converted into "INTERNAL_SERVER_ERROR", although it might not be an internal error, but e.g. a
+     * failed connector call.
      *
      * @param runtimeException The exception causing this method to handle it.
      * @param webRequest       The web request.

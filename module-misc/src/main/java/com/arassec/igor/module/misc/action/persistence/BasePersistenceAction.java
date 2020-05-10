@@ -4,7 +4,7 @@ import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.repository.PersistentValueRepository;
 
 /**
- * Base class for actions that work with persistence services.
+ * Base class for actions that work with persistence connectors.
  */
 public abstract class BasePersistenceAction extends BaseAction {
 

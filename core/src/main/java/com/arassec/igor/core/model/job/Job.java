@@ -138,7 +138,7 @@ public class Job {
     private void initialize(JobExecution jobExecution) {
         if (trigger != null) {
             trigger.initialize(id, null, jobExecution);
-            IgorComponentUtil.initializeServices(trigger, id, null, jobExecution);
+            IgorComponentUtil.initializeConnectors(trigger, id, null, jobExecution);
         }
     }
 
@@ -149,7 +149,7 @@ public class Job {
      */
     private void shutdown(JobExecution jobExecution) {
         if (trigger != null) {
-            IgorComponentUtil.shutdownServices(trigger, id, null, jobExecution);
+            IgorComponentUtil.shutdownConnectors(trigger, id, null, jobExecution);
             trigger.shutdown(id, null, jobExecution);
         }
     }

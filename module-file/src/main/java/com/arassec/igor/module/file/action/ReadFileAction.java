@@ -3,8 +3,8 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.file.service.FallbackFileService;
-import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.connector.FallbackFileConnector;
+import com.arassec.igor.module.file.connector.FileConnector;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +29,11 @@ public class ReadFileAction extends BaseFileAction {
     public static final String KEY_FILE_CONTENTS = "fileContents";
 
     /**
-     * The service providing the file to read.
+     * The connector providing the file to read.
      */
     @NotNull
     @IgorParam
-    private FileService service;
+    private FileConnector source;
 
     /**
      * The directory the file is in.
@@ -54,7 +54,7 @@ public class ReadFileAction extends BaseFileAction {
      */
     public ReadFileAction() {
         super("read-file-action");
-        service = new FallbackFileService();
+        source = new FallbackFileConnector();
     }
 
     /**
@@ -74,7 +74,7 @@ public class ReadFileAction extends BaseFileAction {
         }
 
         log.debug("Reading file: '{}'", filePath);
-        data.put(KEY_FILE_CONTENTS, service.read(filePath, VOID_WIP_MONITOR));
+        data.put(KEY_FILE_CONTENTS, source.read(filePath, VOID_WIP_MONITOR));
         log.debug("File '{}' read", filePath);
 
         return List.of(data);

@@ -385,9 +385,9 @@ class JobManagerTest {
     @DisplayName("Tests loading a page of jobs with state filter.")
     void testLoadPageWithStateFilter() {
         Job running = Job.builder().currentJobExecution(
-                        JobExecution.builder().executionState(JobExecutionState.RUNNING).build()).build();
+                JobExecution.builder().executionState(JobExecutionState.RUNNING).build()).build();
         Job failed = Job.builder().currentJobExecution(
-                        JobExecution.builder().executionState(JobExecutionState.FAILED).build()).build();
+                JobExecution.builder().executionState(JobExecutionState.FAILED).build()).build();
         Job runningHistory = Job.builder().id("runningHistory").build();
         Job failedHistory = Job.builder().id("failedHistory").build();
 
@@ -538,14 +538,14 @@ class JobManagerTest {
     }
 
     /**
-     * Tests retrieving all services that a job with a given ID uses.
+     * Tests retrieving all connectors that a job with a given ID uses.
      */
     @Test
-    @DisplayName("Tests finding services used by a job.")
-    void testGetReferencedServices() {
+    @DisplayName("Tests finding connectors used by a job.")
+    void testGetReferencedConnectors() {
         Set<Pair<String, String>> result = new HashSet<>();
-        when(jobRepository.findReferencedServices(eq("job-id"))).thenReturn(result);
-        assertEquals(result, jobManager.getReferencedServices("job-id"));
+        when(jobRepository.findReferencedConnectors(eq("job-id"))).thenReturn(result);
+        assertEquals(result, jobManager.getReferencedConnectors("job-id"));
     }
 
     /**

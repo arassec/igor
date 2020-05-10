@@ -13,8 +13,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Controls a concurrency group, i.e. a list of {@link Action}s that should all be performed with the same number of
- * threads.
+ * Controls a concurrency group, i.e. a list of {@link Action}s that should all be performed with the same number of threads.
  */
 @Slf4j
 public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
@@ -35,9 +34,9 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     private final BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingDeque<>();
 
     /**
-     * The {@link ExecutorService} managing the threads.
+     * The {@link ThreadPoolExecutor} managing the threads.
      */
-    private final ThreadPoolExecutor executorService;
+    private final ThreadPoolExecutor threadPoolExecutor;
 
     /**
      * The ID of this concurrency-group. Only used for logging purposes to identify this concureency-group.
@@ -50,8 +49,8 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     private final List<ActionsExecutingRunnable> runnables = new LinkedList<>();
 
     /**
-     * The {@link JobExecution} contains information about the state of the current job run. Required here because an
-     * exception in a thread should stop the whole job, which runs in another thread.
+     * The {@link JobExecution} contains information about the state of the current job run. Required here because an exception in
+     * a thread should stop the whole job, which runs in another thread.
      */
     @Getter
     @Setter
@@ -61,8 +60,8 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      * Creates a new concurrency-group.
      *
      * @param actions            The list of {@link Action}s that are contained in this group.
-     * @param inputQueue         The input for this concurrency-group. Data is read from this queue and handed over to
-     *                           the actions. The output of the last action is put into the output queue.
+     * @param inputQueue         The input for this concurrency-group. Data is read from this queue and handed over to the
+     *                           actions. The output of the last action is put into the output queue.
      * @param concurrencyGroupId The ID of this concurrency-group.
      * @param jobExecution       The {@link JobExecution} containing the current state of the job run.
      */
@@ -77,7 +76,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
             numThreads = actions.get(0).getNumThreads();
         }
 
-        executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads, new ThreadFactory() {
+        threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads, new ThreadFactory() {
             private final AtomicInteger counter = new AtomicInteger();
 
             @Override
@@ -91,7 +90,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         for (int i = 0; i < numThreads; i++) {
             ActionsExecutingRunnable runnable = new ActionsExecutingRunnable(actions, inputQueue, outputQueue, jobExecution);
             runnables.add(runnable);
-            executorService.execute(runnable);
+            threadPoolExecutor.execute(runnable);
         }
     }
 
@@ -104,16 +103,16 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     }
 
     /**
-     * Shuts the thread pool down after all incoming data has been processed. Threads might still run after calling this
-     * method if e.g. a large file is copied in an action.
+     * Shuts the thread pool down after all incoming data has been processed. Threads might still run after calling this method if
+     * e.g. a large file is copied in an action.
      * <p>
-     * In case the job is cancelled, this method will not wait for all data to be processed, but shut the thread pool
-     * down immediately.
+     * In case the job is cancelled, this method will not wait for all data to be processed, but shut the thread pool down
+     * immediately.
      */
     public void shutdown() {
         waitForEmptyInputQueue();
         runnables.forEach(ActionsExecutingRunnable::shutdown);
-        executorService.shutdown();
+        threadPoolExecutor.shutdown();
     }
 
     /**
@@ -124,20 +123,20 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      * @return {@code true}, if all threads in the group have been terminated. {@code false} otherwise.
      */
     public boolean awaitTermination() {
-        log.debug("Total/Active/Completed Threads in '{}': {}/{}/{}", concurrencyGroupId, executorService.getPoolSize(),
-                executorService.getActiveCount(), executorService.getCompletedTaskCount());
+        log.debug("Total/Active/Completed Threads in '{}': {}/{}/{}", concurrencyGroupId, threadPoolExecutor.getPoolSize(),
+                threadPoolExecutor.getActiveCount(), threadPoolExecutor.getCompletedTaskCount());
         try {
             if (jobExecution != null && !jobExecution.isRunning()) {
-                executorService.shutdownNow();
+                threadPoolExecutor.shutdownNow();
                 return true;
             }
-            boolean awaitTerminationResult = executorService.awaitTermination(1000, TimeUnit.MILLISECONDS);
-            log.debug("After awaitTermination: Total/Active/Completed Threads: {}/{}/{}", executorService.getPoolSize(),
-                    executorService.getActiveCount(), executorService.getCompletedTaskCount());
+            boolean awaitTerminationResult = threadPoolExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS);
+            log.debug("After awaitTermination: Total/Active/Completed Threads: {}/{}/{}", threadPoolExecutor.getPoolSize(),
+                    threadPoolExecutor.getActiveCount(), threadPoolExecutor.getCompletedTaskCount());
             return awaitTerminationResult;
         } catch (InterruptedException e) {
             log.error("Concurrency-Group interrupted during awaitTermination()!", e);
-            executorService.shutdownNow();
+            threadPoolExecutor.shutdownNow();
             Thread.currentThread().interrupt();
             return true;
         }

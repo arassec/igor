@@ -32,15 +32,15 @@ export const store = {
     timeout: undefined,
     message: ''
   },
-  serviceData: {
-    serviceConfiguration: null
+  connectorData: {
+    connectorConfiguration: null
   },
   jobData: {
     jobConfiguration: null,
     selectionKey: null,
     parameterIndex: null,
-    serviceCategoryCandidates: null,
-    serviceParameter: null
+    connectorCategoryCandidates: null,
+    connectorParameter: null
   },
   valueStore: {},
   routeChanged: false,
@@ -85,20 +85,20 @@ export const store = {
     }
     this.wip.message = ''
   },
-  setServiceData (serviceConfiguration) {
-    this.serviceData.serviceConfiguration = serviceConfiguration
+  setConnectorData (connectorConfiguration) {
+    this.connectorData.connectorConfiguration = connectorConfiguration
   },
-  getServiceData () {
-    return this.serviceData
+  getConnectorData () {
+    return this.connectorData
   },
-  clearServiceData () {
-    this.serviceData.serviceConfiguration = null
+  clearConnectorData () {
+    this.connectorData.connectorConfiguration = null
   },
-  setJobData (jobConfiguration, selectionKey, parameterIndex, serviceCategoryCandidates) {
+  setJobData (jobConfiguration, selectionKey, parameterIndex, connectorCategoryCandidates) {
     this.jobData.jobConfiguration = jobConfiguration
     this.jobData.selectionKey = selectionKey
     this.jobData.parameterIndex = parameterIndex
-    this.jobData.serviceCategoryCandidates = serviceCategoryCandidates
+    this.jobData.connectorCategoryCandidates = connectorCategoryCandidates
   },
   getJobData () {
     return this.jobData
@@ -107,7 +107,7 @@ export const store = {
     this.jobData.jobConfiguration = null
     this.jobData.selectionKey = null
     this.jobData.parameterIndex = null
-    this.jobData.serviceParameter = null
+    this.jobData.connectorParameter = null
   },
   setValue (key, value) {
     this.valueStore[key] = value

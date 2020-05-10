@@ -2,7 +2,7 @@ package com.arassec.igor.persistence.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
-import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.persistence.security.SecurityProvider;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -31,23 +31,24 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
     private final transient SecurityProvider securityProvider;
 
     /**
-     * The {@link ServiceRepository} to load services as parameter values. Can be {@code null} if no services should be loaded.
+     * The {@link ConnectorRepository} to load connectors as parameter values. Can be {@code null} if no connectors should be
+     * loaded.
      */
-    private final transient ServiceRepository serviceRepository;
+    private final transient ConnectorRepository connectorRepository;
 
     /**
      * Creates a new deserializer.
      *
      * @param clazz                 The class parameter.
      * @param igorComponentRegistry The component registry.
-     * @param serviceRepository     The repository for services. Can be {@code null} to ignore services as parameter values.
+     * @param connectorRepository   The repository for connectors. Can be {@code null} to ignore connectors as parameter values.
      * @param securityProvider      The security provider to decrypt secured parameter values.
      */
     IgorComponentPersistenceDeserializer(Class<T> clazz, IgorComponentRegistry igorComponentRegistry,
-                                         ServiceRepository serviceRepository, SecurityProvider securityProvider) {
+                                         ConnectorRepository connectorRepository, SecurityProvider securityProvider) {
         super(clazz);
         this.igorComponentRegistry = igorComponentRegistry;
-        this.serviceRepository = serviceRepository;
+        this.connectorRepository = connectorRepository;
         this.securityProvider = securityProvider;
     }
 
@@ -101,9 +102,9 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
         Map<String, Object> result = new HashMap<>();
         parameters.forEach(jsonParameter -> {
             String parameterName = String.valueOf(jsonParameter.get(PersistenceMapperKey.NAME.getKey()));
-            if (jsonParameter.containsKey(PersistenceMapperKey.SERVICE.getKey()) && (boolean) jsonParameter.get(PersistenceMapperKey.SERVICE.getKey()) && serviceRepository != null) {
+            if (jsonParameter.containsKey(PersistenceMapperKey.CONNECTOR.getKey()) && (boolean) jsonParameter.get(PersistenceMapperKey.CONNECTOR.getKey()) && connectorRepository != null) {
                 result.put(parameterName,
-                        serviceRepository.findById(String.valueOf(jsonParameter.get(PersistenceMapperKey.VALUE.getKey()))));
+                        connectorRepository.findById(String.valueOf(jsonParameter.get(PersistenceMapperKey.VALUE.getKey()))));
             } else if (jsonParameter.containsKey(PersistenceMapperKey.SECURED.getKey()) && (boolean) jsonParameter.get(PersistenceMapperKey.SECURED.getKey())) {
                 result.put(parameterName, securityProvider.decrypt(typeId, parameterName,
                         String.valueOf(jsonParameter.get(PersistenceMapperKey.VALUE.getKey()))));

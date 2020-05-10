@@ -2,8 +2,8 @@ package com.arassec.igor.core.model.job;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.service.Service;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -20,14 +20,14 @@ class IgorComponentUtil {
     }
 
     /**
-     * Initializes {@link Service}s used by the supplied {@link IgorComponent}.
+     * Initializes {@link Connector}s used by the supplied {@link IgorComponent}.
      *
      * @param igorComponent The component.
      * @param jobId         The job's ID.
      * @param taskId        The task's ID.
      * @param jobExecution  Contains information about the job execution.
      */
-    static void initializeServices(IgorComponent igorComponent, String jobId, String taskId, JobExecution jobExecution) {
+    static void initializeConnectors(IgorComponent igorComponent, String jobId, String taskId, JobExecution jobExecution) {
         if (igorComponent == null) {
             return;
         }
@@ -35,14 +35,14 @@ class IgorComponentUtil {
     }
 
     /**
-     * Shuts {@link Service}s used by the supplied {@link IgorComponent} down.
+     * Shuts {@link Connector}s used by the supplied {@link IgorComponent} down.
      *
      * @param igorComponent The component.
      * @param jobId         The job's ID.
      * @param taskId        The task's ID.
      * @param jobExecution  Contains information about the job execution.
      */
-    static void shutdownServices(IgorComponent igorComponent, String jobId, String taskId, JobExecution jobExecution) {
+    static void shutdownConnectors(IgorComponent igorComponent, String jobId, String taskId, JobExecution jobExecution) {
         if (igorComponent == null) {
             return;
         }
@@ -50,14 +50,14 @@ class IgorComponentUtil {
     }
 
     /**
-     * Initializes or shuts down a service if the supplied field contains one.
+     * Initializes or shuts down a connector if the supplied field contains one.
      *
      * @param igorComponent The component.
      * @param jobId         The job's ID.
      * @param taskId        The task's ID.
      * @param jobExecution  Contains information about the job execution.
-     * @param field         The field possibly containing a service.
-     * @param initialize    Set to {@code true} to initialize the service or to {@code false} to shut it down.
+     * @param field         The field possibly containing a connector.
+     * @param initialize    Set to {@code true} to initialize the connector or to {@code false} to shut it down.
      */
     private static void processField(IgorComponent igorComponent, String jobId, String taskId, JobExecution jobExecution,
                                      Field field, boolean initialize) {
@@ -65,15 +65,15 @@ class IgorComponentUtil {
             try {
                 ReflectionUtils.makeAccessible(field);
                 Object value = field.get(igorComponent);
-                if (value instanceof Service) {
+                if (value instanceof Connector) {
                     if (initialize) {
-                        ((Service) value).initialize(jobId, taskId, jobExecution);
+                        ((Connector) value).initialize(jobId, taskId, jobExecution);
                     } else {
-                        ((Service) value).shutdown(jobId, taskId, jobExecution);
+                        ((Connector) value).shutdown(jobId, taskId, jobExecution);
                     }
                 }
             } catch (IllegalAccessException e) {
-                throw new IllegalStateException("Could not initialize service!", e);
+                throw new IllegalStateException("Could not initialize connector!", e);
             }
         }
     }

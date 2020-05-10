@@ -1,1 +1,1 @@
-ALPHA-igor-ftp-service-tests
+ALPHA-igor-ftp-connector-tests

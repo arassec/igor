@@ -3,9 +3,9 @@ package com.arassec.igor.module.file.provider;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.module.file.service.FallbackFileService;
-import com.arassec.igor.module.file.service.FileInfo;
-import com.arassec.igor.module.file.service.FileService;
+import com.arassec.igor.module.file.connector.FallbackFileConnector;
+import com.arassec.igor.module.file.connector.FileConnector;
+import com.arassec.igor.module.file.connector.FileInfo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,11 +40,11 @@ public class ListFilesProvider extends BaseFileProvider {
     public static final String LAST_MODIFIED_KEY = "lastModified";
 
     /**
-     * The service to use for file listing.
+     * The connector to use for file listing.
      */
     @NotNull
     @IgorParam
-    private FileService service;
+    private FileConnector source;
 
     /**
      * Defines the directory to list files in.
@@ -74,7 +74,7 @@ public class ListFilesProvider extends BaseFileProvider {
      */
     public ListFilesProvider() {
         super("list-files-provider");
-        service = new FallbackFileService();
+        source = new FallbackFileConnector();
     }
 
     /**
@@ -83,7 +83,7 @@ public class ListFilesProvider extends BaseFileProvider {
     @Override
     public void initialize(String jobId, String taskId, JobExecution jobExecution) {
         super.initialize(jobId, taskId, jobExecution);
-        files = service.listFiles(directory, fileEnding);
+        files = source.listFiles(directory, fileEnding);
         currentFile = 0;
         if (!directory.endsWith("/")) {
             directory += "/";

@@ -5,9 +5,9 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.module.file.service.FallbackFileService;
-import com.arassec.igor.module.file.service.FileService;
-import com.arassec.igor.module.file.service.FileStreamData;
+import com.arassec.igor.module.file.connector.FallbackFileConnector;
+import com.arassec.igor.module.file.connector.FileConnector;
+import com.arassec.igor.module.file.connector.FileStreamData;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import java.util.Map;
 
 
 /**
- * Copies a file from one service to another.
+ * Copies a file from one connector to another.
  */
 @Slf4j
 @Setter
@@ -60,11 +60,11 @@ public class CopyFileAction extends BaseFileAction {
     private static final String IN_TRANSFER_SUFFIX = ".igor";
 
     /**
-     * The service providing the file to copy.
+     * The connector providing the file to copy.
      */
     @NotNull
     @IgorParam
-    private FileService sourceService;
+    private FileConnector source;
 
     /**
      * Source directory to copy the file from.
@@ -85,7 +85,7 @@ public class CopyFileAction extends BaseFileAction {
      */
     @NotNull
     @IgorParam
-    private FileService targetService;
+    private FileConnector target;
 
     /**
      * The target directory to copy/move the file to.
@@ -118,12 +118,12 @@ public class CopyFileAction extends BaseFileAction {
      */
     public CopyFileAction() {
         super("copy-file-action");
-        sourceService = new FallbackFileService();
-        targetService = new FallbackFileService();
+        source = new FallbackFileConnector();
+        target = new FallbackFileConnector();
     }
 
     /**
-     * Copies the supplied source file to the destination service. During transfer the file is optionally saved with the suffix
+     * Copies the supplied source file to the destination connector. During transfer the file is optionally saved with the suffix
      * ".igor", which will be removed after successful transfer.
      *
      * @param data         The data to process.
@@ -145,7 +145,7 @@ public class CopyFileAction extends BaseFileAction {
         try {
             String sourceFileWithPath = getFilePath(resolvedData.getSourceDirectory(), resolvedData.getSourceFilename());
 
-            FileStreamData fileStreamData = sourceService.readStream(sourceFileWithPath, VOID_WIP_MONITOR);
+            FileStreamData fileStreamData = source.readStream(sourceFileWithPath, VOID_WIP_MONITOR);
 
             if (fileStreamData == null || fileStreamData.getData() == null) {
                 throw new IgorException("Not valid or not a file!");
@@ -162,12 +162,12 @@ public class CopyFileAction extends BaseFileAction {
                 targetFileInTransfer += IN_TRANSFER_SUFFIX;
             }
 
-            targetService.writeStream(targetFileInTransfer, fileStreamData, workInProgressMonitor);
+            target.writeStream(targetFileInTransfer, fileStreamData, workInProgressMonitor);
 
-            sourceService.finalizeStream(fileStreamData);
+            source.finalizeStream(fileStreamData);
 
             if (appendTransferSuffix) {
-                targetService.move(targetFileInTransfer, targetFileWithPath, VOID_WIP_MONITOR);
+                target.move(targetFileInTransfer, targetFileWithPath, VOID_WIP_MONITOR);
             }
 
             log.debug("File '{}' copied to '{}'", sourceFileWithPath, targetFileWithPath);
@@ -221,7 +221,7 @@ public class CopyFileAction extends BaseFileAction {
             directory += "/";
         }
 
-        // Cleanup slashes in the filename. The HTTP-FileService introduced those as part of its implementation.
+        // Cleanup slashes in the filename. The HTTP-FileConnector introduced those as part of its implementation.
         if (file.contains("/")) {
             String[] fileParts = file.split("/");
             if (file.length() == 1) {

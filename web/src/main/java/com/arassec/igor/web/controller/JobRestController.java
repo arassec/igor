@@ -1,7 +1,7 @@
 package com.arassec.igor.web.controller;
 
+import com.arassec.igor.core.application.ConnectorManager;
 import com.arassec.igor.core.application.JobManager;
-import com.arassec.igor.core.application.ServiceManager;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.Task;
@@ -46,9 +46,9 @@ public class JobRestController extends BaseRestController {
     private final JobManager jobManager;
 
     /**
-     * Manager for Services.
+     * Manager for connectors.
      */
-    private final ServiceManager serviceManager;
+    private final ConnectorManager connectorManager;
 
     /**
      * Job-Mapper for simulation runs.
@@ -222,16 +222,16 @@ public class JobRestController extends BaseRestController {
     /**
      * Deletes the job with the given ID.
      *
-     * @param id                      The job's ID.
-     * @param deleteExclusiveServices Set to {@code true} to delete services only used by this job.
+     * @param id                        The job's ID.
+     * @param deleteExclusiveConnectors Set to {@code true} to delete connectors only used by this job.
      */
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJob(@PathVariable("id") String id, @RequestParam Boolean deleteExclusiveServices) {
-        if (Boolean.TRUE.equals(deleteExclusiveServices)) {
-            List<Pair<String, String>> exclusiveServices = getExclusiveServices(id);
-            if (exclusiveServices != null && !exclusiveServices.isEmpty()) {
-                exclusiveServices.forEach(exclusiveService -> serviceManager.deleteService(exclusiveService.getKey()));
+    public void deleteJob(@PathVariable("id") String id, @RequestParam Boolean deleteExclusiveConnectors) {
+        if (Boolean.TRUE.equals(deleteExclusiveConnectors)) {
+            List<Pair<String, String>> exclusiveConnectors = getExclusiveConnectors(id);
+            if (exclusiveConnectors != null && !exclusiveConnectors.isEmpty()) {
+                exclusiveConnectors.forEach(exclusiveConnector -> connectorManager.deleteConnector(exclusiveConnector.getKey()));
             }
         }
         jobManager.delete(id);
@@ -292,24 +292,24 @@ public class JobRestController extends BaseRestController {
     }
 
     /**
-     * Returns the services that are ONLY referenced by this job.
+     * Returns the connectors that are ONLY referenced by this job.
      *
      * @param id The job's ID.
      *
-     * @return The services.
+     * @return The connectors.
      */
-    @GetMapping(value = "{id}/exclusive-service-references", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Pair<String, String>> getExclusiveServices(@PathVariable("id") String id) {
+    @GetMapping(value = "{id}/exclusive-connector-references", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Pair<String, String>> getExclusiveConnectors(@PathVariable("id") String id) {
         List<Pair<String, String>> result = new LinkedList<>();
 
-        Set<Pair<String, String>> referencedServices = jobManager.getReferencedServices(id);
-        if (referencedServices != null && !referencedServices.isEmpty()) {
-            referencedServices.forEach(referencedService -> {
-                ModelPage<Pair<String, String>> referencingJobs = serviceManager
-                        .getReferencingJobs(referencedService.getKey(), 0, Integer.MAX_VALUE);
+        Set<Pair<String, String>> referencedConnectors = jobManager.getReferencedConnectors(id);
+        if (referencedConnectors != null && !referencedConnectors.isEmpty()) {
+            referencedConnectors.forEach(referencedConnector -> {
+                ModelPage<Pair<String, String>> referencingJobs = connectorManager
+                        .getReferencingJobs(referencedConnector.getKey(), 0, Integer.MAX_VALUE);
                 if (referencingJobs != null && referencingJobs.getItems().size() == 1 && referencingJobs.getItems().iterator()
                         .next().getKey().equals(id)) {
-                    result.add(referencedService);
+                    result.add(referencedConnector);
                 }
             });
             result.sort(Comparator.comparing(Pair::getValue));

@@ -1,12 +1,12 @@
 # Send Message Action
-This action sends a message using the configured service.
+This action sends a message using the configured connector.
 
 # Parameters
 The action can be configured by the following parameters.
 
 Parameter | Description
 ---|:---|
-Message service | The service to use for sending the message.
+Message connector | The connector to use for sending the message.
 Message template | A template message that is used as message body. Parameters can be filled by using the template syntax explained below.
 Num threads | The number of threads this action uses to send messages.
 

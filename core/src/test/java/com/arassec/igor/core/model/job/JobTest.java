@@ -2,8 +2,8 @@ package com.arassec.igor.core.model.job;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
-import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.model.trigger.Trigger;
+import com.arassec.igor.core.util.IgorException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

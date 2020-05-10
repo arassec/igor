@@ -4,7 +4,7 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.web.simulation.ActionProxy;
 import com.arassec.igor.web.simulation.ProviderProxy;
 import com.arassec.igor.web.test.TestAction;
-import com.arassec.igor.web.test.TestService;
+import com.arassec.igor.web.test.TestConnector;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,11 +36,11 @@ public class SimulationObjectMapperTest extends MapperBaseTest {
 
         assertTrue(testJob.getTasks().get(0).getActions().get(0) instanceof ActionProxy);
 
-        TestService testService = (TestService) ((TestAction) ((ActionProxy) testJob.getTasks().get(0).getActions().get(0)).getDelegate()).getTestService();
+        TestConnector testConnector = (TestConnector) ((TestAction) ((ActionProxy) testJob.getTasks().get(0).getActions().get(0)).getDelegate()).getTestConnector();
 
-        assertEquals(666, testService.simulationSafeMethod());
-        assertNull(testService.simulationUnsafeMethod());
-        assertEquals("real-value-from-service", testService.directlyAnnotatedSimulationSafeMethod());
+        assertEquals(666, testConnector.simulationSafeMethod());
+        assertNull(testConnector.simulationUnsafeMethod());
+        assertEquals("real-value-from-connector", testConnector.directlyAnnotatedSimulationSafeMethod());
     }
 
 }

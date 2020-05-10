@@ -2,16 +2,16 @@ package com.arassec.igor.persistence.repository;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
+import com.arassec.igor.persistence.dao.ConnectorDao;
+import com.arassec.igor.persistence.dao.JobConnectorReferenceDao;
 import com.arassec.igor.persistence.dao.JobDao;
-import com.arassec.igor.persistence.dao.JobServiceReferenceDao;
-import com.arassec.igor.persistence.dao.ServiceDao;
+import com.arassec.igor.persistence.entity.JobConnectorReferenceEntity;
 import com.arassec.igor.persistence.entity.JobEntity;
-import com.arassec.igor.persistence.entity.JobServiceReferenceEntity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -46,14 +46,14 @@ public class JdbcJobRepository implements JobRepository {
     private final JobDao jobDao;
 
     /**
-     * DAO for service entities.
+     * DAO for connector entities.
      */
-    private final ServiceDao serviceDao;
+    private final ConnectorDao connectorDao;
 
     /**
-     * DAO for job-service-references.
+     * DAO for job-connector-references.
      */
-    private final JobServiceReferenceDao jobServiceReferenceDao;
+    private final JobConnectorReferenceDao jobConnectorReferenceDao;
 
     /**
      * ObjectMapper for JSON conversion.
@@ -109,15 +109,15 @@ public class JdbcJobRepository implements JobRepository {
 
         jobDao.save(jobEntity);
 
-        // Now update the service references:
-        jobServiceReferenceDao.deleteByJobId(job.getId());
-        List<String> referencedServices = new LinkedList<>();
+        // Now update the connector references:
+        jobConnectorReferenceDao.deleteByJobId(job.getId());
+        List<String> referencedConnectors = new LinkedList<>();
         job.getTasks().forEach(task -> {
-            referencedServices.addAll(getServiceIds(task.getProvider()));
-            task.getActions().forEach(action -> referencedServices.addAll(getServiceIds(action)));
+            referencedConnectors.addAll(getConnectorIds(task.getProvider()));
+            task.getActions().forEach(action -> referencedConnectors.addAll(getConnectorIds(action)));
         });
-        referencedServices.forEach(serviceId -> jobServiceReferenceDao.save(new JobServiceReferenceEntity(job.getId(),
-                serviceId)));
+        referencedConnectors.forEach(connectorId -> jobConnectorReferenceDao.save(new JobConnectorReferenceEntity(job.getId(),
+                connectorId)));
 
         return job;
     }
@@ -224,22 +224,22 @@ public class JdbcJobRepository implements JobRepository {
     @Override
     public void deleteById(String id) {
         jobDao.deleteById(id);
-        jobServiceReferenceDao.deleteByJobId(id);
+        jobConnectorReferenceDao.deleteByJobId(id);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Pair<String, String>> findReferencedServices(String jobId) {
+    public Set<Pair<String, String>> findReferencedConnectors(String jobId) {
         Set<Pair<String, String>> result = new HashSet<>();
 
-        List<JobServiceReferenceEntity> serviceReferences = jobServiceReferenceDao.findByJobId(jobId);
-        if (serviceReferences != null) {
-            serviceReferences.forEach(serviceReference -> {
-                String serviceId = serviceReference.getJobServiceReferenceIdentity().getServiceId();
-                String serviceName = serviceDao.findNameById(serviceId);
-                result.add(new Pair<>(serviceId, serviceName));
+        List<JobConnectorReferenceEntity> connectorReferences = jobConnectorReferenceDao.findByJobId(jobId);
+        if (connectorReferences != null) {
+            connectorReferences.forEach(connectorReference -> {
+                String connectorId = connectorReference.getJobConnectorReferenceIdentity().getConnectorId();
+                String connectorName = connectorDao.findNameById(connectorId);
+                result.add(new Pair<>(connectorId, connectorName));
             });
         }
 
@@ -247,13 +247,13 @@ public class JdbcJobRepository implements JobRepository {
     }
 
     /**
-     * Extracts service IDs from the parameters of the supplied class.
+     * Extracts connector IDs from the parameters of the supplied class.
      *
      * @param instance The model instance.
      *
-     * @return List of referenced service IDs.
+     * @return List of referenced connector IDs.
      */
-    private <T extends IgorComponent> List<String> getServiceIds(T instance) {
+    private <T extends IgorComponent> List<String> getConnectorIds(T instance) {
         List<String> result = new LinkedList<>();
 
         if (instance == null) {
@@ -265,11 +265,11 @@ public class JdbcJobRepository implements JobRepository {
                 try {
                     ReflectionUtils.makeAccessible(field);
                     Object value = field.get(instance);
-                    if (value instanceof Service) {
-                        result.add(((Service) value).getId());
+                    if (value instanceof Connector) {
+                        result.add(((Connector) value).getId());
                     }
                 } catch (IllegalAccessException e) {
-                    throw new IllegalStateException("Could not read service ID!", e);
+                    throw new IllegalStateException("Could not read connector ID!", e);
                 }
             }
         });

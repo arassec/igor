@@ -18,8 +18,8 @@
                                            :icon="param.value ? 'check-square' : 'square'"
                                            v-on:click="param.value = !param.value"/>
                         <input :id="'paramlabel_' + param.name + '_' + index"
-                               v-else-if="isService(param)" :disabled="true" class="truncate"
-                               v-model="param.serviceName"
+                               v-else-if="isConnector(param)" :disabled="true" class="truncate"
+                               v-model="param.connectorName"
                                :class="checkValidationError(index) ? 'validation-error' : ''"
                                :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
                         <textarea :id="'paramlabel_' + param.name + '_' + index"
@@ -35,8 +35,8 @@
                         <input-button v-if="!isNumber(param.type) && !isBoolean(param.type) && param.secured"
                                       icon="eye" v-on:clicked="toggleCleartext(index)" class="margin-left"/>
 
-                        <input-button v-else-if="isService(param)" icon="link"
-                                      v-on:clicked="openServicePicker(index, param.categoryCandidates)"
+                        <input-button v-else-if="isConnector(param)" icon="link"
+                                      v-on:clicked="openConnectorPicker(index, param.categoryCandidates)"
                                       class="margin-left"/>
 
                         <input-button v-else-if="param.subtype === 'CRON'" v-on:clicked="openCronPicker(index)"
@@ -53,14 +53,14 @@
             </div>
         </div>
 
-        <service-picker v-show="showServicePicker" :services="servicePage.items" :page="servicePage"
-                        v-on:cancel="showServicePicker = false"
-                        v-on:create="createService"
-                        v-on:selected="setSelectedService"
-                        v-on:first-page="loadServicePage(serviceParameterCategoryCandidates, 0)"
-                        v-on:previous-page="loadServicePage(serviceParameterCategoryCandidates, (servicePage.number - 1))"
-                        v-on:next-page="loadServicePage(serviceParameterCategoryCandidates, (servicePage.number + 1))"
-                        v-on:last-page="loadServicePage(serviceParameterCategoryCandidates, (servicePage.totalPages - 1))"
+        <connector-picker v-show="showConnectorPicker" :connectors="connectorPage.items" :page="connectorPage"
+                          v-on:cancel="showConnectorPicker = false"
+                          v-on:create="createConnector"
+                          v-on:selected="setSelectedConnector"
+                          v-on:first-page="loadConnectorPage(connectorParameterCategoryCandidates, 0)"
+                          v-on:previous-page="loadConnectorPage(connectorParameterCategoryCandidates, (connectorPage.number - 1))"
+                          v-on:next-page="loadConnectorPage(connectorParameterCategoryCandidates, (connectorPage.number + 1))"
+                          v-on:last-page="loadConnectorPage(connectorParameterCategoryCandidates, (connectorPage.totalPages - 1))"
         />
 
         <cron-picker v-show="showCronPicker" v-on:selected="setCronExpression" v-on:cancel="showCronPicker = false"/>
@@ -70,26 +70,26 @@
 
 <script>
     import InputButton from './input-button'
-    import ServicePicker from '../services/service-picker'
+    import ConnectorPicker from '../connectors/connector-picker'
     import CronPicker from "./cron-picker";
     import IgorBackend from '../../utils/igor-backend.js'
 
     export default {
         name: 'parameter-editor',
-        components: {CronPicker, ServicePicker, InputButton},
+        components: {ConnectorPicker, CronPicker, InputButton},
         props: ['parameters'],
         data: function () {
             return {
                 validationOk: true,
-                showServicePicker: false,
+                showConnectorPicker: false,
                 showCronPicker: false,
                 showAdvancedParameters: false,
-                serviceParameterIndex: 0,
-                serviceParameterCategoryCandidates: null,
+                connectorParameterIndex: 0,
+                connectorParameterCategoryCandidates: null,
                 cronParameterIndex: 0,
                 parameterValidationErrors: [],
                 parameterInputTypes: [],
-                servicePage: {
+                connectorPage: {
                     page: -1,
                     size: 10,
                     totalPages: 0,
@@ -113,8 +113,8 @@
                 return (parameter === 'boolean' ||
                     parameter === 'java.lang.Boolean')
             },
-            isService: function (parameter) {
-                return !!parameter.service;
+            isConnector: function (parameter) {
+                return !!parameter.connector;
             },
             formatParameterName: function (parameter) {
                 let string = parameter.name.replace(/\.?([A-Z])/g, function (x, y) {
@@ -169,29 +169,29 @@
                     this.$set(this.parameterInputTypes, index, 'password')
                 }
             },
-            openServicePicker: async function (index, serviceCategoryCandidates) {
-                this.serviceParameterIndex = index
-                this.serviceParameterCategoryCandidates = serviceCategoryCandidates
-                await this.loadServicePage(serviceCategoryCandidates, 0)
-                this.showServicePicker = true
+            openConnectorPicker: async function (index, connectorCategoryCandidates) {
+                this.connectorParameterIndex = index
+                this.connectorParameterCategoryCandidates = connectorCategoryCandidates
+                await this.loadConnectorPage(connectorCategoryCandidates, 0)
+                this.showConnectorPicker = true
             },
-            loadServicePage: async function (serviceCategoryCandidates, pageNumber) {
+            loadConnectorPage: async function (connectorCategoryCandidates, pageNumber) {
                 let typeIds = '';
-                serviceCategoryCandidates.forEach(categoryCandidate => {
+                connectorCategoryCandidates.forEach(categoryCandidate => {
                     categoryCandidate.typeCandidates.forEach(typeCandidate => {
                         typeIds += btoa(typeCandidate.key) + ","
                     })
                 });
-                this.servicePage = await IgorBackend.getData('/api/service/candidate/' + typeIds + '?pageNumber=' + pageNumber +
-                    '&pageSize=' + this.servicePage.size)
+                this.connectorPage = await IgorBackend.getData('/api/connector/candidate/' + typeIds + '?pageNumber=' + pageNumber +
+                    '&pageSize=' + this.connectorPage.size)
             },
-            setSelectedService: function (service) {
-                this.parameters[this.serviceParameterIndex].serviceName = service.name
-                this.parameters[this.serviceParameterIndex].value = service.id
-                this.showServicePicker = false
+            setSelectedConnector: function (connector) {
+                this.parameters[this.connectorParameterIndex].connectorName = connector.name
+                this.parameters[this.connectorParameterIndex].value = connector.id
+                this.showConnectorPicker = false
             },
-            createService: function () {
-                this.$emit('create-service', this.serviceParameterIndex, this.serviceParameterCategoryCandidates)
+            createConnector: function () {
+                this.$emit('create-connector', this.connectorParameterIndex, this.connectorParameterCategoryCandidates)
             },
             openCronPicker: function (index) {
                 this.cronParameterIndex = index

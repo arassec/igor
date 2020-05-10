@@ -28,9 +28,9 @@ public enum PersistenceMapperKey {
     PARAMETERS("parameters"),
 
     /**
-     * The service key.
+     * The connector key.
      */
-    SERVICE("service"),
+    CONNECTOR("connector"),
 
     /**
      * The value key.
@@ -51,7 +51,7 @@ public enum PersistenceMapperKey {
      * The key as String.
      */
     @Getter
-    private String key;
+    private final String key;
 
     /**
      * Creates a new instance.

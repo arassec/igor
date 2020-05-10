@@ -1,1 +1,1 @@
-ALPHA-igor-ssh-service-tests
+ALPHA-igor-ssh-connector-tests

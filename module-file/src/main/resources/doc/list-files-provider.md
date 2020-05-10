@@ -22,7 +22,7 @@ The 'List files' provider can be configured with the following parameters.
 
 Parameter | Description
 ---|:---|
-Service | A file service that provides the directory to list files in.
-Directory | Path to the directory that contains the files provided by the file service. 
+Source | A file-connector that provides the directory to list files in.
+Directory | Path to the directory that contains the files provided by the file connector. 
 File ending | An optional file ending which is used to filter files on the file server, e.g. 'jpeg'. 
 Simulation limit | The maximum number of data items that should be provided during job simulations. 

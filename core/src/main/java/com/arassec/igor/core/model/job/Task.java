@@ -201,10 +201,10 @@ public class Task {
      */
     private void initialize(String jobId, JobExecution jobExecution) {
         provider.initialize(jobId, id, jobExecution);
-        IgorComponentUtil.initializeServices(provider, jobId, id, jobExecution);
+        IgorComponentUtil.initializeConnectors(provider, jobId, id, jobExecution);
         actions.stream().filter(Action::isActive).forEach(action -> {
             action.initialize(jobId, id, jobExecution);
-            IgorComponentUtil.initializeServices(action, jobId, id, jobExecution);
+            IgorComponentUtil.initializeConnectors(action, jobId, id, jobExecution);
         });
     }
 
@@ -260,10 +260,10 @@ public class Task {
      */
     private void shutdown(String jobId, JobExecution jobExecution) {
         actions.stream().filter(Action::isActive).forEach(action -> {
-            IgorComponentUtil.shutdownServices(action, jobId, id, jobExecution);
+            IgorComponentUtil.shutdownConnectors(action, jobId, id, jobExecution);
             action.shutdown(jobId, id, jobExecution);
         });
-        IgorComponentUtil.shutdownServices(provider, jobId, id, jobExecution);
+        IgorComponentUtil.shutdownConnectors(provider, jobId, id, jobExecution);
         provider.shutdown(jobId, id, jobExecution);
     }
 

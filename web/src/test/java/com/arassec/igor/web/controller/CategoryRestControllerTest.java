@@ -1,8 +1,8 @@
 package com.arassec.igor.web.controller;
 
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.provider.Provider;
-import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.web.model.KeyLabelStore;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,15 +27,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CategoryRestControllerTest extends RestControllerBaseTest {
 
     /**
-     * Tests retrieval of service categories.
+     * Tests retrieval of connector categories.
      */
     @Test
-    @DisplayName("Tests retrieval of service categories.")
+    @DisplayName("Tests retrieval of connector categories.")
     @SneakyThrows(Exception.class)
-    void testGetServiceCategories() {
-        when(igorComponentRegistry.getCategoriesOfComponentType(eq(Service.class))).thenReturn(Set.of("two", "one"));
+    void testGetConnectorCategories() {
+        when(igorComponentRegistry.getCategoriesOfComponentType(eq(Connector.class))).thenReturn(Set.of("two", "one"));
 
-        MvcResult mvcResult = mockMvc.perform(get("/api/category/service")).andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/api/category/connector")).andExpect(status().isOk()).andReturn();
 
         List<KeyLabelStore> result = convert(mvcResult, new TypeReference<>() {
         });

@@ -4,9 +4,9 @@ import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
-import com.arassec.igor.module.message.service.FallbackMessageService;
-import com.arassec.igor.module.message.service.Message;
-import com.arassec.igor.module.message.service.MessageService;
+import com.arassec.igor.module.message.connector.FallbackMessageConnector;
+import com.arassec.igor.module.message.connector.Message;
+import com.arassec.igor.module.message.connector.MessageConnector;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,21 +19,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Sends a message to the specified messaging service.
+ * Sends a message to the specified messaging connector.
  */
 @Slf4j
 @Getter
 @Setter
-@ConditionalOnBean(MessageService.class)
+@ConditionalOnBean(MessageConnector.class)
 @IgorComponent
 public class SendMessageAction extends BaseMessageAction {
 
     /**
-     * The service to use for message sending.
+     * The connector to use for message sending.
      */
     @NotNull
     @IgorParam
-    private MessageService messageService;
+    private MessageConnector messageConnector;
 
     /**
      * The message template to use.
@@ -52,13 +52,13 @@ public class SendMessageAction extends BaseMessageAction {
      */
     public SendMessageAction() {
         super("send-message-action");
-        messageService = new FallbackMessageService();
+        messageConnector = new FallbackMessageConnector();
         messageTemplate = "";
     }
 
     /**
      * Processes the supplied data and replaces variables from a message template with the values from the data. The resulting
-     * message is sent via a message service.
+     * message is sent via a message connector.
      *
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
@@ -83,7 +83,7 @@ public class SendMessageAction extends BaseMessageAction {
 
         Message message = new Message();
         message.setContent(content);
-        messageService.sendMessage(message);
+        messageConnector.sendMessage(message);
         log.debug("Message sent: '{}'", content);
 
         return List.of(data);

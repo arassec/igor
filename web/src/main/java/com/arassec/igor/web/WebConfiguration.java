@@ -2,10 +2,10 @@ package com.arassec.igor.web;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.provider.Provider;
-import com.arassec.igor.core.model.service.Service;
 import com.arassec.igor.core.model.trigger.Trigger;
-import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.web.mapper.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -73,9 +73,9 @@ public class WebConfiguration {
      * @return The default {@link ObjectMapper}.
      */
     @Bean
-    public ObjectMapper objectMapper(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository,
+    public ObjectMapper objectMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository,
                                      MessageSource messageSource) {
-        return createObjectMapper(igorComponentRegistry, serviceRepository, messageSource, false);
+        return createObjectMapper(igorComponentRegistry, connectorRepository, messageSource, false);
     }
 
     /**
@@ -84,8 +84,8 @@ public class WebConfiguration {
      * @return The {@link ObjectMapper} for simulated job runs.
      */
     @Bean
-    public ObjectMapper simulationObjectMapper(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository, MessageSource messageSource) {
-        return createObjectMapper(igorComponentRegistry, serviceRepository, messageSource, true);
+    public ObjectMapper simulationObjectMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository, MessageSource messageSource) {
+        return createObjectMapper(igorComponentRegistry, connectorRepository, messageSource, true);
     }
 
     /**
@@ -95,18 +95,18 @@ public class WebConfiguration {
      *
      * @return A newly created {@link ObjectMapper} instance.
      */
-    private ObjectMapper createObjectMapper(IgorComponentRegistry igorComponentRegistry, ServiceRepository serviceRepository,
+    private ObjectMapper createObjectMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository,
                                             MessageSource messageSource, boolean simulationMode) {
 
         SimpleModule mapperModule = new SimpleModule();
 
         mapperModule.addSerializer(new IgorComponentWebSerializer(messageSource, igorComponentRegistry));
-        mapperModule.addDeserializer(Service.class, new ServiceWebDeserializer(igorComponentRegistry, simulationMode));
-        mapperModule.addDeserializer(Action.class, new ActionWebDeserializer(igorComponentRegistry, serviceRepository,
+        mapperModule.addDeserializer(Connector.class, new ConnectorWebDeserializer(igorComponentRegistry, simulationMode));
+        mapperModule.addDeserializer(Action.class, new ActionWebDeserializer(igorComponentRegistry, connectorRepository,
                 simulationMode));
-        mapperModule.addDeserializer(Trigger.class, new TriggerWebDeserializer(igorComponentRegistry, serviceRepository,
+        mapperModule.addDeserializer(Trigger.class, new TriggerWebDeserializer(igorComponentRegistry, connectorRepository,
                 simulationMode));
-        mapperModule.addDeserializer(Provider.class, new ProviderWebDeserializer(igorComponentRegistry, serviceRepository,
+        mapperModule.addDeserializer(Provider.class, new ProviderWebDeserializer(igorComponentRegistry, connectorRepository,
                 simulationMode));
 
         return new ObjectMapper()

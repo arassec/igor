@@ -22,7 +22,7 @@ public class FixedInputProvider extends BaseUtilProvider {
     public static final String INPUT_KEY = "input";
 
     /**
-     * The service to use for file listing.
+     * The connector to use for file listing.
      */
     @Getter
     @Setter

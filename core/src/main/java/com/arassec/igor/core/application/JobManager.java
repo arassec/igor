@@ -4,11 +4,11 @@ import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
-import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.repository.PersistentValueRepository;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
@@ -219,9 +219,9 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     /**
      * Loads a page of jobs matching the supplied criteria.
      *
-     * @param pageNumber The page number.
-     * @param pageSize   The page size.
-     * @param nameFilter An optional name filter for the jobs.
+     * @param pageNumber  The page number.
+     * @param pageSize    The page size.
+     * @param nameFilter  An optional name filter for the jobs.
      * @param stateFilter An optional state filter for the jobs.
      *
      * @return The page with jobs matching the criteria.
@@ -339,20 +339,21 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     }
 
     /**
-     * Searches for services referencing the job with the given ID.
+     * Searches for connectors referencing the job with the given ID.
      *
      * @param id The job's ID.
      *
-     * @return Set of services referencing this service.
+     * @return Set of connectors referencing this connector.
      */
-    public Set<Pair<String, String>> getReferencedServices(String id) {
-        return jobRepository.findReferencedServices(id);
+    public Set<Pair<String, String>> getReferencedConnectors(String id) {
+        return jobRepository.findReferencedConnectors(id);
     }
 
     /**
      * Counts the job executions that are in the given state.
      *
      * @param jobExecutionState The state to count executions for.
+     *
      * @return The number of executions in the requested state.
      */
     public int countJobExecutions(JobExecutionState jobExecutionState) {

@@ -8,7 +8,6 @@ import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.model.JobListEntry;
 import com.arassec.igor.web.model.ScheduleEntry;
-import com.arassec.igor.web.model.simulation.SimulationResult;
 import com.arassec.igor.web.simulation.ActionProxy;
 import com.arassec.igor.web.simulation.ProviderProxy;
 import com.arassec.igor.web.test.TestTrigger;
@@ -274,25 +273,25 @@ class JobRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests deleting a job.")
     @SneakyThrows
     void testDeleteJob() {
-        mockMvc.perform(delete("/api/job/job-id").queryParam("deleteExclusiveServices", "false"))
+        mockMvc.perform(delete("/api/job/job-id").queryParam("deleteExclusiveConnectors", "false"))
                 .andExpect(status().isNoContent());
         verify(jobManager, times(1)).delete(eq("job-id"));
 
-        when(jobManager.getReferencedServices(eq("other-job-id"))).thenReturn(Set.of(new Pair<>("single-ref-id",
-                "single-ref-service"), new Pair<>("multi-ref-id", "multi-ref-service")));
+        when(jobManager.getReferencedConnectors(eq("other-job-id"))).thenReturn(Set.of(new Pair<>("single-ref-id",
+                "single-ref-connector"), new Pair<>("multi-ref-id", "multi-ref-connector")));
 
-        when(serviceManager.getReferencingJobs(eq("single-ref-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(connectorManager.getReferencingJobs(eq("single-ref-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(new Pair<>("other-job-id", "other-job-name")))
         );
-        when(serviceManager.getReferencingJobs(eq("multi-ref-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(connectorManager.getReferencingJobs(eq("multi-ref-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(new Pair<>("other-job-id", "other-job-name"),
                         new Pair<>("yet-another-job-id", "yet-another-job-name")))
         );
 
-        mockMvc.perform(delete("/api/job/other-job-id").queryParam("deleteExclusiveServices", "true"))
+        mockMvc.perform(delete("/api/job/other-job-id").queryParam("deleteExclusiveConnectors", "true"))
                 .andExpect(status().isNoContent());
 
-        verify(serviceManager, times(1)).deleteService(eq("single-ref-id"));
+        verify(connectorManager, times(1)).deleteConnector(eq("single-ref-id"));
 
         verify(jobManager, times(1)).delete(eq("other-job-id"));
     }
@@ -368,30 +367,30 @@ class JobRestControllerTest extends RestControllerBaseTest {
     }
 
     /**
-     * Tests getting exclusive services of a job.
+     * Tests getting exclusive connectors of a job.
      */
     @Test
-    @DisplayName("Tests getting exclusive services of a job.")
+    @DisplayName("Tests getting exclusive connectors of a job.")
     @SneakyThrows
-    void testGetExclusiveServices() {
-        when(jobManager.getReferencedServices(eq("test-job-id"))).thenReturn(Set.of(
-                new Pair<>("serviceC-id", "serviceC"),
-                new Pair<>("serviceB-id", "serviceB"),
-                new Pair<>("serviceA-id", "serviceA")
+    void testGetExclusiveconnectors() {
+        when(jobManager.getReferencedConnectors(eq("test-job-id"))).thenReturn(Set.of(
+                new Pair<>("connectorC-id", "connectorC"),
+                new Pair<>("connectorB-id", "connectorB"),
+                new Pair<>("connectorA-id", "connectorA")
         ));
 
-        when(serviceManager.getReferencingJobs(eq("serviceA-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(connectorManager.getReferencingJobs(eq("connectorA-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(new Pair<>("test-job-id", "test-job-name")))
         );
-        when(serviceManager.getReferencingJobs(eq("serviceB-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(connectorManager.getReferencingJobs(eq("connectorB-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(new Pair<>("test-job-id", "test-job-name"),
                         new Pair<>("another-job-id", "another-job-name")))
         );
-        when(serviceManager.getReferencingJobs(eq("serviceC-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(connectorManager.getReferencingJobs(eq("connectorC-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(new Pair<>("test-job-id", "test-job-name")))
         );
 
-        MvcResult mvcResult = mockMvc.perform(get("/api/job/test-job-id/exclusive-service-references"))
+        MvcResult mvcResult = mockMvc.perform(get("/api/job/test-job-id/exclusive-connector-references"))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -399,10 +398,10 @@ class JobRestControllerTest extends RestControllerBaseTest {
         });
 
         assertEquals(2, result.size());
-        assertEquals("serviceA-id", result.get(0).getKey());
-        assertEquals("serviceA", result.get(0).getValue());
-        assertEquals("serviceC-id", result.get(1).getKey());
-        assertEquals("serviceC", result.get(1).getValue());
+        assertEquals("connectorA-id", result.get(0).getKey());
+        assertEquals("connectorA", result.get(0).getValue());
+        assertEquals("connectorC-id", result.get(1).getKey());
+        assertEquals("connectorC", result.get(1).getValue());
     }
 
 }

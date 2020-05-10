@@ -43,9 +43,9 @@ public enum WebMapperKey {
     PARAMETERS("parameters"),
 
     /**
-     * The service key.
+     * The connector key.
      */
-    SERVICE("service"),
+    CONNECTOR("connector"),
 
     /**
      * The value key.
@@ -88,14 +88,14 @@ public enum WebMapperKey {
     SUBTYPE("subtype"),
 
     /**
-     * The service-name key.
+     * The connector-name key.
      */
-    SERVICE_NAME("serviceName"),
+    CONNECTOR_NAME("connectorName"),
 
     /**
-     * The service-class key.
+     * The connector-class key.
      */
-    SERVICE_CLASS("serviceClass"),
+    CONNECTOR_CLASS("connectorClass"),
 
     /**
      * Indicates whether documentation is available or not.
@@ -106,7 +106,7 @@ public enum WebMapperKey {
      * Contains the key as String.
      */
     @Getter
-    private String key;
+    private final String key;
 
     /**
      * Creates a new instance.

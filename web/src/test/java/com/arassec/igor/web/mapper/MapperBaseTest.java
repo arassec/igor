@@ -1,12 +1,12 @@
 package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
-import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.core.util.IgorConfigHelper;
 import com.arassec.igor.web.WebConfiguration;
 import com.arassec.igor.web.test.TestAction;
+import com.arassec.igor.web.test.TestConnector;
 import com.arassec.igor.web.test.TestProvider;
-import com.arassec.igor.web.test.TestService;
 import com.arassec.igor.web.test.TestTrigger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -41,25 +41,25 @@ public abstract class MapperBaseTest {
     @BeforeEach
     void initialize() {
         ApplicationContext applicationContextMock = mock(ApplicationContext.class);
-        when(applicationContextMock.getBean(eq(TestService.class))).thenReturn(new TestService());
+        when(applicationContextMock.getBean(eq(TestConnector.class))).thenReturn(new TestConnector());
         when(applicationContextMock.getBean(eq(TestTrigger.class))).thenReturn(new TestTrigger());
         when(applicationContextMock.getBean(eq(TestProvider.class))).thenReturn(new TestProvider());
         when(applicationContextMock.getBean(eq(TestAction.class))).thenReturn(new TestAction());
 
         IgorComponentRegistry igorComponentRegistry = new IgorComponentRegistry(List.of(new TestAction()), List.of(new TestProvider()),
-                List.of(new TestTrigger()), List.of(new TestService()));
+                List.of(new TestTrigger()), List.of(new TestConnector()));
         igorComponentRegistry.setApplicationContext(applicationContextMock);
         igorComponentRegistry.afterPropertiesSet();
 
-        ServiceRepository serviceRepositoryMock = mock(ServiceRepository.class);
-        when(serviceRepositoryMock.findById(eq(TestService.SERVICE_ID))).thenReturn(new TestService());
+        ConnectorRepository connectorRepositoryMock = mock(ConnectorRepository.class);
+        when(connectorRepositoryMock.findById(eq(TestConnector.CONNECTOR_ID))).thenReturn(new TestConnector());
 
         WebConfiguration webConfiguration = new WebConfiguration();
 
-        objectMapper = webConfiguration.objectMapper(igorComponentRegistry, serviceRepositoryMock,
+        objectMapper = webConfiguration.objectMapper(igorComponentRegistry, connectorRepositoryMock,
                 webConfiguration.messageSource(List.of(IgorConfigHelper.createMessageSource("i18n/mapper"))));
 
-        simulationObjectMapper = webConfiguration.simulationObjectMapper(igorComponentRegistry, serviceRepositoryMock,
+        simulationObjectMapper = webConfiguration.simulationObjectMapper(igorComponentRegistry, connectorRepositoryMock,
                 webConfiguration.messageSource(List.of(IgorConfigHelper.createMessageSource("i18n/mapper"))));
     }
 

@@ -25,6 +25,7 @@
         background-color: Transparent;
         cursor: pointer;
         padding: .25em;
+        min-width: 9em;
     }
 
     button::-moz-focus-inner {

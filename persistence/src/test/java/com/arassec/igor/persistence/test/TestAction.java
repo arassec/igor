@@ -2,8 +2,8 @@ package com.arassec.igor.persistence.test;
 
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.service.Service;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,10 +28,10 @@ public class TestAction extends BaseAction {
     public static final String TYPE_ID = "action-type-id";
 
     /**
-     * A service as parameter.
+     * A connector as parameter.
      */
     @IgorParam
-    private Service testService;
+    private Connector testConnector;
 
     /**
      * Creates a new component instance.

@@ -63,7 +63,7 @@
                                v-show="selectedTaskId === task.id"
                                v-bind:key="task.id"
                                v-bind:task="task"
-                               v-on:create-service="createService"
+                               v-on:create-connector="createConnector"
                                v-on:open-documentation="openDocumentation"
                                v-on:switch-documentation="switchDocumentation"
                                v-on:close-documentation="showDocumentation = false"
@@ -74,7 +74,7 @@
                                      v-show="selectedActionId === action.id"
                                      v-bind:key="action.id"
                                      v-bind:action="action"
-                                     v-on:create-service="createService"
+                                     v-on:create-connector="createConnector"
                                      v-on:open-documentation="openDocumentation"
                                      v-on:switch-documentation="switchDocumentation"
                                      v-on:close-documentation="showDocumentation = false"
@@ -549,9 +549,9 @@
                     })
                 })
             },
-            createService: function (selectionKey, parameterIndex, serviceCategoryCandidates) {
-                this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, serviceCategoryCandidates);
-                this.$router.push({name: 'service-editor'})
+            createConnector: function (selectionKey, parameterIndex, connectorCategoryCandidates) {
+                this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, connectorCategoryCandidates);
+                this.$router.push({name: 'connector-editor'})
             },
             updateOriginalJobConfiguration: function () {
                 this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
@@ -588,7 +588,7 @@
         },
         mounted() {
             let jobData = this.$root.$data.store.getJobData();
-            // Returning from a service configuration within a job configuration
+            // Returning from a connector configuration within a job configuration
             if (jobData.jobConfiguration != null) {
                 this.jobConfiguration = jobData.jobConfiguration;
                 if (this.jobConfiguration.id != null) {
@@ -600,19 +600,19 @@
 
                     let task = Utils.findTask(this.jobConfiguration, selectionKey);
                     if (task) {
-                        if (jobData.serviceParameter != null && jobData.parameterIndex != null) {
+                        if (jobData.connectorParameter != null && jobData.parameterIndex != null) {
                             let parameter = task.provider.parameters[jobData.parameterIndex];
-                            parameter.serviceName = jobData.serviceParameter.name;
-                            parameter.value = jobData.serviceParameter.id
+                            parameter.connectorName = jobData.connectorParameter.name;
+                            parameter.value = jobData.connectorParameter.id
                         }
                         this.selectTask(task.id);
                     } else {
                         let action = Utils.findAction(this.jobConfiguration, selectionKey);
                         if (action) {
-                            if (jobData.serviceParameter != null && jobData.parameterIndex != null) {
+                            if (jobData.connectorParameter != null && jobData.parameterIndex != null) {
                                 let parameter = action.parameters[jobData.parameterIndex];
-                                parameter.serviceName = jobData.serviceParameter.name;
-                                parameter.value = jobData.serviceParameter.id
+                                parameter.connectorName = jobData.connectorParameter.name;
+                                parameter.value = jobData.connectorParameter.id
                             }
                             this.selectAction(action.id);
                         }
@@ -656,7 +656,7 @@
             clearInterval(this.jobExecutionDetailsRefreshTimer)
         },
         beforeRouteLeave(to, from, next) {
-            // We leave the job editor to create a new service. No unsaved-values-check required!
+            // We leave the job editor to create a new connector. No unsaved-values-check required!
             let jobData = this.$root.$data.store.getJobData();
             if (jobData.jobConfiguration) {
                 next()

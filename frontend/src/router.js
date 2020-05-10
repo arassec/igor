@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
-import ServiceEditor from "./views/service-editor";
-import ServiceOverview from "./views/service-overview";
+import ConnectorEditor from "./views/connector-editor";
+import ConnectorOverview from "./views/connector-overview";
 import JobEditor from "./views/job-editor";
 import JobOverview from "./views/job-overview";
 
@@ -15,14 +15,14 @@ export default new Router({
             component: JobOverview
         },
         {
-            path: "/service-overview",
-            name: "service-overview",
-            component: ServiceOverview
+            path: "/connector-overview",
+            name: "connector-overview",
+            component: ConnectorOverview
         },
         {
-            path: "/service-editor/:serviceId?",
-            name: "service-editor",
-            component: ServiceEditor,
+            path: "/connector-editor/:connectorId?",
+            name: "connector-editor",
+            component: ConnectorEditor,
             props: true
         },
         {

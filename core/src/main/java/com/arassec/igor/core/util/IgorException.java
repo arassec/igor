@@ -1,7 +1,7 @@
 package com.arassec.igor.core.util;
 
 /**
- * Exception for all errors that occur during a service interaction.
+ * Exception for all errors that occur during a connector interaction.
  */
 public class IgorException extends RuntimeException {
 

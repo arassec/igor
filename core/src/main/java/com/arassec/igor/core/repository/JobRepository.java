@@ -16,6 +16,7 @@ public interface JobRepository {
      * Saves a new job or updates an existing one.
      *
      * @param job The job to save.
+     *
      * @return The updated job.
      */
     Job upsert(Job job);
@@ -33,6 +34,7 @@ public interface JobRepository {
      * @param pageNumber The page number to load.
      * @param pageSize   The page size.
      * @param nameFilter An optional filter for the job's name.
+     *
      * @return The page with jobs.
      */
     ModelPage<Job> findPage(int pageNumber, int pageSize, String nameFilter);
@@ -41,6 +43,7 @@ public interface JobRepository {
      * Finds a job by its ID.
      *
      * @param id The job's ID.
+     *
      * @return The {@link Job}.
      */
     Job findById(String id);
@@ -49,6 +52,7 @@ public interface JobRepository {
      * Finds a job by its name.
      *
      * @param name The job's name.
+     *
      * @return The {@link Job}.
      */
     Job findByName(String name);
@@ -61,11 +65,12 @@ public interface JobRepository {
     void deleteById(String id);
 
     /**
-     * Returns all services that are used by the given job.
+     * Returns all connectors that are used by the given job.
      *
      * @param id The job's ID.
-     * @return List of service IDs and names used by this job.
+     *
+     * @return List of connector IDs and names used by this job.
      */
-    Set<Pair<String, String>> findReferencedServices(String id);
+    Set<Pair<String, String>> findReferencedConnectors(String id);
 
 }

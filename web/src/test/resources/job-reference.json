@@ -43,7 +43,7 @@
             "required": false,
             "type": "java.lang.String",
             "value": "test-provider-param",
-            "service": false
+            "connector": false
           },
           {
             "name": "emptyStringParam",
@@ -53,7 +53,7 @@
             "required": false,
             "type": "java.lang.String",
             "value": null,
-            "service": false
+            "connector": false
           },
           {
             "name": "nullInteger",
@@ -63,7 +63,7 @@
             "required": false,
             "type": "java.lang.Integer",
             "value": null,
-            "service": false
+            "connector": false
           },
           {
             "name": "simulationLimit",
@@ -73,7 +73,7 @@
             "required": true,
             "type": "int",
             "value": 456,
-            "service": false
+            "connector": false
           }
         ]
       },
@@ -93,26 +93,26 @@
           },
           "parameters": [
             {
-              "name": "testService",
+              "name": "testConnector",
               "secured": false,
               "advanced": false,
               "subtype": "NONE",
               "required": false,
               "categoryCandidates": [
                 {
-                  "key": "service-category-id",
-                  "value": "Service Category",
+                  "key": "connector-category-id",
+                  "value": "Connector Category",
                   "typeCandidates": [
                     {
-                      "key": "service-type-id",
-                      "value": "Service Type"
+                      "key": "connector-type-id",
+                      "value": "Connector Type"
                     }
                   ]
                 }
               ],
-              "value": "service-id",
-              "serviceName": null,
-              "service": true
+              "value": "connector-id",
+              "connectorName": null,
+              "connector": true
             },
             {
               "name": "numThreads",
@@ -122,7 +122,7 @@
               "required": true,
               "type": "int",
               "value": 1,
-              "service": false
+              "connector": false
             }
           ]
         }

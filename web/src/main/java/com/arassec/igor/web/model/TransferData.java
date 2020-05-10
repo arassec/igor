@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Models igor data for transfer (e.g. import/export).
  * <p>
- * Data is transferred as String to avoid dependency conflicts (i.e. jobs requiring services which are not available during
+ * Data is transferred as String to avoid dependency conflicts (i.e. jobs requiring connectors which are not available during
  * deserialization).
  */
 @Data
@@ -20,8 +20,8 @@ public class TransferData {
     private List<String> jobJsons = new LinkedList<>();
 
     /**
-     * Services as JSON-Strings.
+     * Connectors as JSON-Strings.
      */
-    private List<String> serviceJsons = new LinkedList<>();
+    private List<String> connectorJsons = new LinkedList<>();
 
 }

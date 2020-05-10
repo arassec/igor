@@ -1,7 +1,6 @@
 package com.arassec.igor.core.model.provider;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.trigger.BaseTrigger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

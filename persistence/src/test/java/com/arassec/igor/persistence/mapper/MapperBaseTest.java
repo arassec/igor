@@ -1,7 +1,8 @@
 package com.arassec.igor.persistence.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
-import com.arassec.igor.core.repository.ServiceRepository;
+import com.arassec.igor.core.model.connector.Connector;
+import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.persistence.PersistenceConfiguration;
 import com.arassec.igor.persistence.test.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,9 +23,9 @@ import static org.mockito.Mockito.when;
 public abstract class MapperBaseTest {
 
     /**
-     * {@link ObjectMapper} for {@link com.arassec.igor.core.model.service.Service}s.
+     * {@link ObjectMapper} for {@link Connector}s.
      */
-    protected ObjectMapper serviceObjectMapper;
+    protected ObjectMapper connectorObjectMapper;
 
     /**
      * {@link ObjectMapper} for {@link com.arassec.igor.core.model.job.Job}s.
@@ -37,24 +38,24 @@ public abstract class MapperBaseTest {
     @BeforeEach
     void initialize() {
         ApplicationContext applicationContextMock = mock(ApplicationContext.class);
-        when(applicationContextMock.getBean(eq(TestService.class))).thenReturn(new TestService());
+        when(applicationContextMock.getBean(eq(TestConnector.class))).thenReturn(new TestConnector());
         when(applicationContextMock.getBean(eq(TestTrigger.class))).thenReturn(new TestTrigger());
         when(applicationContextMock.getBean(eq(TestProvider.class))).thenReturn(new TestProvider());
         when(applicationContextMock.getBean(eq(TestAction.class))).thenReturn(new TestAction());
 
         IgorComponentRegistry igorComponentRegistry = new IgorComponentRegistry(List.of(new TestAction()), List.of(new TestProvider()),
-                List.of(new TestTrigger()), List.of(new TestService()));
+                List.of(new TestTrigger()), List.of(new TestConnector()));
         igorComponentRegistry.setApplicationContext(applicationContextMock);
         igorComponentRegistry.afterPropertiesSet();
 
         PersistenceConfiguration persistenceConfiguration = new PersistenceConfiguration();
 
-        serviceObjectMapper = persistenceConfiguration.persistenceServiceMapper(igorComponentRegistry, new TestSecurityProvider());
+        connectorObjectMapper = persistenceConfiguration.persistenceConnectorMapper(igorComponentRegistry, new TestSecurityProvider());
 
-        ServiceRepository serviceRepositoryMock = mock(ServiceRepository.class);
-        when(serviceRepositoryMock.findById(eq(TestService.SERVICE_ID))).thenReturn(new TestService());
+        ConnectorRepository connectorRepositoryMock = mock(ConnectorRepository.class);
+        when(connectorRepositoryMock.findById(eq(TestConnector.CONNECTOR_ID))).thenReturn(new TestConnector());
 
-        jobObjectMapper = persistenceConfiguration.persistenceJobMapper(igorComponentRegistry, serviceRepositoryMock, new TestSecurityProvider());
+        jobObjectMapper = persistenceConfiguration.persistenceJobMapper(igorComponentRegistry, connectorRepositoryMock, new TestSecurityProvider());
     }
 
     /**
