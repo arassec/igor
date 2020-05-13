@@ -79,29 +79,29 @@ class SortByTimestampPatternActionTest extends MiscActionBaseTest {
     }
 
     /**
-     * Tests sorting by timestamp with timezone.
+     * Tests sorting by timestamp with a pattern.
      */
     @Test
-    @DisplayName("Tests sorting with timezone.")
-    void testCompleteWithTimezone() {
+    @DisplayName("Tests sorting by timestamp with a pattern.")
+    void testCompleteWithPattern() {
         SortByTimestampPatternAction action = new SortByTimestampPatternAction();
-        action.setInput("$.timestamp");
+        action.setInput("$.filename");
         action.setPattern("$.pattern");
         action.setTimestampFormat("$.timestampFormat");
 
         action.getCollectedData().add(
-                Map.of("timestamp", "2019-12-29T18:51:00-02:00",
-                        "pattern", ".*",
-                        "timestampFormat", "yyyy-MM-dd'T'HH:mm:ssXXX"));
+                Map.of("filename", "alpha_20200113185100_beta.jpeg",
+                        "pattern", "[0-9]{14}",
+                        "timestampFormat", "yyyyMMddHHmmss"));
         action.getCollectedData().add(
-                Map.of("timestamp", "2019-12-29T18:51:00+01:00",
-                        "pattern", ".*",
-                        "timestampFormat", "yyyy-MM-dd'T'HH:mm:ssXXX"));
+                Map.of("filename", "20191229185100-gamma.jpeg",
+                        "pattern", "[0-9]{14}",
+                        "timestampFormat", "yyyyMMddHHmmss"));
 
         List<Map<String, Object>> completedData = action.complete();
         assertEquals(2, completedData.size());
-        assertEquals("2019-12-29T18:51:00+01:00", completedData.get(0).get("timestamp"));
-        assertEquals("2019-12-29T18:51:00-02:00", completedData.get(1).get("timestamp"));
+        assertEquals("20191229185100-gamma.jpeg", completedData.get(0).get("filename"));
+        assertEquals("alpha_20200113185100_beta.jpeg", completedData.get(1).get("filename"));
     }
 
 }
