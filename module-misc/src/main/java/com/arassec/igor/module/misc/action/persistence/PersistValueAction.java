@@ -1,5 +1,6 @@
 package com.arassec.igor.module.misc.action.persistence;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
@@ -69,8 +70,12 @@ public class PersistValueAction extends BasePersistenceAction {
 
         PersistentValue value = new PersistentValue(getString(data, resolvedInput));
         if (!persistentValueRepository.isPersisted(jobId, taskId, value)) {
-            log.debug("Persisted: '{}'", value);
-            persistentValueRepository.upsert(jobId, taskId, value);
+            if (isSimulation(data)) {
+                data.put(DataKey.SIMULATION_LOG.getKey(), "Would have persisted: " + value.getContent());
+            } else {
+                log.debug("Persisted: '{}'", value);
+                persistentValueRepository.upsert(jobId, taskId, value);
+            }
         } else {
             log.debug("Already persisted: '{}'", value);
         }

@@ -9,32 +9,32 @@
 
         <div class="" slot="body">
             <h2>Time and state</h2>
-            <table class="execution-core">
-                <tr>
-                    <td>State</td>
-                    <td>{{jobExecution.executionState}}</td>
-                </tr>
-                <tr v-if="jobExecution.started == null">
-                    <td>Scheduled:</td>
-                    <td>{{formatDate(jobExecution.created)}}</td>
-                </tr>
-                <tr v-if="jobExecution.started == null">
-                    <td>Waiting:</td>
-                    <td>{{calculateDuration(jobExecution.created, jobExecution.finished)}}</td>
-                </tr>
-                <tr v-if="jobExecution.started != null">
-                    <td>Started:</td>
-                    <td>{{formatDate(jobExecution.started)}}</td>
-                </tr>
-                <tr v-if="jobExecution.finished != null">
-                    <td>Finished:</td>
-                    <td>{{formatDate(jobExecution.finished)}}</td>
-                </tr>
-                <tr v-if="jobExecution.started != null">
-                    <td>Duration:</td>
-                    <td>{{calculateDuration(jobExecution.started, jobExecution.finished)}}</td>
-                </tr>
-            </table>
+            <div class="table execution-core">
+                <div class="tr">
+                    <div class="td">State</div>
+                    <div class="td align-left">{{jobExecution.executionState}}</div>
+                </div>
+                <div class="tr" v-if="jobExecution.started == null">
+                    <div class="td">Scheduled:</div>
+                    <div class="td align-left">{{formatDate(jobExecution.created)}}</div>
+                </div>
+                <div class="tr" v-if="jobExecution.started == null">
+                    <div class="td">Waiting:</div>
+                    <div class="td align-left">{{calculateDuration(jobExecution.created, jobExecution.finished)}}</div>
+                </div>
+                <div class="tr" v-if="jobExecution.started != null">
+                    <div class="td">Started:</div>
+                    <div class="td align-left">{{formatDate(jobExecution.started)}}</div>
+                </div>
+                <div class="tr" v-if="jobExecution.finished != null">
+                    <div class="td">Finished:</div>
+                    <div class="td align-left">{{formatDate(jobExecution.finished)}}</div>
+                </div>
+                <div class="tr" v-if="jobExecution.started != null">
+                    <div class="td">Duration:</div>
+                    <div class="td align-left">{{calculateDuration(jobExecution.started, jobExecution.finished)}}</div>
+                </div>
+            </div>
 
             <div v-if="jobExecution.executionState === 'RUNNING'" class="max-width">
                 <h2 class="truncate">Task: {{jobExecution.currentTask}}</h2>

@@ -3,6 +3,7 @@ package com.arassec.igor.core.model.job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.trigger.Trigger;
+import com.arassec.igor.core.util.validation.UniqueJobName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,11 +27,13 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j
+@UniqueJobName
 public class Job {
 
     /**
      * The job's ID.
      */
+    @NotEmpty
     private String id;
 
     /**

@@ -1,6 +1,5 @@
 <template>
-    <navigation-item class="action-row" v-on:clicked="$emit('action-is-selected', action.id)" :selected="actionSelected"
-                     :has-validation-errors="validationErrors.includes(action.id)">
+    <navigation-item class="action-row" v-on:clicked="$emit('action-is-selected', action.id)" :class="style">
         <font-awesome-icon slot="left" icon="grip-vertical" class="margin-right fa-fw move-icon"/>
         <label slot="center" class="action-label">{{action.name.length > 0 ? action.name : action.type.value}}</label>
         <icon-button slot="right" icon="ellipsis-v" v-on:clicked="showMenu = !showMenu"/>
@@ -31,6 +30,15 @@
         computed: {
             actionSelected: function () {
                 return this.selectedActionId === this.action.id;
+            },
+            style: function () {
+                if (this.action.id in this.validationErrors) {
+                    return "alert";
+                }
+                if (this.selectedActionId === this.action.id) {
+                    return "info";
+                }
+                return "unselected";
             }
         }
     }

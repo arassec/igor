@@ -43,10 +43,10 @@
                 <div class="table">
                     <div class="tr">
                         <div class="td"><label for="connector-name">Name</label></div>
-                        <div class="td"><input id="connector-name" type="text" autocomplete="off"
-                                               v-model="connectorConfiguration.name"
-                                               :class="nameValidationError.length > 0 ? 'validation-error' : ''"
-                                               :placeholder="nameValidationError.length > 0 ? nameValidationError : ''"/>
+                        <div class="td">
+                            <input-validated id="connector-name" :type="'text'" v-model="connectorConfiguration.name"
+                                             :parent-id="connectorConfiguration.id" :property-id="'name'"
+                                             :validation-errors="validationErrors"/>
                         </div>
                     </div>
                 </div>
@@ -64,7 +64,8 @@
                         <div class="td">
                             <select id="category-input" v-model="connectorConfiguration.category"
                                     v-on:change="loadTypesOfCategory(connectorConfiguration.category, true).then(() => {
-                                        loadParametersOfType(connectorConfiguration.type.key)})" :disabled="!newConnector">
+                                        loadParametersOfType(connectorConfiguration.type.key)})"
+                                    :disabled="!newConnector">
                                 <option v-for="category in connectorCategories" v-bind:value="category"
                                         v-bind:key="category.key">
                                     {{category.value}}
@@ -90,6 +91,8 @@
             <core-panel>
                 <h2>Connector Parameters</h2>
                 <parameter-editor v-if="Object.keys(connectorConfiguration.parameters).length > 0"
+                                  :parent-id="connectorConfiguration.id"
+                                  :validation-errors="validationErrors"
                                   :parameters="connectorConfiguration.parameters" ref="parameterEditor"/>
                 <p v-if="Object.keys(connectorConfiguration.parameters).length === 0">
                     This connector has no parameters to configure.
@@ -108,6 +111,18 @@
             </modal-dialog>
 
         </core-content>
+
+        <modal-dialog v-if="showTestDetails" @close="showTestDetails = false"
+                      v-on:cancel="showTestDetails = false">
+            <layout-row slot="header">
+                <h1 slot="left">Testing Failed!</h1>
+                <input-button slot="right" icon="times" v-on:clicked="showTestDetails = false"/>
+            </layout-row>
+            <div slot="body" class="paragraph">
+                Connection to the service failed!
+                <pre><code>{{ testError }}</code></pre>
+            </div>
+        </modal-dialog>
 
         <documentation-container :documentation="documentation" v-show="showDocumentation"
                                  v-on:close="showDocumentation = false"/>
@@ -131,13 +146,15 @@
     import ModalDialog from "../components/common/modal-dialog";
     import FeedbackBox from "../components/common/feedback-box";
     import ListPager from "../components/common/list-pager";
-    import {store} from "../main";
     import IconButton from "../components/common/icon-button";
     import DocumentationContainer from "../components/common/documentation-container";
+    import Utils from "../utils/utils";
+    import InputValidated from "../components/common/input-validated";
 
     export default {
         name: 'connector-editor',
         components: {
+            InputValidated,
             DocumentationContainer,
             IconButton,
             ListPager,
@@ -158,10 +175,11 @@
                 newConnector: true,
                 connectorCategories: [],
                 connectorTypes: [],
-                nameValidationError: '',
                 loadParameters: true,
                 originalConnectorConfiguration: null,
+                validationErrors: {},
                 connectorConfiguration: {
+                    id: Utils.uuidv4(),
                     name: '',
                     category: {},
                     type: {},
@@ -176,7 +194,9 @@
                 showUnsavedValuesExistDialog: false,
                 nextRoute: null,
                 showDocumentation: false,
-                documentation: null
+                documentation: null,
+                showTestDetails: false,
+                testError: null
             }
         },
         methods: {
@@ -232,14 +252,15 @@
                     })
                 }
             },
-            loadParametersOfType: function (typeKey) {
+            loadParametersOfType: async function (typeKey) {
                 if (this.hasDocumentation(typeKey)) {
-                    this.switchDocumentation(typeKey);
+                    await this.switchDocumentation(typeKey);
                 } else {
                     this.showDocumentation = false
                 }
                 IgorBackend.getData('/api/parameters/connector/' + typeKey).then((parameters) => {
-                    this.connectorConfiguration.parameters = parameters
+                    this.connectorConfiguration.parameters = parameters;
+                    this.validationErrors = {};
                 })
             },
             loadReferencingJobs: async function (page) {
@@ -249,45 +270,35 @@
                 }
             },
             testConfiguration: async function () {
-                if (!(await this.validateInput())) {
-                    return
-                }
-                await IgorBackend.postData('/api/connector/test', this.connectorConfiguration, 'Testing connector', 'Test OK.', 'Testing Failed!')
+                await IgorBackend.postData('/api/connector/test', this.connectorConfiguration, 'Testing connector', 'Test OK.', 'Testing Failed!').then((result) => {
+                    this.validationErrors = {};
+                    if (result.status === 400) {
+                        this.validationErrors = result.data;
+                    } else if (result.status === 424 && 'generalError' in result.data) {
+                        this.testError = result.data['generalError'];
+                        this.showTestDetails = true;
+                    }
+                })
             },
             saveConfiguration: async function () {
-                if (!(await this.validateInput())) {
-                    return
-                }
-                if (this.newConnector) {
-                    IgorBackend.postData('/api/connector', this.connectorConfiguration, 'Saving connector',
-                        'Connector \'' + FormatUtils.formatNameForSnackbar(this.connectorConfiguration.name) + '\' saved.',
-                        'Saving failed!').then((result) => {
-                        if (result === 'NAME_ALREADY_EXISTS_ERROR') {
-                            this.nameValidationError = 'nameAlreadyExists'
-                        } else {
-                            this.connectorConfiguration = result;
-                            this.newConnector = false;
-                            this.originalConnectorConfiguration = JSON.stringify(this.connectorConfiguration);
-                            this.$router.push({
-                                name: 'connector-editor',
-                                params: {connectorId: this.connectorConfiguration.id}
-                            });
-                            let jobData = this.$root.$data.store.getJobData();
-                            if (jobData.jobConfiguration != null) {
-                                jobData.connectorParameter = {
-                                    name: this.connectorConfiguration.name,
-                                    id: this.connectorConfiguration.id
-                                }
+                IgorBackend.postData('/api/connector', this.connectorConfiguration, 'Saving connector',
+                    'Connector \'' + FormatUtils.formatNameForSnackbar(this.connectorConfiguration.name) + '\' saved.',
+                    'Saving failed!').then((result) => {
+                    if (result.status === 400) {
+                        this.validationErrors = result.data;
+                    } else {
+                        this.newConnector = false
+                        this.connectorConfiguration = result.data;
+                        this.originalConnectorConfiguration = JSON.stringify(this.connectorConfiguration);
+                        let jobData = this.$root.$data.store.getJobData();
+                        if (jobData.jobConfiguration != null) {
+                            jobData.connectorParameter = {
+                                name: this.connectorConfiguration.name,
+                                id: this.connectorConfiguration.id
                             }
                         }
-                    })
-                } else {
-                    IgorBackend.putData('/api/connector', this.connectorConfiguration, 'Saving connector',
-                        'Connector \'' + FormatUtils.formatNameForSnackbar(this.connectorConfiguration.name) + '\' updated.',
-                        'Saving failed!').then(() => {
-                        this.originalConnectorConfiguration = JSON.stringify(this.connectorConfiguration)
-                    })
-                }
+                    }
+                })
             },
             cancelConfiguration: function () {
                 let jobData = this.$root.$data.store.getJobData();
@@ -296,27 +307,6 @@
                 } else {
                     this.$router.push({name: 'connector-overview'})
                 }
-            },
-            validateInput: async function () {
-                this.nameValidationError = '';
-
-                if (this.connectorConfiguration.name == null || this.connectorConfiguration.name === '') {
-                    this.nameValidationError = 'Name must be set'
-                } else {
-                    let nameAlreadyExists = await IgorBackend.getData('/api/connector/check/'
-                        + btoa(this.connectorConfiguration.name) + '/' + (this.connectorConfiguration.id === undefined ? -1 : this.connectorConfiguration.id));
-                    if (nameAlreadyExists === true) {
-                        store.setFeedback('A connector with this name already exists!', true)
-                        this.nameValidationError = 'nameAlreadyExists'
-                    }
-                }
-
-                let parameterValidationResult = true;
-                if (typeof this.$refs.parameterEditor !== 'undefined') {
-                    parameterValidationResult = this.$refs.parameterEditor.validateInput()
-                }
-
-                return ((this.nameValidationError.length === 0) && parameterValidationResult)
             },
             editJob: function (jobId) {
                 this.$router.push({name: 'job-editor', params: {jobId: jobId}})
@@ -421,6 +411,17 @@
     ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
         color: var(--color-font);
         opacity: 1; /* Firefox */
+    }
+
+    pre {
+        padding: 10px;
+        max-height: calc(100vh / 2);
+        height: auto;
+        overflow: auto;
+        word-break: normal !important;
+        word-wrap: normal !important;
+        white-space: pre !important;
+        background-color: var(--color-alert)
     }
 
 </style>

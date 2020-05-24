@@ -8,36 +8,36 @@
                 </h1>
                 <icon-button slot="right" icon="question" v-on:clicked="$emit('open-documentation', 'task')"/>
             </layout-row>
-            <table>
-                <tr>
-                    <td><label>Active</label></td>
-                    <td>
+            <div class="table">
+                <div class="tr">
+                    <div class="td"><label>Active</label></div>
+                    <div class="td align-left">
                         <font-awesome-icon :icon="task.active ? 'check-square' : 'square'"
                                            v-on:click="task.active = !task.active"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="name">Name*</label></td>
-                    <td>
-                        <input id="name" type="text" autocomplete="off" v-model="task.name"
-                               :class="nameValidationError.length > 0 ? 'validation-error' : ''"
-                               :placeholder="nameValidationError.length > 0 ? nameValidationError : ''"/>
-                    </td>
-                </tr>
-                <tr v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
-                    <td><label for="description">Description</label></td>
-                    <td>
+                    </div>
+                </div>
+                <div class="tr">
+                    <div class="td"><label for="name">Name*</label></div>
+                    <div class="td">
+                        <input-validated id="name" :type="'text'" v-model="task.name"
+                                         :parent-id="task.id" :property-id="'name'"
+                                         :validation-errors="validationErrors"/>
+                    </div>
+                </div>
+                <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
+                    <div class="td"><label for="description">Description</label></div>
+                    <div class="td">
                         <input id="description" type="text" autocomplete="off" v-model="task.description"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
+                    </div>
+                </div>
+                <div class="tr">
+                    <div class="td align-left">
                         <font-awesome-icon class="arrow"
                                            v-bind:icon="showAdvancedParameters ? 'chevron-up' : 'chevron-down'"
                                            v-on:click="showAdvancedParameters = !showAdvancedParameters"/>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+            </div>
         </core-panel>
 
         <core-panel>
@@ -46,10 +46,10 @@
                 <icon-button slot="right" icon="question" v-show="hasDocumentation(task.provider.type.key)"
                              v-on:clicked="$emit('open-documentation', task.provider.type.key)"/>
             </layout-row>
-            <table>
-                <tr v-if="providerCategories.length > 1">
-                    <td><label for="category-selection">Category</label></td>
-                    <td>
+            <div class="table">
+                <div class="tr" v-if="providerCategories.length > 1">
+                    <div class="td"><label for="category-selection">Category</label></div>
+                    <div class="td">
                         <select id="category-selection" v-model="task.provider.category"
                                 v-on:change="loadTypesOfCategory(task.provider.category.key, true).then(() => {
                                         loadParametersOfType(task.provider.type.key)})">
@@ -58,11 +58,11 @@
                                 {{providerCategory.value}}
                             </option>
                         </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="type-selection">Type</label></td>
-                    <td>
+                    </div>
+                </div>
+                <div class="tr">
+                    <div class="td"><label for="type-selection">Type</label></div>
+                    <div class="td">
                         <select id="type-selection" v-model="task.provider.type"
                                 v-on:change="loadParametersOfType(task.provider.type.key)">
                             <option v-for="providerType in providerTypes" v-bind:value="providerType"
@@ -70,15 +70,18 @@
                                 {{providerType.value}}
                             </option>
                         </select>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+            </div>
         </core-panel>
 
         <core-panel v-if="task.provider.parameters.length">
             <h2>Provider Configuration</h2>
-            <parameter-editor v-bind:parameters="task.provider.parameters" ref="parameterEditor"
-                              v-on:create-connector="createConnector"/>
+            <parameter-editor
+                    :parent-id="task.provider.id"
+                    :validation-errors="validationErrors"
+                    :parameters="task.provider.parameters"
+                    v-on:create-connector="createConnector"/>
         </core-panel>
 
     </div>
@@ -90,11 +93,12 @@
     import IgorBackend from '../../utils/igor-backend.js'
     import LayoutRow from "../common/layout-row";
     import IconButton from "../common/icon-button";
+    import InputValidated from "../common/input-validated";
 
     export default {
         name: 'task-configurator',
-        components: {IconButton, LayoutRow, CorePanel, ParameterEditor},
-        props: ['task'],
+        components: {InputValidated, IconButton, LayoutRow, CorePanel, ParameterEditor},
+        props: ['task', 'validationErrors'],
         data: function () {
             return {
                 nameValidationError: '',
@@ -139,22 +143,6 @@
                     this.task.provider.parameters = parameters
                 })
             },
-            validateInput: function () {
-                this.nameValidationError = '';
-
-                let nameValidationResult = true;
-                if (this.task.name == null || this.task.name === '') {
-                    this.nameValidationError = 'Name must be set';
-                    nameValidationResult = false
-                }
-
-                let parameterValidationResult = true;
-                if (typeof this.$refs.parameterEditor !== 'undefined') {
-                    parameterValidationResult = this.$refs.parameterEditor.validateInput()
-                }
-
-                return (nameValidationResult && parameterValidationResult)
-            },
             createConnector: function (parameterIndex, connectorCategoryCandidates) {
                 this.$emit('create-connector', this.task.id, parameterIndex, connectorCategoryCandidates)
             },
@@ -192,10 +180,6 @@
 
     .arrow:hover {
         cursor: pointer;
-    }
-
-    .panel .validation-error {
-        background-color: var(--color-alert);
     }
 
     ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */

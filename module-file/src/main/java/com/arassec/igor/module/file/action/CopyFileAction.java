@@ -104,13 +104,13 @@ public class CopyFileAction extends BaseFileAction {
     /**
      * Enables a ".igor" file suffix during file transfer. The suffix will be removed after the file has been copied completely.
      */
-    @IgorParam
+    @IgorParam(advanced = true)
     private boolean appendTransferSuffix = true;
 
     /**
      * If set to {@code true}, igor appends a filetype suffix if avaliable (e.g. '.html' or '.jpeg').
      */
-    @IgorParam
+    @IgorParam(advanced = true)
     private boolean appendFiletypeSuffix = false;
 
     /**

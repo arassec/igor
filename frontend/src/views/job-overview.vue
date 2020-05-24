@@ -213,6 +213,7 @@
     import OverviewTile from "../components/common/overview-tile";
     import IgorBackend from "../utils/igor-backend";
     import FormatUtils from "../utils/utils";
+    import Utils from "../utils/utils";
     import DeleteJobDialog from "../components/jobs/delete-job-dialog";
     import LayoutRow from "../components/common/layout-row";
     import ModalDialog from "../components/common/modal-dialog";
@@ -421,13 +422,13 @@
             duplicateJob: async function (id) {
                 let jobConfiguration = await IgorBackend.getData('/api/job/' + id);
                 jobConfiguration.name = 'Copy of ' + jobConfiguration.name;
-                delete jobConfiguration.id;
-                delete jobConfiguration.trigger.id;
+                jobConfiguration.id = Utils.uuidv4();
+                jobConfiguration.trigger.id = Utils.uuidv4();
                 for (let i in jobConfiguration.tasks) {
-                    delete jobConfiguration.tasks[i].id;
-                    delete jobConfiguration.tasks[i].provider.id;
+                    jobConfiguration.tasks[i].id = Utils.uuidv4();
+                    jobConfiguration.tasks[i].provider.id = Utils.uuidv4();
                     for (let j in jobConfiguration.tasks[i].actions) {
-                        delete jobConfiguration.tasks[i].actions[j].id
+                        jobConfiguration.tasks[i].actions[j].id = Utils.uuidv4();
                     }
                 }
                 this.$root.$data.store.setJobData(jobConfiguration, '-1_-1', -1, '');

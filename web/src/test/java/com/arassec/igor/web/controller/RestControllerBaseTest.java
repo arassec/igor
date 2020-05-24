@@ -4,6 +4,7 @@ import com.arassec.igor.core.application.ConnectorManager;
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.repository.ConnectorRepository;
+import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.util.IgorConfigHelper;
 import com.arassec.igor.web.WebConfiguration;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -70,6 +71,12 @@ public abstract class RestControllerBaseTest {
     @MockBean
     @Qualifier("simulationObjectMapper")
     protected ObjectMapper simulationObjectMapper;
+
+    /**
+     * Repository for jobs.
+     */
+    @MockBean
+    protected JobRepository jobRepository;
 
     /**
      * Mock of the igor component registry.

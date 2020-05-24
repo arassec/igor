@@ -30,10 +30,14 @@
                 return false;
             },
             style: function () {
+                if (this.job.id in this.validationErrors) {
+                    return "alert";
+                }
+                if (this.job.trigger.id in this.validationErrors) {
+                    return "alert";
+                }
                 if (this.selected) {
                     return "info";
-                } else if (this.validationErrors.includes(this.job.id)) {
-                    return "alert";
                 }
                 return "unselected";
             }

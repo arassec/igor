@@ -101,4 +101,18 @@ class ProviderProxyTest {
         assertNotNull(providerProxy.getErrorCause());
     }
 
+    /**
+     * Tests delegation of the simulation limit.
+     */
+    @Test
+    @DisplayName("Tests delegation of the simulation limit.")
+    void testSimulationLimit() {
+        Provider providerMock = mock(Provider.class);
+        ProviderProxy providerProxy = new ProviderProxy(providerMock);
+        providerProxy.setSimulationLimit(666);
+        providerProxy.getSimulationLimit();
+        verify(providerMock, times(1)).setSimulationLimit(eq(666));
+        verify(providerMock, times(1)).getSimulationLimit();
+    }
+
 }

@@ -100,7 +100,17 @@ public enum WebMapperKey {
     /**
      * Indicates whether documentation is available or not.
      */
-    DOCUMENTATION_AVAILABLE("documentationAvailable");
+    DOCUMENTATION_AVAILABLE("documentationAvailable"),
+
+    /**
+     * Contains general validation errors.
+     */
+    GENERAL_VALIDATION_ERRORS("generalValidationErrors"),
+
+    /**
+     * Contains general errors.
+     */
+    GENERAL_ERROR("generalError");
 
     /**
      * Contains the key as String.

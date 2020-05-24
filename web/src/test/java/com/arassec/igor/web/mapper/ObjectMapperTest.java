@@ -117,7 +117,7 @@ public class ObjectMapperTest extends MapperBaseTest {
         assertEquals(TestProvider.CATEGORY_ID, testProvider.getCategoryId());
         assertEquals(TestProvider.TYPE_ID, testProvider.getTypeId());
         assertEquals(456, testProvider.getSimulationLimit());
-        assertEquals("test-provider-param", testProvider.getTestProviderParam());
+        assertEquals("provider-test-param", testProvider.getTestProviderParam());
 
         assertEquals(1, task.getActions().size());
         TestAction testAction = (TestAction) task.getActions().get(0);

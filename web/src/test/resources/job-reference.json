@@ -13,7 +13,18 @@
       "value": "Trigger Type",
       "documentationAvailable": false
     },
-    "parameters": []
+    "parameters": [
+      {
+        "name": "testParam",
+        "secured": false,
+        "advanced": false,
+        "subtype": "NONE",
+        "required": true,
+        "type": "java.lang.Integer",
+        "value": 666,
+        "connector": false
+      }
+    ]
   },
   "active": true,
   "historyLimit": 666,
@@ -36,16 +47,6 @@
         },
         "parameters": [
           {
-            "name": "testProviderParam",
-            "secured": false,
-            "advanced": false,
-            "subtype": "MULTI_LINE",
-            "required": false,
-            "type": "java.lang.String",
-            "value": "test-provider-param",
-            "connector": false
-          },
-          {
             "name": "emptyStringParam",
             "secured": false,
             "advanced": false,
@@ -61,6 +62,16 @@
             "advanced": false,
             "subtype": "NONE",
             "required": false,
+            "type": "java.lang.Integer",
+            "value": null,
+            "connector": false
+          },
+          {
+            "name": "validatedInteger",
+            "secured": false,
+            "advanced": false,
+            "subtype": "NONE",
+            "required": true,
             "type": "java.lang.Integer",
             "value": null,
             "connector": false

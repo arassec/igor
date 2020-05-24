@@ -12,6 +12,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class SendMessageAction extends BaseMessageAction {
     /**
      * The message template to use.
      */
-    @NotNull
+    @NotEmpty
     @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
     private String messageTemplate;
 

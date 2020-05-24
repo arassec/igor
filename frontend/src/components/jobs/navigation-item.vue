@@ -1,5 +1,5 @@
 <template>
-    <div class="row" v-on:click="$emit('clicked')" :class="style">
+    <div class="row" v-on:click="$emit('clicked')">
         <div class="left">
             <slot name="left"/>
         </div>
@@ -16,17 +16,7 @@
 <script>
     export default {
         name: 'navigation-item',
-        props: ['selected', 'hasValidationErrors'],
-        computed: {
-            style: function () {
-                if (this.selected) {
-                    return "info";
-                } else if (this.hasValidationErrors) {
-                    return "alert";
-                }
-                return "unselected";
-            }
-        }
+        props: ['selected', 'hasValidationErrors']
     }
 </script>
 

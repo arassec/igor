@@ -112,61 +112,43 @@ public class JobRestController extends BaseRestController {
     }
 
     /**
-     * Creates a new job.
+     * Saves a job.
      *
      * @param job The job configuration.
      *
-     * @return 'OK' on success.
+     * @return The saved job.
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Job createJob(@Valid @RequestBody Job job) {
-        if (jobManager.loadByName(job.getName()) == null) {
-            job.setId(null);
-            return jobManager.save(job);
-        } else {
-            throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
-        }
-    }
-
-    /**
-     * Updates an existing job.
-     *
-     * @param job The job configuration.
-     *
-     * @return 'OK' on success.
-     */
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Job updateJob(@Valid @RequestBody Job job) {
-        Job existingJobWithSameName = jobManager.loadByName(job.getName());
-        if (existingJobWithSameName == null || existingJobWithSameName.getId().equals(job.getId())) {
-            return jobManager.save(job);
-        } else {
-            throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
-        }
+    public Job saveJob(@Valid @RequestBody Job job) {
+        return jobManager.save(job);
     }
 
     /**
      * Runs a simulation of the supplied job.
      *
-     * @param jobJson The job in JSON form as String.
+     * @param job The job configuration.
      *
      * @return Test results of the simulated job execution.
      */
     @PostMapping("simulate")
-    public Map<String, SimulationResult> simulateJob(@Valid @RequestBody String jobJson) {
+    public Map<String, SimulationResult> simulateJob(@Valid @RequestBody Job job) {
 
         Map<String, SimulationResult> result = new HashMap<>();
 
-        Job job;
+        Job simulationJob;
         try {
-            job = simulationObjectMapper.readValue(jobJson, Job.class);
+            // The method parameter has been deserialized with the regular object mapper. Thus validation is supported. But to
+            // simulate the job, proxies are required, which are added by the 'simulation object mapper'. Thus we have to first
+            // convert the original job to a JSON string and afterwards back to a Job object, but this time with simpulation
+            // proxies inside...
+            simulationJob = simulationObjectMapper.readValue(simulationObjectMapper.writeValueAsString(job), Job.class);
         } catch (IOException e) {
             throw new IllegalArgumentException("Could not simulate job run!", e);
         }
 
         JobExecution jobExecution = new JobExecution();
 
-        job.run(jobExecution);
+        simulationJob.run(jobExecution);
 
         SimulationResult jobResult = new SimulationResult();
         if (jobExecution.getErrorCause() != null) {
@@ -174,7 +156,7 @@ public class JobRestController extends BaseRestController {
             result.put("job-result", jobResult);
         }
 
-        job.getTasks().forEach(task -> {
+        simulationJob.getTasks().forEach(task -> {
             ProviderProxy providerProxy = (ProviderProxy) task.getProvider();
 
             SimulationResult taskResult = new SimulationResult();
@@ -183,7 +165,7 @@ public class JobRestController extends BaseRestController {
                     .forEach(jsonObject -> {
                         Map<String, Object> item = new HashMap<>();
                         item.put(DataKey.DATA.getKey(), jsonObject);
-                        item.put(DataKey.META.getKey(), Task.createMetaData(job.getId(), task.getId()));
+                        item.put(DataKey.META.getKey(), Task.createMetaData(simulationJob.getId(), task.getId()));
                         taskResult.getResults().add(item);
                     });
             if (task.getId() != null) {

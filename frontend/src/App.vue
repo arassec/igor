@@ -152,6 +152,7 @@
     div.table {
         display: table;
         border-collapse: collapse;
+        width: 100%;
     }
 
     div.tr {
@@ -161,6 +162,56 @@
     div.td {
         display: table-cell;
         padding: 0 0 .25em .25em;
+    }
+
+    div.td:first-child {
+        width: 10em;
+    }
+
+    div.td:last-child:not(.align-left) {
+        text-align: right;
+    }
+
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        background-color: var(--color-foreground);
+        color: var(--color-font);
+        text-align: center;
+        padding: .1em .5em .1em .5em;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left:50%;
+        transform: translateX(-50%);
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+    }
+
+    .tooltip .tooltiptext::after {
+        content: " ";
+        position: absolute;
+        top: 100%; /* At the bottom of the tooltip */
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: var(--color-foreground) transparent transparent transparent;
+    }
+
+    .full-width {
+        width: 100%;
+    }
+
+    .align-left {
+        text-align: left;
     }
 
 </style>

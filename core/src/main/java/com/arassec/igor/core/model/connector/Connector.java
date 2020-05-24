@@ -2,10 +2,12 @@ package com.arassec.igor.core.model.connector;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
+import com.arassec.igor.core.util.validation.UniqueConnectorName;
 
 /**
  * Defines a connector to an outside service. Connectors are the interface used by igor to communicate with other services.
  */
+@UniqueConnectorName
 public interface Connector extends IgorComponent {
 
     /**

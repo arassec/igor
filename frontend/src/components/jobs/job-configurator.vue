@@ -1,5 +1,6 @@
 <template>
     <div class="sticky max-width" v-if="jobConfiguration">
+
         <core-panel>
             <layout-row>
                 <h1 slot="left" class="truncate">
@@ -8,64 +9,63 @@
                 </h1>
                 <icon-button slot="right" icon="question" v-on:clicked="$emit('open-documentation', 'job')"/>
             </layout-row>
-            <table>
-                <tr>
-                    <td><label>Active</label></td>
-                    <td>
+            <div class="table">
+                <div class="tr">
+                    <div class="td"><label>Active</label></div>
+                    <div class="td align-left">
                         <font-awesome-icon :icon="jobConfiguration.active ? 'check-square' : 'square'"
                                            v-on:click="jobConfiguration.active = !jobConfiguration.active"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="name">Name*</label></td>
-                    <td>
-                        <input id="name" type="text" autocomplete="off" v-model="jobConfiguration.name"
-                               :class="nameValidationError.length > 0 ? 'validation-error' : ''"
-                               :placeholder="nameValidationError.length > 0 ? nameValidationError : ''"/>
-                    </td>
-                </tr>
-                <tr v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
-                    <td><label for="description-input">Description</label></td>
-                    <td>
+                    </div>
+                </div>
+                <div class="tr">
+                    <div class="td"><label for="name">Name*</label></div>
+                    <div class="td">
+                        <input-validated id="name" :type="'text'" v-model="jobConfiguration.name"
+                            :parent-id="jobConfiguration.id" :property-id="'name'" :validation-errors="validationErrors"/>
+                    </div>
+                </div>
+                <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
+                    <div class="td"><label for="description-input">Description</label></div>
+                    <div class="td">
                         <input id="description-input" type="text" autocomplete="off"
                                v-model="jobConfiguration.description"/>
-                    </td>
-                </tr>
-                <tr v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
-                    <td><label for="numexechistory-input">History Limit</label></td>
-                    <td>
+                    </div>
+                </div>
+                <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
+                    <div class="td"><label for="numexechistory-input">History Limit</label></div>
+                    <div class="td">
                         <input id="numexechistory-input" type="text" autocomplete="off"
                                v-model.number="jobConfiguration.historyLimit"/>
-                    </td>
-                </tr>
-                <tr v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
-                    <td><label for="faulttolerant-input">Fault tolerant</label></td>
-                    <td>
+                    </div>
+                </div>
+                <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
+                    <div class="td"><label for="faulttolerant-input">Fault tolerant</label></div>
+                    <div class="td align-left">
                         <font-awesome-icon id="faulttolerant-input"
                                            :icon="jobConfiguration.faultTolerant ? 'check-square' : 'square'"
                                            v-on:click="jobConfiguration.faultTolerant = !jobConfiguration.faultTolerant"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
+                    </div>
+                </div>
+                <div class="tr">
+                    <div class="td align-left">
                         <font-awesome-icon class="arrow"
                                            v-bind:icon="showAdvancedParameters ? 'chevron-up' : 'chevron-down'"
                                            v-on:click="showAdvancedParameters = !showAdvancedParameters"/>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+            </div>
         </core-panel>
 
         <core-panel>
             <layout-row>
                 <h2 slot="left">Trigger</h2>
-                <icon-button slot="right" icon="question" v-show="hasDocumentation(jobConfiguration.trigger.type.key)"
+                <icon-button slot="right" icon="question" v-show="hasDocumentation(jobConfiguration.trigger.type)"
                              v-on:clicked="$emit('open-documentation', jobConfiguration.trigger.type.key)"/>
             </layout-row>
-            <table>
-                <tr>
-                    <td><label for="category">Category</label></td>
-                    <td>
+            <div class="table">
+                <div class="tr">
+                    <div class="td"><label for="category">Category</label></div>
+                    <div class="td">
                         <select id="category" v-model="jobConfiguration.trigger.category"
                                 v-on:change="loadTypesOfCategory(jobConfiguration.trigger.category.key)">
                             <option v-for="triggerCategory in triggerCategories" v-bind:value="triggerCategory"
@@ -73,11 +73,11 @@
                                 {{triggerCategory.value}}
                             </option>
                         </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="type">Type</label></td>
-                    <td>
+                    </div>
+                </div>
+                <div class="tr">
+                    <div class="td"><label for="type">Type</label></div>
+                    <div class="td">
                         <select id="type" v-model="jobConfiguration.trigger.type"
                                 v-on:change="loadParametersOfType(jobConfiguration.trigger.type.key)">
                             <option v-for="triggerType in triggerTypes" v-bind:value="triggerType"
@@ -85,15 +85,18 @@
                                 {{triggerType.value}}
                             </option>
                         </select>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+            </div>
         </core-panel>
 
         <core-panel v-if="jobConfiguration.trigger.parameters.length">
             <h2>Trigger Configuration</h2>
-            <parameter-editor v-bind:parameters="jobConfiguration.trigger.parameters" ref="parameterEditor"
-                              v-on:create-connector="createConnector"/>
+            <parameter-editor
+                    :parent-id="jobConfiguration.trigger.id"
+                    :validation-errors="validationErrors"
+                    :parameters="jobConfiguration.trigger.parameters"
+                    v-on:create-connector="createConnector"/>
         </core-panel>
 
     </div>
@@ -105,14 +108,14 @@
     import IgorBackend from '../../utils/igor-backend.js'
     import IconButton from "../common/icon-button";
     import LayoutRow from "../common/layout-row";
+    import InputValidated from "../common/input-validated";
 
     export default {
         name: 'job-configurator',
-        components: {LayoutRow, IconButton, ParameterEditor, CorePanel},
-        props: ['jobConfiguration'],
+        components: {InputValidated, LayoutRow, IconButton, ParameterEditor, CorePanel},
+        props: ['jobConfiguration', 'validationErrors'],
         data: function () {
             return {
-                nameValidationError: '',
                 showAdvancedParameters: false,
                 triggerCategories: [],
                 triggerTypes: []
@@ -157,35 +160,15 @@
                     this.jobConfiguration.trigger.parameters = parameters
                 })
             },
-            validateInput: async function () {
-                this.nameValidationError = '';
-
-                if (this.jobConfiguration.name == null || this.jobConfiguration.name === '') {
-                    this.nameValidationError = 'Name must be set'
-                } else {
-                    let nameAlreadyExists = await IgorBackend.getData('/api/job/check/'
-                        + btoa(this.jobConfiguration.name) + '/' + (this.jobConfiguration.id === undefined ? -1 : this.jobConfiguration.id));
-                    if (nameAlreadyExists === true) {
-                        this.nameValidationError = 'nameAlreadyExists'
-                    }
-                }
-
-                let parameterValidationResult = true;
-                if (typeof this.$refs.parameterEditor !== 'undefined') {
-                    parameterValidationResult = this.$refs.parameterEditor.validateInput()
-                }
-
-                return ((this.nameValidationError.length === 0) && parameterValidationResult)
-            },
-            setNameValidationError: function (errorMessage) {
-                this.nameValidationError = errorMessage
-            },
             createConnector: function (parameterIndex, connectorCategoryCandidates) {
                 this.$emit('create-connector', this.taskKey, parameterIndex, connectorCategoryCandidates)
             },
-            hasDocumentation: function (typeId) {
+            hasDocumentation: function (type) {
+                if (type == null) {
+                    return false;
+                }
                 for (let i = 0; i < this.triggerTypes.length; i++) {
-                    if (this.triggerTypes[i].key === typeId) {
+                    if (this.triggerTypes[i].key === type.key) {
                         return this.triggerTypes[i].documentationAvailable;
                     }
                 }
@@ -211,15 +194,6 @@
 
     .arrow:hover {
         cursor: pointer;
-    }
-
-    .panel .validation-error {
-        background-color: var(--color-alert);
-    }
-
-    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-        color: var(--color-font);
-        opacity: 1; /* Firefox */
     }
 
 </style>

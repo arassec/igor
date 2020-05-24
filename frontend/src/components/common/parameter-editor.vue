@@ -6,31 +6,38 @@
                 <div class="tr" v-bind:key="param.name"
                      v-bind:style="(!showAdvancedParameters && param.advanced) ? 'visibility: collapse' : ''">
                     <div class="text-top td">
-                        <label :for="'paramlabel_' + param.name + '_' + index">{{formatParameterName(param)}}</label>
+                        <label>{{formatParameterName(param)}}</label>
                     </div>
-                    <div class="td">
-                        <input :id="'paramlabel_' + param.name + '_' + index"
-                               v-if="isNumber(param.type)" type="text" autocomplete="off"
-                               v-model.number="param.value"
-                               :class="checkValidationError(index) ? 'validation-error' : ''"
-                               :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
+                    <div class="td" :class="isBoolean(param.type) ? 'align-left' : ''">
+
+                        <input-validated v-if="isNumber(param.type)"
+                                         v-model.number="param.value" :type="'text'"
+                                         :parent-id="parentId"
+                                         :property-id="param.name"
+                                         :validation-errors="validationErrors"/>
+
                         <font-awesome-icon v-else-if="isBoolean(param.type)"
                                            :icon="param.value ? 'check-square' : 'square'"
                                            v-on:click="param.value = !param.value"/>
-                        <input :id="'paramlabel_' + param.name + '_' + index"
-                               v-else-if="isConnector(param)" :disabled="true" class="truncate"
-                               v-model="param.connectorName"
-                               :class="checkValidationError(index) ? 'validation-error' : ''"
-                               :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
-                        <textarea :id="'paramlabel_' + param.name + '_' + index"
-                                  v-else-if="param.subtype === 'MULTI_LINE'" v-model="param.value" rows="8" cols="41"
-                                  :class="checkValidationError(index) ? 'validation-error' : ''"
-                                  :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
-                        <input :id="'paramlabel_' + param.name + '_' + index"
-                               v-else autocomplete="off"
-                               :type="parameterInputTypes[index]" v-model.trim="param.value"
-                               :class="checkValidationError(index) ? 'validation-error' : ''"
-                               :placeholder="checkValidationError(index) ? parameterValidationErrors[index] : ''"/>
+
+                        <input-validated v-else-if="isConnector(param)" :disabled="true"
+                                         v-model="param.connectorName"
+                                         :parent-id="parentId"
+                                         :property-id="param.name"
+                                         :validation-errors="validationErrors"
+                                         :has-button="true"/>
+
+                        <textarea-validated v-else-if="param.subtype === 'MULTI_LINE'" v-model="param.value"
+                                            :parent-id="parentId"
+                                            :property-id="param.name"
+                                            :validation-errors="validationErrors"/>
+
+                        <input-validated v-else
+                                         :type="parameterInputTypes[index]" v-model.trim="param.value"
+                                         :parent-id="parentId"
+                                         :property-id="param.name"
+                                         :validation-errors="validationErrors"
+                                         :has-button="(!isNumber(param.type) && !isBoolean(param.type) && param.secured)|| (param.subtype === 'CRON')"/>
 
                         <input-button v-if="!isNumber(param.type) && !isBoolean(param.type) && param.secured"
                                       icon="eye" v-on:clicked="toggleCleartext(index)" class="margin-left"/>
@@ -73,11 +80,13 @@
     import ConnectorPicker from '../connectors/connector-picker'
     import CronPicker from "./cron-picker";
     import IgorBackend from '../../utils/igor-backend.js'
+    import InputValidated from "./input-validated";
+    import TextareaValidated from "./textarea-validated";
 
     export default {
         name: 'parameter-editor',
-        components: {ConnectorPicker, CronPicker, InputButton},
-        props: ['parameters'],
+        components: {TextareaValidated, InputValidated, ConnectorPicker, CronPicker, InputButton},
+        props: ['parentId', 'validationErrors', 'parameters'],
         data: function () {
             return {
                 validationOk: true,
@@ -95,11 +104,6 @@
                     totalPages: 0,
                     items: []
                 }
-            }
-        },
-        events: {
-            'validate-input': function () {
-                this.validateInput()
             }
         },
         methods: {
@@ -125,42 +129,6 @@
                     star = "*";
                 }
                 return string.charAt(0).toUpperCase() + string.slice(1) + star
-            },
-            validateInput: function () {
-                for (let i = this.parameterValidationErrors.length; i > 0; i--) {
-                    this.parameterValidationErrors[i] = ''
-                }
-                let component = this
-
-                this.parameters.forEach(function (param, index) {
-                    component.parameterValidationErrors[index] = ''
-                })
-
-                this.parameters.forEach(function (param, index) {
-                    if (!param.advanced && (param.value == null || param.value === '')) {
-                        component.parameterValidationErrors[index] = 'Value required'
-                        component.validationOk = false
-                    }
-                    if (component.isNumber(param.type) && !Number.isInteger(param.value)) {
-                        component.parameterValidationErrors[index] = 'Number required'
-                        component.validationOk = false
-                    }
-                })
-
-                this.$forceUpdate()
-
-                if (!component.validationOk) {
-                    component.validationOk = true
-                    return false
-                }
-
-                return true
-            },
-            checkValidationError: function (index) {
-                if (typeof this.parameterValidationErrors[index] === 'undefined') {
-                    this.parameterValidationErrors[index] = ''
-                }
-                return this.parameterValidationErrors[index].length > 0
             },
             toggleCleartext: function (index) {
                 if (this.parameterInputTypes[index] === 'password') {
@@ -244,13 +212,6 @@
 
     .panel .validation-error {
         background-color: var(--color-alert);
-    }
-
-    textarea {
-        color: var(--color-font);
-        background-color: var(--color-foreground);
-        border: none;
-        max-width: 280px;
     }
 
     ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */

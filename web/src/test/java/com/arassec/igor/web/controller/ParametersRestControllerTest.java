@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -134,25 +135,25 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
 
         assertEquals(4, parameters.size());
 
-        assertEquals("testProviderParam", parameters.get(0).get(WebMapperKey.NAME.getKey()));
+        assertEquals("emptyStringParam", parameters.get(0).get(WebMapperKey.NAME.getKey()));
         assertEquals("java.lang.String", parameters.get(0).get(WebMapperKey.TYPE.getKey()));
-        assertEquals("provider-test-param", parameters.get(0).get(WebMapperKey.VALUE.getKey()));
+        assertNull(parameters.get(0).get(WebMapperKey.VALUE.getKey()));
         assertEquals(false, parameters.get(0).get(WebMapperKey.SECURED.getKey()));
         assertEquals(false, parameters.get(0).get(WebMapperKey.ADVANCED.getKey()));
         assertEquals(false, parameters.get(0).get(WebMapperKey.CONNECTOR.getKey()));
-        assertEquals(false, parameters.get(1).get(WebMapperKey.REQUIRED.getKey()));
-        assertEquals(ParameterSubtype.MULTI_LINE.name(), parameters.get(0).get(WebMapperKey.SUBTYPE.getKey()));
+        assertEquals(false, parameters.get(0).get(WebMapperKey.REQUIRED.getKey()));
+        assertEquals(ParameterSubtype.CRON.name(), parameters.get(0).get(WebMapperKey.SUBTYPE.getKey()));
 
-        assertEquals("emptyStringParam", parameters.get(1).get(WebMapperKey.NAME.getKey()));
-        assertEquals("java.lang.String", parameters.get(1).get(WebMapperKey.TYPE.getKey()));
-        assertNull(parameters.get(1).get(WebMapperKey.VALUE.getKey()));
-        assertEquals(false, parameters.get(1).get(WebMapperKey.SECURED.getKey()));
-        assertEquals(false, parameters.get(1).get(WebMapperKey.ADVANCED.getKey()));
-        assertEquals(false, parameters.get(1).get(WebMapperKey.CONNECTOR.getKey()));
-        assertEquals(false, parameters.get(1).get(WebMapperKey.REQUIRED.getKey()));
-        assertEquals(ParameterSubtype.CRON.name(), parameters.get(1).get(WebMapperKey.SUBTYPE.getKey()));
+        verifyParameter(parameters.get(1), "nullInteger", "java.lang.Integer", null);
 
-        verifyParameter(parameters.get(2), "nullInteger", "java.lang.Integer", null);
+        assertEquals("validatedInteger", parameters.get(2).get(WebMapperKey.NAME.getKey()));
+        assertEquals("java.lang.Integer", parameters.get(2).get(WebMapperKey.TYPE.getKey()));
+        assertNull(parameters.get(2).get(WebMapperKey.VALUE.getKey()));
+        assertEquals(false, parameters.get(2).get(WebMapperKey.SECURED.getKey()));
+        assertEquals(false, parameters.get(2).get(WebMapperKey.ADVANCED.getKey()));
+        assertEquals(false, parameters.get(2).get(WebMapperKey.CONNECTOR.getKey()));
+        assertEquals(true, parameters.get(2).get(WebMapperKey.REQUIRED.getKey()));
+        assertEquals(ParameterSubtype.NONE.name(), parameters.get(2).get(WebMapperKey.SUBTYPE.getKey()));
 
         assertEquals("simulationLimit", parameters.get(3).get(WebMapperKey.NAME.getKey()));
         assertEquals("int", parameters.get(3).get(WebMapperKey.TYPE.getKey()));
@@ -173,12 +174,10 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
     void testGetTriggerParameters() {
         when(igorComponentRegistry.createTriggerInstance(eq("type-id"), isNull())).thenReturn(new TestTrigger());
 
-        MvcResult mvcResult = mockMvc.perform(get("/api/parameters/trigger/type-id")).andExpect(status().isOk()).andReturn();
-
-        List<Map<String, Object>> parameters = convert(mvcResult, new TypeReference<>() {
-        });
-
-        assertEquals(0, parameters.size());
+        mockMvc.perform(get("/api/parameters/trigger/type-id"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("testParam"))
+                .andExpect(jsonPath("$[0].value").value("666"));
     }
 
     /**

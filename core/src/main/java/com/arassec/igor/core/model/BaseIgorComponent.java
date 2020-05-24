@@ -2,6 +2,7 @@ package com.arassec.igor.core.model;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,6 +14,7 @@ public abstract class BaseIgorComponent implements IgorComponent {
     /**
      * The component instance's ID.
      */
+    @NotEmpty
     protected String id;
 
     /**

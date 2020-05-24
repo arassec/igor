@@ -6,6 +6,8 @@ import com.arassec.igor.core.model.provider.BaseProvider;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
@@ -28,7 +30,7 @@ public class TestProvider extends BaseProvider {
      */
     @Getter
     @Setter
-    @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
+    @NotEmpty
     private String testProviderParam = "provider-test-param";
 
     /**
@@ -46,6 +48,12 @@ public class TestProvider extends BaseProvider {
     @Setter
     @IgorParam
     private Integer nullInteger;
+
+    @Getter
+    @Setter
+    @IgorParam
+    @NotNull
+    private Integer validatedInteger;
 
     /**
      * Creates a new component instance.

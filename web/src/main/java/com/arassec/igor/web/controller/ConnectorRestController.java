@@ -6,6 +6,8 @@ import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
+import com.arassec.igor.core.util.StacktraceFormatter;
+import com.arassec.igor.web.mapper.WebMapperKey;
 import com.arassec.igor.web.model.ConnectorListEntry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -119,35 +121,15 @@ public class ConnectorRestController {
     }
 
     /**
-     * Creates a new connector.
+     * Saves a connector.
      *
      * @param connector The new connector configuration.
      *
-     * @return The connector JSON on success.
+     * @return The saved connector.
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Connector createConnector(@Valid @RequestBody Connector connector) {
-        if (connectorManager.loadByName(connector.getName()) == null) {
-            return connectorManager.save(connector);
-        } else {
-            throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
-        }
-    }
-
-    /**
-     * Updates an existing connector.
-     *
-     * @param connector The new connector configuration.
-     */
-    @PutMapping()
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateConnector(@Valid @RequestBody Connector connector) {
-        Connector existingConnectorWithSameName = connectorManager.loadByName(connector.getName());
-        if (existingConnectorWithSameName == null || existingConnectorWithSameName.getId().equals(connector.getId())) {
-            connectorManager.save(connector);
-        } else {
-            throw new IllegalArgumentException(RestControllerExceptionHandler.NAME_ALREADY_EXISTS_ERROR);
-        }
+    public Connector saveConnector(@Valid @RequestBody Connector connector) {
+        return connectorManager.save(connector);
     }
 
     /**
@@ -158,16 +140,15 @@ public class ConnectorRestController {
      * @return The string 'OK' on success, an error message if the test was not successful.
      */
     @PostMapping("test")
-    public ResponseEntity<String> testConnector(@Valid @RequestBody Connector connector) {
+    public ResponseEntity<Map<String, Object>> testConnector(@Valid @RequestBody Connector connector) {
+        Map<String, Object> result = new HashMap<>();
         try {
             connector.testConfiguration();
-            return new ResponseEntity<>("OK", HttpStatus.OK);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
-            String result = e.getMessage();
-            if (e.getCause() != null) {
-                result += " (" + e.getCause().getMessage() + ")";
-            }
-            return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+            result.put(WebMapperKey.GENERAL_ERROR.getKey(), StacktraceFormatter.format(e));
+            // HTTP-424 indicates a failed connector test.
+            return new ResponseEntity<>(result, HttpStatus.FAILED_DEPENDENCY);
         }
     }
 

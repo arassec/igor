@@ -22,8 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Tests the {@link ConnectorRestController}.
@@ -168,24 +167,25 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
 
         when(connectorManager.save(any(Connector.class))).thenReturn(testConnector);
 
-        MvcResult mvcResult = mockMvc.perform(post("/api/connector")
+        mockMvc.perform(post("/api/connector")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(testConnector)))
-                .andExpect(status().isOk()).andReturn();
-
-        TestConnector result = convert(mvcResult, TestConnector.class);
-
-        assertEquals("connector-id", result.getId());
-        assertEquals("connector-name", result.getName());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("connector-id"))
+                .andExpect(jsonPath("$.name").value("connector-name"));
 
         verify(connectorManager, times(1)).save(eq(testConnector));
 
         // Connector with same name already exists:
-        when(connectorManager.loadByName(anyString())).thenReturn(new TestConnector());
+        TestConnector existingConnector = new TestConnector();
+        existingConnector.setId("another-id");
+        when(connectorRepository.findByName(anyString())).thenReturn(existingConnector);
+
         mockMvc.perform(post("/api/connector")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(testConnector)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.connector-id.name").value("com.arassec.igor.validation.unique-connector-name"));
     }
 
     /**
@@ -195,34 +195,28 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests updating a connector.")
     @SneakyThrows(Exception.class)
     void testUpdateConnector() {
-        when(igorComponentRegistry.createConnectorInstance(anyString(), anyMap())).thenReturn(new TestConnector());
-
         TestConnector testConnector = new TestConnector();
         testConnector.setId("connector-id");
         testConnector.setName("update-test");
 
-        mockMvc.perform(put("/api/connector")
+        when(igorComponentRegistry.createConnectorInstance(anyString(), anyMap())).thenReturn(new TestConnector());
+        when(connectorManager.save(any(Connector.class))).thenReturn(testConnector);
+
+        mockMvc.perform(post("/api/connector")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(testConnector)))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("connector-id"))
+                .andExpect(jsonPath("$.name").value("update-test"));
 
         verify(connectorManager, times(1)).save(eq(testConnector));
-
-        // Existing name, same connector:
-        when(connectorManager.loadByName(eq("update-test"))).thenReturn(testConnector);
-        mockMvc.perform(put("/api/connector")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(testConnector)))
-                .andExpect(status().isNoContent());
-
-        verify(connectorManager, times(2)).save(eq(testConnector));
 
         // Existing name, different connector:
         TestConnector existingconnector = new TestConnector();
         existingconnector.setId("existing-connector-id");
-        when(connectorManager.loadByName(eq("update-test"))).thenReturn(existingconnector);
+        when(connectorRepository.findByName(eq("update-test"))).thenReturn(existingconnector);
 
-        mockMvc.perform(put("/api/connector")
+        mockMvc.perform(post("/api/connector")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(testConnector)))
                 .andExpect(status().isBadRequest());
@@ -241,15 +235,15 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(new TestConnector())))
                 .andExpect(status().isOk())
-                .andExpect(content().string("OK"));
+                .andExpect(content().string("{}"));
 
         when(igorComponentRegistry.createConnectorInstance(anyString(), anyMap())).thenReturn(new ExceptionProvocingTestConnector());
 
         mockMvc.perform(post("/api/connector/test")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(new TestConnector())))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("test-exception (exception-cause)"));
+                .andExpect(status().isFailedDependency())
+                .andExpect(jsonPath("$.generalError").exists());
     }
 
     /**

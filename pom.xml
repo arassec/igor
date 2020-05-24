@@ -127,14 +127,6 @@
                 <version>1.10.10</version>
             </dependency>
 
-            <!-- for testing bean validation annotations -->
-            <dependency>
-                <groupId>org.hibernate.validator</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>6.1.5.Final</version>
-                <scope>test</scope>
-            </dependency>
-
             <dependency>
                 <groupId>org.glassfish</groupId>
                 <artifactId>javax.el</artifactId>

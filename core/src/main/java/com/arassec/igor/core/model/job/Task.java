@@ -41,6 +41,7 @@ public class Task {
     /**
      * The task's (UU)ID.
      */
+    @NotEmpty
     private String id;
 
     /**

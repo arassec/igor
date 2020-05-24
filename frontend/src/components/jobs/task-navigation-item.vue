@@ -1,7 +1,6 @@
 <template>
     <div>
-        <navigation-item v-on:clicked="$emit('task-is-selected', task.id)" :selected="taskSelected"
-                         :has-validation-errors="validationErrors.includes(task.id)">
+        <navigation-item v-on:clicked="$emit('task-is-selected', task.id)" :selected="taskSelected" :class="style">
             <font-awesome-icon slot="left" icon="grip-vertical" class="margin-right fa-fw move-icon"/>
             <label slot="center" class="task-label">
                 <font-awesome-icon icon="bolt" class="fa-fw sub-validatin-failed" v-if="subValidationFailed"/>
@@ -73,11 +72,23 @@
             subValidationFailed: function () {
                 let validationFailed = false;
                 this.task.actions.forEach((action) => {
-                    if (this.validationErrors.includes(action.id)) {
+                    if (action.id in this.validationErrors) {
                         validationFailed = true;
                     }
                 });
                 return validationFailed;
+            },
+            style: function () {
+                if (this.task.id in this.validationErrors) {
+                    return "alert";
+                }
+                if (this.task.provider.id in this.validationErrors) {
+                    return "alert";
+                }
+                if (this.taskSelected) {
+                    return "info";
+                }
+                return "unselected";
             }
         }
     }

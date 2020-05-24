@@ -8,23 +8,21 @@
                 </h1>
                 <icon-button slot="right" icon="question" v-on:clicked="$emit('open-documentation', 'action')"/>
             </layout-row>
-            <table>
-                <tr>
-                    <td><label>Active</label></td>
-                    <td>
+            <div class="table full-width">
+                <div class="tr">
+                    <div class="td"><label>Active</label></div>
+                    <div class="td align-left">
                         <font-awesome-icon :icon="action.active ? 'check-square' : 'square'"
                                            v-on:click="action.active = !action.active"/>
-                    </td>
-                    <td/>
-                </tr>
-                <tr>
-                    <td><label>Name</label></td>
-                    <td>
-                        <input type="text" autocomplete="off" v-model="action.name"/>
-                    </td>
-                    <td/>
-                </tr>
-            </table>
+                    </div>
+                </div>
+                <div class="tr">
+                    <div class="td"><label>Name</label></div>
+                    <div class="td">
+                        <input type="text" autocomplete="off" v-model="action.name" class="full-width"/>
+                    </div>
+                </div>
+            </div>
         </core-panel>
 
         <core-panel>
@@ -33,10 +31,10 @@
                 <icon-button slot="right" icon="question" v-show="hasDocumentation(action.type.key)"
                              v-on:clicked="$emit('open-documentation', action.type.key)"/>
             </layout-row>
-            <table>
-                <tr>
-                    <td><label>Category</label></td>
-                    <td>
+            <div class="table">
+                <div class="tr">
+                    <div class="td"><label>Category</label></div>
+                    <div class="td">
                         <select v-model="action.category" v-on:change="loadTypesOfCategory(action.category.key, true).then(() => {
                                         loadParametersOfType(action.type.key)})">
                             <option v-for="category in actionCategories" v-bind:value="category"
@@ -44,26 +42,29 @@
                                 {{category.value}}
                             </option>
                         </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Type</td>
-                    <td>
+                    </div>
+                </div>
+                <div class="tr">
+                    <div class="td">Type</div>
+                    <div class="td">
                         <select v-model="action.type" v-on:change="loadParametersOfType(action.type.key)">
                             <option v-for="type in actionTypes" v-bind:value="type"
                                     v-bind:key="type.key">
                                 {{type.value}}
                             </option>
                         </select>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+            </div>
         </core-panel>
 
         <core-panel>
             <h2>Action Configuration</h2>
-            <parameter-editor :parameters="action.parameters" ref="parameterEditor"
-                              v-on:create-connector="createConnector"/>
+            <parameter-editor
+                    :parent-id="action.id"
+                    :validation-errors="validationErrors"
+                    :parameters="action.parameters"
+                    v-on:create-connector="createConnector"/>
         </core-panel>
     </div>
 </template>
@@ -78,7 +79,7 @@
     export default {
         name: 'action-configurator',
         components: {LayoutRow, IconButton, CorePanel, ParameterEditor},
-        props: ['action'],
+        props: ['action', 'validationErrors'],
         data: function () {
             return {
                 actionCategories: [],
@@ -120,13 +121,6 @@
                 IgorBackend.getData('/api/parameters/action/' + typeKey).then((parameters) => {
                     this.action.parameters = parameters
                 })
-            },
-            validateInput: function () {
-                let parameterValidationResult = true
-                if (typeof this.$refs.parameterEditor !== 'undefined') {
-                    parameterValidationResult = this.$refs.parameterEditor.validateInput()
-                }
-                return parameterValidationResult
             },
             createConnector: function (parameterIndex, connectorCategoryCandidates) {
                 this.$emit('create-connector', this.action.id, parameterIndex, connectorCategoryCandidates)

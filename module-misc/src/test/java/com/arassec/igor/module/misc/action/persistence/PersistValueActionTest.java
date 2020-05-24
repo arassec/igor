@@ -1,5 +1,6 @@
 package com.arassec.igor.module.misc.action.persistence;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
 import com.arassec.igor.core.repository.PersistentValueRepository;
@@ -30,7 +31,7 @@ class PersistValueActionTest extends MiscActionBaseTest {
         PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
 
         PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
-        action.setInput("$.data." + PARAM_KEY);
+        action.setInput("$." + DataKey.DATA.getKey() + "." + PARAM_KEY);
 
         ArgumentCaptor<PersistentValue> argCap = ArgumentCaptor.forClass(PersistentValue.class);
 
@@ -50,7 +51,7 @@ class PersistValueActionTest extends MiscActionBaseTest {
         PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
 
         PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
-        action.setInput("$.data.INVALID");
+        action.setInput("$." + DataKey.DATA.getKey() + ".INVALID");
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
         assertTrue(result.isEmpty());
@@ -66,7 +67,7 @@ class PersistValueActionTest extends MiscActionBaseTest {
         when(persistentValueRepositoryMock.isPersisted(eq(JOB_ID), eq(TASK_ID), any(PersistentValue.class))).thenReturn(true);
 
         PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
-        action.setInput("$.data." + PARAM_KEY);
+        action.setInput("$." + DataKey.DATA.getKey() + "." + PARAM_KEY);
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
@@ -90,6 +91,29 @@ class PersistValueActionTest extends MiscActionBaseTest {
         action.setNumValuesToKeep(5);
         action.shutdown(JOB_ID, TASK_ID, new JobExecution());
         verify(persistentValueRepositoryMock, times(1)).cleanup(eq(JOB_ID), eq(TASK_ID), eq(5));
+    }
+
+    /**
+     * Tests processing the action in simulation mode.
+     */
+    @Test
+    @DisplayName("Tests processing the action in simulation mode.")
+    void testProcessInSimulationMode() {
+        PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
+
+        PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
+        action.setInput("$." + DataKey.DATA.getKey() + "." + PARAM_KEY);
+
+        Map<String, Object> data = createData();
+
+        //noinspection unchecked
+        ((Map<String, Object>) data.get(DataKey.DATA.getKey())).put(DataKey.SIMULATION.getKey(), true);
+
+        List<Map<String, Object>> result = action.process(data, new JobExecution());
+
+        assertEquals(1, result.size());
+        verify(persistentValueRepositoryMock, times(0)).upsert(eq(JOB_ID), eq(TASK_ID), any(PersistentValue.class));
+        assertEquals("Would have persisted: igor-message-test", result.get(0).get(DataKey.SIMULATION_LOG.getKey()));
     }
 
 }

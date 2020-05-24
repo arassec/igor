@@ -10,6 +10,7 @@ import com.arassec.igor.web.model.JobListEntry;
 import com.arassec.igor.web.model.ScheduleEntry;
 import com.arassec.igor.web.simulation.ActionProxy;
 import com.arassec.igor.web.simulation.ProviderProxy;
+import com.arassec.igor.web.test.TestProvider;
 import com.arassec.igor.web.test.TestTrigger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.SneakyThrows;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -127,7 +129,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/api/job")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(Job.builder().name("job-name").build())))
+                .content(objectMapper.writeValueAsString(Job.builder().id("job-id").name("job-name").build())))
                 .andExpect(status().isOk()).andReturn();
 
         Job result = convert(mvcResult, Job.class);
@@ -153,7 +155,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
     void testUpdateJob() {
         when(jobManager.save(any(Job.class))).thenReturn(Job.builder().id("job-id").name("saved-job").build());
 
-        MvcResult mvcResult = mockMvc.perform(put("/api/job")
+        MvcResult mvcResult = mockMvc.perform(post("/api/job")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(Job.builder().id("job-id").name("job-name").build())))
                 .andExpect(status().isOk()).andReturn();
@@ -166,7 +168,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
         // Job name is already taken by another job:
         when(jobManager.loadByName(eq("job-name"))).thenReturn(Job.builder().id("job-id").build());
 
-        mockMvc.perform(put("/api/job")
+        mockMvc.perform(post("/api/job")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(Job.builder().name("job-name").build())))
                 .andExpect(status().isBadRequest());
@@ -193,6 +195,9 @@ class JobRestControllerTest extends RestControllerBaseTest {
         when(jobSpy.getTasks()).thenReturn(List.of(
                 Task.builder().id("task-id").provider(providerProxyMock).actions(List.of(actionProxyMock)).build()));
 
+        Job job = Job.builder().id("job-id").name("job-name").build();
+
+        when(simulationObjectMapper.writeValueAsString(any(Job.class))).thenReturn(objectMapper.writeValueAsString(job));
         when(simulationObjectMapper.readValue(anyString(), eq(Job.class))).thenReturn(jobSpy);
 
         doAnswer(invocationOnMock -> {
@@ -203,7 +208,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
 
         mockMvc.perform(post("/api/job/simulate")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(Job.builder().id("job-id").build())))
+                .content(objectMapper.writeValueAsString(job)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.job-result.errorCause").value("job-error-cause"))
                 .andExpect(jsonPath("$.action-id.errorCause").value("action-error-cause"))
@@ -233,11 +238,14 @@ class JobRestControllerTest extends RestControllerBaseTest {
         when(jobSpy.getTasks()).thenReturn(List.of(
                 Task.builder().provider(providerProxyMock).actions(List.of(actionProxyMock)).build()));
 
+        Job job = Job.builder().id("job-id").name("job-name").build();
+
+        when(simulationObjectMapper.writeValueAsString(any(Job.class))).thenReturn(objectMapper.writeValueAsString(job));
         when(simulationObjectMapper.readValue(anyString(), eq(Job.class))).thenReturn(jobSpy);
 
         mockMvc.perform(post("/api/job/simulate")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(Job.builder().id("job-id").build())))
+                .content(objectMapper.writeValueAsString(job)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("{}"));
     }
@@ -308,7 +316,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/api/job/run")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(Job.builder().name("job-name").build())))
+                .content(objectMapper.writeValueAsString(Job.builder().id("job-id").name("job-name").build())))
                 .andExpect(status().isOk()).andReturn();
         Job result = convert(mvcResult, Job.class);
         assertEquals(savedJob, result);
@@ -317,7 +325,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
         savedJob.setActive(true);
         mockMvc.perform(post("/api/job/run")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(Job.builder().name("job-name").build())))
+                .content(objectMapper.writeValueAsString(Job.builder().id("job-id").name("job-name").build())))
                 .andExpect(status().isOk());
         verify(jobManager, times(1)).enqueue(eq(savedJob));
     }
@@ -402,6 +410,40 @@ class JobRestControllerTest extends RestControllerBaseTest {
         assertEquals("connectorA", result.get(0).getValue());
         assertEquals("connectorC-id", result.get(1).getKey());
         assertEquals("connectorC", result.get(1).getValue());
+    }
+
+    /**
+     * Tests bean validation on job creation. Nested validation of tasks and actions is tested, too.
+     */
+    @Test
+    @DisplayName("Tests bean validation on job creation.")
+    @SneakyThrows
+    void testCreateJobBeanValidation() {
+
+        when(igorComponentRegistry.createTriggerInstance(eq(TestTrigger.TYPE_ID), any(Map.class))).thenReturn(new TestTrigger());
+        when(igorComponentRegistry.createProviderInstance(eq(TestProvider.TYPE_ID), any(Map.class))).thenReturn(new TestProvider());
+
+        TestProvider provider = new TestProvider();
+        provider.setId("provider-id");
+
+        Task task = Task.builder().id("first-task-id").provider(provider).build();
+        Task secondTask = Task.builder().id("second-task-id").provider(provider).build();
+
+        TestTrigger trigger = new TestTrigger();
+        trigger.setId("trigger-id");
+        trigger.setTestParam(null);
+
+        Job job = Job.builder().id("job-id").name("job-name").trigger(trigger).tasks(List.of(task, secondTask)).build();
+
+        mockMvc.perform(post("/api/job")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .characterEncoding("UTF-8")
+                .content(objectMapper.writeValueAsString(job)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.provider-id.validatedInteger").value("must not be null"))
+                .andExpect(jsonPath("$.first-task-id.name").value("must not be empty"))
+                .andExpect(jsonPath("$.second-task-id.name").value("must not be empty"));
     }
 
 }

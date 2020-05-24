@@ -45,12 +45,29 @@ export default {
     border: none;
     background-color: var(--color-foreground);
     height: 2em;
-    min-width: 25em;
+    min-width: 20em;
+    width: 100%;
     color: var(--color-font);
+  }
+
+  .panel >>> textarea {
+    background-color: var(--color-foreground);
+    color: var(--color-font);
+    border: none;
+    max-width: 300px;
+    min-width: 300px;
   }
 
   .panel >>> input {
     text-indent: .2em;
+  }
+
+  .panel >>> input.alert {
+    background-color: var(--color-alert);
+  }
+
+  .panel >>> textarea.alert {
+    background-color: var(--color-alert);
   }
 
   .panel >>> select option {
