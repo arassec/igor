@@ -129,6 +129,14 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
      * {@inheritDoc}
      */
     @Override
+    public void setNumThreads(int numThreads) {
+        delegate.setNumThreads(numThreads);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isActive() {
         return delegate.isActive();
     }

@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
  * Tests the {@link BaseSecurityProvider}.
  */
 @DisplayName("Tests the base security-provider.")
-public class BaseSecurityProviderTest {
+class BaseSecurityProviderTest {
 
     /**
      * The class under test.

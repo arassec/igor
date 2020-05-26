@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests the {@link VoidSecurityProvider}.
  */
 @DisplayName("Tests the void security-provider.")
-public class VoidSecurityProviderTest {
+class VoidSecurityProviderTest {
 
     /**
      * Tests that encrypting with the void security-provider doesn't modify the input value.

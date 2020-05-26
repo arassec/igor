@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests the {@link Pair}.
  */
-public class PairTest {
+class PairTest {
 
     /**
      * Tests comparing two pairs.

@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 /**
  * Tests the {@link FtpFileConnector}.
  */
-public class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
+class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
 
     /**
      * Initializes the test environment by starting an FTP server.
@@ -115,8 +115,9 @@ public class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
     @Test
     @DisplayName("Tests reading a file that doesn't exist.")
     void testReadStreamFailSafe() {
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("ftp-readstream-test");
         IgorException igorException = assertThrows(IgorException.class, () -> connector.readStream("invalid/not-existing.file",
-                new WorkInProgressMonitor("ftp-readstream-test")));
+                wipMon));
         assertEquals("Could not retrieve file: invalid/not-existing.file", igorException.getMessage());
     }
 

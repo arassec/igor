@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.Connector;
+import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.web.model.KeyLabelStore;
 import com.arassec.igor.web.util.DocumentationUtil;
@@ -146,11 +147,8 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
 
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), field.getName());
-                jsonGenerator.writeBooleanField(WebMapperKey.SECURED.getKey(), annotation.secured());
-                jsonGenerator.writeBooleanField(WebMapperKey.ADVANCED.getKey(), annotation.advanced());
-                jsonGenerator.writeStringField(WebMapperKey.SUBTYPE.getKey(), annotation.subtype().name());
-                jsonGenerator.writeBooleanField(WebMapperKey.REQUIRED.getKey(), (field.isAnnotationPresent(NotNull.class)
-                        || field.isAnnotationPresent(NotBlank.class) || field.getType().isPrimitive()));
+
+                writeMetaData(jsonGenerator, annotation, field);
 
                 Map<String, Set<String>> candidates = igorComponentRegistry.getConnectorParameterCategoryAndType(field.getType());
 
@@ -172,6 +170,35 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
         });
 
         jsonGenerator.writeEndArray();
+    }
+
+    /**
+     * Adds additional data to the generated JSON, describing a parameter based on its annotation.
+     *
+     * @param jsonGenerator The JSON generator.
+     * @param annotation    The {@link IgorParam} annotation.
+     * @param field         The field annotated by the annotation.
+     *
+     * @throws IOException If the JSON could not be written out.
+     */
+    private void writeMetaData(JsonGenerator jsonGenerator, IgorParam annotation, Field field) throws IOException {
+        if (annotation.secured()) {
+            jsonGenerator.writeBooleanField(WebMapperKey.SECURED.getKey(), annotation.secured());
+        }
+        if (annotation.advanced()) {
+            jsonGenerator.writeBooleanField(WebMapperKey.ADVANCED.getKey(), annotation.advanced());
+        }
+        if (!ParameterSubtype.NONE.equals(annotation.subtype())) {
+            jsonGenerator.writeStringField(WebMapperKey.SUBTYPE.getKey(), annotation.subtype().name());
+        }
+        if (!StringUtils.isEmpty(annotation.defaultValue())) {
+            jsonGenerator.writeStringField(WebMapperKey.DEFAULT_VALUE.getKey(), annotation.defaultValue());
+        }
+        boolean required = (field.isAnnotationPresent(NotNull.class)
+                || field.isAnnotationPresent(NotBlank.class) || field.getType().isPrimitive());
+        if (required) {
+            jsonGenerator.writeBooleanField(WebMapperKey.REQUIRED.getKey(), true);
+        }
     }
 
     /**

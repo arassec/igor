@@ -33,7 +33,7 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Job-Executor Tests")
-public class JobExecutorTest {
+class JobExecutorTest {
 
     /**
      * The tested class.

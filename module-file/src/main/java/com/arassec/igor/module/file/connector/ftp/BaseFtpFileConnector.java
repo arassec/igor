@@ -44,8 +44,8 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
      * The port of the FTP server.
      */
     @Positive
-    @IgorParam
-    private int port = 21;
+    @IgorParam(defaultValue = "21")
+    private int port;
 
     /**
      * The username to login with.
@@ -62,32 +62,41 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
     /**
      * Activates active or passive FTP mode.
      */
-    @IgorParam(advanced = true)
-    private boolean passiveMode = true;
+    @IgorParam(advanced = true, defaultValue = "true")
+    private boolean passiveMode;
 
     /**
      * Buffer size for copying data.
+     *
+     * Default value: 1024 * 1024 = 1.048.576‬
      */
-    @IgorParam(advanced = true)
-    private int bufferSize = 1024 * 1024;
+    @Positive
+    @IgorParam(advanced = true, defaultValue = "1048576")
+    private int bufferSize;
 
     /**
      * Timeout for the data connection.
+     *
+     * Default value = 60 * 5 * 1000 = 300.000‬
      */
-    @IgorParam(advanced = true)
-    private int dataTimeout = 60 * 5 * 1000;
+    @Positive
+    @IgorParam(advanced = true, defaultValue = "300000")
+    private int dataTimeout;
 
     /**
      * Keepalive timeout for the control connection.
+     *
+     * Default value = 60 * 15 = 900
      */
-    @IgorParam(advanced = true)
-    private int keepAliveTimeout = 60 * 15;
+    @Positive
+    @IgorParam(advanced = true, defaultValue = "900")
+    private int keepAliveTimeout;
 
     /**
      * Set to {@code true}, if it's a Windows FTP server.
      */
-    @IgorParam(advanced = true)
-    private boolean windowsFtp = false;
+    @IgorParam(advanced = true, defaultValue = "false")
+    private boolean windowsFtp;
 
     /**
      * Creates a new component instance.

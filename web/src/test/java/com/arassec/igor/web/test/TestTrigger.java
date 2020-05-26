@@ -3,6 +3,7 @@ package com.arassec.igor.web.test;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.trigger.BaseTrigger;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
+import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
@@ -32,10 +33,11 @@ public class TestTrigger extends BaseTrigger implements ScheduledTrigger {
     /**
      * Test parameter for input validation of the trigger.
      */
+    @Getter
     @Setter
     @NotNull
-    @IgorParam
-    private Integer testParam = 666;
+    @IgorParam(defaultValue = "666")
+    private Integer testParam;
 
     /**
      * {@inheritDoc}

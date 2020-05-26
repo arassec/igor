@@ -10,7 +10,7 @@ import com.jayway.jsonpath.Option;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.Map;
 
@@ -50,14 +50,17 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      */
     protected boolean active = true;
 
+    /**
+     * The action's optional name.
+     */
     private String name;
 
     /**
      * Defines the number of threads the action should be processed with.
      */
-    @Min(1)
-    @IgorParam(advanced = true)
-    protected int numThreads = 1;
+    @Positive
+    @IgorParam(advanced = true, defaultValue = "1")
+    protected int numThreads;
 
     /**
      * The JSON-Path configuration.
@@ -107,6 +110,14 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     @Override
     public int getNumThreads() {
         return numThreads;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setNumThreads(int numThreads) {
+        this.numThreads = numThreads;
     }
 
     /**

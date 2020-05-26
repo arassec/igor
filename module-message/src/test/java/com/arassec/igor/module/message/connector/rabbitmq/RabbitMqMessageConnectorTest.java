@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Tests the RabbitMQ-Message-Connector.")
-public class RabbitMqMessageConnectorTest {
+class RabbitMqMessageConnectorTest {
 
     /**
      * Tests initializing the component.

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests the {@link ModuleFileConfiguration}.
  */
 @DisplayName("'Module File'-configuration tests.")
-public class ModuleFileConfigurationTest {
+class ModuleFileConfigurationTest {
 
     /**
      * Tests I18N of the misc-module.

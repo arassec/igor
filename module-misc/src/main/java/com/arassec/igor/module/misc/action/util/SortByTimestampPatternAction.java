@@ -47,14 +47,14 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * The timestamp format.
      */
     @NotBlank
-    @IgorParam
-    private String timestampFormat = defaultTimeFormat;
+    @IgorParam(defaultValue = DEFAULT_TIMESTAMP_FORMAT)
+    private String timestampFormat;
 
     /**
      * Defines the sort order
      */
-    @IgorParam
-    private boolean sortAscending = true;
+    @IgorParam(defaultValue = "true")
+    private boolean sortAscending;
 
     /**
      * Contains all data that should have been processed by the action.

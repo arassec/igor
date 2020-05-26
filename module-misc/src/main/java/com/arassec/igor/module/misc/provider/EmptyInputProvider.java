@@ -22,8 +22,8 @@ public class EmptyInputProvider extends BaseUtilProvider {
      * The amount of data items to generate.
      */
     @PositiveOrZero
-    @IgorParam
-    private int amount = 1;
+    @IgorParam(defaultValue = "1")
+    private int amount;
 
     /**
      * The number of items already generated.

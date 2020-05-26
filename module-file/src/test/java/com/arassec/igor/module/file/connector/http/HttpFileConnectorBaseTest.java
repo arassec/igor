@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 /**
  * Base class for {@link HttpFileConnector} and {@link HttpsFileConnector} tests.
  */
-public abstract class HttpFileConnectorBaseTest {
+abstract class HttpFileConnectorBaseTest {
 
     /**
      * The connector under test. Either {@link HttpFileConnector} or {@link HttpsFileConnector}.
@@ -253,13 +253,15 @@ public abstract class HttpFileConnectorBaseTest {
                 get("/redirect/followed.html").willReturn(aResponse().withStatus(200).withBody("Http(s)FollowRedirectsTest"))
         );
 
+        connector.setFollowRedirects(true);
+
         String content = connector.read("/test.html", new WorkInProgressMonitor("http-follow-redirects-test"));
         assertEquals("Http(s)FollowRedirectsTest", content);
 
         connector.setFollowRedirects(false);
 
-        assertThrows(IgorException.class, () ->
-                connector.read("/test.html", new WorkInProgressMonitor("http-follow-redirects-test")));
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("http-follow-redirects-test");
+        assertThrows(IgorException.class, () -> connector.read("/test.html", wipMon));
     }
 
     /**
@@ -298,16 +300,15 @@ public abstract class HttpFileConnectorBaseTest {
                 get("/").willReturn(aResponse().withStatus(500))
         );
 
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("http-error-handling-test");
+        FileStreamData fileStreamDataMock = mock(FileStreamData.class);
+
         assertAll("HTTP errors must be handled safely.",
                 () -> assertThrows(IgorException.class, () -> connector.listFiles("/test.html", null)),
-                () -> assertThrows(IgorException.class, () -> connector.read("/test.html",
-                        new WorkInProgressMonitor("http-error-handling-test"))),
-                () -> assertThrows(IgorException.class, () -> connector.readStream("/test.html",
-                        new WorkInProgressMonitor("http-error-handling-test"))),
-                () -> assertThrows(IgorException.class, () -> connector.writeStream("/test.html", mock(FileStreamData.class),
-                        new WorkInProgressMonitor("http-error-handling-test"))),
-                () -> assertThrows(IgorException.class, () -> connector.delete("/test.html",
-                        new WorkInProgressMonitor("http-error-handling-test")))
+                () -> assertThrows(IgorException.class, () -> connector.read("/test.html", wipMon)),
+                () -> assertThrows(IgorException.class, () -> connector.readStream("/test.html", wipMon)),
+                () -> assertThrows(IgorException.class, () -> connector.writeStream("/test.html", fileStreamDataMock, wipMon)),
+                () -> assertThrows(IgorException.class, () -> connector.delete("/test.html", wipMon))
         );
     }
 
@@ -330,16 +331,15 @@ public abstract class HttpFileConnectorBaseTest {
                 get("/").willReturn(aResponse().withFault(Fault.MALFORMED_RESPONSE_CHUNK))
         );
 
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("http-exception-handling-test");
+        FileStreamData fileStreamDataMock = mock(FileStreamData.class);
+
         assertAll("Exceptions must be handled safely.",
                 () -> assertThrows(IgorException.class, () -> connector.listFiles("/test.html", null)),
-                () -> assertThrows(IgorException.class, () -> connector.read("/test.html",
-                        new WorkInProgressMonitor("http-exception-handling-test"))),
-                () -> assertThrows(IgorException.class, () -> connector.readStream("/test.html",
-                        new WorkInProgressMonitor("http-exception-handling-test"))),
-                () -> assertThrows(IgorException.class, () -> connector.writeStream("/test.html", mock(FileStreamData.class),
-                        new WorkInProgressMonitor("http-exception-handling-test"))),
-                () -> assertThrows(IgorException.class, () -> connector.delete("/test.html",
-                        new WorkInProgressMonitor("http-exception-handling-test"))),
+                () -> assertThrows(IgorException.class, () -> connector.read("/test.html", wipMon)),
+                () -> assertThrows(IgorException.class, () -> connector.readStream("/test.html", wipMon)),
+                () -> assertThrows(IgorException.class, () -> connector.writeStream("/test.html", fileStreamDataMock, wipMon)),
+                () -> assertThrows(IgorException.class, () -> connector.delete("/test.html", wipMon)),
                 () -> assertThrows(IgorException.class, () -> connector.testConfiguration())
         );
     }

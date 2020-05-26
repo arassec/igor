@@ -16,12 +16,10 @@
     "parameters": [
       {
         "name": "testParam",
-        "secured": false,
-        "advanced": false,
-        "subtype": "NONE",
+        "defaultValue": "666",
         "required": true,
         "type": "java.lang.Integer",
-        "value": 666,
+        "value": null,
         "connector": false
       }
     ]
@@ -48,29 +46,19 @@
         "parameters": [
           {
             "name": "emptyStringParam",
-            "secured": false,
-            "advanced": false,
             "subtype": "CRON",
-            "required": false,
             "type": "java.lang.String",
             "value": null,
             "connector": false
           },
           {
             "name": "nullInteger",
-            "secured": false,
-            "advanced": false,
-            "subtype": "NONE",
-            "required": false,
             "type": "java.lang.Integer",
             "value": null,
             "connector": false
           },
           {
             "name": "validatedInteger",
-            "secured": false,
-            "advanced": false,
-            "subtype": "NONE",
             "required": true,
             "type": "java.lang.Integer",
             "value": null,
@@ -78,9 +66,8 @@
           },
           {
             "name": "simulationLimit",
-            "secured": false,
             "advanced": true,
-            "subtype": "NONE",
+            "defaultValue": "25",
             "required": true,
             "type": "int",
             "value": 456,
@@ -105,10 +92,6 @@
           "parameters": [
             {
               "name": "testConnector",
-              "secured": false,
-              "advanced": false,
-              "subtype": "NONE",
-              "required": false,
               "categoryCandidates": [
                 {
                   "key": "connector-category-id",
@@ -127,12 +110,11 @@
             },
             {
               "name": "numThreads",
-              "secured": false,
               "advanced": true,
-              "subtype": "NONE",
+              "defaultValue": "1",
               "required": true,
               "type": "int",
-              "value": 1,
+              "value": 0,
               "connector": false
             }
           ]

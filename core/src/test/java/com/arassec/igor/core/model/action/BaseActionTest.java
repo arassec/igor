@@ -60,7 +60,8 @@ class BaseActionTest {
     void testGetJobId() {
         assertEquals("job-id", baseAction.getJobId(testData));
         assertThrows(IllegalStateException.class, () -> baseAction.getJobId(null));
-        assertThrows(IllegalStateException.class, () -> baseAction.getJobId(new HashMap<>()));
+        Map<String, Object> map = Map.of();
+        assertThrows(IllegalStateException.class, () -> baseAction.getJobId(map));
         assertThrows(IllegalStateException.class, () -> baseAction.getJobId(wrongData));
     }
 
@@ -72,7 +73,8 @@ class BaseActionTest {
     void testGetTaskId() {
         assertEquals("task-id", baseAction.getTaskId(testData));
         assertThrows(IllegalStateException.class, () -> baseAction.getTaskId(null));
-        assertThrows(IllegalStateException.class, () -> baseAction.getTaskId(new HashMap<>()));
+        Map<String, Object> map = Map.of();
+        assertThrows(IllegalStateException.class, () -> baseAction.getTaskId(map));
         assertThrows(IllegalStateException.class, () -> baseAction.getTaskId(wrongData));
     }
 

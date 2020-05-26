@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
  * Tests the {@link WebConfiguration}.
  */
 @DisplayName("Tests the web layer's configuration.")
-public class WebConfigurationTest {
+class WebConfigurationTest {
 
     /**
      * The configuration under test.

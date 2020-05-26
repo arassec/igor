@@ -29,7 +29,7 @@ class LocalFilesystemFileConnectorTest {
     /**
      * The connector under test.
      */
-    private LocalFilesystemFileConnector fileConnector = new LocalFilesystemFileConnector();
+    private final LocalFilesystemFileConnector fileConnector = new LocalFilesystemFileConnector();
 
     /**
      * Tests listing files.
@@ -139,7 +139,7 @@ class LocalFilesystemFileConnectorTest {
     @Test
     @DisplayName("Tests that testing the connector's configuration succeeds.")
     void testTestConfiguration() {
-        assertDoesNotThrow(() -> fileConnector.testConfiguration());
+        assertDoesNotThrow(fileConnector::testConfiguration);
     }
 
     /**
@@ -151,10 +151,12 @@ class LocalFilesystemFileConnectorTest {
         String file = "target/non-existing.file";
         assertFalse(Files.exists(Paths.get(file)));
 
-        assertThrows(IgorException.class, () -> fileConnector.read(file, mock(WorkInProgressMonitor.class)));
-        assertThrows(IgorException.class, () -> fileConnector.readStream(file, mock(WorkInProgressMonitor.class)));
-        assertThrows(IgorException.class, () -> fileConnector.delete(file, mock(WorkInProgressMonitor.class)));
-        assertThrows(IgorException.class, () -> fileConnector.move(file, file, mock(WorkInProgressMonitor.class)));
+        WorkInProgressMonitor wipMonMock = mock(WorkInProgressMonitor.class);
+
+        assertThrows(IgorException.class, () -> fileConnector.read(file, wipMonMock));
+        assertThrows(IgorException.class, () -> fileConnector.readStream(file, wipMonMock));
+        assertThrows(IgorException.class, () -> fileConnector.delete(file, wipMonMock));
+        assertThrows(IgorException.class, () -> fileConnector.move(file, file, wipMonMock));
     }
 
 }

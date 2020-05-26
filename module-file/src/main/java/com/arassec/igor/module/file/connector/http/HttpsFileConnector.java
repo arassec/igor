@@ -26,8 +26,8 @@ public class HttpsFileConnector extends BaseHttpFileConnector {
      */
     @Getter
     @Setter
-    @IgorParam(advanced = true, value = 2)
-    private boolean certificateVerification = true;
+    @IgorParam(advanced = true, value = 2, defaultValue = "true")
+    private boolean certificateVerification;
 
     /**
      * Creates a new Instance.

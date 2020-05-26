@@ -85,13 +85,13 @@ class BaseFileConnectorTest {
         when(inputStreamMock.read(any(byte[].class), eq(0), anyInt())).thenThrow(new IOException("base-file-connector" +
                 "-test-exception"));
 
-        assertThrows(IgorException.class, () -> baseFileConnector.copyStream(inputStreamMock, null, 100,
-                new WorkInProgressMonitor("test")));
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("test");
+
+        assertThrows(IgorException.class, () -> baseFileConnector.copyStream(inputStreamMock, null, 100, wipMon));
 
         when(inputStreamMock.read(any(byte[].class), eq(0), anyInt())).thenReturn(-1);
 
-        assertThrows(IgorException.class, () -> baseFileConnector.copyStream(inputStreamMock, null, 100,
-                new WorkInProgressMonitor("test")));
+        assertThrows(IgorException.class, () -> baseFileConnector.copyStream(inputStreamMock, null, 100, wipMon));
     }
 
     /**

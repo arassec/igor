@@ -35,8 +35,8 @@ public class FilterByTimestampAction extends BaseUtilAction {
      * If set to {@code true}, timestamps older than the configured one are filtered. If set to {@code false}, timestamps younger
      * than the configured one are filtered.
      */
-    @IgorParam
-    private boolean olderThan = true;
+    @IgorParam(defaultValue = "true")
+    private boolean olderThan;
 
     /**
      * The amount of time (configured by {@link #timeUnit}) to use for filtering.
@@ -49,15 +49,15 @@ public class FilterByTimestampAction extends BaseUtilAction {
      * The time unit to use for filtering.
      */
     @NotBlank
-    @IgorParam
-    private String timeUnit = ChronoUnit.DAYS.name();
+    @IgorParam(defaultValue = DEFAULT_TIME_UNIT)
+    private String timeUnit;
 
     /**
      * The format of the timestamp.
      */
     @NotBlank
-    @IgorParam
-    private String timestampFormat = defaultTimeFormat;
+    @IgorParam(defaultValue = DEFAULT_TIMESTAMP_FORMAT)
+    private String timestampFormat;
 
     /**
      * Creates a new component instance.

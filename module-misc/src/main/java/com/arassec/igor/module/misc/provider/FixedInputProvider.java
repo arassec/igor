@@ -35,8 +35,8 @@ public class FixedInputProvider extends BaseUtilProvider {
      */
     @Getter
     @Setter
-    @IgorParam
-    private boolean separateLines = true;
+    @IgorParam(defaultValue = "true")
+    private boolean separateLines;
 
     /**
      * Contains the separate lines from the input.

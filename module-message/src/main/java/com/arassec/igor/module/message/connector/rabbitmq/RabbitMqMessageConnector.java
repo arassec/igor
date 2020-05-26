@@ -37,8 +37,8 @@ public class RabbitMqMessageConnector extends BaseMessageConnector {
      * The RabbitMQ port.
      */
     @Positive
-    @IgorParam
-    private int port = 5672;
+    @IgorParam(defaultValue = "5672")
+    private int port;
 
     /**
      * The RabbitMQ username.

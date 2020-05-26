@@ -58,6 +58,7 @@ class FilterByTimestampActionTest extends MiscActionBaseTest {
         action.setAmount(1);
         action.setTimeUnit(ChronoUnit.DAYS.name());
         action.setTimestampFormat("yyyy-MM-dd'T'HH:mm:ss");
+        action.setOlderThan(true);
 
         Map<String, Object> data = createData();
         data.put("timestamp", DateTimeFormatter.ofPattern(action.getTimestampFormat()).format(LocalDateTime.now()));

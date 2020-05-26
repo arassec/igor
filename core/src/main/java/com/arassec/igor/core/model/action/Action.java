@@ -50,6 +50,11 @@ public interface Action extends IgorComponent {
     int getNumThreads();
 
     /**
+     * Sets the number of threads this action should run with.
+     */
+    void setNumThreads(int numThreads);
+
+    /**
      * Returns whether the action is active or not.
      *
      * @return {@code true} if the action is active and should be used, {@code false} if the action should be skipped during job

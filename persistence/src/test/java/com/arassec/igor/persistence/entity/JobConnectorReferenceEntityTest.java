@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * Tests the {@link JobConnectorReferenceEntity}.
  */
 @DisplayName("'Job-Connector-Reference-Entity'-Tests")
-public class JobConnectorReferenceEntityTest {
+class JobConnectorReferenceEntityTest {
 
     /**
      * Tests the default constructor.

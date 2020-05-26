@@ -20,6 +20,7 @@ class FixedInputProviderTest {
     void testProvide() {
         FixedInputProvider provider = new FixedInputProvider();
         provider.setInput("abc\ndef");
+        provider.setSeparateLines(true);
 
         provider.initialize("job-id", "task-id", new JobExecution());
 

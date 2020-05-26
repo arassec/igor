@@ -61,15 +61,4 @@ class MoveFileActionTest extends FileActionBaseTest {
         assertEquals(data, processedData.get(0));
     }
 
-    /**
-     * Tests default parameter values.
-     */
-    @Test
-    @DisplayName("Tests default parameter values.")
-    void testDefaults() {
-        MoveFileAction action = new MoveFileAction();
-        assertEquals("$.data.directory", action.getSourceDirectory());
-        assertEquals("$.data.filename", action.getSourceFilename());
-    }
-
 }

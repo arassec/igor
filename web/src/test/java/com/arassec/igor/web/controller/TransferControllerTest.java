@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests the {@link TransferController}.
  */
 @DisplayName("Transfer-Controller tests")
-public class TransferControllerTest extends RestControllerBaseTest {
+class TransferControllerTest extends RestControllerBaseTest {
 
     /**
      * Tests exporting a job.

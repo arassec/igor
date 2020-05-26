@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Teste the {@link ValidCronExpressionValidator}.
  */
 @DisplayName("Tests CRON expression validation.")
-public class ValidCronExpressionValidatorTest {
+class ValidCronExpressionValidatorTest {
 
     /**
      * Tests validation.

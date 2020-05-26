@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests the {@link PersistenceConfiguration}.
  */
 @DisplayName("'Persistence'-configuration tests.")
-public class PersistenceConfigurationTest {
+class PersistenceConfigurationTest {
 
     /**
      * Mock of the component registry.

@@ -190,6 +190,34 @@
                             component.$set(component.parameterInputTypes, i, 'text')
                         }
                     }
+                    if ('defaultValue' in param && param.defaultValue !== "" && !param.value) {
+                        if (component.isNumber(param.type)) {
+                            param.value = parseInt(param.defaultValue);
+                        } else if (component.isBoolean(param.type)) {
+                            param.value = (param.defaultValue === 'true');
+                        } else {
+                            param.value = param.defaultValue;
+                        }
+                    }
+                }
+            }
+        },
+        watch: {
+            parameters: function(newVal) {
+                let component = this
+                for (let i in newVal) {
+                    if (newVal.hasOwnProperty(i)) {
+                        let param = newVal[i]
+                        if ('defaultValue' in param && param.defaultValue !== "" && !param.value) {
+                            if (component.isNumber(param.type)) {
+                                param.value = parseInt(param.defaultValue);
+                            } else if (component.isBoolean(param.type)) {
+                                param.value = (param.defaultValue === 'true');
+                            } else {
+                                param.value = param.defaultValue;
+                            }
+                        }
+                    }
                 }
             }
         }

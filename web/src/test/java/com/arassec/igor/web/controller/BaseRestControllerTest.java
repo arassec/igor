@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
  * Tests the {@link BaseRestController}.
  */
 @DisplayName("Base-Controller Tests")
-public class BaseRestControllerTest {
+class BaseRestControllerTest {
 
     /**
      * The class under test.

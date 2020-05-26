@@ -34,8 +34,9 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests input validation.")
     void testInputvalidation() {
         assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, null, null, null));
-        assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, null, new LinkedBlockingQueue<>(), null));
-        assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, new LinkedBlockingQueue<>(), null, null));
+        LinkedBlockingQueue<Map<String, Object>> linkedBlockingQueue = new LinkedBlockingQueue<>();
+        assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, null, linkedBlockingQueue, null));
+        assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, linkedBlockingQueue, null, null));
     }
 
     /**

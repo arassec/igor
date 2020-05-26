@@ -70,15 +70,15 @@ public class CopyFileAction extends BaseFileAction {
      * Source directory to copy the file from.
      */
     @NotBlank
-    @IgorParam
-    private String sourceDirectory = DIRECTORY_QUERY;
+    @IgorParam(defaultValue = DIRECTORY_QUERY)
+    private String sourceDirectory;
 
     /**
      * Source file to copy.
      */
     @NotBlank
-    @IgorParam
-    private String sourceFilename = FILENAME_QUERY;
+    @IgorParam(defaultValue = FILENAME_QUERY)
+    private String sourceFilename;
 
     /**
      * The destination for the copied file.

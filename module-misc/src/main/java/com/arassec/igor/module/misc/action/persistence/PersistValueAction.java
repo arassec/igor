@@ -36,8 +36,8 @@ public class PersistValueAction extends BasePersistenceAction {
      */
     @Getter
     @Setter
-    @IgorParam
-    private int numValuesToKeep = 0;
+    @IgorParam(defaultValue = "0")
+    private int numValuesToKeep;
 
     /**
      * Creates a new instance.

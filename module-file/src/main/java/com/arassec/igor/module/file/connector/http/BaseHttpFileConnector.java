@@ -58,14 +58,14 @@ public abstract class BaseHttpFileConnector extends BaseFileConnector {
      * The server's port.
      */
     @Positive
-    @IgorParam
-    protected int port = 80;
+    @IgorParam(defaultValue = "80")
+    protected int port;
 
     /**
      * Enables or disables following redirects.
      */
-    @IgorParam
-    protected boolean followRedirects = true;
+    @IgorParam(defaultValue = "true")
+    protected boolean followRedirects;
 
     /**
      * A username for authentication.
@@ -80,10 +80,13 @@ public abstract class BaseHttpFileConnector extends BaseFileConnector {
     protected String password;
 
     /**
-     * A timeout for the HTTP operations.
+     * A timeout for the HTTP operations in seconds.
+     *
+     * Default value: 60 * 60 = 3600
      */
-    @IgorParam(advanced = true)
-    protected long timeout = 3600;
+    @Positive
+    @IgorParam(advanced = true, defaultValue = "3600")
+    protected long timeout;
 
     /**
      * The protocol to use.

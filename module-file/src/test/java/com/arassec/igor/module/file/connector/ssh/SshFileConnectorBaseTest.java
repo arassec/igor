@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Base class for {@link ScpFileConnector} and {@link SftpFileConnector} tests.
  */
-public abstract class SshFileConnectorBaseTest {
+abstract class SshFileConnectorBaseTest {
 
     /**
      * The connector under test. Either an {@link ScpFileConnector} or an {@link SftpFileConnector}.
@@ -132,8 +132,8 @@ public abstract class SshFileConnectorBaseTest {
         assertEquals("ALPHA-igor-ssh-connector-tests",
                 connector.read("src/test/resources/ssh/alpha.txt", new WorkInProgressMonitor("ssh-read-test")));
 
-        assertThrows(IgorException.class, () -> connector.read("non-existing-file",
-                new WorkInProgressMonitor("ssh-read-non-existing-file-test")));
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("ssh-read-non-existing-file-test");
+        assertThrows(IgorException.class, () -> connector.read("non-existing-file", wipMon));
     }
 
     /**

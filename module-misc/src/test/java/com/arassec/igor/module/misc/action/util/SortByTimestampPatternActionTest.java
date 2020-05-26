@@ -61,6 +61,8 @@ class SortByTimestampPatternActionTest extends MiscActionBaseTest {
         action.getCollectedData().add(Map.of("INVALID", "INVALID"));
         action.getCollectedData().add(Map.of("timestamp", "2019-12-29T14:13:11"));
 
+        action.setSortAscending(true);
+
         List<Map<String, Object>> completedData = action.complete();
         assertEquals(3, completedData.size());
         assertEquals("2014-04-13T03:00:00", completedData.get(0).get("timestamp"));
@@ -68,6 +70,7 @@ class SortByTimestampPatternActionTest extends MiscActionBaseTest {
         assertEquals("2019-12-29T14:13:12", completedData.get(2).get("timestamp"));
 
         action.setSortAscending(false);
+
         completedData = action.complete();
         assertEquals(3, completedData.size());
         assertEquals("2019-12-29T14:13:12", completedData.get(0).get("timestamp"));
@@ -88,6 +91,7 @@ class SortByTimestampPatternActionTest extends MiscActionBaseTest {
         action.setInput("$.filename");
         action.setPattern("$.pattern");
         action.setTimestampFormat("$.timestampFormat");
+        action.setSortAscending(true);
 
         action.getCollectedData().add(
                 Map.of("filename", "alpha_20200113185100_beta.jpeg",

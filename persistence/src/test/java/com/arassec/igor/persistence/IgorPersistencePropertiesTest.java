@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * Tests the {@link IgorPersistenceProperties}.
  */
-public class IgorPersistencePropertiesTest {
+class IgorPersistencePropertiesTest {
 
     /**
      * Tests the core properties default values.

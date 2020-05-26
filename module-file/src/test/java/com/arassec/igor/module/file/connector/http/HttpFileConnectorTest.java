@@ -29,6 +29,7 @@ class HttpFileConnectorTest extends HttpFileConnectorBaseTest {
         connector = new HttpFileConnector();
         connector.setHost("localhost");
         connector.setPort(wireMockServer.port());
+        connector.setTimeout(3600);
     }
 
 }

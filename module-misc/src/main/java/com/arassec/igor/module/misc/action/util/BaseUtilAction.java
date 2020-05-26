@@ -8,9 +8,14 @@ import com.arassec.igor.core.model.action.BaseAction;
 public abstract class BaseUtilAction extends BaseAction {
 
     /**
+     * The default time unit to use in actions as default parameter value.
+     */
+    protected static final String DEFAULT_TIME_UNIT = "DAYS";
+
+    /**
      * The default time format to use for parsing data timestamps.
      */
-    String defaultTimeFormat = "yyyy-MM-dd'T'HH:mm:ssXXX";
+    protected static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
 
     /**
      * Creates a new component instance.

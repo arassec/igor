@@ -23,20 +23,24 @@ class FallbackFileConnectorTest {
         assertThrows(IllegalStateException.class, () -> connector.listFiles(null, null));
         assertThrows(IllegalStateException.class, () -> connector.listFiles("", ""));
 
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("");
+
         assertThrows(IllegalStateException.class, () -> connector.read(null, null));
-        assertThrows(IllegalStateException.class, () -> connector.read("", new WorkInProgressMonitor("")));
+        assertThrows(IllegalStateException.class, () -> connector.read("", wipMon));
 
         assertThrows(IllegalStateException.class, () -> connector.readStream(null, null));
-        assertThrows(IllegalStateException.class, () -> connector.readStream("", new WorkInProgressMonitor("")));
+        assertThrows(IllegalStateException.class, () -> connector.readStream("", wipMon));
+
+        FileStreamData fileStreamData = new FileStreamData();
 
         assertThrows(IllegalStateException.class, () -> connector.writeStream(null, null, null));
-        assertThrows(IllegalStateException.class, () -> connector.writeStream("", new FileStreamData(), new WorkInProgressMonitor("")));
+        assertThrows(IllegalStateException.class, () -> connector.writeStream("", fileStreamData, wipMon));
 
         assertThrows(IllegalStateException.class, () -> connector.move(null, null, null));
-        assertThrows(IllegalStateException.class, () -> connector.move("", "", new WorkInProgressMonitor("")));
+        assertThrows(IllegalStateException.class, () -> connector.move("", "", wipMon));
 
         assertThrows(IllegalStateException.class, () -> connector.delete(null, null));
-        assertThrows(IllegalStateException.class, () -> connector.delete("", new WorkInProgressMonitor("")));
+        assertThrows(IllegalStateException.class, () -> connector.delete("", wipMon));
 
         assertThrows(IllegalStateException.class, connector::testConfiguration);
     }

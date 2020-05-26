@@ -8,6 +8,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
@@ -30,8 +31,8 @@ public abstract class BaseSshFileConnector extends BaseFileConnector {
      * The port of the remote server.
      */
     @Positive
-    @IgorParam
-    private int port = 22;
+    @IgorParam(defaultValue = "22")
+    private int port;
 
     /**
      * The username to login with.
@@ -50,20 +51,21 @@ public abstract class BaseSshFileConnector extends BaseFileConnector {
     /**
      * Enables or disables strict host-key checking.
      */
-    @IgorParam(advanced = true)
-    private boolean strictHostkeyChecking = false;
+    @IgorParam(advanced = true, defaultValue = "false")
+    private boolean strictHostkeyChecking;
 
     /**
      * Preferred authentications.
      */
-    @IgorParam(advanced = true)
-    private String preferredAuthentications = "publickey,keyboard-interactive,password";
+    @IgorParam(advanced = true, defaultValue = "publickey,keyboard-interactive,password")
+    private String preferredAuthentications;
 
     /**
-     * Connection timeout.
+     * Connection timeout in milliseconds.
      */
-    @IgorParam(advanced = true)
-    private int timeout = 30000;
+    @Positive
+    @IgorParam(advanced = true, defaultValue = "30000")
+    private int timeout;
 
     /**
      * Creates a new component instance.
@@ -85,7 +87,9 @@ public abstract class BaseSshFileConnector extends BaseFileConnector {
             Session session = jsch.getSession(username, host, port);
             session.setPassword(password);
             session.setConfig("StrictHostKeyChecking", strictHostkeyChecking ? "yes" : "no");
-            session.setConfig("PreferredAuthentications", preferredAuthentications);
+            if (!StringUtils.isEmpty(preferredAuthentications)) {
+                session.setConfig("PreferredAuthentications", preferredAuthentications);
+            }
             session.connect(timeout);
             return session;
         } catch (JSchException e) {

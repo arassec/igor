@@ -49,6 +49,9 @@ public class TestProvider extends BaseProvider {
     @IgorParam
     private Integer nullInteger;
 
+    /**
+     * An integer that is used for validation tests.
+     */
     @Getter
     @Setter
     @IgorParam

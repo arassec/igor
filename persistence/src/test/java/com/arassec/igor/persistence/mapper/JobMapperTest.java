@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests {@link com.arassec.igor.core.model.job.Job} mapping.
  */
 @DisplayName("Tests mapping a job.")
-public class JobMapperTest extends MapperBaseTest {
+class JobMapperTest extends MapperBaseTest {
 
     /**
      * Tests serializing a job.
@@ -59,6 +59,7 @@ public class JobMapperTest extends MapperBaseTest {
         testAction.setId("action-id");
         testAction.setName("action-name");
         testAction.setActive(true);
+        testAction.setNumThreads(1);
 
         TestConnector testConnector = new TestConnector();
         testConnector.setId(TestConnector.CONNECTOR_ID);

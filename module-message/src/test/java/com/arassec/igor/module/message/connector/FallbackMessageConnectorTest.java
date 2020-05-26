@@ -19,8 +19,10 @@ class FallbackMessageConnectorTest {
     void testMethodInvocations() {
         FallbackMessageConnector connector = new FallbackMessageConnector();
 
+        Message message = new Message();
+
         assertThrows(IllegalStateException.class, () -> connector.sendMessage(null));
-        assertThrows(IllegalStateException.class, () -> connector.sendMessage(new Message()));
+        assertThrows(IllegalStateException.class, () -> connector.sendMessage(message));
         assertThrows(IllegalStateException.class, connector::testConfiguration);
     }
 

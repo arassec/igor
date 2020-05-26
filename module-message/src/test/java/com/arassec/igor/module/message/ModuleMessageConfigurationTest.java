@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests the module configuration.
  */
 @DisplayName("Tests the message module's configuration.")
-public class ModuleMessageConfigurationTest {
+class ModuleMessageConfigurationTest {
 
     /**
      * Tests resolution of I18N keys to display texts.

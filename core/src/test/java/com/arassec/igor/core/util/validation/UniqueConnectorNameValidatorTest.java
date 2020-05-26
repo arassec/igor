@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
  * Tests the {@link UniqueConnectorNameValidator}.
  */
 @DisplayName("Unique-Connector-Name-Validator tests")
-public class UniqueConnectorNameValidatorTest {
+class UniqueConnectorNameValidatorTest {
 
     /**
      * Tests validation of a connector's name.

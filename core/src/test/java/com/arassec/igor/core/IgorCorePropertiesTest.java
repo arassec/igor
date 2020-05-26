@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests the {@link IgorCoreProperties}.
  */
 @DisplayName("Igor's core-properties Tests")
-public class IgorCorePropertiesTest {
+class IgorCorePropertiesTest {
 
     /**
      * Tests the core properties default values.

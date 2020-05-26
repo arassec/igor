@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests {@link Connector} mapping.
  */
 @DisplayName("Tests mapping a connector.")
-public class ConnectorMapperTest extends MapperBaseTest {
+class ConnectorMapperTest extends MapperBaseTest {
 
     /**
      * Tests serializing a connector.

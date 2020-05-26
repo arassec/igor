@@ -39,6 +39,13 @@ public @interface IgorParam {
     boolean advanced() default false;
 
     /**
+     * An optional default value which is used in the UI.
+     *
+     * @return A default value for the parameter.
+     */
+    String defaultValue() default "";
+
+    /**
      * Further specifies the type of parameter, additionally to the java data type.
      *
      * @return A value of {@link ParameterSubtype}.

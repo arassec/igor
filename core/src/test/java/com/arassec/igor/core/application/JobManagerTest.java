@@ -227,10 +227,11 @@ class JobManagerTest {
     @Test
     @DisplayName("Tests enqueueing a new job.")
     void testEnqueueNewJob() {
-        assertThrows(IllegalArgumentException.class, () -> jobManager.enqueue(null));
-        assertThrows(IllegalArgumentException.class, () -> jobManager.enqueue(new Job()));
-
         Job job = new Job();
+
+        assertThrows(IllegalArgumentException.class, () -> jobManager.enqueue(null));
+        assertThrows(IllegalArgumentException.class, () -> jobManager.enqueue(job));
+
         job.setId("job-id");
         job.setHistoryLimit(666);
 
@@ -568,8 +569,10 @@ class JobManagerTest {
         when(job.getName()).thenReturn("job-name");
         when(jobRepository.findAll()).thenReturn(List.of(job));
 
+        ContextRefreshedEvent contextRefreshedEventMock = mock(ContextRefreshedEvent.class);
+
         // Job without ID:
-        assertThrows(IllegalArgumentException.class, () -> jobManager.onApplicationEvent(mock(ContextRefreshedEvent.class)),
+        assertThrows(IllegalArgumentException.class, () -> jobManager.onApplicationEvent(contextRefreshedEventMock),
                 "A job without ID should throw an exception!");
 
         // Inactive Job:
@@ -590,7 +593,7 @@ class JobManagerTest {
         job.setTrigger(scheduledTriggerMock);
         when(jobRepository.findAll()).thenReturn(List.of(job));
 
-        assertThrows(IllegalStateException.class, () -> jobManager.onApplicationEvent(mock(ContextRefreshedEvent.class)),
+        assertThrows(IllegalStateException.class, () -> jobManager.onApplicationEvent(contextRefreshedEventMock),
                 "Invalid CRON expression should trigger Exception!");
 
         // A valid job:

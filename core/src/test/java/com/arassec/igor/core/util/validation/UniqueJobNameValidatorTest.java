@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
  * Tests the {@link UniqueJobNameValidator}.
  */
 @DisplayName("Unique-Job-Name-Validator tests")
-public class UniqueJobNameValidatorTest {
+class UniqueJobNameValidatorTest {
 
     /**
      * Tests validation of a connector's name.

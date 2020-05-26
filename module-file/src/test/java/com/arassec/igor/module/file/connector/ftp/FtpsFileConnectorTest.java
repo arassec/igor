@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * <p>
  * So here only the connection to the FTPS server is tested.
  */
-public class FtpsFileConnectorTest extends FtpFileConnectorBaseTest {
+class FtpsFileConnectorTest extends FtpFileConnectorBaseTest {
 
     /**
      * Initializes the test environment by starting an FTP server.

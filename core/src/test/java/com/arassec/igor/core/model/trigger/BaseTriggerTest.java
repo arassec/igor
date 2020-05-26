@@ -10,7 +10,7 @@ import static org.mockito.Mockito.*;
  * Tests the {@link BaseTrigger}.
  */
 @DisplayName("Base-Trigger Tests.")
-public class BaseTriggerTest {
+class BaseTriggerTest {
 
     /**
      * Tests the {@link BaseTrigger}'s constructor.

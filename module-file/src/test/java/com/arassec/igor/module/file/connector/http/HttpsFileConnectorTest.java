@@ -36,6 +36,7 @@ class HttpsFileConnectorTest extends HttpFileConnectorBaseTest {
         connector = new HttpsFileConnector();
         connector.setHost("localhost");
         connector.setPort(wireMockServer.httpsPort());
+        connector.setTimeout(3600);
 
         // For now, we simply accept the WireMock-SSL-Certificate:
         ((HttpsFileConnector) connector).setCertificateVerification(false);

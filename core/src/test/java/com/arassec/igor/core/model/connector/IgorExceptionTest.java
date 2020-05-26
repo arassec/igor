@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests the {@link IgorException}.
  */
 @DisplayName("Connector-Exception Tests")
-public class IgorExceptionTest {
+class IgorExceptionTest {
 
     /**
      * Tests the igor-exception's constructors.
