@@ -12,6 +12,8 @@ import com.arassec.igor.core.repository.PersistentValueRepository;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
+import com.arassec.igor.core.util.event.JobEvent;
+import com.arassec.igor.core.util.event.JobEventType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
@@ -81,12 +84,18 @@ class JobManagerTest {
     private JobExecutor jobExecutor;
 
     /**
+     * Publisher for events based on job changes.
+     */
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    /**
      * Initializes the test environment.
      */
     @BeforeEach
     void initialize() {
         jobManager = new JobManager(igorCoreProperties, jobRepository, jobExecutionRepository,
-                persistentValueRepository, taskScheduler, jobExecutor);
+                persistentValueRepository, taskScheduler, jobExecutor, applicationEventPublisher);
     }
 
     /**
@@ -160,6 +169,12 @@ class JobManagerTest {
 
         assertEquals(job, savedJob);
         verify(scheduledFuture, times(2)).cancel(eq(true));
+
+        // A job event must be sent:
+        ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
+        verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
+        assertEquals(JobEventType.SAVE, argCap.getValue().getType());
+        assertEquals(savedJob, argCap.getValue().getJob());
     }
 
     /**
@@ -184,6 +199,12 @@ class JobManagerTest {
 
         assertEquals(job, savedJob);
         verify(scheduledFuture, times(1)).cancel(eq(true));
+
+        // A job event must be sent:
+        ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
+        verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
+        assertEquals(JobEventType.SAVE, argCap.getValue().getType());
+        assertEquals(savedJob, argCap.getValue().getJob());
     }
 
     /**
@@ -219,6 +240,12 @@ class JobManagerTest {
         verify(jobExecutionRepository, times(1)).deleteByJobId(eq("job-id"));
         verify(persistentValueRepository, times(1)).deleteByJobId(eq("job-id"));
         assertTrue(scheduledJobs.isEmpty());
+
+        // A job event must be sent:
+        ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
+        verify(applicationEventPublisher, times(2)).publishEvent(argCap.capture());
+        assertEquals(JobEventType.DELETE, argCap.getAllValues().get(1).getType());
+        assertEquals(job, argCap.getAllValues().get(1).getJob());
     }
 
     /**
@@ -246,6 +273,12 @@ class JobManagerTest {
         assertEquals(JobExecutionState.WAITING, jobExecution.getExecutionState());
 
         verify(jobExecutionRepository, times(1)).cleanup(eq("job-id"), eq(666));
+
+        // A job event must be sent:
+        ArgumentCaptor<JobEvent> jobEventArgCap = ArgumentCaptor.forClass(JobEvent.class);
+        verify(applicationEventPublisher, times(1)).publishEvent(jobEventArgCap.capture());
+        assertEquals(JobEventType.STATE_CHANGE, jobEventArgCap.getValue().getType());
+        assertEquals(job, jobEventArgCap.getValue().getJob());
     }
 
     /**
@@ -272,6 +305,7 @@ class JobManagerTest {
         jobManager.enqueue(job);
 
         verify(jobExecutionRepository, times(0)).upsert(any(JobExecution.class));
+        verify(applicationEventPublisher, times(0)).publishEvent(any(JobEvent.class));
     }
 
     /**
@@ -320,14 +354,24 @@ class JobManagerTest {
     @DisplayName("Tests cancelling a waiting job execution.")
     void testCancelExecutionWaiting() {
         JobExecution jobExecutionMock = mock(JobExecution.class);
+        when(jobExecutionMock.getJobId()).thenReturn("job-id");
         when(jobExecutionMock.getExecutionState()).thenReturn(JobExecutionState.WAITING);
         when(jobExecutionRepository.findById(eq(666L))).thenReturn(jobExecutionMock);
+
+        Job job = Job.builder().build();
+        when(jobRepository.findById(eq("job-id"))).thenReturn(job);
 
         jobManager.cancelExecution(666L);
 
         verify(jobExecutionRepository, times(1)).upsert(eq(jobExecutionMock));
         verify(jobExecutionMock, times(1)).setExecutionState(eq(JobExecutionState.CANCELLED));
         verify(jobExecutionMock, times(1)).setFinished(any(Instant.class));
+
+        // A job event must be sent:
+        ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
+        verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
+        assertEquals(job, argCap.getValue().getJob());
     }
 
     /**
@@ -385,9 +429,9 @@ class JobManagerTest {
     @Test
     @DisplayName("Tests loading a page of jobs with state filter.")
     void testLoadPageWithStateFilter() {
-        Job running = Job.builder().currentJobExecution(
+        Job running = Job.builder().id("running").currentJobExecution(
                 JobExecution.builder().executionState(JobExecutionState.RUNNING).build()).build();
-        Job failed = Job.builder().currentJobExecution(
+        Job failed = Job.builder().id("failed").currentJobExecution(
                 JobExecution.builder().executionState(JobExecutionState.FAILED).build()).build();
         Job runningHistory = Job.builder().id("runningHistory").build();
         Job failedHistory = Job.builder().id("failedHistory").build();
@@ -398,20 +442,17 @@ class JobManagerTest {
 
         when(jobRepository.findPage(eq(0), eq(Integer.MAX_VALUE), eq("job-name-filter"))).thenReturn(jobModelPage);
 
-        when(jobExecutionRepository.findAllOfJob(eq("runningHistory"), eq(0), eq(1))).thenReturn(
-                new ModelPage<>(0, 1, 1, List.of(JobExecution.builder().executionState(JobExecutionState.RUNNING).build()))
-        );
-        when(jobExecutionRepository.findAllOfJob(eq("failedHistory"), eq(0), eq(1))).thenReturn(
-                new ModelPage<>(0, 1, 1, List.of(JobExecution.builder().executionState(JobExecutionState.FAILED).build()))
-        );
+        lenient().when(jobExecutionRepository.countAllOfJobInState(eq("failed"), eq(JobExecutionState.FAILED))).thenReturn(1);
+        lenient().when(jobExecutionRepository.countAllOfJobInState(eq("failedHistory"), eq(JobExecutionState.FAILED))).thenReturn(4);
 
-        ModelPage<Job> resultPage = jobManager.loadPage(0, 2, "job-name-filter", Set.of(JobExecutionState.RUNNING));
+        ModelPage<Job> resultPage = jobManager.loadPage(0, 2, "job-name-filter", Set.of(JobExecutionState.FAILED));
 
         assertEquals(0, resultPage.getNumber());
         assertEquals(2, resultPage.getSize());
         assertEquals(1, resultPage.getTotalPages());
-        assertEquals(running, resultPage.getItems().get(0));
-        assertEquals(runningHistory, resultPage.getItems().get(1));
+        assertEquals(2, resultPage.getItems().size());
+        assertEquals(failed, resultPage.getItems().get(0));
+        assertEquals(failedHistory, resultPage.getItems().get(1));
     }
 
     /**
@@ -484,7 +525,7 @@ class JobManagerTest {
 
         JobExecution executorJobExecution = new JobExecution();
         executorJobExecution.setCurrentTask("current-task");
-        executorJobExecution.addWorkInProgress(new WorkInProgressMonitor("wip-mon"));
+        executorJobExecution.addWorkInProgress(new WorkInProgressMonitor());
         when(jobExecutor.getJobExecution(eq("job-id"))).thenReturn(executorJobExecution);
 
         assertEquals(jobExecution, jobManager.getJobExecution(1L));
@@ -513,8 +554,19 @@ class JobManagerTest {
     @Test
     @DisplayName("Tests updating a job execution's state.")
     void testUpdateJobExecutionState() {
+        when(jobExecutionRepository.findById(eq(666L))).thenReturn(JobExecution.builder().jobId("job-id").build());
+        Job job = Job.builder().build();
+        when(jobRepository.findById(eq("job-id"))).thenReturn(job);
+
         jobManager.updateJobExecutionState(666L, JobExecutionState.RESOLVED);
+
         verify(jobExecutionRepository, times(1)).updateJobExecutionState(eq(666L), eq(JobExecutionState.RESOLVED));
+
+        // A job event must be sent:
+        ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
+        verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
+        assertEquals(job, argCap.getValue().getJob());
     }
 
     /**
@@ -523,9 +575,19 @@ class JobManagerTest {
     @Test
     @DisplayName("Tests bulk updating job executions.")
     void testUpdateAllJobExecutionsOfJob() {
+        Job job = Job.builder().build();
+        when(jobRepository.findById(eq("job-id"))).thenReturn(job);
+
         jobManager.updateAllJobExecutionsOfJob("job-id", JobExecutionState.FAILED, JobExecutionState.RESOLVED);
+
         verify(jobExecutionRepository, times(1)).updateAllJobExecutionsOfJob(eq("job-id"), eq(JobExecutionState.FAILED),
                 eq(JobExecutionState.RESOLVED));
+
+        // A job event must be sent:
+        ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
+        verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
+        assertEquals(job, argCap.getValue().getJob());
     }
 
     /**
@@ -557,6 +619,16 @@ class JobManagerTest {
     void testCountJobExecutions() {
         when(jobExecutionRepository.countJobsWithState(eq(JobExecutionState.FAILED))).thenReturn(666);
         assertEquals(666, jobManager.countJobExecutions(JobExecutionState.FAILED));
+    }
+
+    /**
+     * Tests counting executions in a certain state of a certain job.
+     */
+    @Test
+    @DisplayName("Tests counting executions in a certain state of a certain job.")
+    void testCountExecutionsOfJobInState() {
+        when(jobExecutionRepository.countAllOfJobInState(eq("job-id"), eq(JobExecutionState.FAILED))).thenReturn(42);
+        assertEquals(42, jobManager.countExecutionsOfJobInState("job-id", JobExecutionState.FAILED));
     }
 
     /**

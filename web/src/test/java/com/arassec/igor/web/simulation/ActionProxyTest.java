@@ -119,6 +119,18 @@ class ActionProxyTest {
     }
 
     /**
+     * Tests setting the number of threads from the proxy.
+     */
+    @Test
+    @DisplayName("Tests setting the number of threads from the proxy.")
+    void testSetNumThreads() {
+        Action actionMock = mock(Action.class);
+        ActionProxy actionProxy = new ActionProxy(actionMock);
+        actionProxy.setNumThreads(23);
+        verify(actionMock, times(1)).setNumThreads(eq(23));
+    }
+
+    /**
      * Tests checking the action activity through the proxy.
      */
     @Test

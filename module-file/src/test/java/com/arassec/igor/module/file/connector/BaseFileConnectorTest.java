@@ -45,7 +45,7 @@ class BaseFileConnectorTest {
         InputStream inputStream = new ByteArrayInputStream("1234567890".getBytes());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor("copy-stream-test");
+        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor();
 
         baseFileConnector.setStreamCopyBufferSize(1024 * 1024);
 
@@ -64,7 +64,7 @@ class BaseFileConnectorTest {
         InputStream inputStream = new ByteArrayInputStream("1234567890".getBytes());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor("copy-stream-test");
+        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor();
 
         baseFileConnector.setStreamCopyBufferSize(2);
 
@@ -85,7 +85,7 @@ class BaseFileConnectorTest {
         when(inputStreamMock.read(any(byte[].class), eq(0), anyInt())).thenThrow(new IOException("base-file-connector" +
                 "-test-exception"));
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("test");
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
 
         assertThrows(IgorException.class, () -> baseFileConnector.copyStream(inputStreamMock, null, 100, wipMon));
 

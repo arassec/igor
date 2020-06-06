@@ -74,7 +74,7 @@ public abstract class BaseFileConnector extends BaseConnector implements FileCon
                     break;
                 }
                 out.flush();
-                workInProgressMonitor.setProgressInPercent(calculatePercentage(fileSize, totalSize));
+                workInProgressMonitor.setProgressInPercent(calculatePercentage((totalSize - fileSize), totalSize));
             }
             out.flush();
         } catch (IOException e) {
@@ -104,8 +104,8 @@ public abstract class BaseFileConnector extends BaseConnector implements FileCon
      *
      * @return The percentage.
      */
-    private double calculatePercentage(double obtained, double total) {
-        return obtained * 100 / total;
+    private double calculatePercentage(long obtained, long total) {
+        return (obtained * 100f) / total;
     }
 
 }

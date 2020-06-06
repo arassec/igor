@@ -71,4 +71,15 @@ public interface JobExecutionDao extends PagingAndSortingRepository<JobExecution
     @Query(value = "SELECT COUNT(DISTINCT (job_id)) FROM job_execution WHERE state = :state", nativeQuery = true)
     int countDistinctJobIdByState(String state);
 
+    /**
+     * Counts job executions in the given state of a certain job.
+     *
+     * @param jobId The ID of the job.
+     * @param state The state a job execution has to be in to count.
+     *
+     * @return The number of executions in the given state.
+     */
+    @Query(value = "SELECT COUNT(job_id) FROM job_execution WHERE job_id = :jobId AND state = :state", nativeQuery = true)
+    int countAllOfJobInState(String jobId, String state);
+
 }

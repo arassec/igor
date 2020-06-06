@@ -18,7 +18,7 @@ class IgorSftpProgressMonitorTest {
     @Test
     @DisplayName("Tests the progress monitor's functionality.")
     void testProgressMonitor() {
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("sftp-progress-monitor-test");
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
         IgorSftpProgressMonitor progressMonitor = new IgorSftpProgressMonitor(666, wipMon);
 
         progressMonitor.init(0, "src", "dest", 0);

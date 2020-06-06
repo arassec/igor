@@ -17,7 +17,7 @@ class WorkInProgressMonitorTest {
     @Test
     @DisplayName("Tests data storage.")
     void testDataStorage() {
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("test");
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("test", 0);
         wipMon.setProgressInPercent(66.0);
         assertEquals("test", wipMon.getName());
         assertEquals(66, wipMon.getProgressInPercent());

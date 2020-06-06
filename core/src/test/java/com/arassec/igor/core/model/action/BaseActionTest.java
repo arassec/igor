@@ -2,6 +2,7 @@ package com.arassec.igor.core.model.action;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.Task;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -124,6 +125,30 @@ class BaseActionTest {
         assertNull(baseAction.getName());
         baseAction.setName("base-action-test");
         assertEquals("base-action-test", baseAction.getName());
+    }
+
+    /**
+     * Tests setting and getting the action's number of threads.
+     */
+    @Test
+    @DisplayName("Tests setting and getting the action's number of threads.")
+    @SneakyThrows
+    void testSetGetNumThreads() {
+        assertEquals(0, baseAction.getNumThreads());
+        baseAction.setNumThreads(5);
+        assertEquals(5, baseAction.getNumThreads());
+    }
+
+    /**
+     * Tests setting and getting the action's 'active' property.
+     */
+    @Test
+    @DisplayName("Tests setting and getting the action's 'active' property.")
+    @SneakyThrows
+    void testSetGetActive() {
+        assertFalse(baseAction.isActive());
+        baseAction.setActive(true);
+        assertTrue(baseAction.isActive());
     }
 
 }

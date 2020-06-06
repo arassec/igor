@@ -130,9 +130,9 @@ abstract class SshFileConnectorBaseTest {
     @DisplayName("Tests reading a file.")
     void testRead() {
         assertEquals("ALPHA-igor-ssh-connector-tests",
-                connector.read("src/test/resources/ssh/alpha.txt", new WorkInProgressMonitor("ssh-read-test")));
+                connector.read("src/test/resources/ssh/alpha.txt", new WorkInProgressMonitor()));
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("ssh-read-non-existing-file-test");
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
         assertThrows(IgorException.class, () -> connector.read("non-existing-file", wipMon));
     }
 
@@ -143,7 +143,7 @@ abstract class SshFileConnectorBaseTest {
     @DisplayName("Tests reading a file as stream.")
     @SneakyThrows
     void testReadStream() {
-        FileStreamData fileStreamData = connector.readStream("src/test/resources/ssh/alpha.txt", new WorkInProgressMonitor("ssh-read-stream-test"));
+        FileStreamData fileStreamData = connector.readStream("src/test/resources/ssh/alpha.txt", new WorkInProgressMonitor());
 
         assertEquals("ALPHA-igor-ssh-connector-tests", StreamUtils.copyToString(fileStreamData.getData(),
                 Charset.defaultCharset()));
@@ -168,7 +168,7 @@ abstract class SshFileConnectorBaseTest {
         fileStreamData.setFileSize(fileContent.getBytes().length);
 
         connector.writeStream(fileName, fileStreamData,
-                new WorkInProgressMonitor("ssh-write-stream-test"));
+                new WorkInProgressMonitor());
 
         assertEquals(fileContent, Files.readString(Paths.get(fileName)));
 
@@ -185,7 +185,7 @@ abstract class SshFileConnectorBaseTest {
         String fileName = "target/ssh-delete-test.txt";
         Files.writeString(Paths.get(fileName), "ssh-delete-test", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
-        connector.delete(fileName, new WorkInProgressMonitor("ssh-delete-test"));
+        connector.delete(fileName, new WorkInProgressMonitor());
 
         assertFalse(Files.exists(Paths.get(fileName)));
     }
@@ -205,7 +205,7 @@ abstract class SshFileConnectorBaseTest {
         assertTrue(Files.exists(Paths.get(fileName)));
         assertFalse(Files.exists(Paths.get(targetFilename)));
 
-        connector.move(fileName, fileName + ".moved", new WorkInProgressMonitor("ssh-move-test"));
+        connector.move(fileName, fileName + ".moved", new WorkInProgressMonitor());
 
         assertFalse(Files.exists(Paths.get(fileName)));
         assertTrue(Files.exists(Paths.get(targetFilename)));

@@ -28,6 +28,11 @@ public class JobListEntry {
     private boolean active;
 
     /**
+     * {@code true} if the job has unresolved, failed executions in its execution history.
+     */
+    private boolean hasFailedExecutions;
+
+    /**
      * Information about the last execution of this job.
      */
     private JobExecutionListEntry execution;

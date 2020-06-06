@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests the web layer's ObjectMapper simulation mode.
  */
 @DisplayName("Simulation-ObjectMapper Tests")
-public class SimulationObjectMapperTest extends MapperBaseTest {
+class SimulationObjectMapperTest extends MapperBaseTest {
 
     /**
      * Tests job deserialization in simulation mode.

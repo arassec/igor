@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +34,7 @@ import java.util.Optional;
  */
 @ControllerAdvice
 @RequiredArgsConstructor
+@Slf4j
 public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
@@ -58,6 +60,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     protected ResponseEntity<Object> handleInternalServerError(RuntimeException runtimeException, WebRequest webRequest) {
         Map<String, Object> result = new HashMap<>();
         result.put(WebMapperKey.GENERAL_ERROR.getKey(), runtimeException.getMessage());
+        log.warn("Caught exception during request!", runtimeException);
         return handleExceptionInternal(runtimeException, result,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, webRequest);
     }

@@ -6,6 +6,9 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
+import com.arassec.igor.core.util.event.JobEvent;
+import com.arassec.igor.core.util.event.JobEventType;
+import com.arassec.igor.web.model.JobExecutionOverview;
 import com.arassec.igor.web.model.JobListEntry;
 import com.arassec.igor.web.model.ScheduleEntry;
 import com.arassec.igor.web.simulation.ActionProxy;
@@ -16,16 +19,20 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -37,6 +44,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @DisplayName("Job-Controller Tests")
 class JobRestControllerTest extends RestControllerBaseTest {
+
+    /**
+     * The REST controller for job handling.
+     */
+    @Autowired
+    private JobRestController jobRestController;
 
     /**
      * Tests reading job list entries.
@@ -53,22 +66,34 @@ class JobRestControllerTest extends RestControllerBaseTest {
                         Job.builder().id("job-id").name("job-name").active(true).build()
                 )));
 
-        MvcResult mvcResult = mockMvc.perform(get("/api/job")
+        when(jobManager.countExecutionsOfJobInState(eq("job-id"), eq(JobExecutionState.FAILED))).thenReturn(3);
+
+        mockMvc.perform(get("/api/job")
                 .queryParam("pageNumber", "1")
                 .queryParam("pageSize", "2")
                 .queryParam("nameFilter", "name-filter"))
-                .andExpect(status().isOk()).andReturn();
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.number").value("1"))
+                .andExpect(jsonPath("$.size").value("2"))
+                .andExpect(jsonPath("$.totalPages").value("3"))
+                .andExpect(jsonPath("$.items[0].id").value("job-id"))
+                .andExpect(jsonPath("$.items[0].name").value("job-name"))
+                .andExpect(jsonPath("$.items[0].active").value("true"))
+                .andExpect(jsonPath("$.items[0].hasFailedExecutions").value("true"))
+                .andExpect(jsonPath("$.items[1]").doesNotExist());
+    }
 
-        ModelPage<JobListEntry> result = convert(mvcResult, new TypeReference<>() {
-        });
-
-        assertEquals(1, result.getNumber());
-        assertEquals(2, result.getSize());
-
-        assertEquals(1, result.getItems().size());
-        assertEquals("job-id", result.getItems().get(0).getId());
-        assertEquals("job-name", result.getItems().get(0).getName());
-        assertTrue(result.getItems().get(0).isActive());
+    /**
+     * Tests getting a stream of job data.
+     */
+    @Test
+    @DisplayName("Tests getting a stream of job data.")
+    @SneakyThrows
+    void testGetJobStream() {
+        MvcResult mvcResult = mockMvc.perform(get("/api/job/stream")).andExpect(status().isOk()).andReturn();
+        String streamContent = mvcResult.getResponse().getContentAsString();
+        assertEquals("event:execution-overview\ndata:{\"numSlots\":0,\"numRunning\":0,\"numWaiting\":0,\"numFailed\":0}\n\n",
+                streamContent);
     }
 
     /**
@@ -415,9 +440,11 @@ class JobRestControllerTest extends RestControllerBaseTest {
     /**
      * Tests bean validation on job creation. Nested validation of tasks and actions is tested, too.
      */
+
     @Test
     @DisplayName("Tests bean validation on job creation.")
     @SneakyThrows
+    @SuppressWarnings("unchecked")
     void testCreateJobBeanValidation() {
 
         when(igorComponentRegistry.createTriggerInstance(eq(TestTrigger.TYPE_ID), any(Map.class))).thenReturn(new TestTrigger());
@@ -444,6 +471,173 @@ class JobRestControllerTest extends RestControllerBaseTest {
                 .andExpect(jsonPath("$.provider-id.validatedInteger").value("must not be null"))
                 .andExpect(jsonPath("$.first-task-id.name").value("must not be empty"))
                 .andExpect(jsonPath("$.second-task-id.name").value("must not be empty"));
+    }
+
+    /**
+     * Tests handling job state refresh events.
+     */
+    @Test
+    @DisplayName("Tests handling job state refresh events.")
+    @SneakyThrows
+    void testOnJobEventStateRefresh() {
+        SseEmitter emitterMock = mock(SseEmitter.class);
+
+        JobExecution jobExecution = JobExecution.builder().id(42L).executionState(JobExecutionState.FINISHED).build();
+
+        //noinspection unchecked
+        ((CopyOnWriteArrayList<SseEmitter>) Objects.requireNonNull(ReflectionTestUtils.getField(jobRestController,
+                "jobStreamEmitters"))).add(emitterMock);
+
+        jobRestController.onJobEvent(
+                new JobEvent(JobEventType.STATE_REFRESH,
+                        Job.builder().id("job-id").name("job-name").currentJobExecution(jobExecution).build())
+        );
+
+        ArgumentCaptor<SseEmitter.SseEventBuilder> argCap = ArgumentCaptor.forClass(SseEmitter.SseEventBuilder.class);
+        verify(emitterMock, times(1)).send(argCap.capture());
+
+        Iterator<ResponseBodyEmitter.DataWithMediaType> eventPartsIterator = argCap.getValue().build().iterator();
+
+        ResponseBodyEmitter.DataWithMediaType eventPart = eventPartsIterator.next();
+        assertEquals("event:state-update\ndata:", eventPart.getData());
+
+        eventPart = eventPartsIterator.next();
+        JobListEntry jobListEntry = (JobListEntry) eventPart.getData();
+        assertEquals("job-id", jobListEntry.getId());
+        assertEquals("job-name", jobListEntry.getName());
+        assertEquals(42L, jobListEntry.getExecution().getId());
+        assertEquals(JobExecutionState.FINISHED.name(), jobListEntry.getExecution().getState());
+    }
+
+    /**
+     * Tests handling job state change events.
+     */
+    @Test
+    @DisplayName("Tests handling job state change events.")
+    @SneakyThrows
+    void testOnJobEventStateChange() {
+        SseEmitter emitterMock = mock(SseEmitter.class);
+
+        JobExecution jobExecution = JobExecution.builder().id(42L).executionState(JobExecutionState.FINISHED).build();
+
+        //noinspection unchecked
+        ((CopyOnWriteArrayList<SseEmitter>) Objects.requireNonNull(ReflectionTestUtils.getField(jobRestController,
+                "jobStreamEmitters"))).add(emitterMock);
+
+        when(jobManager.getNumSlots()).thenReturn(1);
+        when(jobManager.countJobExecutions(eq(JobExecutionState.RUNNING))).thenReturn(2);
+        when(jobManager.countJobExecutions(eq(JobExecutionState.WAITING))).thenReturn(3);
+        when(jobManager.countJobExecutions(eq(JobExecutionState.FAILED))).thenReturn(4);
+
+        jobRestController.onJobEvent(
+                new JobEvent(JobEventType.STATE_CHANGE,
+                        Job.builder().id("job-id").name("job-name").currentJobExecution(jobExecution).build())
+        );
+
+        ArgumentCaptor<SseEmitter.SseEventBuilder> argCap = ArgumentCaptor.forClass(SseEmitter.SseEventBuilder.class);
+        verify(emitterMock, times(2)).send(argCap.capture());
+
+        // First Event
+        Iterator<ResponseBodyEmitter.DataWithMediaType> eventPartsIterator = argCap.getAllValues().get(0).build().iterator();
+
+        ResponseBodyEmitter.DataWithMediaType eventPart = eventPartsIterator.next();
+        assertEquals("event:state-update\ndata:", eventPart.getData());
+
+        eventPart = eventPartsIterator.next();
+        JobListEntry jobListEntry = (JobListEntry) eventPart.getData();
+        assertEquals("job-id", jobListEntry.getId());
+        assertEquals("job-name", jobListEntry.getName());
+        assertEquals(42L, jobListEntry.getExecution().getId());
+        assertEquals(JobExecutionState.FINISHED.name(), jobListEntry.getExecution().getState());
+
+        // Second Event
+        eventPartsIterator = argCap.getAllValues().get(1).build().iterator();
+
+        eventPart = eventPartsIterator.next();
+        assertEquals("event:execution-overview\ndata:", eventPart.getData());
+
+        eventPart = eventPartsIterator.next();
+        JobExecutionOverview jobExecutionOverview = (JobExecutionOverview) eventPart.getData();
+        assertEquals(1, jobExecutionOverview.getNumSlots());
+        assertEquals(2, jobExecutionOverview.getNumRunning());
+        assertEquals(3, jobExecutionOverview.getNumWaiting());
+        assertEquals(4, jobExecutionOverview.getNumFailed());
+    }
+
+    /**
+     * Tests handling job CRUD events.
+     */
+    @Test
+    @DisplayName("Tests handling job CRUD events.")
+    @SneakyThrows
+    void testOnJobEventCrud() {
+        SseEmitter emitterMock = mock(SseEmitter.class);
+
+        //noinspection unchecked
+        ((CopyOnWriteArrayList<SseEmitter>) Objects.requireNonNull(ReflectionTestUtils.getField(jobRestController,
+                "jobStreamEmitters"))).add(emitterMock);
+
+        when(jobManager.getNumSlots()).thenReturn(1);
+        when(jobManager.countJobExecutions(eq(JobExecutionState.RUNNING))).thenReturn(2);
+        when(jobManager.countJobExecutions(eq(JobExecutionState.WAITING))).thenReturn(3);
+        when(jobManager.countJobExecutions(eq(JobExecutionState.FAILED))).thenReturn(4);
+
+        jobRestController.onJobEvent(
+                new JobEvent(JobEventType.DELETE, Job.builder().id("job-id").name("job-name").build())
+        );
+
+        ArgumentCaptor<SseEmitter.SseEventBuilder> argCap = ArgumentCaptor.forClass(SseEmitter.SseEventBuilder.class);
+        verify(emitterMock, times(2)).send(argCap.capture());
+
+        // First Event
+        Iterator<ResponseBodyEmitter.DataWithMediaType> eventPartsIterator = argCap.getAllValues().get(0).build().iterator();
+
+        ResponseBodyEmitter.DataWithMediaType eventPart = eventPartsIterator.next();
+        assertEquals("event:crud\ndata:", eventPart.getData());
+
+        eventPart = eventPartsIterator.next();
+        assertEquals("job-id", eventPart.getData());
+
+        // Second Event
+        eventPartsIterator = argCap.getAllValues().get(1).build().iterator();
+
+        eventPart = eventPartsIterator.next();
+        assertEquals("event:execution-overview\ndata:", eventPart.getData());
+
+        eventPart = eventPartsIterator.next();
+        JobExecutionOverview jobExecutionOverview = (JobExecutionOverview) eventPart.getData();
+        assertEquals(1, jobExecutionOverview.getNumSlots());
+        assertEquals(2, jobExecutionOverview.getNumRunning());
+        assertEquals(3, jobExecutionOverview.getNumWaiting());
+        assertEquals(4, jobExecutionOverview.getNumFailed());
+    }
+
+    /**
+     * Tests cleaning up dead emitters on job events.
+     */
+    @Test
+    @DisplayName("Tests cleaning up dead emitters on job events.")
+    @SneakyThrows
+    void testOnJobEventCleanup() {
+        SseEmitter emitterMock = mock(SseEmitter.class);
+
+        JobExecution jobExecution = JobExecution.builder().build();
+
+        //noinspection unchecked
+        CopyOnWriteArrayList<SseEmitter> emitters =
+                (CopyOnWriteArrayList<SseEmitter>) Objects.requireNonNull(ReflectionTestUtils.getField(jobRestController,
+                        "jobStreamEmitters"));
+        emitters.add(emitterMock);
+
+        doThrow(new IOException("wanted-test-exception")).when(emitterMock).send(any(SseEmitter.SseEventBuilder.class));
+
+        jobRestController.onJobEvent(
+                new JobEvent(JobEventType.STATE_REFRESH,
+                        Job.builder().currentJobExecution(jobExecution).build())
+        );
+
+        // A dead emitter must be removed if sending fails:
+        assertFalse(emitters.contains(emitterMock));
     }
 
 }

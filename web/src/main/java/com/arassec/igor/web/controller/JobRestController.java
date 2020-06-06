@@ -11,6 +11,9 @@ import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
+import com.arassec.igor.core.util.event.JobEvent;
+import com.arassec.igor.core.util.event.JobEventType;
+import com.arassec.igor.web.model.JobExecutionOverview;
 import com.arassec.igor.web.model.JobListEntry;
 import com.arassec.igor.web.model.ScheduleEntry;
 import com.arassec.igor.web.model.simulation.SimulationResult;
@@ -19,16 +22,21 @@ import com.arassec.igor.web.simulation.ProviderProxy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +47,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class JobRestController extends BaseRestController {
+
+    /**
+     * SSE message indicating a job state update.
+     */
+    private static final String SSE_STATE_UPDATE = "state-update";
+
+    /**
+     * SSE message containing execution overview information.
+     */
+    private static final String SSE_EXECUTION_OVERVIEW = "execution-overview";
+
+    /**
+     * SSE message indicating job updates.
+     */
+    private static final String SSE_CRUD = "crud";
 
     /**
      * Manager for Jobs.
@@ -56,7 +79,17 @@ public class JobRestController extends BaseRestController {
     private final ObjectMapper simulationObjectMapper;
 
     /**
-     * Returns the IDs of all available jobs.
+     * Contains {@link SseEmitter} of job stream requests.
+     */
+    private final CopyOnWriteArrayList<SseEmitter> jobStreamEmitters = new CopyOnWriteArrayList<>();
+
+    /**
+     * Returns job data for all available jobs.
+     *
+     * @param pageNumber  The number of the page to retrieve.
+     * @param pageSize    The size of the page to retrieve.
+     * @param nameFilter  Optinoal String to use as filter for job names.
+     * @param stateFilter Optional {@link JobExecutionState} to use for filtering jobs.
      *
      * @return List of Job-IDs.
      */
@@ -77,22 +110,38 @@ public class JobRestController extends BaseRestController {
             ModelPage<JobListEntry> result = new ModelPage<>(pageNumber, pageSize, jobsPage.getTotalPages(), null);
 
             result.setItems(jobsPage.getItems().stream().map(job -> {
-
-                JobExecution jobExecution = job.getCurrentJobExecution();
-                if (jobExecution == null) {
-                    ModelPage<JobExecution> jobExecutionsOfJob = jobManager.getJobExecutionsOfJob(job.getId(), 0, 1);
-                    if (jobExecutionsOfJob != null && !jobExecutionsOfJob.getItems().isEmpty()) {
-                        jobExecution = jobExecutionsOfJob.getItems().get(0);
-                    }
-                }
-
-                return new JobListEntry(job.getId(), job.getName(), job.isActive(), convert(jobExecution, null));
+                JobExecution jobExecution = determineJobExecution(jobManager, job);
+                return new JobListEntry(job.getId(), job.getName(), job.isActive(),
+                        (jobManager.countExecutionsOfJobInState(job.getId(), JobExecutionState.FAILED) > 0), convert(jobExecution, null));
             }).collect(Collectors.toList()));
 
             return result;
         }
 
         return new ModelPage<>(pageNumber, pageSize, 0, List.of());
+    }
+
+    /**
+     * Returns an {@link SseEmitter} that will be used to send SSE job messages to the client.
+     *
+     * @return SSE emitter for job messages.
+     */
+    @GetMapping("stream")
+    public SseEmitter getJobStream(HttpServletResponse response) {
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
+
+        SseEmitter emitter = new SseEmitter(-1L);
+        emitter.onCompletion(() -> jobStreamEmitters.remove(emitter));
+        emitter.onTimeout(() -> jobStreamEmitters.remove(emitter));
+
+        // The first event is an overview of the job executions:
+        try {
+            emitter.send(SseEmitter.event().name(SSE_EXECUTION_OVERVIEW).data(createJobExecutionOverview()));
+            jobStreamEmitters.add(emitter);
+            return emitter;
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
@@ -298,6 +347,56 @@ public class JobRestController extends BaseRestController {
         }
 
         return result;
+    }
+
+    /**
+     * Listens for job events and publishes them as SSE.
+     *
+     * @param jobEvent The event containing more information.
+     */
+    @EventListener
+    public void onJobEvent(JobEvent jobEvent) {
+        List<SseEmitter.SseEventBuilder> events = new LinkedList<>();
+
+        if (JobEventType.STATE_CHANGE.equals(jobEvent.getType()) ||
+                JobEventType.STATE_REFRESH.equals(jobEvent.getType())) {
+            JobExecution jobExecution = determineJobExecution(jobManager, jobEvent.getJob());
+            events.add(SseEmitter.event().name(SSE_STATE_UPDATE).data(
+                    new JobListEntry(jobEvent.getJob().getId(), jobEvent.getJob().getName(),
+                            jobEvent.getJob().isActive(), (jobManager.countExecutionsOfJobInState(jobEvent.getJob().getId(),
+                            JobExecutionState.FAILED) > 0), convert(jobExecution, null))
+            ));
+            if (JobEventType.STATE_CHANGE.equals(jobEvent.getType())) {
+                events.add(SseEmitter.event().name(SSE_EXECUTION_OVERVIEW).data(createJobExecutionOverview()));
+            }
+        } else {
+            events.add(SseEmitter.event().name(SSE_CRUD).data(jobEvent.getJob().getId()));
+            events.add(SseEmitter.event().name(SSE_EXECUTION_OVERVIEW).data(createJobExecutionOverview()));
+        }
+
+        List<SseEmitter> deadJobStreamEmitters = new LinkedList<>();
+        jobStreamEmitters.forEach(emitter -> events.forEach(event -> {
+            try {
+                emitter.send(event);
+            } catch (IOException e) {
+                deadJobStreamEmitters.add(emitter);
+            }
+        }));
+        jobStreamEmitters.removeAll(deadJobStreamEmitters);
+    }
+
+    /**
+     * Creates a job execution overview instance with information about e.g. running or failed job executions.
+     *
+     * @return A {@link JobExecutionOverview}.
+     */
+    private JobExecutionOverview createJobExecutionOverview() {
+        JobExecutionOverview jobExecutionOverview = new JobExecutionOverview();
+        jobExecutionOverview.setNumSlots(jobManager.getNumSlots());
+        jobExecutionOverview.setNumRunning(jobManager.countJobExecutions(JobExecutionState.RUNNING));
+        jobExecutionOverview.setNumWaiting(jobManager.countJobExecutions(JobExecutionState.WAITING));
+        jobExecutionOverview.setNumFailed(jobManager.countJobExecutions(JobExecutionState.FAILED));
+        return jobExecutionOverview;
     }
 
 }

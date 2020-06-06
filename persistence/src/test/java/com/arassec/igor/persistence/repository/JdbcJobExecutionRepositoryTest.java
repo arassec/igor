@@ -195,6 +195,17 @@ class JdbcJobExecutionRepositoryTest {
     }
 
     /**
+     * Tests counting job executions with a given state of a given job.
+     */
+    @Test
+    @DisplayName("Tests counting job executions with a given state of a given job.")
+    @SneakyThrows
+    void testCountAllOfJobInState() {
+        when(jobExecutionDao.countAllOfJobInState(eq("job-id"), eq(JobExecutionState.FAILED.name()))).thenReturn(23);
+        assertEquals(23, repository.countAllOfJobInState("job-id", JobExecutionState.FAILED));
+    }
+
+    /**
      * Tests finding all job-executions of a job in a certain state.
      */
     @Test

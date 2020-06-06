@@ -5,14 +5,22 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.util.ModelPage;
+import com.arassec.igor.core.util.event.JobEvent;
+import com.arassec.igor.core.util.event.JobEventType;
 import com.arassec.igor.web.model.JobExecutionListEntry;
-import com.arassec.igor.web.model.JobExecutionOverview;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -29,18 +37,26 @@ public class ExecutionRestController extends BaseRestController {
     private final JobManager jobManager;
 
     /**
-     * Returns an overview of the job executions.
-     *
-     * @return A {@link JobExecutionOverview}.
+     * Contains {@link SseEmitter} of execution stream requests.
      */
-    @GetMapping("overview")
-    public JobExecutionOverview getJobExecutionOverview() {
-        JobExecutionOverview result = new JobExecutionOverview();
-        result.setNumSlots(jobManager.getNumSlots());
-        result.setNumRunning(jobManager.countJobExecutions(JobExecutionState.RUNNING));
-        result.setNumWaiting(jobManager.countJobExecutions(JobExecutionState.WAITING));
-        result.setNumFailed(jobManager.countJobExecutions(JobExecutionState.FAILED));
-        return result;
+    private final CopyOnWriteArrayList<SseEmitter> executionStreamEmitters = new CopyOnWriteArrayList<>();
+
+    /**
+     * Returns an {@link SseEmitter} that will be used to send SSE job execution messages to the client.
+     *
+     * @return SSE emitter for job execution messages.
+     */
+    @GetMapping("stream")
+    public SseEmitter getExecutionStream(HttpServletResponse response) {
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
+
+        SseEmitter emitter = new SseEmitter(-1L);
+        emitter.onCompletion(() -> executionStreamEmitters.remove(emitter));
+        emitter.onTimeout(() -> executionStreamEmitters.remove(emitter));
+
+        executionStreamEmitters.add(emitter);
+
+        return emitter;
     }
 
     /**
@@ -144,7 +160,31 @@ public class ExecutionRestController extends BaseRestController {
         } else {
             jobManager.updateJobExecutionState(id, newState);
         }
+    }
 
+
+    /**
+     * Listens for job events and publishes them as SSE.
+     *
+     * @param jobEvent The event containing more information.
+     */
+    @EventListener
+    public void onJobEvent(JobEvent jobEvent) {
+        List<SseEmitter> deadJobStreamEmitters = new LinkedList<>();
+
+        if ((JobEventType.STATE_CHANGE.equals(jobEvent.getType())
+                || JobEventType.STATE_REFRESH.equals(jobEvent.getType()))) {
+            JobExecution jobExecution = determineJobExecution(jobManager, jobEvent.getJob());
+            for (SseEmitter emitter : executionStreamEmitters) {
+                try {
+                    emitter.send(jobExecution);
+                } catch (IOException e) {
+                    deadJobStreamEmitters.add(emitter);
+                }
+            }
+        }
+
+        executionStreamEmitters.removeAll(deadJobStreamEmitters);
     }
 
 }

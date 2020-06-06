@@ -1,8 +1,12 @@
 package com.arassec.igor.web.controller;
 
+import com.arassec.igor.core.application.JobManager;
+import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.web.model.JobExecutionListEntry;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -10,6 +14,7 @@ import java.time.Instant;
 /**
  * Base class for REST-Controllers.
  */
+@Slf4j
 public abstract class BaseRestController {
 
     /**
@@ -27,7 +32,9 @@ public abstract class BaseRestController {
         listEntry.setId(jobExecution.getId());
         listEntry.setJobId(jobExecution.getJobId());
         listEntry.setJobName(jobName);
-        listEntry.setState(jobExecution.getExecutionState().name());
+        if (jobExecution.getExecutionState() != null) {
+            listEntry.setState(jobExecution.getExecutionState().name());
+        }
         listEntry.setCreated(jobExecution.getCreated());
         listEntry.setStarted(jobExecution.getStarted());
         listEntry.setFinished(jobExecution.getFinished());
@@ -42,6 +49,25 @@ public abstract class BaseRestController {
             listEntry.setDuration("");
         }
         return listEntry;
+    }
+
+    /**
+     * Determines the most recent {@link JobExecution} of the given job.
+     *
+     * @param jobManager The manager for jobs.
+     * @param job        The {@link Job} to get the execution for.
+     *
+     * @return The most recent {@link JobExecution} if available, {@code null} otherwise.
+     */
+    protected JobExecution determineJobExecution(JobManager jobManager, Job job) {
+        JobExecution jobExecution = job.getCurrentJobExecution();
+        if (jobExecution == null) {
+            ModelPage<JobExecution> jobExecutionsOfJob = jobManager.getJobExecutionsOfJob(job.getId(), 0, 1);
+            if (jobExecutionsOfJob != null && !jobExecutionsOfJob.getItems().isEmpty()) {
+                jobExecution = jobExecutionsOfJob.getItems().get(0);
+            }
+        }
+        return jobExecution;
     }
 
     /**

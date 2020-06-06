@@ -110,6 +110,14 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      * {@inheritDoc}
      */
     @Override
+    public int countAllOfJobInState(String jobId, JobExecutionState state) {
+        return jobExecutionDao.countAllOfJobInState(jobId, state.name());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ModelPage<JobExecution> findInState(JobExecutionState state, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id").descending());
         Page<JobExecutionEntity> page = jobExecutionDao.findByState(state.name(), pageable);

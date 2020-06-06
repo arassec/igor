@@ -4,22 +4,30 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.util.ModelPage;
+import com.arassec.igor.core.util.event.JobEvent;
+import com.arassec.igor.core.util.event.JobEventType;
 import com.arassec.igor.web.model.JobExecutionListEntry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Tests the {@link ExecutionRestController}.
@@ -28,24 +36,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ExecutionRestControllerTest extends RestControllerBaseTest {
 
     /**
-     * Tests getting an execution overview.
+     * The REST controller for job executions.
+     */
+    @Autowired
+    private ExecutionRestController executionRestController;
+
+    /**
+     * Tests getting a stream of execution data.
      */
     @Test
-    @DisplayName("Tests getting an execution overview.")
+    @DisplayName("Tests getting a stream of execution data.")
     @SneakyThrows
-    void testGetJobExecutionOverview() {
-        when(jobManager.getNumSlots()).thenReturn(1);
-        when(jobManager.countJobExecutions(eq(JobExecutionState.RUNNING))).thenReturn(2);
-        when(jobManager.countJobExecutions(eq(JobExecutionState.WAITING))).thenReturn(3);
-        when(jobManager.countJobExecutions(eq(JobExecutionState.FAILED))).thenReturn(4);
+    void testGetExecutionStream() {
+        MvcResult mvcResult = mockMvc.perform(get("/api/execution/stream")).andExpect(status().isOk()).andReturn();
 
-        mockMvc.perform(get("/api/execution/overview")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.numSlots").value("1"))
-                .andExpect(jsonPath("$.numRunning").value("2"))
-                .andExpect(jsonPath("$.numWaiting").value("3"))
-                .andExpect(jsonPath("$.numFailed").value("4"));
+        // Simulate an event:
+        executionRestController.onJobEvent(new JobEvent(JobEventType.STATE_CHANGE,
+                Job.builder().id("job-id").name("job-name").currentJobExecution(
+                        JobExecution.builder().executionState(JobExecutionState.RUNNING).build()
+                ).build()));
+
+        String streamContent = mvcResult.getResponse().getContentAsString();
+        assertEquals("data:{\"executionState\":\"RUNNING\",\"workInProgress\":[],\"running\":true}\n\n", streamContent);
     }
-
 
     /**
      * Tests getting executions of a job.
@@ -183,6 +196,55 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
                         .param("updateAllOfJob", "true"))
                 .andExpect(status().isNoContent());
         verify(jobManager, times(1)).updateAllJobExecutionsOfJob(eq("job-id"), eq(JobExecutionState.FAILED), eq(JobExecutionState.RESOLVED));
+    }
+
+    /**
+     * Tests handling job events.
+     */
+    @Test
+    @DisplayName("Tests handling job events.")
+    @SneakyThrows
+    void testOnJobEvent() {
+        SseEmitter emitterMock = mock(SseEmitter.class);
+
+        JobExecution jobExecution = JobExecution.builder().build();
+
+        //noinspection unchecked
+        ((CopyOnWriteArrayList<SseEmitter>) Objects.requireNonNull(ReflectionTestUtils.getField(executionRestController, "executionStreamEmitters")))
+                .add(emitterMock);
+
+        executionRestController.onJobEvent(
+                new JobEvent(JobEventType.STATE_REFRESH,
+                        Job.builder().currentJobExecution(jobExecution).build())
+        );
+
+        verify(emitterMock, times(1)).send(eq(jobExecution));
+    }
+
+    /**
+     * Tests cleaning up dead emitters on job events.
+     */
+    @Test
+    @DisplayName("Tests cleaning up dead emitters on job events.")
+    @SneakyThrows
+    void testOnJobEventCleanup() {
+        SseEmitter emitterMock = mock(SseEmitter.class);
+
+        JobExecution jobExecution = JobExecution.builder().build();
+
+        //noinspection unchecked
+        CopyOnWriteArrayList<SseEmitter> emitters = (CopyOnWriteArrayList<SseEmitter>) Objects.requireNonNull(ReflectionTestUtils.getField(executionRestController, "executionStreamEmitters"));
+        emitters.add(emitterMock);
+
+        doThrow(new IOException("wanted-test-exception")).when(emitterMock).send(any(JobExecution.class));
+
+        executionRestController.onJobEvent(
+                new JobEvent(JobEventType.STATE_REFRESH,
+                        Job.builder().currentJobExecution(jobExecution).build())
+        );
+
+        // A dead emitter must be removed if sending fails:
+        assertFalse(emitters.contains(emitterMock));
     }
 
 }

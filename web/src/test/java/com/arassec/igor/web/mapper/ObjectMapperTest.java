@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests the Object mapping in the web layer.
  */
 @DisplayName("Web-Layer ObjectMapper Tests")
-public class ObjectMapperTest extends MapperBaseTest {
+class ObjectMapperTest extends MapperBaseTest {
 
     /**
      * Tests serializing a job.

@@ -7,7 +7,10 @@ import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.util.ModelPage;
+import com.arassec.igor.core.util.event.JobEvent;
+import com.arassec.igor.core.util.event.JobEventType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -16,10 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 /**
  * Executes jobs and keeps track of their state. Prevents parallel execution and limits the number of jobs running in parallel.
@@ -59,13 +59,19 @@ public class JobExecutor {
     private final Map<String, Job> runningJobs = new HashMap<>();
 
     /**
+     * Publisher for events based on job changes.
+     */
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    /**
      * Creates a new JobExecutor instance.
      */
     public JobExecutor(IgorCoreProperties igorCoreProperties, JobRepository jobRepository,
-                       JobExecutionRepository jobExecutionRepository) {
+                       JobExecutionRepository jobExecutionRepository, ApplicationEventPublisher applicationEventPublisher) {
         this.igorCoreProperties = igorCoreProperties;
         this.jobRepository = jobRepository;
         this.jobExecutionRepository = jobExecutionRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
         threadPoolExecutor = (ThreadPoolExecutor) Executors
                 .newFixedThreadPool(igorCoreProperties.getJobQueueSize(), runnable -> new Thread(runnable, "job-executor-thread"));
     }
@@ -79,31 +85,31 @@ public class JobExecutor {
         // First check the state of the running jobs:
         runningJobFutures.removeIf(this::processFinished);
 
-        // If the queue is still full, no more job executions are processed:
-        if (runningJobFutures.size() == igorCoreProperties.getJobQueueSize()) {
-            return;
-        }
+        // Send updates on running jobs to clients:
+        runningJobs.forEach((key, value) -> applicationEventPublisher.publishEvent(
+                new JobEvent(JobEventType.STATE_REFRESH, value)));
 
-        // At this point we run the next jobs if necessary:
+        // Check if we can run another job:
         int freeSlots = igorCoreProperties.getJobQueueSize() - runningJobs.size();
         ModelPage<JobExecution> waitingJobExecutions = jobExecutionRepository
                 .findInState(JobExecutionState.WAITING, 0, Integer.MAX_VALUE);
         if (waitingJobExecutions != null && waitingJobExecutions.getItems() != null) {
-            for (int i = 0; i < waitingJobExecutions.getItems().size(); i++) {
-                JobExecution jobExecution = waitingJobExecutions.getItems().get(i);
-                if (!runningJobs.containsKey(jobExecution.getJobId())) {
-                    Job job = jobRepository.findById(jobExecution.getJobId());
-                    if (job != null) {
-                        jobExecution.setExecutionState(JobExecutionState.RUNNING);
-                        jobExecution.setStarted(Instant.now());
-                        runningJobs.put(job.getId(), job);
-                        runningJobFutures.add(threadPoolExecutor.submit(new JobRunningCallable(job, jobExecution)));
-                        jobExecutionRepository.upsert(jobExecution);
-                        freeSlots--;
-                    }
+            for (JobExecution jobExecution : waitingJobExecutions.getItems()) {
+                Job job = jobRepository.findById(jobExecution.getJobId());
+                if (job == null) {
+                    continue;
                 }
-                if (freeSlots == 0) {
-                    break;
+                if (freeSlots > 0 && !runningJobs.containsKey(jobExecution.getJobId())) {
+                    jobExecution.setExecutionState(JobExecutionState.RUNNING);
+                    jobExecution.setStarted(Instant.now());
+                    runningJobs.put(job.getId(), job);
+                    runningJobFutures.add(threadPoolExecutor.submit(new JobRunningCallable(job, jobExecution)));
+                    jobExecutionRepository.upsert(jobExecution);
+                    applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE, job));
+                    freeSlots--;
+                } else {
+                    // Send updates on waiting jobs to clients:
+                    applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_REFRESH, job));
                 }
             }
         }
@@ -121,14 +127,31 @@ public class JobExecutor {
         if (runningJobs.containsKey(jobId)) {
             Job job = runningJobs.get(jobId);
             job.cancel();
-            while (job.isRunning()) {
-                log.trace("Job {} is still running: {}", job.getId(), job.getName());
+
+            Object cancelLock = new Object();
+
+            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+            executor.scheduleAtFixedRate(() -> {
+                synchronized (cancelLock) {
+                    log.trace("Checking if job {} is still running: {}", job.getId(), job.getName());
+                    if (!job.isRunning()) {
+                        cancelLock.notifyAll();
+                    }
+                }
+            }, 0, 100, TimeUnit.MILLISECONDS);
+
+            synchronized (cancelLock) {
                 try {
-                    Thread.sleep(100L);
+                    while (job.isRunning()) {
+                        cancelLock.wait();
+                    }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
+
+            executor.shutdown();
+            applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE, job));
         }
     }
 
@@ -164,6 +187,7 @@ public class JobExecutor {
                 }
                 jobExecutionRepository.upsert(jobExecution);
                 runningJobs.remove(job.getId());
+                applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE, job));
                 return true;
             }
         } catch (InterruptedException e) {

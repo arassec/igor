@@ -99,7 +99,7 @@ abstract class HttpFileConnectorBaseTest {
                 )
         );
 
-        String fileContent = connector.read("/sample/file.txt", new WorkInProgressMonitor("http-read-file-test"));
+        String fileContent = connector.read("/sample/file.txt", new WorkInProgressMonitor());
         assertEquals("Http(s)FileConnectorTests", fileContent);
     }
 
@@ -118,7 +118,7 @@ abstract class HttpFileConnectorBaseTest {
                 )
         );
 
-        FileStreamData fileStreamData = connector.readStream("/sample/file.txt", new WorkInProgressMonitor("http-read-file-test"));
+        FileStreamData fileStreamData = connector.readStream("/sample/file.txt", new WorkInProgressMonitor());
 
         StringWriter stringWriter = new StringWriter();
         IOUtils.copy(fileStreamData.getData(), stringWriter);
@@ -142,7 +142,7 @@ abstract class HttpFileConnectorBaseTest {
                 )
         );
 
-        FileStreamData fileStreamData = connector.readStream("/sample/file.txt", new WorkInProgressMonitor("http-read-file-test"));
+        FileStreamData fileStreamData = connector.readStream("/sample/file.txt", new WorkInProgressMonitor());
         assertEquals("html", fileStreamData.getFilenameSuffix());
         assertEquals(11, fileStreamData.getFileSize());
     }
@@ -158,7 +158,7 @@ abstract class HttpFileConnectorBaseTest {
         FileStreamData fileStreamData = new FileStreamData();
         fileStreamData.setData(new ByteArrayInputStream("Http(s)WriteStreamTest".getBytes()));
 
-        connector.writeStream("/target/file.txt", fileStreamData, new WorkInProgressMonitor("http-write-stream-test"));
+        connector.writeStream("/target/file.txt", fileStreamData, new WorkInProgressMonitor());
 
         wireMockServer.verify(putRequestedFor(urlEqualTo("/target/file.txt"))
                 .withRequestBody(equalTo("Http(s)WriteStreamTest")));
@@ -173,7 +173,7 @@ abstract class HttpFileConnectorBaseTest {
     void testDelete() {
         wireMockServer.stubFor(delete("/target/file.txt").willReturn(aResponse().withStatus(200)));
 
-        connector.delete("/target/file.txt", new WorkInProgressMonitor("http-delete-file-test"));
+        connector.delete("/target/file.txt", new WorkInProgressMonitor());
 
         wireMockServer.verify(deleteRequestedFor(urlEqualTo("/target/file.txt")));
     }
@@ -194,7 +194,7 @@ abstract class HttpFileConnectorBaseTest {
         wireMockServer.stubFor(put("/target/file.txt").willReturn(aResponse().withStatus(200)));
         wireMockServer.stubFor(delete("/sample/file.txt.igor").willReturn(aResponse().withStatus(200)));
 
-        connector.move("/sample/file.txt.igor", "/target/file.txt", new WorkInProgressMonitor("http-move-file-test"));
+        connector.move("/sample/file.txt.igor", "/target/file.txt", new WorkInProgressMonitor());
 
         wireMockServer.verify(putRequestedFor(urlEqualTo("/target/file.txt"))
                 .withRequestBody(equalTo("Http(s)MoveTest")));
@@ -255,12 +255,12 @@ abstract class HttpFileConnectorBaseTest {
 
         connector.setFollowRedirects(true);
 
-        String content = connector.read("/test.html", new WorkInProgressMonitor("http-follow-redirects-test"));
+        String content = connector.read("/test.html", new WorkInProgressMonitor());
         assertEquals("Http(s)FollowRedirectsTest", content);
 
         connector.setFollowRedirects(false);
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("http-follow-redirects-test");
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
         assertThrows(IgorException.class, () -> connector.read("/test.html", wipMon));
     }
 
@@ -278,7 +278,7 @@ abstract class HttpFileConnectorBaseTest {
         connector.setUsername("igor");
         connector.setPassword("s3cr3t");
 
-        assertEquals("Http(s)BasicAuthTest", connector.read("/test.html", new WorkInProgressMonitor("http-basic-auth-test")));
+        assertEquals("Http(s)BasicAuthTest", connector.read("/test.html", new WorkInProgressMonitor()));
     }
 
     /**
@@ -300,7 +300,7 @@ abstract class HttpFileConnectorBaseTest {
                 get("/").willReturn(aResponse().withStatus(500))
         );
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("http-error-handling-test");
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
         FileStreamData fileStreamDataMock = mock(FileStreamData.class);
 
         assertAll("HTTP errors must be handled safely.",
@@ -331,7 +331,7 @@ abstract class HttpFileConnectorBaseTest {
                 get("/").willReturn(aResponse().withFault(Fault.MALFORMED_RESPONSE_CHUNK))
         );
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("http-exception-handling-test");
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
         FileStreamData fileStreamDataMock = mock(FileStreamData.class);
 
         assertAll("Exceptions must be handled safely.",

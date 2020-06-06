@@ -250,7 +250,6 @@
                     totalPages: 0,
                     items: []
                 },
-                jobExecutionsRefreshTimer: null,
                 selectedJobExecutionListEntry: null,
                 selectedJobExecution: null,
                 selectedJobExecutionId: null,
@@ -260,7 +259,9 @@
                 nextRoute: null,
                 resolveAllFailedExecutionsOfJob: false,
                 numFailedExecutionsForSelectedJob: 0,
-                documentation: null
+                documentation: null,
+                jobListEventSource: null,
+                jobExecutionEventSource: null,
             }
         },
         computed: {
@@ -377,7 +378,7 @@
                 let copiedTask = JSON.parse(JSON.stringify(originalTask));
                 copiedTask.id = Utils.uuidv4();
                 copiedTask.name = "Copy of " + copiedTask.name;
-                delete copiedTask.provider.id;
+                copiedTask.provider.id = Utils.uuidv4();
                 copiedTask.actions.forEach((action) => {
                     action.id = Utils.uuidv4();
                 });
@@ -449,16 +450,16 @@
             },
             runJob: async function () {
                 this.showRunDialog = false;
-                    IgorBackend.postData('/api/job/run', this.jobConfiguration, 'Starting job', 'Job \'' +
-                        Utils.formatNameForSnackbar(this.jobConfiguration.name) + '\' started manually.', 'Job \'' +
-                        Utils.formatNameForSnackbar(this.jobConfiguration.name) + '\' startup failed!').then((result) => {
-                        if (result.status === 400) {
-                            this.validationErrors = result.data;
-                        } else {
-                            this.validationErrors = {};
-                            this.jobConfiguration = result.data;
-                        }
-                    })
+                IgorBackend.postData('/api/job/run', this.jobConfiguration, 'Starting job', 'Job \'' +
+                    Utils.formatNameForSnackbar(this.jobConfiguration.name) + '\' started manually.', 'Job \'' +
+                    Utils.formatNameForSnackbar(this.jobConfiguration.name) + '\' startup failed!').then((result) => {
+                    if (result.status === 400) {
+                        this.validationErrors = result.data;
+                    } else {
+                        this.validationErrors = {};
+                        this.jobConfiguration = result.data;
+                    }
+                })
             },
             updateJobExecutions: async function () {
                 if (this.jobConfiguration.id) {
@@ -468,10 +469,8 @@
             },
             manualUpdateJobExecutions: async function (page) {
                 if (this.jobConfiguration.id) {
-                    clearInterval(this.jobExecutionsRefreshTimer);
                     this.jobExecutionsPage = await IgorBackend.getData('/api/execution/job/' + this.jobConfiguration.id + '?pageNumber=' +
                         page + '&pageSize=' + this.jobExecutionsPage.size);
-                    this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
                 }
             },
             openExecutionDetailsDialog: async function (selectedJobExecutionListEntry) {
@@ -479,33 +478,23 @@
                 this.selectedJobExecution = await IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId);
                 this.showExecutionDetailsDialog = true;
                 if (this.selectedJobExecution.executionState === 'WAITING' || this.selectedJobExecution.executionState === 'RUNNING') {
-                    this.jobExecutionDetailsRefreshTimer = setInterval(() => {
-                        this.updateJobExectuionDetails()
-                    }, 1000)
+                    this.initJobExecutionEventSource();
                 }
             },
             closeExecutionDetailsDialog: function () {
-                if (this.jobExecutionDetailsRefreshTimer) {
-                    clearTimeout(this.jobExecutionDetailsRefreshTimer)
+                if (this.jobExecutionEventSource) {
+                    this.jobExecutionEventSource.close();
                 }
                 this.showExecutionDetailsDialog = false
-            },
-            updateJobExectuionDetails: async function () {
-                this.selectedJobExecution = await IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId)
             },
             openCancelJobDialog: function (selectedJobExecutionListEntry) {
                 this.selectedJobExecutionListEntry = selectedJobExecutionListEntry;
                 this.showCancelJobDialog = true
             },
             cancelJobExecution: function () {
-                clearInterval(this.jobExecutionsRefreshTimer);
                 this.showCancelJobDialog = false;
                 IgorBackend.postData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/cancel', null,
-                    "Cancelling job", "Job cancelled.", "Job could not be cancelled!").then(() => {
-                    this.updateJobExecutions().then(() => {
-                        this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
-                    })
-                })
+                    "Cancelling job", "Job cancelled.", "Job could not be cancelled!")
             },
             createConnector: function (selectionKey, parameterIndex, connectorCategoryCandidates) {
                 this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, connectorCategoryCandidates);
@@ -523,13 +512,10 @@
                 this.showMarkJobExecutionResolvedDialog = true
             },
             markJobExecutionResolved: async function () {
-                clearTimeout(this.jobExecutionsRefreshTimer);
                 await IgorBackend.putData('/api/execution/' + this.selectedJobExecutionListEntry.id + '/' +
                     this.selectedJobExecutionListEntry.jobId + '/FAILED/RESOLVED?updateAllOfJob=' + this.resolveAllFailedExecutionsOfJob, null,
                     'Updating executions', 'Executions updated', 'Executions could not be updated!');
-                await this.manualUpdateJobExecutions(0);
                 this.resolveAllFailedExecutionsOfJob = false;
-                this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000);
                 this.showMarkJobExecutionResolvedDialog = false
             },
             openDocumentation: async function (filename) {
@@ -541,6 +527,53 @@
                 if (this.showDocumentation) {
                     this.documentation = await IgorBackend.getData('/api/doc/' + filename);
                     this.testResults = null;
+                }
+            },
+            initJobListEventSource: function () {
+                if (this.jobListEventSource) {
+                    this.jobListEventSource.close();
+                }
+                this.jobListEventSource = new EventSource('api/job/stream');
+                let component = this;
+                this.jobListEventSource.addEventListener('state-update', function (event) {
+                    let jobListEntry = JSON.parse(event.data);
+                    if (jobListEntry.id === component.jobConfiguration.id) {
+                        let elementIndex = -1;
+                        component.jobExecutionsPage.items.forEach(function (item, index) {
+                            if (item.id === jobListEntry.execution.id) {
+                                elementIndex = index;
+                            }
+                        })
+                        if (elementIndex !== -1) {
+                            if (jobListEntry.execution.state === 'WAITING' || jobListEntry.execution.state === 'RUNNING') {
+                                component.$set(component.jobExecutionsPage.items, elementIndex, jobListEntry.execution);
+                            } else {
+                                component.updateJobExecutions();
+                            }
+                        } else {
+                            // Put new entry on top of the list:
+                            component.jobExecutionsPage.items.unshift(jobListEntry.execution);
+                            if (component.jobExecutionsPage.items.size > component.jobExecutionsPage.size) {
+                                component.jobExecutionsPage.items.pop();
+                            }
+                        }
+                    }
+                }, false);
+                this.jobListEventSource.onerror = () => {
+                    setTimeout(this.initJobListEventSource, 5000);
+                }
+            },
+            initJobExecutionEventSource: function () {
+                this.jobExecutionEventSource = new EventSource('api/execution/stream');
+                let component = this;
+                this.jobExecutionEventSource.onmessage = event => {
+                    let jobExecutionDetails = JSON.parse(event.data)
+                    if (jobExecutionDetails.id === component.selectedJobExecutionId) {
+                        component.selectedJobExecution = jobExecutionDetails;
+                    }
+                }
+                this.jobExecutionEventSource.onerror = () => {
+                    setTimeout(this.initJobListEventSource, 5000);
                 }
             }
         },
@@ -574,14 +607,14 @@
                     }
                 }
                 this.updateJobExecutions().then(() => {
-                    this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+                    this.initJobListEventSource();
                 });
                 this.originalJobConfiguration = JSON.stringify(this.jobConfiguration);
                 this.$root.$data.store.clearJobData()
             } else if (this.jobId != null) {
                 this.loadJob(this.jobId).then(() => {
                     this.updateJobExecutions().then(() => {
-                        this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+                        this.initJobListEventSource();
                     });
                     this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
                 })
@@ -589,7 +622,7 @@
                 // The job-configurator loads trigger data and modifies the initial jobConfiguration. So the 'originalJobConfiguration'
                 // property is set there, and 'update-original-job-configuration' is emitted...
                 this.createJob();
-                this.jobExecutionsRefreshTimer = setInterval(() => this.updateJobExecutions(), 1000)
+                this.initJobListEventSource();
             }
 
             let component = this;
@@ -607,8 +640,12 @@
             })
         },
         destroyed() {
-            clearInterval(this.jobExecutionsRefreshTimer);
-            clearInterval(this.jobExecutionDetailsRefreshTimer)
+            if (this.jobListEventSource) {
+                this.jobListEventSource.close()
+            }
+            if (this.jobExecutionEventSource) {
+                this.jobExecutionEventSource.close();
+            }
         },
         beforeRouteLeave(to, from, next) {
             // We leave the job editor to create a new connector. No unsaved-values-check required!

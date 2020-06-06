@@ -139,7 +139,7 @@ public class CopyFileAction extends BaseFileAction {
             return List.of(data);
         }
 
-        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor(resolvedData.getSourceFilename());
+        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor(resolvedData.getSourceFilename(), 0);
         jobExecution.addWorkInProgress(workInProgressMonitor);
 
         try {
@@ -178,7 +178,6 @@ public class CopyFileAction extends BaseFileAction {
             actionData.put(KEY_TARGET_FILENAME, targetFileWithSuffix);
             actionData.put(KEY_TARGET_DIRECTORY, resolvedData.getTargetDirectory());
             data.put(KEY_COPY_FILE_ACTION, actionData);
-
         } finally {
             jobExecution.removeWorkInProgress(workInProgressMonitor);
         }

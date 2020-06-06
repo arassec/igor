@@ -12,9 +12,12 @@ import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
+import com.arassec.igor.core.util.event.JobEvent;
+import com.arassec.igor.core.util.event.JobEventType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.lang.NonNull;
@@ -73,6 +76,11 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     private final Map<String, ScheduledFuture<?>> scheduledJobs = new ConcurrentHashMap<>();
 
     /**
+     * Publisher for events based on job changes.
+     */
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    /**
      * Initializes the manager by scheduling all available jobs.
      *
      * @param contextRefreshedEvent Event indicating that the spring context has been refreshed.
@@ -116,6 +124,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
         } else {
             unschedule(savedJob);
         }
+        applicationEventPublisher.publishEvent(new JobEvent(JobEventType.SAVE, job));
         return savedJob;
     }
 
@@ -133,6 +142,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             jobExecutionRepository.deleteByJobId(id);
             persistentValueRepository.deleteByJobId(id);
             scheduledJobs.remove(id);
+            applicationEventPublisher.publishEvent(new JobEvent(JobEventType.DELETE, job));
         }
     }
 
@@ -166,6 +176,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             jobExecution.setExecutionState(JobExecutionState.WAITING);
             jobExecutionRepository.upsert(jobExecution);
             jobExecutionRepository.cleanup(job.getId(), job.getHistoryLimit());
+            applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE, job));
         } else {
             log.info("Job '{}' ({}) already executing or waiting for execution. Skipped execution until next time.",
                     job.getName(), job.getId());
@@ -188,6 +199,8 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
                 jobExecution.setExecutionState(JobExecutionState.CANCELLED);
                 jobExecution.setFinished(Instant.now());
                 jobExecutionRepository.upsert(jobExecution);
+                applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE,
+                        jobRepository.findById(jobExecution.getJobId())));
             } else if (JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {
                 jobExecutor.cancel(jobExecution.getJobId());
             }
@@ -219,25 +232,21 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     /**
      * Loads a page of jobs matching the supplied criteria.
      *
-     * @param pageNumber  The page number.
-     * @param pageSize    The page size.
-     * @param nameFilter  An optional name filter for the jobs.
-     * @param stateFilter An optional state filter for the jobs.
+     * @param pageNumber   The page number.
+     * @param pageSize     The page size.
+     * @param nameFilter   An optional name filter for the jobs.
+     * @param stateFilters An optional state filter for the jobs.
      *
      * @return The page with jobs matching the criteria.
      */
-    public ModelPage<Job> loadPage(int pageNumber, int pageSize, String nameFilter, Set<JobExecutionState> stateFilter) {
+    public ModelPage<Job> loadPage(int pageNumber, int pageSize, String nameFilter, Set<JobExecutionState> stateFilters) {
         ModelPage<Job> nameFilteredPage = jobRepository.findPage(0, Integer.MAX_VALUE, nameFilter);
         List<Job> filteredList = nameFilteredPage.getItems().stream().filter(job -> {
-            if (stateFilter == null || stateFilter.isEmpty()) {
+            if (stateFilters == null || stateFilters.isEmpty()) {
                 return true;
             }
-            if (job.getCurrentJobExecution() != null) {
-                return stateFilter.contains(job.getCurrentJobExecution().getExecutionState());
-            } else {
-                ModelPage<JobExecution> lastJobExecution = jobExecutionRepository.findAllOfJob(job.getId(), 0, 1);
-                return !lastJobExecution.getItems().isEmpty() && stateFilter.contains(lastJobExecution.getItems().get(0).getExecutionState());
-            }
+            return stateFilters.stream().filter(stateFilter -> (jobExecutionRepository.countAllOfJobInState(job.getId(),
+                    stateFilter) > 0)).map(result -> true).findFirst().orElse(false);
         }).collect(Collectors.toList());
         return ModelPageHelper.getModelPage(filteredList, pageNumber, pageSize);
     }
@@ -316,6 +325,9 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      */
     public void updateJobExecutionState(Long id, JobExecutionState newState) {
         jobExecutionRepository.updateJobExecutionState(id, newState);
+        JobExecution jobExecution = jobExecutionRepository.findById(id);
+        applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE,
+                jobRepository.findById(jobExecution.getJobId())));
     }
 
     /**
@@ -327,6 +339,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      */
     public void updateAllJobExecutionsOfJob(String jobId, JobExecutionState oldState, JobExecutionState newState) {
         jobExecutionRepository.updateAllJobExecutionsOfJob(jobId, oldState, newState);
+        applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE, jobRepository.findById(jobId)));
     }
 
     /**
@@ -358,6 +371,18 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      */
     public int countJobExecutions(JobExecutionState jobExecutionState) {
         return jobExecutionRepository.countJobsWithState(jobExecutionState);
+    }
+
+    /**
+     * Counts the job executions that are in the given state.
+     *
+     * @param jobId             The job's ID.
+     * @param jobExecutionState The state to count executions for.
+     *
+     * @return The number of executions in the requested state.
+     */
+    public int countExecutionsOfJobInState(String jobId, JobExecutionState jobExecutionState) {
+        return jobExecutionRepository.countAllOfJobInState(jobId, jobExecutionState);
     }
 
     /**

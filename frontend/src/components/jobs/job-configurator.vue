@@ -59,7 +59,7 @@
         <core-panel>
             <layout-row>
                 <h2 slot="left">Trigger</h2>
-                <icon-button slot="right" icon="question" v-show="hasDocumentation(jobConfiguration.trigger.type)"
+                <icon-button slot="right" icon="question" v-show="hasDocumentation(jobConfiguration.trigger.type.key)"
                              v-on:clicked="$emit('open-documentation', jobConfiguration.trigger.type.key)"/>
             </layout-row>
             <div class="table">
@@ -163,12 +163,12 @@
             createConnector: function (parameterIndex, connectorCategoryCandidates) {
                 this.$emit('create-connector', this.taskKey, parameterIndex, connectorCategoryCandidates)
             },
-            hasDocumentation: function (type) {
-                if (type == null) {
+            hasDocumentation: function (typeKey) {
+                if (!typeKey) {
                     return false;
                 }
                 for (let i = 0; i < this.triggerTypes.length; i++) {
-                    if (this.triggerTypes[i].key === type.key) {
+                    if (this.triggerTypes[i].key === typeKey) {
                         return this.triggerTypes[i].documentationAvailable;
                     }
                 }

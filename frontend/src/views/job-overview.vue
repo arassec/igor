@@ -32,7 +32,8 @@
         <div class="tiles-container">
             <div class="tiles">
                 <div v-for="job of jobsPage.items" :key="job.id">
-                    <overview-tile v-on:clicked="editJob(job.id)" v-on:action-clicked="openExecutionDetailsDialog(job)"
+                    <overview-tile v-on:clicked="editJob(job.id)"
+                                   v-on:action-clicked="openExecutionDetailsDialog(job)"
                                    :active="job.active">
                         <div slot="title">{{job.name}}</div>
                         <layout-row slot="menu">
@@ -61,8 +62,9 @@
                                                v-if="isJobInState(job, ['WAITING'])"/>
                             <font-awesome-icon icon="bolt" class="fa-fw"
                                                v-if="isJobInState(job, ['FAILED'])"/>
+                            <font-awesome-icon icon="bolt" class="fa-fw has-failed-executions"
+                                               v-if="job.hasFailedExecutions && !isJobInState(job, ['FAILED'])"/>
                             {{formatJobState(job)}}
-
                         </div>
                     </overview-tile>
                 </div>
@@ -181,7 +183,8 @@
                 </div>
                 <div class="paragraph margin-top">
                     <label for="import-file-selector" id="import-file-select">
-                        <font-awesome-icon icon="folder-open"/> Select file
+                        <font-awesome-icon icon="folder-open"/>
+                        Select file
                         <input id="import-file-selector" type="file" @change="importFileChanged"/>
                     </label>
                     <label v-if="importFile != null">{{importFile.name}}</label>
@@ -265,8 +268,6 @@
                     waiting: false,
                     failed: false
                 },
-                jobsPageTimer: null,
-                jobExecutionDetailsRefreshTimer: null,
                 showDeleteDialog: false,
                 showRunDialog: false,
                 showExportDialog: false,
@@ -282,6 +283,8 @@
                 resolveAllFailedExecutionsOfJob: false,
                 importFile: null,
                 showExecutionDetailsDialog: false,
+                jobListEventSource: null,
+                jobExecutionEventSource: null,
             }
         },
         methods: {
@@ -327,17 +330,6 @@
                     });
                 }
             },
-            loadExecutionsOverview: function () {
-                IgorBackend.getData('/api/execution/overview').then((data) => {
-                    this.executionsOverview = data;
-                });
-            },
-            enableRefreshTimer: function () {
-                this.jobsPageTimer = setInterval(() => {
-                    this.loadExecutionsOverview();
-                    this.loadJobs()
-                }, 1000)
-            },
             editJob: function (jobId) {
                 this.$router.push({name: 'job-editor', params: {jobId: jobId}})
             },
@@ -364,7 +356,6 @@
                     'Job \'' + FormatUtils.formatNameForSnackbar(this.selectedJobName) + '\' started manually.',
                     'Job \'' + FormatUtils.formatNameForSnackbar(this.selectedJobName) + '\' startup failed'
                 ).then(() => {
-                    this.loadJobs();
                     this.showRunDialog = false
                 })
             },
@@ -392,13 +383,8 @@
             },
             cancelJobExecution: function () {
                 this.showCancelJobDialog = false;
-                clearTimeout(this.jobsPageTimer);
-                let component = this;
                 IgorBackend.postData('/api/execution/' + this.selectedJobExecutionId + '/cancel', null,
-                    "Cancelling job", "Job cancelled.", "Job could not be cancelled!").then(() => {
-                    component.loadJobs();
-                    component.enableRefreshTimer();
-                })
+                    "Cancelling job", "Job cancelled.", "Job could not be cancelled!");
             },
             openMarkJobExecutionResolvedDialog: async function (jobExecutionId, jobId, jobName) {
                 this.selectedJobExecutionId = jobExecutionId;
@@ -411,12 +397,10 @@
                 this.showMarkJobExecutionResolvedDialog = true
             },
             markJobExecutionResolved: async function () {
-                clearTimeout(this.jobsPageTimer);
                 await IgorBackend.putData('/api/execution/' + this.selectedJobExecutionId + '/' +
                     this.selectedJobId + '/FAILED/RESOLVED?updateAllOfJob=' + this.resolveAllFailedExecutionsOfJob, null,
                     'Updating executions', 'Executions updated', 'Executions could not be updated!');
                 this.resolveAllFailedExecutionsOfJob = false;
-                this.enableRefreshTimer();
                 this.showMarkJobExecutionResolvedDialog = false
             },
             duplicateJob: async function (id) {
@@ -492,19 +476,57 @@
                 this.selectedJobExecutionId = job.execution.id;
                 this.selectedJobExecution = await IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId);
                 this.showExecutionDetailsDialog = true;
-                this.jobExecutionDetailsRefreshTimer = setInterval(() => {
-                    this.updateJobExectuionDetails()
-                }, 1000)
+                if (this.selectedJobExecution.executionState === 'WAITING' || this.selectedJobExecution.executionState === 'RUNNING') {
+                    this.initJobExecutionEventSource();
+                }
             },
             closeExecutionDetailsDialog: function () {
-                clearTimeout(this.jobExecutionDetailsRefreshTimer);
+                if (this.jobExecutionEventSource) {
+                    this.jobExecutionEventSource.close();
+                }
                 this.showExecutionDetailsDialog = false
             },
-            updateJobExectuionDetails: function () {
-                IgorBackend.getData('/api/execution/details/' + this.selectedJobExecutionId).then((result) => {
-                    this.selectedJobExecution = result
-                })
+            initJobListEventSource: function () {
+                if (this.jobListEventSource) {
+                    this.jobListEventSource.close();
+                }
+                this.jobListEventSource = new EventSource('api/job/stream');
+                let component = this;
+                this.jobListEventSource.addEventListener('state-update', function (event) {
+                    let jobListEntry = JSON.parse(event.data);
+                    let elementIndex = -1;
+                    component.jobsPage.items.forEach(function (item, index) {
+                        if (item.id === jobListEntry.id) {
+                            elementIndex = index;
+                        }
+                    })
+                    if (elementIndex !== -1) {
+                        component.$set(component.jobsPage.items, elementIndex, jobListEntry);
+                    }
+                }, false);
+                this.jobListEventSource.addEventListener('execution-overview', function (event) {
+                    component.executionsOverview = JSON.parse(event.data);
+                }, false);
+                this.jobListEventSource.addEventListener('crud', function () {
+                    component.loadJobs();
+                }, false);
+                this.jobListEventSource.onerror = () => {
+                    setTimeout(this.initJobListEventSource, 5000);
+                }
             },
+            initJobExecutionEventSource: function () {
+                this.jobExecutionEventSource = new EventSource('api/execution/stream');
+                let component = this;
+                this.jobExecutionEventSource.onmessage = event => {
+                    let jobExecutionDetails = JSON.parse(event.data)
+                    if (jobExecutionDetails.id === component.selectedJobExecutionId) {
+                        component.selectedJobExecution = jobExecutionDetails;
+                    }
+                }
+                this.jobExecutionEventSource.onerror = () => {
+                    setTimeout(this.initJobListEventSource, 5000);
+                }
+            }
         },
         mounted() {
             this.$root.$data.store.clearJobData();
@@ -517,8 +539,16 @@
             this.$root.$data.store.clearConnectorData();
             this.$root.$data.store.clearJobData();
             this.loadJobs().then(() => {
-                this.enableRefreshTimer()
+                this.initJobListEventSource();
             });
+        },
+        destroyed() {
+            if (this.jobListEventSource) {
+                this.jobListEventSource.close()
+            }
+            if (this.jobExecutionEventSource) {
+                this.jobExecutionEventSource.close();
+            }
         }
     }
 </script>
@@ -548,6 +578,10 @@
 
     .right {
         float: right;
+    }
+
+    .has-failed-executions {
+        color: var(--color-alert);
     }
 
     input[type="file"] {

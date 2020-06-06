@@ -51,6 +51,16 @@ public interface JobExecutionRepository {
     List<JobExecution> findAllOfJobInState(String jobId, JobExecutionState state);
 
     /**
+     * Counts all job-executions of a certain job in the specified state.
+     *
+     * @param jobId The job's ID.
+     * @param state The state the job-execution should be in.
+     *
+     * @return The number of found executions.
+     */
+    int countAllOfJobInState(String jobId, JobExecutionState state);
+
+    /**
      * Finds all job-executions in the specified state.
      *
      * @param state      The state of the job-exeuctions.

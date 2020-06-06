@@ -23,7 +23,7 @@ class FallbackFileConnectorTest {
         assertThrows(IllegalStateException.class, () -> connector.listFiles(null, null));
         assertThrows(IllegalStateException.class, () -> connector.listFiles("", ""));
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("");
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
 
         assertThrows(IllegalStateException.class, () -> connector.read(null, null));
         assertThrows(IllegalStateException.class, () -> connector.read("", wipMon));

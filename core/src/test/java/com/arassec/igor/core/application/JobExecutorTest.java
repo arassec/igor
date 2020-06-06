@@ -7,13 +7,17 @@ import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.util.ModelPage;
+import com.arassec.igor.core.util.event.JobEvent;
+import com.arassec.igor.core.util.event.JobEventType;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashMap;
@@ -59,12 +63,18 @@ class JobExecutorTest {
     private JobExecutionRepository jobExecutionRepository;
 
     /**
+     * Publisher for events based on job changes.
+     */
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    /**
      * Initializes the test environment.
      */
     @BeforeEach
     void initialize() {
         when(igorCoreProperties.getJobQueueSize()).thenReturn(1);
-        jobExecutor = new JobExecutor(igorCoreProperties, jobRepository, jobExecutionRepository);
+        jobExecutor = new JobExecutor(igorCoreProperties, jobRepository, jobExecutionRepository, applicationEventPublisher);
     }
 
     /**
@@ -96,6 +106,12 @@ class JobExecutorTest {
         // The finished job must have been removed:
         verify(jobExecutionRepository, times(1)).upsert(finishedJobExecution);
         assertFalse(runningJobs.containsKey("running-job-id"));
+
+        // An update event must be sent:
+        ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
+        verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
+        assertEquals(runningJob, argCap.getValue().getJob());
     }
 
     /**
@@ -111,11 +127,33 @@ class JobExecutorTest {
         List<Future<Job>> runningJobFutures = new LinkedList<>();
         runningJobFutures.add(finishedJobFuture);
 
+        Map<String, Job> runningJobs = new HashMap<>();
+        Job runningJob = Job.builder().id("running-job-id").name("running-job-name").build();
+        runningJobs.put("running-job-id", runningJob);
+
         ReflectionTestUtils.setField(jobExecutor, "runningJobFutures", runningJobFutures);
+        ReflectionTestUtils.setField(jobExecutor, "runningJobs", runningJobs);
+
+        // Another job is waiting for execution:
+        when(jobExecutionRepository.findInState(eq(JobExecutionState.WAITING), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+                new ModelPage<>(0, 1, 1, List.of(JobExecution.builder().id(1L).jobId("job-id").build()))
+        );
+        Job waitingJob = Job.builder().id("waiting-job-id").name("waiting-job-name").build();
+        when(jobRepository.findById(eq("job-id"))).thenReturn(waitingJob);
+
+        // update has to check the number of available slots;
         jobExecutor.update();
 
-        // The finished job must have been removed:
-        verify(jobExecutionRepository, times(0)).findInState(eq(JobExecutionState.WAITING), eq(0), eq(Integer.MAX_VALUE));
+        verify(jobExecutionRepository, times(0)).upsert(any(JobExecution.class));
+
+        // Update events must be sent for both jobs, running and waiting:
+        ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
+        verify(applicationEventPublisher, times(2)).publishEvent(argCap.capture());
+
+        assertEquals(JobEventType.STATE_REFRESH, argCap.getAllValues().get(0).getType());
+        assertEquals(runningJob, argCap.getAllValues().get(0).getJob());
+        assertEquals(JobEventType.STATE_REFRESH, argCap.getAllValues().get(1).getType());
+        assertEquals(waitingJob, argCap.getAllValues().get(1).getJob());
     }
 
     /**
@@ -148,6 +186,12 @@ class JobExecutorTest {
         assertTrue((JobExecutionState.RUNNING.equals(executedExecution.getExecutionState())) ||
                 (JobExecutionState.FINISHED.equals(executedExecution.getExecutionState())));
         assertNotNull(executedExecution.getStarted());
+
+        // An update event must be sent:
+        ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
+        verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
+        assertEquals(job, argCap.getValue().getJob());
     }
 
     /**
@@ -174,7 +218,12 @@ class JobExecutorTest {
         jobExecutor.cancel("job-id");
 
         verify(job, times(1)).cancel();
-        assertFalse(verify(job, times(4)).isRunning());
+
+        // An update event must be sent:
+        ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
+        verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
+        assertEquals(job, argCap.getValue().getJob());
     }
 
     /**

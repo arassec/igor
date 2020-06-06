@@ -56,7 +56,7 @@ class LocalFilesystemFileConnectorTest {
     @Test
     @DisplayName("Test reading a file.")
     void testRead() {
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("read-test");
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
         String fileContent = fileConnector.read("src/test/resources/localfs/alpha.txt", wipMon);
         assertEquals("Just a test", fileContent);
         assertEquals(100, wipMon.getProgressInPercent());
@@ -69,7 +69,7 @@ class LocalFilesystemFileConnectorTest {
     @DisplayName("Tests reading a file as stream.")
     @SneakyThrows(IOException.class)
     void testReadStream() {
-        FileStreamData fileStreamData = fileConnector.readStream("src/test/resources/localfs/alpha.txt", new WorkInProgressMonitor("readstream-test"));
+        FileStreamData fileStreamData = fileConnector.readStream("src/test/resources/localfs/alpha.txt", new WorkInProgressMonitor());
         assertEquals(11, fileStreamData.getFileSize());
         assertEquals("Just a test", StreamUtils.copyToString(fileStreamData.getData(), StandardCharsets.UTF_8));
     }
@@ -85,8 +85,8 @@ class LocalFilesystemFileConnectorTest {
         Files.deleteIfExists(targetFile);
         assertFalse(Files.exists(targetFile));
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("writestream-test");
-        FileStreamData fileStreamData = fileConnector.readStream("src/test/resources/localfs/alpha.txt", new WorkInProgressMonitor("readstream-test"));
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
+        FileStreamData fileStreamData = fileConnector.readStream("src/test/resources/localfs/alpha.txt", new WorkInProgressMonitor());
         fileConnector.writeStream(targetFile.toString(), fileStreamData, wipMon);
 
         assertTrue(Files.exists(targetFile));
@@ -103,7 +103,7 @@ class LocalFilesystemFileConnectorTest {
         Files.copy(Paths.get("src/test/resources/localfs/alpha.txt"), Paths.get("target/delete-file-alpha.txt"), StandardCopyOption.REPLACE_EXISTING);
         assertTrue(Files.exists(Paths.get("target/delete-file-alpha.txt")));
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("delete-test");
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
         fileConnector.delete("target/delete-file-alpha.txt", wipMon);
 
         assertFalse(Files.exists(Paths.get("target/delete-file-alpha.txt")));
@@ -125,7 +125,7 @@ class LocalFilesystemFileConnectorTest {
         assertTrue(Files.exists(Paths.get(source)));
         assertFalse(Files.exists(Paths.get(target)));
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor("move-test");
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
         fileConnector.move(source, target, wipMon);
 
         assertFalse(Files.exists(Paths.get(source)));
