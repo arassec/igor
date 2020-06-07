@@ -6,7 +6,7 @@
 > 
 > *Terry Pratchett, Making Money* 
 
-<img align="right" src="https://github.com/arassec/igor/documentation/docs/.vuepress/public/logo.png" alt="igor-logo"/>
+<img style="float: right;" height="240" width="256" src="https://raw.githubusercontent.com/arassec/igor/master/documentation/docs/.vuepress/public/logo.png" alt="igor-logo"/>
 
 Igor is a tool for managing 'continuous workarounds'.
 
