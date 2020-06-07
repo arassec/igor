@@ -1,5 +1,7 @@
 package com.arassec.igor.module.file.connector.ftp;
 
+import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.connector.FileInfo;
@@ -91,7 +93,7 @@ class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
     @Test
     @DisplayName("Tests reading a file.")
     void testRead() {
-        assertEquals("DELTA-igor-ftp-connector-tests", connector.read("subdir/delta.txt", new WorkInProgressMonitor()));
+        assertEquals("DELTA-igor-ftp-connector-tests", connector.read("subdir/delta.txt"));
     }
 
     /**
@@ -101,7 +103,7 @@ class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
     @DisplayName("Tests reading a file as stream.")
     @SneakyThrows
     void testReadStream() {
-        FileStreamData fileStreamData = connector.readStream("alpha.txt", new WorkInProgressMonitor());
+        FileStreamData fileStreamData = connector.readStream("alpha.txt");
 
         StringWriter stringWriter = new StringWriter();
         IOUtils.copy(fileStreamData.getData(), stringWriter);
@@ -115,9 +117,7 @@ class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
     @Test
     @DisplayName("Tests reading a file that doesn't exist.")
     void testReadStreamFailSafe() {
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
-        IgorException igorException = assertThrows(IgorException.class, () -> connector.readStream("invalid/not-existing.file",
-                wipMon));
+        IgorException igorException = assertThrows(IgorException.class, () -> connector.readStream("invalid/not-existing.file"));
         assertEquals("Could not retrieve file: invalid/not-existing.file", igorException.getMessage());
     }
 
@@ -136,7 +136,8 @@ class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
 
         WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
 
-        connector.writeStream(fileName, fileStreamData, wipMon);
+        connector.writeStream(fileName, fileStreamData, wipMon,
+                JobExecution.builder().executionState(JobExecutionState.RUNNING).build());
 
         assertEquals(100, wipMon.getProgressInPercent());
         assertEquals(fileContent, Files.readString(Paths.get(ftpRoot + fileName)));
@@ -210,7 +211,7 @@ class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
         Files.copy(Paths.get(ftpRoot + "beta.save"), Paths.get(ftpRoot + "beta.delete"), StandardCopyOption.REPLACE_EXISTING);
         assertTrue(Files.exists(Paths.get(ftpRoot + "beta.delete")));
 
-        connector.delete("beta.delete", new WorkInProgressMonitor());
+        connector.delete("beta.delete");
 
         assertFalse(Files.exists(Paths.get(ftpRoot + "beta.delete")));
     }
@@ -225,7 +226,7 @@ class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
         Files.copy(Paths.get(ftpRoot + "beta.save"), Paths.get(ftpRoot + "beta.move"), StandardCopyOption.REPLACE_EXISTING);
         assertTrue(Files.exists(Paths.get(ftpRoot + "beta.move")));
 
-        connector.move("beta.move", "epsilon.moved", new WorkInProgressMonitor());
+        connector.move("beta.move", "epsilon.moved");
 
         assertTrue(Files.exists(Paths.get(ftpRoot + "epsilon.moved")));
         assertFalse(Files.exists(Paths.get(ftpRoot + "beta.move")));

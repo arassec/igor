@@ -1,6 +1,7 @@
 package com.arassec.igor.module.file.connector.http;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.connector.BaseFileConnector;
@@ -140,7 +141,7 @@ public abstract class BaseHttpFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public String read(String file) {
         HttpClient client = connect();
         HttpRequest request = getRequestBuilder(file).GET().build();
         try {
@@ -162,7 +163,7 @@ public abstract class BaseHttpFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public FileStreamData readStream(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public FileStreamData readStream(String file) {
         HttpClient client = connect();
         HttpRequest request = getRequestBuilder(file).GET().build();
         try {
@@ -194,7 +195,7 @@ public abstract class BaseHttpFileConnector extends BaseFileConnector {
             } else {
                 // Fallback if no content-length header is available!
                 response.body().close();
-                String fileContent = read(file, workInProgressMonitor);
+                String fileContent = read(file);
                 FileStreamData fsd = new FileStreamData();
                 fsd.setFileSize(fileContent.getBytes().length);
                 fsd.setData(new ByteArrayInputStream(fileContent.getBytes()));
@@ -213,7 +214,8 @@ public abstract class BaseHttpFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
+    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor,
+                            JobExecution jobExecution) {
         HttpRequest request = getRequestBuilder(file).PUT(HttpRequest.BodyPublishers.ofInputStream(fileStreamData::getData))
                 .build();
         sendRequest(connect(), request);
@@ -223,7 +225,7 @@ public abstract class BaseHttpFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public void delete(String file) {
         sendRequest(connect(), getRequestBuilder(file).DELETE().build());
     }
 
@@ -231,11 +233,13 @@ public abstract class BaseHttpFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
-        FileStreamData fileStreamData = readStream(source, workInProgressMonitor);
-        writeStream(target, fileStreamData, workInProgressMonitor);
+    public void move(String source, String target) {
+        FileStreamData fileStreamData = readStream(source);
+        HttpRequest request = getRequestBuilder(target).PUT(HttpRequest.BodyPublishers.ofInputStream(fileStreamData::getData))
+                .build();
+        sendRequest(connect(), request);
         finalizeStream(fileStreamData);
-        delete(source, workInProgressMonitor);
+        delete(source);
     }
 
     /**

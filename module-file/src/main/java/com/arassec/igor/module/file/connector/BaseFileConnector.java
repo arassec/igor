@@ -1,6 +1,7 @@
 package com.arassec.igor.module.file.connector;
 
 import com.arassec.igor.core.model.connector.BaseConnector;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import lombok.Getter;
@@ -50,13 +51,15 @@ public abstract class BaseFileConnector extends BaseConnector implements FileCon
      * @param out                   The output stream.
      * @param fileSize              The max number of bytes to copy.
      * @param workInProgressMonitor The {@link WorkInProgressMonitor} that keeps track of the copy progress.
+     * @param jobExecution          The container for job execution data.
      */
-    protected void copyStream(InputStream in, OutputStream out, long fileSize, WorkInProgressMonitor workInProgressMonitor) {
+    protected void copyStream(InputStream in, OutputStream out, long fileSize, WorkInProgressMonitor workInProgressMonitor,
+                              JobExecution jobExecution) {
         try {
             long totalSize = fileSize;
             byte[] buf = new byte[streamCopyBufferSize];
             int foo;
-            while (true) {
+            while (jobExecution.isRunning()) {
                 if (buf.length < fileSize) {
                     foo = buf.length;
                 } else {

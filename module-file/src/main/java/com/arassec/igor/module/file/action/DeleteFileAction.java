@@ -69,7 +69,7 @@ public class DeleteFileAction extends BaseFileAction {
         }
 
         log.debug("Deleting file: '{}'", filePath);
-        source.delete(filePath, VOID_WIP_MONITOR);
+        source.delete(filePath);
         log.debug("File '{}' deleted", filePath);
 
         return List.of(data);

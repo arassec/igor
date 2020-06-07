@@ -1,6 +1,7 @@
 package com.arassec.igor.module.file.connector.ftp;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.connector.BaseFileConnector;
@@ -140,7 +141,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public String read(String file) {
         FTPClient ftpClient = connect();
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             ftpClient.retrieveFile(file, outputStream);
@@ -156,7 +157,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public FileStreamData readStream(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public FileStreamData readStream(String file) {
         try {
             FTPClient ftpClient = connect();
             FileStreamData result = new FileStreamData();
@@ -177,10 +178,11 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
+    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor,
+                            JobExecution jobExecution) {
         FTPClient ftpClient = connect();
         try (BufferedOutputStream outputStream = new BufferedOutputStream(ftpClient.storeFileStream(file))) {
-            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), workInProgressMonitor);
+            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), workInProgressMonitor, jobExecution);
         } catch (IOException e) {
             throw new IgorException("Could not store file: " + file, e);
         } finally {
@@ -213,7 +215,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public void delete(String file) {
         try {
             FTPClient ftpClient = connect();
             if (!ftpClient.deleteFile(file)) {
@@ -229,7 +231,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
+    public void move(String source, String target) {
         try {
             FTPClient ftpClient = connect();
             ftpClient.rename(source, target);

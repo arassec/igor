@@ -1,6 +1,7 @@
 package com.arassec.igor.module.file.connector.ssh;
 
 import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.connector.FileInfo;
@@ -63,7 +64,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public String read(String file) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
@@ -81,13 +82,17 @@ public class SftpFileConnector extends BaseSshFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public FileStreamData readStream(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public FileStreamData readStream(String file) {
         try {
             Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
-            @SuppressWarnings({"squid:S1149", "java:S3740"}) // Don't change JSCH code.
-                    Vector lsEntries = channel.ls(file);
+
+            // Unmodifiable JSCH code.
+            // noinspection rawtypes
+            @SuppressWarnings({"squid:S1149", "java:S3740"})
+            Vector lsEntries = channel.ls(file);
+
             if (lsEntries != null && !lsEntries.isEmpty() && lsEntries.firstElement() instanceof ChannelSftp.LsEntry) {
                 FileStreamData result = new FileStreamData();
                 result.setFileSize(((ChannelSftp.LsEntry) lsEntries.firstElement()).getAttrs().getSize());
@@ -113,15 +118,19 @@ public class SftpFileConnector extends BaseSshFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
+    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor,
+                            JobExecution jobExecution) {
         try {
             Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
             channel.put(fileStreamData.getData(), file,
-                    new IgorSftpProgressMonitor(fileStreamData.getFileSize(), workInProgressMonitor), ChannelSftp.OVERWRITE);
+                    new IgorSftpProgressMonitor(fileStreamData.getFileSize(), workInProgressMonitor, jobExecution), ChannelSftp.OVERWRITE);
             channel.disconnect();
             session.disconnect();
+        } catch (JobCancelledException e) {
+            // No need to log error or warning, the job has simply been cancelled by the user.
+            log.debug("SFTP PUT aborted due to job cancellation.", e);
         } catch (SftpException | JSchException e) {
             throw new IgorException("Could not write file (sftp/stream)!", e);
         }
@@ -143,7 +152,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public void delete(String file) {
         try {
             Session session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
@@ -160,7 +169,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
+    public void move(String source, String target) {
         try {
             moveInternal(source, target);
         } catch (SftpException | JSchException e) {

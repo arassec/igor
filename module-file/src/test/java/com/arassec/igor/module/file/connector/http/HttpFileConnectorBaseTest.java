@@ -1,5 +1,7 @@
 package com.arassec.igor.module.file.connector.http;
 
+import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.connector.FileInfo;
@@ -99,7 +101,7 @@ abstract class HttpFileConnectorBaseTest {
                 )
         );
 
-        String fileContent = connector.read("/sample/file.txt", new WorkInProgressMonitor());
+        String fileContent = connector.read("/sample/file.txt");
         assertEquals("Http(s)FileConnectorTests", fileContent);
     }
 
@@ -118,7 +120,7 @@ abstract class HttpFileConnectorBaseTest {
                 )
         );
 
-        FileStreamData fileStreamData = connector.readStream("/sample/file.txt", new WorkInProgressMonitor());
+        FileStreamData fileStreamData = connector.readStream("/sample/file.txt");
 
         StringWriter stringWriter = new StringWriter();
         IOUtils.copy(fileStreamData.getData(), stringWriter);
@@ -142,7 +144,7 @@ abstract class HttpFileConnectorBaseTest {
                 )
         );
 
-        FileStreamData fileStreamData = connector.readStream("/sample/file.txt", new WorkInProgressMonitor());
+        FileStreamData fileStreamData = connector.readStream("/sample/file.txt");
         assertEquals("html", fileStreamData.getFilenameSuffix());
         assertEquals(11, fileStreamData.getFileSize());
     }
@@ -158,7 +160,8 @@ abstract class HttpFileConnectorBaseTest {
         FileStreamData fileStreamData = new FileStreamData();
         fileStreamData.setData(new ByteArrayInputStream("Http(s)WriteStreamTest".getBytes()));
 
-        connector.writeStream("/target/file.txt", fileStreamData, new WorkInProgressMonitor());
+        connector.writeStream("/target/file.txt", fileStreamData, new WorkInProgressMonitor(),
+                JobExecution.builder().executionState(JobExecutionState.RUNNING).build());
 
         wireMockServer.verify(putRequestedFor(urlEqualTo("/target/file.txt"))
                 .withRequestBody(equalTo("Http(s)WriteStreamTest")));
@@ -173,7 +176,7 @@ abstract class HttpFileConnectorBaseTest {
     void testDelete() {
         wireMockServer.stubFor(delete("/target/file.txt").willReturn(aResponse().withStatus(200)));
 
-        connector.delete("/target/file.txt", new WorkInProgressMonitor());
+        connector.delete("/target/file.txt");
 
         wireMockServer.verify(deleteRequestedFor(urlEqualTo("/target/file.txt")));
     }
@@ -194,7 +197,7 @@ abstract class HttpFileConnectorBaseTest {
         wireMockServer.stubFor(put("/target/file.txt").willReturn(aResponse().withStatus(200)));
         wireMockServer.stubFor(delete("/sample/file.txt.igor").willReturn(aResponse().withStatus(200)));
 
-        connector.move("/sample/file.txt.igor", "/target/file.txt", new WorkInProgressMonitor());
+        connector.move("/sample/file.txt.igor", "/target/file.txt");
 
         wireMockServer.verify(putRequestedFor(urlEqualTo("/target/file.txt"))
                 .withRequestBody(equalTo("Http(s)MoveTest")));
@@ -255,13 +258,12 @@ abstract class HttpFileConnectorBaseTest {
 
         connector.setFollowRedirects(true);
 
-        String content = connector.read("/test.html", new WorkInProgressMonitor());
+        String content = connector.read("/test.html");
         assertEquals("Http(s)FollowRedirectsTest", content);
 
         connector.setFollowRedirects(false);
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
-        assertThrows(IgorException.class, () -> connector.read("/test.html", wipMon));
+        assertThrows(IgorException.class, () -> connector.read("/test.html"));
     }
 
     /**
@@ -278,7 +280,7 @@ abstract class HttpFileConnectorBaseTest {
         connector.setUsername("igor");
         connector.setPassword("s3cr3t");
 
-        assertEquals("Http(s)BasicAuthTest", connector.read("/test.html", new WorkInProgressMonitor()));
+        assertEquals("Http(s)BasicAuthTest", connector.read("/test.html"));
     }
 
     /**
@@ -300,15 +302,17 @@ abstract class HttpFileConnectorBaseTest {
                 get("/").willReturn(aResponse().withStatus(500))
         );
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
         FileStreamData fileStreamDataMock = mock(FileStreamData.class);
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
+        JobExecution jobExecution = JobExecution.builder().executionState(JobExecutionState.RUNNING).build();
 
         assertAll("HTTP errors must be handled safely.",
                 () -> assertThrows(IgorException.class, () -> connector.listFiles("/test.html", null)),
-                () -> assertThrows(IgorException.class, () -> connector.read("/test.html", wipMon)),
-                () -> assertThrows(IgorException.class, () -> connector.readStream("/test.html", wipMon)),
-                () -> assertThrows(IgorException.class, () -> connector.writeStream("/test.html", fileStreamDataMock, wipMon)),
-                () -> assertThrows(IgorException.class, () -> connector.delete("/test.html", wipMon))
+                () -> assertThrows(IgorException.class, () -> connector.read("/test.html")),
+                () -> assertThrows(IgorException.class, () -> connector.readStream("/test.html")),
+                () -> assertThrows(IgorException.class, () -> connector.writeStream("/test.html", fileStreamDataMock, wipMon,
+                        jobExecution)),
+                () -> assertThrows(IgorException.class, () -> connector.delete("/test.html"))
         );
     }
 
@@ -331,15 +335,17 @@ abstract class HttpFileConnectorBaseTest {
                 get("/").willReturn(aResponse().withFault(Fault.MALFORMED_RESPONSE_CHUNK))
         );
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
         FileStreamData fileStreamDataMock = mock(FileStreamData.class);
+        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
+        JobExecution jobExecution = JobExecution.builder().executionState(JobExecutionState.RUNNING).build();
 
         assertAll("Exceptions must be handled safely.",
                 () -> assertThrows(IgorException.class, () -> connector.listFiles("/test.html", null)),
-                () -> assertThrows(IgorException.class, () -> connector.read("/test.html", wipMon)),
-                () -> assertThrows(IgorException.class, () -> connector.readStream("/test.html", wipMon)),
-                () -> assertThrows(IgorException.class, () -> connector.writeStream("/test.html", fileStreamDataMock, wipMon)),
-                () -> assertThrows(IgorException.class, () -> connector.delete("/test.html", wipMon)),
+                () -> assertThrows(IgorException.class, () -> connector.read("/test.html")),
+                () -> assertThrows(IgorException.class, () -> connector.readStream("/test.html")),
+                () -> assertThrows(IgorException.class, () -> connector.writeStream("/test.html", fileStreamDataMock, wipMon,
+                        jobExecution)),
+                () -> assertThrows(IgorException.class, () -> connector.delete("/test.html")),
                 () -> assertThrows(IgorException.class, () -> connector.testConfiguration())
         );
     }

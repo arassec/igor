@@ -1,6 +1,7 @@
 package com.arassec.igor.module.file.connector.localfs;
 
 import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.connector.BaseFileConnector;
@@ -66,11 +67,9 @@ public class LocalFilesystemFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public String read(String file) {
         try {
-            String result = new String(Files.readAllBytes(Paths.get(file)));
-            workInProgressMonitor.setProgressInPercent(100);
-            return result;
+            return new String(Files.readAllBytes(Paths.get(file)));
         } catch (IOException e) {
             throw new IgorException("Could not read file: " + file, e);
         }
@@ -80,7 +79,7 @@ public class LocalFilesystemFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public FileStreamData readStream(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public FileStreamData readStream(String file) {
         try {
             FileStreamData result = new FileStreamData();
             result.setFileSize(Files.size(Paths.get(file)));
@@ -95,9 +94,10 @@ public class LocalFilesystemFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
+    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor,
+                            JobExecution jobExecution) {
         try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-            copyStream(fileStreamData.getData(), fileOutputStream, fileStreamData.getFileSize(), workInProgressMonitor);
+            copyStream(fileStreamData.getData(), fileOutputStream, fileStreamData.getFileSize(), workInProgressMonitor, jobExecution);
         } catch (IOException e) {
             throw new IgorException("Could not write file (stream): " + file, e);
         }
@@ -107,10 +107,9 @@ public class LocalFilesystemFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public void delete(String file) {
         try {
             Files.delete(Paths.get(file));
-            workInProgressMonitor.setProgressInPercent(100);
         } catch (IOException e) {
             throw new IgorException("Could not delete local file " + file, e);
         }
@@ -120,10 +119,9 @@ public class LocalFilesystemFileConnector extends BaseFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
+    public void move(String source, String target) {
         try {
             Files.move(Paths.get(source), Paths.get(target), StandardCopyOption.REPLACE_EXISTING);
-            workInProgressMonitor.setProgressInPercent(100);
         } catch (IOException e) {
             throw new IgorException("Could not move local file '" + source + "' to '" + target + "'!", e);
         }

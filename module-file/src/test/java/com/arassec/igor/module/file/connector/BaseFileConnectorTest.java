@@ -1,15 +1,14 @@
 package com.arassec.igor.module.file.connector;
 
+import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,7 +48,8 @@ class BaseFileConnectorTest {
 
         baseFileConnector.setStreamCopyBufferSize(1024 * 1024);
 
-        baseFileConnector.copyStream(inputStream, outputStream, 10, workInProgressMonitor);
+        baseFileConnector.copyStream(inputStream, outputStream, 10, workInProgressMonitor,
+                JobExecution.builder().executionState(JobExecutionState.RUNNING).build());
 
         assertEquals(100, workInProgressMonitor.getProgressInPercent());
         assertEquals("1234567890", outputStream.toString());
@@ -68,7 +68,8 @@ class BaseFileConnectorTest {
 
         baseFileConnector.setStreamCopyBufferSize(2);
 
-        baseFileConnector.copyStream(inputStream, outputStream, 10, workInProgressMonitor);
+        baseFileConnector.copyStream(inputStream, outputStream, 10, workInProgressMonitor,
+                JobExecution.builder().executionState(JobExecutionState.RUNNING).build());
 
         assertEquals(100, workInProgressMonitor.getProgressInPercent());
         assertEquals("1234567890", outputStream.toString());
@@ -86,12 +87,13 @@ class BaseFileConnectorTest {
                 "-test-exception"));
 
         WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
+        JobExecution jobExecution = JobExecution.builder().executionState(JobExecutionState.RUNNING).build();
 
-        assertThrows(IgorException.class, () -> baseFileConnector.copyStream(inputStreamMock, null, 100, wipMon));
+        assertThrows(IgorException.class, () -> baseFileConnector.copyStream(inputStreamMock, null, 100, wipMon, jobExecution));
 
         when(inputStreamMock.read(any(byte[].class), eq(0), anyInt())).thenReturn(-1);
 
-        assertThrows(IgorException.class, () -> baseFileConnector.copyStream(inputStreamMock, null, 100, wipMon));
+        assertThrows(IgorException.class, () -> baseFileConnector.copyStream(inputStreamMock, null, 100, wipMon, jobExecution));
     }
 
     /**
@@ -105,6 +107,22 @@ class BaseFileConnectorTest {
         String formattedInstant = baseFileConnector.formatInstant(instant);
         assertTrue(formattedInstant.startsWith("1970-01-15"));
         assertTrue(formattedInstant.contains(":56:07.89"));
+    }
+
+    /**
+     * Tests aborting file transfer if the job is cancelled.
+     */
+    @Test
+    @DisplayName("Tests aborting file transfer if the job is cancelled.")
+    @SneakyThrows
+    void testCopyStreamJobCancelled() {
+        InputStream inputStreamMock = mock(InputStream.class);
+        OutputStream outputStreamMock = mock(OutputStream.class);
+
+        baseFileConnector.copyStream(inputStreamMock, outputStreamMock, 123L, new WorkInProgressMonitor(),
+                JobExecution.builder().executionState(JobExecutionState.CANCELLED).build());
+
+        verifyNoInteractions(inputStreamMock);
     }
 
 }

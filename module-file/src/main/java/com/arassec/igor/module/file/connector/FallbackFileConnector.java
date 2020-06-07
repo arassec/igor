@@ -1,5 +1,6 @@
 package com.arassec.igor.module.file.connector;
 
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class FallbackFileConnector extends BaseFileConnector {
      * Throws an {@link IllegalStateException} on every invocation!
      */
     @Override
-    public String read(String file, WorkInProgressMonitor workInProgress) {
+    public String read(String file) {
         throw new IllegalStateException(ERROR_MESSAGE);
     }
 
@@ -41,7 +42,7 @@ public class FallbackFileConnector extends BaseFileConnector {
      * Throws an {@link IllegalStateException} on every invocation!
      */
     @Override
-    public FileStreamData readStream(String file, WorkInProgressMonitor workInProgress) {
+    public FileStreamData readStream(String file) {
         throw new IllegalStateException(ERROR_MESSAGE);
     }
 
@@ -49,7 +50,7 @@ public class FallbackFileConnector extends BaseFileConnector {
      * Throws an {@link IllegalStateException} on every invocation!
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgress) {
+    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgress, JobExecution jobExecution) {
         throw new IllegalStateException(ERROR_MESSAGE);
     }
 
@@ -57,7 +58,7 @@ public class FallbackFileConnector extends BaseFileConnector {
      * Throws an {@link IllegalStateException} on every invocation!
      */
     @Override
-    public void move(String source, String target, WorkInProgressMonitor workInProgress) {
+    public void move(String source, String target) {
         throw new IllegalStateException(ERROR_MESSAGE);
     }
 
@@ -65,7 +66,7 @@ public class FallbackFileConnector extends BaseFileConnector {
      * Throws an {@link IllegalStateException} on every invocation!
      */
     @Override
-    public void delete(String file, WorkInProgressMonitor workInProgress) {
+    public void delete(String file) {
         throw new IllegalStateException(ERROR_MESSAGE);
     }
 

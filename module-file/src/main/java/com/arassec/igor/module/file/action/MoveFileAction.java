@@ -81,7 +81,7 @@ public class MoveFileAction extends BaseFileAction {
         String targetFilePath = resolvedData.getTargetDirectory() + resolvedData.getTargetFilename();
 
         log.debug("Moving file '{}' to '{}'", sourceFilePath, targetFilePath);
-        source.move(sourceFilePath, targetFilePath, VOID_WIP_MONITOR);
+        source.move(sourceFilePath, targetFilePath);
         log.debug("File '{}' moved to '{}'", sourceFilePath, targetFilePath);
 
         return List.of(data);

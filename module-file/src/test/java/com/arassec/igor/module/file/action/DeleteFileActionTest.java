@@ -1,7 +1,6 @@
 package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.module.file.connector.FileConnector;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,8 +37,7 @@ class DeleteFileActionTest extends FileActionBaseTest {
         assertEquals(1, processedData.size());
         assertEquals(data, processedData.get(0));
 
-        verify(fileConnectorMock, times(1))
-                .delete(eq("/directory/test/filename.txt"), any(WorkInProgressMonitor.class));
+        verify(fileConnectorMock, times(1)).delete(eq("/directory/test/filename.txt"));
     }
 
     /**

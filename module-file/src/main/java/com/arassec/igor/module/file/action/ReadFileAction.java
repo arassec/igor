@@ -74,7 +74,7 @@ public class ReadFileAction extends BaseFileAction {
         }
 
         log.debug("Reading file: '{}'", filePath);
-        data.put(KEY_FILE_CONTENTS, source.read(filePath, VOID_WIP_MONITOR));
+        data.put(KEY_FILE_CONTENTS, source.read(filePath));
         log.debug("File '{}' read", filePath);
 
         return List.of(data);

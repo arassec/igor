@@ -16,7 +16,7 @@ Keep your applications clean and let igor do the dirty work.
 
 # Status
 
-Igor tries to give the user a toolbox consisting of connectors and actions, which can be flexibly combined to solve bigger tasks.
+Igor gives the user a toolbox consisting of connectors and actions, which can be flexibly combined to solve bigger tasks.
 
 It is similar to [Node-RED](https://nodered.org/), [Huginn](https://github.com/huginn/huginn) or [Beehive](https://github.com/muesli/beehive), but focuses more on
 data processing instead of specific online connectors or home automation. 

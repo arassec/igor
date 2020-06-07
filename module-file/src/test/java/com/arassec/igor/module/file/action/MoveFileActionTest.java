@@ -2,7 +2,6 @@ package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.module.file.connector.FileConnector;
 import com.arassec.igor.module.file.provider.ListFilesProvider;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -39,8 +37,7 @@ class MoveFileActionTest extends FileActionBaseTest {
 
         moveFileAction.process(createData(), new JobExecution());
 
-        verify(fileConnectorMock, times(1)).move(eq("/directory/test/filename.txt"), eq("/dev/null/deleted.txt"),
-                any(WorkInProgressMonitor.class));
+        verify(fileConnectorMock, times(1)).move(eq("/directory/test/filename.txt"), eq("/dev/null/deleted.txt"));
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.module.file.connector.FileConnector;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,7 +26,7 @@ class ReadFileActionTest extends FileActionBaseTest {
     @DisplayName("Tests the action with JSON-Path parameters.")
     void testProcess() {
         FileConnector fileConnectorMock = mock(FileConnector.class);
-        when(fileConnectorMock.read(eq("/directory/test/filename.txt"), any(WorkInProgressMonitor.class))).thenReturn("igor-junit-test");
+        when(fileConnectorMock.read(eq("/directory/test/filename.txt"))).thenReturn("igor-junit-test");
 
         ReadFileAction action = new ReadFileAction();
         action.setSource(fileConnectorMock);

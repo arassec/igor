@@ -1,5 +1,7 @@
 package com.arassec.igor.module.file.connector.localfs;
 
+import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.connector.FileInfo;
@@ -18,7 +20,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 /**
  * Tests the {@link LocalFilesystemFileConnector}.
@@ -56,10 +57,8 @@ class LocalFilesystemFileConnectorTest {
     @Test
     @DisplayName("Test reading a file.")
     void testRead() {
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
-        String fileContent = fileConnector.read("src/test/resources/localfs/alpha.txt", wipMon);
+        String fileContent = fileConnector.read("src/test/resources/localfs/alpha.txt");
         assertEquals("Just a test", fileContent);
-        assertEquals(100, wipMon.getProgressInPercent());
     }
 
     /**
@@ -69,7 +68,7 @@ class LocalFilesystemFileConnectorTest {
     @DisplayName("Tests reading a file as stream.")
     @SneakyThrows(IOException.class)
     void testReadStream() {
-        FileStreamData fileStreamData = fileConnector.readStream("src/test/resources/localfs/alpha.txt", new WorkInProgressMonitor());
+        FileStreamData fileStreamData = fileConnector.readStream("src/test/resources/localfs/alpha.txt");
         assertEquals(11, fileStreamData.getFileSize());
         assertEquals("Just a test", StreamUtils.copyToString(fileStreamData.getData(), StandardCharsets.UTF_8));
     }
@@ -85,9 +84,9 @@ class LocalFilesystemFileConnectorTest {
         Files.deleteIfExists(targetFile);
         assertFalse(Files.exists(targetFile));
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
-        FileStreamData fileStreamData = fileConnector.readStream("src/test/resources/localfs/alpha.txt", new WorkInProgressMonitor());
-        fileConnector.writeStream(targetFile.toString(), fileStreamData, wipMon);
+        FileStreamData fileStreamData = fileConnector.readStream("src/test/resources/localfs/alpha.txt");
+        fileConnector.writeStream(targetFile.toString(), fileStreamData, new WorkInProgressMonitor(),
+                JobExecution.builder().executionState(JobExecutionState.RUNNING).build());
 
         assertTrue(Files.exists(targetFile));
         assertEquals("Just a test", Files.readString(targetFile));
@@ -103,11 +102,9 @@ class LocalFilesystemFileConnectorTest {
         Files.copy(Paths.get("src/test/resources/localfs/alpha.txt"), Paths.get("target/delete-file-alpha.txt"), StandardCopyOption.REPLACE_EXISTING);
         assertTrue(Files.exists(Paths.get("target/delete-file-alpha.txt")));
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
-        fileConnector.delete("target/delete-file-alpha.txt", wipMon);
+        fileConnector.delete("target/delete-file-alpha.txt");
 
         assertFalse(Files.exists(Paths.get("target/delete-file-alpha.txt")));
-        assertEquals(100, wipMon.getProgressInPercent());
     }
 
     /**
@@ -125,12 +122,10 @@ class LocalFilesystemFileConnectorTest {
         assertTrue(Files.exists(Paths.get(source)));
         assertFalse(Files.exists(Paths.get(target)));
 
-        WorkInProgressMonitor wipMon = new WorkInProgressMonitor();
-        fileConnector.move(source, target, wipMon);
+        fileConnector.move(source, target);
 
         assertFalse(Files.exists(Paths.get(source)));
         assertTrue(Files.exists(Paths.get(target)));
-        assertEquals(100, wipMon.getProgressInPercent());
     }
 
     /**
@@ -150,13 +145,10 @@ class LocalFilesystemFileConnectorTest {
     void testExceptionHandling() {
         String file = "target/non-existing.file";
         assertFalse(Files.exists(Paths.get(file)));
-
-        WorkInProgressMonitor wipMonMock = mock(WorkInProgressMonitor.class);
-
-        assertThrows(IgorException.class, () -> fileConnector.read(file, wipMonMock));
-        assertThrows(IgorException.class, () -> fileConnector.readStream(file, wipMonMock));
-        assertThrows(IgorException.class, () -> fileConnector.delete(file, wipMonMock));
-        assertThrows(IgorException.class, () -> fileConnector.move(file, file, wipMonMock));
+        assertThrows(IgorException.class, () -> fileConnector.read(file));
+        assertThrows(IgorException.class, () -> fileConnector.readStream(file));
+        assertThrows(IgorException.class, () -> fileConnector.delete(file));
+        assertThrows(IgorException.class, () -> fileConnector.move(file, file));
     }
 
 }

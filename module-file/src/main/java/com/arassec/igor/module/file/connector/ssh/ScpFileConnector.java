@@ -1,6 +1,8 @@
 package com.arassec.igor.module.file.connector.ssh;
 
 import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.file.connector.FileInfo;
@@ -94,10 +96,11 @@ public class ScpFileConnector extends BaseSshFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public String read(String file, WorkInProgressMonitor workInProgressMonitor) {
-        FileStreamData fileStreamData = readStream(file, workInProgressMonitor);
+    public String read(String file) {
+        FileStreamData fileStreamData = readStream(file);
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), workInProgressMonitor);
+            copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), new WorkInProgressMonitor(),
+                    JobExecution.builder().executionState(JobExecutionState.RUNNING).build());
             outputStream.flush();
             return outputStream.toString();
         } catch (IOException e) {
@@ -111,7 +114,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public FileStreamData readStream(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public FileStreamData readStream(String file) {
         try {
             FileStreamData result = new FileStreamData();
 
@@ -142,6 +145,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
             }
 
             // read '0644 '
+            //noinspection ResultOfMethodCallIgnored
             sshInputStream.read(buf, 0, 5);
 
             long fileSize = 0L;
@@ -158,6 +162,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
 
             // Consume the file name from the stream...
             for (int i = 0; ; i++) {
+                //noinspection ResultOfMethodCallIgnored
                 sshInputStream.read(buf, i, 1);
                 if (buf[i] == (byte) 0x0a) {
                     break;
@@ -192,7 +197,8 @@ public class ScpFileConnector extends BaseSshFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor) {
+    public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor,
+                            JobExecution jobExecution) {
         try {
             String command = "scp -t " + file;
             Session session = connect(getHost(), getPort(), getUsername(), getPassword());
@@ -226,7 +232,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
                 throw new IgorException("Error during SCP file transfer (" + sshReturnCode + "): " + log);
             }
 
-            copyStream(fileStreamData.getData(), sshOutputStream, fileStreamData.getFileSize(), workInProgressMonitor);
+            copyStream(fileStreamData.getData(), sshOutputStream, fileStreamData.getFileSize(), workInProgressMonitor, jobExecution);
 
             finalizeStreams(session, channel, sshOutputStream, sshInputStream);
         } catch (IOException | JSchException e) {
@@ -250,7 +256,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String file, WorkInProgressMonitor workInProgressMonitor) {
+    public void delete(String file) {
         execute("rm -f " + file);
     }
 
@@ -258,7 +264,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
      * {@inheritDoc}
      */
     @Override
-    public void move(String source, String target, WorkInProgressMonitor workInProgressMonitor) {
+    public void move(String source, String target) {
         execute("mv " + source + " " + target);
     }
 

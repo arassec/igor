@@ -1,5 +1,6 @@
 package com.arassec.igor.module.file.connector.ssh;
 
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.jcraft.jsch.SftpProgressMonitor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +24,17 @@ public class IgorSftpProgressMonitor implements SftpProgressMonitor {
     /**
      * The total size of the transferred file.
      */
-    private long fileSize;
+    private final long fileSize;
 
     /**
      * Contains the progress.
      */
-    private WorkInProgressMonitor workInProgressMonitor;
+    private final WorkInProgressMonitor workInProgressMonitor;
+
+    /**
+     * Container for job execution data.
+     */
+    private final JobExecution jobExecution;
 
     /**
      * Creates a new instance.
@@ -36,9 +42,10 @@ public class IgorSftpProgressMonitor implements SftpProgressMonitor {
      * @param fileSize              The total file size.
      * @param workInProgressMonitor The work-in-progress monitor.
      */
-    public IgorSftpProgressMonitor(long fileSize, WorkInProgressMonitor workInProgressMonitor) {
+    public IgorSftpProgressMonitor(long fileSize, WorkInProgressMonitor workInProgressMonitor, JobExecution jobExecution) {
         this.fileSize = fileSize;
         this.workInProgressMonitor = workInProgressMonitor;
+        this.jobExecution = jobExecution;
     }
 
     /**
@@ -55,6 +62,9 @@ public class IgorSftpProgressMonitor implements SftpProgressMonitor {
      */
     @Override
     public boolean count(long bytes) {
+        if (!jobExecution.isRunning()) {
+            throw new JobCancelledException("The job has been cancelled: " + jobExecution.getJobId());
+        }
         count += bytes;
         if (count >= fileSize) {
             workInProgressMonitor.setProgressInPercent(100);

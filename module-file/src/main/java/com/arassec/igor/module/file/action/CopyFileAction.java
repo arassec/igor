@@ -145,7 +145,7 @@ public class CopyFileAction extends BaseFileAction {
         try {
             String sourceFileWithPath = getFilePath(resolvedData.getSourceDirectory(), resolvedData.getSourceFilename());
 
-            FileStreamData fileStreamData = source.readStream(sourceFileWithPath, VOID_WIP_MONITOR);
+            FileStreamData fileStreamData = source.readStream(sourceFileWithPath);
 
             if (fileStreamData == null || fileStreamData.getData() == null) {
                 throw new IgorException("Not valid or not a file!");
@@ -162,12 +162,12 @@ public class CopyFileAction extends BaseFileAction {
                 targetFileInTransfer += IN_TRANSFER_SUFFIX;
             }
 
-            target.writeStream(targetFileInTransfer, fileStreamData, workInProgressMonitor);
+            target.writeStream(targetFileInTransfer, fileStreamData, workInProgressMonitor, jobExecution);
 
             source.finalizeStream(fileStreamData);
 
             if (appendTransferSuffix) {
-                target.move(targetFileInTransfer, targetFileWithPath, VOID_WIP_MONITOR);
+                target.move(targetFileInTransfer, targetFileWithPath);
             }
 
             log.debug("File '{}' copied to '{}'", sourceFileWithPath, targetFileWithPath);
