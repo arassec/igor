@@ -44,6 +44,7 @@
         <module>module-file</module>
         <module>module-message</module>
         <module>igor-spring-boot-starter</module>
+        <module>documentation</module>
         <module>application</module>
     </modules>
 
