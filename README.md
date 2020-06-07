@@ -1,3 +1,7 @@
+<p align="center">
+ <img height="240" width="256" src="https://raw.githubusercontent.com/arassec/igor/master/documentation/docs/.vuepress/public/logo.png" alt="igor-logo"/>
+</p>
+
 [![Travis (.com)](https://img.shields.io/travis/com/arassec/igor)](https://travis-ci.com/arassec/igor) 
 [![Sonar Quality Gate](https://img.shields.io/sonar/quality_gate/arassec_igor?server=http%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/dashboard?id=arassec_igor)
 [![Sonar Coverage](https://img.shields.io/sonar/coverage/arassec_igor?server=http%3A%2F%2Fsonarcloud.io&color=success)](https://sonarcloud.io/component_measures?id=arassec_igor&metric=coverage&view=treemap)
@@ -6,8 +10,7 @@
 > 
 > *Terry Pratchett, Making Money* 
 
-<img style="float: right;" height="240" width="256" src="https://raw.githubusercontent.com/arassec/igor/master/documentation/docs/.vuepress/public/logo.png" alt="igor-logo"/>
-
+# About
 Igor is a tool for managing 'continuous workarounds'.
 
 It provides an easy to use, reliable place where you can put all those workarounds, which would 

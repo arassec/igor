@@ -9,5 +9,6 @@ module.exports = {
         sidebar: 'auto',
         logo: '/logo.png',
     },
-    dest: './target/current/'
+    dest: './target/current/',
+    base: '/igor/'
 }
