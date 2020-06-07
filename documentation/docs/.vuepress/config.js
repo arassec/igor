@@ -10,5 +10,5 @@ module.exports = {
         logo: '/logo.png',
     },
     dest: './target/current/',
-    base: '/igor/'
+    base: '/igor/current/'
 }
