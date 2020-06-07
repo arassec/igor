@@ -1,14 +1,18 @@
 <p align="center">
- <img height="240" width="256" src="https://raw.githubusercontent.com/arassec/igor/master/documentation/docs/.vuepress/public/logo.png" alt="igor-logo"/>
+  <img height="240" width="256" src="https://raw.githubusercontent.com/arassec/igor/master/documentation/docs/.vuepress/public/logo.png" alt="igor-logo"/>
 </p>
 
-[![Travis (.com)](https://img.shields.io/travis/com/arassec/igor)](https://travis-ci.com/arassec/igor) 
-[![Sonar Quality Gate](https://img.shields.io/sonar/quality_gate/arassec_igor?server=http%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/dashboard?id=arassec_igor)
-[![Sonar Coverage](https://img.shields.io/sonar/coverage/arassec_igor?server=http%3A%2F%2Fsonarcloud.io&color=success)](https://sonarcloud.io/component_measures?id=arassec_igor&metric=coverage&view=treemap)
-
-> “I'm an Igor, thur. We don't athk quethtionth."  
-> 
-> *Terry Pratchett, Making Money* 
+<p align="center">
+  <a href="https://travis-ci.com/arassec/igor">
+    <img src="https://img.shields.io/travis/com/arassec/igor" alt="build-state"/>
+  </a>
+  <a href="https://sonarcloud.io/dashboard?id=arassec_igor">
+    <img src="https://img.shields.io/sonar/quality_gate/arassec_igor?server=http%3A%2F%2Fsonarcloud.io" alt="quality-state"/>
+  </a>
+  <a href="https://sonarcloud.io/component_measures?id=arassec_igor&metric=coverage&view=treemap">
+    <img src="https://img.shields.io/sonar/coverage/arassec_igor?server=http%3A%2F%2Fsonarcloud.io&color=success" alt="coverage-state"/>
+  </a>
+</p> 
 
 # About
 Igor is a tool for managing 'continuous workarounds'.
