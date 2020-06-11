@@ -1,8 +1,10 @@
 # 'Empty input' Provider
+
+## Description
 This provider creates data items that only contain igor's meta data.
 
 A data item created by this provider looks similar to this:
-```
+``` json
 {
   "meta": {
     "jobId": "1e91a654-ba8c-4c3a-afd0-932bd27d2888",
@@ -12,7 +14,7 @@ A data item created by this provider looks similar to this:
 }
 ```
 
-# Parameters
+## Parameters
 The following parameters can be configured for the 'Empty Input' provider.
 
 Parameter | Description

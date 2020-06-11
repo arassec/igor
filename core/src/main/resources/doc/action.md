@@ -1,10 +1,15 @@
 # Action
-An action operates on each data item of a tasks data stream and performs modifications on it. The result is handed
+
+## Description
+Tasks consist of a list of **actions**, which are called sequentially in the configured order.
+If an action fails, further execution is aborted.
+
+An action operates on each data item of a task's data stream and performs modifications on it. The result is handed
 over to the following action, which itself can modify the data.
 
 Actions are similar to methods of a "Java Stream API" stream.
  
-# Parameters
+## Parameters
 The following parameters can be configured for every action.
 
 Parameter | Description
@@ -14,12 +19,12 @@ Name | The name of the task.
 
 Depending on the actual type, the action might require more parameters to be configured.
 
-# JSON-Path
+## JSON-Path
 Actions support JSON-Path expressions in configuration parameters. 
 Those expressions are evaluated against the data item the action operates on.
 
 For example, an action operating on the following data item: 
-```
+``` json
 {
   "data": {
     "filename": "README.TXT",

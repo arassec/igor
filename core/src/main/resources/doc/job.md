@@ -1,12 +1,11 @@
 # Job
+
+## Description
 Jobs are the core elements of igor. They contain all configurations required to fulfill a specific mission.
 
 A job is triggered by a **Trigger**, which determines when the job should run.
 
-Jobs themselves are split into **Tasks**. Tasks are executed sequentially and perform independent steps to support the job's mission. 
-If a task fails, the job execution is aborted and all subsequent tasks are ignored.
-
-# Parameters
+## Parameters
 The following parameters can be configured for every job. 
 
 Parameter | Description

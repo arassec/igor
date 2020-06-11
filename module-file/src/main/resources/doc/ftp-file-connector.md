@@ -1,7 +1,9 @@
 # FTP Connector
+
+## Description
 A file-connector providing access to an FTP server.
 
-# Parameters
+## Parameters
 The FTP connector can be configured by the following parameters:
 
 Parameter | Description

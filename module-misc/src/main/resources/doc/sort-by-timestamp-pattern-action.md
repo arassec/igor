@@ -1,9 +1,11 @@
 # 'Sort by timestamp pattern' Action
+
+## Description
 This action sorts data items based on a timestamp inside a value of the input data.
 
 This might e.g. be used to sort files by a timestamp that is part of their filename, if the timestamp of the last modification is not available. 
 
-# Parameters
+## Parameters
 The action can be configured by the following parameters:
 
 Parameter | Description
@@ -13,10 +15,10 @@ Pattern | A regular expression matching the timestamp part of the input value.
 Timestamp format | The format of the timtestamp part of the property's value. See [Java DateTimeFormat](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/format/DateTimeFormatter.html) (section 'Patterns for Formatting and Parsing') for allowed values.
 Sort ascending | If checked, data items are sorted from older to newer timestamps. If unchecked, data items are sorted from newer to older timestamps.
 
-# Example
+## Example
  
 An example data item processed by this action might look like this:
-```
+``` json
 {
   "data": {
     "filename": "alpha_20200113185100_beta.jpeg",

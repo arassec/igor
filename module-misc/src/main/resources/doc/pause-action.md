@@ -1,7 +1,10 @@
 # Pause Action
-This action pauses execution by the configured amount of time.
 
-# Parameters
+## Description
+This action pauses execution by the configured amount of time.
+Execution pauses **for every data item** which is processed by the action.
+
+## Parameters
 The action can be configured by the following parameters:
 
 Parameter | Description

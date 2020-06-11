@@ -1,7 +1,9 @@
 # HTTPS Connector
+
+## Description
 A file-connector that connects to an HTTPS server.
 
-# Parameters
+## Parameters
 The connector can be configured by the following parameters:
 
 Parameter | Description

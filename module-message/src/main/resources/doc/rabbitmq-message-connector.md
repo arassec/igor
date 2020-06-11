@@ -1,7 +1,9 @@
 # RabbitMQ Connector
+
+## Description
 A message-connector that uses RabbitMQ to send messages.
 
-# Parameters
+## Parameters
 The RabbitMQ connector can be configured with the following parameters:
 
 Parameter | Description

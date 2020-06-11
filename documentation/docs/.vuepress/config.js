@@ -6,20 +6,18 @@ module.exports = {
             {text: "User Guide", link: "/user/"},
             {text: "GitHub", link: "https://www.github.com/arassec/igor"}
         ],
-        logo: "/logo.png",
         sidebar: {
             "/user/": [
                 {
                     title: "Introduction",
-                    collapsable: false,
                     children: [
                         "",
-                        "installation"
+                        "installation",
+                        "configuration"
                     ]
                 },
                 {
-                    title: "Core Principals",
-                    collapsable: false,
+                    title: "Using Igor",
                     children: [
                         "core/job",
                         "core/task",
@@ -29,7 +27,6 @@ module.exports = {
                 },
                 {
                     title: "Misc Components",
-                    collapsable: false,
                     children: [
                         "module-misc/cron-trigger",
                         "module-misc/manual-trigger",
@@ -45,16 +42,26 @@ module.exports = {
                 },
                 {
                     title: "File Components",
-                    collapsable: false,
                     children: [
-                        "module-file/list-files-provider"
+                        "module-file/list-files-provider",
+                        "module-file/copy-file-action",
+                        "module-file/delete-file-action",
+                        "module-file/move-file-action",
+                        "module-file/read-file-action",
+                        "module-file/ftp-file-connector",
+                        "module-file/ftps-file-connector",
+                        "module-file/localfs-file-connector",
+                        "module-file/http-file-connector",
+                        "module-file/https-file-connector",
+                        "module-file/scp-file-connector",
+                        "module-file/sftp-file-connector"
                     ]
                 },
                 {
                     title: "Message Components",
-                    collapsable: false,
                     children: [
-                        "module-message/send-message-action"
+                        "module-message/send-message-action",
+                        "module-message/rabbitmq-message-connector",
                     ]
                 }
             ]

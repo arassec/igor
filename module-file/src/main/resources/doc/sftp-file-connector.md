@@ -1,7 +1,9 @@
 # SFTP Connector
+
+## Description
 A file-connector that connects to an SFTP server.
 
-# Parameters
+## Parameters
 The connector can be configured by the following parameters:
 
 Parameter | Description

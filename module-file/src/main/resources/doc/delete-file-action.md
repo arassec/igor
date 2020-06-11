@@ -1,7 +1,9 @@
 # 'Delete file' Action
+
+## Description
 This action deletes a file.
 
-# Parameters
+## Parameters
 The action can be configured by the following parameters:
 
 Parameter | Description

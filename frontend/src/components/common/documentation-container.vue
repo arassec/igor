@@ -45,8 +45,8 @@
         padding: 1em;
     }
 
-    #documentation >>> h1:not(:first-of-type) {
-        margin: 2em 0 1em 0;
+    #documentation >>> h2 {
+        margin: 2em 0 .5em 0;
     }
 
     #documentation >>> table {

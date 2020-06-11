@@ -1,10 +1,12 @@
 # 'Read file' Action
+
+## Description
 This action reads a file from a file-connector and adds its contents to the processed data item.
 
 The file's contents will be available in the data item under the key 'fileContents'.
 
 A data item processed by this action could look like this:
-```
+``` json
 {
   "data": {
     ...
@@ -16,7 +18,7 @@ A data item processed by this action could look like this:
 }
 ```
 
-# Parameters
+## Parameters
 The action can be configured by the following parameters:
 
 Parameter | Description

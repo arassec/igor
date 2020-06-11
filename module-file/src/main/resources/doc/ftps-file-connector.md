@@ -1,7 +1,9 @@
 # FTPS Connector
+
+## Description
 A file-connector providing access to an FTPS server.
 
-# Parameters
+## Parameters
 The FTPS connector can be configured by the following parameters:
 
 Parameter | Description

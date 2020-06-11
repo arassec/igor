@@ -18,7 +18,7 @@ public class LocalSecurityProvider extends BaseSecurityProvider {
     /**
      * Provides encryption for secured properties.
      */
-    private StrongTextEncryptor textEncryptor = new StrongTextEncryptor();
+    private final StrongTextEncryptor textEncryptor = new StrongTextEncryptor();
 
     /**
      * Prepares the property encryption.

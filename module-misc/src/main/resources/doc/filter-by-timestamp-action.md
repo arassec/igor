@@ -1,9 +1,11 @@
 # 'Filter by timestamp' Action
+
+## Description
 This action filters data items by comparing a timestamp from the input against a configured time span.
 
 Filtered data items are not passed to following actions.
 
-# Parameters
+## Parameters
 The action can be configured by the following parameters:
 
 Parameter | Description

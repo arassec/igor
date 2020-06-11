@@ -1,7 +1,9 @@
 # 'Move file' Action
+
+## Description
 This action moves/renames a file.
 
-# Parameters
+## Parameters
 The action can be configured by the following parameters:
 
 Parameter | Description

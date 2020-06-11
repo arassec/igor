@@ -1,8 +1,10 @@
 # Connector
+
+## Description
 External services can be configured in igor using **connectors**. 
 A connector can be used in job configurations to access the service.
 
-# Parameters
+## Parameters
 The following parameters can be configured for every connector. 
 
 Parameter | Description

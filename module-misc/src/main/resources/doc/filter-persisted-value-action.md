@@ -1,9 +1,11 @@
 # 'Filter persisted value' Action
+
+## Description
 This action filters data items based on values from igor's datastore.
 
 Filtered data items are not passed to the following action.
 
-# Parameters
+## Parameters
 The action can be configured by the following parameters:
 
 Parameter | Description

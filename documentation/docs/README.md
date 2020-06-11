@@ -15,10 +15,9 @@ features:
 footer: MIT Licensed | Copyright © 2017-present Andreas Sensen
 ---
 # Quick Start
+Install igor using docker:
 ``` sh
 # use docker to get the latest, stable version:
 docker run --name igor -p8080:8080 arassec/igor
-
-# igor is now available in your browser under:
-http://localhost:8080
 ```
+Igor's web interface should now be available at: [http://localhost:8080](http://localhost:8080)

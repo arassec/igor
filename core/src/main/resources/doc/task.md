@@ -1,14 +1,16 @@
 # Task
-Tasks are independent pieces of a job. 
-They consist of a list of **actions**, which are called sequentially in the configured order.
-If an action fails, further execution is aborted.
+
+## Description
+Jobs are split into **Tasks**. 
+Tasks are executed sequentially and perform independent steps to support the job's mission. 
+If a task fails, the job execution is aborted and all subsequent tasks are ignored.
 
 The input data for each task is provided by a **Provider**. 
 Each data items is passed to the first action of the task, and then handed over to the following action and so on.
 Think about the "Java Stream API" to get an idea of the process. 
 The data items are the initial source of the stream's data.
 
-# Parameters
+## Parameters
 The following parameters can be configured for every task. 
 
 Parameter | Description

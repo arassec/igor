@@ -1,8 +1,10 @@
 # 'List files' Provider
+
+## Description
 This provider lists all files contained in a directory. 
 
 A data item created by this provider could look like this:
-```
+``` json
 {
   "data": {
     "filename": "README.TXT",
@@ -17,7 +19,7 @@ A data item created by this provider could look like this:
 }
 ```
 
-# Parameters
+## Parameters
 The 'List files' provider can be configured with the following parameters.
 
 Parameter | Description
