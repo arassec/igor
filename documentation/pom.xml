@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.arassec.igor</groupId>
         <artifactId>igor</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>documentation</artifactId>
@@ -20,6 +20,13 @@
     </properties>
 
     <build>
+        <resources>
+            <resource>
+                <directory>docs/.vuepress/</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>com.github.eirslett</groupId>
@@ -33,7 +40,7 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                         <configuration>
-                            <nodeVersion>v10.10.0</nodeVersion>
+                            <nodeVersion>v12.18.0</nodeVersion>
                         </configuration>
                     </execution>
                     <!-- Install all project dependencies -->
@@ -53,11 +60,98 @@
                             <goal>npm</goal>
                         </goals>
                         <configuration>
+                            <environmentVariables>
+                                <REVISION>${revision}</REVISION>
+                            </environmentVariables>
                             <arguments>run build</arguments>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources-core</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>docs/user/core</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/core/src/main/resources/doc</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-misc</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>docs/user/module-misc</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/module-misc/src/main/resources/doc</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-file</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>docs/user/module-file</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/module-file/src/main/resources/doc</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-message</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>docs/user/module-message</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/module-message/src/main/resources/doc</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-to-target</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/${revision}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/target/doc</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 

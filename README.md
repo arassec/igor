@@ -1,5 +1,5 @@
 <p align="center">
-  <img height="240" width="256" src="https://raw.githubusercontent.com/arassec/igor/master/documentation/docs/.vuepress/public/logo.png" alt="igor-logo"/>
+  <img width="256" src="https://raw.githubusercontent.com/arassec/igor/master/documentation/docs/.vuepress/public/logo.png" alt="igor-logo"/>
 </p>
 
 <p align="center">

@@ -1,5 +1,6 @@
 target/
 !.mvn/wrapper/maven-wrapper.jar
+.flattened-pom.xml
 
 ### STS ###
 .apt_generated
@@ -26,8 +27,17 @@ target/
 ### VS Code ###
 .vscode/
 
+### igor specific ###
+
 dbdata/
 appdata/
 frontend/package-lock.json
 web/src/main/resources/static
 application.properties
+documentation/package-lock.json
+documentation/docs/user/module-misc
+!documentation/docs/user/module-misc/README.md
+documentation/docs/user/module-file
+!documentation/docs/user/module-file/README.md
+documentation/docs/user/module-message
+!documentation/docs/user/module-message/README.md

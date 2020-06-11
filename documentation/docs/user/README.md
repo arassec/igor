@@ -1,4 +1,4 @@
-# Igor Reference Guide
+# About
 
 ## What is Igor?
 Igor is a tool for managing 'continuous workarounds'.
@@ -38,7 +38,6 @@ http://localhost:8080
 ```
 
 ## Contact
-
 You can contact me via e-mail under andreas.sensen@arassec.com
 
 If you found a bug or have a feature request, don't hesitate to create an issue at [GitHub](https://github.com/arassec/igor/issues).

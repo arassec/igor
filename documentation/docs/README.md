@@ -1,10 +1,10 @@
 ---
 home: true
 heroImage: /logo.png
-heroText: Igor - Continuous Workarounds
+heroText: Reference Guide
 tagline: 
-actionText: Get Started →
-actionLink: /guide/
+actionText: User Guide →
+actionLink: /user/
 features:
 - title: Easy To Use
   details: Minimal setup and an easy to use web-frontend to configure continuous workarounds that last.

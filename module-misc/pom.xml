@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.arassec.igor</groupId>
         <artifactId>igor</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>module-misc</artifactId>

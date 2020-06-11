@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.arassec.igor</groupId>
         <artifactId>igor</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>frontend</artifactId>
@@ -33,7 +33,7 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                         <configuration>
-                            <nodeVersion>v10.10.0</nodeVersion>
+                            <nodeVersion>v12.18.0</nodeVersion>
                         </configuration>
                     </execution>
                     <!-- Install all project dependencies -->
