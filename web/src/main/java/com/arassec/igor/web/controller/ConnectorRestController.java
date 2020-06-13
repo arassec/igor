@@ -42,6 +42,10 @@ public class ConnectorRestController {
     /**
      * Returns all available connectors.
      *
+     * @param pageNumber The number of the page to return.
+     * @param pageSize   The size of the page to return.
+     * @param nameFilter An optional filter for connector names.
+     *
      * @return List of available connectors.
      */
     @GetMapping
@@ -67,7 +71,9 @@ public class ConnectorRestController {
     /**
      * Returns all connectors which are a candidate for the supplied type IDs.
      *
-     * @param types The required connector types.
+     * @param types      The required connector types.
+     * @param pageNumber The number of the page to return.
+     * @param pageSize   The size of the page to return.
      *
      * @return List of available connectors of the given types.
      */
@@ -100,7 +106,8 @@ public class ConnectorRestController {
     /**
      * Deletes the connector with the given ID.
      *
-     * @param id The connector's ID.
+     * @param id                 The connector's ID.
+     * @param deleteAffectedJobs Set to {@code true} to delete jobs using this connector.
      */
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -171,6 +178,8 @@ public class ConnectorRestController {
      * Returns the jobs that reference this connector.
      *
      * @param id The connector's ID.
+     * @param pageNumber The number of the page to return.
+     * @param pageSize   The size of the page to return.
      *
      * @return The jobs.
      */

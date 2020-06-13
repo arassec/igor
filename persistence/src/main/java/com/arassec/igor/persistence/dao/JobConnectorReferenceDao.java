@@ -42,6 +42,7 @@ public interface JobConnectorReferenceDao extends PagingAndSortingRepository<Job
      * Finds all job-connector-references for the given connector ID.
      *
      * @param connectorId The connector's ID.
+     * @param pageable    Spring's {@link Pageable} object to support paging.
      *
      * @return List of job-connector-references.
      */

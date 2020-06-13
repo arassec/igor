@@ -1,9 +1,12 @@
 module.exports = {
     title: "Igor Reference Guide",
     themeConfig: {
+        searchMaxSuggestions: 25,
         nav: [
             {text: "Home", link: "/"},
             {text: "User Guide", link: "/user/"},
+            {text: "Developer Guide", link: "/developer/"},
+            {text: "JavaDoc", link: "/apidocs/"},
             {text: "GitHub", link: "https://www.github.com/arassec/igor"}
         ],
         sidebar: {

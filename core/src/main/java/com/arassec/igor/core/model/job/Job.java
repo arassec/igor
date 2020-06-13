@@ -92,6 +92,8 @@ public class Job {
 
     /**
      * Runs the job.
+     *
+     * @param jobExecution The container for job execution information.
      */
     public void run(JobExecution jobExecution) {
         log.debug("Running job: {} ({})", name, id);
@@ -125,8 +127,8 @@ public class Job {
     }
 
     /**
-     * Cancels the job if it is currently running. The job might not stop immediately if it is executing a non-interruptible task.
-     * Check {@link Job#isRunning()} regularly to see when the job execution finished.
+     * Cancels the job if it is currently running. The job might not stop immediately if it is executing a non-interruptible
+     * task. Check the job's isRunning method regularly to see when the job execution finished.
      */
     public void cancel() {
         if (currentJobExecution != null && JobExecutionState.RUNNING.equals(currentJobExecution.getExecutionState())) {

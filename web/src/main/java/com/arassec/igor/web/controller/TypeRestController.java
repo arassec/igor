@@ -38,6 +38,7 @@ public class TypeRestController extends BaseRestController {
     /**
      * Returns all types of a certain category as {@link KeyLabelStore}s.
      *
+     * @param locale   The user's locale for i18n.
      * @param category The category to use.
      *
      * @return Set of types.

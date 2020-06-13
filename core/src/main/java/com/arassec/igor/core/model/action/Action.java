@@ -51,6 +51,8 @@ public interface Action extends IgorComponent {
 
     /**
      * Sets the number of threads this action should run with.
+     *
+     * @param numThreads The number of threads the action should run with.
      */
     void setNumThreads(int numThreads);
 

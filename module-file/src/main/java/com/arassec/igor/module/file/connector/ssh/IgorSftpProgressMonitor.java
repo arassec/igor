@@ -41,6 +41,7 @@ public class IgorSftpProgressMonitor implements SftpProgressMonitor {
      *
      * @param fileSize              The total file size.
      * @param workInProgressMonitor The work-in-progress monitor.
+     * @param jobExecution          The container for job execution information.
      */
     public IgorSftpProgressMonitor(long fileSize, WorkInProgressMonitor workInProgressMonitor, JobExecution jobExecution) {
         this.fileSize = fileSize;

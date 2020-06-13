@@ -35,7 +35,9 @@ In the future, databases, messaging systems or other interfaces could be added t
 
 # Reference Guide
 
-[Current Development Version](https://arassec.github.io/igor/current)
+**Unstable**
+
+[Current Development Version](https://arassec.github.io/igor/0.0.0-SNAPSHOT)
 
 # License
 

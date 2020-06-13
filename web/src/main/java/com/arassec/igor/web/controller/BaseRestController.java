@@ -21,6 +21,7 @@ public abstract class BaseRestController {
      * Converts a job-execution into a list entry for the UI.
      *
      * @param jobExecution The job-execution.
+     * @param jobName      The job's name.
      *
      * @return The {@link JobExecutionListEntry} for the UI.
      */

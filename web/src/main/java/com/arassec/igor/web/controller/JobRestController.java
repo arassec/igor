@@ -124,6 +124,8 @@ public class JobRestController extends BaseRestController {
     /**
      * Returns an {@link SseEmitter} that will be used to send SSE job messages to the client.
      *
+     * @param response The {@link HttpServletResponse} of the request.
+     *
      * @return SSE emitter for job messages.
      */
     @GetMapping("stream")
@@ -304,6 +306,9 @@ public class JobRestController extends BaseRestController {
 
     /**
      * Gets the schedule of all active jobs.
+     *
+     * @param pageNumber The number of the page to return.
+     * @param pageSize   The size of the page to return.
      *
      * @return List of schedules.
      */

@@ -70,6 +70,10 @@ public class WebConfiguration {
     /**
      * Creates the default object mapper for the web layer.
      *
+     * @param igorComponentRegistry Igor's component registry.
+     * @param connectorRepository   Repository for connectors.
+     * @param messageSource         Spring's message source for i18n.
+     *
      * @return The default {@link ObjectMapper}.
      */
     @Bean
@@ -80,6 +84,10 @@ public class WebConfiguration {
 
     /**
      * Creates an {@link ObjectMapper} with enabled "simulation mode" to support simulated job executions.
+     *
+     * @param igorComponentRegistry Igor's component registry.
+     * @param connectorRepository   Repository for connectors.
+     * @param messageSource         Spring's message source for i18n.
      *
      * @return The {@link ObjectMapper} for simulated job runs.
      */

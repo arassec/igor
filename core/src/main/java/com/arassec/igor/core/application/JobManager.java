@@ -113,6 +113,8 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      * Saves the supplied job using the {@link JobRepository}.
      *
      * @param job The job to save.
+     *
+     * @return The saved {@link Job}.
      */
     public Job save(Job job) {
         Job savedJob = jobRepository.upsert(job);

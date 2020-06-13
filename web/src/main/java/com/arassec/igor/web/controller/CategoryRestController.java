@@ -38,6 +38,8 @@ public class CategoryRestController extends BaseRestController {
     /**
      * Returns all connector categories as {@link KeyLabelStore}s.
      *
+     * @param locale The user's locale for i18n.
+     *
      * @return Set of all available connector categories.
      */
     @GetMapping("connector")
@@ -50,6 +52,8 @@ public class CategoryRestController extends BaseRestController {
 
     /**
      * Returns all action categories as {@link KeyLabelStore}s.
+     *
+     * @param locale The user's locale for i18n.
      *
      * @return Set of all available action categories.
      */
@@ -64,6 +68,8 @@ public class CategoryRestController extends BaseRestController {
     /**
      * Returns all action categories as {@link KeyLabelStore}s.
      *
+     * @param locale The user's locale for i18n.
+     *
      * @return Set of all available action categories.
      */
     @GetMapping("action")
@@ -76,6 +82,8 @@ public class CategoryRestController extends BaseRestController {
 
     /**
      * Returns all trigger categories as {@link KeyLabelStore}s.
+     *
+     * @param locale The user's locale for i18n.
      *
      * @return Set of all available trigger categories.
      */

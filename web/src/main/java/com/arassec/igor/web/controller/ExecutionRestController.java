@@ -44,6 +44,8 @@ public class ExecutionRestController extends BaseRestController {
     /**
      * Returns an {@link SseEmitter} that will be used to send SSE job execution messages to the client.
      *
+     * @param response the {@link HttpServletResponse} of the request.
+     *
      * @return SSE emitter for job execution messages.
      */
     @GetMapping("stream")

@@ -47,7 +47,8 @@ public class TransferController {
     /**
      * Exports the job with the given ID.
      *
-     * @param id The job's ID.
+     * @param id       The job's ID.
+     * @param response The {@link HttpServletResponse} of the request.
      */
     @GetMapping(value = "job/{id}")
     public void exportJob(@PathVariable("id") String id, HttpServletResponse response) {
@@ -83,7 +84,8 @@ public class TransferController {
     /**
      * Exports the connector with the given ID.
      *
-     * @param id The connector's ID.
+     * @param id       The connector's ID.
+     * @param response The {@link HttpServletResponse} of the request.
      */
     @GetMapping(value = "connector/{id}")
     public void exportConnector(@PathVariable("id") String id, HttpServletResponse response) {
@@ -111,6 +113,8 @@ public class TransferController {
      * Imports transfer data.
      *
      * @param transferData The data to import.
+     *
+     * @return The string "OK" if the import succeeded.
      */
     @PostMapping
     public ResponseEntity<String> importTransferData(@RequestBody TransferData transferData) {

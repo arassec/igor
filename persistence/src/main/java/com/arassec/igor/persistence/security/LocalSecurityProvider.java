@@ -22,6 +22,8 @@ public class LocalSecurityProvider extends BaseSecurityProvider {
 
     /**
      * Prepares the property encryption.
+     *
+     * @param igorPersistenceProperties Persistence configuration properties.
      */
     public LocalSecurityProvider(IgorPersistenceProperties igorPersistenceProperties) {
         textEncryptor.setPassword(igorPersistenceProperties.getLocalSecurityToken());

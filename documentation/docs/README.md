@@ -1,17 +1,17 @@
 ---
 home: true
 heroImage: /logo.png
-heroText: Reference Guide
+heroText: Reference Documentation
 tagline: 
 actionText: User Guide →
 actionLink: /user/
 features:
-- title: Easy To Use
-  details: Minimal setup and an easy to use web-frontend to configure continuous workarounds that last.
-- title: Flexible
-  details: Flexibly combine simple elements to solve complex tasks.
-- title: Customizable
-  details: Powered by Java and the Spring ecosystem, igor is easy to extend and customize.
+- title: User Guide
+  details: Documentation for igor users that want to use the application with its standard features.
+- title: Developer Guide
+  details: Documentation for developers who wish to customize igor and extend it to their needs.
+- title: JavaDoc
+  details: JavaDoc reference documentation of igor's source code.
 footer: MIT Licensed | Copyright © 2017-present Andreas Sensen
 ---
 # Quick Start

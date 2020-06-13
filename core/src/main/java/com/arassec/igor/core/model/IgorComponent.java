@@ -2,7 +2,6 @@ package com.arassec.igor.core.model;
 
 import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import org.springframework.lang.Nullable;
 
 import java.util.Set;
 
@@ -44,7 +43,9 @@ public interface IgorComponent {
     void setId(String id);
 
     /**
-     * Returns
+     * Returns all un-editable properties.
+     *
+     * @return Set of names of properties which should not be edited by the user.
      */
     @IgorSimulationSafe
     Set<String> getUnEditableProperties();
@@ -56,7 +57,7 @@ public interface IgorComponent {
      * @param taskId       The task's ID.
      * @param jobExecution Contains the state of the job execution.
      */
-    void initialize(String jobId, @Nullable String taskId, JobExecution jobExecution);
+    void initialize(String jobId, String taskId, JobExecution jobExecution);
 
 
     /**

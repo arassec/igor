@@ -22,7 +22,8 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 /**
- * Executes jobs and keeps track of their state. Prevents parallel execution and limits the number of jobs running in parallel.
+ * Executes jobs and keeps track of their state. Prevents parallel execution of the same job and limits the total number of jobs
+ * running in parallel.
  */
 @Slf4j
 @Component
@@ -65,6 +66,11 @@ public class JobExecutor {
 
     /**
      * Creates a new JobExecutor instance.
+     *
+     * @param igorCoreProperties        Core configuration properties of igor.
+     * @param jobRepository             Repository for jobs.
+     * @param jobExecutionRepository    Repository for job executions.
+     * @param applicationEventPublisher Publisher for application events.     *
      */
     public JobExecutor(IgorCoreProperties igorCoreProperties, JobRepository jobRepository,
                        JobExecutionRepository jobExecutionRepository, ApplicationEventPublisher applicationEventPublisher) {
