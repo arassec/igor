@@ -139,14 +139,14 @@ abstract class HttpFileConnectorBaseTest {
                         aResponse()
                                 .withStatus(200)
                                 .withHeader("Content-Type", "text/html; charset=UTF-8")
-                                .withHeader("content-length", "11")
+                                .withHeader("content-length", "25")
                                 .withBody("Http(s)FileConnectorTests")
                 )
         );
 
         FileStreamData fileStreamData = connector.readStream("/sample/file.txt");
         assertEquals("html", fileStreamData.getFilenameSuffix());
-        assertEquals(11, fileStreamData.getFileSize());
+        assertEquals(25, fileStreamData.getFileSize());
     }
 
     /**
