@@ -24,7 +24,7 @@ Actions can also be used to store the modified data items on external services, 
 
 <br/>
 
-![An image](/overview.png)
+![igor overview image](./overview.png)
 
 ## Connectors
 

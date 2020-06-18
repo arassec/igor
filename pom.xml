@@ -15,13 +15,31 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-    <name>igor</name>
-    <description>Continuous workarounds...</description>
-    <url>https://arassec.com/igor</url>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>A tool to implement continuous workarounds...</description>
+    <url>https://www.arassec.com/igor</url>
 
     <scm>
+        <connection>scm:git:git://github.com/arassec/igor.git</connection>
+        <developerConnection>scm:git:ssh://github.com:arassec/igor.git</developerConnection>
         <url>https://github.com/arassec/igor</url>
     </scm>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Andreas Sensen</name>
+            <email>andreas.sensen@arassec.com</email>
+            <organization>arassec</organization>
+            <organizationUrl>https://www.arassec.com</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>
         <revision>0.0.0-SNAPSHOT</revision>
@@ -111,20 +129,6 @@
                         <phase>clean</phase>
                         <goals>
                             <goal>clean</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>aggregate</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>aggregate-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>

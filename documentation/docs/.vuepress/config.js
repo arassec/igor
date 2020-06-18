@@ -6,7 +6,7 @@ module.exports = {
             {text: "Home", link: "/"},
             {text: "User Guide", link: "/user/"},
             {text: "Developer Guide", link: "/developer/"},
-            {text: "JavaDoc", link: "/apidocs/index.html"},
+            {text: "Examples", link: "/examples/"},
             {text: "GitHub", link: "https://www.github.com/arassec/igor"}
         ],
         sidebar: {
