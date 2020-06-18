@@ -6,7 +6,7 @@ module.exports = {
             {text: "Home", link: "/"},
             {text: "User Guide", link: "/user/"},
             {text: "Developer Guide", link: "/developer/"},
-            {text: "JavaDoc", link: "/apidocs/"},
+            {text: "JavaDoc", link: "/apidocs/index.html"},
             {text: "GitHub", link: "https://www.github.com/arassec/igor"}
         ],
         sidebar: {
@@ -23,48 +23,52 @@ module.exports = {
                     title: "Using Igor",
                     children: [
                         "core/job",
-                        "core/task",
                         "core/action",
                         "core/connector"
                     ]
                 },
                 {
-                    title: "Misc Components",
+                    title: "Available Triggers",
                     children: [
                         "module-misc/cron-trigger",
-                        "module-misc/manual-trigger",
+                        "module-misc/manual-trigger"
+                    ]
+                },
+                {
+                    title: "Available Providers",
+                    children: [
                         "module-misc/empty-input-provider",
                         "module-misc/fixed-input-provider",
+                        "module-file/list-files-provider"
+                    ]
+                },
+                {
+                    title: "Available Actions",
+                    children: [
                         "module-misc/filter-persisted-value-action",
                         "module-misc/persist-value-action",
                         "module-misc/filter-by-regexp-action",
                         "module-misc/filter-by-timestamp-action",
                         "module-misc/pause-action",
-                        "module-misc/sort-by-timestamp-pattern-action"
-                    ]
-                },
-                {
-                    title: "File Components",
-                    children: [
-                        "module-file/list-files-provider",
+                        "module-misc/sort-by-timestamp-pattern-action",
                         "module-file/copy-file-action",
                         "module-file/delete-file-action",
                         "module-file/move-file-action",
                         "module-file/read-file-action",
+                        "module-message/send-message-action"
+                    ]
+                },
+                {
+                    title: "Available Connectors",
+                    children: [
                         "module-file/ftp-file-connector",
                         "module-file/ftps-file-connector",
                         "module-file/localfs-file-connector",
                         "module-file/http-file-connector",
                         "module-file/https-file-connector",
                         "module-file/scp-file-connector",
-                        "module-file/sftp-file-connector"
-                    ]
-                },
-                {
-                    title: "Message Components",
-                    children: [
-                        "module-message/send-message-action",
-                        "module-message/rabbitmq-message-connector",
+                        "module-file/sftp-file-connector",
+                        "module-message/rabbitmq-message-connector"
                     ]
                 }
             ]

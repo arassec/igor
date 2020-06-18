@@ -54,10 +54,10 @@ class IgorComponentUtilTest {
     @DisplayName("Tests connector shutdown")
     void testShutdownConnectors() {
         // Initialize should handle null-input:
-        IgorComponentUtil.initializeConnectors(null, "job-id", "task-id", jobExecution);
+        IgorComponentUtil.initializeConnectors(null, "job-id", jobExecution);
 
-        IgorComponentUtil.initializeConnectors(testAction, "job-id", "task-id", jobExecution);
-        verify(testConnector, times(1)).initialize(eq("job-id"), eq("task-id"), eq(jobExecution));
+        IgorComponentUtil.initializeConnectors(testAction, "job-id", jobExecution);
+        verify(testConnector, times(1)).initialize(eq("job-id"), eq(jobExecution));
     }
 
     /**
@@ -67,16 +67,16 @@ class IgorComponentUtilTest {
     @DisplayName("Tests connector initialization")
     void testInitializeConnector() {
         // Shutdown should handle null-input:
-        IgorComponentUtil.shutdownConnectors(null, "job-id", "task-id", jobExecution);
+        IgorComponentUtil.shutdownConnectors(null, "job-id", jobExecution);
 
-        IgorComponentUtil.shutdownConnectors(testAction, "job-id", "task-id", jobExecution);
-        verify(testConnector, times(1)).shutdown(eq("job-id"), eq("task-id"), eq(jobExecution));
+        IgorComponentUtil.shutdownConnectors(testAction, "job-id", jobExecution);
+        verify(testConnector, times(1)).shutdown(eq("job-id"), eq(jobExecution));
     }
 
     /**
      * Action for testing.
      */
-    private class TestAction extends BaseAction {
+    private static class TestAction extends BaseAction {
 
         /**
          * Test connector.

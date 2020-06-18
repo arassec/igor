@@ -4,7 +4,6 @@
         <side-menu v-if="jobConfiguration">
             <job-navigation slot="content"
                             :job-configuration="jobConfiguration"
-                            :selected-task-id="selectedTaskId"
                             :selected-action-id="selectedActionId"
                             :job-running-or-waiting="jobRunningOrWaiting"
                             :validation-errors="validationErrors"
@@ -14,13 +13,9 @@
                             v-on:save-configuration="saveConfiguration"
                             v-on:run-job="showRunDialog = true"
                             v-on:job-is-selected="selectJob"
-                            v-on:task-is-selected="selectTask"
                             v-on:action-is-selected="selectAction"
-                            v-on:add-task="addTask"
                             v-on:add-action="addAction"
-                            v-on:delete-task="showDeleteTask"
-                            v-on:delete-action="showDeleteAction"
-                            v-on:duplicate-task="duplicateTask"/>
+                            v-on:delete-action="showDeleteAction"/>
             <core-panel slot="footer" v-if="jobExecutionsPage.items.length > 0">
                 <h1>Job Executions</h1>
                 <feedback-box
@@ -51,59 +46,34 @@
 
         <core-content v-if="jobConfiguration">
             <job-configurator
-                    v-show="selectedTaskId === null && selectedActionId === null"
+                    v-show="selectedActionId === null"
                     :job-configuration="jobConfiguration"
                     :validation-errors="validationErrors"
-                    v-on:update-original-job-configuration="updateOriginalJobConfiguration()"
+                    v-on:create-connector="createConnector"
                     v-on:open-documentation="openDocumentation"
                     v-on:switch-documentation="switchDocumentation"
                     v-on:close-documentation="showDocumentation = false"
                     ref="jobConfigurator"/>
 
-            <task-configurator v-for="task in jobConfiguration.tasks"
-                               v-show="selectedTaskId === task.id"
-                               :key="task.id"
-                               :task="task"
-                               :validation-errors="validationErrors"
-                               v-on:create-connector="createConnector"
-                               v-on:open-documentation="openDocumentation"
-                               v-on:switch-documentation="switchDocumentation"
-                               v-on:close-documentation="showDocumentation = false"
-                               ref="taskConfigurators"/>
-
-            <template v-for="task in jobConfiguration.tasks">
-                <action-configurator v-for="action in task.actions"
-                                     v-show="selectedActionId === action.id"
-                                     :key="action.id"
-                                     :action="action"
-                                     :validation-errors="validationErrors"
-                                     v-on:create-connector="createConnector"
-                                     v-on:open-documentation="openDocumentation"
-                                     v-on:switch-documentation="switchDocumentation"
-                                     v-on:close-documentation="showDocumentation = false"
-                                     ref="actionConfigurators"/>
-            </template>
+            <action-configurator v-for="action in jobConfiguration.actions"
+                                 v-show="selectedActionId === action.id"
+                                 :key="action.id"
+                                 :action="action"
+                                 :validation-errors="validationErrors"
+                                 v-on:create-connector="createConnector"
+                                 v-on:open-documentation="openDocumentation"
+                                 v-on:switch-documentation="switchDocumentation"
+                                 v-on:close-documentation="showDocumentation = false"
+                                 ref="actionConfigurators"/>
 
             <job-execution-details v-if="showExecutionDetailsDialog"
                                    v-bind:job-execution="selectedJobExecution"
                                    v-on:close="closeExecutionDetailsDialog()"/>
-
         </core-content>
 
         <test-result-container v-if="testResults != null"
                                v-on:close="testResults = null"
                                v-bind:selected-test-results="selectedTestResults"/>
-
-        <modal-dialog v-if="showDeleteTaskDialog" @close="showDeleteTaskDialog = false">
-            <h1 slot="header">Delete Task?</h1>
-            <div slot="body" class="paragraph">Do you really want to delete this Task?</div>
-            <div slot="footer">
-                <layout-row>
-                    <input-button slot="left" v-on:clicked="showDeleteTaskDialog = false" icon="times"/>
-                    <input-button slot="right" v-on:clicked="deleteTask()" icon="check"/>
-                </layout-row>
-            </div>
-        </modal-dialog>
 
         <modal-dialog v-if="showDeleteActionDialog" @close="showDeleteActionDialog = false">
             <h1 slot="header">Delete Action?</h1>
@@ -186,7 +156,6 @@
     import CoreContainer from '../components/common/core-container'
     import CoreContent from '../components/common/core-content'
     import JobConfigurator from '../components/jobs/job-configurator'
-    import TaskConfigurator from '../components/jobs/task-configurator'
     import ActionConfigurator from '../components/jobs/action-configurator'
     import ModalDialog from '../components/common/modal-dialog'
     import LayoutRow from '../components/common/layout-row'
@@ -220,7 +189,6 @@
             LayoutRow,
             ModalDialog,
             ActionConfigurator,
-            TaskConfigurator,
             JobConfigurator,
             CoreContent,
             CoreContainer
@@ -228,16 +196,10 @@
         props: ['jobId'],
         data: function () {
             return {
-                showDeleteTaskDialog: false,
                 showDeleteActionDialog: false,
                 showCancelJobDialog: false,
                 showExecutionDetailsDialog: false,
                 showRunDialog: false,
-                initialProviderCategory: {},
-                initialProviderType: {},
-                initialActionCategory: {},
-                initialActionType: {},
-                selectedTaskId: null,
                 selectedActionId: null,
                 testResults: null,
                 selectedTestResults: null,
@@ -286,22 +248,6 @@
                 }
                 return formattedState;
             },
-            createJob: function () {
-                this.jobConfiguration = {
-                    id: Utils.uuidv4(),
-                    name: 'New Job',
-                    trigger: {
-                        id: Utils.uuidv4(),
-                        category: null,
-                        type: null,
-                        parameters: []
-                    },
-                    description: '',
-                    historyLimit: 5,
-                    active: true,
-                    tasks: []
-                }
-            },
             loadJob: async function (id) {
                 this.jobConfiguration = await IgorBackend.getData('/api/job/' + id)
             },
@@ -338,75 +284,18 @@
                 this.$router.push({name: 'job-overview'})
             },
             selectJob: function () {
-                this.selectedTaskId = null;
-                this.selectedActionId = null;
-                this.showDocumentation = false;
-                this.updateSelectedTestResult()
-            },
-            selectTask: function (taskId) {
-                this.selectedTaskId = taskId;
                 this.selectedActionId = null;
                 this.showDocumentation = false;
                 this.updateSelectedTestResult()
             },
             selectAction: function (actionId) {
-                this.selectedTaskId = null;
                 this.selectedActionId = actionId;
                 this.showDocumentation = false;
                 this.updateSelectedTestResult()
             },
-            addTask: function () {
-                let task = {
-                    id: Utils.uuidv4(),
-                    name: 'New Task',
-                    description: '',
-                    active: true,
-                    simulationLimit: 25,
-                    provider: {
-                        id: Utils.uuidv4(),
-                        category: this.initialProviderCategory,
-                        type: this.initialProviderType,
-                        parameters: []
-                    },
-                    actions: []
-                };
-                this.jobConfiguration.tasks.push(task);
-                this.selectTask(task.id)
-            },
-            duplicateTask: function (taskId) {
-                let originalTask = Utils.findTask(this.jobConfiguration, taskId);
-                let copiedTask = JSON.parse(JSON.stringify(originalTask));
-                copiedTask.id = Utils.uuidv4();
-                copiedTask.name = "Copy of " + copiedTask.name;
-                copiedTask.provider.id = Utils.uuidv4();
-                copiedTask.actions.forEach((action) => {
-                    action.id = Utils.uuidv4();
-                });
-                this.$set(this.jobConfiguration.tasks, this.jobConfiguration.tasks.length, copiedTask);
-                this.selectTask(copiedTask.id)
-            },
-            showDeleteTask: function (taskId) {
-                this.selectedTaskId = taskId;
-                this.showDeleteTaskDialog = true
-            },
-            deleteTask: function () {
-                this.validationErrors = {};
-                this.$delete(this.jobConfiguration.tasks, Utils.findTaskIndex(this.jobConfiguration, this.selectedTaskId));
-                this.showDeleteTaskDialog = false;
-                this.selectedTaskId = null;
-                this.selectedActionId = null;
-                this.testResults = null
-            },
-            addAction: function (taskId) {
-                let action = {
-                    id: Utils.uuidv4(),
-                    active: true,
-                    name: '',
-                    category: this.initialActionCategory,
-                    type: this.initialActionType,
-                    parameters: []
-                };
-                Utils.findTask(this.jobConfiguration, taskId).actions.push(action);
+            addAction: async function () {
+                let action = await IgorBackend.getData('/api/job/action/prototype');
+                this.jobConfiguration.actions.push(action);
                 this.selectAction(action.id)
             },
             showDeleteAction: function (actionId) {
@@ -415,33 +304,27 @@
             },
             deleteAction: function () {
                 this.validationErrors = {};
-                let task = Utils.findTaskWithAction(this.jobConfiguration, this.selectedActionId);
-                this.$delete(task.actions, Utils.findActionIndex(task, this.selectedActionId));
+                this.$delete(this.jobConfiguration.actions, Utils.findActionIndex(this.jobConfiguration, this.selectedActionId));
                 this.showDeleteActionDialog = false;
-                this.selectedTaskId = null;
                 this.selectedActionId = null;
                 this.testResults = null;
             },
             updateSelectedTestResult: function () {
                 if (this.testResults != null) {
-                    let taskId = this.selectedTaskId;
                     let actionId = this.selectedActionId;
 
-                    // The job has been selected:
-                    if (taskId === null && actionId === null) {
-                        if (this.testResults['job-result'] && this.testResults['job-result'].errorCause) {
-                            this.selectedTestResults = this.testResults['job-result']
+                    // The job has been selected, use the provider's test data:
+                    if (actionId === null) {
+                        if (this.testResults[this.jobConfiguration.id]) {
+                            this.selectedTestResults = this.testResults[this.jobConfiguration.id]
                         } else {
-                            this.selectedTestResults = null
+                            this.selectedTestResults = null;
                         }
                         return
                     }
 
-                    // A Task has been selected:
-                    if (taskId != null && this.testResults[taskId] != null) {
-                        this.selectedTestResults = this.testResults[taskId]
-                    } else if (actionId != null && this.testResults[actionId] != null) {
-                        // An action has been selected:
+                    // An Action has been selected:
+                    if (actionId != null && this.testResults[actionId] != null) {
                         this.selectedTestResults = this.testResults[actionId];
                     } else {
                         this.selectedTestResults = null;
@@ -499,9 +382,6 @@
             createConnector: function (selectionKey, parameterIndex, connectorCategoryCandidates) {
                 this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, connectorCategoryCandidates);
                 this.$router.push({name: 'connector-editor'})
-            },
-            updateOriginalJobConfiguration: function () {
-                this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
             },
             openMarkJobExecutionResolvedDialog: async function (selectedJobExecutionListEntry) {
                 this.selectedJobExecutionListEntry = selectedJobExecutionListEntry;
@@ -577,32 +457,26 @@
                 }
             }
         },
-        mounted() {
+        async mounted() {
             let jobData = this.$root.$data.store.getJobData();
             // Returning from a connector configuration within a job configuration
             if (jobData.jobConfiguration != null) {
                 this.jobConfiguration = jobData.jobConfiguration;
-
                 let selectionKey = jobData.selectionKey;
                 if (selectionKey != null) {
-
-                    let task = Utils.findTask(this.jobConfiguration, selectionKey);
-                    if (task) {
+                    let action = Utils.findAction(this.jobConfiguration, selectionKey);
+                    if (action) {
                         if (jobData.connectorParameter != null && jobData.parameterIndex != null) {
-                            let parameter = task.provider.parameters[jobData.parameterIndex];
+                            let parameter = action.parameters[jobData.parameterIndex];
                             parameter.connectorName = jobData.connectorParameter.name;
                             parameter.value = jobData.connectorParameter.id
                         }
-                        this.selectTask(task.id);
+                        this.selectAction(action.id);
                     } else {
-                        let action = Utils.findAction(this.jobConfiguration, selectionKey);
-                        if (action) {
-                            if (jobData.connectorParameter != null && jobData.parameterIndex != null) {
-                                let parameter = action.parameters[jobData.parameterIndex];
-                                parameter.connectorName = jobData.connectorParameter.name;
-                                parameter.value = jobData.connectorParameter.id
-                            }
-                            this.selectAction(action.id);
+                        if (jobData.connectorParameter != null && jobData.parameterIndex != null) {
+                            let parameter = this.jobConfiguration.provider.parameters[jobData.parameterIndex];
+                            parameter.connectorName = jobData.connectorParameter.name;
+                            parameter.value = jobData.connectorParameter.id
                         }
                     }
                 }
@@ -619,25 +493,10 @@
                     this.originalJobConfiguration = JSON.stringify(this.jobConfiguration)
                 })
             } else {
-                // The job-configurator loads trigger data and modifies the initial jobConfiguration. So the 'originalJobConfiguration'
-                // property is set there, and 'update-original-job-configuration' is emitted...
-                this.createJob();
+                this.jobConfiguration = await IgorBackend.getData('/api/job/prototype');
+                this.originalJobConfiguration = JSON.stringify(this.jobConfiguration);
                 this.initJobListEventSource();
             }
-
-            let component = this;
-            IgorBackend.getData('/api/category/provider').then((categoryResult) => {
-                this.initialProviderCategory = Array.from(categoryResult)[0];
-                IgorBackend.getData('/api/type/' + component.initialProviderCategory.key).then((typeResult) => {
-                    component.initialProviderType = Array.from(typeResult)[0]
-                })
-            });
-            IgorBackend.getData('/api/category/action').then((categoryResult) => {
-                this.initialActionCategory = Array.from(categoryResult)[0];
-                IgorBackend.getData('/api/type/' + component.initialActionCategory.key).then((typeResult) => {
-                    component.initialActionType = Array.from(typeResult)[0]
-                })
-            })
         },
         destroyed() {
             if (this.jobListEventSource) {

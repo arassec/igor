@@ -51,8 +51,6 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
         String jobId = getJobId(data);
-        String taskId = getTaskId(data);
-
         String resolvedInput = getString(data, input);
 
         if (resolvedInput == null) {
@@ -61,7 +59,7 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
         }
 
         PersistentValue value = new PersistentValue(resolvedInput);
-        if (persistentValueRepository.isPersisted(jobId, taskId, value)) {
+        if (persistentValueRepository.isPersisted(jobId, value)) {
             log.debug("Filtered persisted value: '{}'", resolvedInput);
             return List.of();
         }

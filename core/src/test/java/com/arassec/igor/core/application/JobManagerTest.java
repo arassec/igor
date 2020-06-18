@@ -512,24 +512,20 @@ class JobManagerTest {
         when(jobExecutionRepository.findById(eq(1L))).thenReturn(jobExecution);
 
         assertEquals(jobExecution, jobManager.getJobExecution(1L));
-        assertNull(jobExecution.getCurrentTask());
 
         // Running job execution without executor information:
         jobExecution.setExecutionState(JobExecutionState.RUNNING);
 
         assertEquals(jobExecution, jobManager.getJobExecution(1L));
-        assertNull(jobExecution.getCurrentTask());
 
         // Running job execution with executor information:
         jobExecution.setJobId("job-id");
 
         JobExecution executorJobExecution = new JobExecution();
-        executorJobExecution.setCurrentTask("current-task");
         executorJobExecution.addWorkInProgress(new WorkInProgressMonitor());
         when(jobExecutor.getJobExecution(eq("job-id"))).thenReturn(executorJobExecution);
 
         assertEquals(jobExecution, jobManager.getJobExecution(1L));
-        assertEquals("current-task", jobExecution.getCurrentTask());
         assertEquals(executorJobExecution.getWorkInProgress(), jobExecution.getWorkInProgress());
     }
 

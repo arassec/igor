@@ -260,9 +260,9 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      */
     public List<Job> loadScheduled() {
         return jobRepository.findAll().stream().filter(Job::isActive)
-                .filter(job -> job.getTrigger() instanceof ScheduledTrigger).sorted((o1, o2) -> {
-                    String firstCron = ((ScheduledTrigger) o1.getTrigger()).getCronExpression();
-                    String secondCron = ((ScheduledTrigger) o2.getTrigger()).getCronExpression();
+                .filter(job -> job.getTrigger() instanceof ScheduledTrigger).sorted((jobOne, jobTwo) -> {
+                    String firstCron = ((ScheduledTrigger) jobOne.getTrigger()).getCronExpression();
+                    String secondCron = ((ScheduledTrigger) jobTwo.getTrigger()).getCronExpression();
                     CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(firstCron);
                     Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
                     CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(secondCron);
@@ -296,7 +296,6 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
         if (jobExecution != null && JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {
             JobExecution runningJobExecution = jobExecutor.getJobExecution(jobExecution.getJobId());
             if (runningJobExecution != null) {
-                jobExecution.setCurrentTask(runningJobExecution.getCurrentTask());
                 runningJobExecution.getWorkInProgress().forEach(jobExecution::addWorkInProgress);
             }
         }

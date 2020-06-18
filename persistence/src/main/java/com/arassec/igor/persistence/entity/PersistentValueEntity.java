@@ -33,11 +33,6 @@ public class PersistentValueEntity {
     private String jobId;
 
     /**
-     * The task's ID.
-     */
-    private String taskId;
-
-    /**
      * Date of creation of this value.
      */
     private Instant created;

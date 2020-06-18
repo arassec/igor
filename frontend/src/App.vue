@@ -85,12 +85,20 @@
         color: var(--color-font);
     }
 
+    *:focus {
+        outline: none;
+    }
+
     .margin-right {
         margin-right: .5em;
     }
 
     .margin-left {
         margin-left: .5em;
+    }
+
+    .margin-bottom {
+        margin-bottom: 2em;
     }
 
     .inactive {

@@ -31,7 +31,7 @@
                 <icon-button slot="right" icon="question" v-show="hasDocumentation(action.type.key)"
                              v-on:clicked="$emit('open-documentation', action.type.key)"/>
             </layout-row>
-            <div class="table">
+            <div class="table margin-bottom">
                 <div class="tr">
                     <div class="td"><label>Category</label></div>
                     <div class="td">
@@ -56,16 +56,14 @@
                     </div>
                 </div>
             </div>
-        </core-panel>
 
-        <core-panel>
-            <h2>Action Configuration</h2>
             <parameter-editor
                     :parent-id="action.id"
                     :validation-errors="validationErrors"
                     :parameters="action.parameters"
                     v-on:create-connector="createConnector"/>
         </core-panel>
+
     </div>
 </template>
 
@@ -122,8 +120,8 @@
                     this.action.parameters = parameters
                 })
             },
-            createConnector: function (parameterIndex, connectorCategoryCandidates) {
-                this.$emit('create-connector', this.action.id, parameterIndex, connectorCategoryCandidates)
+            createConnector: function (componentId, parameterIndex, connectorCategoryCandidates) {
+                this.$emit('create-connector', componentId, parameterIndex, connectorCategoryCandidates)
             },
             hasDocumentation: function (typeId) {
                 for (let i = 0; i < this.actionTypes.length; i++) {

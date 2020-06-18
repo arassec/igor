@@ -13,7 +13,7 @@ import java.util.Map;
 public class SimulationResult {
 
     /**
-     * The simulation results of every task of the job.
+     * The simulation results as JSON objects.
      */
     private List<Map<String, Object>> results = new LinkedList<>();
 

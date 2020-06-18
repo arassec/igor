@@ -1,8 +1,10 @@
 package com.arassec.igor.core.application;
 
+import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.connector.Connector;
+import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +50,11 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * All available connectors.
      */
     private final List<Connector> connectors;
+
+    /**
+     * Igor's core configuration properties.
+     */
+    private final IgorCoreProperties igorCoreProperties;
 
     /**
      * Contains the categories of a certain component type (e.g. Action.class -> Action-Categories or Connector.class ->
@@ -108,6 +115,47 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
             return typesByCategoryKey.get(categoryKey);
         }
         return Set.of();
+    }
+
+    /**
+     * Returns a new {@link Job} instance as prototype.
+     *
+     * @return A new job instance.
+     */
+    public Job createJobPrototype() {
+        Trigger trigger = createTriggerInstance(triggers.stream()
+                .filter(triggerCandidate -> triggerCandidate.getTypeId().equals(igorCoreProperties.getDefaultTrigger()))
+                .findFirst()
+                .orElse(triggers.get(0)).getTypeId(), null);
+        trigger.setId(UUID.randomUUID().toString());
+
+        Provider provider = createProviderInstance(providers.stream()
+                .filter(providerCandidate -> providerCandidate.getTypeId().equals(igorCoreProperties.getDefaultProvider()))
+                .findFirst()
+                .orElse(providers.get(0)).getTypeId(), null);
+        provider.setId(UUID.randomUUID().toString());
+
+        return Job.builder()
+                .id(UUID.randomUUID().toString())
+                .name("New Job")
+                .active(true)
+                .trigger(trigger)
+                .provider(provider)
+                .build();
+    }
+
+    /**
+     * Returns a new {@link Action} instance as protopye.
+     *
+     * @return A new action instance.
+     */
+    public Action createActionPrototype() {
+        Action action = createActionInstance(actions.stream()
+                .filter(actionCandidate -> actionCandidate.getTypeId().equals(igorCoreProperties.getDefaultAction()))
+                .findFirst()
+                .orElse(actions.get(0)).getTypeId(), null);
+        action.setId(UUID.randomUUID().toString());
+        return action;
     }
 
     /**

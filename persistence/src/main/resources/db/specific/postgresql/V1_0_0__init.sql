@@ -24,11 +24,10 @@ CREATE TABLE persistent_value (
     id SERIAL PRIMARY KEY,
     version INTEGER,
     job_id VARCHAR(128) NOT NULL,
-    task_id VARCHAR NOT NULL,
     created TIMESTAMP NOT NULL,
     content VARCHAR NOT NULL
 );
-CREATE UNIQUE INDEX unique_persistent_value ON persistent_value (job_id, task_id, content);
+CREATE UNIQUE INDEX unique_persistent_value ON persistent_value (job_id, content);
 
 CREATE TABLE job_connector_reference (
     job_id VARCHAR(128) NOT NULL,

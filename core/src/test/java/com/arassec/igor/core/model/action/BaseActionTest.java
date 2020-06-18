@@ -1,7 +1,7 @@
 package com.arassec.igor.core.model.action;
 
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.job.Task;
+import com.arassec.igor.core.model.job.Job;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +40,7 @@ class BaseActionTest {
      */
     @BeforeAll
     static void initialize() {
-        Map<String, Object> meta = Task.createMetaData("job-id", "task-id");
+        Map<String, Object> meta = Job.createMetaData("job-id");
         Map<String, Object> data = new HashMap<>();
         data.put(DataKey.SIMULATION.getKey(), true);
 
@@ -64,19 +64,6 @@ class BaseActionTest {
         Map<String, Object> map = Map.of();
         assertThrows(IllegalStateException.class, () -> baseAction.getJobId(map));
         assertThrows(IllegalStateException.class, () -> baseAction.getJobId(wrongData));
-    }
-
-    /**
-     * Tests retrieving the task ID from the supplied data.
-     */
-    @Test
-    @DisplayName("Tests retrieving the task's ID from the action data.")
-    void testGetTaskId() {
-        assertEquals("task-id", baseAction.getTaskId(testData));
-        assertThrows(IllegalStateException.class, () -> baseAction.getTaskId(null));
-        Map<String, Object> map = Map.of();
-        assertThrows(IllegalStateException.class, () -> baseAction.getTaskId(map));
-        assertThrows(IllegalStateException.class, () -> baseAction.getTaskId(wrongData));
     }
 
     /**

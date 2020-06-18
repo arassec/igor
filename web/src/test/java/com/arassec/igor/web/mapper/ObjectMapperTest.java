@@ -2,7 +2,6 @@ package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.web.test.TestAction;
 import com.arassec.igor.web.test.TestConnector;
 import com.arassec.igor.web.test.TestProvider;
@@ -44,17 +43,11 @@ class ObjectMapperTest extends MapperBaseTest {
         testTrigger.setId("trigger-id");
         job.setTrigger(testTrigger);
 
-        Task task = new Task();
-        task.setId("task-id");
-        task.setName("task-name");
-        task.setActive(true);
-        task.setDescription("task-description");
-
         TestProvider testProvider = new TestProvider();
         testProvider.setId("provider-id");
         testProvider.setSimulationLimit(456);
         testProvider.setTestProviderParam("test-provider-param");
-        task.setProvider(testProvider);
+        job.setProvider(testProvider);
 
         TestAction testAction = new TestAction();
         testAction.setId("action-id");
@@ -65,9 +58,7 @@ class ObjectMapperTest extends MapperBaseTest {
         testConnector.setId(TestConnector.CONNECTOR_ID);
         testAction.setTestConnector(testConnector);
 
-        task.getActions().add(testAction);
-
-        job.getTasks().add(task);
+        job.getActions().add(testAction);
 
         Writer serializedJob = new StringWriter();
 
@@ -104,23 +95,15 @@ class ObjectMapperTest extends MapperBaseTest {
         assertEquals(TestTrigger.CATEGORY_ID, testTrigger.getCategoryId());
         assertEquals(TestTrigger.TYPE_ID, testTrigger.getTypeId());
 
-        assertEquals(1, testJob.getTasks().size());
-        Task task = testJob.getTasks().get(0);
-
-        assertEquals("task-id", task.getId());
-        assertEquals("task-name", task.getName());
-        assertTrue(task.isActive());
-        assertEquals("task-description", task.getDescription());
-
-        TestProvider testProvider = (TestProvider) task.getProvider();
+        TestProvider testProvider = (TestProvider) testJob.getProvider();
         assertEquals("provider-id", testProvider.getId());
         assertEquals(TestProvider.CATEGORY_ID, testProvider.getCategoryId());
         assertEquals(TestProvider.TYPE_ID, testProvider.getTypeId());
         assertEquals(456, testProvider.getSimulationLimit());
         assertEquals("provider-test-param", testProvider.getTestProviderParam());
 
-        assertEquals(1, task.getActions().size());
-        TestAction testAction = (TestAction) task.getActions().get(0);
+        assertEquals(1, testJob.getActions().size());
+        TestAction testAction = (TestAction) testJob.getActions().get(0);
 
         assertEquals("action-id", testAction.getId());
         assertEquals("action-name", testAction.getName());

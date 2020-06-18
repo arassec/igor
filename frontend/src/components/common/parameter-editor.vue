@@ -159,7 +159,7 @@
                 this.showConnectorPicker = false
             },
             createConnector: function () {
-                this.$emit('create-connector', this.connectorParameterIndex, this.connectorParameterCategoryCandidates)
+                this.$emit('create-connector', this.parentId, this.connectorParameterIndex, this.connectorParameterCategoryCandidates)
             },
             openCronPicker: function (index) {
                 this.cronParameterIndex = index

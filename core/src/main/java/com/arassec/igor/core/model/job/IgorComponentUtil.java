@@ -24,14 +24,13 @@ class IgorComponentUtil {
      *
      * @param igorComponent The component.
      * @param jobId         The job's ID.
-     * @param taskId        The task's ID.
      * @param jobExecution  Contains information about the job execution.
      */
-    static void initializeConnectors(IgorComponent igorComponent, String jobId, String taskId, JobExecution jobExecution) {
+    static void initializeConnectors(IgorComponent igorComponent, String jobId, JobExecution jobExecution) {
         if (igorComponent == null) {
             return;
         }
-        ReflectionUtils.doWithFields(igorComponent.getClass(), field -> processField(igorComponent, jobId, taskId, jobExecution, field, true));
+        ReflectionUtils.doWithFields(igorComponent.getClass(), field -> processField(igorComponent, jobId, jobExecution, field, true));
     }
 
     /**
@@ -39,14 +38,13 @@ class IgorComponentUtil {
      *
      * @param igorComponent The component.
      * @param jobId         The job's ID.
-     * @param taskId        The task's ID.
      * @param jobExecution  Contains information about the job execution.
      */
-    static void shutdownConnectors(IgorComponent igorComponent, String jobId, String taskId, JobExecution jobExecution) {
+    static void shutdownConnectors(IgorComponent igorComponent, String jobId, JobExecution jobExecution) {
         if (igorComponent == null) {
             return;
         }
-        ReflectionUtils.doWithFields(igorComponent.getClass(), field -> processField(igorComponent, jobId, taskId, jobExecution, field, false));
+        ReflectionUtils.doWithFields(igorComponent.getClass(), field -> processField(igorComponent, jobId, jobExecution, field, false));
     }
 
     /**
@@ -54,12 +52,11 @@ class IgorComponentUtil {
      *
      * @param igorComponent The component.
      * @param jobId         The job's ID.
-     * @param taskId        The task's ID.
      * @param jobExecution  Contains information about the job execution.
      * @param field         The field possibly containing a connector.
      * @param initialize    Set to {@code true} to initialize the connector or to {@code false} to shut it down.
      */
-    private static void processField(IgorComponent igorComponent, String jobId, String taskId, JobExecution jobExecution,
+    private static void processField(IgorComponent igorComponent, String jobId, JobExecution jobExecution,
                                      Field field, boolean initialize) {
         if (field.isAnnotationPresent(IgorParam.class)) {
             try {
@@ -67,9 +64,9 @@ class IgorComponentUtil {
                 Object value = field.get(igorComponent);
                 if (value instanceof Connector) {
                     if (initialize) {
-                        ((Connector) value).initialize(jobId, taskId, jobExecution);
+                        ((Connector) value).initialize(jobId, jobExecution);
                     } else {
-                        ((Connector) value).shutdown(jobId, taskId, jobExecution);
+                        ((Connector) value).shutdown(jobId, jobExecution);
                     }
                 }
             } catch (IllegalAccessException e) {

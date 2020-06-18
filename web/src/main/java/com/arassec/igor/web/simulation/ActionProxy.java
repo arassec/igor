@@ -49,9 +49,9 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, String taskId, JobExecution jobExecution) {
+    public void initialize(String jobId, JobExecution jobExecution) {
         try {
-            delegate.initialize(jobId, taskId, jobExecution);
+            delegate.initialize(jobId, jobExecution);
         } catch (Exception e) {
             setErrorCause(StacktraceFormatter.format(e));
         }

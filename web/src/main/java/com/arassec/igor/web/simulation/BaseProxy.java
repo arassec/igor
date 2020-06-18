@@ -40,9 +40,9 @@ public abstract class BaseProxy<T extends IgorComponent> implements IgorComponen
      * {@inheritDoc}
      */
     @Override
-    public void shutdown(String jobId, String taskId, JobExecution jobExecution) {
+    public void shutdown(String jobId, JobExecution jobExecution) {
         try {
-            delegate.shutdown(jobId, taskId, jobExecution);
+            delegate.shutdown(jobId, jobExecution);
         } catch (Exception e) {
             errorCause = StacktraceFormatter.format(e);
         }

@@ -1,7 +1,11 @@
 package com.arassec.igor.core.model.job;
 
+import com.arassec.igor.core.model.DataKey;
+import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.validation.UniqueJobName;
 import lombok.AllArgsConstructor;
@@ -15,9 +19,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.Instant;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Defines an igor job.
@@ -29,6 +33,11 @@ import java.util.Objects;
 @Slf4j
 @UniqueJobName
 public class Job {
+
+    /**
+     * The name pattern for concurrency-group IDs.
+     */
+    private static final String CONCURRENCY_GROUP_ID_PATTERN = "%s_%s_%d";
 
     /**
      * The job's ID.
@@ -49,12 +58,6 @@ public class Job {
     private String description;
 
     /**
-     * A trigger for the job.
-     */
-    @Valid
-    private Trigger trigger;
-
-    /**
      * Enables or disables the job.
      */
     private boolean active;
@@ -67,11 +70,23 @@ public class Job {
     private int historyLimit = 5;
 
     /**
-     * The tasks this job will perform.
+     * A trigger for the job.
+     */
+    @Valid
+    private Trigger trigger;
+
+    /**
+     * The data provider for the job.
+     */
+    @Valid
+    private Provider provider;
+
+    /**
+     * The actions this job will perform during its run.
      */
     @Builder.Default
     @Valid
-    private List<Task> tasks = new LinkedList<>();
+    private List<Action> actions = new LinkedList<>();
 
     /**
      * Contains information about a job run.
@@ -91,6 +106,20 @@ public class Job {
     private boolean faultTolerant = true;
 
     /**
+     * Creates the meta-data.
+     *
+     * @param jobId The job's ID.
+     *
+     * @return The meta-data for the job run.
+     */
+    public static Map<String, Object> createMetaData(String jobId) {
+        Map<String, Object> metaData = new HashMap<>();
+        metaData.put(DataKey.JOB_ID.getKey(), jobId);
+        metaData.put(DataKey.TIMESTAMP.getKey(), Instant.now().toEpochMilli());
+        return metaData;
+    }
+
+    /**
      * Runs the job.
      *
      * @param jobExecution The container for job execution information.
@@ -102,16 +131,31 @@ public class Job {
         currentJobExecution.setStarted(Instant.now());
         running = true;
         try {
+
+            // Scan all actions to create lists of actions that belong to the same concurrency group (i.e. use the same
+            // number of threads):
+            List<List<Action>> concurrencyLists = createConcurrencyLists();
+
+            // Create concurrency groups which start the threads that process the actions:
+            BlockingQueue<Map<String, Object>> providerInputQueue = new LinkedBlockingQueue<>();
+            List<ConcurrencyGroup> concurrencyGroups = createConcurrencyGroups(concurrencyLists, providerInputQueue, id,
+                    jobExecution);
+
+            // Initialize IgorComponents used by the job:
             initialize(jobExecution);
-            for (Task task : tasks) {
-                if (!currentJobExecution.isRunning()) {
-                    break;
-                }
-                currentJobExecution.setCurrentTask(task.getName());
-                if (task.isActive()) {
-                    task.run(id, currentJobExecution);
-                }
-            }
+
+            // Read the data from the provider and start working:
+            processProviderData(providerInputQueue, id, jobExecution);
+
+            // Completes each action inside each concurrency group:
+            concurrencyGroups.forEach(ConcurrencyGroup::complete);
+
+            // Shuts the concurrency group down:
+            concurrencyGroups.forEach(ConcurrencyGroup::shutdown);
+
+            // Awaits thread termination of each concurrency group:
+            awaitThreadTermination(concurrencyGroups);
+
             if (currentJobExecution.isRunning()) {
                 currentJobExecution.setExecutionState(JobExecutionState.FINISHED);
             }
@@ -127,13 +171,68 @@ public class Job {
     }
 
     /**
-     * Cancels the job if it is currently running. The job might not stop immediately if it is executing a non-interruptible
-     * task. Check the job's isRunning method regularly to see when the job execution finished.
+     * Cancels the job if it is currently running. The job might not stop immediately if it is executing a non-interruptible action.
+     * Check the job's isRunning method regularly to see when the job execution finished.
      */
     public void cancel() {
         if (currentJobExecution != null && JobExecutionState.RUNNING.equals(currentJobExecution.getExecutionState())) {
             currentJobExecution.setExecutionState(JobExecutionState.CANCELLED);
         }
+    }
+
+    /**
+     * Combines actions to a list that should be executed with the same number of threads. Keeps the order of the actions.
+     *
+     * @return {@link Action}s grouped by the number of threads they should execute with.
+     */
+    private List<List<Action>> createConcurrencyLists() {
+        List<List<Action>> concurrencyLists = new LinkedList<>();
+
+        // Initialized with -1 so that at least one concurrency-group is created.
+        int lastNumThreads = -1;
+
+        for (Action action : actions) {
+            if (!action.isActive()) {
+                continue;
+            }
+            if (action.getNumThreads() != lastNumThreads) {
+                List<Action> concurrencyList = new LinkedList<>();
+                concurrencyList.add(action);
+                concurrencyLists.add(concurrencyList);
+                lastNumThreads = action.getNumThreads();
+            } else {
+                concurrencyLists.get(concurrencyLists.size() - 1).add(action);
+            }
+        }
+
+        return concurrencyLists;
+    }
+
+    /**
+     * Creates concurrency groups, i.e. actions with the same amount of threads to process data and linked via queues.
+     *
+     * @param concurrencyLists   The ordered list of actions that should be executed with the same number of threads.
+     * @param providerInputQueue The initial input queue in which the provider's data will be put.
+     * @param jobId              The job's ID.
+     * @param jobExecution       The container for job execution data.
+     *
+     * @return List of {@link ConcurrencyGroup}s.
+     */
+    private List<ConcurrencyGroup> createConcurrencyGroups(List<List<Action>> concurrencyLists, BlockingQueue<Map<String,
+            Object>> providerInputQueue, String jobId, JobExecution jobExecution) {
+        List<ConcurrencyGroup> concurrencyGroups = new LinkedList<>();
+        BlockingQueue<Map<String, Object>> inputQueue = providerInputQueue;
+
+        for (List<Action> concurrencyList : concurrencyLists) {
+            String concurrencyGroupId = String
+                    .format(CONCURRENCY_GROUP_ID_PATTERN, jobId, getId(), concurrencyLists.indexOf(concurrencyList));
+            ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueue, concurrencyGroupId,
+                    jobExecution);
+            inputQueue = concurrencyGroup.getOutputQueue();
+            concurrencyGroups.add(concurrencyGroup);
+        }
+
+        return concurrencyGroups;
     }
 
     /**
@@ -143,8 +242,66 @@ public class Job {
      */
     private void initialize(JobExecution jobExecution) {
         if (trigger != null) {
-            trigger.initialize(id, null, jobExecution);
-            IgorComponentUtil.initializeConnectors(trigger, id, null, jobExecution);
+            trigger.initialize(id, jobExecution);
+            IgorComponentUtil.initializeConnectors(trigger, id, jobExecution);
+        }
+        if (provider != null) {
+            provider.initialize(id, jobExecution);
+            IgorComponentUtil.initializeConnectors(provider, id, jobExecution);
+        }
+        if (!actions.isEmpty()) {
+            actions.stream().filter(Action::isActive).forEach(action -> {
+                action.initialize(id, jobExecution);
+                IgorComponentUtil.initializeConnectors(action, id, jobExecution);
+            });
+        }
+    }
+
+    /**
+     * Processes the data offered by the provider and gets the actions to work.
+     *
+     * @param providerInputQueue The input queue to put the provider's data in.
+     * @param jobId              The job's ID.
+     * @param jobExecution       Contains information about the job execution.
+     */
+    private void processProviderData(BlockingQueue<Map<String, Object>> providerInputQueue, String jobId,
+                                     JobExecution jobExecution) {
+        if (provider == null) {
+            return;
+        }
+
+        // Read the data from the provider and start working:
+        while (provider.hasNext() && jobExecution.isRunning()) {
+            Map<String, Object> data = new HashMap<>();
+            data.put(DataKey.META.getKey(), createMetaData(jobId));
+            data.put(DataKey.DATA.getKey(), provider.next());
+            boolean added = false;
+            while (!added) {
+                added = providerInputQueue.offer(data);
+                if (!added) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Awaits thread termination of each concurrency group.
+     *
+     * @param concurrencyGroups List of concurrency group to wait for.
+     */
+    private void awaitThreadTermination(List<ConcurrencyGroup> concurrencyGroups) {
+        boolean allThreadsTerminated = false;
+        while (!allThreadsTerminated) {
+            allThreadsTerminated = true;
+            for (ConcurrencyGroup concurrencyGroup : concurrencyGroups) {
+                allThreadsTerminated = (allThreadsTerminated && concurrencyGroup.awaitTermination());
+            }
+            log.debug("Threads terminated over all concurrency-groups: {}", allThreadsTerminated);
         }
     }
 
@@ -154,9 +311,19 @@ public class Job {
      * @param jobExecution Container for execution information.
      */
     private void shutdown(JobExecution jobExecution) {
+        if (!actions.isEmpty()) {
+            actions.stream().filter(Action::isActive).forEach(action -> {
+                IgorComponentUtil.shutdownConnectors(action, id, jobExecution);
+                action.shutdown(id, jobExecution);
+            });
+        }
+        if (provider != null) {
+            IgorComponentUtil.shutdownConnectors(provider, id, jobExecution);
+            provider.shutdown(id, jobExecution);
+        }
         if (trigger != null) {
-            IgorComponentUtil.shutdownConnectors(trigger, id, null, jobExecution);
-            trigger.shutdown(id, null, jobExecution);
+            IgorComponentUtil.shutdownConnectors(trigger, id, jobExecution);
+            trigger.shutdown(id, jobExecution);
         }
     }
 

@@ -38,7 +38,7 @@ class PersistValueActionTest extends MiscActionBaseTest {
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
         assertEquals(1, result.size());
-        verify(persistentValueRepositoryMock, times(1)).upsert(eq(JOB_ID), eq(TASK_ID), argCap.capture());
+        verify(persistentValueRepositoryMock, times(1)).upsert(eq(JOB_ID), argCap.capture());
         assertEquals(PARAM_VALUE, argCap.getValue().getContent());
     }
 
@@ -64,7 +64,7 @@ class PersistValueActionTest extends MiscActionBaseTest {
     @DisplayName("Tests the action with already persisted data.")
     void testProcessAlreadyPersisted() {
         PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
-        when(persistentValueRepositoryMock.isPersisted(eq(JOB_ID), eq(TASK_ID), any(PersistentValue.class))).thenReturn(true);
+        when(persistentValueRepositoryMock.isPersisted(eq(JOB_ID), any(PersistentValue.class))).thenReturn(true);
 
         PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
         action.setInput("$." + DataKey.DATA.getKey() + "." + PARAM_KEY);
@@ -72,7 +72,7 @@ class PersistValueActionTest extends MiscActionBaseTest {
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
         assertEquals(1, result.size());
-        verify(persistentValueRepositoryMock, times(0)).upsert(eq(JOB_ID), eq(TASK_ID), any(PersistentValue.class));
+        verify(persistentValueRepositoryMock, times(0)).upsert(eq(JOB_ID), any(PersistentValue.class));
     }
 
     /**
@@ -85,12 +85,12 @@ class PersistValueActionTest extends MiscActionBaseTest {
 
         PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
 
-        action.shutdown(JOB_ID, TASK_ID, new JobExecution());
-        verify(persistentValueRepositoryMock, times(0)).cleanup(eq(JOB_ID), eq(TASK_ID), anyInt());
+        action.shutdown(JOB_ID, new JobExecution());
+        verify(persistentValueRepositoryMock, times(0)).cleanup(eq(JOB_ID), anyInt());
 
         action.setNumValuesToKeep(5);
-        action.shutdown(JOB_ID, TASK_ID, new JobExecution());
-        verify(persistentValueRepositoryMock, times(1)).cleanup(eq(JOB_ID), eq(TASK_ID), eq(5));
+        action.shutdown(JOB_ID, new JobExecution());
+        verify(persistentValueRepositoryMock, times(1)).cleanup(eq(JOB_ID), eq(5));
     }
 
     /**
@@ -112,7 +112,7 @@ class PersistValueActionTest extends MiscActionBaseTest {
         List<Map<String, Object>> result = action.process(data, new JobExecution());
 
         assertEquals(1, result.size());
-        verify(persistentValueRepositoryMock, times(0)).upsert(eq(JOB_ID), eq(TASK_ID), any(PersistentValue.class));
+        verify(persistentValueRepositoryMock, times(0)).upsert(eq(JOB_ID), any(PersistentValue.class));
         assertEquals("Would have persisted: igor-message-test", result.get(0).get(DataKey.SIMULATION_LOG.getKey()));
     }
 

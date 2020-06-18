@@ -1,9 +1,11 @@
 package com.arassec.igor.core.application;
 
+import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.connector.Connector;
+import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.IgorException;
@@ -60,6 +62,12 @@ class IgorComponentRegistryTest {
     private Trigger triggerMock;
 
     /**
+     * Igor's core configuration properties.
+     */
+    @Mock
+    private IgorCoreProperties igorCoreProperties;
+
+    /**
      * Initializes the test environment.
      */
     @BeforeEach
@@ -76,7 +84,7 @@ class IgorComponentRegistryTest {
         applicationContextMock = mock(ApplicationContext.class);
 
         igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock), List.of(providerMock), List.of(triggerMock),
-                List.of(new TestConnectorImpl()));
+                List.of(new TestConnectorImpl()), igorCoreProperties);
         igorComponentRegistry.afterPropertiesSet();
         igorComponentRegistry.setApplicationContext(applicationContextMock);
     }
@@ -87,7 +95,7 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting all categories of a component type")
     void testGetCategoriesOfComponentType() {
-        assertNotNull(new IgorComponentRegistry(List.of(), List.of(), List.of(), List.of()).getCategoriesOfComponentType(Action.class));
+        assertNotNull(new IgorComponentRegistry(List.of(), List.of(), List.of(), List.of(), null).getCategoriesOfComponentType(Action.class));
 
         Set<String> categoriesOfComponentType = igorComponentRegistry.getCategoriesOfComponentType(Action.class);
         assertEquals("action-category-id", categoriesOfComponentType.iterator().next());
@@ -102,6 +110,37 @@ class IgorComponentRegistryTest {
         assertTrue(igorComponentRegistry.getTypesOfCategory("unknown-category").isEmpty());
         Set<String> typesOfCategory = igorComponentRegistry.getTypesOfCategory("action-category-id");
         assertEquals("action-type-id", typesOfCategory.iterator().next());
+    }
+
+    /**
+     * Tests creating a job instance as prototype.
+     */
+    @Test
+    @DisplayName("Tests creating a job instance as prototype.")
+    void testCreateJobPrototype() {
+        doReturn(triggerMock).when(applicationContextMock).getBean(eq(triggerMock.getClass()));
+        doReturn(providerMock).when(applicationContextMock).getBean(eq(providerMock.getClass()));
+
+        Job jobPrototype = igorComponentRegistry.createJobPrototype();
+
+        verify(triggerMock, times(1)).setId(anyString());
+        verify(providerMock, times(1)).setId(anyString());
+        assertEquals("New Job", jobPrototype.getName());
+        assertTrue(jobPrototype.isActive());
+    }
+
+    /**
+     * Tests creating a connector instance as prototype.
+     */
+    @Test
+    @DisplayName("Tests creating a connector instance as prototype.")
+    void testCreateActionPrototype() {
+        doReturn(actionMock).when(applicationContextMock).getBean(eq(actionMock.getClass()));
+
+        Action actionPrototype = igorComponentRegistry.createActionPrototype();
+
+        assertNotNull(actionPrototype);
+        verify(actionPrototype, times(1)).setId(anyString());
     }
 
     /**
@@ -197,6 +236,7 @@ class IgorComponentRegistryTest {
 
         @Getter
         @IgorParam
+        @SuppressWarnings("FieldMayBeFinal")
         private int testParam = 0;
 
         /**

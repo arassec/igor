@@ -25,12 +25,11 @@ CREATE TABLE persistent_value (
     id INTEGER PRIMARY KEY auto_increment,
     version INTEGER,
     job_id VARCHAR NOT NULL,
-    task_id VARCHAR NOT NULL,
     created TIMESTAMP NOT NULL,
     content VARCHAR NOT NULL
 );
 CREATE SEQUENCE PERSISTENT_VALUE_ID_SEQUENCE START WITH 1 INCREMENT BY 1;
-CREATE UNIQUE INDEX unique_persistent_value ON persistent_value (job_id, task_id, content);
+CREATE UNIQUE INDEX unique_persistent_value ON persistent_value (job_id, content);
 
 CREATE TABLE job_connector_reference (
     job_id VARCHAR(128) NOT NULL,

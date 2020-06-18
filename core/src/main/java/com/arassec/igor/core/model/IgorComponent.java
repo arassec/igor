@@ -54,19 +54,17 @@ public interface IgorComponent {
      * Initializes the component before job executions.
      *
      * @param jobId        The job's ID.
-     * @param taskId       The task's ID.
      * @param jobExecution Contains the state of the job execution.
      */
-    void initialize(String jobId, String taskId, JobExecution jobExecution);
+    void initialize(String jobId, JobExecution jobExecution);
 
 
     /**
      * Shuts the component down at the end of the job execution.
      *
      * @param jobId        The job's ID.
-     * @param taskId       The task's ID.
      * @param jobExecution Contains the state of the job execution.
      */
-    void shutdown(String jobId, String taskId, JobExecution jobExecution);
+    void shutdown(String jobId, JobExecution jobExecution);
 
 }

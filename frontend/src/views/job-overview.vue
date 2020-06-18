@@ -529,6 +529,7 @@
             }
         },
         mounted() {
+            this.$root.$data.store.clearConnectorData();
             this.$root.$data.store.clearJobData();
             if (this.$root.$data.store.getValue('job-name-filter')) {
                 this.nameFilter = this.$root.$data.store.getValue('job-name-filter')
@@ -536,8 +537,6 @@
             if (this.$root.$data.store.getValue('job-state-filter')) {
                 this.stateFilter = this.$root.$data.store.getValue('job-state-filter')
             }
-            this.$root.$data.store.clearConnectorData();
-            this.$root.$data.store.clearJobData();
             this.loadJobs().then(() => {
                 this.initJobListEventSource();
             });

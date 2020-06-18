@@ -107,6 +107,7 @@ export const store = {
     this.jobData.jobConfiguration = null
     this.jobData.selectionKey = null
     this.jobData.parameterIndex = null
+    this.jobData.connectorCategoryCandidates = null;
     this.jobData.connectorParameter = null
   },
   setValue (key, value) {

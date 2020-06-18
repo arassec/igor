@@ -1,10 +1,10 @@
 # Action
 
 ## Description
-Tasks consist of a list of **actions**, which are called sequentially in the configured order.
+Jobs consist of a list of **actions**, which are called sequentially in the configured order.
 If an action fails, further execution is aborted.
 
-An action operates on each data item of a task's data stream and performs modifications on it. The result is handed
+An action operates on each data item of a job's data stream and performs modifications on it. The result is handed
 over to the following action, which itself can modify the data.
 
 Actions are similar to methods of a "Java Stream API" stream.
@@ -33,7 +33,6 @@ For example, an action operating on the following data item:
   },
   "meta": {
     "jobId": "1e91a654-ba8c-4c3a-afd0-932bd27d2888",
-    "taskId": "b5350687-fbbe-446d-9776-68c6fbbcf982",
     "timestamp": 1587203554775
   }
 }

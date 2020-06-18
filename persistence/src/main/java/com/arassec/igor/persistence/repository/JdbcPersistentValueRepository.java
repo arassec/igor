@@ -28,13 +28,12 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
      * Saves the supplied value in igor's own database.
      *
      * @param jobId  The job's ID.
-     * @param taskId The task's ID.
      * @param value  The value to save.
      *
      * @return The persisted value. An ID is added if required.
      */
     @Override
-    public PersistentValue upsert(String jobId, String taskId, PersistentValue value) {
+    public PersistentValue upsert(String jobId, PersistentValue value) {
         PersistentValueEntity entity = new PersistentValueEntity();
         if (value.getId() != null) {
             entity = persistentValueDao.findById(value.getId()).orElseThrow(
@@ -42,7 +41,6 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
         } else {
             entity.setCreated(Instant.now());
             entity.setJobId(jobId);
-            entity.setTaskId(taskId);
         }
         entity.setContent(value.getContent());
 
@@ -59,32 +57,30 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
      * Checks in igor's database if the value is already persisted.
      *
      * @param jobId  The job's ID.
-     * @param taskId The task's ID.
      * @param value  The value to check.
      *
      * @return {@code true} if the value is persisted, {@code false} otherwise.
      */
     @Override
-    public boolean isPersisted(String jobId, String taskId, PersistentValue value) {
+    public boolean isPersisted(String jobId, PersistentValue value) {
         if (value == null) {
             return false;
         }
-        return (persistentValueDao.findByJobIdAndTaskIdAndContent(jobId, taskId, value.getContent()) != null);
+        return (persistentValueDao.findByJobIdAndContent(jobId, value.getContent()) != null);
     }
 
     /**
      * Deletes old entries from the database.
      *
      * @param jobId            The job's ID.
-     * @param taskId           The task's ID.
      * @param numEntriesToKeep Number of entries to keep.
      */
     @Override
-    public void cleanup(String jobId, String taskId, int numEntriesToKeep) {
-        List<Integer> ids = persistentValueDao.findMostRecentIds(jobId, taskId, numEntriesToKeep);
+    public void cleanup(String jobId, int numEntriesToKeep) {
+        List<Integer> ids = persistentValueDao.findMostRecentIds(jobId, numEntriesToKeep);
         if (ids != null && ids.size() == numEntriesToKeep) {
             Integer oldestIdToKeep = ids.get(numEntriesToKeep - 1);
-            persistentValueDao.deleteByJobIdAndTaskIdAndIdBefore(jobId, taskId, Long.valueOf(oldestIdToKeep));
+            persistentValueDao.deleteByJobIdAndIdBefore(jobId, Long.valueOf(oldestIdToKeep));
         }
     }
 

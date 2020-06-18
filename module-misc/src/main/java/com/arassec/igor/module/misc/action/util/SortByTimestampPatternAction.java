@@ -66,6 +66,8 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      */
     public SortByTimestampPatternAction() {
         super("sort-by-timestamp-pattern-action");
+        // Sorting is always done single threaded:
+        setNumThreads(1);
         // This action requires to be run in a single thread!
         getUnEditableProperties().add("numThreads");
     }

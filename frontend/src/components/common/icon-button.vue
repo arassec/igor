@@ -24,7 +24,7 @@
         background-color: transparent;
         color: var(--color-font);
         border: none;
-        padding: 0;
+        padding: .2em;
     }
 
     button:hover:enabled {

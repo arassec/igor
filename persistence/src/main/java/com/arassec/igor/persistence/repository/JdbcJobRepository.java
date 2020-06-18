@@ -87,18 +87,13 @@ public class JdbcJobRepository implements JobRepository {
         if (job.getTrigger() != null && job.getTrigger().getId() == null) {
             job.getTrigger().setId(UUID.randomUUID().toString());
         }
-        job.getTasks().forEach(task -> {
-            if (task.getId() == null) {
-                task.setId(UUID.randomUUID().toString());
+        if (job.getProvider() != null && job.getProvider().getId() == null) {
+            job.getProvider().setId(UUID.randomUUID().toString());
+        }
+        job.getActions().forEach(action -> {
+            if (action.getId() == null) {
+                action.setId(UUID.randomUUID().toString());
             }
-            if (task.getProvider() != null && task.getProvider().getId() == null) {
-                task.getProvider().setId(UUID.randomUUID().toString());
-            }
-            task.getActions().forEach(action -> {
-                if (action.getId() == null) {
-                    action.setId(UUID.randomUUID().toString());
-                }
-            });
         });
 
         try {
@@ -111,11 +106,9 @@ public class JdbcJobRepository implements JobRepository {
 
         // Now update the connector references:
         jobConnectorReferenceDao.deleteByJobId(job.getId());
-        List<String> referencedConnectors = new LinkedList<>();
-        job.getTasks().forEach(task -> {
-            referencedConnectors.addAll(getConnectorIds(task.getProvider()));
-            task.getActions().forEach(action -> referencedConnectors.addAll(getConnectorIds(action)));
-        });
+        List<String> referencedConnectors = new LinkedList<>(getConnectorIds(job.getProvider()));
+        job.getActions().forEach(action -> referencedConnectors.addAll(getConnectorIds(action)));
+
         referencedConnectors.forEach(connectorId -> jobConnectorReferenceDao.save(new JobConnectorReferenceEntity(job.getId(),
                 connectorId)));
 

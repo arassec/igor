@@ -2,7 +2,7 @@ package com.arassec.igor.core.model.job.concurrent;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
-import com.arassec.igor.core.model.job.Task;
+import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests actually running the runnable.")
     void testRun() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), Task.createMetaData("job-id", "task-id"));
+        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id"));
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         inputQueue.offer(inputData);
@@ -66,7 +66,7 @@ class ActionsExecutingRunnnableTest {
                 inputQueue, outputQueue, null);
 
         when(firstActionMock.process(eq(inputData), nullable(JobExecution.class))).thenAnswer(invocationOnMock -> {
-            // Simulates the task saying: 'finish your work, but no new items will be published'
+            // Simulates the job saying: 'finish your work, but no new items will be published'
             actionsExecutingRunnable.shutdown();
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> result = List.of((Map<String, Object>) invocationOnMock.getArgument(0));
@@ -89,7 +89,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests completing the runnable.")
     void testComplete() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), Task.createMetaData("job-id", "task-id"));
+        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id"));
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingQueue<>();

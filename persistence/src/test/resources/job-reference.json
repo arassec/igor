@@ -2,50 +2,42 @@
   "id": "job-id",
   "name": "job-name",
   "description": "job-description",
+  "active": true,
+  "historyLimit": 666,
   "trigger": {
     "id": "trigger-id",
     "typeId": "trigger-type-id",
     "parameters": []
   },
-  "active": true,
-  "historyLimit": 666,
-  "tasks": [
-    {
-      "id": "task-id",
-      "name": "task-name",
-      "description": "task-description",
-      "active": true,
-      "provider": {
-        "id": "provider-id",
-        "typeId": "provider-type-id",
-        "parameters": [
-          {
-            "name": "testProviderParam",
-            "value": "test-provider-param"
-          },
-          {
-            "name": "simulationLimit",
-            "value": 456
-          }
-        ]
+  "provider": {
+    "id": "provider-id",
+    "typeId": "provider-type-id",
+    "parameters": [
+      {
+        "name": "testProviderParam",
+        "value": "test-provider-param"
       },
-      "actions": [
+      {
+        "name": "simulationLimit",
+        "value": 456
+      }
+    ]
+  },
+  "actions": [
+    {
+      "id": "action-id",
+      "typeId": "action-type-id",
+      "name": "action-name",
+      "active": true,
+      "parameters": [
         {
-          "id": "action-id",
-          "typeId": "action-type-id",
-          "name": "action-name",
-          "active": true,
-          "parameters": [
-            {
-              "name": "testConnector",
-              "value": "connector-id",
-              "connector": true
-            },
-            {
-              "name": "numThreads",
-              "value": 1
-            }
-          ]
+          "name": "testConnector",
+          "value": "connector-id",
+          "connector": true
+        },
+        {
+          "name": "numThreads",
+          "value": 1
         }
       ]
     }

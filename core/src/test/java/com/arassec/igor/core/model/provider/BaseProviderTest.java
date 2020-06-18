@@ -36,9 +36,8 @@ class BaseProviderTest {
     @DisplayName("Tests provider initialization.")
     void testInitialize() {
         JobExecution jobExecution = new JobExecution();
-        baseProvider.initialize("job-id", "task-id", jobExecution);
+        baseProvider.initialize("job-id", jobExecution);
         assertEquals("job-id", baseProvider.getJobId());
-        assertEquals("task-id", baseProvider.getTaskId());
         assertEquals(jobExecution, baseProvider.getJobExecution());
     }
 

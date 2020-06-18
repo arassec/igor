@@ -18,7 +18,7 @@
 Igor is a tool for managing 'continuous workarounds'.
 
 It provides an easy to use, reliable place where you can put all those workarounds, which would 
-otherwise be solved by scattered scripts or code fragments across your applications and connectors. 
+otherwise be solved by scattered scripts or code fragments across your applications and services. 
 
 # Status
 

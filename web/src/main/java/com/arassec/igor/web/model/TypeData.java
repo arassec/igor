@@ -1,11 +1,13 @@
 package com.arassec.igor.web.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Contains information about an igor component type.
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class TypeData extends KeyLabelStore {
 
     /**

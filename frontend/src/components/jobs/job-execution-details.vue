@@ -37,7 +37,7 @@
             </div>
 
             <div v-if="jobExecution.executionState === 'RUNNING'" class="max-width">
-                <h2 class="truncate">Task: {{jobExecution.currentTask}}</h2>
+                <h2 class="truncate" v-if="jobExecution.workInProgress.length > 0">Executing:</h2>
 
                 <feedback-box v-for="(wip, index) in jobExecution.workInProgress" :key="index" :clickable="false">
                     <div slot="left" class="margin-right truncate">{{wip.name}}</div>

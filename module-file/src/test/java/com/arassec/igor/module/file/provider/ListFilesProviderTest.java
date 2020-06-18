@@ -48,7 +48,7 @@ class ListFilesProviderTest {
         provider.setDirectory("/tmp");
         provider.setFileEnding("jpg");
 
-        provider.initialize("job-id", "task-id", new JobExecution());
+        provider.initialize("job-id", new JobExecution());
 
         assertEquals("/tmp/", provider.getDirectory());
 

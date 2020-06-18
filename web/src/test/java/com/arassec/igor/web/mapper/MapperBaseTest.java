@@ -47,7 +47,7 @@ public abstract class MapperBaseTest {
         when(applicationContextMock.getBean(eq(TestAction.class))).thenReturn(new TestAction());
 
         IgorComponentRegistry igorComponentRegistry = new IgorComponentRegistry(List.of(new TestAction()), List.of(new TestProvider()),
-                List.of(new TestTrigger()), List.of(new TestConnector()));
+                List.of(new TestTrigger()), List.of(new TestConnector()), null);
         igorComponentRegistry.setApplicationContext(applicationContextMock);
         igorComponentRegistry.afterPropertiesSet();
 

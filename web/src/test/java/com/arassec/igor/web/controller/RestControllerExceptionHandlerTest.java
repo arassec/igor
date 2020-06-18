@@ -93,7 +93,7 @@ class RestControllerExceptionHandlerTest {
         when(bindingResultMock.getTarget()).thenReturn(job);
         when(bindingResultMock.getAllErrors()).thenReturn(List.of(
                 new FieldError("job", "name", "name-validation-failed"),
-                new FieldError("task", "unknown.field", "id-validation-failed")
+                new FieldError("provider", "unknown.field", "id-validation-failed")
         ));
 
         MethodArgumentNotValidException exceptionMock = mock(MethodArgumentNotValidException.class);

@@ -23,11 +23,6 @@ public enum DataKey {
     JOB_ID("jobId"),
 
     /**
-     * The key to the task's ID in the meta-data.
-     */
-    TASK_ID("taskId"),
-
-    /**
      * The key to the current timestamp in the meta-data.
      */
     TIMESTAMP("timestamp"),

@@ -170,6 +170,7 @@
             }
         },
         mounted() {
+            this.$root.$data.store.clearJobData();
             this.$root.$data.store.clearConnectorData();
             if (this.$root.$data.store.getValue('connector-name-filter')) {
                 this.nameFilter = this.$root.$data.store.getValue('connector-name-filter')

@@ -31,11 +31,6 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     private static final String JOB_ID_QUERY = "$." + DataKey.META.getKey() + "." + DataKey.JOB_ID.getKey();
 
     /**
-     * Query for the Task-ID.
-     */
-    private static final String TASK_ID_QUERY = "$." + DataKey.META.getKey() + "." + DataKey.TASK_ID.getKey();
-
-    /**
      * Query for the simulation property that indicates a simulated job run.
      */
     private static final String SIMULATION_QUERY = "$." + DataKey.DATA.getKey() + "." + DataKey.SIMULATION.getKey();
@@ -148,23 +143,6 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
             String jobId = getString(data, JOB_ID_QUERY);
             if (jobId != null) {
                 return jobId;
-            }
-        }
-        throw new IllegalStateException("No Job-ID found in meta-data!");
-    }
-
-    /**
-     * Returns the current task's ID.
-     *
-     * @param data The data to process.
-     *
-     * @return The current task's ID.
-     */
-    protected String getTaskId(Map<String, Object> data) {
-        if (data != null && !data.isEmpty()) {
-            String taskId = getString(data, TASK_ID_QUERY);
-            if (taskId != null) {
-                return taskId;
             }
         }
         throw new IllegalStateException("No Job-ID found in meta-data!");

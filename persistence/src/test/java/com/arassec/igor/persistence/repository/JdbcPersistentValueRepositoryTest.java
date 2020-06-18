@@ -55,7 +55,7 @@ class JdbcPersistentValueRepositoryTest {
 
         when(persistentValueDao.save(any(PersistentValueEntity.class))).thenReturn(entity);
 
-        PersistentValue persistedValue = repository.upsert("job-id", "task-id", value);
+        PersistentValue persistedValue = repository.upsert("job-id", value);
 
         assertEquals(entity.getId(), persistedValue.getId());
         assertNotNull(persistedValue.getCreated());
@@ -64,7 +64,6 @@ class JdbcPersistentValueRepositoryTest {
         verify(persistentValueDao, times(1)).save(argCap.capture());
         assertEquals(value.getContent(), argCap.getValue().getContent());
         assertEquals("job-id", argCap.getValue().getJobId());
-        assertEquals("task-id", argCap.getValue().getTaskId());
     }
 
 
@@ -87,7 +86,7 @@ class JdbcPersistentValueRepositoryTest {
 
         when(persistentValueDao.save(eq(entity))).thenReturn(entity);
 
-        PersistentValue persistedValue = repository.upsert("job-id", "task-id", value);
+        PersistentValue persistedValue = repository.upsert("job-id", value);
 
         assertEquals(persistedValue, value);
 
@@ -102,15 +101,15 @@ class JdbcPersistentValueRepositoryTest {
     @Test
     @DisplayName("Tests checking an entity for its persistence state.")
     void testIsPersisted() {
-        assertFalse(repository.isPersisted(null, null, null));
-        assertFalse(repository.isPersisted(null, null, new PersistentValue()));
+        assertFalse(repository.isPersisted(null, null));
+        assertFalse(repository.isPersisted(null, new PersistentValue()));
 
         PersistentValue value = new PersistentValue();
         value.setContent("content");
 
-        when(persistentValueDao.findByJobIdAndTaskIdAndContent(eq("job-id"), eq("task-id"), eq("content"))).thenReturn(new PersistentValueEntity());
+        when(persistentValueDao.findByJobIdAndContent(eq("job-id"), eq("content"))).thenReturn(new PersistentValueEntity());
 
-        assertTrue(repository.isPersisted("job-id", "task-id", value));
+        assertTrue(repository.isPersisted("job-id", value));
     }
 
     /**
@@ -119,12 +118,12 @@ class JdbcPersistentValueRepositoryTest {
     @Test
     @DisplayName("Tests cleaning up old entities.")
     void testCleanup() {
-        repository.cleanup("job-id", "task-id", 3);
-        verify(persistentValueDao, times(0)).deleteByJobIdAndTaskIdAndIdBefore(eq("job-id"), eq("task-id"), anyLong());
+        repository.cleanup("job-id", 3);
+        verify(persistentValueDao, times(0)).deleteByJobIdAndIdBefore(eq("job-id"), anyLong());
 
-        when(persistentValueDao.findMostRecentIds(eq("job-id"), eq("task-id"), eq(3))).thenReturn(List.of(123, 456, 789));
-        repository.cleanup("job-id", "task-id", 3);
-        verify(persistentValueDao, times(1)).deleteByJobIdAndTaskIdAndIdBefore(eq("job-id"), eq("task-id"), eq(789L));
+        when(persistentValueDao.findMostRecentIds(eq("job-id"), eq(3))).thenReturn(List.of(123, 456, 789));
+        repository.cleanup("job-id", 3);
+        verify(persistentValueDao, times(1)).deleteByJobIdAndIdBefore(eq("job-id"), eq(789L));
     }
 
     /**

@@ -54,11 +54,6 @@ public class JobExecution {
     private String errorCause;
 
     /**
-     * Contains the current task the job is in.
-     */
-    private String currentTask;
-
-    /**
      * List with current work in progress, that should be visible in the UI for the user.
      */
     private final List<WorkInProgressMonitor> workInProgress = Collections.synchronizedList(new LinkedList<>());

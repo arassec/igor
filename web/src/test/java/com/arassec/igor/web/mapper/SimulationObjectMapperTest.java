@@ -32,11 +32,11 @@ class SimulationObjectMapperTest extends MapperBaseTest {
 
         Job testJob = simulationObjectMapper.readValue(jobJson, Job.class);
 
-        assertTrue(testJob.getTasks().get(0).getProvider() instanceof ProviderProxy);
+        assertTrue(testJob.getProvider() instanceof ProviderProxy);
 
-        assertTrue(testJob.getTasks().get(0).getActions().get(0) instanceof ActionProxy);
+        assertTrue(testJob.getActions().get(0) instanceof ActionProxy);
 
-        TestConnector testConnector = (TestConnector) ((TestAction) ((ActionProxy) testJob.getTasks().get(0).getActions().get(0)).getDelegate()).getTestConnector();
+        TestConnector testConnector = (TestConnector) ((TestAction) ((ActionProxy) testJob.getActions().get(0)).getDelegate()).getTestConnector();
 
         assertEquals(666, testConnector.simulationSafeMethod());
         assertNull(testConnector.simulationUnsafeMethod());

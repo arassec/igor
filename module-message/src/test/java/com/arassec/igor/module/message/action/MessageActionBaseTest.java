@@ -1,7 +1,7 @@
 package com.arassec.igor.module.message.action;
 
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.job.Task;
+import com.arassec.igor.core.model.job.Job;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +31,7 @@ abstract class MessageActionBaseTest {
         item.put(PARAM_KEY, PARAM_VALUE);
 
         Map<String, Object> result = new HashMap<>();
-        result.put(DataKey.META.getKey(), Task.createMetaData("1", "1"));
+        result.put(DataKey.META.getKey(), Job.createMetaData("1"));
         result.put(DataKey.DATA.getKey(), item);
 
         return result;

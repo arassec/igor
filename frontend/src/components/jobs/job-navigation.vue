@@ -12,23 +12,20 @@
                              v-on:save-configuration="$emit('save-configuration')"
                              v-on:run-job="$emit('run-job')"/>
 
-        <draggable v-model="jobConfiguration.tasks" group="tasks" @start="drag=true" @end="drag=false" handle=".move-icon">
-            <task-navigation-item v-for="task of jobConfiguration.tasks" :key="task.id" :task="task"
-                                  class="task-navi-item"
-                                  :selected-task-id="selectedTaskId"
-                                  :selected-action-id="selectedActionId"
-                                  :validation-errors="validationErrors"
-                                  v-on:delete-task="$emit('delete-task', $event)"
-                                  v-on:duplicate-task="$emit('duplicate-task', $event)"
-                                  v-on:add-action="$emit('add-action', $event)"
-                                  v-on:delete-action="$emit('delete-action', $event)"
-                                  v-on:task-is-selected="$emit('task-is-selected', $event)"
-                                  v-on:action-is-selected="$emit('action-is-selected', $event)"/>
+        <draggable v-model="jobConfiguration.actions" :group="'actions'" @start="drag=true" @end="drag=false"
+                   handle=".move-icon">
+            <action-navigation-item v-for="action of jobConfiguration.actions" :key="action.id" :action="action"
+                                    :selected-action-id="selectedActionId"
+                                    :validation-errors="validationErrors"
+                                    v-on:action-is-selected="$emit('action-is-selected', $event)"
+                                    v-on:delete-action="$emit('delete-action', $event)"/>
         </draggable>
 
-        <layout-row class="add-task-row">
-            <label slot="left" v-if="jobConfiguration.tasks.length === 0">There are no tasks defined yet.</label>
-            <add-item-button slot="right" icon="plus" label="Add new Task" v-on:clicked="$emit('add-task')" class="add-task-button"/>
+        <layout-row class="add-action-row">
+            <label slot="left" v-if="jobConfiguration.actions.length === 0">There are no actions defined
+                yet.</label>
+            <add-item-button slot="right" icon="plus" label="Add new Action"
+                             v-on:clicked="$emit('add-action')"/>
         </layout-row>
 
     </div>
@@ -37,17 +34,17 @@
 <script>
     import draggable from 'vuedraggable'
     import JobNavigationItem from "./job-navigation-item";
-    import TaskNavigationItem from "./task-navigation-item";
     import AddItemButton from "./add-item-button";
     import LayoutRow from "../common/layout-row";
+    import ActionNavigationItem from "./action-navigation-item";
 
     export default {
         name: "job-navigation",
-        components: {LayoutRow, AddItemButton, TaskNavigationItem, JobNavigationItem, draggable},
-        props: ['jobConfiguration', 'validationErrors', 'selectedTaskId', 'selectedActionId', 'jobRunningOrWaiting', 'jobExecutionsPage'],
+        components: {ActionNavigationItem, LayoutRow, AddItemButton, JobNavigationItem, draggable},
+        props: ['jobConfiguration', 'validationErrors', 'selectedActionId', 'jobRunningOrWaiting', 'jobExecutionsPage'],
         computed: {
             jobSelected: function () {
-                return (this.selectedTaskId === null && this.selectedActionId === null);
+                return (this.selectedActionId === null);
             }
         }
     }
@@ -60,21 +57,12 @@
     }
 
     .job-navi-item {
-        margin: 0 0 1em 0;
         padding: .5em;
     }
 
-    .task-navi-item {
-        margin: .5em 0 0 0;
-    }
-
-    .task-navi-item:active {
-        cursor: move;
-    }
-
-    .add-task-row {
+    .add-action-row {
         color: var(--color-background);
-        margin: .5em 0 1em .25em;
+        padding: .25em 0 2em .25em;
     }
 
 </style>

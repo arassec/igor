@@ -1,7 +1,6 @@
 package com.arassec.igor.web.controller;
 
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.util.ModelPage;
@@ -13,6 +12,7 @@ import com.arassec.igor.web.model.JobListEntry;
 import com.arassec.igor.web.model.ScheduleEntry;
 import com.arassec.igor.web.simulation.ActionProxy;
 import com.arassec.igor.web.simulation.ProviderProxy;
+import com.arassec.igor.web.test.TestAction;
 import com.arassec.igor.web.test.TestProvider;
 import com.arassec.igor.web.test.TestTrigger;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -81,6 +80,38 @@ class JobRestControllerTest extends RestControllerBaseTest {
                 .andExpect(jsonPath("$.items[0].active").value("true"))
                 .andExpect(jsonPath("$.items[0].hasFailedExecutions").value("true"))
                 .andExpect(jsonPath("$.items[1]").doesNotExist());
+    }
+
+    /**
+     * Tests creating a job prototype instance.
+     */
+    @Test
+    @DisplayName("Tests creating a job prototype instance")
+    @SneakyThrows
+    void testGetJobPrototype() {
+        when(igorComponentRegistry.createJobPrototype()).thenReturn(Job.builder().id("job-id").name("new-job").build());
+
+        mockMvc.perform(get("/api/job/prototype"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("job-id"))
+                .andExpect(jsonPath("$.name").value("new-job"));
+    }
+
+    /**
+     * Tests creating an action prototype instance.
+     */
+    @Test
+    @DisplayName("Tests creating an action prototype instance")
+    @SneakyThrows
+    void testGetActionPrototype() {
+        TestAction testAction = new TestAction();
+        testAction.setId("action-id");
+
+        when(igorComponentRegistry.createActionPrototype()).thenReturn(testAction);
+
+        mockMvc.perform(get("/api/job/action/prototype"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("action-id"));
     }
 
     /**
@@ -212,13 +243,14 @@ class JobRestControllerTest extends RestControllerBaseTest {
         when(providerProxyMock.getErrorCause()).thenReturn("provider-error-cause");
         when(providerProxyMock.getCollectedData()).thenReturn(List.of(Map.of("provider-key", "provider-value")));
 
+        when(jobSpy.getProvider()).thenReturn(providerProxyMock);
+
         ActionProxy actionProxyMock = mock(ActionProxy.class);
         when(actionProxyMock.getId()).thenReturn("action-id");
         when(actionProxyMock.getErrorCause()).thenReturn("action-error-cause");
         when(actionProxyMock.getCollectedData()).thenReturn(List.of(Map.of("action-key", "action-value")));
 
-        when(jobSpy.getTasks()).thenReturn(List.of(
-                Task.builder().id("task-id").provider(providerProxyMock).actions(List.of(actionProxyMock)).build()));
+        when(jobSpy.getActions()).thenReturn(List.of(actionProxyMock));
 
         Job job = Job.builder().id("job-id").name("job-name").build();
 
@@ -235,12 +267,10 @@ class JobRestControllerTest extends RestControllerBaseTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(job)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.job-result.errorCause").value("job-error-cause"))
+                .andExpect(jsonPath("$.job-id.errorCause").value("job-error-cause"))
+                .andExpect(jsonPath("$.job-id.results[0].data.provider-key").value("provider-value"))
                 .andExpect(jsonPath("$.action-id.errorCause").value("action-error-cause"))
-                .andExpect(jsonPath("$.task-id.errorCause").value("provider-error-cause"))
-                .andExpect(jsonPath("$.action-id.results[0].action-key").value("action-value"))
-                .andExpect(jsonPath("$.task-id.results[0].data.provider-key").value("provider-value"))
-                .andExpect(jsonPath("$.task-id.results[0].meta.taskId").value("task-id"));
+                .andExpect(jsonPath("$.action-id.results[0].action-key").value("action-value"));
     }
 
     /**
@@ -260,8 +290,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
         when(actionProxyMock.getErrorCause()).thenReturn("action-error-cause");
         when(actionProxyMock.getCollectedData()).thenReturn(List.of(Map.of("action-key", "action-value")));
 
-        when(jobSpy.getTasks()).thenReturn(List.of(
-                Task.builder().provider(providerProxyMock).actions(List.of(actionProxyMock)).build()));
+        when(jobSpy.getActions()).thenReturn(List.of(actionProxyMock));
 
         Job job = Job.builder().id("job-id").name("job-name").build();
 
@@ -438,9 +467,8 @@ class JobRestControllerTest extends RestControllerBaseTest {
     }
 
     /**
-     * Tests bean validation on job creation. Nested validation of tasks and actions is tested, too.
+     * Tests bean validation on job creation. Nested validation of components is tested, too.
      */
-
     @Test
     @DisplayName("Tests bean validation on job creation.")
     @SneakyThrows
@@ -453,24 +481,20 @@ class JobRestControllerTest extends RestControllerBaseTest {
         TestProvider provider = new TestProvider();
         provider.setId("provider-id");
 
-        Task task = Task.builder().id("first-task-id").provider(provider).build();
-        Task secondTask = Task.builder().id("second-task-id").provider(provider).build();
-
         TestTrigger trigger = new TestTrigger();
         trigger.setId("trigger-id");
         trigger.setTestParam(null);
 
-        Job job = Job.builder().id("job-id").name("job-name").trigger(trigger).tasks(List.of(task, secondTask)).build();
+        Job job = Job.builder().id("job-id").name("job-name")
+                .trigger(trigger).provider(provider).build();
 
         mockMvc.perform(post("/api/job")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .characterEncoding("UTF-8")
                 .content(objectMapper.writeValueAsString(job)))
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.provider-id.validatedInteger").value("must not be null"))
-                .andExpect(jsonPath("$.first-task-id.name").value("must not be empty"))
-                .andExpect(jsonPath("$.second-task-id.name").value("must not be empty"));
+                .andExpect(jsonPath("$.trigger-id.testParam").value("must not be null"));
     }
 
     /**

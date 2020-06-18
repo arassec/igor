@@ -20,11 +20,6 @@ public abstract class BaseProvider extends BaseIgorComponent implements Provider
     private String jobId;
 
     /**
-     * The task's ID.
-     */
-    private String taskId;
-
-    /**
      * The job execution.
      */
     private JobExecution jobExecution;
@@ -51,9 +46,8 @@ public abstract class BaseProvider extends BaseIgorComponent implements Provider
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, String taskId, JobExecution jobExecution) {
+    public void initialize(String jobId, JobExecution jobExecution) {
         this.jobId = jobId;
-        this.taskId = taskId;
         this.jobExecution = jobExecution;
     }
 

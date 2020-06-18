@@ -81,8 +81,8 @@ public class ListFilesProvider extends BaseFileProvider {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, String taskId, JobExecution jobExecution) {
-        super.initialize(jobId, taskId, jobExecution);
+    public void initialize(String jobId, JobExecution jobExecution) {
+        super.initialize(jobId, jobExecution);
         files = source.listFiles(directory, fileEnding);
         currentFile = 0;
         if (!directory.endsWith("/")) {

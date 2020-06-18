@@ -1,10 +1,11 @@
 package com.arassec.igor.web.controller;
 
 import com.arassec.igor.core.application.ConnectorManager;
+import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.model.DataKey;
+import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
@@ -27,6 +28,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.support.CronSequenceGenerator;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -79,6 +81,11 @@ public class JobRestController extends BaseRestController {
     private final ObjectMapper simulationObjectMapper;
 
     /**
+     * The registry for igor components.
+     */
+    private final IgorComponentRegistry igorComponentRegistry;
+
+    /**
      * Contains {@link SseEmitter} of job stream requests.
      */
     private final CopyOnWriteArrayList<SseEmitter> jobStreamEmitters = new CopyOnWriteArrayList<>();
@@ -119,6 +126,26 @@ public class JobRestController extends BaseRestController {
         }
 
         return new ModelPage<>(pageNumber, pageSize, 0, List.of());
+    }
+
+    /**
+     * Returns a newly created job instance as prototype for new jobs.
+     *
+     * @return A new {@link Job} instance.
+     */
+    @GetMapping("prototype")
+    public Job getJobPrototype() {
+        return igorComponentRegistry.createJobPrototype();
+    }
+
+    /**
+     * Returns a newly created action instance as prototype for new actions.
+     *
+     * @return A new {@link Action} instance.
+     */
+    @GetMapping("action/prototype")
+    public Action getActionPrototype() {
+        return igorComponentRegistry.createActionPrototype();
     }
 
     /**
@@ -188,9 +215,9 @@ public class JobRestController extends BaseRestController {
 
         Job simulationJob;
         try {
-            // The method parameter has been deserialized with the regular object mapper. Thus validation is supported. But to
+            // The method parameter has been deserialized with the regular object mapper to support bean validation. But to
             // simulate the job, proxies are required, which are added by the 'simulation object mapper'. Thus we have to first
-            // convert the original job to a JSON string and afterwards back to a Job object, but this time with simpulation
+            // convert the original job to a JSON string and afterwards back to a Job object, but this time with simulation
             // proxies inside...
             simulationJob = simulationObjectMapper.readValue(simulationObjectMapper.writeValueAsString(job), Job.class);
         } catch (IOException e) {
@@ -202,28 +229,23 @@ public class JobRestController extends BaseRestController {
         simulationJob.run(jobExecution);
 
         SimulationResult jobResult = new SimulationResult();
+
         if (jobExecution.getErrorCause() != null) {
             jobResult.setErrorCause(jobExecution.getErrorCause());
-            result.put("job-result", jobResult);
         }
 
-        simulationJob.getTasks().forEach(task -> {
-            ProviderProxy providerProxy = (ProviderProxy) task.getProvider();
+        ProviderProxy providerProxy = (ProviderProxy) simulationJob.getProvider();
 
-            SimulationResult taskResult = new SimulationResult();
-            taskResult.setErrorCause(providerProxy.getErrorCause());
+        if (providerProxy != null) {
             providerProxy.getCollectedData()
                     .forEach(jsonObject -> {
                         Map<String, Object> item = new HashMap<>();
                         item.put(DataKey.DATA.getKey(), jsonObject);
-                        item.put(DataKey.META.getKey(), Task.createMetaData(simulationJob.getId(), task.getId()));
-                        taskResult.getResults().add(item);
+                        item.put(DataKey.META.getKey(), Job.createMetaData(simulationJob.getId()));
+                        jobResult.getResults().add(item);
                     });
-            if (task.getId() != null) {
-                result.put(task.getId(), taskResult);
-            }
 
-            task.getActions().forEach(action -> {
+            simulationJob.getActions().forEach(action -> {
                 ActionProxy actionProxy = (ActionProxy) action;
                 SimulationResult actionResult = new SimulationResult();
                 actionResult.setErrorCause(actionProxy.getErrorCause());
@@ -232,7 +254,11 @@ public class JobRestController extends BaseRestController {
                     result.put(action.getId(), actionResult);
                 }
             });
-        });
+        }
+
+        if (!StringUtils.isEmpty(jobResult.getErrorCause()) || !jobResult.getResults().isEmpty()) {
+            result.put(job.getId(), jobResult);
+        }
 
         return result;
     }

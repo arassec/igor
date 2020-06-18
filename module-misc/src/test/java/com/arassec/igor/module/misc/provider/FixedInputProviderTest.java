@@ -22,7 +22,7 @@ class FixedInputProviderTest {
         provider.setInput("abc\ndef");
         provider.setSeparateLines(true);
 
-        provider.initialize("job-id", "task-id", new JobExecution());
+        provider.initialize("job-id", new JobExecution());
 
         assertTrue(provider.hasNext());
         assertEquals("abc", provider.next().get(FixedInputProvider.INPUT_KEY));
@@ -41,7 +41,7 @@ class FixedInputProviderTest {
         provider.setInput("abc\ndef");
         provider.setSeparateLines(false);
 
-        provider.initialize("job-id", "task-id", new JobExecution());
+        provider.initialize("job-id", new JobExecution());
 
         assertTrue(provider.hasNext());
         assertEquals("abc\ndef", provider.next().get(FixedInputProvider.INPUT_KEY));

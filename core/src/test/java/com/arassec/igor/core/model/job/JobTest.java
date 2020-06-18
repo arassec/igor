@@ -1,11 +1,17 @@
 package com.arassec.igor.core.model.job;
 
+import com.arassec.igor.core.model.DataKey;
+import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.IgorException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -33,45 +39,31 @@ class JobTest {
     }
 
     /**
-     * Tests running a minimal job with inactive task.
+     * Tests running a minimal, inactive job.
      */
     @Test
-    @DisplayName("Tests running a minimal job with inactive task.")
-    void testRunJobInactiveTask() {
-        Job job = new Job();
-        job.setId("job-id");
+    @DisplayName("Tests running a minimal, inactive job.")
+    void testRunJobInactive() {
+        Job job = Job.builder().id("job-id").active(false).build();
         JobExecution jobExecution = new JobExecution();
-
-        Task taskMock = mock(Task.class);
-        job.getTasks().add(taskMock);
 
         job.run(jobExecution);
 
         assertEquals(JobExecutionState.FINISHED, jobExecution.getExecutionState());
-
-        // inactive Task:
-        verify(taskMock, times(0)).run(eq("job-id"), eq(jobExecution));
     }
 
     /**
-     * Tests running a minimal job with active task.
+     * Tests running a minimal, active job.
      */
     @Test
-    @DisplayName("Tests running a minimal job with active task.")
-    void testRunJobActiveTask() {
-        Job job = new Job();
-        job.setId("job-id");
+    @DisplayName("Tests running a minimal, active job.")
+    void testRunJobActive() {
+        Job job = Job.builder().id("job-id").active(true).build();
         JobExecution jobExecution = new JobExecution();
-
-        Task taskMock = mock(Task.class);
-        job.getTasks().add(taskMock);
-
-        when(taskMock.isActive()).thenReturn(true);
 
         job.run(jobExecution);
 
         assertEquals(JobExecutionState.FINISHED, jobExecution.getExecutionState());
-        verify(taskMock, times(1)).run(eq("job-id"), eq(jobExecution));
     }
 
     /**
@@ -89,37 +81,8 @@ class JobTest {
 
         job.run(jobExecution);
 
-        verify(triggerMock, times(1)).initialize(eq("job-id"), isNull(), eq(jobExecution));
-        verify(triggerMock, times(1)).shutdown(eq("job-id"), isNull(), eq(jobExecution));
-    }
-
-    /**
-     * Tests cancelling a running job by setting the job-execution's state to {@link JobExecutionState#CANCELLED}.
-     */
-    @Test
-    @DisplayName("Tests cancelling a running job by setting the execution state.")
-    void testJobCancellationByExecutionState() {
-        Job job = new Job();
-        job.setId("job-id");
-        JobExecution jobExecution = new JobExecution();
-
-        Task firstTaskMock = mock(Task.class);
-        when(firstTaskMock.isActive()).thenReturn(true);
-        Task secondTaskMock = mock(Task.class);
-        when(secondTaskMock.isActive()).thenReturn(true);
-
-        job.getTasks().add(firstTaskMock);
-        job.getTasks().add(secondTaskMock);
-
-        doAnswer(invocation -> {
-            jobExecution.setExecutionState(JobExecutionState.CANCELLED);
-            return null;
-        }).when(firstTaskMock).run(eq("job-id"), eq(jobExecution));
-
-        job.run(jobExecution);
-
-        verify(firstTaskMock, times(1)).run(eq("job-id"), eq(jobExecution));
-        verify(secondTaskMock, times(0)).run(eq("job-id"), eq(jobExecution));
+        verify(triggerMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
+        verify(triggerMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
     }
 
     /**
@@ -147,16 +110,13 @@ class JobTest {
     @Test
     @DisplayName("Tests failing safe on execution errors.")
     void testFailSafe() {
-        Job job = new Job();
-        job.setId("job-id");
+        Job job = Job.builder().id("job-id").build();
         JobExecution jobExecution = new JobExecution();
 
-        Task taskMock = mock(Task.class);
-        when(taskMock.isActive()).thenReturn(true);
+        Provider providerMock = mock(Provider.class);
+        doThrow(new IgorException("wanted-test-exception")).when(providerMock).hasNext();
 
-        job.getTasks().add(taskMock);
-
-        doThrow(new IgorException("wanted-test-exception")).when(taskMock).run(eq("job-id"), eq(jobExecution));
+        job.setProvider(providerMock);
 
         job.run(jobExecution);
 
@@ -188,6 +148,53 @@ class JobTest {
         assertEquals(5, job.getHistoryLimit());
         assertFalse(job.isRunning());
         assertTrue(job.isFaultTolerant());
+    }
+
+    /**
+     * Tests running a minimal job with a provider.
+     */
+    @Test
+    @DisplayName("Tests running a minimal job.")
+    void testRunMinimalJob() {
+        Job job = Job.builder().id("job-id").build();
+
+        JobExecution jobExecution = new JobExecution();
+        jobExecution.setExecutionState(JobExecutionState.RUNNING);
+
+        Map<String, Object> dataItem = new HashMap<>();
+
+        Provider providerMock = mock(Provider.class);
+        when(providerMock.hasNext()).thenReturn(true).thenReturn(false);
+        when(providerMock.next()).thenReturn(dataItem);
+        job.setProvider(providerMock);
+
+        Action actionMock = mock(Action.class);
+        when(actionMock.isActive()).thenReturn(true);
+        when(actionMock.getNumThreads()).thenReturn(1);
+        job.getActions().add(actionMock);
+
+        job.run(jobExecution);
+
+        verify(providerMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
+        verify(actionMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
+
+        verify(providerMock, times(2)).hasNext();
+        verify(providerMock, times(1)).next();
+        verify(actionMock, times(1)).process(anyMap(), eq(jobExecution));
+
+        verify(providerMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
+        verify(actionMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
+    }
+
+    /**
+     * Tests creating the meta-data for a job's data item.
+     */
+    @Test
+    @DisplayName("Tests creating job meta-data.")
+    void testCreateMetaData() {
+        Map<String, Object> metaData = Job.createMetaData("job-id");
+        assertEquals("job-id", metaData.get(DataKey.JOB_ID.getKey()));
+        assertNotNull(metaData.get(DataKey.TIMESTAMP.getKey()));
     }
 
 }

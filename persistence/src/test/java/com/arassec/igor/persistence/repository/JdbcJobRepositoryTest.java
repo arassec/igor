@@ -1,7 +1,6 @@
 package com.arassec.igor.persistence.repository;
 
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.job.Task;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.persistence.dao.ConnectorDao;
@@ -85,12 +84,11 @@ class JdbcJobRepositoryTest {
         Job job = new Job();
         job.setName("job-name");
         job.setTrigger(new TestTrigger());
-        job.getTasks().add(new Task());
-        job.getTasks().get(0).setProvider(new TestProvider());
+        job.setProvider(new TestProvider());
         TestAction testAction = new TestAction();
         testAction.setTestConnector(new TestConnector());
         testAction.getTestConnector().setId("connector-id");
-        job.getTasks().get(0).getActions().add(testAction);
+        job.getActions().add(testAction);
 
         when(persistenceJobMapper.writeValueAsString(any(Job.class))).thenReturn("job-json");
 
@@ -98,9 +96,8 @@ class JdbcJobRepositoryTest {
 
         assertNotNull(savedJob.getId());
         assertNotNull(savedJob.getTrigger().getId());
-        assertNotNull(savedJob.getTasks().get(0).getId());
-        assertNotNull(savedJob.getTasks().get(0).getProvider().getId());
-        assertNotNull(savedJob.getTasks().get(0).getActions().get(0).getId());
+        assertNotNull(savedJob.getProvider().getId());
+        assertNotNull(savedJob.getActions().get(0).getId());
 
         ArgumentCaptor<JobEntity> argCap = ArgumentCaptor.forClass(JobEntity.class);
         verify(jobDao, times(1)).save(argCap.capture());

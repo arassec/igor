@@ -29,9 +29,9 @@ class ProviderProxyTest {
 
         JobExecution jobExecution = new JobExecution();
 
-        providerProxy.initialize("job-id", "task-id", jobExecution);
+        providerProxy.initialize("job-id", jobExecution);
 
-        verify(providerMock, times(1)).initialize(eq("job-id"), eq("task-id"), eq(jobExecution));
+        verify(providerMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
     }
 
     /**
@@ -41,7 +41,7 @@ class ProviderProxyTest {
     @DisplayName("Tests exception handling during proxy initialization.")
     void testInitializeFail() {
         ProviderProxy providerProxy = new ProviderProxy(null);
-        providerProxy.initialize("job-id", "task-id", new JobExecution());
+        providerProxy.initialize("job-id", new JobExecution());
         assertNotNull(providerProxy.getErrorCause());
     }
 

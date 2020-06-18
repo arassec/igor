@@ -175,6 +175,7 @@
                 newConnector: true,
                 connectorCategories: [],
                 connectorTypes: [],
+                connectorCategoryCandidates: [],
                 loadParameters: true,
                 originalConnectorConfiguration: null,
                 validationErrors: {},
@@ -213,44 +214,58 @@
                     for (let i = this.connectorCategories.length; i > 0; i--) {
                         this.connectorCategories.pop()
                     }
+
                     let component = this;
-                    Array.from(categories).forEach(function (item) {
-                        component.connectorCategories.push(item)
+                    Array.from(categories).forEach(function (category) {
+                        if (component.connectorCategoryCandidates.length > 0) {
+                            for (let i = 0; i < component.connectorCategoryCandidates.length; i++) {
+                                if (category.key === component.connectorCategoryCandidates[i].key) {
+                                    component.connectorCategories.push(category);
+                                }
+                            }
+                        } else {
+                            component.connectorCategories.push(category);
+                        }
                     });
+
                     if (!('key' in this.connectorConfiguration.category)) {
                         this.connectorConfiguration.category = this.connectorCategories[0]
                     }
                 })
             },
             loadTypesOfCategory: async function (category, selectFirst) {
-                // If the category contains an array with name 'typeCandidates' the allowed types are pre-selected, because
-                // the connector is created from within a job configuration:
-                if (category.hasOwnProperty('typeCandidates')) {
+                await IgorBackend.getData('/api/type/' + category.key).then((types) => {
                     for (let i = this.connectorTypes.length; i > 0; i--) {
                         this.connectorTypes.pop()
                     }
                     let component = this;
-                    Array.from(category.typeCandidates).forEach(function (item) {
-                        component.connectorTypes.push(item)
+
+                    let connectorTypeCandidates = [];
+                    if (this.connectorCategoryCandidates.length > 0) {
+                        for (let i = 0; i < this.connectorCategoryCandidates.length; i++) {
+                            if (category.key === this.connectorCategoryCandidates[i].key) {
+                                connectorTypeCandidates = this.connectorCategoryCandidates[i].typeCandidates;
+                                break;
+                            }
+                        }
+                    }
+
+                    Array.from(types).forEach(function (type) {
+                        if (connectorTypeCandidates.length > 0) {
+                            for (let i = 0; i < connectorTypeCandidates.length; i++) {
+                                if (type.key === connectorTypeCandidates[i].key) {
+                                    component.connectorTypes.push(type);
+                                }
+                            }
+                        } else {
+                            component.connectorTypes.push(type);
+                        }
                     });
+
                     if (selectFirst) {
                         this.connectorConfiguration.type = this.connectorTypes[0]
                     }
-                } else {
-                    // No restrictions, simply load all types of the given category:
-                    await IgorBackend.getData('/api/type/' + category.key).then((types) => {
-                        for (let i = this.connectorTypes.length; i > 0; i--) {
-                            this.connectorTypes.pop()
-                        }
-                        let component = this;
-                        Array.from(types).forEach(function (item) {
-                            component.connectorTypes.push(item)
-                        });
-                        if (selectFirst) {
-                            this.connectorConfiguration.type = this.connectorTypes[0]
-                        }
-                    })
-                }
+                })
             },
             loadParametersOfType: async function (typeKey) {
                 if (this.hasDocumentation(typeKey)) {
@@ -329,7 +344,7 @@
                     this.documentation = await IgorBackend.getData('/api/doc/' + key);
                     this.testResults = null;
                 }
-            }
+            },
         },
         mounted() {
             let connectorData = this.$root.$data.store.getConnectorData();
@@ -348,34 +363,21 @@
                         this.loadReferencingJobs(0)
                     })
                 } else {
-                    // Create a new connector from within a job configuration. The categories and types are fixed since the job
-                    // requires a certain set of connectors.
+                    // Create a new connector. The categories and types may be fixed if the connector is created from
+                    // within a job configuration..
+                    this.connectorCategoryCandidates = [];
                     let jobData = this.$root.$data.store.getJobData();
                     if (jobData.connectorCategoryCandidates != null) {
-                        for (let i = this.connectorCategories.length; i > 0; i--) {
-                            this.connectorCategories.pop()
-                        }
-                        let component = this;
-                        Array.from(jobData.connectorCategoryCandidates).forEach(function (item) {
-                            component.connectorCategories.push(item)
-                        });
-                        this.connectorConfiguration.category = this.connectorCategories[0];
+                        this.connectorCategoryCandidates = jobData.connectorCategoryCandidates;
+                    }
+                    let component = this;
+                    this.loadCategories().then(() => {
                         component.loadTypesOfCategory(component.connectorConfiguration.category, true).then(() => {
                             component.loadParametersOfType(component.connectorConfiguration.type.key).then(() => {
                                 component.originalConnectorConfiguration = JSON.stringify(component.connectorConfiguration)
                             })
                         })
-                    } else {
-                        // Create a new connector without restrictions:
-                        let component = this;
-                        this.loadCategories().then(() => {
-                            component.loadTypesOfCategory(component.connectorConfiguration.category, true).then(() => {
-                                component.loadParametersOfType(component.connectorConfiguration.type.key).then(() => {
-                                    component.originalConnectorConfiguration = JSON.stringify(component.connectorConfiguration)
-                                })
-                            })
-                        })
-                    }
+                    })
                 }
             }
         },

@@ -1,7 +1,7 @@
 package com.arassec.igor.module.misc.action;
 
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.job.Task;
+import com.arassec.igor.core.model.job.Job;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,11 +27,6 @@ public abstract class MiscActionBaseTest {
     protected static final String JOB_ID = "job-id";
 
     /**
-     * The task's ID.
-     */
-    protected static final String TASK_ID = "task-id";
-
-    /**
      * Creates an input data map for tests.
      *
      * @return Test data.
@@ -41,7 +36,7 @@ public abstract class MiscActionBaseTest {
         item.put(PARAM_KEY, PARAM_VALUE);
 
         Map<String, Object> result = new HashMap<>();
-        result.put(DataKey.META.getKey(), Task.createMetaData(JOB_ID, TASK_ID));
+        result.put(DataKey.META.getKey(), Job.createMetaData(JOB_ID));
         result.put(DataKey.DATA.getKey(), item);
 
         return result;

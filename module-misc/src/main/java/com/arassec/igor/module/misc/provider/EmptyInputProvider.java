@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Provides a configurable amount of empty input data to tasks.
+ * Provides a configurable amount of empty input data to jobs.
  */
 @Getter
 @Setter

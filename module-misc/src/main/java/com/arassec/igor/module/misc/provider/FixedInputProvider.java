@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 /**
- * Provides fixed input to tasks.
+ * Provides fixed input to jobs.
  */
 @IgorComponent
 public class FixedInputProvider extends BaseUtilProvider {
@@ -59,8 +59,8 @@ public class FixedInputProvider extends BaseUtilProvider {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, String taskId, JobExecution jobExecution) {
-        super.initialize(jobId, taskId, jobExecution);
+    public void initialize(String jobId, JobExecution jobExecution) {
+        super.initialize(jobId, jobExecution);
         index = 0;
         if (input != null && !input.isEmpty()) {
             if (separateLines) {

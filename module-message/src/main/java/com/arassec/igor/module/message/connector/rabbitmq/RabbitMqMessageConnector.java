@@ -124,8 +124,8 @@ public class RabbitMqMessageConnector extends BaseMessageConnector {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, String taskId, JobExecution jobExecution) {
-        super.initialize(jobId, taskId, jobExecution);
+    public void initialize(String jobId, JobExecution jobExecution) {
+        super.initialize(jobId, jobExecution);
 
         connectionFactory = new CachingConnectionFactory(host, port);
         connectionFactory.setUsername(username);
@@ -163,8 +163,8 @@ public class RabbitMqMessageConnector extends BaseMessageConnector {
      * {@inheritDoc}
      */
     @Override
-    public void shutdown(String jobId, String taskId, JobExecution jobExecution) {
-        super.shutdown(jobId, taskId, jobExecution);
+    public void shutdown(String jobId, JobExecution jobExecution) {
+        super.shutdown(jobId, jobExecution);
         rabbitTemplate.stop();
         connectionFactory.destroy();
     }

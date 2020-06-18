@@ -21,49 +21,18 @@ export default {
             (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
         )
     },
-    findTask: function (jobConfiguration, taskId) {
-        let result = null;
-        jobConfiguration.tasks.forEach((task) => {
-            if (taskId === task.id) {
-                result = task;
-            }
-        });
-        return result;
-    },
-    findTaskIndex: function (jobConfiguration, taskId) {
-        let result = null;
-        jobConfiguration.tasks.forEach(function (task, index) {
-            if (task.id === taskId) {
-                result = index;
-            }
-        });
-        return result;
-    },
-    findTaskWithAction: function (jobConfiguration, actionId) {
-        let result = null;
-        jobConfiguration.tasks.forEach(function (task) {
-            task.actions.forEach((action) => {
-                if (actionId === action.id) {
-                    result = task;
-                }
-            })
-        });
-        return result;
-    },
     findAction: function (jobConfiguration, actionId) {
         let result = null;
-        jobConfiguration.tasks.forEach((task) => {
-            task.actions.forEach((action) => {
-                if (actionId === action.id) {
-                    result = action;
-                }
-            })
+        jobConfiguration.actions.forEach((action) => {
+            if (actionId === action.id) {
+                result = action;
+            }
         });
         return result;
     },
-    findActionIndex: function (task, actionId) {
+    findActionIndex: function (jobConfiguration, actionId) {
         let result = -1;
-        task.actions.forEach((action, index) => {
+        jobConfiguration.actions.forEach((action, index) => {
             if (action.id === actionId) {
                 result = index;
             }

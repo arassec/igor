@@ -18,34 +18,30 @@ public interface PersistentValueDao extends PagingAndSortingRepository<Persisten
      * Returns a persisted value if it exists.
      *
      * @param jobId   The job's ID.
-     * @param taskId  The task's ID.
      * @param content The content of the value.
      *
      * @return The {@link PersistentValueEntity} if it exists or {@code null} otherwise.
      */
-    PersistentValueEntity findByJobIdAndTaskIdAndContent(String jobId, String taskId, String content);
+    PersistentValueEntity findByJobIdAndContent(String jobId, String content);
 
     /**
-     * Returns all persistent-value-IDs for the given job and task until the given limit.
+     * Returns all persistent-value-IDs for the given job until the given limit.
      *
-     * @param jobId  The job's ID.
-     * @param taskId The task's ID.
-     * @param limit  The limit.
+     * @param jobId The job's ID.
+     * @param limit The limit.
      *
      * @return List of IDs.
      */
-    @Query(value = "SELECT id FROM persistent_value WHERE job_id = :jobId AND task_id = :taskId ORDER BY id DESC LIMIT :limit",
-            nativeQuery = true)
-    List<Integer> findMostRecentIds(@Param("jobId") String jobId, @Param("taskId") String taskId, @Param("limit") int limit);
+    @Query(value = "SELECT id FROM persistent_value WHERE job_id = :jobId ORDER BY id DESC LIMIT :limit", nativeQuery = true)
+    List<Integer> findMostRecentIds(@Param("jobId") String jobId, @Param("limit") int limit);
 
     /**
-     * Deletes all entries of the given job and task that are older than the specified persistent-value.
+     * Deletes all entries of the given job that are older than the specified persistent-value.
      *
      * @param jobId       The job's ID.
-     * @param taskId      The task's ID.
      * @param executionId The ID of the oldest persistent-value to keep.
      */
-    void deleteByJobIdAndTaskIdAndIdBefore(String jobId, String taskId, Long executionId);
+    void deleteByJobIdAndIdBefore(String jobId, Long executionId);
 
     /**
      * Deletes all values of the given job.

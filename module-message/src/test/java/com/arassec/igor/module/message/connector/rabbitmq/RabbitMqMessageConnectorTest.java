@@ -35,7 +35,7 @@ class RabbitMqMessageConnectorTest {
         RabbitMqMessageConnector rabbitMqMessageConnector = new RabbitMqMessageConnector();
         assertNull(rabbitMqMessageConnector.getRabbitTemplate());
 
-        rabbitMqMessageConnector.initialize("job-id", "task-id", new JobExecution());
+        rabbitMqMessageConnector.initialize("job-id", new JobExecution());
         assertNotNull(rabbitMqMessageConnector.getRabbitTemplate());
     }
 
@@ -86,7 +86,7 @@ class RabbitMqMessageConnectorTest {
         rabbitMqMessageConnector.setRabbitTemplate(rabbitTemplateSpy);
         rabbitMqMessageConnector.setConnectionFactory(connectionFactorySpy);
 
-        rabbitMqMessageConnector.shutdown("job-id", "task-id", new JobExecution());
+        rabbitMqMessageConnector.shutdown("job-id", new JobExecution());
 
         verify(rabbitTemplateSpy, times(1)).stop();
         verify(connectionFactorySpy, times(1)).destroy();

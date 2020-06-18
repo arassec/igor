@@ -36,10 +36,6 @@ web/src/main/resources/static
 application.properties
 documentation/package-lock.json
 documentation/docs/user/core
-!documentation/docs/user/core/README.md
 documentation/docs/user/module-misc
-!documentation/docs/user/module-misc/README.md
 documentation/docs/user/module-file
-!documentation/docs/user/module-file/README.md
 documentation/docs/user/module-message
-!documentation/docs/user/module-message/README.md

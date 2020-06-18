@@ -60,7 +60,6 @@ public class PersistValueAction extends BasePersistenceAction {
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
         String jobId = getJobId(data);
-        String taskId = getTaskId(data);
 
         String resolvedInput = getString(data, input);
         if (resolvedInput == null) {
@@ -69,12 +68,12 @@ public class PersistValueAction extends BasePersistenceAction {
         }
 
         PersistentValue value = new PersistentValue(getString(data, resolvedInput));
-        if (!persistentValueRepository.isPersisted(jobId, taskId, value)) {
+        if (!persistentValueRepository.isPersisted(jobId, value)) {
             if (isSimulation(data)) {
                 data.put(DataKey.SIMULATION_LOG.getKey(), "Would have persisted: " + value.getContent());
             } else {
                 log.debug("Persisted: '{}'", value);
-                persistentValueRepository.upsert(jobId, taskId, value);
+                persistentValueRepository.upsert(jobId, value);
             }
         } else {
             log.debug("Already persisted: '{}'", value);
@@ -87,13 +86,12 @@ public class PersistValueAction extends BasePersistenceAction {
      * Cleans up the persisted values and keep only the {@link #numValuesToKeep} most recent values in the store.
      *
      * @param jobId        The job's ID.
-     * @param taskId       The task's ID.
      * @param jobExecution The container for job execution details.
      */
     @Override
-    public void shutdown(String jobId, String taskId, JobExecution jobExecution) {
+    public void shutdown(String jobId, JobExecution jobExecution) {
         if (numValuesToKeep > 0) {
-            persistentValueRepository.cleanup(jobId, taskId, numValuesToKeep);
+            persistentValueRepository.cleanup(jobId, numValuesToKeep);
         }
     }
 

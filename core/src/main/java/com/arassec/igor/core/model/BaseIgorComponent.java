@@ -47,7 +47,7 @@ public abstract class BaseIgorComponent implements IgorComponent {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, String taskId, JobExecution jobExecution) {
+    public void initialize(String jobId, JobExecution jobExecution) {
         // nothing to do here...
     }
 
@@ -55,7 +55,7 @@ public abstract class BaseIgorComponent implements IgorComponent {
      * {@inheritDoc}
      */
     @Override
-    public void shutdown(String jobId, String taskId, JobExecution jobExecution) {
+    public void shutdown(String jobId, JobExecution jobExecution) {
         // nothing to do here...
     }
 
