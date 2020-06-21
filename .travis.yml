@@ -27,6 +27,7 @@ deploy:
   - provider: netlify
     edge: true # opt in to dpl v2
     dir: "documentation/target/doc"
+    prod: true
     on:
       branch: master
   - provider: script
