@@ -10,8 +10,8 @@ features:
   details: Documentation for igor users that want to use the application with its standard features.
 - title: Developer Guide
   details: Documentation for developers who wish to customize igor and extend it to their needs.
-- title: JavaDoc
-  details: JavaDoc reference documentation of igor's source code.
+- title: Examples
+  details: Examples of how to use igor to solve different problems.
 footer: MIT Licensed | Copyright © 2017-present Andreas Sensen
 ---
 # Quick Start

@@ -67,6 +67,8 @@
             </layout-row>
         </modal-dialog>
 
+        <background-icon right="true" icon-one="link"/>
+
     </core-container>
 </template>
 
@@ -82,10 +84,12 @@
     import LayoutRow from "../components/common/layout-row";
     import FormatUtils from "../utils/utils";
     import ListPager from "../components/common/list-pager";
+    import BackgroundIcon from "../components/common/background-icon";
 
     export default {
         name: "connector-overview",
         components: {
+            BackgroundIcon,
             DeleteConnectorDialog,
             ListPager,
             LayoutRow,
