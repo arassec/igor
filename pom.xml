@@ -58,13 +58,13 @@
     <modules>
         <module>core</module>
         <module>persistence</module>
-        <module>frontend</module>
-        <module>web</module>
         <module>module-misc</module>
         <module>module-file</module>
         <module>module-message</module>
-        <module>igor-spring-boot-starter</module>
+        <module>frontend</module>
         <module>documentation</module>
+        <module>web</module>
+        <module>igor-spring-boot-starter</module>
         <module>application</module>
     </modules>
 

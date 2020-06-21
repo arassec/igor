@@ -94,5 +94,5 @@ module.exports = {
         }
     },
     dest: "./target/doc/",
-    base: "/igor/" + process.env.REVISION + "/"
-}
+    base: "/igor/"
+};

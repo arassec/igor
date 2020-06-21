@@ -23,7 +23,7 @@
                 <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <id>Copy vue.js frontend code.</id>
+                        <id>Copy frontend code.</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -40,6 +40,22 @@
                                         <include>favicon.ico</include>
                                         <include>index.html</include>
                                     </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Copy documentation code.</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>src/main/resources/static/igor</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/documentation/target/doc</directory>
                                 </resource>
                             </resources>
                         </configuration>

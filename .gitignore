@@ -50,6 +50,7 @@ yarn-error.log*
 *.sw*
 
 node
+package-lock.json
 
 ### igor specific ###
 

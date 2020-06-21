@@ -33,11 +33,11 @@ e.g. 'Regularly copy new files from an FTP-Server to a destination server via SC
 
 In the future, databases, messaging systems or other interfaces could be added to extract, transform and load the data. 
 
-# Reference Guide
+# Reference Documentation
 
-**Unstable**
+The reference documentation is distributed within the igor application or available online at:
 
-[Current Development Version](https://arassec.github.io/igor/0.0.0-SNAPSHOT)
+[Igor Reference Documentation](https://arassec.com/igor/)
 
 # License
 

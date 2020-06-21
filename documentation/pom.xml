@@ -63,7 +63,7 @@
                             <environmentVariables>
                                 <REVISION>${revision}</REVISION>
                             </environmentVariables>
-                            <arguments>run build</arguments>
+                            <arguments>run docs:build</arguments>
                         </configuration>
                     </execution>
                 </executions>
@@ -129,22 +129,6 @@
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/module-message/src/main/resources/doc</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-to-target</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/${revision}</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/target/doc</directory>
-                                    <filtering>false</filtering>
                                 </resource>
                             </resources>
                         </configuration>

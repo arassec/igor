@@ -14,6 +14,9 @@
                 </li>
             </ul>
             <h1 class="heading">{{heading}}</h1>
+            <a class="documentation-link" target="_blank" rel="noopener noreferrer" href="/igor/index.html">
+                Reference Documentation
+            </a>
         </nav>
 
         <router-view/>
@@ -86,6 +89,11 @@
         flex-grow: 1;
         font-size: 220%;
         margin: 0 1.5em 0 -5em;
+    }
+
+    .documentation-link {
+        margin: 0 .25em 0 0;
+        font-size: 100%;
     }
 
 </style>
