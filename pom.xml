@@ -32,6 +32,11 @@
         </license>
     </licenses>
 
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/arassec/igor/issues</url>
+    </issueManagement>
+
     <developers>
         <developer>
             <name>Andreas Sensen</name>

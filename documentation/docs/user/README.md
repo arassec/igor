@@ -1,46 +1,28 @@
-# Overview
+# Installation
 
-## What is Igor?
-Igor is a tool for managing 'continuous workarounds'.
+There are currently two ways to install igor: as docker image and compiling from source.
 
-It provides an easy to use, reliable place where you can put all those workarounds, which would 
-otherwise be solved by scattered scripts or code fragments across your applications and connectors. 
+::: tip
+After installation, igor's web interface will be available at: [http://localhost:8080/](http://localhost:8080/)
+:::
 
-It is similar to [Node-RED](https://nodered.org/), [Huginn](https://github.com/huginn/huginn) or [Beehive](https://github.com/muesli/beehive), but focuses more on
-data processing instead of specific online services or home automation. 
+## Docker
+The latest, stable version of igor is available as docker image under the :latest tag.
+``` shell script
+# use docker to get the latest, stable version:
+$> docker run --name igor -p8080:8080 arassec/igor
+```
 
-It's written in Java using [Spring Boot](https://spring.io/projects/spring-boot) and provides an easy-to-use web-frontend written in [vue.js](https://vuejs.org/).
+## From Source
+In order to build igor from source Java 11 needs to be installed.
+The application is compiled as Spring-Boot fat jar, containing all its dependencies.
+``` shell script
+# get the sources from GitHub:
+$> git clone https://github.com/arassec/igor.git
 
-## What can it do?
+# build igor
+$> cd igor && ./mvnw clean install
 
-Continuous workarounds are configured in igor using **jobs**.
-
-A job ist triggered by a **trigger**, e.g. a CRON trigger starting the job at a regular interval.
-
-A **provider** then loads **data items**, e.g. from an external service, using a **connector** for that service.
-
-The data items are passed to different, configurable **actions**, that modify the data to the user's needs.
-Actions can also be used to store the modified data items on external services, again using connectors.
-
-<br/>
-
-![igor overview image](./overview.png)
-
-## Connectors
-
-There are currently connectors for the following protocols and services:
-
-File Handling | Message Handling
----|---
-FTP | RabbitMQ
-FTPS | 
-HTTP | 
-HTTPS | 
-Local Filesystem | 
-SCP | 
-SFTP |
-
-## Contact
-You can contact me via e-mail under andreas.sensen@arassec.com
-
-If you found a bug or have a feature request, don't hesitate to create an issue at [GitHub](https://github.com/arassec/igor/issues).
+# run the application
+$> java -jar application/target/igor-0.0.0-SNAPSHOT.jar
+```

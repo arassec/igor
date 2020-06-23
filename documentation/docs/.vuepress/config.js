@@ -12,10 +12,9 @@ module.exports = {
         sidebar: {
             "/user/": [
                 {
-                    title: "Introduction",
+                    title: "Getting Started",
                     children: [
                         "",
-                        "installation",
                         "configuration"
                     ]
                 },
