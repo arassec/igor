@@ -19,6 +19,8 @@ cache:
 
 before_install:
   - chmod +x mvnw
+  - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+  - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
 
 script:
   - ./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=arassec_igor
@@ -30,8 +32,17 @@ deploy:
     prod: true
     on:
       branch: master
+      tags: true
+  - provider: releases
+    file:
+      - application/target/igor-$TRAVIS_TAG.jar
+    skip_cleanup: true
+    name: $TRAVIS_TAG
+    on:
+      branch: master
+      tags: true
   - provider: script
-    script: ./mvnw clean install -Prelease
+    script: ./mvnw clean deploy --settings .mvn/settings.xml -Prelease -Drevision=$TRAVIS_TAG -DskipTests=true
     on:
       branch: master
       tags: true
