@@ -19,7 +19,7 @@ cache:
 
 before_install:
   - chmod +x mvnw
-  - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+  - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import --no-tty --batch
   - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
 
 script:
@@ -34,6 +34,7 @@ deploy:
       branch: master
       tags: true
   - provider: releases
+    api_key: $GITHUB_TOKEN
     file:
       - application/target/igor-$TRAVIS_TAG.jar
     skip_cleanup: true
