@@ -36,6 +36,7 @@
                                     <directory>${project.parent.basedir}/frontend/target/dist</directory>
                                     <includes>
                                         <include>css/</include>
+                                        <include>fonts/</include>
                                         <include>js/</include>
                                         <include>favicon.ico</include>
                                         <include>index.html</include>

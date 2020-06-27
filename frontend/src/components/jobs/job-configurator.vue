@@ -69,7 +69,8 @@
                     <div class="td"><label for="category">Category</label></div>
                     <div class="td">
                         <select id="category" v-model="jobConfiguration.trigger.category"
-                                v-on:change="loadTriggerTypesOfCategory(jobConfiguration.trigger.category.key, true)">
+                                v-on:change="loadTriggerTypesOfCategory(jobConfiguration.trigger.category.key, true).then(() => {
+                                        loadTriggerParametersOfType(jobConfiguration.trigger.type.key)})">
                             <option v-for="triggerCategory in triggerCategories" v-bind:value="triggerCategory"
                                     v-bind:key="triggerCategory.key">
                                 {{triggerCategory.value}}
@@ -193,7 +194,7 @@
                         component.triggerTypes.push(item)
                     });
                     if (selectFirst) {
-                        this.jobConfiguration.trigger.type = component.triggerTypes[0]
+                        this.jobConfiguration.trigger.type = this.triggerTypes[0]
                     }
                 })
             },

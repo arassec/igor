@@ -15,7 +15,8 @@ module.exports = {
                     title: "Getting Started",
                     children: [
                         "",
-                        "configuration"
+                        "configuration",
+                        "releasenotes"
                     ]
                 },
                 {
@@ -87,6 +88,24 @@ module.exports = {
                                 "module-message/rabbitmq-message-connector"
                             ]
                         }
+                    ]
+                }
+            ],
+            "/developer/": [
+                {
+                    title: "Getting Started",
+                    children: [
+                        ""
+                    ]
+                },
+                {
+                    title: "Adding Components",
+                    children: [
+                        "component",
+                        "trigger",
+                        "provider",
+                        "action",
+                        "connector"
                     ]
                 }
             ]

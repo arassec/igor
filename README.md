@@ -35,7 +35,8 @@ In the future, databases, messaging systems or other interfaces could be added t
 
 # Reference Documentation
 
-The reference documentation is distributed within the igor application or available online at:
+The reference documentation is distributed within the igor application.
+The documentation of the latest, stable release is also available online at:
 
 [Igor Reference Documentation](https://arassec.com/igor/)
 

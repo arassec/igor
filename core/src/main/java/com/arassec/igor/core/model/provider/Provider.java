@@ -17,7 +17,7 @@ public interface Provider extends IgorComponent {
     boolean hasNext();
 
     /**
-     * Returns the next data-piece to process.
+     * Returns the next data item to process.
      *
      * @return A JSON-Object that contains the data to process.
      */

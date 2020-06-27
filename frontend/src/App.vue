@@ -1,14 +1,14 @@
 <template>
-    <Navigation/>
+    <app-navigation/>
 </template>
 
 <script>
-    import Navigation from './components/app-navigation'
+    import AppNavigation from "./components/app-navigation";
 
     export default {
         name: 'app',
         components: {
-            Navigation
+            AppNavigation
         }
     }
 </script>
@@ -48,7 +48,7 @@
 
     @font-face {
         font-family: 'Roboto';
-        src: url('/font/Roboto-Light-webfont.woff') format('woff');
+        src: url('/fonts/Roboto-Light-webfont.woff') format('woff');
         font-weight: normal;
         font-style: normal;
     }
@@ -195,7 +195,7 @@
         position: absolute;
         z-index: 1;
         bottom: 125%;
-        left:50%;
+        left: 50%;
         transform: translateX(-50%);
     }
 

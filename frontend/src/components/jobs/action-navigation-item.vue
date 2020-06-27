@@ -42,4 +42,13 @@
         border-top: .1em solid var(--color-font);
     }
 
+    .move-icon {
+        opacity: 0.5;
+    }
+
+    .move-icon:hover {
+        cursor: move;
+        opacity: 1;
+    }
+
 </style>

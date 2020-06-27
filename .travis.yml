@@ -37,7 +37,7 @@ deploy:
     api_key: $GITHUB_TOKEN
     file:
       - application/target/igor-$TRAVIS_TAG.jar
-    name: $TRAVIS_TAG
+    name: "Version $TRAVIS_TAG"
     on:
       branch: master
       tags: true

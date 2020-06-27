@@ -13,6 +13,18 @@ The latest, stable version of igor is available as docker image under the :lates
 $> docker run --name igor -p8080:8080 arassec/igor
 ```
 
+## Spring-Boot Executable Jar
+Igor uses Spring-Boot and during the build process an executable JAR ist created. 
+You can simply download it and run it from the console.
+**Java 11** is required in order to start igor.
+``` shell script
+# download the executable jar from GitHub
+$> curl https://github.com/arassec/igor/archive/igor-0.1.0.jar
+
+# Start the jar with java
+$> java -jar igor-0.1.0.jar 
+```
+
 ## From Source
 In order to build igor from source Java 11 needs to be installed.
 The application is compiled as Spring-Boot fat jar, containing all its dependencies.

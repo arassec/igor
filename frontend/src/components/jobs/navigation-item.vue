@@ -60,15 +60,6 @@
         position: relative;
     }
 
-    .move-icon {
-        opacity: 50%;
-    }
-
-    .move-icon:hover {
-        cursor: move;
-        opacity: 100%;
-    }
-
     .unselected {
         background-color: var(--color-background);
     }

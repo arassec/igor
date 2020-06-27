@@ -55,7 +55,6 @@ package-lock.json
 ### igor specific ###
 
 dbdata/
-appdata/
 frontend/package-lock.json
 web/src/main/resources/static
 application.properties

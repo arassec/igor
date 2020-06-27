@@ -43,5 +43,4 @@ public abstract class BaseConnector extends BaseIgorComponent implements Connect
         this.name = name;
     }
 
-
 }
