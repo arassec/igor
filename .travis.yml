@@ -34,7 +34,7 @@ deploy:
   - provider: releases
     api_key: $GITHUB_TOKEN
     file:
-      - application/target/igor-$TRAVIS_TAG.jar
+      - /home/travis/build/arassec/igor/application/target/igor-$TRAVIS_TAG.jar
     skip_cleanup: true
     name: $TRAVIS_TAG
     on:
