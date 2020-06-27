@@ -28,7 +28,7 @@ script:
 deploy:
   - provider: script
     skip_cleanup: true
-    script: ./mvnw clean deploy --settings .mvn/settings.xml -Prelease -Drevision=$TRAVIS_TAG -DskipTests=true
+    script: ./mvnw clean deploy --settings .mvn/settings.xml -Prelease -Drevision=$TRAVIS_TAG
     on:
       branch: master
       tags: true
@@ -36,7 +36,7 @@ deploy:
     skip_cleanup: true
     api_key: $GITHUB_TOKEN
     file:
-      - /home/travis/build/arassec/igor/application/target/igor-$TRAVIS_TAG.jar
+      - application/target/igor-$TRAVIS_TAG.jar
     name: $TRAVIS_TAG
     on:
       branch: master
