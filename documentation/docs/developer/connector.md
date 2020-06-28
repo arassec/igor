@@ -78,6 +78,8 @@ This connector will be available in igor under the Category- and Type-ID we set 
 
 ![custom connector](./images/custom-connector.png)
 
+## Usage
+
 In order to use the new connector we set it as parameter in a new action:
 
 ``` java
@@ -121,7 +123,8 @@ This action will be available in igor under the Category- and Type-ID we set in 
 
 ![search action](./images/search-action.png)
 
-A new connector instance can be configured as parameter for the action.
+The new connector instance can be configured as parameter for the action.
+
 The processed data item of our action then looks like this:
 
 ![search action sim result](./images/search-action-sim-result.png)

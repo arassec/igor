@@ -10,6 +10,12 @@ String getTypeId();
 ```
 Both properties are strings and can be freely assigned. 
 The category and type of a component are selected in the user interface with dropdown-boxes.
+
+::: warning
+You must not assign the same category ID to different component types. 
+I.e. don't use 'my-custom-category' on both, a provider and an action component!  
+:::
+
 If you want to add your custom component to an existing category, you should set the corresponding category ID or better yet, inherit from the appropriate base class.
 
 |Component Type|Category|Category-ID|Base Class to Extend|
@@ -44,7 +50,7 @@ Igor provides the following annotations that must be used in components.
 
 |Annotation|Type|Description|
 |---|---|---|
-|@IgorComponent|Class Annotation|Marks a class as component that will automatically be used by igor.|
+|@IgorComponent|Class Annotation|Marks a class as component that will be used by igor.|
 |@IgorParam|Property Annotation|Marks a property of a class as parameter, that should be configurable by the user.|
 |@IgorSimulationSafe|Method Annotation|Marks a method of a Connector as safe for simulated job executions.
 
@@ -82,7 +88,10 @@ In order to control the appearance, the annotation has the following parameters 
 |defaultValue|""|An optional default value that will be used in the UI.
 |subtype|NONE|Can be used to further specify the type of the parameter. The parameter editor will adopt the input accordingly. Possible values are 'MULTI_LINE' for parameters that can contain multiple lines of input and 'CRON', if the parameter represents a cron expression.
 
-Igor supports [bean validation](https://beanvalidation.org/) which should be used to validate the input made by the user.
+::: tip
+Igor supports [bean validation](https://beanvalidation.org/). 
+You should use it to validate the input made by the user.
+:::
 
 An example use of this annotation might look like this:
 ``` java
@@ -92,7 +101,7 @@ private int port;
 ```
 
 ### @IgorSimulationSafe
-This annotation marks connector's method as safe for execution during simulated job runs.
+This annotation marks connector methods as safe for execution during simulated job runs.
 
 Only methods marked with `@IgorSimulationSafe` will be executed during simulated job runs. 
 For all other methods of a connector, a proxy will be generated which uses default values.

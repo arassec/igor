@@ -4,7 +4,7 @@ Igor is a Spring-Boot application.
 Thus, it can be configured like any other Spring-Boot application, be it with JVM parameters, an application.properties file in the root directory or any other method supported by Spring.
 
 ## Database Configuration
-For its own database, igor supports H2 and PostgreSQL databases. 
+For its own database, igor supports **H2** and **PostgreSQL** databases. 
 Igor uses an embedded H2 database as default. It will be stored in a `dbdata` directory in the root folder. 
 For production use, PostgreSQL is strongly advised. 
 You can configure the Database to use by configuring it with standard Spring mechanisms.

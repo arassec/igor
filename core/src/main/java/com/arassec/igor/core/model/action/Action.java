@@ -17,7 +17,7 @@ public interface Action extends IgorComponent {
      * @param data         The data the action will work with.
      * @param jobExecution The job's execution log.
      *
-     * @return {@code true}, if the data should further be processed, {@code false} otherwise.
+     * @return A list of data items that should further be processed, or {@code null}, if there is no further data to process.
      */
     List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution);
 

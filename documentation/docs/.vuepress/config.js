@@ -1,5 +1,5 @@
 module.exports = {
-    title: "Igor Reference Documentation",
+    title: "Igor Reference Documentation (v" + process.env.REVISION + ")",
     themeConfig: {
         searchMaxSuggestions: 25,
         nav: [
@@ -108,9 +108,25 @@ module.exports = {
                         "connector"
                     ]
                 }
+            ],
+            "/examples/": [
+                {
+                    title: "Overview",
+                    children: [
+                        ""
+                    ]
+                },
+                {
+                    title: "File Handling",
+                    children: [
+                        "copyfiles",
+                    ]
+                }
             ]
-        }
+        },
+        igorVersion: process.env.REVISION,
+        igorJavaVersion: "Java 11"
     },
     dest: "./target/doc/",
-    base: "/igor/"
+    base: "/igor/",
 };

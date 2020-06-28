@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: /logo.png
-heroText: Reference Documentation (v0.1.0)
+heroText: Reference Documentation
 tagline: 
 actionText: User Guide →
 actionLink: /user/

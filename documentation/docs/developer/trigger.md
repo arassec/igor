@@ -10,7 +10,7 @@ At the moment, there are only two kinds of triggers available in igor:
 - Triggers for manual execution
 - Triggers that schedule a job based on a CRON expression
 
-::: tip
+::: tip Note
 Until igor supports other types of triggers, e.g. event based triggers, there is not much you can do in a custom trigger.
 So this documentation is for future expansion and completeness purposes at the moment!
 :::
