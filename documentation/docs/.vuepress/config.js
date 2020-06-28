@@ -66,6 +66,7 @@ module.exports = {
                                 "module-misc/filter-by-regexp-action",
                                 "module-misc/filter-by-timestamp-action",
                                 "module-misc/pause-action",
+                                "module-misc/skip-action",
                                 "module-misc/sort-by-timestamp-pattern-action",
                                 "module-file/copy-file-action",
                                 "module-file/delete-file-action",

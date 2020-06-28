@@ -149,8 +149,8 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     }
 
     /**
-     * Enqueues the provided job to the exeuction list if no previously enqueued execution of the same job currently exists. The
-     * job will be run as soon as an execution slot is availalbe
+     * Enqueues the provided job to the execution list if no previously enqueued execution of the same job currently exists. The
+     * job will be run as soon as an execution slot is available
      * <p>
      * This method should be called if the job should run immediately and only once. If the job should run regularly according to
      * its trigger configuration, {@link JobManager#schedule(Job)} should be used.

@@ -41,7 +41,7 @@ public class PauseAction extends BaseUtilAction {
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
      *
-     * @return Always {@code true}.
+     * @return The supplied data item.
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {

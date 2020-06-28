@@ -43,7 +43,7 @@ The tile contains the following buttons to modify the job:
 
 ![duplicate job](./images/duplicate-button.png) Opens the job editor with a duplicated job configuration.
 
-![run job](./images/run-button-dark.png) Opens the job editor with a duplicated job configuration.
+![run job](./images/run-button-dark.png) Runs the job.
 
 Information about the last job execution is displayed at the bottom of the job tile.
 You can open detailed information by clicking on it. 

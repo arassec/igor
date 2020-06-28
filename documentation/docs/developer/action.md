@@ -66,6 +66,6 @@ This action will be available in igor under the Category- and Type-ID we set in 
 
 ![custom action](./images/custom-action.png)
 
-The processed data item of our action looks like this, if the checkbos is selected by the user:
+The processed data item of our action looks like this, if the checkbox is selected by the user:
 
 ![custom action sim result](./images/custom-action-sim-result.png)

@@ -68,7 +68,6 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
         super("sort-by-timestamp-pattern-action");
         // Sorting is always done single threaded:
         setNumThreads(1);
-        // This action requires to be run in a single thread!
         getUnEditableProperties().add("numThreads");
     }
 
@@ -78,7 +77,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
      *
-     * @return Always {@code null}.
+     * @return Always an empty list.
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
