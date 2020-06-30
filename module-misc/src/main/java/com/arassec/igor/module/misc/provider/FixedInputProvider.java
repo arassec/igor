@@ -4,6 +4,8 @@ import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -85,7 +87,16 @@ public class FixedInputProvider extends BaseUtilProvider {
     @Override
     public Map<String, Object> next() {
         Map<String, Object> item = new HashMap<>();
-        item.put(INPUT_KEY, inputParts.get(index));
+
+        String inputString = inputParts.get(index);
+
+        try {
+            item.put(INPUT_KEY, new ObjectMapper().readValue(inputString, Object.class));
+        } catch (JsonProcessingException e) {
+            // no problem, probably no JSON input...
+            item.put(INPUT_KEY, inputString);
+        }
+
         index++;
         return item;
     }

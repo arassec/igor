@@ -27,7 +27,6 @@ As example, let's assume the action operates on the following data item:
   },
   "meta": {
     "jobId": "1e91a654-ba8c-4c3a-afd0-932bd27d2888",
-    "taskId": "b5350687-fbbe-446d-9776-68c6fbbcf982",
     "timestamp": 1587203554775
   }
 }

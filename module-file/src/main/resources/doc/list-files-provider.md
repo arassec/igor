@@ -13,7 +13,6 @@ A data item created by this provider could look like this:
   },
   "meta": {
     "jobId": "1e91a654-ba8c-4c3a-afd0-932bd27d2888",
-    "taskId": "b5350687-fbbe-446d-9776-68c6fbbcf982",
     "timestamp": 1587203554775
   }
 }
