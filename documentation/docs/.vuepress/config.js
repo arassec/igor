@@ -65,6 +65,7 @@ module.exports = {
                                 "module-misc/persist-value-action",
                                 "module-misc/filter-by-regexp-action",
                                 "module-misc/filter-by-timestamp-action",
+                                "module-misc/limit-action",
                                 "module-misc/pause-action",
                                 "module-misc/skip-action",
                                 "module-misc/sort-by-timestamp-pattern-action",
@@ -120,7 +121,7 @@ module.exports = {
                 {
                     title: "File Handling",
                     children: [
-                        "copyfiles",
+                        "copyfiles"
                     ]
                 }
             ]
@@ -129,5 +130,5 @@ module.exports = {
         igorJavaVersion: "Java 11"
     },
     dest: "./target/doc/",
-    base: "/igor/",
+    base: "/igor/"
 };

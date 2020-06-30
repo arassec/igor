@@ -19,7 +19,7 @@ class SkipActionTest extends MiscActionBaseTest {
      */
     @Test
     @DisplayName("Tests skipping data items.")
-    void testProcessDuringSimulation() {
+    void testProcess() {
         SkipAction skipAction = new SkipAction();
         skipAction.setNumber(2);
 
