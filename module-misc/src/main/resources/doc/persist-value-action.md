@@ -1,4 +1,4 @@
-# 'Persist value' Action
+# 'Persist Value' Action
 
 ## Description
 This action persists values in igor's datastore.

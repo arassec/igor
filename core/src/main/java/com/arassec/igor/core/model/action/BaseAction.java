@@ -3,7 +3,6 @@ package com.arassec.igor.core.model.action;
 import com.arassec.igor.core.model.BaseIgorComponent;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.annotation.IgorParam;
-import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
@@ -34,11 +33,6 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      * Query for the simulation property that indicates a simulated job run.
      */
     private static final String SIMULATION_QUERY = "$." + DataKey.DATA.getKey() + "." + DataKey.SIMULATION.getKey();
-
-    /**
-     * Dummy work-in-progress monitor that can be used, if progress shouldn't be monitored.
-     */
-    protected static final WorkInProgressMonitor VOID_WIP_MONITOR = new WorkInProgressMonitor();
 
     /**
      * Activates or deactivates an action.
@@ -189,7 +183,7 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      * @param data  The data to execute the query on.
      * @param query The JSON-Path query.
      *
-     * @return The querie's result or the query itself, if it isn't a JSON-Path query.
+     * @return The query's result or the query itself, if it isn't a JSON-Path query.
      */
     protected String getString(Map<String, Object> data, String query) {
         if (data == null || query == null) {

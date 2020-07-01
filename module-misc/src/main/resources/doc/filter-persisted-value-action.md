@@ -1,4 +1,4 @@
-# 'Filter persisted value' Action
+# 'Filter Persisted Value' Action
 
 ## Description
 This action filters data items based on values from igor's datastore.

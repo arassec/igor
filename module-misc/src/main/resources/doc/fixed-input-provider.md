@@ -1,4 +1,4 @@
-# 'Fixed input' Provider
+# 'Fixed Input' Provider
 
 ## Description
 This provider creates data items that can be configured by the user.

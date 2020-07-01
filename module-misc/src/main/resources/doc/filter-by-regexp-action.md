@@ -1,4 +1,4 @@
-# 'Filter by regular expression' Action
+# 'Filter by Regular Expression' Action
 
 ## Description
 This action filters data items by evaluating a regular expression agains a property value of the data item.

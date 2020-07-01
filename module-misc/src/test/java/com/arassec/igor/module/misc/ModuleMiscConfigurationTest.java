@@ -22,7 +22,7 @@ class ModuleMiscConfigurationTest {
     void testI18n() {
         ModuleMiscConfiguration configuration = new ModuleMiscConfiguration();
         MessageSource messageSource = configuration.miscMessageSource();
-        assertEquals("Sort by timestamp pattern", messageSource.getMessage("sort-by-timestamp-pattern-action", null,
+        assertEquals("Sort by Timestamp Pattern", messageSource.getMessage("sort-by-timestamp-pattern-action", null,
                 Locale.getDefault()));
     }
 

@@ -1,4 +1,4 @@
-# 'Filter by timestamp' Action
+# 'Filter by Timestamp' Action
 
 ## Description
 This action filters data items by comparing a timestamp from the input against a configured time span.

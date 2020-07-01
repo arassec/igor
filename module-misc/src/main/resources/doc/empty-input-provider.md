@@ -1,4 +1,4 @@
-# 'Empty input' Provider
+# 'Empty Input' Provider
 
 ## Description
 This provider creates data items that only contain igor's meta data.

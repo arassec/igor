@@ -1,4 +1,4 @@
-# 'Sort by timestamp pattern' Action
+# 'Sort by Timestamp Pattern' Action
 
 ## Description
 This action sorts data items based on a timestamp inside a value of the input data.

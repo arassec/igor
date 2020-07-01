@@ -69,6 +69,7 @@ module.exports = {
                                 "module-misc/pause-action",
                                 "module-misc/skip-action",
                                 "module-misc/sort-by-timestamp-pattern-action",
+                                "module-misc/split-array-action",
                                 "module-file/copy-file-action",
                                 "module-file/delete-file-action",
                                 "module-file/move-file-action",
