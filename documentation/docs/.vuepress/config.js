@@ -74,6 +74,7 @@ module.exports = {
                                 "module-misc/split-array-action",
                                 "module-file/copy-file-action",
                                 "module-file/delete-file-action",
+                                "module-file/list-files-action",
                                 "module-file/move-file-action",
                                 "module-file/read-file-action",
                                 "module-message/send-message-action"

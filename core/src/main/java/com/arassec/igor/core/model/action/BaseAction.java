@@ -212,4 +212,15 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
         return null;
     }
 
+    /**
+     * Creates a deep copy of the supplied map.
+     *
+     * @param data The map to clone.
+     *
+     * @return A new Map instance with copied content.
+     */
+    protected Map<String, Object> clone(Map<String, Object> data) {
+        return JsonPath.parse(JsonPath.parse(data).jsonString()).json();
+    }
+
 }
