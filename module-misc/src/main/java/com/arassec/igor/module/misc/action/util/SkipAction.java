@@ -59,4 +59,12 @@ public class SkipAction extends BaseUtilAction {
         return List.of(data);
     }
 
+    /**
+     * Resets the action so that the configured amount of data items is skiped again.
+     */
+    @Override
+    public void reset() {
+        processed = 0;
+    }
+
 }

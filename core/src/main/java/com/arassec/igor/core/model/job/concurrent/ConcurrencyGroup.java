@@ -103,6 +103,14 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     }
 
     /**
+     * Calls {@link Action#reset()} on all actions of this concurrency group.
+     */
+    public void reset() {
+        waitForEmptyInputQueue();
+        runnables.forEach(ActionsExecutingRunnable::reset);
+    }
+
+    /**
      * Shuts the thread pool down after all incoming data has been processed. Threads might still run after calling this method if
      * e.g. a large file is copied in an action.
      * <p>
@@ -126,7 +134,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         log.debug("Total/Active/Completed Threads in '{}': {}/{}/{}", concurrencyGroupId, threadPoolExecutor.getPoolSize(),
                 threadPoolExecutor.getActiveCount(), threadPoolExecutor.getCompletedTaskCount());
         try {
-            if (jobExecution != null && !jobExecution.isRunning()) {
+            if (jobExecution != null && !jobExecution.isRunningOrActive()) {
                 threadPoolExecutor.shutdownNow();
                 return true;
             }
@@ -161,7 +169,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
-        if (jobExecution != null && jobExecution.isRunning()) {
+        if (jobExecution != null && jobExecution.isRunningOrActive()) {
             jobExecution.fail(throwable);
             log.error("Exception caught in ConcurrencyGroup!", throwable);
         }
@@ -172,7 +180,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      */
     private void waitForEmptyInputQueue() {
         while (!inputQueue.isEmpty()) {
-            if (jobExecution != null && !jobExecution.isRunning()) {
+            if (jobExecution != null && !jobExecution.isRunningOrActive()) {
                 log.debug("Job cancelled. Not waiting for empty input queue in concurrency group: {}", concurrencyGroupId);
                 break;
             }

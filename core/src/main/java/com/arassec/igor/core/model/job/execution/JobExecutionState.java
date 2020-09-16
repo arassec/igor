@@ -6,6 +6,11 @@ package com.arassec.igor.core.model.job.execution;
 public enum JobExecutionState {
 
     /**
+     * The job is triggered by events and actively waiting for them.
+     */
+    ACTIVE,
+
+    /**
      * The job waits for its execution.
      */
     WAITING,

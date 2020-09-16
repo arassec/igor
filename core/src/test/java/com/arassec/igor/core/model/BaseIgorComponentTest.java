@@ -1,8 +1,10 @@
 package com.arassec.igor.core.model;
 
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
@@ -26,6 +28,23 @@ class BaseIgorComponentTest {
     void testIdHandling() {
         baseIgorComponent.setId("test-id");
         assertEquals("test-id", baseIgorComponent.getId());
+    }
+
+    /**
+     * Tests initialization.
+     */
+    @Test
+    @DisplayName("Tests initialization.")
+    void testInitialize() {
+        assertDoesNotThrow(() -> baseIgorComponent.initialize("job-id", new JobExecution()));
+    }
+    /**
+     * Tests shutdown.
+     */
+    @Test
+    @DisplayName("Tests shutdown.")
+    void testShutdown() {
+        assertDoesNotThrow(() -> baseIgorComponent.shutdown("job-id", new JobExecution()));
     }
 
 }

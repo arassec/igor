@@ -103,6 +103,13 @@ public class ActionsExecutingRunnable implements Runnable {
     }
 
     /**
+     * Resets all actions.
+     */
+    public void reset() {
+        actions.forEach(Action::reset);
+    }
+
+    /**
      * Shuts this thread down by preventing it to read more data from the input queue.
      */
     public void shutdown() {

@@ -123,4 +123,12 @@ public class ListFilesProvider extends BaseFileProvider {
         return item;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        currentFile = 0;
+    }
+
 }

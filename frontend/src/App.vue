@@ -3,9 +3,9 @@
 </template>
 
 <script>
-    import AppNavigation from "./components/app-navigation";
+import AppNavigation from "./components/app-navigation";
 
-    export default {
+export default {
         name: 'app',
         components: {
             AppNavigation
@@ -173,11 +173,12 @@
     }
 
     div.td:first-child {
-        width: 10em;
+        min-width: 10em;
     }
 
     div.td:last-child:not(.align-left) {
         text-align: right;
+        width: 100%;
     }
 
     .tooltip {

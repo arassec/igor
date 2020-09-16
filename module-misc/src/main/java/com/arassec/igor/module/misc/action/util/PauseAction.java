@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +24,8 @@ public class PauseAction extends BaseUtilAction {
     /**
      * Amount of milliseconds the action should pause data processing.
      */
-    @PositiveOrZero
-    @IgorParam
+    @Positive
+    @IgorParam(defaultValue = "1000")
     private long milliseconds;
 
     /**

@@ -1,6 +1,7 @@
 <template>
     <button :class="disabled ? 'disabled' : ''" v-on:click.stop="fire()">
-        <font-awesome-icon :icon="icon" class="fa-fw"/><label v-if="label"> {{label}}</label>
+        <font-awesome-icon :icon="icon" class="fa-fw"/>
+        <label v-if="label"> {{label}}</label>
     </button>
 </template>
 
@@ -31,7 +32,7 @@
         border: 0;
     }
 
-    button:hover:not(.disabled)  {
+    button:hover:not(.disabled) {
         background-color: var(--color-font);
         color: var(--color-background);
         cursor: pointer;

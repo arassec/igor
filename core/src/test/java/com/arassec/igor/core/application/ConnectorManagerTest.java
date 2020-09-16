@@ -93,11 +93,11 @@ class ConnectorManagerTest {
     }
 
     /**
-     * Tests loading connectors of a specified category.
+     * Tests loading connectors of a specified type.
      */
     @Test
-    @DisplayName("Tests loading connectors of a category.")
-    void testLoadAllOfCategory() {
+    @DisplayName("Tests loading connectors of a type.")
+    void testLoadAllOfType() {
         Connector first = mock(Connector.class);
         when(first.getTypeId()).thenReturn("a");
         Connector second = mock(Connector.class);
@@ -113,6 +113,25 @@ class ConnectorManagerTest {
 
         assertEquals("y", modelPage.getItems().get(0).getName());
         assertEquals("z", modelPage.getItems().get(1).getName());
+    }
+
+    /**
+     * Tests loading connectors of a type without specifying the type.
+     */
+    @Test
+    @DisplayName("Tests loading connectors of a type without specifying the type.")
+    void testLoadAllOfTypeInputValidation() {
+        ModelPage<Connector> modelPage = connectorManager.loadAllOfType(null, 1, 2);
+        assertEquals(0, modelPage.getNumber());
+        assertEquals(0, modelPage.getSize());
+        assertEquals(0, modelPage.getItems().size());
+        assertEquals(0, modelPage.getTotalPages());
+
+        modelPage = connectorManager.loadAllOfType(Set.of(), 3, 4);
+        assertEquals(0, modelPage.getNumber());
+        assertEquals(0, modelPage.getSize());
+        assertEquals(0, modelPage.getItems().size());
+        assertEquals(0, modelPage.getTotalPages());
     }
 
     /**

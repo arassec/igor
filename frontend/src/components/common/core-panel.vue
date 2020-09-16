@@ -54,8 +54,6 @@ export default {
     background-color: var(--color-foreground);
     color: var(--color-font);
     border: none;
-    max-width: 300px;
-    min-width: 300px;
   }
 
   .panel >>> input {

@@ -6,7 +6,7 @@ pageClass: docpage
 
 ## Introduction
 Providers create the data items the actions work with.
-There are two methods that must be implemented in custom providers:
+There are three methods that must be implemented in custom providers:
 
 ``` java
 /**
@@ -22,6 +22,11 @@ boolean hasNext();
  * @return A JSON-Object that contains the data to process.
  */
 Map<String, Object> next();
+
+/**
+ * Resets the provider in order to start again with data processing.
+ */
+void reset();
 ```
 
 ## Example Code
@@ -74,11 +79,21 @@ public class CustomProvider extends BaseProvider {
         return item;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        counter = 0;
+    }
+
 }
 ```
 
 The JSON object returned by the `next()` method will be added to the data item under the `data` attribute.
 The data item's meta data is added automatically by igor.
+
+If the job is configured to use an event-based trigger, the provider will be `reset` after each event that is processed by the job.
 
 This provider will be available in igor under the Category- and Type-ID we set in the constructor.
 

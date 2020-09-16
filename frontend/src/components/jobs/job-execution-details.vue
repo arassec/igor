@@ -30,9 +30,13 @@
                     <div class="td">Finished:</div>
                     <div class="td align-left">{{formatDate(jobExecution.finished)}}</div>
                 </div>
-                <div class="tr" v-if="jobExecution.started != null">
+                <div class="tr" v-if="jobExecution.started != null && jobExecution.executionState !== 'ACTIVE'">
                     <div class="td">Duration:</div>
                     <div class="td align-left">{{calculateDuration(jobExecution.started, jobExecution.finished)}}</div>
+                </div>
+                <div class="tr" v-if="jobExecution.processedEvents > 0">
+                    <div class="td">Processed Events:</div>
+                    <div class="td align-left">{{jobExecution.processedEvents}}</div>
                 </div>
             </div>
 
@@ -57,12 +61,12 @@
 </template>
 
 <script>
-    import ModalDialog from '../common/modal-dialog'
-    import LayoutRow from '../common/layout-row'
-    import InputButton from '../common/input-button'
-    import FeedbackBox from '../common/feedback-box'
+import ModalDialog from '../common/modal-dialog'
+import LayoutRow from '../common/layout-row'
+import InputButton from '../common/input-button'
+import FeedbackBox from '../common/feedback-box'
 
-    export default {
+export default {
     name: 'job-execution-details',
     props: ['jobExecution'],
     components: {FeedbackBox, InputButton, LayoutRow, ModalDialog},

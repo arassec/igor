@@ -20,6 +20,7 @@ import com.arassec.igor.web.model.ScheduleEntry;
 import com.arassec.igor.web.model.simulation.SimulationResult;
 import com.arassec.igor.web.simulation.ActionProxy;
 import com.arassec.igor.web.simulation.ProviderProxy;
+import com.arassec.igor.web.simulation.TriggerProxy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -226,7 +227,7 @@ public class JobRestController extends BaseRestController {
 
         JobExecution jobExecution = new JobExecution();
 
-        simulationJob.run(jobExecution);
+        simulationJob.start(jobExecution);
 
         SimulationResult jobResult = new SimulationResult();
 
@@ -234,14 +235,17 @@ public class JobRestController extends BaseRestController {
             jobResult.setErrorCause(jobExecution.getErrorCause());
         }
 
+        TriggerProxy triggerProxy = (TriggerProxy) simulationJob.getTrigger();
         ProviderProxy providerProxy = (ProviderProxy) simulationJob.getProvider();
+
+        final Map<String, Object> triggerData = triggerProxy != null ? triggerProxy.getData() : Map.of();
 
         if (providerProxy != null) {
             providerProxy.getCollectedData()
                     .forEach(jsonObject -> {
                         Map<String, Object> item = new HashMap<>();
-                        item.put(DataKey.DATA.getKey(), jsonObject);
-                        item.put(DataKey.META.getKey(), Job.createMetaData(simulationJob.getId()));
+                        item.put(DataKey.META.getKey(), Job.createMetaData(simulationJob.getId(), triggerProxy));
+                        item.put(DataKey.DATA.getKey(), Job.createData(triggerData, jsonObject));
                         jobResult.getResults().add(item);
                     });
 
@@ -424,7 +428,8 @@ public class JobRestController extends BaseRestController {
     private JobExecutionOverview createJobExecutionOverview() {
         JobExecutionOverview jobExecutionOverview = new JobExecutionOverview();
         jobExecutionOverview.setNumSlots(jobManager.getNumSlots());
-        jobExecutionOverview.setNumRunning(jobManager.countJobExecutions(JobExecutionState.RUNNING));
+        jobExecutionOverview.setNumRunning(jobManager.countJobExecutions(JobExecutionState.RUNNING)
+            + jobManager.countJobExecutions(JobExecutionState.ACTIVE));
         jobExecutionOverview.setNumWaiting(jobManager.countJobExecutions(JobExecutionState.WAITING));
         jobExecutionOverview.setNumFailed(jobManager.countJobExecutions(JobExecutionState.FAILED));
         return jobExecutionOverview;

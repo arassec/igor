@@ -24,7 +24,7 @@ abstract class FileActionBaseTest {
         item.put(ListFilesProvider.LAST_MODIFIED_KEY, "123");
 
         Map<String, Object> result = new HashMap<>();
-        result.put(DataKey.META.getKey(), Job.createMetaData("1"));
+        result.put(DataKey.META.getKey(), Job.createMetaData("1", null));
         result.put(DataKey.DATA.getKey(), item);
 
         return result;

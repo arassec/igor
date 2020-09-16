@@ -108,12 +108,14 @@ class JobManagerTest {
         verify(jobExecutionRepository, times(0)).upsert(any(JobExecution.class));
         verify(jobRepository, times(1)).findAll();
 
-        JobExecution firstJobExecution = new JobExecution();
-        JobExecution secondJobExecution = new JobExecution();
+        JobExecution runningJobExecution = new JobExecution();
+        JobExecution activeJobExecution = new JobExecution();
 
-        ModelPage<JobExecution> modelPage = new ModelPage<>(0, Integer.MAX_VALUE, 1, List.of(firstJobExecution, secondJobExecution));
+        ModelPage<JobExecution> runningModelPage = new ModelPage<>(0, Integer.MAX_VALUE, 1, List.of(runningJobExecution));
+        ModelPage<JobExecution> activeModelPage = new ModelPage<>(0, Integer.MAX_VALUE, 1, List.of(activeJobExecution));
 
-        when(jobExecutionRepository.findInState(eq(JobExecutionState.RUNNING), eq(0), eq(Integer.MAX_VALUE))).thenReturn(modelPage);
+        when(jobExecutionRepository.findInState(eq(JobExecutionState.RUNNING), eq(0), eq(Integer.MAX_VALUE))).thenReturn(runningModelPage);
+        when(jobExecutionRepository.findInState(eq(JobExecutionState.ACTIVE), eq(0), eq(Integer.MAX_VALUE))).thenReturn(activeModelPage);
 
         jobManager.onApplicationEvent(mock(ContextRefreshedEvent.class));
 
@@ -124,9 +126,9 @@ class JobManagerTest {
         assertEquals(JobExecutionState.FAILED, argCap.getAllValues().get(0).getExecutionState());
         assertNotNull(argCap.getAllValues().get(0).getFinished());
         assertEquals("Job interrupted due to application restart!", argCap.getAllValues().get(0).getErrorCause());
-        assertEquals(JobExecutionState.FAILED, argCap.getAllValues().get(1).getExecutionState());
+        assertEquals(JobExecutionState.FINISHED, argCap.getAllValues().get(1).getExecutionState());
         assertNotNull(argCap.getAllValues().get(1).getFinished());
-        assertEquals("Job interrupted due to application restart!", argCap.getAllValues().get(1).getErrorCause());
+        assertNull(argCap.getAllValues().get(1).getErrorCause());
     }
 
     /**

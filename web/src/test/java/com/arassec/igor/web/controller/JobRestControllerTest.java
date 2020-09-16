@@ -261,7 +261,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
             JobExecution jobExecution = invocationOnMock.getArgument(0);
             jobExecution.setErrorCause("job-error-cause");
             return null;
-        }).when(jobSpy).run(any(JobExecution.class));
+        }).when(jobSpy).start(any(JobExecution.class));
 
         mockMvc.perform(post("/api/job/simulate")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

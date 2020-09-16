@@ -1,11 +1,14 @@
 package com.arassec.igor.web.simulation;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.StacktraceFormatter;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,7 +23,7 @@ public abstract class BaseProxy<T extends IgorComponent> implements IgorComponen
     /**
      * The original {@link IgorComponent}.
      */
-    private T delegate;
+    protected T delegate;
 
     /**
      * Might contain an error cause if the proxied provider failed abnormally.
@@ -34,6 +37,18 @@ public abstract class BaseProxy<T extends IgorComponent> implements IgorComponen
      */
     BaseProxy(T delegate) {
         this.delegate = delegate;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initialize(String jobId, JobExecution jobExecution) {
+        try {
+            delegate.initialize(jobId, jobExecution);
+        } catch (Exception e) {
+            setErrorCause(StacktraceFormatter.format(e));
+        }
     }
 
     /**
@@ -86,6 +101,20 @@ public abstract class BaseProxy<T extends IgorComponent> implements IgorComponen
     @Override
     public void setId(String id) {
         delegate.setId(id);
+    }
+
+    /**
+     * Marks data items as "in simulation mode".
+     *
+     * @return Meta-data for the data items.
+     */
+    protected Map<String, Object> createMetaData(Map<String, Object> delegateMetaData) {
+        Map<String, Object> metaData = new HashMap<>();
+        metaData.put(DataKey.SIMULATION.getKey(), true);
+        if (delegateMetaData != null) {
+            delegateMetaData.forEach(metaData::put);
+        }
+        return metaData;
     }
 
 }

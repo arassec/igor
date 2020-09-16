@@ -1,7 +1,6 @@
 <template>
-    <core-content class="sticky ">
+    <core-content>
         <div class="test-result-container">
-
             <layout-row>
                 <div slot="left">
                     <h1>Simulation results</h1>
@@ -26,11 +25,11 @@
 </template>
 
 <script>
-    import LayoutRow from '../common/layout-row'
-    import InputButton from '../common/input-button'
-    import CoreContent from '../common/core-content'
+import LayoutRow from '../common/layout-row'
+import InputButton from '../common/input-button'
+import CoreContent from '../common/core-content'
 
-    export default {
+export default {
     name: 'test-result-container',
     components: {CoreContent, InputButton, LayoutRow},
     props: ['selectedTestResults'],
@@ -46,7 +45,7 @@
 
     .content {
         z-index: 2;
-        flex: 2;
+        flex-grow: 2;
         margin-right: 0;
         overflow: hidden;
     }

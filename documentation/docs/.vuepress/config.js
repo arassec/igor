@@ -45,7 +45,8 @@ module.exports = {
                             sidebarDepth: 0,
                             children: [
                                 "module-misc/cron-trigger",
-                                "module-misc/manual-trigger"
+                                "module-misc/manual-trigger",
+                                "module-web/web-hook-trigger"
                             ]
                         },
                         {
@@ -66,6 +67,7 @@ module.exports = {
                                 "module-misc/filter-by-regexp-action",
                                 "module-misc/filter-by-timestamp-action",
                                 "module-misc/limit-action",
+                                "module-misc/log-action",
                                 "module-misc/pause-action",
                                 "module-misc/skip-action",
                                 "module-misc/sort-by-timestamp-pattern-action",

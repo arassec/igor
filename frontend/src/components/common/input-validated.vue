@@ -1,5 +1,5 @@
 <template>
-    <div class="tooltip" :class="hasButton ? 'auto-width' : ''">
+    <div class="tooltip">
         <span v-if="hasValidationErrors()" class="tooltiptext">{{validationError}}</span>
         <input :type="type" autocomplete="off" :disabled="disabled" :value="text"
                @input="updateSelf($event.target.value)"
@@ -10,7 +10,7 @@
 <script>
     export default {
         name: "input-validated",
-        props: ['text', 'type', 'disabled', 'propertyId', 'parentId', 'validationErrors', 'hasButton'],
+        props: ['text', 'type', 'disabled', 'propertyId', 'parentId', 'validationErrors'],
         model: {
             prop: "text",
             event: "input"
@@ -46,10 +46,6 @@
 
     .tooltip .tooltiptext::after {
         border-color: var(--color-font) transparent transparent transparent;
-    }
-
-    .auto-width {
-        width: auto;
     }
 
 </style>

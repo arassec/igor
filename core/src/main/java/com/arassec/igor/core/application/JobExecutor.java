@@ -4,13 +4,17 @@ import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.event.JobEvent;
 import com.arassec.igor.core.util.event.JobEventType;
+import com.arassec.igor.core.util.event.JobTriggerEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -50,14 +54,14 @@ public class JobExecutor {
     private final ThreadPoolExecutor threadPoolExecutor;
 
     /**
-     * Contains the futures of currently running jobs.
+     * Contains the futures of currently running or active jobs.
      */
-    private final List<Future<Job>> runningJobFutures = new LinkedList<>();
+    private final List<Future<Job>> runningOrActiveJobFutures = new LinkedList<>();
 
     /**
-     * Contains the currently running jobs, indexed by their ID.
+     * Contains the currently running or active jobs, indexed by their ID.
      */
-    private final Map<String, Job> runningJobs = new HashMap<>();
+    private final Map<String, Job> runningOrActiveJobs = new HashMap<>();
 
     /**
      * Publisher for events based on job changes.
@@ -89,34 +93,40 @@ public class JobExecutor {
     public void update() {
 
         // First check the state of the running jobs:
-        runningJobFutures.removeIf(this::processFinished);
+        runningOrActiveJobFutures.removeIf(this::processFinished);
 
         // Send updates on running jobs to clients:
-        runningJobs.forEach((key, value) -> applicationEventPublisher.publishEvent(
+        runningOrActiveJobs.forEach((key, value) -> applicationEventPublisher.publishEvent(
                 new JobEvent(JobEventType.STATE_REFRESH, value)));
 
         // Check if we can run another job:
-        int freeSlots = igorCoreProperties.getJobQueueSize() - runningJobs.size();
+        int freeSlots = igorCoreProperties.getJobQueueSize() - runningOrActiveJobs.size();
+
         ModelPage<JobExecution> waitingJobExecutions = jobExecutionRepository
                 .findInState(JobExecutionState.WAITING, 0, Integer.MAX_VALUE);
-        if (waitingJobExecutions != null && waitingJobExecutions.getItems() != null) {
-            for (JobExecution jobExecution : waitingJobExecutions.getItems()) {
-                Job job = jobRepository.findById(jobExecution.getJobId());
-                if (job == null) {
-                    continue;
-                }
-                if (freeSlots > 0 && !runningJobs.containsKey(jobExecution.getJobId())) {
-                    jobExecution.setExecutionState(JobExecutionState.RUNNING);
-                    jobExecution.setStarted(Instant.now());
-                    runningJobs.put(job.getId(), job);
-                    runningJobFutures.add(threadPoolExecutor.submit(new JobRunningCallable(job, jobExecution)));
-                    jobExecutionRepository.upsert(jobExecution);
-                    applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE, job));
-                    freeSlots--;
+
+        for (JobExecution jobExecution : waitingJobExecutions.getItems()) {
+            Job job = jobRepository.findById(jobExecution.getJobId());
+            if (job == null) {
+                continue;
+            }
+            if (freeSlots > 0 && !runningOrActiveJobs.containsKey(jobExecution.getJobId())) {
+
+                if (job.getTrigger() instanceof EventTrigger) {
+                    jobExecution.setExecutionState(JobExecutionState.ACTIVE);
                 } else {
-                    // Send updates on waiting jobs to clients:
-                    applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_REFRESH, job));
+                    jobExecution.setExecutionState(JobExecutionState.RUNNING);
                 }
+
+                jobExecution.setStarted(Instant.now());
+                runningOrActiveJobs.put(job.getId(), job);
+                runningOrActiveJobFutures.add(threadPoolExecutor.submit(new JobRunningCallable(job, jobExecution)));
+                jobExecutionRepository.upsert(jobExecution);
+                applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE, job));
+                freeSlots--;
+            } else {
+                // Send updates on waiting jobs to clients:
+                applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_REFRESH, job));
             }
         }
     }
@@ -130,8 +140,8 @@ public class JobExecutor {
         if (jobId == null) {
             throw new IllegalArgumentException("Cannot cancel a job without a job ID!");
         }
-        if (runningJobs.containsKey(jobId)) {
-            Job job = runningJobs.get(jobId);
+        if (runningOrActiveJobs.containsKey(jobId)) {
+            Job job = runningOrActiveJobs.get(jobId);
             job.cancel();
 
             Object cancelLock = new Object();
@@ -162,6 +172,24 @@ public class JobExecutor {
     }
 
     /**
+     * Listens for job trigger events and starts processing in the job.
+     *
+     * @param jobTriggerEvent The event containing additional data.
+     */
+    @EventListener
+    public void onJobTriggerEvent(JobTriggerEvent jobTriggerEvent) {
+        if (jobTriggerEvent != null && jobTriggerEvent.getJobId() != null && !jobTriggerEvent.getJobId().isEmpty()) {
+            Job triggeredJob = runningOrActiveJobs.values().stream()
+                    .filter(job -> job.getId().equals(jobTriggerEvent.getJobId()))
+                    .findFirst().orElseThrow(() -> new IgorException("No active job with ID "
+                            + jobTriggerEvent.getJobId() + " found!"));
+            if (triggeredJob.getTrigger() instanceof EventTrigger) {
+                ((EventTrigger) triggeredJob.getTrigger()).processEvent(jobTriggerEvent.getEventData());
+            }
+        }
+    }
+
+    /**
      * Returns the job execution of a currently running job.
      *
      * @param jobId The job's ID.
@@ -169,8 +197,8 @@ public class JobExecutor {
      * @return The {@link JobExecution} or {@code null}, if none could be found.
      */
     JobExecution getJobExecution(String jobId) {
-        if (runningJobs.containsKey(jobId)) {
-            return runningJobs.get(jobId).getCurrentJobExecution();
+        if (runningOrActiveJobs.containsKey(jobId)) {
+            return runningOrActiveJobs.get(jobId).getCurrentJobExecution();
         }
         return null;
     }
@@ -192,7 +220,7 @@ public class JobExecutor {
                     jobExecutionRepository.updateAllJobExecutionsOfJob(job.getId(), JobExecutionState.FAILED, JobExecutionState.RESOLVED);
                 }
                 jobExecutionRepository.upsert(jobExecution);
-                runningJobs.remove(job.getId());
+                runningOrActiveJobs.remove(job.getId());
                 applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE, job));
                 return true;
             }

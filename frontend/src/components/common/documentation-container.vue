@@ -1,5 +1,5 @@
 <template>
-    <core-content class="sticky ">
+    <core-content class="max-width">
         <div class="documentation-container">
 
             <input-button slot="right" icon="times" v-on:clicked="$emit('close')" style="float: right;"/>
@@ -10,10 +10,10 @@
 </template>
 
 <script>
-    import CoreContent from "./core-content";
-    import InputButton from "./input-button";
+import CoreContent from "./core-content";
+import InputButton from "./input-button";
 
-    export default {
+export default {
         name: "documentation-container",
         components: {InputButton, CoreContent},
         props: ['documentation'],
@@ -34,7 +34,7 @@
 
     .content {
         z-index: 3;
-        flex: 2;
+        flex-grow: 1;
         margin-right: 0;
         overflow: hidden;
     }

@@ -32,7 +32,7 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     /**
      * Query for the simulation property that indicates a simulated job run.
      */
-    private static final String SIMULATION_QUERY = "$." + DataKey.DATA.getKey() + "." + DataKey.SIMULATION.getKey();
+    private static final String SIMULATION_QUERY = "$." + DataKey.META.getKey() + "." + DataKey.SIMULATION.getKey();
 
     /**
      * Activates or deactivates an action.
@@ -123,6 +123,13 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     @Override
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
     }
 
     /**

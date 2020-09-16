@@ -4,6 +4,7 @@ import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
@@ -87,7 +88,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      */
     @Override
     public void onApplicationEvent(@NonNull ContextRefreshedEvent contextRefreshedEvent) {
-        // If jobs are already 'running' (e.g. after a server restart) the are updated here:
+        // If jobs are already 'running' (e.g. after a server restart) they are updated here:
         ModelPage<JobExecution> jobExecutions = jobExecutionRepository
                 .findInState(JobExecutionState.RUNNING, 0, Integer.MAX_VALUE);
         if (jobExecutions != null && jobExecutions.getItems() != null) {
@@ -98,7 +99,17 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
                 jobExecutionRepository.upsert(jobExecution);
             });
         }
-        jobRepository.findAll().forEach(this::schedule);
+        // Previously active jobs are simply marked as finished and re-activated.
+        jobExecutions = jobExecutionRepository
+                .findInState(JobExecutionState.ACTIVE, 0, Integer.MAX_VALUE);
+        if (jobExecutions != null && jobExecutions.getItems() != null) {
+            jobExecutions.getItems().forEach(jobExecution -> {
+                jobExecution.setExecutionState(JobExecutionState.FINISHED);
+                jobExecution.setFinished(Instant.now());
+                jobExecutionRepository.upsert(jobExecution);
+            });
+        }
+        jobRepository.findAll().forEach(this::activate);
     }
 
     /**
@@ -119,12 +130,11 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     public Job save(Job job) {
         Job savedJob = jobRepository.upsert(job);
         if (savedJob.isActive()) {
-            // The cron trigger might have changed, so the job is unscheduled first and then re-scheduled according
-            // to its trigger.
-            unschedule(savedJob);
-            schedule(savedJob);
+            // The trigger might have changed, so the job is unscheduled first and then re-scheduled according to its trigger.
+            deactivate(savedJob);
+            activate(savedJob);
         } else {
-            unschedule(savedJob);
+            deactivate(savedJob);
         }
         applicationEventPublisher.publishEvent(new JobEvent(JobEventType.SAVE, job));
         return savedJob;
@@ -139,7 +149,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
         jobExecutor.cancel(id);
         Job job = jobRepository.findById(id);
         if (job != null) {
-            unschedule(job);
+            deactivate(job);
             jobRepository.deleteById(id);
             jobExecutionRepository.deleteByJobId(id);
             persistentValueRepository.deleteByJobId(id);
@@ -153,7 +163,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      * job will be run as soon as an execution slot is available
      * <p>
      * This method should be called if the job should run immediately and only once. If the job should run regularly according to
-     * its trigger configuration, {@link JobManager#schedule(Job)} should be used.
+     * its trigger configuration, {@link JobManager#activate(Job)} should be used.
      *
      * @param job The job to run as soon as possible.
      */
@@ -203,7 +213,8 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
                 jobExecutionRepository.upsert(jobExecution);
                 applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE,
                         jobRepository.findById(jobExecution.getJobId())));
-            } else if (JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {
+            } else if (JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())
+                    || JobExecutionState.ACTIVE.equals(jobExecution.getExecutionState())) {
                 jobExecutor.cancel(jobExecution.getJobId());
             }
         }
@@ -293,10 +304,11 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      */
     public JobExecution getJobExecution(Long id) {
         JobExecution jobExecution = jobExecutionRepository.findById(id);
-        if (jobExecution != null && JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())) {
+        if (jobExecution != null && jobExecution.isRunningOrActive()) {
             JobExecution runningJobExecution = jobExecutor.getJobExecution(jobExecution.getJobId());
             if (runningJobExecution != null) {
                 runningJobExecution.getWorkInProgress().forEach(jobExecution::addWorkInProgress);
+                jobExecution.setProcessedEvents(runningJobExecution.getProcessedEvents());
             }
         }
         return jobExecution;
@@ -387,16 +399,16 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     }
 
     /**
-     * Schedules the given job according to its trigger configuration.
+     * Activates the given job according to its trigger configuration.
      *
      * @param job The job to schedule.
      */
-    private void schedule(Job job) {
+    private void activate(Job job) {
         if (job.getId() == null) {
             throw new IllegalArgumentException("Job with ID required for scheduling!");
         }
         if (!job.isActive()) {
-            log.debug("Job '{}' is not active and will not be scheduled...", job.getName());
+            log.debug("Job '{}' is not active...", job.getName());
             return;
         }
 
@@ -407,25 +419,31 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
                     log.info("Job triggered for execution: {} ({})", job.getName(), job.getId());
                     enqueue(job);
                 }, new CronTrigger(cronExpression)));
-                log.info("Scheduled job: {} ({}).", job.getName(), job.getId());
+                log.info("Activated job: {} ({}).", job.getName(), job.getId());
             } catch (IllegalArgumentException e) {
                 throw new IllegalStateException("Illegal trigger configured (" + e.getMessage() + ")");
             }
         }
+
+        if (job.getTrigger() instanceof EventTrigger) {
+            enqueue(job);
+        }
     }
 
     /**
-     * Unschedules the provided job.
+     * Deactivates the provided job.
      *
      * @param job The job to unschedule.
      */
-    private void unschedule(Job job) {
+    private void deactivate(Job job) {
         if (job.getId() != null && scheduledJobs.containsKey(job.getId())) {
             if (!scheduledJobs.get(job.getId()).cancel(true)) {
                 throw new IgorException("Job " + job.getId() + " could not be cancelled!");
             }
             scheduledJobs.remove(job.getId());
-            log.info("Unscheduled job: {} ({})", job.getName(), job.getId());
+            log.info("Deactivated job: {} ({})", job.getName(), job.getId());
+        } else if (job.getId() != null && job.getTrigger() instanceof EventTrigger) {
+            jobExecutor.cancel(job.getId());
         }
     }
 

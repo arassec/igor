@@ -2,7 +2,10 @@
     <core-container>
 
         <side-menu>
-            <p slot="title">Connector Configuration</p>
+            <p slot="title">
+                <font-awesome-icon icon="link" class="margin-right fa-fw"/>
+                Connector Configuration
+            </p>
             <layout-row slot="header">
                 <p slot="left">
                     <input-button v-on:clicked="cancelConfiguration()" icon="arrow-left" class="margin-right"/>
@@ -18,7 +21,7 @@
                                   class="list-entry"
                                   :clickable="true"
                                   v-on:feedback-clicked="editJob(referencingJob.key)">
-                        <div slot="left" class="width-restricted truncate">{{referencingJob.value}}</div>
+                        <div slot="left" class="max-width truncate">{{referencingJob.value}}</div>
                     </feedback-box>
                     <list-pager :page="referencingJobsPage" v-if="referencingJobsPage.totalPages > 1"
                                 v-on:first="loadReferencingJobs(0)"
@@ -26,91 +29,97 @@
                                 v-on:next="loadReferencingJobs(referencingJobsPage.number + 1)"
                                 v-on:last="loadReferencingJobs(referencingJobsPage.totalPages -1)"/>
                 </p>
-                <label v-if="!referencingJobsPage || !referencingJobsPage.items || referencingJobsPage.items.length
-             === 0">No jobs are using this connector.</label>
+                <label v-if="!referencingJobsPage || !referencingJobsPage.items
+                    || referencingJobsPage.items.length === 0">No jobs are using this connector.</label>
             </core-panel>
         </side-menu>
 
-        <core-content>
-            <core-panel>
-                <layout-row>
-                    <h1 slot="left" class="truncate width-restricted">
-                        <font-awesome-icon icon="link"/>
-                        {{ connectorConfiguration.name.length > 0 ? connectorConfiguration.name : 'Unnamed Connector' }}
-                    </h1>
-                    <icon-button slot="right" icon="question" v-on:clicked="openDocumentation('connector')"/>
-                </layout-row>
-                <div class="table">
-                    <div class="tr">
-                        <div class="td"><label for="connector-name">Name</label></div>
-                        <div class="td">
-                            <input-validated id="connector-name" :type="'text'" v-model="connectorConfiguration.name"
-                                             :parent-id="connectorConfiguration.id" :property-id="'name'"
-                                             :validation-errors="validationErrors"/>
-                        </div>
-                    </div>
-                </div>
-            </core-panel>
-
-            <core-panel>
-                <layout-row>
-                    <h2 slot="left">Connector</h2>
-                    <icon-button slot="right" icon="question" v-show="hasDocumentation(connectorConfiguration.type.key)"
-                                 v-on:clicked="openDocumentation(connectorConfiguration.type.key)"/>
-                </layout-row>
-                <div class="table">
-                    <div class="tr">
-                        <div class="td"><label for="category-input">Category</label></div>
-                        <div class="td">
-                            <select id="category-input" v-model="connectorConfiguration.category"
-                                    v-on:change="loadTypesOfCategory(connectorConfiguration.category, true).then(() => {
-                                        loadParametersOfType(connectorConfiguration.type.key)})"
-                                    :disabled="!newConnector">
-                                <option v-for="category in connectorCategories" v-bind:value="category"
-                                        v-bind:key="category.key">
-                                    {{category.value}}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="tr">
-                        <div class="td"><label for="type-input">Type</label></div>
-                        <div class="td">
-                            <select id="type-input" v-model="connectorConfiguration.type"
-                                    v-on:change="loadParametersOfType(connectorConfiguration.type.key)"
-                                    :disabled="!newConnector">
-                                <option v-for="type in connectorTypes" v-bind:value="type" v-bind:key="type.key">
-                                    {{type.value}}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </core-panel>
-
-            <core-panel>
-                <h2>Connector Parameters</h2>
-                <parameter-editor v-if="Object.keys(connectorConfiguration.parameters).length > 0"
-                                  :parent-id="connectorConfiguration.id"
-                                  :validation-errors="validationErrors"
-                                  :parameters="connectorConfiguration.parameters" ref="parameterEditor"/>
-                <p v-if="Object.keys(connectorConfiguration.parameters).length === 0">
-                    This connector has no parameters to configure.
-                </p>
-            </core-panel>
-
-            <modal-dialog v-if="showUnsavedValuesExistDialog" @close="showUnsavedValuesExistDialog = false">
-                <h1 slot="header">Unsaved configuration</h1>
-                <p slot="body">There are unsaved configuration changes.<br/><br/>Do you really want to leave?</p>
-                <div slot="footer">
+        <core-content class="configurator">
+            <div class="max-width">
+                <core-panel>
                     <layout-row>
-                        <input-button slot="left" v-on:clicked="showUnsavedValuesExistDialog = false" icon="times"/>
-                        <input-button slot="right" v-on:clicked="nextRoute()" icon="check"/>
+                        <h1 slot="left" class="truncate max-width">
+                            <font-awesome-icon icon="link"/>
+                            {{ connectorConfiguration.name.length > 0 ? connectorConfiguration.name : 'Unnamed Connector' }}
+                        </h1>
+                        <icon-button slot="right" icon="question" v-on:clicked="openDocumentation('connector')"/>
                     </layout-row>
-                </div>
-            </modal-dialog>
+                    <div class="table">
+                        <div class="tr">
+                            <div class="td"><label for="connector-name">Name</label></div>
+                            <div class="td">
+                                <input-validated id="connector-name" :type="'text'"
+                                                 v-model="connectorConfiguration.name"
+                                                 :parent-id="connectorConfiguration.id" :property-id="'name'"
+                                                 :validation-errors="validationErrors"/>
+                            </div>
+                        </div>
+                    </div>
+                </core-panel>
 
+                <core-panel>
+                    <layout-row>
+                        <h2 slot="left">Connector</h2>
+                        <icon-button slot="right" icon="question"
+                                     v-show="hasDocumentation(connectorConfiguration.type.key)"
+                                     v-on:clicked="openDocumentation(connectorConfiguration.type.key)"/>
+                    </layout-row>
+                    <div class="table">
+                        <div class="tr">
+                            <div class="td"><label for="category-input">Category</label></div>
+                            <div class="td">
+                                <select id="category-input" v-model="connectorConfiguration.category"
+                                        v-on:change="loadTypesOfCategory(connectorConfiguration.category, true).then(() => {
+                                        loadParametersOfType(connectorConfiguration.type.key)})"
+                                        :disabled="!newConnector">
+                                    <option v-for="category in connectorCategories" v-bind:value="category"
+                                            v-bind:key="category.key">
+                                        {{category.value}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="tr">
+                            <div class="td"><label for="type-input">Type</label></div>
+                            <div class="td">
+                                <select id="type-input" v-model="connectorConfiguration.type"
+                                        v-on:change="loadParametersOfType(connectorConfiguration.type.key)"
+                                        :disabled="!newConnector">
+                                    <option v-for="type in connectorTypes" v-bind:value="type" v-bind:key="type.key">
+                                        {{type.value}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </core-panel>
+
+                <core-panel>
+                    <h2>Connector Parameters</h2>
+                    <parameter-editor v-if="Object.keys(connectorConfiguration.parameters).length > 0"
+                                      :parent-id="connectorConfiguration.id"
+                                      :validation-errors="validationErrors"
+                                      :parameters="connectorConfiguration.parameters" ref="parameterEditor"/>
+                    <p v-if="Object.keys(connectorConfiguration.parameters).length === 0">
+                        This connector has no parameters to configure.
+                    </p>
+                </core-panel>
+            </div>
         </core-content>
+
+        <documentation-container :documentation="documentation" v-show="showDocumentation"
+                                 v-on:close="showDocumentation = false"/>
+
+        <modal-dialog v-if="showUnsavedValuesExistDialog" @close="showUnsavedValuesExistDialog = false">
+            <h1 slot="header">Unsaved configuration</h1>
+            <p slot="body">There are unsaved configuration changes.<br/><br/>Do you really want to leave?</p>
+            <div slot="footer">
+                <layout-row>
+                    <input-button slot="left" v-on:clicked="showUnsavedValuesExistDialog = false" icon="times"/>
+                    <input-button slot="right" v-on:clicked="nextRoute()" icon="check"/>
+                </layout-row>
+            </div>
+        </modal-dialog>
 
         <modal-dialog v-if="showTestDetails" @close="showTestDetails = false"
                       v-on:cancel="showTestDetails = false">
@@ -124,34 +133,31 @@
             </div>
         </modal-dialog>
 
-        <documentation-container :documentation="documentation" v-show="showDocumentation"
-                                 v-on:close="showDocumentation = false"/>
-
         <background-icon right="true" icon-one="link"/>
 
     </core-container>
 </template>
 
 <script>
-    import ParameterEditor from '../components/common/parameter-editor'
-    import InputButton from '../components/common/input-button'
-    import CorePanel from '../components/common/core-panel'
-    import CoreContainer from '../components/common/core-container'
-    import CoreContent from '../components/common/core-content'
-    import LayoutRow from '../components/common/layout-row'
-    import SideMenu from '../components/common/side-menu'
-    import FormatUtils from '../utils/utils.js'
-    import IgorBackend from '../utils/igor-backend.js'
-    import BackgroundIcon from "../components/common/background-icon";
-    import ModalDialog from "../components/common/modal-dialog";
-    import FeedbackBox from "../components/common/feedback-box";
-    import ListPager from "../components/common/list-pager";
-    import IconButton from "../components/common/icon-button";
-    import DocumentationContainer from "../components/common/documentation-container";
-    import Utils from "../utils/utils";
-    import InputValidated from "../components/common/input-validated";
+import ParameterEditor from '../components/common/parameter-editor'
+import InputButton from '../components/common/input-button'
+import CorePanel from '../components/common/core-panel'
+import CoreContainer from '../components/common/core-container'
+import CoreContent from '../components/common/core-content'
+import LayoutRow from '../components/common/layout-row'
+import SideMenu from '../components/common/side-menu'
+import FormatUtils from '../utils/utils.js'
+import IgorBackend from '../utils/igor-backend.js'
+import BackgroundIcon from "../components/common/background-icon";
+import ModalDialog from "../components/common/modal-dialog";
+import FeedbackBox from "../components/common/feedback-box";
+import ListPager from "../components/common/list-pager";
+import IconButton from "../components/common/icon-button";
+import DocumentationContainer from "../components/common/documentation-container";
+import Utils from "../utils/utils";
+import InputValidated from "../components/common/input-validated";
 
-    export default {
+export default {
         name: 'connector-editor',
         components: {
             InputValidated,
@@ -397,8 +403,8 @@
 
 <style scoped>
 
-    .width-restricted {
-        max-width: 500px;
+    .configurator {
+        flex-grow: 2;
     }
 
     .list-label {

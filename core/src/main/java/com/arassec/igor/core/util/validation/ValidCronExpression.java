@@ -1,4 +1,4 @@
-package com.arassec.igor.module.misc.util.validation;
+package com.arassec.igor.core.util.validation;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

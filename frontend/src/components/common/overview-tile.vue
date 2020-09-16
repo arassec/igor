@@ -1,8 +1,10 @@
 <template>
     <a class="overview-tile">
         <div class="content">
-            <div class="title" :class="active ? '' : 'disabled'" v-on:click="$emit('clicked')">
-                <slot name="title"/>
+            <div class="title" v-on:click="$emit('clicked')">
+                <fit-text>
+                    <slot name="title"/>
+                </fit-text>
             </div>
             <div class="menu" v-on:click="$emit('clicked')">
                 <slot name="menu"/>
@@ -15,10 +17,12 @@
 </template>
 
 <script>
-    export default {
+import FitText from "./fit-text";
+
+export default {
         name: "overview-tile",
         props: ['active'],
-        components: {}
+        components: {FitText}
     }
 </script>
 
@@ -62,11 +66,9 @@
         text-align: center;
         vertical-align: middle;
         margin: .5em .2em .2em .2em;
-        line-height: 1.25em;
-        font-size: 200%;
-        overflow: hidden;
         flex-grow: 1;
         z-index: 1;
+        overflow: hidden;
     }
 
     .title div {

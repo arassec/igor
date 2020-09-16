@@ -54,6 +54,11 @@ public class JobExecution {
     private String errorCause;
 
     /**
+     * Contains the number of processed events.
+     */
+    private int processedEvents;
+
+    /**
      * List with current work in progress, that should be visible in the UI for the user.
      */
     private final List<WorkInProgressMonitor> workInProgress = Collections.synchronizedList(new LinkedList<>());
@@ -84,8 +89,8 @@ public class JobExecution {
      *
      * @return {@code true} if the job is running, {@code false} otherwise.
      */
-    public boolean isRunning() {
-        return JobExecutionState.RUNNING.equals(executionState);
+    public boolean isRunningOrActive() {
+        return (JobExecutionState.RUNNING.equals(executionState) || JobExecutionState.ACTIVE.equals(executionState));
     }
 
     /**

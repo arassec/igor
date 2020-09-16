@@ -2,6 +2,7 @@ package com.arassec.igor.core.model.action;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -11,8 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests the {@link BaseAction} model.
@@ -40,9 +40,11 @@ class BaseActionTest {
      */
     @BeforeAll
     static void initialize() {
-        Map<String, Object> meta = Job.createMetaData("job-id");
+        Trigger triggerMock = mock(Trigger.class);
+        when(triggerMock.getMetaData()).thenReturn(Map.of(DataKey.SIMULATION.getKey(), true));
+
+        Map<String, Object> meta = Job.createMetaData("job-id", triggerMock);
         Map<String, Object> data = new HashMap<>();
-        data.put(DataKey.SIMULATION.getKey(), true);
 
         testData.put(DataKey.META.getKey(), meta);
         testData.put(DataKey.DATA.getKey(), data);

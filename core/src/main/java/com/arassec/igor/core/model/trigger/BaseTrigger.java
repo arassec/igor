@@ -2,6 +2,9 @@ package com.arassec.igor.core.model.trigger;
 
 import com.arassec.igor.core.model.BaseIgorComponent;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Baseclass for Triggers.
  */
@@ -15,6 +18,22 @@ public abstract class BaseTrigger extends BaseIgorComponent implements Trigger {
      */
     public BaseTrigger(String categoryId, String typeId) {
         super(categoryId, typeId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Object> getMetaData() {
+        return new HashMap<>();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Object> getData() {
+        return new HashMap<>();
     }
 
 }

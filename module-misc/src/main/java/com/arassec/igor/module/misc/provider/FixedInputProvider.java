@@ -95,4 +95,12 @@ public class FixedInputProvider extends BaseUtilProvider {
         return item;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        index = 0;
+    }
+
 }

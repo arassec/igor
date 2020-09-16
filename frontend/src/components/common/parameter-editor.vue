@@ -11,44 +11,57 @@
                     <div class="td" :class="isBoolean(param.type) ? 'align-left' : ''">
 
                         <input-validated v-if="isNumber(param.type)"
-                                         v-model.number="param.value" :type="'text'"
+                                         v-model.number="param.value"
                                          :parent-id="parentId"
                                          :property-id="param.name"
-                                         :validation-errors="validationErrors"/>
+                                         :validation-errors="validationErrors"
+                                          v-on:keypress="checkNumber($event)"/>
 
                         <font-awesome-icon v-else-if="isBoolean(param.type)"
                                            :icon="param.value ? 'check-square' : 'square'"
                                            v-on:click="param.value = !param.value"/>
 
-                        <input-validated v-else-if="isConnector(param)" :disabled="true"
-                                         v-model="param.connectorName"
-                                         :parent-id="parentId"
-                                         :property-id="param.name"
-                                         :validation-errors="validationErrors"
-                                         :has-button="true"/>
+                        <input-validated-with-button v-else-if="isConnector(param)"
+                                                     :disabled="true"
+                                                     v-model="param.connectorName"
+                                                     :parent-id="parentId"
+                                                     :property-id="param.name"
+                                                     :validation-errors="validationErrors"
+                                                     :icon="'link'"
+                                                     v-on:icon-clicked="openConnectorPicker(index, param.categoryCandidates)"/>
 
-                        <textarea-validated v-else-if="param.subtype === 'MULTI_LINE'" v-model="param.value"
+                        <input-validated-with-button v-else-if="param.subtype === 'CRON'"
+                                                     :disabled="false"
+                                                     :type="parameterInputTypes[index]"
+                                                     v-model.trim="param.value"
+                                                     :parent-id="parentId"
+                                                     :property-id="param.name"
+                                                     :validation-errors="validationErrors"
+                                                     :icon="'clock'"
+                                                     v-on:icon-clicked="openCronPicker(index)"/>
+
+                        <input-validated-with-button v-else-if="!isNumber(param.type) && !isBoolean(param.type) && param.secured"
+                                                     :disabled="false"
+                                                     :type="parameterInputTypes[index]"
+                                                     v-model.trim="param.value"
+                                                     :parent-id="parentId"
+                                                     :property-id="param.name"
+                                                     :validation-errors="validationErrors"
+                                                     :icon="'eye'"
+                                                     v-on:icon-clicked="toggleCleartext(index)"/>
+
+                        <textarea-validated v-else-if="param.subtype === 'MULTI_LINE'"
+                                            v-model="param.value"
                                             :parent-id="parentId"
                                             :property-id="param.name"
                                             :validation-errors="validationErrors"/>
 
                         <input-validated v-else
-                                         :type="parameterInputTypes[index]" v-model.trim="param.value"
+                                         :type="parameterInputTypes[index]"
+                                         v-model.trim="param.value"
                                          :parent-id="parentId"
                                          :property-id="param.name"
-                                         :validation-errors="validationErrors"
-                                         :has-button="(!isNumber(param.type) && !isBoolean(param.type) && param.secured)|| (param.subtype === 'CRON')"/>
-
-                        <input-button v-if="!isNumber(param.type) && !isBoolean(param.type) && param.secured"
-                                      icon="eye" v-on:clicked="toggleCleartext(index)" class="margin-left"/>
-
-                        <input-button v-else-if="isConnector(param)" icon="link"
-                                      v-on:clicked="openConnectorPicker(index, param.categoryCandidates)"
-                                      class="margin-left"/>
-
-                        <input-button v-else-if="param.subtype === 'CRON'" v-on:clicked="openCronPicker(index)"
-                                      icon="clock"
-                                      class="margin-left"/>
+                                         :validation-errors="validationErrors"/>
 
                     </div>
                 </div>
@@ -76,16 +89,19 @@
 </template>
 
 <script>
-    import InputButton from './input-button'
-    import ConnectorPicker from '../connectors/connector-picker'
-    import CronPicker from "./cron-picker";
-    import IgorBackend from '../../utils/igor-backend.js'
-    import InputValidated from "./input-validated";
-    import TextareaValidated from "./textarea-validated";
+import ConnectorPicker from '../connectors/connector-picker'
+import CronPicker from "./cron-picker";
+import IgorBackend from '../../utils/igor-backend.js'
+import InputValidated from "./input-validated";
+import TextareaValidated from "./textarea-validated";
+import InputValidatedWithButton from "./input-validated-with-button";
 
-    export default {
+export default {
         name: 'parameter-editor',
-        components: {TextareaValidated, InputValidated, ConnectorPicker, CronPicker, InputButton},
+        components: {
+            InputValidatedWithButton,
+            TextareaValidated, InputValidated, ConnectorPicker, CronPicker
+        },
         props: ['parentId', 'validationErrors', 'parameters'],
         data: function () {
             return {
@@ -119,6 +135,15 @@
             },
             isConnector: function (parameter) {
                 return !!parameter.connector;
+            },
+            checkNumber: function (evt) {
+              evt = (evt) ? evt : window.event;
+              let charCode = (evt.which) ? evt.which : evt.keyCode;
+              if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode === 46) {
+                evt.preventDefault();
+              } else {
+                return true;
+              }
             },
             formatParameterName: function (parameter) {
                 let string = parameter.name.replace(/\.?([A-Z])/g, function (x, y) {
@@ -203,7 +228,7 @@
             }
         },
         watch: {
-            parameters: function(newVal) {
+            parameters: function (newVal) {
                 let component = this
                 for (let i in newVal) {
                     if (newVal.hasOwnProperty(i)) {

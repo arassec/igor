@@ -59,7 +59,7 @@ public abstract class BaseFileConnector extends BaseConnector implements FileCon
             long totalSize = fileSize;
             byte[] buf = new byte[streamCopyBufferSize];
             int foo;
-            while (jobExecution.isRunning()) {
+            while (jobExecution.isRunningOrActive()) {
                 if (buf.length < fileSize) {
                     foo = buf.length;
                 } else {

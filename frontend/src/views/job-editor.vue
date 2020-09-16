@@ -23,14 +23,18 @@
                         :key="index" :alert="jobExecution.state === 'FAILED'" :clickable="true"
                         v-on:feedback-clicked="openExecutionDetailsDialog(jobExecution)">
                     <div slot="left">
-                        <font-awesome-icon icon="spinner" class="fa-spin fa-fw margin-right"
-                                           v-if="jobExecution.state === 'RUNNING' || jobExecution.state === 'WAITING'"/>
+                        <font-awesome-icon icon="spinner" class="fa-spin fa-fw"
+                                           v-if="jobExecution.state === 'RUNNING'"/>
+                        <font-awesome-icon icon="sign-in-alt" class="fa-fw"
+                                           v-if="jobExecution.state === 'ACTIVE'"/>
+                        <font-awesome-icon icon="hourglass" class="fa-fw fal"
+                                           v-if="jobExecution.state === 'WAITING'"/>
                         <font-awesome-icon icon="bolt" class="fa-fw" v-if="jobExecution.state === 'FAILED'"/>
                         {{formatJobExecution(jobExecution)}}
                     </div>
                     <div slot="right">
                         <input-button slot="right" icon="times" v-on:clicked="openCancelJobDialog(jobExecution)"
-                                      v-if="jobExecution.state === 'WAITING' || jobExecution.state === 'RUNNING'"/>
+                                      v-if="jobExecution.state === 'WAITING' || jobExecution.state === 'RUNNING' || jobExecution.state === 'ACTIVE'"/>
                         <input-button slot="right" icon="check"
                                       v-on:clicked="openMarkJobExecutionResolvedDialog(jobExecution)"
                                       v-if="jobExecution.state === 'FAILED'"/>
@@ -44,7 +48,7 @@
             </core-panel>
         </side-menu>
 
-        <core-content v-if="jobConfiguration">
+        <core-content class="configurator" v-if="jobConfiguration">
             <job-configurator
                     v-show="selectedActionId === null"
                     :job-configuration="jobConfiguration"
@@ -65,15 +69,18 @@
                                  v-on:switch-documentation="switchDocumentation"
                                  v-on:close-documentation="showDocumentation = false"
                                  ref="actionConfigurators"/>
-
-            <job-execution-details v-if="showExecutionDetailsDialog"
-                                   v-bind:job-execution="selectedJobExecution"
-                                   v-on:close="closeExecutionDetailsDialog()"/>
         </core-content>
 
         <test-result-container v-if="testResults != null"
                                v-on:close="testResults = null"
                                v-bind:selected-test-results="selectedTestResults"/>
+
+        <documentation-container :documentation="documentation" v-show="showDocumentation"
+                                 v-on:close="showDocumentation = false"/>
+
+        <job-execution-details v-if="showExecutionDetailsDialog"
+                               v-bind:job-execution="selectedJobExecution"
+                               v-on:close="closeExecutionDetailsDialog()"/>
 
         <modal-dialog v-if="showDeleteActionDialog" @close="showDeleteActionDialog = false">
             <h1 slot="header">Delete Action?</h1>
@@ -145,42 +152,35 @@
             </layout-row>
         </modal-dialog>
 
-        <documentation-container :documentation="documentation" v-show="showDocumentation"
-                                 v-on:close="showDocumentation = false"/>
-
-        <background-icon right="true" icon-one="toolbox"/>
-
     </core-container>
 </template>
 <script>
-    import CoreContainer from '../components/common/core-container'
-    import CoreContent from '../components/common/core-content'
-    import JobConfigurator from '../components/jobs/job-configurator'
-    import ActionConfigurator from '../components/jobs/action-configurator'
-    import ModalDialog from '../components/common/modal-dialog'
-    import LayoutRow from '../components/common/layout-row'
-    import InputButton from '../components/common/input-button'
-    import TestResultContainer from '../components/jobs/test-result-container'
-    import SideMenu from '../components/common/side-menu'
-    import FeedbackBox from '../components/common/feedback-box'
-    import JobExecutionDetails from '../components/jobs/job-execution-details'
-    import Utils from '../utils/utils.js'
-    import BackgroundIcon from '../components/common/background-icon';
-    import IgorBackend from '../utils/igor-backend.js'
-    import ListPager from "../components/common/list-pager";
-    import JobNavigation from "../components/jobs/job-navigation";
-    import CorePanel from "../components/common/core-panel";
-    import FormatUtils from "../utils/utils";
-    import DocumentationContainer from "../components/common/documentation-container";
+import CoreContainer from '../components/common/core-container'
+import CoreContent from '../components/common/core-content'
+import JobConfigurator from '../components/jobs/job-configurator'
+import ActionConfigurator from '../components/jobs/action-configurator'
+import ModalDialog from '../components/common/modal-dialog'
+import LayoutRow from '../components/common/layout-row'
+import InputButton from '../components/common/input-button'
+import TestResultContainer from '../components/jobs/test-result-container'
+import SideMenu from '../components/common/side-menu'
+import FeedbackBox from '../components/common/feedback-box'
+import JobExecutionDetails from '../components/jobs/job-execution-details'
+import Utils from '../utils/utils.js'
+import IgorBackend from '../utils/igor-backend.js'
+import ListPager from "../components/common/list-pager";
+import JobNavigation from "../components/jobs/job-navigation";
+import CorePanel from "../components/common/core-panel";
+import FormatUtils from "../utils/utils";
+import DocumentationContainer from "../components/common/documentation-container";
 
-    export default {
+export default {
         name: 'job-editor',
         components: {
             DocumentationContainer,
             CorePanel,
             JobNavigation,
             ListPager,
-            BackgroundIcon,
             JobExecutionDetails,
             FeedbackBox,
             SideMenu,
@@ -230,7 +230,9 @@
             jobRunningOrWaiting: function () {
                 if (this.jobExecutionsPage) {
                     for (let i = 0; i < this.jobExecutionsPage.items.length; i++) {
-                        if ('RUNNING' === this.jobExecutionsPage.items[i].state || 'WAITING' === this.jobExecutionsPage.items[i].state) {
+                        if ('RUNNING' === this.jobExecutionsPage.items[i].state
+                            || 'WAITING' === this.jobExecutionsPage.items[i].state
+                            || 'ACTIVE' === this.jobExecutionsPage.items[i].state) {
                             return true
                         }
                     }
@@ -252,12 +254,15 @@
                 this.jobConfiguration = await IgorBackend.getData('/api/job/' + id)
             },
             saveConfiguration: async function () {
-                this.testResults = null;
                 await IgorBackend.postData('/api/job', this.jobConfiguration, 'Saving job',
                     'Job \'' + Utils.formatNameForSnackbar(this.jobConfiguration.name) + '\' saved.',
                     'Saving failed!').then((result) => {
                     if (result.status === 400) {
+                      if(result.data === undefined || result.data === "") {
+                        this.validationErrors = {};
+                      } else {
                         this.validationErrors = result.data;
+                      }
                     } else {
                         this.validationErrors = {};
                         this.jobConfiguration = result.data;
@@ -272,7 +277,11 @@
                 await IgorBackend.postData('/api/job/simulate', this.jobConfiguration, 'Testing job',
                     'Test OK.', 'Test Failed!').then((result) => {
                     if (result.status === 400) {
-                        this.validationErrors = result.data;
+                        if(result.data === undefined || result.data === "") {
+                          this.validationErrors = {};
+                        } else {
+                          this.validationErrors = result.data;
+                        }
                     } else {
                         this.validationErrors = {};
                         this.testResults = result.data;
@@ -531,6 +540,10 @@
 
     .paragraph {
         margin-bottom: 2em;
+    }
+
+    .configurator {
+        flex-grow: 1;
     }
 
 </style>

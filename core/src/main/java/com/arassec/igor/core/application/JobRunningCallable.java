@@ -38,7 +38,7 @@ public class JobRunningCallable implements Callable<Job> {
      */
     @Override
     public Job call() {
-        job.run(jobExecution);
+        job.start(jobExecution);
         return job;
     }
 

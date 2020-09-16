@@ -31,7 +31,7 @@ class JobTest {
         Job job = new Job();
         JobExecution jobExecution = new JobExecution();
 
-        job.run(jobExecution);
+        job.start(jobExecution);
 
         assertEquals(JobExecutionState.FINISHED, jobExecution.getExecutionState());
         assertNotNull(jobExecution.getStarted());
@@ -47,7 +47,7 @@ class JobTest {
         Job job = Job.builder().id("job-id").active(false).build();
         JobExecution jobExecution = new JobExecution();
 
-        job.run(jobExecution);
+        job.start(jobExecution);
 
         assertEquals(JobExecutionState.FINISHED, jobExecution.getExecutionState());
     }
@@ -61,7 +61,7 @@ class JobTest {
         Job job = Job.builder().id("job-id").active(true).build();
         JobExecution jobExecution = new JobExecution();
 
-        job.run(jobExecution);
+        job.start(jobExecution);
 
         assertEquals(JobExecutionState.FINISHED, jobExecution.getExecutionState());
     }
@@ -79,7 +79,7 @@ class JobTest {
         Trigger triggerMock = mock(Trigger.class);
         job.setTrigger(triggerMock);
 
-        job.run(jobExecution);
+        job.start(jobExecution);
 
         verify(triggerMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
         verify(triggerMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
@@ -118,7 +118,7 @@ class JobTest {
 
         job.setProvider(providerMock);
 
-        job.run(jobExecution);
+        job.start(jobExecution);
 
         assertEquals(JobExecutionState.FAILED, jobExecution.getExecutionState());
     }
@@ -131,7 +131,7 @@ class JobTest {
     void testCreateJobExecutionInstance() {
         Job job = new Job();
 
-        job.run(null);
+        job.start(null);
 
         assertEquals(JobExecutionState.FINISHED, job.getCurrentJobExecution().getExecutionState());
         assertNotNull(job.getCurrentJobExecution().getStarted());
@@ -173,7 +173,7 @@ class JobTest {
         when(actionMock.getNumThreads()).thenReturn(1);
         job.getActions().add(actionMock);
 
-        job.run(jobExecution);
+        job.start(jobExecution);
 
         verify(providerMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
         verify(actionMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
@@ -192,9 +192,14 @@ class JobTest {
     @Test
     @DisplayName("Tests creating job meta-data.")
     void testCreateMetaData() {
-        Map<String, Object> metaData = Job.createMetaData("job-id");
+        Trigger triggerMock = mock(Trigger.class);
+        when(triggerMock.getMetaData()).thenReturn(Map.of(DataKey.SIMULATION.getKey(), true));
+        Map<String, Object> metaData = Job.createMetaData("job-id", null);
         assertEquals("job-id", metaData.get(DataKey.JOB_ID.getKey()));
         assertNotNull(metaData.get(DataKey.TIMESTAMP.getKey()));
+        assertNull(metaData.get(DataKey.SIMULATION.getKey()));
+        metaData = Job.createMetaData("job-id", triggerMock);
+        assertEquals(true, metaData.get(DataKey.SIMULATION.getKey()));
     }
 
 }

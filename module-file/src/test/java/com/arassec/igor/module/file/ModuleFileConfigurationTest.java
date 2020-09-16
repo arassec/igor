@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ModuleFileConfigurationTest {
 
     /**
-     * Tests I18N of the misc-module.
+     * Tests I18N of the file-module.
      */
     @Test
     @DisplayName("Tests module-file I18N.")

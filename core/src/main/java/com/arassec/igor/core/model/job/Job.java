@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.provider.Provider;
+import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.validation.UniqueJobName;
 import lombok.AllArgsConstructor;
@@ -16,12 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Defines an igor job.
@@ -66,7 +68,7 @@ public class Job {
      * Max. number of job-execution entries to keep for this job.
      */
     @Builder.Default
-    @PositiveOrZero
+    @Positive
     private int historyLimit = 5;
 
     /**
@@ -106,28 +108,54 @@ public class Job {
     private boolean faultTolerant = true;
 
     /**
-     * Creates the meta-data.
+     * Creates the meta-data part of a data item.
      *
-     * @param jobId The job's ID.
+     * @param jobId    The job's ID.
+     * @param trigger  The job's trigger.
      *
      * @return The meta-data for the job run.
      */
-    public static Map<String, Object> createMetaData(String jobId) {
+    public static Map<String, Object> createMetaData(String jobId, Trigger trigger) {
         Map<String, Object> metaData = new HashMap<>();
         metaData.put(DataKey.JOB_ID.getKey(), jobId);
         metaData.put(DataKey.TIMESTAMP.getKey(), Instant.now().toEpochMilli());
+        Map<String, Object> triggerMetaData = trigger != null ? trigger.getMetaData() : Map.of();
+        triggerMetaData.forEach(metaData::put);
         return metaData;
     }
 
     /**
-     * Runs the job.
+     * Creates the data part of a data item.
+     *
+     * @param triggerData  Input data received from the trigger.
+     * @param providerData Input data received from the provider.
+     *
+     * @return The data for the job run.
+     */
+    public static Map<String, Object> createData(Map<String, Object> triggerData, Map<String, Object> providerData) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> triggerInput = Optional.ofNullable(triggerData).orElse(Map.of());
+        triggerInput.forEach(result::put);
+        Map<String, Object> providerInput = Optional.ofNullable(providerData).orElse(Map.of());
+        providerInput.forEach(result::put);
+        return result;
+    }
+
+    /**
+     * Starts the job. Depending on the trigger type (scheduled vs event based) the job will either run once and will be finished
+     * after the last data item is processed, or it will remain in state {@link JobExecutionState#ACTIVE} until it is stopped or
+     * igor is shut down.
      *
      * @param jobExecution The container for job execution information.
      */
-    public void run(JobExecution jobExecution) {
-        log.debug("Running job: {} ({})", name, id);
+    public void start(JobExecution jobExecution) {
+        log.debug("Starting job: {} ({})", name, id);
         currentJobExecution = Objects.requireNonNullElseGet(jobExecution, JobExecution::new);
-        currentJobExecution.setExecutionState(JobExecutionState.RUNNING);
+        if (trigger instanceof EventTrigger) {
+            currentJobExecution.setExecutionState(JobExecutionState.ACTIVE);
+        } else {
+            currentJobExecution.setExecutionState(JobExecutionState.RUNNING);
+        }
         currentJobExecution.setStarted(Instant.now());
         running = true;
         try {
@@ -144,8 +172,29 @@ public class Job {
             // Initialize IgorComponents used by the job:
             initialize(jobExecution);
 
-            // Read the data from the provider and start working:
-            processProviderData(providerInputQueue, id, jobExecution);
+            if (trigger instanceof EventTrigger) {
+                BlockingQueue<Map<String, Object>> triggerInputQueue = new LinkedBlockingQueue<>();
+                ((EventTrigger) trigger).setEventQueue(triggerInputQueue);
+                // Block until igor is shut down and wait for trigger events...
+                while (JobExecutionState.ACTIVE.equals(currentJobExecution.getExecutionState())) {
+                    Map<String, Object> triggerData = triggerInputQueue.poll(500, TimeUnit.MILLISECONDS);
+                    if (triggerData != null) {
+                        log.debug("Job '{}' ({}) triggered by event: {}", name, id, triggerData);
+                        currentJobExecution.setProcessedEvents(currentJobExecution.getProcessedEvents() + 1);
+                        trigger.getData().forEach(triggerData::put); // A custom trigger might add additional data to the items.
+                        processProviderData(providerInputQueue, id, jobExecution, triggerData);
+                        concurrencyGroups.forEach(ConcurrencyGroup::reset);
+                    }
+                }
+            } else {
+                // Read the data from the trigger and start working. This is used during simulated job runs to get the data from
+                // an event based trigger, too!
+                Map<String, Object> triggerData = Map.of();
+                if (trigger != null) {
+                    triggerData = trigger.getData();
+                }
+                processProviderData(providerInputQueue, id, jobExecution, triggerData);
+            }
 
             // Completes each action inside each concurrency group:
             concurrencyGroups.forEach(ConcurrencyGroup::complete);
@@ -156,7 +205,7 @@ public class Job {
             // Awaits thread termination of each concurrency group:
             awaitThreadTermination(concurrencyGroups);
 
-            if (currentJobExecution.isRunning()) {
+            if (currentJobExecution.isRunningOrActive()) {
                 currentJobExecution.setExecutionState(JobExecutionState.FINISHED);
             }
         } catch (Exception e) {
@@ -171,12 +220,14 @@ public class Job {
     }
 
     /**
-     * Cancels the job if it is currently running. The job might not stop immediately if it is executing a non-interruptible action.
-     * Check the job's isRunning method regularly to see when the job execution finished.
+     * Cancels the job if it is currently running. The job might not stop immediately if it is executing a non-interruptible
+     * action. Check the job's isRunning method regularly to see when the job execution finished.
      */
     public void cancel() {
         if (currentJobExecution != null && JobExecutionState.RUNNING.equals(currentJobExecution.getExecutionState())) {
             currentJobExecution.setExecutionState(JobExecutionState.CANCELLED);
+        } else if (currentJobExecution != null && JobExecutionState.ACTIVE.equals(currentJobExecution.getExecutionState())) {
+            currentJobExecution.setExecutionState(JobExecutionState.FINISHED);
         }
     }
 
@@ -263,30 +314,30 @@ public class Job {
      * @param providerInputQueue The input queue to put the provider's data in.
      * @param jobId              The job's ID.
      * @param jobExecution       Contains information about the job execution.
+     * @param triggerData        Data provided by an event trigger.
      */
     private void processProviderData(BlockingQueue<Map<String, Object>> providerInputQueue, String jobId,
-                                     JobExecution jobExecution) {
+                                     JobExecution jobExecution, Map<String, Object> triggerData) {
         if (provider == null) {
             return;
         }
 
         // Read the data from the provider and start working:
-        while (provider.hasNext() && jobExecution.isRunning()) {
-            Map<String, Object> data = new HashMap<>();
-            data.put(DataKey.META.getKey(), createMetaData(jobId));
-            data.put(DataKey.DATA.getKey(), provider.next());
+        while (provider.hasNext() && jobExecution.isRunningOrActive()) {
+            Map<String, Object> dataItem = new HashMap<>();
+            dataItem.put(DataKey.META.getKey(), createMetaData(jobId, trigger));
+            dataItem.put(DataKey.DATA.getKey(), createData(triggerData, provider.next()));
             boolean added = false;
             while (!added) {
-                added = providerInputQueue.offer(data);
-                if (!added) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
+                try {
+                    added = providerInputQueue.offer(dataItem, 100, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }
+
+        provider.reset();
     }
 
     /**

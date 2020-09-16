@@ -5,6 +5,7 @@
 - Added Limit action to filter data items from the stream after the first 'n' data items have been processed.
 - 'Fixed Input' provider now supports JSON as input.
 - Added 'Split Array' action to split an input array into multiple data items.
+- Added Log action to debug-log processed data items.
 
 ## Version 0.1.0
 - First stable release with core features.

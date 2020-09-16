@@ -107,7 +107,7 @@ class PersistValueActionTest extends MiscActionBaseTest {
         Map<String, Object> data = createData();
 
         //noinspection unchecked
-        ((Map<String, Object>) data.get(DataKey.DATA.getKey())).put(DataKey.SIMULATION.getKey(), true);
+        ((Map<String, Object>) data.get(DataKey.META.getKey())).put(DataKey.SIMULATION.getKey(), true);
 
         List<Map<String, Object>> result = action.process(data, new JobExecution());
 

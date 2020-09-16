@@ -63,7 +63,7 @@ public class IgorSftpProgressMonitor implements SftpProgressMonitor {
      */
     @Override
     public boolean count(long bytes) {
-        if (!jobExecution.isRunning()) {
+        if (!jobExecution.isRunningOrActive()) {
             throw new JobCancelledException("The job has been cancelled: " + jobExecution.getJobId());
         }
         count += bytes;

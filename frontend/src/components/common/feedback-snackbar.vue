@@ -13,10 +13,10 @@
 </template>
 
 <script>
-    import LayoutRow from './layout-row'
-    import InputButton from './input-button'
+import LayoutRow from './layout-row'
+import InputButton from './input-button'
 
-    export default {
+export default {
     name: 'feedback-snackbar',
     components: {InputButton, LayoutRow},
     methods: {
@@ -47,6 +47,9 @@
         left: 50%;
         margin-left: -200px;
         bottom: 0px;
+        border-left: .1em solid var(--color-font);
+        border-top: .1em solid var(--color-font);
+        border-right: .1em solid var(--color-font);
     }
 
     .feedback {

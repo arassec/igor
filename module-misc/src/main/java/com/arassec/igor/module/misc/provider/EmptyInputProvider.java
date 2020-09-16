@@ -6,7 +6,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +21,7 @@ public class EmptyInputProvider extends BaseUtilProvider {
     /**
      * The amount of data items to generate.
      */
-    @PositiveOrZero
+    @Positive
     @IgorParam(defaultValue = "1")
     private int amount;
 
@@ -52,6 +52,14 @@ public class EmptyInputProvider extends BaseUtilProvider {
     public Map<String, Object> next() {
         current++;
         return new HashMap<>();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        current = 0;
     }
 
 }

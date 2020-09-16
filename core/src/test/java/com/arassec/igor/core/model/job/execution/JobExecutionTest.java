@@ -58,13 +58,13 @@ class JobExecutionTest {
     @DisplayName("Tests the job-executions 'running' information.")
     void testRunning() {
         JobExecution jobExecution = new JobExecution();
-        assertFalse(jobExecution.isRunning());
+        assertFalse(jobExecution.isRunningOrActive());
 
         jobExecution.setExecutionState(JobExecutionState.RUNNING);
-        assertTrue(jobExecution.isRunning());
+        assertTrue(jobExecution.isRunningOrActive());
 
         jobExecution.setExecutionState(JobExecutionState.FINISHED);
-        assertFalse(jobExecution.isRunning());
+        assertFalse(jobExecution.isRunningOrActive());
     }
 
     /**

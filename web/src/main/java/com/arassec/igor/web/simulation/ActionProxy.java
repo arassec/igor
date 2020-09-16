@@ -21,11 +21,6 @@ import java.util.Map;
 public class ActionProxy extends BaseProxy<Action> implements Action {
 
     /**
-     * The real action this proxy is hiding.
-     */
-    private Action delegate;
-
-    /**
      * The collected Data.
      */
     private List<Map<String, Object>> collectedData = new LinkedList<>();
@@ -42,19 +37,6 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
      */
     public ActionProxy(Action delegate) {
         super(delegate);
-        this.delegate = delegate;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialize(String jobId, JobExecution jobExecution) {
-        try {
-            delegate.initialize(jobId, jobExecution);
-        } catch (Exception e) {
-            setErrorCause(StacktraceFormatter.format(e));
-        }
     }
 
     /**
@@ -147,6 +129,14 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
     @Override
     public void setActive(boolean active) {
         delegate.setActive(active);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        delegate.reset();
     }
 
 }

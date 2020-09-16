@@ -2,7 +2,7 @@
     <div class="tooltip">
         <span  v-if="hasValidationErrors()" class="tooltiptext">{{validationError}}</span>
         <textarea rows="8" cols="35" :type="type" autocomplete="off" :disabled="disabled" :value="text" @input="updateSelf($event.target.value)"
-               :class="hasValidationErrors() ? 'alert' : ''"/>
+               :class="hasValidationErrors() ? 'alert' : ''" class="textarea"/>
     </div>
 
 </template>
@@ -46,6 +46,12 @@
 
     .tooltip .tooltiptext::after {
         border-color: var(--color-font) transparent transparent transparent;
+    }
+
+    .textarea {
+        width: 100%;
+        height: 100%;
+        resize: vertical;
     }
 
 </style>

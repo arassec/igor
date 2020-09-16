@@ -1,6 +1,5 @@
 package com.arassec.igor.web.simulation;
 
-import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.Provider;
 import org.junit.jupiter.api.DisplayName;
@@ -86,7 +85,6 @@ class ProviderProxyTest {
 
         Map<String, Object> data = providerProxy.next();
 
-        assertEquals(true, data.get(DataKey.SIMULATION.getKey()));
         assertEquals(data, providerProxy.getCollectedData().get(0));
     }
 
@@ -113,6 +111,18 @@ class ProviderProxyTest {
         providerProxy.getSimulationLimit();
         verify(providerMock, times(1)).setSimulationLimit(eq(666));
         verify(providerMock, times(1)).getSimulationLimit();
+    }
+
+    /**
+     * Tests resetting the proxy.
+     */
+    @Test
+    @DisplayName("Tests resetting the proxy.")
+    void testReset() {
+        Provider providerMock = mock(Provider.class);
+        ProviderProxy providerProxy = new ProviderProxy(providerMock);
+        providerProxy.reset();
+        verify(providerMock, times(1)).reset();
     }
 
 }

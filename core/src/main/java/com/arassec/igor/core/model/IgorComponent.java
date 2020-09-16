@@ -58,7 +58,6 @@ public interface IgorComponent {
      */
     void initialize(String jobId, JobExecution jobExecution);
 
-
     /**
      * Shuts the component down at the end of the job execution.
      *

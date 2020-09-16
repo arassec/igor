@@ -37,7 +37,7 @@ public class LimitAction extends BaseUtilAction {
      */
     public LimitAction() {
         super("limit-action");
-        // Skipping is always done single threaded:
+        // Limiting is always done single threaded:
         setNumThreads(1);
         getUnEditableProperties().add("numThreads");
     }
@@ -59,4 +59,11 @@ public class LimitAction extends BaseUtilAction {
         return List.of();
     }
 
+    /**
+     * Resets the action's counter so that the configured amount of data items is processed again.
+     */
+    @Override
+    public void reset() {
+        processed = 0;
+    }
 }

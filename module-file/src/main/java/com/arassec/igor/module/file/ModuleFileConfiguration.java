@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for the igor file-module.
+ * Configuration for the igor 'file' module.
  */
 @Configuration
 @ComponentScan

@@ -6,15 +6,15 @@
                 <input-filter :filter-key="'job-name-filter'" :filter="filterJobName" :label="'Name filter:'"/>
                 <label id="state-filter-label">State filter:</label>
                 <toggle-button icon="spinner"
-                               :label="'(' + executionsOverview.numRunning + '/' + executionsOverview.numSlots + ') Running'"
+                               :label="'Running/Active (' + executionsOverview.numRunning + '/' + executionsOverview.numSlots + ')'"
                                bgcolor="var(--color-foreground)" class="margin-right"
                                fontcolor="var(--color-font)" v-on:selected="filterJobStateRunning"
                                :selected="stateFilter.running"/>
-                <toggle-button icon="hourglass" :label="'(' + executionsOverview.numWaiting + ') Waiting'"
+                <toggle-button icon="hourglass" :label="'Waiting (' + executionsOverview.numWaiting + ')'"
                                bgcolor="var(--color-foreground)" class="margin-right"
                                fontcolor="var(--color-font)" v-on:selected="filterJobStateWaiting"
                                :selected="stateFilter.waiting"/>
-                <toggle-button icon="bolt" :label="'(' + executionsOverview.numFailed + ') Failed'"
+                <toggle-button icon="bolt" :label="'Failed (' + executionsOverview.numFailed + ')'"
                                bgcolor="var(--color-alert)" class="margin-right"
                                fontcolor="var(--color-font)" v-on:selected="filterJobStateFailed"
                                :selected="stateFilter.failed"/>
@@ -47,17 +47,19 @@
                             </div>
                             <div slot="right">
                                 <input-button icon="play" v-on:clicked="openRunJobDialog(job.id, job.name)"
-                                              :disabled="isJobInState(job, ['WAITING', 'RUNNING'])"/>
+                                              :disabled="isJobInState(job, ['WAITING', 'RUNNING', 'ACTIVE'])"/>
                             </div>
                         </layout-row>
                         <div slot="action" :class="isJobInState(job, ['FAILED']) ? 'alert' : 'info'">
                             <icon-button icon="times" v-on:clicked="openCancelJobDialog(job.execution.id, job.name)"
-                                         v-if="isJobInState(job, ['WAITING', 'RUNNING'])" class="right"/>
+                                         v-if="isJobInState(job, ['WAITING', 'RUNNING', 'ACTIVE'])" class="right"/>
                             <icon-button icon="check"
                                          v-on:clicked="openMarkJobExecutionResolvedDialog(job.execution.id, job.id, job.name)"
                                          v-if="isJobInState(job, ['FAILED'])" class="right"/>
                             <font-awesome-icon icon="spinner" class="fa-fw fa-spin"
                                                v-if="isJobInState(job, ['RUNNING'])"/>
+                            <font-awesome-icon icon="sign-in-alt" class="fa-fw"
+                                               v-if="isJobInState(job, ['ACTIVE'])"/>
                             <font-awesome-icon icon="hourglass" class="fa-fw"
                                                v-if="isJobInState(job, ['WAITING'])"/>
                             <font-awesome-icon icon="bolt" class="fa-fw"
@@ -212,25 +214,25 @@
 </template>
 
 <script>
-    import CoreContainer from "../components/common/core-container";
-    import OverviewTile from "../components/common/overview-tile";
-    import IgorBackend from "../utils/igor-backend";
-    import FormatUtils from "../utils/utils";
-    import Utils from "../utils/utils";
-    import DeleteJobDialog from "../components/jobs/delete-job-dialog";
-    import LayoutRow from "../components/common/layout-row";
-    import ModalDialog from "../components/common/modal-dialog";
-    import InputButton from "../components/common/input-button";
-    import IconButton from "../components/common/icon-button";
-    import ListPager from "../components/common/list-pager";
-    import ActionBar from "../components/common/action-bar";
-    import BackgroundIcon from "../components/common/background-icon";
-    import InputFilter from "../components/common/input-filter";
-    import FeedbackBox from "../components/common/feedback-box";
-    import JobExecutionDetails from "../components/jobs/job-execution-details";
-    import ToggleButton from "../components/common/toggle-button";
+import CoreContainer from "../components/common/core-container";
+import OverviewTile from "../components/common/overview-tile";
+import IgorBackend from "../utils/igor-backend";
+import FormatUtils from "../utils/utils";
+import Utils from "../utils/utils";
+import DeleteJobDialog from "../components/jobs/delete-job-dialog";
+import LayoutRow from "../components/common/layout-row";
+import ModalDialog from "../components/common/modal-dialog";
+import InputButton from "../components/common/input-button";
+import IconButton from "../components/common/icon-button";
+import ListPager from "../components/common/list-pager";
+import ActionBar from "../components/common/action-bar";
+import BackgroundIcon from "../components/common/background-icon";
+import InputFilter from "../components/common/input-filter";
+import FeedbackBox from "../components/common/feedback-box";
+import JobExecutionDetails from "../components/jobs/job-execution-details";
+import ToggleButton from "../components/common/toggle-button";
 
-    export default {
+export default {
         name: "job-overview",
         components: {
             ToggleButton,
@@ -313,7 +315,7 @@
                 if (this.jobsPage) {
                     let stateFilter = '';
                     if (this.stateFilter.running) {
-                        stateFilter += 'RUNNING,';
+                        stateFilter += 'RUNNING,ACTIVE,';
                     }
                     if (this.stateFilter.waiting) {
                         stateFilter += 'WAITING,';

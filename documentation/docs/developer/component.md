@@ -21,6 +21,7 @@ If you want to add your custom component to an existing category, you should set
 |Component Type|Category|Category-ID|Base Class to Extend|
 |---|---|---|---|
 |Trigger|Util|"util-triggers"|BaseUtilTrigger.class|
+|Trigger|Web|"web-triggers"|-|
 |Provider|Util|"util-providers"|BaseUtilProvider.class|
 |Provider|File|"file-providers"|BaseFileProvider.class|
 |Action|Util|"util-actions"|BaseUtilAction.class|

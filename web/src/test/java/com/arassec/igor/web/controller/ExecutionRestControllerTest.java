@@ -57,7 +57,8 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
                 ).build()));
 
         String streamContent = mvcResult.getResponse().getContentAsString();
-        assertEquals("data:{\"executionState\":\"RUNNING\",\"workInProgress\":[],\"running\":true}\n\n", streamContent);
+        assertEquals("data:{\"executionState\":\"RUNNING\",\"processedEvents\":0,\"workInProgress\":[]," +
+                "\"runningOrActive\":true}\n\n", streamContent);
     }
 
     /**

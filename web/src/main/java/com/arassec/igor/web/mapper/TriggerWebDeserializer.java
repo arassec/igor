@@ -3,6 +3,7 @@ package com.arassec.igor.web.mapper;
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.repository.ConnectorRepository;
+import com.arassec.igor.web.simulation.TriggerProxy;
 
 import java.util.Map;
 
@@ -26,7 +27,12 @@ public class TriggerWebDeserializer extends IgorComponentWebDeserializer<Trigger
      */
     @Override
     Trigger createInstance(String typeId, Map<String, Object> parameters, boolean simulationMode) {
-        return igorComponentRegistry.createTriggerInstance(typeId, parameters);
+        Trigger trigger = igorComponentRegistry.createTriggerInstance(typeId, parameters);
+        if (simulationMode) {
+            return new TriggerProxy(trigger);
+        } else {
+            return trigger;
+        }
     }
 
 }

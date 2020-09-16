@@ -1,7 +1,5 @@
 package com.arassec.igor.web.simulation;
 
-import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.util.StacktraceFormatter;
 import lombok.Getter;
@@ -17,11 +15,6 @@ import java.util.Map;
 @Getter
 @Setter
 public class ProviderProxy extends BaseProxy<Provider> implements Provider {
-
-    /**
-     * The real provider proxied by this class.
-     */
-    private Provider delegate;
 
     /**
      * Contains the number of data items that were actually returned by this proxy so far.
@@ -40,19 +33,6 @@ public class ProviderProxy extends BaseProxy<Provider> implements Provider {
      */
     public ProviderProxy(Provider delegate) {
         super(delegate);
-        this.delegate = delegate;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialize(String jobId, JobExecution jobExecution) {
-        try {
-            delegate.initialize(jobId, jobExecution);
-        } catch (Exception e) {
-            setErrorCause(StacktraceFormatter.format(e));
-        }
     }
 
     /**
@@ -84,7 +64,6 @@ public class ProviderProxy extends BaseProxy<Provider> implements Provider {
         try {
             Map<String, Object> data = delegate.next();
             if (data != null) {
-                data.put(DataKey.SIMULATION.getKey(), true);
                 collectedData.add(data);
             }
             return data;
@@ -92,6 +71,14 @@ public class ProviderProxy extends BaseProxy<Provider> implements Provider {
             setErrorCause(StacktraceFormatter.format(e));
         }
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        delegate.reset();
     }
 
     /**

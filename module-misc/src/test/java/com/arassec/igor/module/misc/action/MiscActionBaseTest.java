@@ -36,7 +36,7 @@ public abstract class MiscActionBaseTest {
         item.put(PARAM_KEY, PARAM_VALUE);
 
         Map<String, Object> result = new HashMap<>();
-        result.put(DataKey.META.getKey(), Job.createMetaData(JOB_ID));
+        result.put(DataKey.META.getKey(), Job.createMetaData(JOB_ID, null));
         result.put(DataKey.DATA.getKey(), item);
 
         return result;

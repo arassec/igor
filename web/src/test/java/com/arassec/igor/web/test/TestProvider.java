@@ -81,4 +81,12 @@ public class TestProvider extends BaseProvider {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+
+    }
+
 }

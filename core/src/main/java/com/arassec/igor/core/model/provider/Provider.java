@@ -24,6 +24,11 @@ public interface Provider extends IgorComponent {
     Map<String, Object> next();
 
     /**
+     * Resets the provider in order to start again with data processing.
+     */
+    void reset();
+
+    /**
      * Returns the limit for test data during simulated job runs of this provider.
      *
      * @return The maximum number of data sets to use during simulations.

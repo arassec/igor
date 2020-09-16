@@ -71,4 +71,11 @@ public interface Action extends IgorComponent {
      */
     void setActive(boolean active);
 
+    /**
+     * Resets the action to its initial state. A job that is triggered by events is not finished after processing an event. This
+     * method is responsible to reset the action to an initial state, so that the next event will be processed as if the job had
+     * been newly created.
+     */
+    void reset();
+
 }

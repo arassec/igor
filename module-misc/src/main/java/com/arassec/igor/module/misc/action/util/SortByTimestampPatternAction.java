@@ -196,4 +196,11 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
         return 1;
     }
 
+    /**
+     * Deletes all processed data items so that sorting can begin with the next data item.
+     */
+    @Override
+    public void reset() {
+        collectedData.clear();
+    }
 }

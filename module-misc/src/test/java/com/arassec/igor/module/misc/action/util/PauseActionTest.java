@@ -29,10 +29,10 @@ class PauseActionTest extends MiscActionBaseTest {
     @SuppressWarnings("unchecked")
     void testProcessDuringSimulation() {
         PauseAction pauseAction = new PauseAction();
-        pauseAction.setMilliseconds(666);
+        pauseAction.setMilliseconds(666L);
 
         Map<String, Object> data = createData();
-        ((Map<String, Object>) data.get(DataKey.DATA.getKey())).put(DataKey.SIMULATION.getKey(), true);
+        ((Map<String, Object>) data.get(DataKey.META.getKey())).put(DataKey.SIMULATION.getKey(), true);
 
         List<Map<String, Object>> processedData = pauseAction.process(data, new JobExecution());
         assertEquals("Would have paused for 666 milliseconds.", processedData.get(0).get(DataKey.SIMULATION_LOG.getKey()));
@@ -45,7 +45,7 @@ class PauseActionTest extends MiscActionBaseTest {
     @DisplayName("Tests running the action during normal job runs.")
     void testProcess() {
         PauseAction pauseAction = new PauseAction();
-        pauseAction.setMilliseconds(23);
+        pauseAction.setMilliseconds(23L);
 
         Map<String, Object> data = createData();
 
@@ -61,7 +61,7 @@ class PauseActionTest extends MiscActionBaseTest {
     @DisplayName("Tests interrupting the action.")
     void testInterruption() {
         PauseAction pauseAction = new PauseAction();
-        pauseAction.setMilliseconds(5000);
+        pauseAction.setMilliseconds(5000L);
 
         Logger logger = (Logger) LoggerFactory.getLogger(PauseAction.class);
         ListAppender<ILoggingEvent> listAppender = new ListAppender<>();

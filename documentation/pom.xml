@@ -133,6 +133,21 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-resources-web</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>docs/user/module-web</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/module-web/src/main/resources/doc</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 

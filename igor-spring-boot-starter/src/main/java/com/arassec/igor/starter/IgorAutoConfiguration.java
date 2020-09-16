@@ -4,6 +4,7 @@ import com.arassec.igor.core.CoreConfiguration;
 import com.arassec.igor.module.file.ModuleFileConfiguration;
 import com.arassec.igor.module.message.ModuleMessageConfiguration;
 import com.arassec.igor.module.misc.ModuleMiscConfiguration;
+import com.arassec.igor.module.web.ModuleWebConfiguration;
 import com.arassec.igor.persistence.PersistenceConfiguration;
 import com.arassec.igor.web.WebConfiguration;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +16,7 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Configuration
 @Import({CoreConfiguration.class, PersistenceConfiguration.class, WebConfiguration.class, ModuleMiscConfiguration.class,
-        ModuleMessageConfiguration.class, ModuleFileConfiguration.class})
+        ModuleMessageConfiguration.class, ModuleFileConfiguration.class, ModuleWebConfiguration.class})
 @PropertySource("classpath:igor.properties")
 public class IgorAutoConfiguration {
 }

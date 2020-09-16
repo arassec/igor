@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -41,7 +41,7 @@ public class FilterByTimestampAction extends BaseUtilAction {
     /**
      * The amount of time (configured by {@link #timeUnit}) to use for filtering.
      */
-    @PositiveOrZero
+    @Positive
     @IgorParam
     private long amount;
 

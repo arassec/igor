@@ -55,7 +55,7 @@ class FilterByTimestampActionTest extends MiscActionBaseTest {
     void testOlderThan() {
         FilterByTimestampAction action = new FilterByTimestampAction();
         action.setInput("$.timestamp");
-        action.setAmount(1);
+        action.setAmount(1L);
         action.setTimeUnit(ChronoUnit.DAYS.name());
         action.setTimestampFormat("yyyy-MM-dd'T'HH:mm:ss");
         action.setOlderThan(true);
@@ -66,7 +66,7 @@ class FilterByTimestampActionTest extends MiscActionBaseTest {
         assertEquals(data, processedData.get(0));
 
         // Filter all older than 15 days:
-        action.setAmount(15);
+        action.setAmount(15L);
 
         processedData = action.process(data, new JobExecution());
         assertEquals(data, processedData.get(0));
@@ -85,7 +85,7 @@ class FilterByTimestampActionTest extends MiscActionBaseTest {
         FilterByTimestampAction action = new FilterByTimestampAction();
         action.setOlderThan(false);
         action.setInput("$.timestamp");
-        action.setAmount(1);
+        action.setAmount(1L);
         action.setTimeUnit(ChronoUnit.HOURS.name());
         action.setTimestampFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 

@@ -1,8 +1,12 @@
 <template>
     <div :class="style" v-on:click="$emit('job-is-selected')">
-        <h1><font-awesome-icon icon="toolbox" class="margin-right fa-fw"/>{{ job.name.length > 0 ? job.name : 'Job' }}</h1>
+        <h1>
+            <font-awesome-icon icon="toolbox" class="margin-right fa-fw"/>
+            {{ job.name.length > 0 ? job.name : 'Job' }}
+        </h1>
         <layout-row>
-            <input-button slot="left" icon="arrow-left" v-on:clicked="$emit('cancel-configuration')" class="margin-right"/>
+            <input-button slot="left" icon="arrow-left" v-on:clicked="$emit('cancel-configuration')"
+                          class="margin-right"/>
             <input-button slot="left" icon="plug" v-on:clicked="$emit('test-configuration')" class="margin-right"/>
             <input-button slot="left" icon="save" v-on:clicked="$emit('save-configuration')"/>
             <input-button slot="right" icon="play" v-on:clicked="$emit('run-job')" class="margin-left"
@@ -12,10 +16,10 @@
 </template>
 
 <script>
-    import InputButton from "../common/input-button";
-    import LayoutRow from "../common/layout-row";
+import InputButton from "../common/input-button";
+import LayoutRow from "../common/layout-row";
 
-    export default {
+export default {
         name: "job-navigation-item",
         components: {LayoutRow, InputButton},
         props: ['job', 'selected', 'validationErrors', 'jobRunningOrWaiting', 'jobExecutionsPage'],
@@ -34,6 +38,9 @@
                     return "alert";
                 }
                 if (this.job.trigger.id in this.validationErrors) {
+                    return "alert";
+                }
+                if (this.job.provider.id in this.validationErrors) {
                     return "alert";
                 }
                 if (this.selected) {

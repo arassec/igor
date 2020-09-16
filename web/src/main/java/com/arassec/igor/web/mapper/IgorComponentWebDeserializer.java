@@ -69,7 +69,8 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
         String typeId = getTypeId((Map<String, Object>) map.get(WebMapperKey.TYPE.getKey()));
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> parameters = deserializeParameters((List<Map<String, Object>>) map.get(WebMapperKey.PARAMETERS.getKey()));
+        Map<String, Object> parameters =
+                deserializeParameters((List<Map<String, Object>>) map.get(WebMapperKey.PARAMETERS.getKey()));
 
         T instance = createInstance(typeId, parameters, simulationMode);
 
@@ -112,15 +113,26 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
                 result.put(parameterName, deserializeConnectorParameter(jsonParameter));
             } else {
                 Object value = jsonParameter.get(WebMapperKey.VALUE.getKey());
-                if (value != null) {
-                    if (value instanceof String && StringUtils.isEmpty(value)) {
-                        return;
-                    }
+                if (parameterValueValid(value)) {
                     result.put(parameterName, value);
                 }
             }
         });
         return result;
+    }
+
+    /**
+     * Checks if a parameter value is valid for further processing.
+     *
+     * @param value The value to check.
+     *
+     * @return {@code true} if the parameter's value is valid and should be further processed, {@code false} otherwise.
+     */
+    private boolean parameterValueValid(Object value) {
+        if (value == null) {
+            return false;
+        }
+        return !(value instanceof String) || !StringUtils.isEmpty(value);
     }
 
     /**
