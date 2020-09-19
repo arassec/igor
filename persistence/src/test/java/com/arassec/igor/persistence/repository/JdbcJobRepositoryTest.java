@@ -11,7 +11,6 @@ import com.arassec.igor.persistence.entity.JobConnectorReferenceIdentity;
 import com.arassec.igor.persistence.entity.JobEntity;
 import com.arassec.igor.persistence.test.TestAction;
 import com.arassec.igor.persistence.test.TestConnector;
-import com.arassec.igor.persistence.test.TestProvider;
 import com.arassec.igor.persistence.test.TestTrigger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -84,7 +83,6 @@ class JdbcJobRepositoryTest {
         Job job = new Job();
         job.setName("job-name");
         job.setTrigger(new TestTrigger());
-        job.setProvider(new TestProvider());
         TestAction testAction = new TestAction();
         testAction.setTestConnector(new TestConnector());
         testAction.getTestConnector().setId("connector-id");
@@ -96,7 +94,6 @@ class JdbcJobRepositoryTest {
 
         assertNotNull(savedJob.getId());
         assertNotNull(savedJob.getTrigger().getId());
-        assertNotNull(savedJob.getProvider().getId());
         assertNotNull(savedJob.getActions().get(0).getId());
 
         ArgumentCaptor<JobEntity> argCap = ArgumentCaptor.forClass(JobEntity.class);

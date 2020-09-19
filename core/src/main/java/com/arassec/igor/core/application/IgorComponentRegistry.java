@@ -5,7 +5,6 @@ import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,11 +34,6 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * All available actions.
      */
     private final List<Action> actions;
-
-    /**
-     * All available providers.
-     */
-    private final List<Provider> providers;
 
     /**
      * All available triggers.
@@ -74,7 +68,6 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     @Override
     public void afterPropertiesSet() {
         initializeComponent(Action.class, actions);
-        initializeComponent(Provider.class, providers);
         initializeComponent(Trigger.class, triggers);
         initializeComponent(Connector.class, connectors);
     }
@@ -129,18 +122,11 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
                 .orElse(triggers.get(0)).getTypeId(), null);
         trigger.setId(UUID.randomUUID().toString());
 
-        Provider provider = createProviderInstance(providers.stream()
-                .filter(providerCandidate -> providerCandidate.getTypeId().equals(igorCoreProperties.getDefaultProvider()))
-                .findFirst()
-                .orElse(providers.get(0)).getTypeId(), null);
-        provider.setId(UUID.randomUUID().toString());
-
         return Job.builder()
                 .id(UUID.randomUUID().toString())
                 .name("New Job")
                 .active(true)
                 .trigger(trigger)
-                .provider(provider)
                 .build();
     }
 
@@ -192,24 +178,6 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
             return connector;
         }
         throw new IllegalArgumentException("No connector found for type ID: " + typeId);
-    }
-
-    /**
-     * Returns a new {@link Provider} instance for the given type ID.
-     *
-     * @param typeId     The provider's type ID.
-     * @param parameters The parameters of the newly created action.
-     *
-     * @return The new {@link Provider} instance.
-     */
-    public Provider createProviderInstance(String typeId, Map<String, Object> parameters) {
-        Optional<Provider> optional = providers.stream().filter(provider -> provider.getTypeId().equals(typeId)).findFirst();
-        if (optional.isPresent()) {
-            Provider provider = applicationContext.getBean(optional.get().getClass());
-            applyParameters(provider, parameters);
-            return provider;
-        }
-        throw new IllegalArgumentException("No provider found for type ID: " + typeId);
     }
 
     /**

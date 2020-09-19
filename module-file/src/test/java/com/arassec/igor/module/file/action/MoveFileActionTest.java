@@ -3,7 +3,6 @@ package com.arassec.igor.module.file.action;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.module.file.connector.FileConnector;
-import com.arassec.igor.module.file.provider.ListFilesProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -30,8 +29,8 @@ class MoveFileActionTest extends FileActionBaseTest {
 
         MoveFileAction moveFileAction = new MoveFileAction();
         moveFileAction.setSource(fileConnectorMock);
-        moveFileAction.setSourceDirectory("$." + DataKey.DATA.getKey() + "." + ListFilesProvider.DIRECTORY_KEY);
-        moveFileAction.setSourceFilename("$." + DataKey.DATA.getKey() + "." + ListFilesProvider.FILENAME_KEY);
+        moveFileAction.setSourceDirectory("$." + DataKey.DATA.getKey() + "." + BaseFileAction.DIRECTORY_KEY);
+        moveFileAction.setSourceFilename("$." + DataKey.DATA.getKey() + "." + BaseFileAction.FILENAME_KEY);
         moveFileAction.setTargetDirectory("/dev/null");
         moveFileAction.setTargetFilename("deleted.txt");
 

@@ -3,12 +3,11 @@
 ## Description
 Jobs are the core elements of igor. They contain all configurations required to fulfill a specific... job.
 
-A **Trigger** determines when the job should run. It activates job execution e.g. based on a daily schedule.
+A **Trigger** determines when the job should run. It activates job execution e.g. based on a daily schedule or on received events.
+The trigger creates an initial data item, which is passed to the job's first action.
 
-A **Provider** creates the initial input data for the job.
-Each data item is passed to the first action of the job, and then handed over to the following action and so on.
+Each data item is then handed over to the following action and so on.
 Think about the "Java Stream API" to get an idea of the process. 
-The provider's data items are the initial source of the stream's data.
 
 **Actions** implement the job's logic and operate on the data items of the data stream.
 

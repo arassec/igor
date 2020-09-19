@@ -6,7 +6,6 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.IgorException;
 import lombok.Getter;
@@ -50,12 +49,6 @@ class IgorComponentRegistryTest {
     private Action actionMock;
 
     /**
-     * A provider mock.
-     */
-    @Mock
-    private Provider providerMock;
-
-    /**
      * A trigger mock.
      */
     @Mock
@@ -75,15 +68,12 @@ class IgorComponentRegistryTest {
         when(actionMock.getTypeId()).thenReturn("action-type-id");
         when(actionMock.getCategoryId()).thenReturn("action-category-id");
 
-        when(providerMock.getTypeId()).thenReturn("provider-type-id");
-        when(providerMock.getCategoryId()).thenReturn("provider-category-id");
-
         when(triggerMock.getTypeId()).thenReturn("trigger-type-id");
         when(triggerMock.getCategoryId()).thenReturn("trigger-category-id");
 
         applicationContextMock = mock(ApplicationContext.class);
 
-        igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock), List.of(providerMock), List.of(triggerMock),
+        igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock), List.of(triggerMock),
                 List.of(new TestConnectorImpl()), igorCoreProperties);
         igorComponentRegistry.afterPropertiesSet();
         igorComponentRegistry.setApplicationContext(applicationContextMock);
@@ -95,7 +85,7 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting all categories of a component type")
     void testGetCategoriesOfComponentType() {
-        assertNotNull(new IgorComponentRegistry(List.of(), List.of(), List.of(), List.of(), null).getCategoriesOfComponentType(Action.class));
+        assertNotNull(new IgorComponentRegistry(List.of(), List.of(), List.of(), null).getCategoriesOfComponentType(Action.class));
 
         Set<String> categoriesOfComponentType = igorComponentRegistry.getCategoriesOfComponentType(Action.class);
         assertEquals("action-category-id", categoriesOfComponentType.iterator().next());
@@ -119,12 +109,10 @@ class IgorComponentRegistryTest {
     @DisplayName("Tests creating a job instance as prototype.")
     void testCreateJobPrototype() {
         doReturn(triggerMock).when(applicationContextMock).getBean(eq(triggerMock.getClass()));
-        doReturn(providerMock).when(applicationContextMock).getBean(eq(providerMock.getClass()));
 
         Job jobPrototype = igorComponentRegistry.createJobPrototype();
 
         verify(triggerMock, times(1)).setId(anyString());
-        verify(providerMock, times(1)).setId(anyString());
         assertEquals("New Job", jobPrototype.getName());
         assertTrue(jobPrototype.isActive());
     }
@@ -176,17 +164,6 @@ class IgorComponentRegistryTest {
         when(applicationContextMock.getBean(eq(TestConnectorImpl.class))).thenReturn(new TestConnectorImpl());
         TestConnectorImpl connectorInstance = (TestConnectorImpl) igorComponentRegistry.createConnectorInstance("connector-type-id", params);
         assertEquals(666, connectorInstance.getTestParam());
-    }
-
-    /**
-     * Tests getting a component instance.
-     */
-    @Test
-    @DisplayName("Tests getting a Provider instance.")
-    void testGetProviderInstance() {
-        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.createProviderInstance("unknown-type-id", null));
-        igorComponentRegistry.createProviderInstance("provider-type-id", null);
-        verify(applicationContextMock, times(1)).getBean(eq(providerMock.getClass()));
     }
 
     /**

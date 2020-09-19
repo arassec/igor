@@ -4,7 +4,10 @@ import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.persistence.PersistenceConfiguration;
-import com.arassec.igor.persistence.test.*;
+import com.arassec.igor.persistence.test.TestAction;
+import com.arassec.igor.persistence.test.TestConnector;
+import com.arassec.igor.persistence.test.TestSecurityProvider;
+import com.arassec.igor.persistence.test.TestTrigger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,10 +43,9 @@ public abstract class MapperBaseTest {
         ApplicationContext applicationContextMock = mock(ApplicationContext.class);
         when(applicationContextMock.getBean(eq(TestConnector.class))).thenReturn(new TestConnector());
         when(applicationContextMock.getBean(eq(TestTrigger.class))).thenReturn(new TestTrigger());
-        when(applicationContextMock.getBean(eq(TestProvider.class))).thenReturn(new TestProvider());
         when(applicationContextMock.getBean(eq(TestAction.class))).thenReturn(new TestAction());
 
-        IgorComponentRegistry igorComponentRegistry = new IgorComponentRegistry(List.of(new TestAction()), List.of(new TestProvider()),
+        IgorComponentRegistry igorComponentRegistry = new IgorComponentRegistry(List.of(new TestAction()),
                 List.of(new TestTrigger()), List.of(new TestConnector()), null);
         igorComponentRegistry.setApplicationContext(applicationContextMock);
         igorComponentRegistry.afterPropertiesSet();

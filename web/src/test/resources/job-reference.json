@@ -23,48 +23,21 @@
         "type": "java.lang.Integer",
         "value": null,
         "connector": false
-      }
-    ]
-  },
-  "provider": {
-    "id": "provider-id",
-    "category": {
-      "key": "provider-category-id",
-      "value": "Provider Category"
-    },
-    "type": {
-      "key": "provider-type-id",
-      "value": "Provider Type",
-      "documentationAvailable": false
-    },
-    "parameters": [
+      },
       {
-        "name": "emptyStringParam",
-        "subtype": "CRON",
+        "name": "metaData",
+        "advanced": true,
+        "subtype": "MULTI_LINE",
         "type": "java.lang.String",
         "value": null,
         "connector": false
       },
       {
-        "name": "nullInteger",
-        "type": "java.lang.Integer",
-        "value": null,
-        "connector": false
-      },
-      {
-        "name": "validatedInteger",
-        "required": true,
-        "type": "java.lang.Integer",
-        "value": null,
-        "connector": false
-      },
-      {
-        "name": "simulationLimit",
+        "name": "data",
         "advanced": true,
-        "defaultValue": "25",
-        "required": true,
-        "type": "int",
-        "value": 456,
+        "subtype": "MULTI_LINE",
+        "type": "java.lang.String",
+        "value": null,
         "connector": false
       }
     ]

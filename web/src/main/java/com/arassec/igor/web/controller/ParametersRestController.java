@@ -4,7 +4,6 @@ import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.connector.Connector;
-import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.web.mapper.WebMapperKey;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -68,18 +67,6 @@ public class ParametersRestController {
      *
      * @return List of parameters.
      */
-    @GetMapping(value = "provider/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Object getProviderParameters(@PathVariable("type") String type) {
-        return serializeParameters(Provider.class, type);
-    }
-
-    /**
-     * Returns all configuration parameters of an action type.
-     *
-     * @param type The type to get parameters for.
-     *
-     * @return List of parameters.
-     */
     @GetMapping(value = "trigger/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Object getTriggerParameters(@PathVariable("type") String type) {
         return serializeParameters(Trigger.class, type);
@@ -99,8 +86,6 @@ public class ParametersRestController {
                 igorComponent = igorComponentRegistry.createActionInstance(typeId, null);
             } else if (clazz.equals(Connector.class)) {
                 igorComponent = igorComponentRegistry.createConnectorInstance(typeId, null);
-            } else if (clazz.equals(Provider.class)) {
-                igorComponent = igorComponentRegistry.createProviderInstance(typeId, null);
             } else if (clazz.equals(Trigger.class)) {
                 igorComponent = igorComponentRegistry.createTriggerInstance(typeId, null);
             } else {

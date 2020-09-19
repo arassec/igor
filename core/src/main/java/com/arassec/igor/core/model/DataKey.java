@@ -13,7 +13,7 @@ public enum DataKey {
     META("meta"),
 
     /**
-     * The key for the provider's data.
+     * The key for the data.
      */
     DATA("data"),
 

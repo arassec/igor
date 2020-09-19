@@ -7,10 +7,10 @@
 </template>
 
 <script>
-    import NavigationItem from "./navigation-item";
-    import IconButton from "../common/icon-button";
+import NavigationItem from "./navigation-item";
+import IconButton from "../common/icon-button";
 
-    export default {
+export default {
         name: "action-navigation-item",
         components: {IconButton, NavigationItem},
         props: ['action', 'selectedActionId', 'validationErrors'],
@@ -24,6 +24,9 @@
                 }
                 if (this.selectedActionId === this.action.id) {
                     return "info";
+                }
+                if (!this.action.active) {
+                  return "inactive";
                 }
                 return "unselected";
             }
@@ -49,6 +52,11 @@
     .move-icon:hover {
         cursor: move;
         opacity: 1;
+    }
+
+    .inactive {
+      background-color: var(--color-background);
+      opacity: 0.75;
     }
 
 </style>

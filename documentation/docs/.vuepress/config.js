@@ -50,15 +50,6 @@ module.exports = {
                             ]
                         },
                         {
-                            title: "Providers",
-                            sidebarDepth: 0,
-                            children: [
-                                "module-misc/empty-input-provider",
-                                "module-misc/fixed-input-provider",
-                                "module-file/list-files-provider"
-                            ]
-                        },
-                        {
                             title: "Actions",
                             sidebarDepth: 0,
                             children: [
@@ -109,7 +100,6 @@ module.exports = {
                     children: [
                         "component",
                         "trigger",
-                        "provider",
                         "action",
                         "connector"
                     ]

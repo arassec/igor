@@ -15,7 +15,7 @@ A message should be sent to an application to further process each newly copied 
 :::
 
 ## General Idea
-The following ist a rough idea of how to configure a job in igor to solve the task.
+The following is a rough idea of how to configure a job in igor to solve the task.
 
 - Use a CRON expression to regularly check for new files.
 - List all files on the remote server
@@ -27,23 +27,37 @@ The following ist a rough idea of how to configure a job in igor to solve the ta
 ## Job Configuration
 In order to implement the general idea with igor, we will create a new job with the following configuration.
 
-### Trigger and Provider
+### Trigger
 We configure a **CRON trigger** and set the expression to `0 */15 * * * *`. 
 Thus, igor will start the job every 15 minutes.
-
-The **'List Files' provider** will list all files in the configured directory and create data items from them.
-In this example I chose the publicly available SFTP server at [test.rebex.net](https://test.rebex.net/).
 
 The configuration of the job then looks like this:
 
 ![job configuration](./images/copyfiles/job-configuration.png)
 
-The resulting data items look like this:
+The resulting initial data item looks like this:
 
 ![job configuration sim result](./images/copyfiles/job-configuration-sim-result.png)
 
+### List Files
+The **'List Files' action** will list all files in the configured directory and create data items from them.
+In this example I chose the publicly available SFTP server at [test.rebex.net](https://test.rebex.net/).
+
+In order to filter files in the first place we configure the file ending to be `png`.
+
+During simulated job executions we don't need all files on the server, so we limit them to five.
+
+The action configuration looks like this:
+
+![filter regexp](./images/copyfiles/list-files.png)
+
+The resulting data items look like this:
+
+![filter regexp sim result](./images/copyfiles/list-files-sim-result.png)
+
+
 ### Filename Filter
-The job's first action filters the data items based on the file name.
+The job's second action filters the data items based on the file name.
 In the example, we only want files containing the word "Generator" in the filename to be copied.
 
 The **'Filter by Regular Expression' action** can be used for this. 

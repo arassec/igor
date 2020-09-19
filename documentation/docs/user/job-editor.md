@@ -37,6 +37,14 @@ Details can be opened by clicking on an execution entry.
 
 If an execution failed, its entry is red.
 By clicking the ![mark resolved](./images/mark-resolved-button.png) button, the job execution can manually be marked as resolved and will no longer be displayed in red.
+
+::: tip
+A job will not run if failed executions exist. 
+You can either resolve the failed executions manually or configure the job to be fault tolerant (which is an advanced job parameter).
+
+Fault tolerant jobs are executed even if previous executions failed. 
+A successful job execution will mark all previously failed executions as resolved.
+:::
  
 ## Parameters Editor
 

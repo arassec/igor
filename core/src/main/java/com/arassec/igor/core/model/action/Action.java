@@ -22,7 +22,7 @@ public interface Action extends IgorComponent {
     List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution);
 
     /**
-     * Finalizes the action after all input data from the provider has been processed.
+     * Finalizes the action after all data items have been processed.
      *
      * @return List of final data that should be processed by later actions.
      */

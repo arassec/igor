@@ -2,7 +2,6 @@ package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.web.simulation.ActionProxy;
-import com.arassec.igor.web.simulation.ProviderProxy;
 import com.arassec.igor.web.test.TestAction;
 import com.arassec.igor.web.test.TestConnector;
 import lombok.SneakyThrows;
@@ -31,8 +30,6 @@ class SimulationObjectMapperTest extends MapperBaseTest {
         String jobJson = Files.readString(Paths.get("src/test/resources/job-reference.json"));
 
         Job testJob = simulationObjectMapper.readValue(jobJson, Job.class);
-
-        assertTrue(testJob.getProvider() instanceof ProviderProxy);
 
         assertTrue(testJob.getActions().get(0) instanceof ActionProxy);
 

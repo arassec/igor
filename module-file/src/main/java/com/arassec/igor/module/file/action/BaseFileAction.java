@@ -2,7 +2,6 @@ package com.arassec.igor.module.file.action;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.BaseAction;
-import com.arassec.igor.module.file.provider.ListFilesProvider;
 import lombok.Data;
 
 import java.util.Map;
@@ -13,14 +12,29 @@ import java.util.Map;
 public abstract class BaseFileAction extends BaseAction {
 
     /**
+     * The key to the filename.
+     */
+    public static final String FILENAME_KEY = "filename";
+
+    /**
+     * The key to the directory.
+     */
+    public static final String DIRECTORY_KEY = "directory";
+
+    /**
+     * The key to the file's last modification timestamp.
+     */
+    public static final String LAST_MODIFIED_KEY = "lastModified";
+
+    /**
      * Default-Query for the directory.
      */
-    protected static final String DIRECTORY_QUERY = "$.data." + ListFilesProvider.DIRECTORY_KEY;
+    protected static final String DIRECTORY_QUERY = "$.data." + DIRECTORY_KEY;
 
     /**
      * Default-Query for the filename.
      */
-    protected static final String FILENAME_QUERY = "$.data." + ListFilesProvider.FILENAME_KEY;
+    protected static final String FILENAME_QUERY = "$.data." + FILENAME_KEY;
 
     /**
      * Creates a new component instance.

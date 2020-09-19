@@ -4,7 +4,6 @@ import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.web.test.TestAction;
 import com.arassec.igor.web.test.TestConnector;
-import com.arassec.igor.web.test.TestProvider;
 import com.arassec.igor.web.test.TestTrigger;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
@@ -42,12 +41,6 @@ class ObjectMapperTest extends MapperBaseTest {
         TestTrigger testTrigger = new TestTrigger();
         testTrigger.setId("trigger-id");
         job.setTrigger(testTrigger);
-
-        TestProvider testProvider = new TestProvider();
-        testProvider.setId("provider-id");
-        testProvider.setSimulationLimit(456);
-        testProvider.setTestProviderParam("test-provider-param");
-        job.setProvider(testProvider);
 
         TestAction testAction = new TestAction();
         testAction.setId("action-id");
@@ -94,13 +87,6 @@ class ObjectMapperTest extends MapperBaseTest {
         assertEquals("trigger-id", testTrigger.getId());
         assertEquals(TestTrigger.CATEGORY_ID, testTrigger.getCategoryId());
         assertEquals(TestTrigger.TYPE_ID, testTrigger.getTypeId());
-
-        TestProvider testProvider = (TestProvider) testJob.getProvider();
-        assertEquals("provider-id", testProvider.getId());
-        assertEquals(TestProvider.CATEGORY_ID, testProvider.getCategoryId());
-        assertEquals(TestProvider.TYPE_ID, testProvider.getTypeId());
-        assertEquals(456, testProvider.getSimulationLimit());
-        assertEquals("provider-test-param", testProvider.getTestProviderParam());
 
         assertEquals(1, testJob.getActions().size());
         TestAction testAction = (TestAction) testJob.getActions().get(0);

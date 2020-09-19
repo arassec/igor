@@ -4,13 +4,12 @@ import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
-import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.IgorException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -110,13 +109,11 @@ class JobTest {
     @Test
     @DisplayName("Tests failing safe on execution errors.")
     void testFailSafe() {
-        Job job = Job.builder().id("job-id").build();
+        Trigger triggerMock = mock(Trigger.class);
+        doThrow(new IgorException("Test-Exception!")).when(triggerMock).initialize(anyString(), any(JobExecution.class));
+
+        Job job = Job.builder().id("job-id").trigger(triggerMock).build();
         JobExecution jobExecution = new JobExecution();
-
-        Provider providerMock = mock(Provider.class);
-        doThrow(new IgorException("wanted-test-exception")).when(providerMock).hasNext();
-
-        job.setProvider(providerMock);
 
         job.start(jobExecution);
 
@@ -151,39 +148,29 @@ class JobTest {
     }
 
     /**
-     * Tests running a minimal job with a provider.
+     * Tests running a minimal job with a trigger and an action.
      */
     @Test
     @DisplayName("Tests running a minimal job.")
     void testRunMinimalJob() {
-        Job job = Job.builder().id("job-id").build();
-
-        JobExecution jobExecution = new JobExecution();
-        jobExecution.setExecutionState(JobExecutionState.RUNNING);
-
-        Map<String, Object> dataItem = new HashMap<>();
-
-        Provider providerMock = mock(Provider.class);
-        when(providerMock.hasNext()).thenReturn(true).thenReturn(false);
-        when(providerMock.next()).thenReturn(dataItem);
-        job.setProvider(providerMock);
+        Trigger triggerMock = mock(Trigger.class);
 
         Action actionMock = mock(Action.class);
         when(actionMock.isActive()).thenReturn(true);
         when(actionMock.getNumThreads()).thenReturn(1);
-        job.getActions().add(actionMock);
+
+        Job job = Job.builder().id("job-id").trigger(triggerMock).actions(List.of(actionMock)).build();
+
+        JobExecution jobExecution = new JobExecution();
+        jobExecution.setExecutionState(JobExecutionState.RUNNING);
 
         job.start(jobExecution);
 
-        verify(providerMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
+        verify(triggerMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
         verify(actionMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
-
-        verify(providerMock, times(2)).hasNext();
-        verify(providerMock, times(1)).next();
         verify(actionMock, times(1)).process(anyMap(), eq(jobExecution));
-
-        verify(providerMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
         verify(actionMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
+        verify(triggerMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
     }
 
     /**

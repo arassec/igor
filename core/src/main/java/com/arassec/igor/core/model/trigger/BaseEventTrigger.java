@@ -2,11 +2,10 @@ package com.arassec.igor.core.model.trigger;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
-import lombok.Getter;
+import com.arassec.igor.core.util.validation.ValidJsonObject;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
@@ -19,10 +18,10 @@ public abstract class BaseEventTrigger extends BaseTrigger implements EventTrigg
     /**
      * Contains the user configured event data that is used during simulated job executions.
      */
-    @Getter
+    @ValidJsonObject
     @Setter
     @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
-    private String simulationInput;
+    private String simulationData;
 
     /**
      * The job's event queue.
@@ -63,15 +62,8 @@ public abstract class BaseEventTrigger extends BaseTrigger implements EventTrigg
      */
     @Override
     public Map<String, Object> getSimulationData() {
-        if (StringUtils.hasText(simulationInput)) {
-            Map<String, Object> triggerData = new HashMap<>();
-            String[] dataParts = simulationInput.split("\n");
-            for (String dataPart : dataParts) {
-                String[] keyValue = dataPart.split("=");
-                if (keyValue.length == 2) {
-                    triggerData.put(keyValue[0], keyValue[1]);
-                }
-            }
+        if (StringUtils.hasText(simulationData)) {
+            Map<String, Object> triggerData = convertJsonString(simulationData);
             getData().forEach(triggerData::put); // Add custom trigger's data.
             return triggerData;
         }

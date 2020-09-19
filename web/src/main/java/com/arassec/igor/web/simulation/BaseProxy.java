@@ -26,7 +26,7 @@ public abstract class BaseProxy<T extends IgorComponent> implements IgorComponen
     protected T delegate;
 
     /**
-     * Might contain an error cause if the proxied provider failed abnormally.
+     * Might contain an error cause if the proxied component failed abnormally.
      */
     private String errorCause;
 

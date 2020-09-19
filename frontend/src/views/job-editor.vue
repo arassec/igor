@@ -283,7 +283,7 @@ export default {
                           this.validationErrors = result.data;
                         }
                     } else {
-                        this.validationErrors = {};
+                      this.validationErrors = {};
                         this.testResults = result.data;
                     }
                 });
@@ -322,7 +322,7 @@ export default {
                 if (this.testResults != null) {
                     let actionId = this.selectedActionId;
 
-                    // The job has been selected, use the provider's test data:
+                    // The job has been selected, use the trigger's test data:
                     if (actionId === null) {
                         if (this.testResults[this.jobConfiguration.id]) {
                             this.selectedTestResults = this.testResults[this.jobConfiguration.id]
@@ -483,7 +483,7 @@ export default {
                         this.selectAction(action.id);
                     } else {
                         if (jobData.connectorParameter != null && jobData.parameterIndex != null) {
-                            let parameter = this.jobConfiguration.provider.parameters[jobData.parameterIndex];
+                            let parameter = this.jobConfiguration.trigger.parameters[jobData.parameterIndex];
                             parameter.connectorName = jobData.connectorParameter.name;
                             parameter.value = jobData.connectorParameter.id
                         }

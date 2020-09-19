@@ -5,7 +5,6 @@ import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
-import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.validation.UniqueJobName;
@@ -57,6 +56,7 @@ public class Job {
     /**
      * A job description.
      */
+    @Size(max = 500)
     private String description;
 
     /**
@@ -76,12 +76,6 @@ public class Job {
      */
     @Valid
     private Trigger trigger;
-
-    /**
-     * The data provider for the job.
-     */
-    @Valid
-    private Provider provider;
 
     /**
      * The actions this job will perform during its run.
@@ -110,8 +104,8 @@ public class Job {
     /**
      * Creates the meta-data part of a data item.
      *
-     * @param jobId    The job's ID.
-     * @param trigger  The job's trigger.
+     * @param jobId   The job's ID.
+     * @param trigger The job's trigger.
      *
      * @return The meta-data for the job run.
      */
@@ -125,26 +119,9 @@ public class Job {
     }
 
     /**
-     * Creates the data part of a data item.
-     *
-     * @param triggerData  Input data received from the trigger.
-     * @param providerData Input data received from the provider.
-     *
-     * @return The data for the job run.
-     */
-    public static Map<String, Object> createData(Map<String, Object> triggerData, Map<String, Object> providerData) {
-        Map<String, Object> result = new HashMap<>();
-        Map<String, Object> triggerInput = Optional.ofNullable(triggerData).orElse(Map.of());
-        triggerInput.forEach(result::put);
-        Map<String, Object> providerInput = Optional.ofNullable(providerData).orElse(Map.of());
-        providerInput.forEach(result::put);
-        return result;
-    }
-
-    /**
      * Starts the job. Depending on the trigger type (scheduled vs event based) the job will either run once and will be finished
-     * after the last data item is processed, or it will remain in state {@link JobExecutionState#ACTIVE} until it is stopped or
-     * igor is shut down.
+     * after the last data item has been processed, or it will remain in state {@link JobExecutionState#ACTIVE} until it is
+     * manually stopped or igor is shut down.
      *
      * @param jobExecution The container for job execution information.
      */
@@ -165,24 +142,24 @@ public class Job {
             List<List<Action>> concurrencyLists = createConcurrencyLists();
 
             // Create concurrency groups which start the threads that process the actions:
-            BlockingQueue<Map<String, Object>> providerInputQueue = new LinkedBlockingQueue<>();
-            List<ConcurrencyGroup> concurrencyGroups = createConcurrencyGroups(concurrencyLists, providerInputQueue, id,
+            BlockingQueue<Map<String, Object>> triggerInputQueue = new LinkedBlockingQueue<>();
+            List<ConcurrencyGroup> concurrencyGroups = createConcurrencyGroups(concurrencyLists, triggerInputQueue, id,
                     jobExecution);
 
             // Initialize IgorComponents used by the job:
             initialize(jobExecution);
 
             if (trigger instanceof EventTrigger) {
-                BlockingQueue<Map<String, Object>> triggerInputQueue = new LinkedBlockingQueue<>();
-                ((EventTrigger) trigger).setEventQueue(triggerInputQueue);
+                BlockingQueue<Map<String, Object>> triggerEventInputQueue = new LinkedBlockingQueue<>();
+                ((EventTrigger) trigger).setEventQueue(triggerEventInputQueue);
                 // Block until igor is shut down and wait for trigger events...
                 while (JobExecutionState.ACTIVE.equals(currentJobExecution.getExecutionState())) {
-                    Map<String, Object> triggerData = triggerInputQueue.poll(500, TimeUnit.MILLISECONDS);
+                    Map<String, Object> triggerData = triggerEventInputQueue.poll(500, TimeUnit.MILLISECONDS);
                     if (triggerData != null) {
                         log.debug("Job '{}' ({}) triggered by event: {}", name, id, triggerData);
                         currentJobExecution.setProcessedEvents(currentJobExecution.getProcessedEvents() + 1);
                         trigger.getData().forEach(triggerData::put); // A custom trigger might add additional data to the items.
-                        processProviderData(providerInputQueue, id, jobExecution, triggerData);
+                        createInitialDataItem(triggerInputQueue, id, triggerData);
                         concurrencyGroups.forEach(ConcurrencyGroup::reset);
                     }
                 }
@@ -193,7 +170,7 @@ public class Job {
                 if (trigger != null) {
                     triggerData = trigger.getData();
                 }
-                processProviderData(providerInputQueue, id, jobExecution, triggerData);
+                createInitialDataItem(triggerInputQueue, id, triggerData);
             }
 
             // Completes each action inside each concurrency group:
@@ -262,17 +239,17 @@ public class Job {
     /**
      * Creates concurrency groups, i.e. actions with the same amount of threads to process data and linked via queues.
      *
-     * @param concurrencyLists   The ordered list of actions that should be executed with the same number of threads.
-     * @param providerInputQueue The initial input queue in which the provider's data will be put.
-     * @param jobId              The job's ID.
-     * @param jobExecution       The container for job execution data.
+     * @param concurrencyLists  The ordered list of actions that should be executed with the same number of threads.
+     * @param triggerInputQueue The initial input queue in which the trigger's data item will be put.
+     * @param jobId             The job's ID.
+     * @param jobExecution      The container for job execution data.
      *
      * @return List of {@link ConcurrencyGroup}s.
      */
     private List<ConcurrencyGroup> createConcurrencyGroups(List<List<Action>> concurrencyLists, BlockingQueue<Map<String,
-            Object>> providerInputQueue, String jobId, JobExecution jobExecution) {
+            Object>> triggerInputQueue, String jobId, JobExecution jobExecution) {
         List<ConcurrencyGroup> concurrencyGroups = new LinkedList<>();
-        BlockingQueue<Map<String, Object>> inputQueue = providerInputQueue;
+        BlockingQueue<Map<String, Object>> inputQueue = triggerInputQueue;
 
         for (List<Action> concurrencyList : concurrencyLists) {
             String concurrencyGroupId = String
@@ -296,10 +273,6 @@ public class Job {
             trigger.initialize(id, jobExecution);
             IgorComponentUtil.initializeConnectors(trigger, id, jobExecution);
         }
-        if (provider != null) {
-            provider.initialize(id, jobExecution);
-            IgorComponentUtil.initializeConnectors(provider, id, jobExecution);
-        }
         if (!actions.isEmpty()) {
             actions.stream().filter(Action::isActive).forEach(action -> {
                 action.initialize(id, jobExecution);
@@ -309,35 +282,24 @@ public class Job {
     }
 
     /**
-     * Processes the data offered by the provider and gets the actions to work.
+     * Creates the initial data item and starts processing it with the first action.
      *
-     * @param providerInputQueue The input queue to put the provider's data in.
-     * @param jobId              The job's ID.
-     * @param jobExecution       Contains information about the job execution.
-     * @param triggerData        Data provided by an event trigger.
+     * @param triggerInputQueue The input queue to put the trigger's data in.
+     * @param jobId             The job's ID.
+     * @param triggerData       Data provided by an event trigger.
      */
-    private void processProviderData(BlockingQueue<Map<String, Object>> providerInputQueue, String jobId,
-                                     JobExecution jobExecution, Map<String, Object> triggerData) {
-        if (provider == null) {
-            return;
-        }
-
-        // Read the data from the provider and start working:
-        while (provider.hasNext() && jobExecution.isRunningOrActive()) {
-            Map<String, Object> dataItem = new HashMap<>();
-            dataItem.put(DataKey.META.getKey(), createMetaData(jobId, trigger));
-            dataItem.put(DataKey.DATA.getKey(), createData(triggerData, provider.next()));
-            boolean added = false;
-            while (!added) {
-                try {
-                    added = providerInputQueue.offer(dataItem, 100, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+    private void createInitialDataItem(BlockingQueue<Map<String, Object>> triggerInputQueue, String jobId, Map<String, Object> triggerData) {
+        Map<String, Object> dataItem = new HashMap<>();
+        dataItem.put(DataKey.META.getKey(), createMetaData(jobId, trigger));
+        dataItem.put(DataKey.DATA.getKey(), triggerData);
+        boolean added = false;
+        while (!added) {
+            try {
+                added = triggerInputQueue.offer(dataItem, 100, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
-
-        provider.reset();
     }
 
     /**
@@ -367,10 +329,6 @@ public class Job {
                 IgorComponentUtil.shutdownConnectors(action, id, jobExecution);
                 action.shutdown(id, jobExecution);
             });
-        }
-        if (provider != null) {
-            IgorComponentUtil.shutdownConnectors(provider, id, jobExecution);
-            provider.shutdown(id, jobExecution);
         }
         if (trigger != null) {
             IgorComponentUtil.shutdownConnectors(trigger, id, jobExecution);

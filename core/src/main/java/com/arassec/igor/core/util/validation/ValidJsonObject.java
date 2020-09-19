@@ -10,13 +10,13 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Bean validation constraint that checks CRON expression compatability with Spring.
+ * Bean validation constraint that checks JSON objects.
  */
 @Target({ElementType.FIELD})
 @Retention(RUNTIME)
-@Constraint(validatedBy = ValidCronExpressionValidator.class)
+@Constraint(validatedBy = ValidJsonObjectValidator.class)
 @Documented
-public @interface ValidCronExpression {
+public @interface ValidJsonObject {
 
     /**
      * Returns the message key.
@@ -24,7 +24,7 @@ public @interface ValidCronExpression {
      * @return The message key.
      */
     @SuppressWarnings("unused")
-    String message() default "{com.arassec.igor.validation.cron-expression}";
+    String message() default "{com.arassec.igor.validation.json-object}";
 
     /**
      * Possible bean validation groups.

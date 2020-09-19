@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
 
 /**
  * Annotates a class as igor component. It can be used on classes that inherit from
- * {@link com.arassec.igor.core.model.trigger.Trigger}, {@link com.arassec.igor.core.model.provider.Provider},
- * {@link com.arassec.igor.core.model.action.Action} or {@link com.arassec.igor.core.model.connector.Connector}.
+ * {@link com.arassec.igor.core.model.trigger.Trigger}, {@link com.arassec.igor.core.model.action.Action} or
+ * {@link com.arassec.igor.core.model.connector.Connector}.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

@@ -410,13 +410,6 @@ export default {
                 jobConfiguration.name = 'Copy of ' + jobConfiguration.name;
                 jobConfiguration.id = Utils.uuidv4();
                 jobConfiguration.trigger.id = Utils.uuidv4();
-                for (let i in jobConfiguration.tasks) {
-                    jobConfiguration.tasks[i].id = Utils.uuidv4();
-                    jobConfiguration.tasks[i].provider.id = Utils.uuidv4();
-                    for (let j in jobConfiguration.tasks[i].actions) {
-                        jobConfiguration.tasks[i].actions[j].id = Utils.uuidv4();
-                    }
-                }
                 this.$root.$data.store.setJobData(jobConfiguration, '-1_-1', -1, '');
                 this.$router.push({name: 'job-editor'})
             },

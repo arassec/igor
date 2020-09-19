@@ -30,12 +30,11 @@ It's written in Java using [Spring Boot](https://spring.io/projects/spring-boot)
 
 Continuous workarounds are configured in igor using **jobs**.
 
-A job ist triggered by a **trigger**, e.g. a CRON trigger starting the job at a regular interval.
+A job ist triggered by a **trigger**, e.g. a CRON trigger starting the job at a regular interval or an event that is received by the trigger.
+The trigger creates an initial data item to start the job.
 
-A **provider** then loads **data items**, e.g. from an external service, using a **connector** for that service.
-
-The data items are passed to different, configurable **actions**, that modify the data to the user's needs.
-Actions can also be used to store the modified data items on external services, again using connectors.
+The data item is passed to different, configurable **actions**, that modify the data to the user's needs.
+Actions can also be used to load data from or store modified data items in external services using **connectors** for these services..
 
 <br/>
 

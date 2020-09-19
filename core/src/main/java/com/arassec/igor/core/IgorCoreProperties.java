@@ -25,11 +25,6 @@ public class IgorCoreProperties {
     private String defaultTrigger;
 
     /**
-     * Type ID of the default provider to use for new jobs.
-     */
-    private String defaultProvider;
-
-    /**
      * Type ID of the default action to use for new actions.
      */
     private String defaultAction;

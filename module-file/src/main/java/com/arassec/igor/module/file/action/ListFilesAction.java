@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,21 +25,6 @@ import java.util.Map;
 @Setter
 @IgorComponent
 public class ListFilesAction extends BaseFileAction {
-
-    /**
-     * The key to the filename.
-     */
-    public static final String FILENAME_KEY = "filename";
-
-    /**
-     * The key to the directory.
-     */
-    public static final String DIRECTORY_KEY = "directory";
-
-    /**
-     * The key to the file's last modification timestamp.
-     */
-    public static final String LAST_MODIFIED_KEY = "lastModified";
 
     /**
      * The connector to use for file listing.
@@ -61,11 +47,19 @@ public class ListFilesAction extends BaseFileAction {
     private String fileEnding;
 
     /**
+     * Limits the data items during simulated job executions.
+     */
+    @Positive
+    @IgorParam(advanced = true, defaultValue = "25")
+    private int simulationLimit;
+
+    /**
      * Creates a new component instance.
      */
     public ListFilesAction() {
         super("list-files-action");
         source = new FallbackFileConnector();
+        setNumThreads(1);
         getUnEditableProperties().add("numThreads");
     }
 
@@ -79,7 +73,11 @@ public class ListFilesAction extends BaseFileAction {
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
-        List<FileInfo> files = source.listFiles(directory, fileEnding);
+        List<FileInfo> fileInfos = source.listFiles(directory, fileEnding);
+
+        if (isSimulation(data) && fileInfos.size() > simulationLimit) {
+            fileInfos = fileInfos.subList(0, simulationLimit);
+        }
 
         if (!directory.endsWith("/")) {
             directory += "/";
@@ -87,7 +85,7 @@ public class ListFilesAction extends BaseFileAction {
 
         List<Map<String, Object>> result = new LinkedList<>();
 
-        files.forEach(fileInfo -> {
+        fileInfos.forEach(fileInfo -> {
             Map<String, Object> newDataItem = clone(data);
 
             Map<String, Object> item = new HashMap<>();

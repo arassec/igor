@@ -4,7 +4,6 @@ import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.persistence.mapper.*;
@@ -53,7 +52,6 @@ public class PersistenceConfiguration {
         mapperModule.addDeserializer(Connector.class, new ConnectorPersistenceDeserializer(igorComponentRegistry, securityProvider));
         mapperModule.addDeserializer(Action.class, new ActionPersistenceDeserializer(igorComponentRegistry, connectorRepository, securityProvider));
         mapperModule.addDeserializer(Trigger.class, new TriggerPersistenceDeserializer(igorComponentRegistry, connectorRepository, securityProvider));
-        mapperModule.addDeserializer(Provider.class, new ProviderPersistenceDeserializer(igorComponentRegistry, connectorRepository, securityProvider));
 
         ObjectMapper result = applyDefaultConfiguration(new ObjectMapper()).registerModule(mapperModule);
 

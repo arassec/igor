@@ -53,12 +53,13 @@ class BaseEventTriggerTest {
 
         assertEquals(Map.of(), baseEventTrigger.getSimulationData());
 
-        baseEventTrigger.setSimulationInput("a=b\nc:d\ne=42\ng");
+        baseEventTrigger.setSimulationData("{a:\"b\",\nc:\"d\",\ne:42\n}");
 
         Map<String, Object> data = baseEventTrigger.getSimulationData();
-        assertEquals(2, data.size());
+        assertEquals(3, data.size());
         assertEquals("b", data.get("a"));
-        assertEquals("42", data.get("e"));
+        assertEquals("d", data.get("c"));
+        assertEquals(42, data.get("e"));
     }
 
 }

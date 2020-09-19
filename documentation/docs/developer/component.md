@@ -13,7 +13,7 @@ The category and type of a component are selected in the user interface with dro
 
 ::: warning
 You must not assign the same category ID to different component types. 
-I.e. don't use 'my-custom-category' on both, a provider and an action component!  
+I.e. don't use 'my-custom-category' on both, a trigger and an action component!  
 :::
 
 If you want to add your custom component to an existing category, you should set the corresponding category ID or better yet, inherit from the appropriate base class.
@@ -22,8 +22,6 @@ If you want to add your custom component to an existing category, you should set
 |---|---|---|---|
 |Trigger|Util|"util-triggers"|BaseUtilTrigger.class|
 |Trigger|Web|"web-triggers"|-|
-|Provider|Util|"util-providers"|BaseUtilProvider.class|
-|Provider|File|"file-providers"|BaseFileProvider.class|
 |Action|Util|"util-actions"|BaseUtilAction.class|
 |Action|File|"file-actions"|BaseFileAction.class|
 |Action|Message|"message-actions"|BaseMessageAction.class|
@@ -40,7 +38,6 @@ Base classes exist that ease development of custom components of the given type.
 |Component Type|Interface to Implement|Base Class to Extend|
 |---|---|---|
 |Trigger|Trigger.class|BaseTrigger.class|
-|Provider|Provider.class|BaseProvider.class|
 |Action|Action.class|BaseAction.class|
 |Connector|Connector.class|BaseConnector.class|
 

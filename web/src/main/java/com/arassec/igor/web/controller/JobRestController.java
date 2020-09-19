@@ -19,7 +19,6 @@ import com.arassec.igor.web.model.JobListEntry;
 import com.arassec.igor.web.model.ScheduleEntry;
 import com.arassec.igor.web.model.simulation.SimulationResult;
 import com.arassec.igor.web.simulation.ActionProxy;
-import com.arassec.igor.web.simulation.ProviderProxy;
 import com.arassec.igor.web.simulation.TriggerProxy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -236,29 +235,23 @@ public class JobRestController extends BaseRestController {
         }
 
         TriggerProxy triggerProxy = (TriggerProxy) simulationJob.getTrigger();
-        ProviderProxy providerProxy = (ProviderProxy) simulationJob.getProvider();
 
         final Map<String, Object> triggerData = triggerProxy != null ? triggerProxy.getData() : Map.of();
 
-        if (providerProxy != null) {
-            providerProxy.getCollectedData()
-                    .forEach(jsonObject -> {
-                        Map<String, Object> item = new HashMap<>();
-                        item.put(DataKey.META.getKey(), Job.createMetaData(simulationJob.getId(), triggerProxy));
-                        item.put(DataKey.DATA.getKey(), Job.createData(triggerData, jsonObject));
-                        jobResult.getResults().add(item);
-                    });
+        Map<String, Object> item = new HashMap<>();
+        item.put(DataKey.META.getKey(), Job.createMetaData(simulationJob.getId(), triggerProxy));
+        item.put(DataKey.DATA.getKey(), triggerData);
+        jobResult.getResults().add(item);
 
-            simulationJob.getActions().forEach(action -> {
-                ActionProxy actionProxy = (ActionProxy) action;
-                SimulationResult actionResult = new SimulationResult();
-                actionResult.setErrorCause(actionProxy.getErrorCause());
-                actionProxy.getCollectedData().forEach(jsonObject -> actionResult.getResults().add(jsonObject));
-                if (action.getId() != null) {
-                    result.put(action.getId(), actionResult);
-                }
-            });
-        }
+        simulationJob.getActions().forEach(action -> {
+            ActionProxy actionProxy = (ActionProxy) action;
+            SimulationResult actionResult = new SimulationResult();
+            actionResult.setErrorCause(actionProxy.getErrorCause());
+            actionProxy.getCollectedData().forEach(jsonObject -> actionResult.getResults().add(jsonObject));
+            if (action.getId() != null) {
+                result.put(action.getId(), actionResult);
+            }
+        });
 
         if (!StringUtils.isEmpty(jobResult.getErrorCause()) || !jobResult.getResults().isEmpty()) {
             result.put(job.getId(), jobResult);

@@ -40,11 +40,11 @@ export default {
                 if (this.job.trigger.id in this.validationErrors) {
                     return "alert";
                 }
-                if (this.job.provider.id in this.validationErrors) {
-                    return "alert";
-                }
                 if (this.selected) {
                     return "info";
+                }
+                if (!this.job.active) {
+                  return "inactive";
                 }
                 return "unselected";
             }
@@ -64,6 +64,11 @@ export default {
 
     .unselected:hover {
         background-color: var(--color-foreground);
+    }
+
+    .inactive {
+      background-color: var(--color-background);
+      opacity: 0.75;
     }
 
 </style>

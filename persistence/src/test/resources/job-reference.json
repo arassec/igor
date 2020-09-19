@@ -9,20 +9,6 @@
     "typeId": "trigger-type-id",
     "parameters": []
   },
-  "provider": {
-    "id": "provider-id",
-    "typeId": "provider-type-id",
-    "parameters": [
-      {
-        "name": "testProviderParam",
-        "value": "test-provider-param"
-      },
-      {
-        "name": "simulationLimit",
-        "value": 456
-      }
-    ]
-  },
   "actions": [
     {
       "id": "action-id",

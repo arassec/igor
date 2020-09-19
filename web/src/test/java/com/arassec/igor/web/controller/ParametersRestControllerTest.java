@@ -1,8 +1,10 @@
 package com.arassec.igor.web.controller;
 
-import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.web.mapper.WebMapperKey;
-import com.arassec.igor.web.test.*;
+import com.arassec.igor.web.test.TestAction;
+import com.arassec.igor.web.test.TestConnector;
+import com.arassec.igor.web.test.TestConnectorInterface;
+import com.arassec.igor.web.test.TestTrigger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
@@ -109,42 +111,6 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
         assertEquals(true, parameters.get(1).get(WebMapperKey.ADVANCED.getKey()));
         assertEquals(true, parameters.get(1).get(WebMapperKey.REQUIRED.getKey()));
         assertEquals("1", parameters.get(1).get(WebMapperKey.DEFAULT_VALUE.getKey()));
-    }
-
-    /**
-     * Tests retrieval of provider parameters.
-     */
-    @Test
-    @DisplayName("Tests retrieval of provider parameters.")
-    @SneakyThrows(Exception.class)
-    void testGetProviderParameters() {
-        when(igorComponentRegistry.createProviderInstance(eq("type-id"), isNull())).thenReturn(new TestProvider());
-
-        MvcResult mvcResult = mockMvc.perform(get("/api/parameters/provider/type-id")).andExpect(status().isOk()).andReturn();
-
-        List<Map<String, Object>> parameters = convert(mvcResult, new TypeReference<>() {
-        });
-
-        assertEquals(4, parameters.size());
-
-        assertEquals("emptyStringParam", parameters.get(0).get(WebMapperKey.NAME.getKey()));
-        assertEquals("java.lang.String", parameters.get(0).get(WebMapperKey.TYPE.getKey()));
-        assertNull(parameters.get(0).get(WebMapperKey.VALUE.getKey()));
-        assertEquals(ParameterSubtype.CRON.name(), parameters.get(0).get(WebMapperKey.SUBTYPE.getKey()));
-
-        verifyParameter(parameters.get(1), "nullInteger", "java.lang.Integer", null);
-
-        assertEquals("validatedInteger", parameters.get(2).get(WebMapperKey.NAME.getKey()));
-        assertEquals("java.lang.Integer", parameters.get(2).get(WebMapperKey.TYPE.getKey()));
-        assertNull(parameters.get(2).get(WebMapperKey.VALUE.getKey()));
-        assertEquals(true, parameters.get(2).get(WebMapperKey.REQUIRED.getKey()));
-
-        assertEquals("simulationLimit", parameters.get(3).get(WebMapperKey.NAME.getKey()));
-        assertEquals("int", parameters.get(3).get(WebMapperKey.TYPE.getKey()));
-        assertEquals(0, parameters.get(3).get(WebMapperKey.VALUE.getKey()));
-        assertEquals(true, parameters.get(3).get(WebMapperKey.ADVANCED.getKey()));
-        assertEquals(true, parameters.get(3).get(WebMapperKey.REQUIRED.getKey()));
-        assertEquals("25", parameters.get(3).get(WebMapperKey.DEFAULT_VALUE.getKey()));
     }
 
     /**

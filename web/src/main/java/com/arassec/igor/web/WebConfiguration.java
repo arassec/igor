@@ -3,10 +3,12 @@ package com.arassec.igor.web;
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.connector.Connector;
-import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.repository.ConnectorRepository;
-import com.arassec.igor.web.mapper.*;
+import com.arassec.igor.web.mapper.ActionWebDeserializer;
+import com.arassec.igor.web.mapper.ConnectorWebDeserializer;
+import com.arassec.igor.web.mapper.IgorComponentWebSerializer;
+import com.arassec.igor.web.mapper.TriggerWebDeserializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -113,8 +115,6 @@ public class WebConfiguration {
         mapperModule.addDeserializer(Action.class, new ActionWebDeserializer(igorComponentRegistry, connectorRepository,
                 simulationMode));
         mapperModule.addDeserializer(Trigger.class, new TriggerWebDeserializer(igorComponentRegistry, connectorRepository,
-                simulationMode));
-        mapperModule.addDeserializer(Provider.class, new ProviderWebDeserializer(igorComponentRegistry, connectorRepository,
                 simulationMode));
 
         return new ObjectMapper()

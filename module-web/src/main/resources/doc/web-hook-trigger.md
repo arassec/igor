@@ -17,7 +17,7 @@ The following parameters can be configured for the web-hook trigger:
 
 Parameter | Description
 ---|:---|
-Simulation input | A list of "key=value" pairs that is used during simulated job runs as trigger input data. Each line must contain one "key=value" pair.
+Simulation data | A list of "key=value" pairs that is used during simulated job runs as trigger input data. Each line must contain one "key=value" pair.
 
 ## Examples
 

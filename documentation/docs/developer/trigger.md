@@ -200,7 +200,7 @@ simulated job execution will contain both configurations in the `data` segment:
 {
   "data": {
     "demoParam": "user input",
-    "sample": "param"
+    "sample": "parameter"
   },
   "meta": {
     "jobId": "a1f005d2-7ffc-4e0d-a2c9-9ea7e51e16c8",

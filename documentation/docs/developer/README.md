@@ -6,7 +6,6 @@ It is based on the popular Spring framework and uses many of its tools and conce
 
 Custom types for the following components can easily be added to igor:
 - Trigger
-- Provider
 - Action
 - Connector 
 

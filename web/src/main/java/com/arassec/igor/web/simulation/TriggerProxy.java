@@ -1,6 +1,5 @@
 package com.arassec.igor.web.simulation;
 
-import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.Getter;
@@ -9,7 +8,7 @@ import lombok.Setter;
 import java.util.Map;
 
 /**
- * Proxy for {@link Provider}s, that collects the provided data for later processing. Used during simulated job executions.
+ * Proxy for {@link Trigger}s. Used during simulated job executions.
  */
 @Getter
 @Setter

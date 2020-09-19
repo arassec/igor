@@ -6,7 +6,6 @@ import com.arassec.igor.core.util.IgorConfigHelper;
 import com.arassec.igor.web.WebConfiguration;
 import com.arassec.igor.web.test.TestAction;
 import com.arassec.igor.web.test.TestConnector;
-import com.arassec.igor.web.test.TestProvider;
 import com.arassec.igor.web.test.TestTrigger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,10 +42,9 @@ public abstract class MapperBaseTest {
         ApplicationContext applicationContextMock = mock(ApplicationContext.class);
         when(applicationContextMock.getBean(eq(TestConnector.class))).thenReturn(new TestConnector());
         when(applicationContextMock.getBean(eq(TestTrigger.class))).thenReturn(new TestTrigger());
-        when(applicationContextMock.getBean(eq(TestProvider.class))).thenReturn(new TestProvider());
         when(applicationContextMock.getBean(eq(TestAction.class))).thenReturn(new TestAction());
 
-        IgorComponentRegistry igorComponentRegistry = new IgorComponentRegistry(List.of(new TestAction()), List.of(new TestProvider()),
+        IgorComponentRegistry igorComponentRegistry = new IgorComponentRegistry(List.of(new TestAction()),
                 List.of(new TestTrigger()), List.of(new TestConnector()), null);
         igorComponentRegistry.setApplicationContext(applicationContextMock);
         igorComponentRegistry.afterPropertiesSet();

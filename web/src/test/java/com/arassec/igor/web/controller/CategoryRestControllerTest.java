@@ -2,7 +2,6 @@ package com.arassec.igor.web.controller;
 
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.connector.Connector;
-import com.arassec.igor.core.model.provider.Provider;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.web.model.KeyLabelStore;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,25 +35,6 @@ class CategoryRestControllerTest extends RestControllerBaseTest {
         when(igorComponentRegistry.getCategoriesOfComponentType(eq(Connector.class))).thenReturn(Set.of("two", "one"));
 
         MvcResult mvcResult = mockMvc.perform(get("/api/category/connector")).andExpect(status().isOk()).andReturn();
-
-        List<KeyLabelStore> result = convert(mvcResult, new TypeReference<>() {
-        });
-
-        assertEquals(2, result.size());
-        assertEquals(new KeyLabelStore("one", "alpha"), result.get(0));
-        assertEquals(new KeyLabelStore("two", "beta"), result.get(1));
-    }
-
-    /**
-     * Tests retrieval of provider categories.
-     */
-    @Test
-    @DisplayName("Tests retrieval of provider categories.")
-    @SneakyThrows(Exception.class)
-    void testGetProviderCategories() {
-        when(igorComponentRegistry.getCategoriesOfComponentType(eq(Provider.class))).thenReturn(Set.of("two", "one"));
-
-        MvcResult mvcResult = mockMvc.perform(get("/api/category/provider")).andExpect(status().isOk()).andReturn();
 
         List<KeyLabelStore> result = convert(mvcResult, new TypeReference<>() {
         });
