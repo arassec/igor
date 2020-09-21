@@ -63,8 +63,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>11</java.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.release>11</maven.compiler.release>
         <!-- Ignore sonar false positives: https://jira.sonarsource.com/browse/SONARJAVA-3157 -->
         <sonar.issue.ignore.multicriteria>fp1</sonar.issue.ignore.multicriteria>
         <sonar.issue.ignore.multicriteria.fp1.ruleKey>squid:S2637</sonar.issue.ignore.multicriteria.fp1.ruleKey>
