@@ -22,7 +22,7 @@ class ModuleWebConfigurationTest {
     void testI18n() {
         ModuleWebConfiguration configuration = new ModuleWebConfiguration();
         MessageSource messageSource = configuration.webMessageSource();
-        assertEquals("HTTP(S)", messageSource.getMessage("http-web-connector", null, Locale.getDefault()));
+        assertEquals("HTTP", messageSource.getMessage("http-web-connector", null, Locale.getDefault()));
     }
 
 }

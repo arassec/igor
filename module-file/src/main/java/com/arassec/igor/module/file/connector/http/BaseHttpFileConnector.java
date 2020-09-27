@@ -77,7 +77,7 @@ public abstract class BaseHttpFileConnector extends BaseFileConnector {
     /**
      * The password for authentication.
      */
-    @IgorParam(advanced = true)
+    @IgorParam(advanced = true, secured = true)
     protected String password;
 
     /**

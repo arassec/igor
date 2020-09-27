@@ -88,11 +88,6 @@ public enum WebMapperKey {
     SUBTYPE("subtype"),
 
     /**
-     * The 'defaultValue' key.
-     */
-    DEFAULT_VALUE("defaultValue"),
-
-    /**
      * The connector-name key.
      */
     CONNECTOR_NAME("connectorName"),

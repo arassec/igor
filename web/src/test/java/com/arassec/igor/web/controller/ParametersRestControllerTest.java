@@ -110,7 +110,6 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
         assertEquals(0, parameters.get(1).get(WebMapperKey.VALUE.getKey()));
         assertEquals(true, parameters.get(1).get(WebMapperKey.ADVANCED.getKey()));
         assertEquals(true, parameters.get(1).get(WebMapperKey.REQUIRED.getKey()));
-        assertEquals("1", parameters.get(1).get(WebMapperKey.DEFAULT_VALUE.getKey()));
     }
 
     /**
@@ -125,7 +124,9 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
         mockMvc.perform(get("/api/parameters/trigger/type-id"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("testParam"))
-                .andExpect(jsonPath("$[0].defaultValue").value("666"));
+                .andExpect(jsonPath("$[0].required").value("true"))
+                .andExpect(jsonPath("$[0].type").value("java.lang.Integer"))
+                .andExpect(jsonPath("$[0].connector").value("false"));
     }
 
     /**

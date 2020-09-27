@@ -21,8 +21,8 @@ Igor is a tool for managing 'continuous workarounds'.
 It provides an easy to use, reliable place where you can put all those workarounds, which would 
 otherwise be solved by scattered scripts or code fragments across your applications and connectors. 
 
-It is similar to [Node-RED](https://nodered.org/), [Huginn](https://github.com/huginn/huginn) or [Beehive](https://github.com/muesli/beehive), but focuses more on
-data processing instead of specific online services or home automation. 
+It is similar to [Node-RED](https://nodered.org/), [Huginn](https://github.com/huginn/huginn) or [Beehive](https://github.com/muesli/beehive), 
+i.e. it provides a "low-code" environment. 
 
 It's written in Java using [Spring Boot](https://spring.io/projects/spring-boot) and provides an easy-to-use web-frontend written in [vue.js](https://vuejs.org/).
 
@@ -34,7 +34,7 @@ A job ist triggered by a **trigger**, e.g. a CRON trigger starting the job at a 
 The trigger creates an initial data item to start the job.
 
 The data item is passed to different, configurable **actions**, that modify the data to the user's needs.
-Actions can also be used to load data from or store modified data items in external services using **connectors** for these services..
+Actions can also be used to load data from, or store modified data items in, external services using **connectors** for these services..
 
 <br/>
 
@@ -51,7 +51,7 @@ Igor's web interface should now be available at: [http://localhost:8080](http://
 # Reference Documentation
 
 The reference documentation is distributed within the igor application.
-The documentation of the latest, stable release is also available online at:
+The documentation of the latest, **stable** release is also available online at:
 
 [Igor Reference Documentation](https://arassec.com/igor/)
 

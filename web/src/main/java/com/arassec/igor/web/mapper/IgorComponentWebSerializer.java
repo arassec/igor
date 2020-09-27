@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Serializer for igor components in the web layer.
@@ -126,21 +127,32 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
     private void writeParameters(JsonGenerator jsonGenerator, IgorComponent instance) throws IOException {
         jsonGenerator.writeArrayFieldStart(WebMapperKey.PARAMETERS.getKey());
 
-        List<Field> fields = new LinkedList<>();
+        List<Field> parameters = new LinkedList<>();
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
             ReflectionUtils.makeAccessible(field);
             if (field.isAnnotationPresent(IgorParam.class) && !instance.getUnEditableProperties().contains(field.getName())) {
-                fields.add(field);
+                parameters.add(field);
             }
         });
 
-        fields.sort((o1, o2) -> {
+        List<Field> advancedParameters = parameters.stream().filter(field -> {
+            IgorParam annotation = field.getAnnotation(IgorParam.class);
+            return annotation.advanced();
+        }).sorted((o1, o2) -> {
+            Integer first = o1.getAnnotation(IgorParam.class).value();
+            Integer second = o2.getAnnotation(IgorParam.class).value();
+            return first.compareTo(second);
+        }).collect(Collectors.toList());
+
+        parameters.removeAll(advancedParameters);
+        parameters.sort((o1, o2) -> {
             Integer first = o1.getAnnotation(IgorParam.class).value();
             Integer second = o2.getAnnotation(IgorParam.class).value();
             return first.compareTo(second);
         });
+        parameters.addAll(advancedParameters);
 
-        fields.forEach(field -> {
+        parameters.forEach(field -> {
             try {
                 Object value = field.get(instance);
                 IgorParam annotation = field.getAnnotation(IgorParam.class);
@@ -190,9 +202,6 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
         }
         if (!ParameterSubtype.NONE.equals(annotation.subtype())) {
             jsonGenerator.writeStringField(WebMapperKey.SUBTYPE.getKey(), annotation.subtype().name());
-        }
-        if (!StringUtils.isEmpty(annotation.defaultValue())) {
-            jsonGenerator.writeStringField(WebMapperKey.DEFAULT_VALUE.getKey(), annotation.defaultValue());
         }
         boolean required = (field.isAnnotationPresent(NotNull.class)
                 || field.isAnnotationPresent(NotBlank.class) || field.getType().isPrimitive());

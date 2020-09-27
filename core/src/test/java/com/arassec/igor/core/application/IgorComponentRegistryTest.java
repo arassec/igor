@@ -9,6 +9,7 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.IgorException;
 import lombok.Getter;
+import lombok.Setter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -160,10 +161,10 @@ class IgorComponentRegistryTest {
     @DisplayName("Tests getting a Connector instance with parameters.")
     void testGetConnectorInstanceWithParameters() {
         Map<String, Object> params = new HashMap<>();
-        params.put("testParam", 666);
+        params.put("intParam", 666);
         when(applicationContextMock.getBean(eq(TestConnectorImpl.class))).thenReturn(new TestConnectorImpl());
         TestConnectorImpl connectorInstance = (TestConnectorImpl) igorComponentRegistry.createConnectorInstance("connector-type-id", params);
-        assertEquals(666, connectorInstance.getTestParam());
+        assertEquals(666, connectorInstance.getIntParam());
     }
 
     /**
@@ -201,6 +202,37 @@ class IgorComponentRegistryTest {
     }
 
     /**
+     * Tests setting the default value on new instances.
+     */
+    @Test
+    @DisplayName("Tests setting the default value on new instances.")
+    void testDefaultValueHandling() {
+        when(applicationContextMock.getBean(eq(TestConnectorImpl.class))).thenReturn(new TestConnectorImpl());
+
+        TestConnectorImpl connector = (TestConnectorImpl) igorComponentRegistry.createConnectorInstance("connector-type-id",
+                Map.of());
+
+        assertNull(connector.getEmptyDefaultValueParam());
+        assertTrue(connector.isBooleanParam());
+        assertTrue(connector.getBooleanObjectParam());
+        assertEquals(-128, connector.getByteParam());
+        assertEquals(127, connector.getByteObjectParam().byteValue());
+        assertEquals(123, connector.getShortParam());
+        assertEquals(456, connector.getShortObjectParam().shortValue());
+        assertEquals(23, connector.getIntParam());
+        assertEquals(42, connector.getIntegerParam());
+        assertEquals(123456789, connector.getLongParam());
+        assertEquals(987654321, connector.getLongObjectParam());
+        assertEquals(1.23f, connector.getFloatParam());
+        assertEquals(4.56f, connector.getFloatObjectParam());
+        assertEquals(1.23456789d, connector.getDoubleParam());
+        assertEquals(9.87654321d, connector.getDoubleObjectParam());
+        assertEquals('A', connector.getCharParam());
+        assertEquals('B', connector.getCharacterParam());
+        assertEquals("igor", connector.getStringParam());
+    }
+
+    /**
      * Connector-Interface for testing.
      */
     private interface TestConnector extends Connector {
@@ -209,12 +241,117 @@ class IgorComponentRegistryTest {
     /**
      * Connector-Implementation for testing.
      */
+    @Getter
+    @Setter
     private static class TestConnectorImpl extends BaseConnector implements TestConnector {
 
-        @Getter
+        /**
+         * A parameter without a default value.
+         */
         @IgorParam
-        @SuppressWarnings("FieldMayBeFinal")
-        private int testParam = 0;
+        private String emptyDefaultValueParam;
+
+        /**
+         * boolean test parameter.
+         */
+        @IgorParam(defaultValue = "true")
+        private boolean booleanParam;
+
+        /**
+         * Boolean test parameter.
+         */
+        @IgorParam(defaultValue = "true")
+        private Boolean booleanObjectParam;
+
+        /**
+         * byte test parameter.
+         */
+        @IgorParam(defaultValue = "-128")
+        private byte byteParam;
+
+        /**
+         * Byte test parameter.
+         */
+        @IgorParam(defaultValue = "127")
+        private Byte byteObjectParam;
+
+        /**
+         * short test parameter.
+         */
+        @IgorParam(defaultValue = "123")
+        private short shortParam;
+
+        /**
+         * Short test parameter.
+         */
+        @IgorParam(defaultValue = "456")
+        private Short shortObjectParam;
+
+        /**
+         * int test parameter.
+         */
+        @IgorParam(defaultValue = "23")
+        private int intParam;
+
+        /**
+         * Integer test parameter.
+         */
+        @IgorParam(defaultValue = "42")
+        private Integer integerParam;
+
+        /**
+         * long test parameter.
+         */
+        @IgorParam(defaultValue = "123456789")
+        private long longParam;
+
+        /**
+         * Long test parameter.
+         */
+        @IgorParam(defaultValue = "987654321")
+        private Long longObjectParam;
+
+        /**
+         * float test parameter.
+         */
+        @IgorParam(defaultValue = "1.23")
+        private float floatParam;
+
+        /**
+         * Float test parameter.
+         */
+        @IgorParam(defaultValue = "4.56")
+        private Float floatObjectParam;
+
+        /**
+         * double test parameter.
+         */
+        @IgorParam(defaultValue = "1.23456789")
+        private double doubleParam;
+
+        /**
+         * Double test parameter.
+         */
+        @IgorParam(defaultValue = "9.87654321")
+        private Double doubleObjectParam;
+
+        /**
+         * char test parameter.
+         */
+        @IgorParam(defaultValue = "A")
+        private char charParam;
+
+        /**
+         * Character test parameter.
+         */
+        @IgorParam(defaultValue = "B")
+        private Character characterParam;
+
+        /**
+         * String test parameter.
+         */
+        @IgorParam(defaultValue = "igor")
+        private String stringParam;
 
         /**
          * Creates a new component instance.

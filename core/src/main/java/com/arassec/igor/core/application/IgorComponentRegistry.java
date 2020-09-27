@@ -3,6 +3,7 @@ package com.arassec.igor.core.application;
 import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.trigger.Trigger;
@@ -14,6 +15,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -244,18 +246,56 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     /**
      * Sets the supplied parameters at the supplied instance.
      *
-     * @param instance   The instance to apply the parameters to.
-     * @param parameters The parameters to set.
+     * @param instance           The instance to apply the parameters to.
+     * @param parameters         The parameters to set.
      */
     private void applyParameters(Object instance, Map<String, Object> parameters) {
-        if (instance != null && parameters != null && !parameters.isEmpty()) {
+        if (instance != null) {
             ReflectionUtils.doWithFields(instance.getClass(), field -> {
-                if (parameters.containsKey(field.getName())) {
-                    ReflectionUtils.makeAccessible(field);
+                ReflectionUtils.makeAccessible(field);
+                if (parameters != null && parameters.containsKey(field.getName())) {
                     ReflectionUtils.setField(field, instance, parameters.get(field.getName()));
+                } else if (field.isAnnotationPresent(IgorParam.class) && parameters == null) {
+                    convertToObject(field.getType(), field.getAnnotation(IgorParam.class).defaultValue())
+                            .ifPresent(o -> ReflectionUtils.setField(field, instance, o));
                 }
             });
         }
+    }
+
+    /**
+     * Converts the supplied String value to a corresponding java type.
+     *
+     * @param clazz The target class to convert the input to.
+     * @param value The input to convert.
+     *
+     * @return An object with the supplied value.
+     */
+    @SuppressWarnings("java:S3776") // Splitting up this method would increase complexity and decrease readability...
+    private Optional<Object> convertToObject(Class<?> clazz, String value) {
+        Optional<Object> result;
+        if (!StringUtils.hasText(value)) {
+            result = Optional.empty();
+        } else if (Boolean.class == clazz || boolean.class == clazz) {
+            result = Optional.of(Boolean.parseBoolean(value));
+        } else if (Byte.class == clazz || byte.class == clazz) {
+            result = Optional.of(Byte.parseByte(value));
+        } else if (Short.class == clazz || short.class == clazz) {
+            result = Optional.of(Short.parseShort(value));
+        } else if (Integer.class == clazz || int.class == clazz) {
+            result = Optional.of(Integer.parseInt(value));
+        } else if (Long.class == clazz || long.class == clazz) {
+            result = Optional.of(Long.parseLong(value));
+        } else if (Float.class == clazz || float.class == clazz) {
+            result = Optional.of(Float.parseFloat(value));
+        } else if (Double.class == clazz || double.class == clazz) {
+            result = Optional.of(Double.parseDouble(value));
+        } else if (Character.class == clazz || char.class == clazz) {
+            result = Optional.of(value.charAt(0));
+        } else {
+            result = Optional.of(value);
+        }
+        return result;
     }
 
 }

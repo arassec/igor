@@ -305,6 +305,7 @@ export default {
                 IgorBackend.postData('/api/connector', this.connectorConfiguration, 'Saving connector',
                     'Connector \'' + FormatUtils.formatNameForSnackbar(this.connectorConfiguration.name) + '\' saved.',
                     'Saving failed!').then((result) => {
+                    this.validationErrors = {};
                     if (result.status === 400) {
                         this.validationErrors = result.data;
                     } else {

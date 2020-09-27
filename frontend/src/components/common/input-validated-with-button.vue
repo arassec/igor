@@ -10,7 +10,7 @@
         />
         <input-button :icon="icon"
                       v-on:clicked="$emit('icon-clicked')"
-                      class="margin-left"/>
+                      class="small-margin-left"/>
     </div>
 </template>
 
@@ -38,6 +38,10 @@ export default {
 
     .flex-container {
         display: flex;
+    }
+
+    .small-margin-left {
+      margin-left: .3em;
     }
 
 </style>
