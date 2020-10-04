@@ -28,12 +28,12 @@ class FilterByRegExpActionTest extends MiscActionBaseTest {
         List<Map<String, Object>> processedData = action.process(createData(), new JobExecution());
         assertTrue(processedData.isEmpty());
 
-        action.setInput("$." + DataKey.DATA.getKey() + "." + PARAM_KEY);
+        action.setInput("{{" + DataKey.DATA.getKey() + "." + PARAM_KEY + "}}");
         processedData = action.process(createData(), new JobExecution());
         assertTrue(processedData.isEmpty());
 
         action.setInput(null);
-        action.setExpression("$." + DataKey.DATA.getKey() + "." + PARAM_KEY);
+        action.setExpression("{{" + DataKey.DATA.getKey() + "." + PARAM_KEY + "}}");
 
         processedData = action.process(createData(), new JobExecution());
         assertTrue(processedData.isEmpty());
@@ -49,7 +49,7 @@ class FilterByRegExpActionTest extends MiscActionBaseTest {
         Map<String, Object> data = createData();
 
         // matches the expression:
-        action.setInput("$." + DataKey.DATA.getKey() + "." + PARAM_KEY);
+        action.setInput("{{" + DataKey.DATA.getKey() + "." + PARAM_KEY + "}}");
         action.setExpression("igor.*test");
 
         List<Map<String, Object>> processedData = action.process(data, new JobExecution());

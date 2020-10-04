@@ -22,8 +22,6 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Action to issue an HTTP(S) request using a
@@ -90,11 +88,6 @@ public class HttpRequestAction extends BaseAction {
     protected String password;
 
     /**
-     * Pattern to extract variables from the message template.
-     */
-    private final Pattern pattern = Pattern.compile("##(.*?)##");
-
-    /**
      * Contains the parsed headers.
      */
     private List<String> parsedHeaders = new LinkedList<>();
@@ -131,21 +124,11 @@ public class HttpRequestAction extends BaseAction {
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
         String requestUrl = getString(data, url);
-
-        Matcher m = pattern.matcher(body);
-        while (m.find()) {
-            // e.g. ##$.data.targetFilename##
-            String variableName = m.group();
-            // e.g. file.zip
-            String variableContent = getString(data, variableName.replace("##", ""));
-            if (variableContent != null) {
-                body = body.replace(variableName, variableContent);
-            }
-        }
+        String content = getString(data, body);
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
                 .uri(URI.create(requestUrl))
-                .method(this.method, HttpRequest.BodyPublishers.ofString(body));
+                .method(this.method, HttpRequest.BodyPublishers.ofString(content));
         parsedHeaders.forEach(header -> httpRequestBuilder.header(header.split("=")[0], header.split("=")[1]));
         addBasicAuthHeaderIfConfigured(httpRequestBuilder);
 

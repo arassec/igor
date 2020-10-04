@@ -27,14 +27,14 @@ public abstract class BaseFileAction extends BaseAction {
     public static final String LAST_MODIFIED_KEY = "lastModified";
 
     /**
-     * Default-Query for the directory.
+     * Default-Template for the directory.
      */
-    protected static final String DIRECTORY_QUERY = "$.data." + DIRECTORY_KEY;
+    protected static final String DIRECTORY_TEMPLATE = "{{data." + DIRECTORY_KEY + "}}";
 
     /**
-     * Default-Query for the filename.
+     * Default-Template for the filename.
      */
-    protected static final String FILENAME_QUERY = "$.data." + FILENAME_KEY;
+    protected static final String FILENAME_TEMPLATE = "{{data." + FILENAME_KEY + "}}";
 
     /**
      * Creates a new component instance.

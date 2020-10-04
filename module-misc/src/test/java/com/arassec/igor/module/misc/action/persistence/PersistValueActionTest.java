@@ -23,15 +23,15 @@ import static org.mockito.Mockito.*;
 class PersistValueActionTest extends MiscActionBaseTest {
 
     /**
-     * Tests processing the action with JSON-Path parameters.
+     * Tests the action with mustache template parameters.
      */
     @Test
-    @DisplayName("Tests the action with JSON-Path parameters.")
+    @DisplayName("Tests the action with mustache template parameters.")
     void testProcess() {
         PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
 
         PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
-        action.setInput("$." + DataKey.DATA.getKey() + "." + PARAM_KEY);
+        action.setInput("{{" + DataKey.DATA.getKey() + "." + PARAM_KEY + "}}");
 
         ArgumentCaptor<PersistentValue> argCap = ArgumentCaptor.forClass(PersistentValue.class);
 
@@ -51,7 +51,7 @@ class PersistValueActionTest extends MiscActionBaseTest {
         PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
 
         PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
-        action.setInput("$." + DataKey.DATA.getKey() + ".INVALID");
+        action.setInput("{{" + DataKey.DATA.getKey() + ".INVALID}}");
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
         assertTrue(result.isEmpty());
@@ -67,7 +67,7 @@ class PersistValueActionTest extends MiscActionBaseTest {
         when(persistentValueRepositoryMock.isPersisted(eq(JOB_ID), any(PersistentValue.class))).thenReturn(true);
 
         PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
-        action.setInput("$." + DataKey.DATA.getKey() + "." + PARAM_KEY);
+        action.setInput("{{" + DataKey.DATA.getKey() + "." + PARAM_KEY + "}}");
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
@@ -102,7 +102,7 @@ class PersistValueActionTest extends MiscActionBaseTest {
         PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
 
         PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
-        action.setInput("$." + DataKey.DATA.getKey() + "." + PARAM_KEY);
+        action.setInput("{{" + DataKey.DATA.getKey() + "." + PARAM_KEY + "}}");
 
         Map<String, Object> data = createData();
 

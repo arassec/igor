@@ -34,14 +34,14 @@ public class DeleteFileAction extends BaseFileAction {
      * The directory the file is in.
      */
     @NotBlank
-    @IgorParam(defaultValue = DIRECTORY_QUERY)
+    @IgorParam(defaultValue = DIRECTORY_TEMPLATE)
     private String directory;
 
     /**
      * The name of the file.
      */
     @NotBlank
-    @IgorParam(defaultValue = FILENAME_QUERY)
+    @IgorParam(defaultValue = FILENAME_TEMPLATE)
     private String filename;
 
     /**

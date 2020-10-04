@@ -19,8 +19,8 @@ Name | The name of the task.
 
 Depending on the actual type, the action might require more parameters to be configured.
 
-## JSON-Path
-Actions support JSON-Path expressions in configuration parameters. 
+## Mustache Template Parameters
+Most actions support mustache expressions in configuration parameters. 
 Those expressions are evaluated against the data item the action operates on.
 
 For example, an action operating on the following data item: 
@@ -37,8 +37,9 @@ For example, an action operating on the following data item:
   }
 }
 ```
-can contain the JSON-Path expression
+can contain the mustache expression
 ```
-$.data.filename
+{{data.filename}}
 ```
-in a parameter configuration. During execution, the actual filename from the JSON data is used as parameter value.
+in a parameter configuration. 
+During execution, the actual filename from the JSON data is used as parameter value.

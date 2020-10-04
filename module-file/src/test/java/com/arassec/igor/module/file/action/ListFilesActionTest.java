@@ -25,10 +25,10 @@ import static org.mockito.Mockito.when;
 class ListFilesActionTest {
 
     /**
-     * Tests processing the action with JSON-Path parameters.
+     * Tests processing the action with mustache template parameters.
      */
     @Test
-    @DisplayName("Tests the action with JSON-Path parameters.")
+    @DisplayName("Tests the action with mustache template parameters.")
     void testProcess() {
         FileConnector fileConnectorMock = mock(FileConnector.class);
         when(fileConnectorMock.listFiles(eq("/dir"), eq("jpg"))).thenReturn(

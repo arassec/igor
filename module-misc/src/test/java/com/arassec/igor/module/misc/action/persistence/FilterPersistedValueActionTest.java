@@ -29,7 +29,7 @@ class FilterPersistedValueActionTest extends MiscActionBaseTest {
         PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
 
         FilterPersistedValueAction action = new FilterPersistedValueAction(persistentValueRepositoryMock);
-        action.setInput("$.data.INVALID");
+        action.setInput("{{data.INVALID}}");
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
         assertTrue(result.isEmpty());
@@ -46,7 +46,7 @@ class FilterPersistedValueActionTest extends MiscActionBaseTest {
         when(persistentValueRepositoryMock.isPersisted(eq(JOB_ID), any(PersistentValue.class))).thenReturn(true);
 
         FilterPersistedValueAction action = new FilterPersistedValueAction(persistentValueRepositoryMock);
-        action.setInput("$.data." + PARAM_KEY);
+        action.setInput("{{data." + PARAM_KEY + "}}");
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
         assertTrue(result.isEmpty());
@@ -61,7 +61,7 @@ class FilterPersistedValueActionTest extends MiscActionBaseTest {
         PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
 
         FilterPersistedValueAction action = new FilterPersistedValueAction(persistentValueRepositoryMock);
-        action.setInput("$.data." + PARAM_KEY);
+        action.setInput("{{data." + PARAM_KEY + "}}");
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
         assertFalse(result.isEmpty());

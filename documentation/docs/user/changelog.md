@@ -1,4 +1,7 @@
-# Releasenotes
+# Changelog
+
+## Version 0.2.1
+- Replaced JSON-Path support in parameters with Mustache templates.
 
 ## Version 0.2.0
 - Added Skip action to skip the first 'n' data items of a stream.

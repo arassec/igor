@@ -20,17 +20,17 @@ import static org.mockito.Mockito.*;
 class MoveFileActionTest extends FileActionBaseTest {
 
     /**
-     * Tests processing the action with JSON-Path parameters.
+     * Tests processing the action with mustache template parameters.
      */
     @Test
-    @DisplayName("Tests the action with JSON-Path parameters.")
+    @DisplayName("Tests processing the action with mustache template parameters.")
     void testProcess() {
         FileConnector fileConnectorMock = mock(FileConnector.class);
 
         MoveFileAction moveFileAction = new MoveFileAction();
         moveFileAction.setSource(fileConnectorMock);
-        moveFileAction.setSourceDirectory("$." + DataKey.DATA.getKey() + "." + BaseFileAction.DIRECTORY_KEY);
-        moveFileAction.setSourceFilename("$." + DataKey.DATA.getKey() + "." + BaseFileAction.FILENAME_KEY);
+        moveFileAction.setSourceDirectory("{{" + DataKey.DATA.getKey() + "." + BaseFileAction.DIRECTORY_KEY + "}}");
+        moveFileAction.setSourceFilename("{{" + DataKey.DATA.getKey() + "." + BaseFileAction.FILENAME_KEY + "}}");
         moveFileAction.setTargetDirectory("/dev/null");
         moveFileAction.setTargetFilename("deleted.txt");
 
@@ -47,9 +47,9 @@ class MoveFileActionTest extends FileActionBaseTest {
     void testPreocessFailSafe() {
         MoveFileAction moveFileAction = new MoveFileAction();
         moveFileAction.setSourceDirectory("/tmp");
-        moveFileAction.setSourceFilename("$.INVALID");
+        moveFileAction.setSourceFilename("{{INVALID}}");
         moveFileAction.setTargetDirectory("/dev/null");
-        moveFileAction.setTargetFilename("$.INVALID");
+        moveFileAction.setTargetFilename("{{INVALID}}");
 
         Map<String, Object> data = createData();
         List<Map<String, Object>> processedData = moveFileAction.process(data, new JobExecution());

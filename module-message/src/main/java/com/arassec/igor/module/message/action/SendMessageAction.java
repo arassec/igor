@@ -16,8 +16,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Sends a message to the specified messaging connector.
@@ -44,11 +42,6 @@ public class SendMessageAction extends BaseMessageAction {
     private String messageTemplate;
 
     /**
-     * Pattern to extract variables from the message template.
-     */
-    private final Pattern pattern = Pattern.compile("##(.*?)##");
-
-    /**
      * Creates a new component instance.
      */
     public SendMessageAction() {
@@ -69,18 +62,7 @@ public class SendMessageAction extends BaseMessageAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String content = messageTemplate;
-
-        Matcher m = pattern.matcher(content);
-        while (m.find()) {
-            // e.g. ##$.data.targetFilename##
-            String variableName = m.group();
-            // e.g. file.zip
-            String variableContent = getString(data, variableName.replace("##", ""));
-            if (variableContent != null) {
-                content = content.replace(variableName, variableContent);
-            }
-        }
+        String content = getString(data, messageTemplate);
 
         Message message = new Message();
         message.setContent(content);

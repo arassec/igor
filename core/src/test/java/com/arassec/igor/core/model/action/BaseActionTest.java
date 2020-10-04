@@ -51,8 +51,6 @@ class BaseActionTest {
         testData.put(DataKey.TIMESTAMP.getKey(), 1234567890);
 
         wrongData.put("foo", "bar");
-
-        baseAction.setJsonPathConfiguration(BaseAction.DEFAULT_JSONPATH_CONFIG);
     }
 
     /**
@@ -81,28 +79,17 @@ class BaseActionTest {
     }
 
     /**
-     * Tests if the action is able to spot a JSON-Path query.
-     */
-    @Test
-    @DisplayName("Tests the actin's ability to spot JSON-Path queries.")
-    void testIsQuery() {
-        assertFalse(baseAction.isQuery(null));
-        assertFalse(baseAction.isQuery(""));
-        assertFalse(baseAction.isQuery("foo"));
-        assertTrue(baseAction.isQuery("$"));
-    }
-
-    /**
      * Tests retrieving Strings from the supplied action data.
      */
     @Test
     @DisplayName("Tests retrieving Strings from the data.")
     void testGetString() {
-        assertNull(baseAction.getString(null, "$.test"));
+        assertNull(baseAction.getString(null, "{{test}}"));
         assertNull(baseAction.getString(testData, null));
         assertEquals("original-input", baseAction.getString(testData, "original-input"));
-        assertEquals("job-id", baseAction.getString(testData, "$." + DataKey.META.getKey() + "." + DataKey.JOB_ID.getKey()));
-        assertEquals("1234567890", baseAction.getString(testData, "$." + DataKey.TIMESTAMP.getKey()));
+        assertEquals("job-id", baseAction.getString(testData, "{{" + DataKey.META.getKey() + "."
+                + DataKey.JOB_ID.getKey() + "}}"));
+        assertEquals("1234567890", baseAction.getString(testData, "{{" + DataKey.TIMESTAMP.getKey() + "}}"));
     }
 
     /**

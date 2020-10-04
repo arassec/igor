@@ -34,14 +34,14 @@ public class MoveFileAction extends BaseFileAction {
      * Source directory to copy the file from.
      */
     @NotBlank
-    @IgorParam(defaultValue = DIRECTORY_QUERY)
+    @IgorParam(defaultValue = DIRECTORY_TEMPLATE)
     private String sourceDirectory;
 
     /**
      * Source file to copy.
      */
     @NotBlank
-    @IgorParam(defaultValue = FILENAME_QUERY)
+    @IgorParam(defaultValue = FILENAME_TEMPLATE)
     private String sourceFilename;
 
     /**

@@ -3,11 +3,9 @@ package com.arassec.igor.core.model.action;
 import com.arassec.igor.core.model.BaseIgorComponent;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.annotation.IgorParam;
-import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
-import lombok.Getter;
-import lombok.Setter;
+import com.samskivert.mustache.Mustache;
+import com.samskivert.mustache.MustacheException;
 
 import javax.validation.constraints.Positive;
 import java.util.List;
@@ -19,20 +17,14 @@ import java.util.Map;
 public abstract class BaseAction extends BaseIgorComponent implements Action {
 
     /**
-     * The default JSON-Path configuration.
+     * Template for the Job-ID.
      */
-    static final Configuration DEFAULT_JSONPATH_CONFIG = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS,
-            Option.DEFAULT_PATH_LEAF_TO_NULL);
+    private static final String JOB_ID_TEMPLATE = "{{" + DataKey.META.getKey() + "." + DataKey.JOB_ID.getKey() + "}}";
 
     /**
-     * Query for the Job-ID.
+     * Template for the simulation property that indicates a simulated job run.
      */
-    private static final String JOB_ID_QUERY = "$." + DataKey.META.getKey() + "." + DataKey.JOB_ID.getKey();
-
-    /**
-     * Query for the simulation property that indicates a simulated job run.
-     */
-    private static final String SIMULATION_QUERY = "$." + DataKey.META.getKey() + "." + DataKey.SIMULATION.getKey();
+    private static final String SIMULATION_TEMPLATE = "{{" + DataKey.META.getKey() + "." + DataKey.SIMULATION.getKey() + "}}";
 
     /**
      * Activates or deactivates an action.
@@ -50,13 +42,6 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     @Positive
     @IgorParam(advanced = true, defaultValue = "1")
     protected int numThreads;
-
-    /**
-     * The JSON-Path configuration.
-     */
-    @Getter
-    @Setter
-    private Configuration jsonPathConfiguration = DEFAULT_JSONPATH_CONFIG;
 
     /**
      * Creates a new component instance.
@@ -141,8 +126,8 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      */
     protected String getJobId(Map<String, Object> data) {
         if (data != null && !data.isEmpty()) {
-            String jobId = getString(data, JOB_ID_QUERY);
-            if (jobId != null) {
+            String jobId = getString(data, JOB_ID_TEMPLATE);
+            if (jobId != null && !JOB_ID_TEMPLATE.equals(jobId)) {
                 return jobId;
             }
         }
@@ -161,55 +146,34 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
             return false;
         }
 
-        Boolean value = JsonPath.using(jsonPathConfiguration).parse(data).read(BaseAction.SIMULATION_QUERY);
-        if (value != null) {
-            return value;
-        }
+        String result = getString(data, SIMULATION_TEMPLATE);
 
-        return false;
-    }
-
-    /**
-     * Determines whether the supplied String is a JSON-Path query or not.
-     *
-     * @param query The query to test.
-     *
-     * @return {@code true} if the supplied String can be used as JSON-Path query, {@code false} otherwise.
-     */
-    protected boolean isQuery(String query) {
-        if (query == null || query.isEmpty()) {
+        if (result == null || SIMULATION_TEMPLATE.equals(result)) {
             return false;
         }
-        return query.startsWith("$");
+
+        return Boolean.parseBoolean(result);
     }
 
     /**
-     * Returns the result of the JSON-Path query against the provided data. If no valid JSON-Path query is provided as input, the
-     * query is returned instead.
+     * Returns the result of the template executed against the provided data. If the template is invalid with regard to the input
+     * data, {@code null} is returned.
      *
-     * @param data  The data to execute the query on.
-     * @param query The JSON-Path query.
+     * @param data     The data to execute the query on.
+     * @param template The mustache template.
      *
-     * @return The query's result or the query itself, if it isn't a JSON-Path query.
+     * @return The template executed against the data or {@code null} if either of the input parameters is {@code null} or the
+     * template is invalid.
      */
-    protected String getString(Map<String, Object> data, String query) {
-        if (data == null || query == null) {
+    protected String getString(Map<String, Object> data, String template) {
+        if (data == null || template == null) {
             return null;
         }
-
-        if (!isQuery(query)) {
-            return query;
+        try {
+            return Mustache.compiler().compile(template).execute(data);
+        } catch (MustacheException e) {
+            return null;
         }
-
-        Object result = JsonPath.using(jsonPathConfiguration).parse(data).read(query);
-
-        if (result instanceof String) {
-            return (String) result;
-        } else if (result != null) {
-            return String.valueOf(result);
-        }
-
-        return null;
     }
 
     /**

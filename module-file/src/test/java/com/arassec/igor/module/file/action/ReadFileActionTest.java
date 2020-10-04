@@ -20,18 +20,18 @@ import static org.mockito.Mockito.when;
 class ReadFileActionTest extends FileActionBaseTest {
 
     /**
-     * Tests processing the action with JSON-Path parameters.
+     * Tests processing the action with mustache template parameters.
      */
     @Test
-    @DisplayName("Tests the action with JSON-Path parameters.")
+    @DisplayName("Tests processing the action with mustache template parameters.")
     void testProcess() {
         FileConnector fileConnectorMock = mock(FileConnector.class);
         when(fileConnectorMock.read(eq("/directory/test/filename.txt"))).thenReturn("igor-junit-test");
 
         ReadFileAction action = new ReadFileAction();
         action.setSource(fileConnectorMock);
-        action.setDirectory("$.data.directory");
-        action.setFilename("$.data.filename");
+        action.setDirectory("{{data.directory}}");
+        action.setFilename("{{data.filename}}");
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
@@ -46,7 +46,7 @@ class ReadFileActionTest extends FileActionBaseTest {
     @DisplayName("Tests the action with unresolved parameters.")
     void testProcessUnresolvedParameter() {
         ReadFileAction action = new ReadFileAction();
-        action.setFilename("$.INVALID");
+        action.setFilename("{{INVALID}}");
 
         Map<String, Object> data = createData();
         List<Map<String, Object>> processedData = action.process(data, new JobExecution());

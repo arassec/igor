@@ -198,6 +198,13 @@
     <dependencyManagement>
         <dependencies>
 
+            <!-- templating -->
+            <dependency>
+                <groupId>com.samskivert</groupId>
+                <artifactId>jmustache</artifactId>
+                <version>1.15</version>
+            </dependency>
+
             <!-- persistence / encryption -->
             <dependency>
                 <groupId>org.jasypt</groupId>

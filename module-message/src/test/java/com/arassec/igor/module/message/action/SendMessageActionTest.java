@@ -24,16 +24,16 @@ import static org.mockito.Mockito.*;
 class SendMessageActionTest extends MessageActionBaseTest {
 
     /**
-     * Tests processing the action with JSON-Path parameters.
+     * Tests processing the action with mustache template parameter.
      */
     @Test
-    @DisplayName("Tests the action with JSON-Path parameters.")
+    @DisplayName("Tests processing the action with mustache template parameter.")
     void testProcess() {
         MessageConnector messageConnectorMock = mock(MessageConnector.class);
 
         SendMessageAction action = new SendMessageAction();
         action.setMessageConnector(messageConnectorMock);
-        action.setMessageTemplate("{'key': '##$.data." + PARAM_KEY + "##'}");
+        action.setMessageTemplate("{'key': '{{data." + PARAM_KEY + "}}'}");
 
         ArgumentCaptor<Message> argCap = ArgumentCaptor.forClass(Message.class);
 

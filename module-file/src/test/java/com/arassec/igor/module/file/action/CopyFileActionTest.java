@@ -24,10 +24,10 @@ import static org.mockito.Mockito.*;
 class CopyFileActionTest extends FileActionBaseTest {
 
     /**
-     * Tests processing the action with JSON-Path parameters.
+     * Tests processing the action with mustache template parameters.
      */
     @Test
-    @DisplayName("Tests the action with JSON-Path parameters.")
+    @DisplayName("Tests the action with mustache template parameters.")
     void testProcess() {
         FileStreamData fileStreamData = new FileStreamData();
         fileStreamData.setData(new ByteArrayInputStream("test".getBytes()));
@@ -38,8 +38,8 @@ class CopyFileActionTest extends FileActionBaseTest {
 
         CopyFileAction action = new CopyFileAction();
         action.setSource(sourceFileConnectorMock);
-        action.setSourceDirectory("$.data.directory");
-        action.setSourceFilename("$.data.filename");
+        action.setSourceDirectory("{{data.directory}}");
+        action.setSourceFilename("{{data.filename}}");
         action.setTarget(targetFileConnectorMock);
         action.setTargetDirectory("target");
         action.setTargetFilename("copy-file-action-alpha.txt");
@@ -123,8 +123,8 @@ class CopyFileActionTest extends FileActionBaseTest {
 
         CopyFileAction action = new CopyFileAction();
         action.setSource(sourceFileConnectorMock);
-        action.setSourceDirectory("$.INVALID");
-        action.setSourceFilename("$.INVALID");
+        action.setSourceDirectory("{{INVALID}}");
+        action.setSourceFilename("{{INVALID}}");
         action.setTargetDirectory("target");
         action.setTargetFilename("copy-file-action-alpha.txt");
 
@@ -147,8 +147,8 @@ class CopyFileActionTest extends FileActionBaseTest {
 
         CopyFileAction action = new CopyFileAction();
         action.setSource(sourceFileConnectorMock);
-        action.setSourceDirectory("$.data.directory");
-        action.setSourceFilename("$.data.filename");
+        action.setSourceDirectory("{{data.directory}}");
+        action.setSourceFilename("{{data.filename}}");
         action.setTargetDirectory("target");
         action.setTargetFilename("copy-file-action-alpha.txt");
 

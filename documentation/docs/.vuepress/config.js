@@ -16,7 +16,7 @@ module.exports = {
                     children: [
                         "",
                         "configuration",
-                        "releasenotes"
+                        "changelog"
                     ]
                 },
                 {

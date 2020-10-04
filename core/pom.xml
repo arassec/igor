@@ -32,6 +32,11 @@
             <artifactId>validation-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.samskivert</groupId>
+            <artifactId>jmustache</artifactId>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>ch.qos.logback</groupId>

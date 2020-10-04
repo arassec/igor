@@ -62,13 +62,12 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
     }
 
     /**
-     * Tests getting executions of a job.
+     * Tests getting executions of a job with an empty page as result.
      */
     @Test
-    @DisplayName("Tests getting executions of a job.")
+    @DisplayName("Tests getting executions of a job with an empty page as result.")
     @SneakyThrows
-    void testGetExecutionsOfJob() {
-        // Test empty page:
+    void testGetExecutionsOfJobEmptyPage() {
         MvcResult mvcResult = mockMvc.perform(get("/api/execution/job/job-id")).andExpect(status().isOk()).andReturn();
         ModelPage<JobExecutionListEntry> result = convert(mvcResult, new TypeReference<>() {
         });
@@ -77,8 +76,15 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
         assertEquals(Integer.MAX_VALUE, result.getSize());
         assertEquals(0, result.getTotalPages());
         assertNotNull(result.getItems());
+    }
 
-        // With actual job executions in the result:
+    /**
+     * Tests getting executions of a job.
+     */
+    @Test
+    @DisplayName("Tests getting executions of a job.")
+    @SneakyThrows
+    void testGetExecutionsOfJob() {
         ModelPage<JobExecution> jobExecutions = new ModelPage<>(1, 2, 3,
                 List.of(JobExecution.builder().id(123L).jobId("job-id")
                                 .executionState(JobExecutionState.FAILED).created(Instant.now()).build(),
@@ -91,10 +97,10 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
 
         when(jobManager.load(eq("job-id"))).thenReturn(Job.builder().name("job-name").build());
 
-        mvcResult = mockMvc.perform(get("/api/execution/job/job-id")
+        MvcResult mvcResult = mvcResult = mockMvc.perform(get("/api/execution/job/job-id")
                 .param("pageNumber", "666")
                 .param("pageSize", "42")).andExpect(status().isOk()).andReturn();
-        result = convert(mvcResult, new TypeReference<>() {
+        ModelPage<JobExecutionListEntry> result = convert(mvcResult, new TypeReference<>() {
         });
 
         assertEquals(666, result.getNumber());

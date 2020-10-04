@@ -54,7 +54,7 @@ public class FilterByTimestampAction extends BaseUtilAction {
      * The amount of time (configured by {@link #timeUnit}) to use for filtering.
      */
     @Positive
-    @IgorParam
+    @IgorParam(defaultValue = "1")
     private long amount;
 
     /**

@@ -55,10 +55,12 @@ public class SplitArrayAction extends BaseUtilAction {
 
         DocumentContext documentContext = JsonPath.parse(data);
 
-        Object queryResult = documentContext.read(jsonPathQuery);
+        String query = getString(data, jsonPathQuery);
+
+        Object queryResult = documentContext.read(query);
         if (queryResult instanceof List) {
             for (Object element : (List) queryResult) {
-                documentContext.set(jsonPathQuery, element);
+                documentContext.set(query, element);
                 result.add(JsonPath.parse(documentContext.jsonString()).json());
             }
         }

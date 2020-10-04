@@ -55,7 +55,7 @@ class FilterByTimestampActionTest extends MiscActionBaseTest {
     @DisplayName("Tests filtering older entries.")
     void testOlderThan() {
         FilterByTimestampAction action = new FilterByTimestampAction();
-        action.setInput("$.timestamp");
+        action.setInput("{{timestamp}}");
         action.setAmount(1L);
         action.setTimeUnit(ChronoUnit.DAYS.name());
         action.setTimestampFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -85,7 +85,7 @@ class FilterByTimestampActionTest extends MiscActionBaseTest {
     void testYoungerThan() {
         FilterByTimestampAction action = new FilterByTimestampAction();
         action.setOlderThan(false);
-        action.setInput("$.timestamp");
+        action.setInput("{{timestamp}}");
         action.setAmount(1L);
         action.setTimeUnit(ChronoUnit.HOURS.name());
         action.setTimestampFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
@@ -108,7 +108,7 @@ class FilterByTimestampActionTest extends MiscActionBaseTest {
     void testFilterByEpochTimestampsSeconds() {
         FilterByTimestampAction action = new FilterByTimestampAction();
         action.setOlderThan(true);
-        action.setInput("$.timestamp");
+        action.setInput("{{timestamp}}");
         action.setAmount(1L);
         action.setTimeUnit(ChronoUnit.SECONDS.name());
         action.setTimestampFormat(FilterByTimestampAction.FORMAT_EPOCH_SECONDS);
@@ -128,7 +128,7 @@ class FilterByTimestampActionTest extends MiscActionBaseTest {
     void testFilterByEpochTimestampsMilliseconds() {
         FilterByTimestampAction action = new FilterByTimestampAction();
         action.setOlderThan(true);
-        action.setInput("$.timestamp");
+        action.setInput("{{timestamp}}");
         action.setAmount(1L);
         action.setTimeUnit(ChronoUnit.SECONDS.name());
         action.setTimestampFormat(FilterByTimestampAction.FORMAT_EPOCH_MILLIS);

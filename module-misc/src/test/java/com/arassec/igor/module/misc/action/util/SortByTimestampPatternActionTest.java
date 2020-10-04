@@ -52,7 +52,7 @@ class SortByTimestampPatternActionTest extends MiscActionBaseTest {
     @DisplayName("Tests sorting the collected data.")
     void testComplete() {
         SortByTimestampPatternAction action = new SortByTimestampPatternAction();
-        action.setInput("$.timestamp");
+        action.setInput("{{timestamp}}");
         action.setPattern(".*");
         action.setTimestampFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -88,9 +88,9 @@ class SortByTimestampPatternActionTest extends MiscActionBaseTest {
     @DisplayName("Tests sorting by timestamp with a pattern.")
     void testCompleteWithPattern() {
         SortByTimestampPatternAction action = new SortByTimestampPatternAction();
-        action.setInput("$.filename");
-        action.setPattern("$.pattern");
-        action.setTimestampFormat("$.timestampFormat");
+        action.setInput("{{filename}}");
+        action.setPattern("{{pattern}}");
+        action.setTimestampFormat("{{timestampFormat}}");
         action.setSortAscending(true);
 
         action.getCollectedData().add(

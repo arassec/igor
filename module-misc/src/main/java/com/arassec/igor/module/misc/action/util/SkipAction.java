@@ -24,7 +24,7 @@ public class SkipAction extends BaseUtilAction {
      * The configured number of items to skip.
      */
     @Positive
-    @IgorParam
+    @IgorParam(defaultValue = "1")
     private int number;
 
     /**

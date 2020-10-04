@@ -18,17 +18,17 @@ import static org.mockito.Mockito.*;
 class DeleteFileActionTest extends FileActionBaseTest {
 
     /**
-     * Tests processing the action with JSON-Path parameters.
+     * Tests processing the action with mustache template parameters.
      */
     @Test
-    @DisplayName("Tests the action with JSON-Path parameters.")
+    @DisplayName("Tests the action with mustache template parameters.")
     void process() {
         FileConnector fileConnectorMock = mock(FileConnector.class);
 
         DeleteFileAction action = new DeleteFileAction();
         action.setSource(fileConnectorMock);
-        action.setDirectory("$.data.directory");
-        action.setFilename("$.data.filename");
+        action.setDirectory("{{data.directory}}");
+        action.setFilename("{{data.filename}}");
 
         Map<String, Object> data = createData();
 
@@ -47,8 +47,8 @@ class DeleteFileActionTest extends FileActionBaseTest {
     @DisplayName("Tests the action with unresolved parameters.")
     void testProcessUnresolvedParameter() {
         DeleteFileAction action = new DeleteFileAction();
-        action.setDirectory("$.INVALID");
-        action.setFilename("$.INVALID");
+        action.setDirectory("{{INVALID}}");
+        action.setFilename("{{INVALID}}");
 
         Map<String, Object> data = createData();
 

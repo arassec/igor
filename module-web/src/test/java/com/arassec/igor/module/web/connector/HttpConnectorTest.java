@@ -180,6 +180,7 @@ class HttpConnectorTest {
     void testClientCertAuth() {
         // Start a server which requires client authentication:
         WireMockServer server = new WireMockServer(new WireMockConfiguration()
+                .dynamicPort()
                 .dynamicHttpsPort()
                 .trustStorePath("src/test/resources/igor-tests-keystore.jks")
                 .trustStorePassword("password")

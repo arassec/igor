@@ -94,14 +94,14 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     public List<Map<String, Object>> complete() {
 
         final Pattern p;
-        if (isQuery(pattern)) {
+        if (isTemplate(pattern)) {
             p = null;
         } else {
             p = Pattern.compile(pattern);
         }
 
         final DateTimeFormatter formatter;
-        if (isQuery(timestampFormat)) {
+        if (isTemplate(timestampFormat)) {
             formatter = null;
         } else {
             formatter = DateTimeFormatter.ofPattern(timestampFormat);
@@ -125,6 +125,17 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
         }
 
         return List.of();
+    }
+
+    /**
+     * Checks if a configured value is a mustache template or not.
+     *
+     * @param input The input to check.
+     *
+     * @return {@code true} if the input is a mustache template, {@code false} otherwise.
+     */
+    private boolean isTemplate(String input) {
+        return input.contains("{{") && input.contains("}}");
     }
 
     /**
@@ -203,4 +214,6 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     public void reset() {
         collectedData.clear();
     }
+
+
 }

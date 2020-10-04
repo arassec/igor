@@ -11,7 +11,7 @@ The action can be configured by the following parameters:
 
 Parameter | Description
 ---|:---|
-Input | A JSON-Path expression selecting a property from the data item. The property's value is used for matching against the regular expression.
+Input | A mustache expression selecting a property from the data item. The property's value is used for matching against the regular expression.
 Expression | The regular expression.
 Num threads | The number of threads this action uses to filter data items.
 

@@ -81,7 +81,7 @@ class HttpRequestActionTest {
         action.setUrl("http://localhost:" + httpServer.port() + "/test");
         action.setMethod("POST");
         action.setHeaders("X-Igor-Test=just-a-test");
-        action.setBody("The POST request body: ##$.variable##");
+        action.setBody("The POST request body: {{variable}}");
 
         action.initialize(jobId, jobExecution);
 
