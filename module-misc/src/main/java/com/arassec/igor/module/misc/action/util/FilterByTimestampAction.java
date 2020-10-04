@@ -9,7 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -23,6 +25,16 @@ import java.util.Map;
 @Getter
 @IgorComponent
 public class FilterByTimestampAction extends BaseUtilAction {
+
+    /**
+     * Format value for epoch timestamps in milliseconds.
+     */
+    public static final String FORMAT_EPOCH_MILLIS = "epoch-millis";
+
+    /**
+     * Format value for epoch timestamps in seconds.
+     */
+    public static final String FORMAT_EPOCH_SECONDS = "epoch-seconds";
 
     /**
      * The input to use as Timestamp.
@@ -90,7 +102,16 @@ public class FilterByTimestampAction extends BaseUtilAction {
         LocalDateTime target = LocalDateTime.now();
         target = target.minus(amount, ChronoUnit.valueOf(resolvedTimeUnit));
 
-        LocalDateTime actual = LocalDateTime.parse(resolvedInput, DateTimeFormatter.ofPattern(resolvedTimestampFormat));
+        LocalDateTime actual;
+        if (FORMAT_EPOCH_MILLIS.equals(resolvedTimestampFormat)) {
+            Instant instant = Instant.ofEpochMilli(Long.parseLong(resolvedInput));
+            actual = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else if (FORMAT_EPOCH_SECONDS.equals(resolvedTimestampFormat)) {
+            Instant instant = Instant.ofEpochSecond(Long.parseLong(resolvedInput));
+            actual = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else {
+            actual = LocalDateTime.parse(resolvedInput, DateTimeFormatter.ofPattern(resolvedTimestampFormat));
+        }
 
         if (olderThan) {
             if (actual.isBefore(target)) {

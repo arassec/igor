@@ -11,6 +11,7 @@
 - Triggers now support JSON input to enhance data and meta-data of the initial data item.
 - Added HTTP connector to support web requests.
 - Added 'HTTP Request' action to support web requests.
+- Updated 'Filter by Timestamp' action to support epoch timestamps in seconds and milliseconds.
 
 ## Version 0.1.0
 - First stable release with core features.

@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import javax.net.ssl.*;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -85,7 +85,7 @@ public class HttpConnector extends BaseConnector {
      */
     @Getter
     @Setter
-    @NotEmpty
+    @NotBlank
     @IgorParam(advanced = true, defaultValue = "pkcs12")
     private String keymanagerType;
 
@@ -110,7 +110,7 @@ public class HttpConnector extends BaseConnector {
      */
     @Getter
     @Setter
-    @NotEmpty
+    @NotBlank
     @IgorParam(advanced = true, defaultValue = "pkcs12")
     private String trustmanagerType;
 

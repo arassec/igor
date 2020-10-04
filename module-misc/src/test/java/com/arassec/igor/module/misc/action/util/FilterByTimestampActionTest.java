@@ -5,6 +5,7 @@ import com.arassec.igor.module.misc.action.MiscActionBaseTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -97,6 +98,47 @@ class FilterByTimestampActionTest extends MiscActionBaseTest {
         data.put("timestamp", "2014-04-13T03:00:00+02:00");
         processedData = action.process(data, new JobExecution());
         assertEquals(data, processedData.get(0));
+    }
+
+    /**
+     * Tests filtering by epoch timestamps in seconds.
+     */
+    @Test
+    @DisplayName("Tests filtering by epoch timestamps in seconds.")
+    void testFilterByEpochTimestampsSeconds() {
+        FilterByTimestampAction action = new FilterByTimestampAction();
+        action.setOlderThan(true);
+        action.setInput("$.timestamp");
+        action.setAmount(1L);
+        action.setTimeUnit(ChronoUnit.SECONDS.name());
+        action.setTimestampFormat(FilterByTimestampAction.FORMAT_EPOCH_SECONDS);
+
+        Map<String, Object> data = createData();
+        data.put("timestamp", Instant.now().minusSeconds(5).getEpochSecond());
+
+        List<Map<String, Object>> processedData = action.process(data, new JobExecution());
+        assertTrue(processedData.isEmpty());
+    }
+
+    /**
+     * Tests filtering by epoch timestamps in milliseconds.
+     */
+    @Test
+    @DisplayName("Tests filtering by epoch timestamps in milliseconds.")
+    void testFilterByEpochTimestampsMilliseconds() {
+        FilterByTimestampAction action = new FilterByTimestampAction();
+        action.setOlderThan(true);
+        action.setInput("$.timestamp");
+        action.setAmount(1L);
+        action.setTimeUnit(ChronoUnit.SECONDS.name());
+        action.setTimestampFormat(FilterByTimestampAction.FORMAT_EPOCH_MILLIS);
+
+        Map<String, Object> data = createData();
+
+        data.put("timestamp", System.currentTimeMillis() - 5000);
+
+        List<Map<String, Object>> processedData = action.process(data, new JobExecution());
+        assertTrue(processedData.isEmpty());
     }
 
 }

@@ -216,4 +216,14 @@ class HttpConnectorTest {
         server.stop();
     }
 
+    /**
+     * Tests testing the connector without a configuration.
+     */
+    @Test
+    @DisplayName("Tests testing the connector without a configuration.")
+    void testTestConfigurationWithoutConfiguration() {
+        HttpConnector httpConnector = new HttpConnector();
+        assertDoesNotThrow(httpConnector::testConfiguration);
+    }
+
 }

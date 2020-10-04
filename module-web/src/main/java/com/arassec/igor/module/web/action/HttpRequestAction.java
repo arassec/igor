@@ -15,7 +15,7 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URI;
@@ -48,14 +48,14 @@ public class HttpRequestAction extends BaseAction {
     /**
      * The URL to request.
      */
-    @NotEmpty
+    @NotBlank
     @IgorParam
     private String url;
 
     /**
      * The HTTP method to use.
      */
-    @NotEmpty
+    @NotBlank
     @IgorParam(defaultValue = "GET")
     private String method;
 
