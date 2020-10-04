@@ -32,7 +32,7 @@ public class CopyFileAction extends BaseFileAction {
     /**
      * Key for the copy file action's data.
      */
-    public static final String KEY_COPY_FILE_ACTION = "copyFileAction";
+    public static final String KEY_COPY_FILE_ACTION = "copiedFile";
 
     /**
      * Key to the source file's name.

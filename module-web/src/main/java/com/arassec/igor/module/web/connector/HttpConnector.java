@@ -2,6 +2,7 @@ package com.arassec.igor.module.web.connector;
 
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.IgorException;
@@ -132,7 +133,6 @@ public class HttpConnector extends BaseConnector {
     /**
      * The HTTP-Client for web requests.
      */
-    @Getter
     private HttpClient httpClient;
 
     /**
@@ -253,6 +253,16 @@ public class HttpConnector extends BaseConnector {
             Thread.currentThread().interrupt();
             throw new IgorException("Exception during request: " + e.getMessage() + " (" + request.uri().toString() + ")");
         }
+    }
+
+    /**
+     * Returns the configured {@link HttpClient}.
+     *
+     * @return The configured HTTP client.
+     */
+    @IgorSimulationSafe
+    public HttpClient getHttpClient() {
+        return httpClient;
     }
 
 }

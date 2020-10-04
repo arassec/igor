@@ -62,13 +62,13 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>adoptopenjdk/openjdk12:slim</image>
+                                <image>adoptopenjdk:11-jre-openj9</image>
                             </from>
                             <to>
                                 <image>docker.io/arassec/igor</image>
                                 <tags>
-                                    <tag>${project.version}</tag>
                                     <tag>latest</tag>
+                                    <tag>${project.version}</tag>
                                 </tags>
                                 <auth>
                                     <!--suppress UnresolvedMavenProperty -->

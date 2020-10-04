@@ -11,7 +11,7 @@
           <div class="td" :class="isBoolean(param.type) ? 'align-left' : ''">
 
             <input-validated v-if="isNumber(param.type)"
-                             v-modelr="param.value"
+                             v-model="param.value"
                              :parent-id="parentId"
                              :property-id="param.name"
                              :validation-errors="validationErrors"

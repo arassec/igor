@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 /**
  * Utility class for the work with {@link com.arassec.igor.core.model.IgorComponent}s.
  */
-class IgorComponentUtil {
+public class IgorComponentUtil {
 
     /**
      * Prevents instantiation.
@@ -26,7 +26,7 @@ class IgorComponentUtil {
      * @param jobId         The job's ID.
      * @param jobExecution  Contains information about the job execution.
      */
-    static void initializeConnectors(IgorComponent igorComponent, String jobId, JobExecution jobExecution) {
+    public static void initializeConnectors(IgorComponent igorComponent, String jobId, JobExecution jobExecution) {
         if (igorComponent == null) {
             return;
         }
@@ -40,7 +40,7 @@ class IgorComponentUtil {
      * @param jobId         The job's ID.
      * @param jobExecution  Contains information about the job execution.
      */
-    static void shutdownConnectors(IgorComponent igorComponent, String jobId, JobExecution jobExecution) {
+    public static void shutdownConnectors(IgorComponent igorComponent, String jobId, JobExecution jobExecution) {
         if (igorComponent == null) {
             return;
         }

@@ -210,7 +210,7 @@ class IgorComponentRegistryTest {
         when(applicationContextMock.getBean(eq(TestConnectorImpl.class))).thenReturn(new TestConnectorImpl());
 
         TestConnectorImpl connector = (TestConnectorImpl) igorComponentRegistry.createConnectorInstance("connector-type-id",
-                Map.of());
+                null);
 
         assertNull(connector.getEmptyDefaultValueParam());
         assertTrue(connector.isBooleanParam());

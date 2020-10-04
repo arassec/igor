@@ -44,6 +44,9 @@ public class ConnectorProxy implements InvocationHandler {
         if (AnnotationUtils.findAnnotation(method, IgorSimulationSafe.class) != null) {
             return method.invoke(connector, arguments);
         }
+        if (method.getName().equals("initialize") || method.getName().equals("shutdown")) {
+            return method.invoke(connector, arguments);
+        }
         return method.invoke(connectorMock, arguments);
     }
 

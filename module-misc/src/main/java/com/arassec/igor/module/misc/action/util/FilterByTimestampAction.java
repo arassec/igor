@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Filters the supplied data by a regular expression.
+ * Filters the supplied data by a timestamp.
  */
 @Slf4j
 @Setter

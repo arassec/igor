@@ -9,6 +9,8 @@
 - Removed Providers completely
 - Added 'Web-Hook' trigger to start a job by web requests.
 - Triggers now support JSON input to enhance data and meta-data of the initial data item.
+- Added HTTP connector to support web requests.
+- Added 'HTTP Request' action to support web requests.
 
 ## Version 0.1.0
 - First stable release with core features.

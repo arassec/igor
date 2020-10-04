@@ -68,7 +68,8 @@ module.exports = {
                                 "module-file/list-files-action",
                                 "module-file/move-file-action",
                                 "module-file/read-file-action",
-                                "module-message/send-message-action"
+                                "module-message/send-message-action",
+                                "module-web/http-request-action"
                             ]
                         },
                         {
@@ -82,7 +83,8 @@ module.exports = {
                                 "module-file/https-file-connector",
                                 "module-file/scp-file-connector",
                                 "module-file/sftp-file-connector",
-                                "module-message/rabbitmq-message-connector"
+                                "module-message/rabbitmq-message-connector",
+                                "module-web/http-web-connector"
                             ]
                         }
                     ]

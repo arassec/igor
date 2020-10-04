@@ -12,6 +12,9 @@
   <a href="https://sonarcloud.io/component_measures?id=arassec_igor&metric=coverage&view=treemap">
     <img src="https://img.shields.io/sonar/coverage/arassec_igor?server=http%3A%2F%2Fsonarcloud.io&color=success" alt="coverage-state"/>
   </a>
+  <a href="https://maven-badges.herokuapp.com/maven-central/com.arassec.igor/application">
+    <img src="https://maven-badges.herokuapp.com/maven-central/com.arassec.igor/application/badge.svg"/>
+  </a>
 </p> 
 
 

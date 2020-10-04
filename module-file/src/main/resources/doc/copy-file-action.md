@@ -3,6 +3,30 @@
 ## Description
 This action copies a file.
 
+Details about the action's parameters are added to processed data items under the 'copiedFile' key. 
+
+A data item processed by this action could look like this:
+``` json
+{
+  "data": {
+    "filename": "KeyGenerator.png",
+    "lastModified": "2007-03-19T20:52:58+01:00",
+    "directory": "/pub/example/"
+  },
+  "meta": {
+    "jobId": "e0b925ed-104f-45b1-81b7-5d79ea46a633",
+    "simulation": true,
+    "timestamp": 1601302694149
+  },
+  "copiedFile": {
+    "sourceDirectory": "/pub/example/",
+    "targetFilename": "KeyGenerator.png",
+    "targetDirectory": "/volume1/data/test/",
+    "sourceFilename": "KeyGenerator.png"
+  }
+}
+```
+
 ## Parameters
 The action can be configured by the following parameters:
 
