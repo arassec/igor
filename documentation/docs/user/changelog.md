@@ -6,6 +6,7 @@
     - All 2XX HTTP status codes are now accepted as successful
     - Mustache templates can now be used in headers
 - Minor changes in HTTP connector (all 2XX HTTP status codes are now accepted as successful during connector tests)
+- Added new property to 'Filter by Regular Expression' action to drop matching items if configured.
 
 ## Version 0.2.1
 - Replaced JSON-Path support in parameters with Mustache templates.

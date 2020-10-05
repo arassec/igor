@@ -63,6 +63,14 @@ class FilterByRegExpActionTest extends MiscActionBaseTest {
         processedData = action.process(data, new JobExecution());
 
         assertTrue(processedData.isEmpty());
+
+        // matches, but should be dropped:
+        action.setExpression("igor.*test");
+        action.setDropMatching(true);
+
+        processedData = action.process(data, new JobExecution());
+
+        assertTrue(processedData.isEmpty());
     }
 
 }

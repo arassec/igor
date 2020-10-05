@@ -13,6 +13,7 @@ Parameter | Description
 ---|:---|
 Input | A mustache expression selecting a property from the data item. The property's value is used for matching against the regular expression.
 Expression | The regular expression.
+Drop matching | If checked, data items that **match** the regular expression will be removed from the stream. If unchecked, data items that **do not** match are removed from further processing.
 Num threads | The number of threads this action uses to filter data items.
 
 ## Regular Expressions

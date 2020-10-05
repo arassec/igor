@@ -35,6 +35,13 @@ public class FilterByRegExpAction extends BaseUtilAction {
     private String expression;
 
     /**
+     * If set to {@code true}, the filter will drop all matching data items. If set to {@code false}, all non-matching data items
+     * will be dropped.
+     */
+    @IgorParam(advanced = true)
+    private boolean dropMatching;
+
+    /**
      * Creates a new component instance.
      */
     public FilterByRegExpAction() {
@@ -61,7 +68,8 @@ public class FilterByRegExpAction extends BaseUtilAction {
             return List.of();
         }
 
-        if (!resolvedInput.matches(resolvedExpression)) {
+        if ((dropMatching && resolvedInput.matches(resolvedExpression))
+                || (!dropMatching && !resolvedInput.matches(resolvedExpression))) {
             log.debug("Filtered '{}' against RegExp '{}'", resolvedInput, resolvedExpression);
             return List.of();
         }
