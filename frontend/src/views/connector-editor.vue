@@ -9,7 +9,7 @@
             <layout-row slot="header">
                 <p slot="left">
                     <input-button v-on:clicked="cancelConfiguration()" icon="arrow-left" class="margin-right"/>
-                    <input-button v-on:clicked="testConfiguration()" icon="plug" class="margin-right"/>
+                    <input-button v-on:clicked="testConfiguration()" icon="cogs" class="margin-right"/>
                     <input-button v-on:clicked="saveConfiguration()" icon="save"/>
                 </p>
             </layout-row>
@@ -291,7 +291,7 @@ export default {
                 }
             },
             testConfiguration: async function () {
-                await IgorBackend.postData('/api/connector/test', this.connectorConfiguration, 'Testing connector', 'Test OK.', 'Testing Failed!').then((result) => {
+                await IgorBackend.postData('/api/connector/test', this.connectorConfiguration, 'Testing connection', 'Connection OK.', 'Connection Failed!').then((result) => {
                     this.validationErrors = {};
                     if (result.status === 400) {
                         this.validationErrors = result.data;

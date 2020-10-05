@@ -1,5 +1,6 @@
 package com.arassec.igor.module.web.action;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
@@ -17,6 +18,7 @@ import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -34,7 +36,12 @@ public class HttpRequestAction extends BaseAction {
     /**
      * Key for the web request action's data.
      */
-    public static final String KEY_WEB_REQUEST_ACTION = "webResponse";
+    private static final String DEFAULT_KEY_WEB_RESPONSE = "webResponse";
+
+    /**
+     * Contains all HTTP methods which are unsafe to be executed during simulated job executions.
+     */
+    private static final Set<String> SIMULATION_UNSAFE_METHODS = Set.of("POST", "PUT", "DELETE", "PATCH");
 
     /**
      * The connector to use for requests.
@@ -54,6 +61,7 @@ public class HttpRequestAction extends BaseAction {
      * The HTTP method to use.
      */
     @NotBlank
+    @Pattern(regexp = "GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH")
     @IgorParam(defaultValue = "GET")
     private String method;
 
@@ -70,22 +78,35 @@ public class HttpRequestAction extends BaseAction {
     private String body;
 
     /**
+     * A username for authentication.
+     */
+    @IgorParam(advanced = true)
+    private String username;
+
+    /**
+     * The password for authentication.
+     */
+    @IgorParam(advanced = true, secured = true)
+    private String password;
+
+    /**
+     * The target key to put the web response in the data item.
+     */
+    @NotBlank
+    @IgorParam(advanced = true, defaultValue = DEFAULT_KEY_WEB_RESPONSE)
+    private String targetKey;
+
+    /**
      * Enables igor to treat any HTTP result code as if it was HTTP 200.
      */
     @IgorParam(advanced = true)
     private boolean ignoreErrors;
 
     /**
-     * A username for authentication.
+     * Doesn't execute non-idempotent web requests if {@code true}.
      */
-    @IgorParam(advanced = true)
-    protected String username;
-
-    /**
-     * The password for authentication.
-     */
-    @IgorParam(advanced = true, secured = true)
-    protected String password;
+    @IgorParam(advanced = true, defaultValue = "true")
+    private boolean simulationSafe;
 
     /**
      * Contains the parsed headers.
@@ -129,36 +150,41 @@ public class HttpRequestAction extends BaseAction {
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
                 .uri(URI.create(requestUrl))
                 .method(this.method, HttpRequest.BodyPublishers.ofString(content));
-        parsedHeaders.forEach(header -> httpRequestBuilder.header(header.split("=")[0], header.split("=")[1]));
+        parsedHeaders.forEach(header -> httpRequestBuilder.header(getString(data, header.split("=")[0]),
+                getString(data, header.split("=")[1])));
         addBasicAuthHeaderIfConfigured(httpRequestBuilder);
 
-        try {
-            HttpResponse<String> httpResponse = httpConnector.getHttpClient().send(httpRequestBuilder.build(),
-                    HttpResponse.BodyHandlers.ofString());
+        if (isSimulation(data) && simulationSafe && SIMULATION_UNSAFE_METHODS.contains(method)) {
+            data.put(DataKey.SIMULATION_LOG.getKey(), "Would have executed '" + method + "' against: " + requestUrl);
+        } else {
+            try {
+                HttpResponse<String> httpResponse = httpConnector.getHttpClient().send(httpRequestBuilder.build(),
+                        HttpResponse.BodyHandlers.ofString());
 
-            if (!ignoreErrors && httpResponse.statusCode() != 200) {
-                throw new IgorException("Received HTTP error code on web request for url '" + requestUrl + "': "
-                        + httpResponse.statusCode());
+                if (!ignoreErrors && (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 226)) {
+                    throw new IgorException("Received HTTP error code on web request for url '" + requestUrl + "': "
+                            + httpResponse.statusCode());
+                }
+
+                String responseBody = httpResponse.body();
+                Object parsedResponseBody = JSONValue.parse(responseBody);
+
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("headers", httpResponse.headers().map());
+
+                if (parsedResponseBody instanceof JSONObject || parsedResponseBody instanceof JSONArray) {
+                    responseData.put("body", parsedResponseBody);
+                } else {
+                    responseData.put("body", responseBody);
+                }
+
+                data.put(getString(data, targetKey), responseData);
+            } catch (IOException e) {
+                throw new IgorException("Could not request URL: " + url, e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IgorException("Interrupted during HTTP request!", e);
             }
-
-            String responseBody = httpResponse.body();
-            Object parsedResponseBody = JSONValue.parse(responseBody);
-
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("headers", httpResponse.headers().map());
-
-            if (parsedResponseBody instanceof JSONObject || parsedResponseBody instanceof JSONArray) {
-                responseData.put("body", parsedResponseBody);
-            } else {
-                responseData.put("body", responseBody);
-            }
-
-            data.put(KEY_WEB_REQUEST_ACTION, responseData);
-        } catch (IOException e) {
-            throw new IgorException("Could not request URL: " + url, e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IgorException("Interrupted during HTTP request!", e);
         }
 
         return List.of(data);

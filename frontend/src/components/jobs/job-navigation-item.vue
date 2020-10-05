@@ -7,7 +7,7 @@
         <layout-row>
             <input-button slot="left" icon="arrow-left" v-on:clicked="$emit('cancel-configuration')"
                           class="margin-right"/>
-            <input-button slot="left" icon="plug" v-on:clicked="$emit('test-configuration')" class="margin-right"/>
+            <input-button slot="left" icon="cogs" v-on:clicked="$emit('test-configuration')" class="margin-right"/>
             <input-button slot="left" icon="save" v-on:clicked="$emit('save-configuration')"/>
             <input-button slot="right" icon="play" v-on:clicked="$emit('run-job')" class="margin-left"
                           :disabled="jobRunningOrWaiting || job.id == null || !job.active || disableDueToFaultIntolerance"/>

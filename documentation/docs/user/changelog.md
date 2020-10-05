@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 0.2.2
+- Minor changes in 'HTTP request' action.
+    - POST, PUT, PATCH and DELETE are no longer executed during simulated job executions
+    - All 2XX HTTP status codes are now accepted as successful
+    - Mustache templates can now be used in headers
+- Minor changes in HTTP connector (all 2XX HTTP status codes are now accepted as successful during connector tests)
+
 ## Version 0.2.1
 - Replaced JSON-Path support in parameters with Mustache templates.
 

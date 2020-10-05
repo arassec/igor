@@ -274,8 +274,8 @@ export default {
                 this.showDocumentation = false;
                 this.testResults = null;
                 this.selectedTestResults = null;
-                await IgorBackend.postData('/api/job/simulate', this.jobConfiguration, 'Testing job',
-                    'Test OK.', 'Test Failed!').then((result) => {
+                await IgorBackend.postData('/api/job/simulate', this.jobConfiguration, 'Simulating job',
+                    'Simulation OK.', 'Simulation Failed!').then((result) => {
                     if (result.status === 400) {
                         if(result.data === undefined || result.data === "") {
                           this.validationErrors = {};

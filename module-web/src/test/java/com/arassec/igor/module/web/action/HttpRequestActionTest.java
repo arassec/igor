@@ -1,5 +1,6 @@
 package com.arassec.igor.module.web.action;
 
+import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.module.web.connector.HttpConnector;
@@ -61,7 +62,7 @@ class HttpRequestActionTest {
         httpServer.start();
         httpServer.stubFor(
                 post("/test")
-                        .withHeader("X-Igor-Test", equalTo("just-a-test"))
+                        .withHeader("X-Igor-Test", equalTo("variable-value"))
                         .withRequestBody(equalTo("The POST request body: variable-value"))
                         .willReturn(
                                 aResponse()
@@ -80,8 +81,9 @@ class HttpRequestActionTest {
         action.setHttpConnector(httpConnector);
         action.setUrl("http://localhost:" + httpServer.port() + "/test");
         action.setMethod("POST");
-        action.setHeaders("X-Igor-Test=just-a-test");
+        action.setHeaders("X-Igor-Test={{variable}}");
         action.setBody("The POST request body: {{variable}}");
+        action.setTargetKey("webResponse");
 
         action.initialize(jobId, jobExecution);
 
@@ -143,6 +145,69 @@ class HttpRequestActionTest {
 
         action.setPassword("action-test");
         assertDoesNotThrow(() -> action.process(data, jobExecution));
+
+        httpServer.resetAll();
+        httpServer.stop();
+    }
+
+    /**
+     * Tests sending an HTTP DELETE request while simulating the job.
+     */
+    @Test
+    @DisplayName("Tests sending an HTTP DELETE request while simulating the job.")
+    void testHttpDeleteInSimulationMode() {
+        String jobId = "job-id";
+        JobExecution jobExecution = new JobExecution();
+
+        HttpConnector httpConnector = new HttpConnector();
+        httpConnector.initialize(jobId, jobExecution);
+
+        HttpRequestAction action = new HttpRequestAction();
+        action.setHttpConnector(httpConnector);
+        action.setUrl("http://localhost/must-not-be-called");
+        action.setMethod("DELETE");
+        action.setSimulationSafe(true);
+
+        action.initialize(jobId, jobExecution);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(DataKey.META.getKey(), Map.of(DataKey.SIMULATION.getKey(), true));
+
+        List<Map<String, Object>> result = action.process(data, jobExecution);
+
+        assertEquals(1, result.size());
+        assertEquals("Would have executed 'DELETE' against: http://localhost/must-not-be-called",
+                result.get(0).get(DataKey.SIMULATION_LOG.getKey()));
+    }
+
+    /**
+     * Tests error handling.
+     */
+    @Test
+    @DisplayName("Tests error handling.")
+    void testErrorHandling() {
+        String jobId = "job-id";
+        JobExecution jobExecution = new JobExecution();
+
+        HttpConnector httpConnector = new HttpConnector();
+        httpConnector.initialize(jobId, jobExecution);
+
+        HttpRequestAction action = new HttpRequestAction();
+        action.setHttpConnector(httpConnector);
+        action.setUrl("http://no-server-running");
+        action.setMethod("DELETE");
+        action.setSimulationSafe(true);
+
+        action.initialize(jobId, jobExecution);
+
+        Map<String, Object> data = Map.of();
+        assertThrows(IgorException.class, () -> action.process(data, jobExecution));
+
+        WireMockServer httpServer = new WireMockServer(new WireMockConfiguration().dynamicPort());
+        httpServer.start();
+
+        action.setUrl("http://localhost:" + httpServer.port() + "/not-existing");
+        assertThrows(IgorException.class, () -> action.process(data, jobExecution));
 
         httpServer.resetAll();
         httpServer.stop();

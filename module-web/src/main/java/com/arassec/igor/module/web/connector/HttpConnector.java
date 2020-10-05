@@ -244,7 +244,7 @@ public class HttpConnector extends BaseConnector {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(testUrl)).GET().build();
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
+            if (response.statusCode() < 200 || response.statusCode() > 226) {
                 throw new IgorException("Received HTTP error code: " + response.statusCode());
             }
         } catch (IOException e) {
