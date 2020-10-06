@@ -1,12 +1,12 @@
 {
   "name": "frontend",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Vue.js frontend for igor",
   "author": "Andreas Sensen <andreas.sensen@arassec.com>",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --modern",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

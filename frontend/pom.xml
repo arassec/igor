@@ -46,6 +46,16 @@
                             <arguments>install</arguments>
                         </configuration>
                     </execution>
+                    <!-- Set the version to the revision -->
+                    <execution>
+                        <id>npm version</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>version ${revision}</arguments>
+                        </configuration>
+                    </execution>
                     <!-- Build and minify static files -->
                     <execution>
                         <id>npm run build</id>

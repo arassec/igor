@@ -15,7 +15,7 @@
             </ul>
             <h1 class="heading">{{heading}}</h1>
             <a class="documentation-link" target="_blank" rel="noopener noreferrer" href="/igor/index.html">
-                Reference Documentation
+              v{{version}} Reference Documentation
             </a>
         </nav>
 
@@ -25,7 +25,9 @@
 </template>
 
 <script>
-    export default {
+import {version} from '../../package.json';
+
+export default {
         name: 'app-navigation',
         components: {},
         data: function () {
@@ -49,7 +51,10 @@
                 } else {
                     return 'Undefined'
                 }
-            }
+            },
+            version: function () {
+              return version;
+          }
         }
     }
 </script>
