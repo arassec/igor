@@ -9,6 +9,8 @@ import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome'
 import {fas} from '@fortawesome/free-solid-svg-icons'
 import {far} from '@fortawesome/free-regular-svg-icons'
 
+import "animate.css/source/animate.css";
+
 library.add(fas)
 library.add(far)
 

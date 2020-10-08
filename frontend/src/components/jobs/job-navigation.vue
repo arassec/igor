@@ -10,6 +10,7 @@
                              v-on:cancel-configuration="$emit('cancel-configuration')"
                              v-on:test-configuration="$emit('test-configuration')"
                              v-on:save-configuration="$emit('save-configuration')"
+                             v-on:show-executions="$emit('show-executions')"
                              v-on:run-job="$emit('run-job')"/>
 
         <draggable v-model="jobConfiguration.actions" :group="'actions'" @start="drag=true" @end="drag=false"
@@ -32,13 +33,13 @@
 </template>
 
 <script>
-    import draggable from 'vuedraggable'
-    import JobNavigationItem from "./job-navigation-item";
-    import AddItemButton from "./add-item-button";
-    import LayoutRow from "../common/layout-row";
-    import ActionNavigationItem from "./action-navigation-item";
+import draggable from 'vuedraggable'
+import JobNavigationItem from "./job-navigation-item";
+import AddItemButton from "./add-item-button";
+import LayoutRow from "../common/layout-row";
+import ActionNavigationItem from "./action-navigation-item";
 
-    export default {
+export default {
         name: "job-navigation",
         components: {ActionNavigationItem, LayoutRow, AddItemButton, JobNavigationItem, draggable},
         props: ['jobConfiguration', 'validationErrors', 'selectedActionId', 'jobRunningOrWaiting', 'jobExecutionsPage'],

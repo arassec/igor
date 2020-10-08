@@ -76,6 +76,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
                 .andExpect(jsonPath("$.items[0].id").value("job-id"))
                 .andExpect(jsonPath("$.items[0].name").value("job-name"))
                 .andExpect(jsonPath("$.items[0].active").value("true"))
+                .andExpect(jsonPath("$.items[0].faultTolerant").value("true"))
                 .andExpect(jsonPath("$.items[0].hasFailedExecutions").value("true"))
                 .andExpect(jsonPath("$.items[1]").doesNotExist());
     }

@@ -53,7 +53,7 @@
                             <goal>npm</goal>
                         </goals>
                         <configuration>
-                            <arguments>version ${revision}</arguments>
+                            <arguments>--allow-same-version version ${revision}</arguments>
                         </configuration>
                     </execution>
                     <!-- Build and minify static files -->

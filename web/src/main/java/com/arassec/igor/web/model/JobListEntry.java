@@ -33,6 +33,11 @@ public class JobListEntry {
     private boolean hasFailedExecutions;
 
     /**
+     * {@code true} if the job is configured to be fault tolerant, {@code false} otherwise.
+     */
+    private boolean faultTolerant;
+
+    /**
      * Information about the last execution of this job.
      */
     private JobExecutionListEntry execution;

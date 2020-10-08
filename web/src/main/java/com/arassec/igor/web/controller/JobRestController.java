@@ -119,7 +119,8 @@ public class JobRestController extends BaseRestController {
             result.setItems(jobsPage.getItems().stream().map(job -> {
                 JobExecution jobExecution = determineJobExecution(jobManager, job);
                 return new JobListEntry(job.getId(), job.getName(), job.isActive(),
-                        (jobManager.countExecutionsOfJobInState(job.getId(), JobExecutionState.FAILED) > 0), convert(jobExecution, null));
+                        (jobManager.countExecutionsOfJobInState(job.getId(), JobExecutionState.FAILED) > 0), job.isFaultTolerant(),
+                        convert(jobExecution, null));
             }).collect(Collectors.toList()));
 
             return result;
@@ -392,7 +393,7 @@ public class JobRestController extends BaseRestController {
             events.add(SseEmitter.event().name(SSE_STATE_UPDATE).data(
                     new JobListEntry(jobEvent.getJob().getId(), jobEvent.getJob().getName(),
                             jobEvent.getJob().isActive(), (jobManager.countExecutionsOfJobInState(jobEvent.getJob().getId(),
-                            JobExecutionState.FAILED) > 0), convert(jobExecution, null))
+                            JobExecutionState.FAILED) > 0), jobEvent.getJob().isFaultTolerant(), convert(jobExecution, null))
             ));
             if (JobEventType.STATE_CHANGE.equals(jobEvent.getType())) {
                 events.add(SseEmitter.event().name(SSE_EXECUTION_OVERVIEW).data(createJobExecutionOverview()));
@@ -422,7 +423,7 @@ public class JobRestController extends BaseRestController {
         JobExecutionOverview jobExecutionOverview = new JobExecutionOverview();
         jobExecutionOverview.setNumSlots(jobManager.getNumSlots());
         jobExecutionOverview.setNumRunning(jobManager.countJobExecutions(JobExecutionState.RUNNING)
-            + jobManager.countJobExecutions(JobExecutionState.ACTIVE));
+                + jobManager.countJobExecutions(JobExecutionState.ACTIVE));
         jobExecutionOverview.setNumWaiting(jobManager.countJobExecutions(JobExecutionState.WAITING));
         jobExecutionOverview.setNumFailed(jobManager.countJobExecutions(JobExecutionState.FAILED));
         return jobExecutionOverview;

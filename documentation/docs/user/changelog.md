@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.2.3
+- UI refactoring: 
+  - igor's version is displayed in the navigation
+  - job configuration and job executions switch places
+  - simulation results and documentation can overlap
+
 ## Version 0.2.2
 - Minor changes in 'HTTP request' action.
     - POST, PUT, PATCH and DELETE are no longer executed during simulated job executions

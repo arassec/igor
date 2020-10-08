@@ -1,5 +1,5 @@
 <template>
-    <core-content class="max-width">
+    <core-content>
         <div class="documentation-container">
 
             <input-button slot="right" icon="times" v-on:clicked="$emit('close')" style="float: right;"/>

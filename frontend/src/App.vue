@@ -19,6 +19,10 @@ export default {
         box-sizing: border-box;
     }
 
+    body {
+        overflow-x: hidden;
+    }
+
     *, *:before, *:after {
         box-sizing: inherit;
     }
@@ -44,6 +48,7 @@ export default {
         --color-foreground: #62929E;
         --color-background: #546A7B;
         --color-alert: #DF6A7C;
+        --animate-css-duration: 0.3s;
     }
 
     @font-face {

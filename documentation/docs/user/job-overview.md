@@ -45,5 +45,15 @@ The tile contains the following buttons to modify the job:
 
 ![run job](./images/run-button-dark.png) Runs the job.
 
+The 'run job' button might be disabled for the following reasons, indicated by the button's icon:
+
+![run job disabled waiting](./images/run-button-dark-waiting.png) The job is waiting for an execution slot.
+
+![run job disabled running](./images/run-button-dark-running.png) The job is already running.
+
+![run job disabled active](./images/run-button-dark-active.png) The job is triggered by events and already active.
+
+![run job disabled failed](./images/run-button-dark-failed.png) The job failed previously and is fault-intolerant.
+
 Information about the last job execution is displayed at the bottom of the job tile.
 You can open detailed information by clicking on it. 

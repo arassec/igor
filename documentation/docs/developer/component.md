@@ -105,7 +105,7 @@ Only methods marked with `@IgorSimulationSafe` will be executed during simulated
 For all other methods of a connector, a proxy will be generated which uses default values.
 
 ::: warning
-Only idempotent operations should be annotated with this annoatation.
+Only idempotent operations should be annotated with this annotation.
 :::
 
 An example use of this annotation might look like this:
