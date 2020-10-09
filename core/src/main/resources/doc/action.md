@@ -14,8 +14,9 @@ The following parameters can be configured for every action.
 
 Parameter | Description
 ---|:---|
-Active | Active tasks retrieve data from their provider. Inactive tasks are skipped during job executions.
-Name | The name of the task.
+Active | Active actions process data items. Inactive actions are skipped during job executions.
+Name | An optional name of the action.
+Description | An optional description of the action.
 
 Depending on the actual type, the action might require more parameters to be configured.
 

@@ -45,6 +45,7 @@
     {
       "id": "action-id",
       "name": "action-name",
+      "description": "action-description",
       "active": true,
       "category": {
         "key": "action-category-id",

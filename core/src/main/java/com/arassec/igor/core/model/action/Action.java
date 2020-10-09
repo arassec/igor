@@ -43,6 +43,20 @@ public interface Action extends IgorComponent {
     void setName(String name);
 
     /**
+     * Returns the action's description.
+     *
+     * @return An optional description.
+     */
+    String getDescription();
+
+    /**
+     * Sets an description for the action.
+     *
+     * @param description The action's description.
+     */
+    void setDescription(String description);
+
+    /**
      * Returns the number of threads this action should be executed with.
      *
      * @return The number of threads.

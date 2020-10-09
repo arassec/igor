@@ -14,6 +14,7 @@
       "id": "action-id",
       "typeId": "action-type-id",
       "name": "action-name",
+      "description": "action-description",
       "active": true,
       "parameters": [
         {

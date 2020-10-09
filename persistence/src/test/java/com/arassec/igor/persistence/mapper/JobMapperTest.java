@@ -44,6 +44,7 @@ class JobMapperTest extends MapperBaseTest {
         TestAction testAction = new TestAction();
         testAction.setId("action-id");
         testAction.setName("action-name");
+        testAction.setDescription("action-description");
         testAction.setActive(true);
         testAction.setNumThreads(1);
 
@@ -93,6 +94,7 @@ class JobMapperTest extends MapperBaseTest {
 
         assertEquals("action-id", testAction.getId());
         assertEquals("action-name", testAction.getName());
+        assertEquals("action-description", testAction.getDescription());
         assertEquals(TestAction.CATEGORY_ID, testAction.getCategoryId());
         assertEquals(TestAction.TYPE_ID, testAction.getTypeId());
         assertTrue(testAction.getTestConnector() instanceof TestConnector);

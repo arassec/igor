@@ -31,8 +31,8 @@ public class ConnectorPersistenceDeserializer extends IgorComponentPersistenceDe
      * {@inheritDoc}
      */
     @Override
-    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
-        super.setComponentSpecifica(instance, map);
-        ((Connector) instance).setName(String.valueOf(map.get(PersistenceMapperKey.NAME.getKey())));
+    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> componentJson) {
+        super.setComponentSpecifica(instance, componentJson);
+        ((Connector) instance).setName(String.valueOf(componentJson.get(PersistenceMapperKey.NAME.getKey())));
     }
 }

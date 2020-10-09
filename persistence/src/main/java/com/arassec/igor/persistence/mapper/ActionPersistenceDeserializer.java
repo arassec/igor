@@ -36,13 +36,16 @@ public class ActionPersistenceDeserializer extends IgorComponentPersistenceDeser
      * {@inheritDoc}
      */
     @Override
-    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
-        super.setComponentSpecifica(instance, map);
-        if (map.containsKey(PersistenceMapperKey.ACTIVE.getKey())) {
-            ((Action) instance).setActive((boolean) map.get(PersistenceMapperKey.ACTIVE.getKey()));
+    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> componentJson) {
+        super.setComponentSpecifica(instance, componentJson);
+        if (componentJson.containsKey(PersistenceMapperKey.ACTIVE.getKey())) {
+            ((Action) instance).setActive((boolean) componentJson.get(PersistenceMapperKey.ACTIVE.getKey()));
         }
-        if (map.containsKey(PersistenceMapperKey.NAME.getKey())) {
-            ((Action) instance).setName((String) map.get(PersistenceMapperKey.NAME.getKey()));
+        if (componentJson.containsKey(PersistenceMapperKey.NAME.getKey())) {
+            ((Action) instance).setName((String) componentJson.get(PersistenceMapperKey.NAME.getKey()));
+        }
+        if (componentJson.containsKey(PersistenceMapperKey.DESCRIPTION.getKey())) {
+            ((Action) instance).setDescription((String) componentJson.get(PersistenceMapperKey.DESCRIPTION.getKey()));
         }
     }
 }

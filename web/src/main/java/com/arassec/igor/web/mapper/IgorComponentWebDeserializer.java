@@ -185,12 +185,12 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
     /**
      * Sets component specific properties using the provided raw data.
      *
-     * @param instance The newly created component instance.
-     * @param map      The map of component data.
+     * @param instance      The newly created component instance.
+     * @param componentJson The component data in JSON form.
      */
-    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
-        if (map.containsKey(WebMapperKey.ID.getKey())) {
-            instance.setId(String.valueOf(map.get(WebMapperKey.ID.getKey())));
+    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> componentJson) {
+        if (componentJson.containsKey(WebMapperKey.ID.getKey())) {
+            instance.setId(String.valueOf(componentJson.get(WebMapperKey.ID.getKey())));
         }
     }
 

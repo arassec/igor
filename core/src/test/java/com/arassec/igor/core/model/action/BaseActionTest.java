@@ -104,6 +104,17 @@ class BaseActionTest {
     }
 
     /**
+     * Tests setting and getting the action's description.
+     */
+    @Test
+    @DisplayName("Tests setting and getting the action's description.")
+    void testSetGetDescription() {
+        assertNull(baseAction.getDescription());
+        baseAction.setDescription("base-action-test");
+        assertEquals("base-action-test", baseAction.getDescription());
+    }
+
+    /**
      * Tests setting and getting the action's number of threads.
      */
     @Test

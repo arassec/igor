@@ -28,6 +28,11 @@ public enum WebMapperKey {
     NAME("name"),
 
     /**
+     * The description key.
+     */
+    DESCRIPTION("description"),
+
+    /**
      * The key key. :)
      */
     KEY("key"),

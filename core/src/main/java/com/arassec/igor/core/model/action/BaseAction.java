@@ -37,6 +37,11 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     private String name;
 
     /**
+     * A description for the action.
+     */
+    private String description;
+
+    /**
      * Defines the number of threads the action should be processed with.
      */
     @Positive
@@ -76,6 +81,22 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**

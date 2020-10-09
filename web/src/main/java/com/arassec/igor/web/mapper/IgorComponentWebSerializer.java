@@ -69,6 +69,11 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
             } else {
                 jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), "");
             }
+            if (((Action) instance).getDescription() != null) {
+                jsonGenerator.writeStringField(WebMapperKey.DESCRIPTION.getKey(), ((Action) instance).getDescription());
+            } else {
+                jsonGenerator.writeStringField(WebMapperKey.DESCRIPTION.getKey(), "");
+            }
             jsonGenerator.writeBooleanField(WebMapperKey.ACTIVE.getKey(), ((Action) instance).isActive());
         }
         writeKeyLabelStore(jsonGenerator, WebMapperKey.CATEGORY.getKey(),

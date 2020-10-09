@@ -133,12 +133,12 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
     /**
      * Sets component specific properties using the provided raw data.
      *
-     * @param instance The newly created component instance.
-     * @param map      The map of component data.
+     * @param instance      The newly created component instance.
+     * @param componentJson The component in JSON form.
      */
-    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
-        if (map.containsKey(PersistenceMapperKey.ID.getKey())) {
-            instance.setId(String.valueOf(map.get(PersistenceMapperKey.ID.getKey())));
+    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> componentJson) {
+        if (componentJson.containsKey(PersistenceMapperKey.ID.getKey())) {
+            instance.setId(String.valueOf(componentJson.get(PersistenceMapperKey.ID.getKey())));
         }
     }
 

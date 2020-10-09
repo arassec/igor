@@ -5,6 +5,7 @@
   - igor's version is displayed in the navigation
   - job configuration and job executions switch places
   - simulation results and documentation can overlap
+- Actions can now have a description.
 
 ## Version 0.2.2
 - Minor changes in 'HTTP request' action.

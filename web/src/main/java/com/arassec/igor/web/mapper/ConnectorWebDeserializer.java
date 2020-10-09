@@ -33,12 +33,12 @@ public class ConnectorWebDeserializer extends IgorComponentWebDeserializer<Conne
      * {@inheritDoc}
      */
     @Override
-    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> map) {
-        super.setComponentSpecifica(instance, map);
-        if (map.containsKey(WebMapperKey.ID.getKey())) {
-            instance.setId(String.valueOf(map.get(WebMapperKey.ID.getKey())));
+    protected void setComponentSpecifica(IgorComponent instance, Map<String, Object> componentJson) {
+        super.setComponentSpecifica(instance, componentJson);
+        if (componentJson.containsKey(WebMapperKey.ID.getKey())) {
+            instance.setId(String.valueOf(componentJson.get(WebMapperKey.ID.getKey())));
         }
-        ((Connector) instance).setName(String.valueOf(map.get(WebMapperKey.NAME.getKey())));
+        ((Connector) instance).setName(String.valueOf(componentJson.get(WebMapperKey.NAME.getKey())));
     }
 
 }

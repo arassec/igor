@@ -18,6 +18,11 @@ public enum PersistenceMapperKey {
     NAME("name"),
 
     /**
+     * The description key.
+     */
+    DESCRIPTION("description"),
+
+    /**
      * The active key.
      */
     ACTIVE("active"),
