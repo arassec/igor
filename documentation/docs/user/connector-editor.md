@@ -17,7 +17,7 @@ The connector configuration on the left side of the page is used to configure th
 
 The top element contains buttons for the following actions:
 
-![back button](./images/back-button.png) Navigates back to the connector overview page.
+![leave button](./images/leave-button.png) Navigates back to the job configuration from which the connector editor was opened.
 
 ![test button](./images/test-button.png) Tests the connector configuration and displays the results.
 

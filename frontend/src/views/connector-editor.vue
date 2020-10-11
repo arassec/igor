@@ -7,10 +7,12 @@
                 Connector Configuration
             </p>
             <layout-row slot="header">
-                <input-button slot="left" v-on:clicked="cancelConfiguration()" icon="arrow-left" class="margin-right"
-                              v-if="inJobConfiguration"/>
-                <input-button slot="left" v-on:clicked="saveConfiguration()" icon="save"/>
-                <input-button slot="right" v-on:clicked="testConfiguration()" icon="plug"/>
+                <input-button slot="left" v-on:clicked="leaveConfiguration()" icon="arrow-left" class="margin-right"
+                              v-if="inJobConfiguration" data-e2e="connector-editor-leave"/>
+                <input-button slot="left" v-on:clicked="saveConfiguration()" icon="save"
+                    data-e2e="connector-editor-save"/>
+                <input-button slot="right" v-on:clicked="testConfiguration()" icon="plug"
+                    data-e2e="connector-editor-test"/>
             </layout-row>
             <core-panel slot="footer">
                 <p
@@ -37,7 +39,7 @@
             <div class="max-width">
                 <core-panel>
                     <layout-row>
-                        <h1 slot="left" class="truncate max-width">
+                        <h1 slot="left" class="truncate max-width" data-e2e="connector-name-heading">
                             <font-awesome-icon icon="link"/>
                             {{
                                 connectorConfiguration.name.length > 0 ? connectorConfiguration.name : 'Unnamed Connector'
@@ -52,7 +54,8 @@
                                 <input-validated id="connector-name" :type="'text'"
                                                  v-model="connectorConfiguration.name"
                                                  :parent-id="connectorConfiguration.id" :property-id="'name'"
-                                                 :validation-errors="validationErrors"/>
+                                                 :validation-errors="validationErrors"
+                                                 data-e2e="connector-name-input"/>
                             </div>
                         </div>
                     </div>
@@ -72,7 +75,7 @@
                                 <select id="category-input" v-model="connectorConfiguration.category"
                                         v-on:change="loadTypesOfCategory(connectorConfiguration.category, true).then(() => {
                                         loadParametersOfType(connectorConfiguration.type.key)})"
-                                        :disabled="!newConnector">
+                                        :disabled="!newConnector" data-e2e="category-selector">
                                     <option v-for="category in connectorCategories" v-bind:value="category"
                                             v-bind:key="category.key">
                                         {{ category.value }}
@@ -85,7 +88,7 @@
                             <div class="td">
                                 <select id="type-input" v-model="connectorConfiguration.type"
                                         v-on:change="loadParametersOfType(connectorConfiguration.type.key)"
-                                        :disabled="!newConnector">
+                                        :disabled="!newConnector" data-e2e="type-selector">
                                     <option v-for="type in connectorTypes" v-bind:value="type" v-bind:key="type.key">
                                         {{ type.value }}
                                     </option>
@@ -328,7 +331,7 @@ export default {
                 }
             })
         },
-        cancelConfiguration: function () {
+        leaveConfiguration: function () {
             let jobData = this.$root.$data.store.getJobData();
             if (jobData.jobConfiguration != null) {
                 this.$router.push({name: 'job-editor'})

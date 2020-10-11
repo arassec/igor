@@ -34,7 +34,8 @@
                 <div v-for="job of jobsPage.items" :key="job.id">
                     <overview-tile v-on:clicked="editJob(job.id)"
                                    v-on:action-clicked="openExecutionDetailsDialog(job)"
-                                   :active="job.active">
+                                   :active="job.active"
+                                   :title-content="job.name">
                         <div slot="title">{{ job.name }}</div>
                         <layout-row slot="menu">
                             <div slot="left">

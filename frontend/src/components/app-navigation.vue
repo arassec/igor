@@ -1,19 +1,19 @@
 <template>
-    <div id="app-content">
+    <div id="app-content" data-e2e="app-content">
         <nav>
             <ul>
                 <li>
-                    <router-link to="/">
+                    <router-link to="/" data-e2e="navigation-job-overview">
                         <font-awesome-icon icon="toolbox"/> Jobs
                     </router-link>
                 </li>
                 <li>
-                    <router-link to="/connector-overview">
+                    <router-link to="/connector-overview" data-e2e="navigation-connector-overview">
                         <font-awesome-icon icon="link"/> Connectors
                     </router-link>
                 </li>
             </ul>
-            <h1 class="heading">{{heading}}</h1>
+            <h1 class="heading" data-e2e="navigation-heading">{{heading}}</h1>
             <a class="documentation-link" target="_blank" rel="noopener noreferrer" href="/igor/index.html">
               v{{version}} Reference Documentation
             </a>

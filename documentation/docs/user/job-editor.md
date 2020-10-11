@@ -18,8 +18,6 @@ The job configuration on the left side of the page is used to configure the job.
 
 The top element contains buttons for the following actions:
 
-![back button](./images/back-button.png) Navigates back to the job overview page.
-
 ![test button](./images/test-button.png) Runs the job in **simulation** mode. The results are displayed in the simulation results element.
 
 ![save button](./images/save-button.png) Saves the job.

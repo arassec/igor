@@ -56,6 +56,7 @@ package-lock.json
 
 dbdata/
 frontend/package-lock.json
+frontend/debug.log
 web/src/main/resources/static
 application.properties
 documentation/package-lock.json
@@ -65,3 +66,5 @@ documentation/docs/user/module-misc
 documentation/docs/user/module-file
 documentation/docs/user/module-message
 documentation/docs/user/module-web
+application/src/test/e2e/cypress/screenshots
+application/src/test/e2e/cypress/videos
