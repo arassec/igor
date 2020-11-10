@@ -72,7 +72,7 @@ public abstract class BaseSshFileConnector extends BaseFileConnector {
      *
      * @param typeId The type ID.
      */
-    public BaseSshFileConnector(String typeId) {
+    protected BaseSshFileConnector(String typeId) {
         super(typeId);
     }
 

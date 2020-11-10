@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management-alpine"
+    container_name: "igor-rabbitmq"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=igor
+      - RABBITMQ_DEFAULT_PASS=igor
+  nginx:
+    image: "nginx:stable-alpine"
+    container_name: "igor-nginx"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./environment/nginx/webdata:/usr/share/nginx/html:ro
+      - ./environment/nginx/ssl:/etc/nginx/certs
+      - ./environment/nginx/conf:/etc/nginx/conf.d
+  vsftpd:
+    image: "fauria/vsftpd"
+    container_name: "igor-vsftpd"
+    ports:
+      - "21:21"
+    volumes:
+      - ./environment/vsftpd:/home/vsftpd
+    environment:
+      - FTP_USER=igor
+      - FTP_PASS=igor
+      - LOCAL_UMASK=0777
+  igor:
+    image: "arassec/igor"
+    container_name: "igor"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../dbdata:/dbdata:rw

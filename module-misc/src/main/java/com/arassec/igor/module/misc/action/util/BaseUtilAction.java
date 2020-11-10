@@ -22,7 +22,7 @@ public abstract class BaseUtilAction extends BaseAction {
      *
      * @param typeId The type ID.
      */
-    public BaseUtilAction(String typeId) {
+    protected BaseUtilAction(String typeId) {
         super("util-actions", typeId);
     }
 

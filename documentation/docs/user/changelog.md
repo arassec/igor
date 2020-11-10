@@ -1,5 +1,10 @@
 # Changelog
 
+## Version {{ $themeConfig.igorVersion }}
+- Added E2E tests with Cypress
+- Fixed missing 'Import connector' functionality
+- Fixed detecting changes in connector configurator.
+
 ## Version 0.2.3
 - UI refactoring: 
   - igor's version is displayed in the navigation

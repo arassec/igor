@@ -13,8 +13,9 @@
 
             <div class="connectors-container max-width">
                 <feedback-box v-for="connector in connectors" :key="connector.id" :clickable="true"
-                              v-on:feedback-clicked="$emit('selected', connector)">
-                    <div slot="left" class="truncate">{{connector.name}}</div>
+                              v-on:feedback-clicked="$emit('selected', connector)"
+                              :data-e2e="dataE2EName('picker-', connector.name)">
+                    <div slot="left" class="truncate">{{ connector.name }}</div>
                 </feedback-box>
                 <layout-row slot="footer">
                     <input-button slot="right" icon="plus" v-on:clicked="$emit('create')"/>
@@ -32,41 +33,47 @@
 </template>
 
 <script>
-    import ModalDialog from '../common/modal-dialog'
-    import LayoutRow from '../common/layout-row'
-    import InputButton from '../common/input-button'
-    import ListPager from "../common/list-pager";
-    import FeedbackBox from "../common/feedback-box";
+import ModalDialog from '../common/modal-dialog'
+import LayoutRow from '../common/layout-row'
+import InputButton from '../common/input-button'
+import ListPager from "../common/list-pager";
+import FeedbackBox from "../common/feedback-box";
+import Utils from "@/utils/utils";
 
-    export default {
+export default {
     name: 'connector-picker',
     components: {FeedbackBox, ListPager, InputButton, LayoutRow, ModalDialog},
     props: ['connectors', 'page'],
     data: function () {
-      return {
-        feedback: '',
-        feedbackOk: true
-      }
+        return {
+            feedback: '',
+            feedbackOk: true
+        }
+    },
+    methods: {
+        dataE2EName: function (prefix, suffix) {
+            return prefix + Utils.toKebabCase(suffix);
+        }
     }
-  }
+}
 </script>
 
 <style scoped>
 
-    table {
-        width: 100%;
-    }
+table {
+    width: 100%;
+}
 
-    .first {
-        width: 100%;
-    }
+.first {
+    width: 100%;
+}
 
-    .last {
-        padding-right: 0px !important;
-    }
+.last {
+    padding-right: 0px !important;
+}
 
-    .connectors-container {
-        min-height: 425px;
-    }
+.connectors-container {
+    min-height: 425px;
+}
 
 </style>

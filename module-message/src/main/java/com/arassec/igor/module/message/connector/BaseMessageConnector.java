@@ -12,7 +12,7 @@ public abstract class BaseMessageConnector extends BaseConnector implements Mess
      *
      * @param typeId The type ID.
      */
-    public BaseMessageConnector(String typeId) {
+    protected BaseMessageConnector(String typeId) {
         super("message-connectors", typeId);
     }
 

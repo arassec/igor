@@ -12,7 +12,8 @@
                                   data-e2e="connector-overview-add-connector"/>
                 </router-link>
                 <input-button icon="file-upload" label="Import connector"
-                              data-e2e="connector-overview-import-connector"/>
+                              data-e2e="connector-overview-import-connector"
+                              v-on:clicked="openShowImportDialog"/>
             </div>
         </action-bar>
 
@@ -34,7 +35,7 @@
                                               :data-e2e="dataE2EName('export-', connector.name)"/>
                                 <input-button icon="clone" v-on:clicked="duplicateConnector(connector.id)"
                                               class="margin-right"
-                                              :data-e2e="dataE2EName('clone-', connector.name)"/>
+                                              :data-e2e="dataE2EName('duplicate-', connector.name)"/>
                             </div>
                         </layout-row>
                     </overview-tile>
@@ -74,7 +75,31 @@
             </layout-row>
         </modal-dialog>
 
-        <background-icon right="true" icon-one="link"/>
+        <modal-dialog v-show="showImportDialog" @close="showImportDialog = false" v-on:cancel="showImportDialog = false">
+            <h1 slot="header">Import data?</h1>
+            <div slot="body">
+                <div class="paragraph">
+                    Select a previously exported JSON file to import.
+                </div>
+                <div class="paragraph alert">
+                    WARNING: existing connectors will be overwritten by the import!
+                </div>
+                <div class="paragraph margin-top">
+                    <label for="import-file-selector" id="import-file-select">
+                        <font-awesome-icon icon="folder-open"/>
+                        Select file
+                        <input id="import-file-selector" type="file" @change="importFileChanged"/>
+                    </label>
+                    <label v-if="importFile != null">{{ importFile.name }}</label>
+                </div>
+            </div>
+            <layout-row slot="footer">
+                <input-button slot="left" v-on:clicked="showImportDialog = false" icon="times"/>
+                <input-button slot="right" v-on:clicked="executeImport" icon="check"/>
+            </layout-row>
+        </modal-dialog>
+
+        <background-icon icon="link"/>
 
     </core-container>
 </template>
@@ -119,7 +144,9 @@ export default {
             showDeleteDialog: false,
             showExportDialog: false,
             selectedConnectorId: null,
-            selectedConnectorName: null
+            selectedConnectorName: null,
+            importFile: null,
+            showImportDialog: false
         }
     },
     methods: {
@@ -166,7 +193,7 @@ export default {
                 const url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)]));
                 const link = document.createElement('a');
                 link.href = url;
-                let fileName = response.headers['content-disposition'].split("filename=")[1];
+                let fileName ='connector-' + Utils.toKebabCase(this.selectedConnectorName) + ".igor.json";
                 link.setAttribute('download', fileName);
                 document.body.appendChild(link);
                 link.click();
@@ -181,6 +208,28 @@ export default {
         },
         dataE2EName: function (prefix, suffix) {
             return prefix + Utils.toKebabCase(suffix);
+        },
+        openShowImportDialog: function () {
+            this.importFile = null;
+            this.showImportDialog = true;
+        },
+        importFileChanged: function (event) {
+            this.importFile = event.target.files[0];
+        },
+        executeImport: function () {
+            if (!this.importFile) {
+                this.showImportDialog = false;
+            } else {
+                let reader = new FileReader();
+                reader.onload = (e) => {
+                    this.showImportDialog = false;
+                    IgorBackend.postData('/api/transfer', JSON.parse(e.target.result), 'Importing Connector', 'Import finished', 'Import failed').then(() => {
+                        this.importFile = null
+                        this.loadConnectors();
+                    });
+                };
+                reader.readAsText(this.importFile);
+            }
         }
     },
     mounted() {
@@ -216,6 +265,28 @@ export default {
 .action-bar-container {
     display: flex;
     flex-direction: row;
+}
+
+.margin-top {
+    margin: 1.25em 0 1em 0;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+#import-file-select {
+    border: 1px solid var(--color-font);
+    padding: 0.25em;
+    background-color: var(--color-background);
+    color: var(--color-font);
+    margin: 0em 1em 0 0;
+}
+
+#import-file-select:hover {
+    cursor: pointer;
+    background-color: var(--color-font);
+    color: var(--color-background);
 }
 
 </style>

@@ -54,7 +54,7 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      * @param categoryId The category ID.
      * @param typeId     The type ID.
      */
-    public BaseAction(String categoryId, String typeId) {
+    protected BaseAction(String categoryId, String typeId) {
         super(categoryId, typeId);
     }
 

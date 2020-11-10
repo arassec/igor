@@ -17,7 +17,8 @@
             <div slot="right">Every thirty seconds.</div>
         </feedback-box>
 
-        <feedback-box :clickable="true" v-on:feedback-clicked="$emit('selected', '0 */15 * * * *')" :align-left="true">
+        <feedback-box :clickable="true" v-on:feedback-clicked="$emit('selected', '0 */15 * * * *')" :align-left="true"
+            data-e2e="every-fiveteen-minutes-cron">
             <div slot="left" class="cron-expression">"0 */15 * * * *"</div>
             <div slot="right">Once every fifteen minutes.</div>
         </feedback-box>
@@ -47,12 +48,12 @@
 </template>
 
 <script>
-    import ModalDialog from './modal-dialog'
-    import InputButton from './input-button'
-    import LayoutRow from './layout-row'
-    import FeedbackBox from "./feedback-box";
+import ModalDialog from './modal-dialog'
+import InputButton from './input-button'
+import LayoutRow from './layout-row'
+import FeedbackBox from "./feedback-box";
 
-    export default {
+export default {
   name: 'cron-picker',
     components: {FeedbackBox, LayoutRow, InputButton, ModalDialog}
 }

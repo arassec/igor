@@ -27,9 +27,9 @@ export default {
     computed: {
         tileDataE2E: function () {
             if (this.titleContent) {
-                return 'connector-tile-' + Utils.toKebabCase(this.titleContent);
+                return 'tile-' + Utils.toKebabCase(this.titleContent);
             } else {
-                return 'connector-tile';
+                return 'tile';
             }
         }
     }

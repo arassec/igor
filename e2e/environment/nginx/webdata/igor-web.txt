@@ -1,0 +1,3 @@
+title=Igor Web Test - TXT
+heading=Igor TXT Test File
+description.label=This is a test...

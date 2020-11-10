@@ -6,11 +6,15 @@
         </h1>
         <layout-row>
             <input-button slot="left" icon="chevron-left" v-on:clicked="$emit('show-executions')"
-                          :class="jobExecutionFailed ? 'alert' : ''"/>
-            <input-button slot="left" icon="save" v-on:clicked="$emit('save-configuration')" class="margin-left"/>
-            <input-button slot="right" icon="plug" v-on:clicked="$emit('test-configuration')"/>
+                          :class="jobExecutionFailed ? 'alert' : ''"
+                          data-e2e="show-job-executions-button"/>
+            <input-button slot="left" icon="save" v-on:clicked="$emit('save-configuration')" class="margin-left"
+                          data-e2e="save-job-button"/>
+            <input-button slot="right" icon="plug" v-on:clicked="$emit('test-configuration')"
+                          data-e2e="test-job-button"/>
             <input-button slot="right" :icon="playIcon" v-on:clicked="$emit('run-job')" class="margin-left"
-                          :disabled="jobRunningOrWaiting || job.id == null || !job.active || disableDueToFaultIntolerance"/>
+                          :disabled="jobRunningOrWaiting || job.id == null || !job.active || disableDueToFaultIntolerance"
+                          data-e2e="run-job-button"/>
         </layout-row>
     </div>
 </template>

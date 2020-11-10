@@ -34,7 +34,7 @@ public abstract class BaseEventTrigger extends BaseTrigger implements EventTrigg
      * @param categoryId The category ID.
      * @param typeId     The type ID.
      */
-    public BaseEventTrigger(String categoryId, String typeId) {
+    protected BaseEventTrigger(String categoryId, String typeId) {
         super(categoryId, typeId);
     }
 

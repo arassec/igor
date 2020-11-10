@@ -23,7 +23,7 @@ public abstract class BaseConnector extends BaseIgorComponent implements Connect
      * @param categoryId The category ID.
      * @param typeId     The type ID.
      */
-    public BaseConnector(String categoryId, String typeId) {
+    protected BaseConnector(String categoryId, String typeId) {
         super(categoryId, typeId);
     }
 

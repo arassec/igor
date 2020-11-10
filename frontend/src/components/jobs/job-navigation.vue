@@ -11,7 +11,8 @@
                              v-on:test-configuration="$emit('test-configuration')"
                              v-on:save-configuration="$emit('save-configuration')"
                              v-on:show-executions="$emit('show-executions')"
-                             v-on:run-job="$emit('run-job')"/>
+                             v-on:run-job="$emit('run-job')"
+                             data-e2e="job-configuration"/>
 
         <draggable v-model="jobConfiguration.actions" :group="'actions'" @start="drag=true" @end="drag=false"
                    handle=".move-icon">
@@ -26,7 +27,8 @@
             <label slot="left" v-if="jobConfiguration.actions.length === 0">There are no actions defined
                 yet.</label>
             <add-item-button slot="right" icon="plus" label="Add new Action"
-                             v-on:clicked="$emit('add-action')"/>
+                             v-on:clicked="$emit('add-action')"
+                             data-e2e="add-action-button"/>
         </layout-row>
 
     </div>
@@ -40,30 +42,30 @@ import LayoutRow from "../common/layout-row";
 import ActionNavigationItem from "./action-navigation-item";
 
 export default {
-        name: "job-navigation",
-        components: {ActionNavigationItem, LayoutRow, AddItemButton, JobNavigationItem, draggable},
-        props: ['jobConfiguration', 'validationErrors', 'selectedActionId', 'jobRunningOrWaiting', 'jobExecutionsPage'],
-        computed: {
-            jobSelected: function () {
-                return (this.selectedActionId === null);
-            }
+    name: "job-navigation",
+    components: {ActionNavigationItem, LayoutRow, AddItemButton, JobNavigationItem, draggable},
+    props: ['jobConfiguration', 'validationErrors', 'selectedActionId', 'jobRunningOrWaiting', 'jobExecutionsPage'],
+    computed: {
+        jobSelected: function () {
+            return (this.selectedActionId === null);
         }
     }
+}
 </script>
 
 <style scoped>
 
-    div {
-        max-width: 25em;
-    }
+div {
+    max-width: 25em;
+}
 
-    .job-navi-item {
-        padding: .5em;
-    }
+.job-navi-item {
+    padding: .5em;
+}
 
-    .add-action-row {
-        color: var(--color-background);
-        padding: .25em 0 2em .25em;
-    }
+.add-action-row {
+    color: var(--color-background);
+    padding: .25em 0 2em .25em;
+}
 
 </style>

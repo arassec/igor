@@ -1,6 +1,6 @@
 <template>
     <transition name="snackbar" v-if="feedback.message.length > 0">
-        <div class="snackbar" :class="{'alert': feedback.alert, 'feedback': !feedback.alert}">
+        <div class="snackbar" :class="{'alert': feedback.alert, 'feedback': !feedback.alert}" data-e2e="snackbar">
             <layout-row :scroll-left="true">
                 <p slot="left">
                     {{ feedback.message }}

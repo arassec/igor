@@ -12,7 +12,7 @@ abstract class BaseMessageAction extends BaseAction {
      *
      * @param typeId The type ID.
      */
-    public BaseMessageAction(String typeId) {
+    protected BaseMessageAction(String typeId) {
         super("message-actions", typeId);
     }
 

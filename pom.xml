@@ -16,7 +16,7 @@
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>A tool to implement continuous workarounds...</description>
+    <description>A tool to manage continuous workarounds...</description>
     <url>https://www.arassec.com/igor</url>
 
     <scm>
@@ -85,6 +85,7 @@
         <module>web</module>
         <module>igor-spring-boot-starter</module>
         <module>application</module>
+        <module>e2e</module>
     </modules>
 
     <repositories>
@@ -275,6 +276,20 @@
                 <artifactId>testcontainers</artifactId>
                 <version>1.15.0</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>1.14.3</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- application -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>1.4.8</version>
             </dependency>
 
         </dependencies>

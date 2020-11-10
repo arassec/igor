@@ -7,12 +7,13 @@
                 Connector Configuration
             </p>
             <layout-row slot="header">
-                <input-button slot="left" v-on:clicked="leaveConfiguration()" icon="arrow-left" class="margin-right"
-                              v-if="inJobConfiguration" data-e2e="connector-editor-leave"/>
+                <input-button slot="left" v-on:clicked="returnToJobConfiguration()" icon="arrow-left"
+                              class="margin-right"
+                              disabled="inJobConfiguration" data-e2e="connector-editor-return-to-job"/>
                 <input-button slot="left" v-on:clicked="saveConfiguration()" icon="save"
-                    data-e2e="connector-editor-save"/>
+                              data-e2e="connector-editor-save"/>
                 <input-button slot="right" v-on:clicked="testConfiguration()" icon="plug"
-                    data-e2e="connector-editor-test"/>
+                              data-e2e="connector-editor-test"/>
             </layout-row>
             <core-panel slot="footer">
                 <p
@@ -36,7 +37,7 @@
         </side-menu>
 
         <core-content class="configurator">
-            <div class="max-width">
+            <div class="max-width" data-e2e="connector-configurator">
                 <core-panel>
                     <layout-row>
                         <h1 slot="left" class="truncate max-width" data-e2e="connector-name-heading">
@@ -45,7 +46,8 @@
                                 connectorConfiguration.name.length > 0 ? connectorConfiguration.name : 'Unnamed Connector'
                             }}
                         </h1>
-                        <icon-button slot="right" icon="question" v-on:clicked="openDocumentation('connector')"/>
+                        <icon-button slot="right" icon="question" v-on:clicked="openDocumentation('connector')"
+                                     data-e2e="main-help-button"/>
                     </layout-row>
                     <div class="table">
                         <div class="tr">
@@ -66,7 +68,8 @@
                         <h2 slot="left">Connector</h2>
                         <icon-button slot="right" icon="question"
                                      v-show="hasDocumentation(connectorConfiguration.type.key)"
-                                     v-on:clicked="openDocumentation(connectorConfiguration.type.key)"/>
+                                     v-on:clicked="openDocumentation(connectorConfiguration.type.key)"
+                                     data-e2e="secondary-help-button"/>
                     </layout-row>
                     <div class="table">
                         <div class="tr">
@@ -137,7 +140,7 @@
             </div>
         </modal-dialog>
 
-        <background-icon right="true" icon-one="link"/>
+        <background-icon icon="network-wired"/>
 
     </core-container>
 </template>
@@ -288,7 +291,7 @@ export default {
             } else {
                 this.showDocumentation = false
             }
-            IgorBackend.getData('/api/parameters/connector/' + typeKey).then((parameters) => {
+            await IgorBackend.getData('/api/parameters/connector/' + typeKey).then((parameters) => {
                 this.connectorConfiguration.parameters = parameters;
                 this.validationErrors = {};
             })
@@ -331,7 +334,7 @@ export default {
                 }
             })
         },
-        leaveConfiguration: function () {
+        returnToJobConfiguration: function () {
             let jobData = this.$root.$data.store.getJobData();
             if (jobData.jobConfiguration != null) {
                 this.$router.push({name: 'job-editor'})

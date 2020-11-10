@@ -1,5 +1,10 @@
 module.exports = {
     title: "Igor Reference Documentation (v" + process.env.REVISION + ")",
+    head: [
+        ['meta', {name: "Cache-Control", content: "no-cache, no-store, must-revalidate"}],
+        ['meta', {name: "Pragma", content: "no-cache"}],
+        ['meta', {name: "Expires", content: "0"}]
+    ],
     themeConfig: {
         searchMaxSuggestions: 25,
         nav: [

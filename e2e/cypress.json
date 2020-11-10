@@ -1,0 +1,17 @@
+{
+  "baseUrl": "http://localhost:8080",
+  "viewportWidth": 1300,
+  "viewportHeight": 900,
+  "trashAssetsBeforeRuns": true,
+  "env": {
+    "nginx_http_port": 80,
+    "rabbitmq_port": 5672,
+    "vsftpd_port": 21
+  },
+  "watchForFileChanges": false,
+  "testFiles": [
+    "preparation/create-connectors.js",
+    "preparation/create-copy-new-files-job.js",
+    "documentation/*.*"
+  ]
+}

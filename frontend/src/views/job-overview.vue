@@ -21,7 +21,8 @@
             </div>
             <div slot="right">
                 <router-link :to="'job-editor'">
-                    <input-button icon="plus" label="Add job" class="margin-right"/>
+                    <input-button icon="plus" label="Add job" class="margin-right"
+                                  data-e2e="add-job-button"/>
                 </router-link>
                 <input-button icon="file-upload" label="Import job" class="margin-right"
                               v-on:clicked="openShowImportDialog"/>
@@ -211,7 +212,7 @@
                            v-on:delete-plus="deleteJob(true)"
                            v-on:delete="deleteJob(false)"/>
 
-        <background-icon icon-one="toolbox" right="true"/>
+        <background-icon icon="toolbox"/>
     </core-container>
 </template>
 
@@ -390,7 +391,7 @@ export default {
                 const url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)]));
                 const link = document.createElement('a');
                 link.href = url;
-                let fileName = response.headers['content-disposition'].split("filename=")[1];
+                let fileName = 'job-' + Utils.toKebabCase(this.selectedJobName) + ".igor.json";
                 link.setAttribute('download', fileName);
                 document.body.appendChild(link);
                 link.click();
@@ -596,17 +597,17 @@ export default {
     color: var(--color-alert);
 }
 
-input[type="file"] {
-    display: none;
-}
-
 #state-filter-label {
     margin: .15em .25em 0 0;
     color: var(--color-font);
 }
 
 .margin-top {
-    margin: 1em 0 1em 0;
+    margin: 1.25em 0 1em 0;
+}
+
+input[type="file"] {
+    display: none;
 }
 
 #import-file-select {

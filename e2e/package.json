@@ -1,0 +1,18 @@
+{
+  "name": "e2e",
+  "version": "1.0.0",
+  "description": "Igor End-to-End tests.",
+  "main": "index.js",
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress": "cypress run",
+    "environment:up": "docker-compose up -d",
+    "environment:down": "docker-compose down",
+    "e2e": "npm run environment:up && npm run cypress && npm run environment:down"
+  },
+  "author": "Andreas Sensen",
+  "license": "MIT",
+  "devDependencies": {
+    "cypress": "^5.5.0"
+  }
+}

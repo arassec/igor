@@ -1,22 +1,38 @@
 <template>
     <div id="app-content" data-e2e="app-content">
         <nav>
-            <ul>
-                <li>
-                    <router-link to="/" data-e2e="navigation-job-overview">
-                        <font-awesome-icon icon="toolbox"/> Jobs
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/connector-overview" data-e2e="navigation-connector-overview">
-                        <font-awesome-icon icon="link"/> Connectors
-                    </router-link>
-                </li>
-            </ul>
-            <h1 class="heading" data-e2e="navigation-heading">{{heading}}</h1>
-            <a class="documentation-link" target="_blank" rel="noopener noreferrer" href="/igor/index.html">
-              v{{version}} Reference Documentation
-            </a>
+            <div class="main-menu">
+                <router-link to="/">
+                    <div class="top-logo-container">
+                        <img src="@/assets/igor-logo-top.png" class="top-logo"/>
+                        <!--<font-awesome-icon icon="bars" class="top-logo-icon"></font-awesome-icon>-->
+                        <div class="top-logo-label">Igor</div>
+                    </div>
+                </router-link>
+                <ul>
+                    <li>
+                        <router-link to="/" data-e2e="navigation-job-overview">
+                            <font-awesome-icon icon="toolbox"/>
+                            Jobs
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/connector-overview" data-e2e="navigation-connector-overview">
+                            <font-awesome-icon icon="link"/>
+                            Connectors
+                        </router-link>
+                    </li>
+                </ul>
+            </div>
+            <div class="title">
+                <div>
+                    <h1 class="heading" data-e2e="navigation-heading">{{ heading }}</h1>
+                    <a class="documentation-link" target="_blank" rel="noopener noreferrer"
+                       href="/igor/index.html">
+                        v{{ version }} Reference Documentation
+                    </a>
+                </div>
+            </div>
         </nav>
 
         <router-view/>
@@ -28,77 +44,122 @@
 import {version} from '../../package.json';
 
 export default {
-        name: 'app-navigation',
-        components: {},
-        data: function () {
-            return {
-                importFile: null,
-                showImportDialog: false
+    name: 'app-navigation',
+    components: {},
+    data: function () {
+        return {
+            importFile: null,
+            showImportDialog: false
+        }
+    },
+    computed: {
+        heading: function () {
+            if (this.$route.name === 'app-status') {
+                return 'Dashboard'
+            } else if (this.$route.name === 'job-overview') {
+                return 'Job Overview'
+            } else if (this.$route.name === 'job-editor') {
+                return 'Job-Editor'
+            } else if (this.$route.name === 'connector-overview') {
+                return 'Connector Overview'
+            } else if (this.$route.name === 'connector-editor') {
+                return 'Connector-Editor'
+            } else {
+                return 'Undefined'
             }
         },
-        computed: {
-            heading: function () {
-                if (this.$route.name === 'app-status') {
-                    return 'Dashboard'
-                } else if (this.$route.name === 'job-overview') {
-                    return 'Job Overview'
-                } else if (this.$route.name === 'job-editor') {
-                    return 'Job-Editor'
-                } else if (this.$route.name === 'connector-overview') {
-                    return 'Connector Overview'
-                } else if (this.$route.name === 'connector-editor') {
-                    return 'Connector-Editor'
-                } else {
-                    return 'Undefined'
-                }
-            },
-            version: function () {
-              return version;
-          }
+        version: function () {
+            return version;
         }
     }
+}
 </script>
 
 <style scoped>
 
-    nav {
-        flex: 1;
-        display: flex;
-        flex-direction: row;
-        background-color: var(--color-background);
-        border-bottom: 2px solid var(--color-font);
-    }
+.main-menu {
+    flex-basis: 50%;
+    display: flex;
+    flex-direction: row;
+}
 
-    nav ul {
-        flex-grow: 1;
-    }
+.main-menu a {
+    text-decoration: none;
+}
 
-    nav ul li {
-        float: left;
-        margin: .5em 1em .5em 1em;
-    }
+.title {
+    flex-basis: 50%;
+}
 
-    nav ul li a {
-        color: var(--color-font);
-        text-decoration: none;
-        font-size: 150%;
-        padding: .35em;
-        outline: none;
-    }
+nav {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    background-color: var(--color-background);
+    border-bottom: 2px solid var(--color-font);
+    height: 2.8em;
+}
 
-    nav ul li a:hover {
-        background-color: var(--color-foreground);
-    }
+nav ul {
+    flex-grow: 1;
+    margin-left: 2em;
+}
 
-    nav h1 {
-        flex-grow: 1;
-        font-size: 220%;
-        margin: 0 1.5em 0 -5em;
-    }
+nav ul li {
+    float: left;
+    margin-left: .5em;
+}
 
-    .documentation-link {
-        margin: 0 .25em 0 0;
-        font-size: 100%;
-    }
+nav ul li a {
+    color: var(--color-font);
+    text-decoration: none;
+    font-size: 120%;
+    outline: none;
+    padding: 0.2em;
+}
+
+nav ul li:hover a {
+    background-color: var(--color-foreground);
+}
+
+nav h1 {
+    flex-grow: 2;
+    font-size: 175%;
+    margin: 0 1.5em 0 -5em;
+}
+
+.documentation-link {
+    margin: -2.5em .25em 0 0;
+    font-size: 85%;
+    float: right;
+}
+
+.top-logo {
+    height: 2.4em;
+    position: absolute;
+    top: 3px;
+    left: 0;
+}
+
+.top-logo-icon {
+    color: var(--color-font);
+    text-decoration: none;
+    font-size: 175%;
+    margin: .1em 0 0 1.8em;
+}
+
+.top-logo-label {
+    color: var(--color-font);
+    font-size: 150%;
+    margin: .05em 0 0 2em;
+}
+
+.top-logo-container div {
+    text-decoration: none;
+}
+
+.top-logo-container:hover {
+    cursor: pointer;
+}
 
 </style>

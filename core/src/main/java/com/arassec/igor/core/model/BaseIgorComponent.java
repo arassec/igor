@@ -38,7 +38,7 @@ public abstract class BaseIgorComponent implements IgorComponent {
      * @param categoryId The category ID.
      * @param typeId     The type ID.
      */
-    public BaseIgorComponent(String categoryId, String typeId) {
+    protected BaseIgorComponent(String categoryId, String typeId) {
         this.categoryId = categoryId;
         this.typeId = typeId;
     }

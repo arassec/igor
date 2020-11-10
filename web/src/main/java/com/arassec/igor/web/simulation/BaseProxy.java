@@ -109,6 +109,8 @@ public abstract class BaseProxy<T extends IgorComponent> implements IgorComponen
     /**
      * Marks data items as "in simulation mode".
      *
+     * @param delegateMetaData The delegate's meta-data.
+     *
      * @return Meta-data for the data items.
      */
     protected Map<String, Object> createMetaData(Map<String, Object> delegateMetaData) {

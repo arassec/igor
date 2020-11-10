@@ -13,7 +13,7 @@
     <packaging>jar</packaging>
 
     <name>application</name>
-    <description>Combines all parts of igor together into a running application.</description>
+    <description>The application to manage continuous workarounds...</description>
 
     <properties>
         <sonar.skip>true</sonar.skip>
@@ -38,8 +38,19 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -56,18 +67,11 @@
                 </configuration>
             </plugin>
         </plugins>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-            <testResource>
-                <directory>src/test/e2e</directory>
-                <targetPath>e2e</targetPath>
-            </testResource>
-        </testResources>
     </build>
 
     <profiles>
+
+        <!-- During release: deploy the docker image to hub.docker.com -->
         <profile>
             <id>release</id>
             <build>
@@ -77,7 +81,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>adoptopenjdk:11-jre-openj9</image>
+                                <image>adoptopenjdk:11-jre-openj9@sha256:686ef31677ea8189abe062e5ee08f5c625d823beba298170bd7a479a051efc8a</image>
                             </from>
                             <to>
                                 <image>docker.io/arassec/igor</image>
@@ -92,12 +96,56 @@
                                     <password>${env.DOCKER_PASSWORD}</password>
                                 </auth>
                             </to>
+                            <container>
+                                <mainClass>com.arassec.igor.application.IgorApplication</mainClass>
+                            </container>
                         </configuration>
                         <executions>
                             <execution>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Only relevant for end-to-end-tests: create the docker image locally -->
+        <profile>
+            <id>e2e</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <configuration>
+                            <from>
+                                <image>adoptopenjdk:11-jre-openj9@sha256:686ef31677ea8189abe062e5ee08f5c625d823beba298170bd7a479a051efc8a</image>
+                            </from>
+                            <to>
+                                <image>arassec/igor</image>
+                                <tags>
+                                    <tag>latest</tag>
+                                </tags>
+                                <auth>
+                                    <!--suppress UnresolvedMavenProperty -->
+                                    <username>${env.DOCKER_USERNAME}</username>
+                                    <!--suppress UnresolvedMavenProperty -->
+                                    <password>${env.DOCKER_PASSWORD}</password>
+                                </auth>
+                            </to>
+                            <container>
+                                <mainClass>com.arassec.igor.application.IgorApplication</mainClass>
+                            </container>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>dockerBuild</goal>
                                 </goals>
                             </execution>
                         </executions>

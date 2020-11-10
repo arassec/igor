@@ -1,53 +1,41 @@
 <template>
-  <div>
-    <div v-if="right">
-      <font-awesome-icon v-if="iconTwo != null" :icon="iconTwo" class="bi-right-left fa-6x"/>
-      <font-awesome-icon :icon="iconOne" class="bi-right fa-10x"/>
+    <div>
+        <div>
+            <img src="../../assets/igor-logo.png" alt="igor-logo" width="512"/>
+            <font-awesome-icon :icon="icon" class="bi-right fa-2x"/>
+        </div>
     </div>
-    <div v-if="left">
-      <font-awesome-icon :icon="iconOne" class="bi-left fa-10x"/>
-    </div>
-  </div>
 </template>
 
 <script>
+
 export default {
-  name: 'background-icon',
-  props: ['iconOne', 'iconTwo', 'left', 'right']
+    name: 'background-icon',
+    props: ['icon']
 }
 </script>
 
 <style scoped>
 
-  div {
+div {
     font-size: 48px;
-  }
+}
 
-  .bi-right {
-    color: var(--nav-background-color);
-    opacity: 0.3;
+img {
+    opacity: 0.1;
     position: fixed;
-    bottom: -20px;
-    right: 20px;
+    bottom: -50px;
+    right: -10px;
     z-index: -1;
-  }
+}
 
-  .bi-right-left {
-    color: var(--nav-background-color);
-    opacity: 0.3;
+.bi-right {
+    color: var(--color-background);
+    opacity: 0.1;
     position: fixed;
-    bottom: -20px;
-    right: 420px;
+    bottom: 140px;
+    right: 370px;
     z-index: -1;
-  }
-
-  .bi-left {
-    color: var(--nav-background-color);
-    opacity: 0.3;
-    position: fixed;
-    bottom: 10px;
-    left: 20px;
-    z-index: -1;
-  }
+}
 
 </style>

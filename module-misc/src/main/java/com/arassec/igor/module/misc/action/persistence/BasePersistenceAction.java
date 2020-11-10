@@ -19,7 +19,7 @@ public abstract class BasePersistenceAction extends BaseAction {
      * @param typeId                    The concrete action's type ID.
      * @param persistentValueRepository The repository for persisted values.
      */
-    public BasePersistenceAction(String typeId, PersistentValueRepository persistentValueRepository) {
+    protected BasePersistenceAction(String typeId, PersistentValueRepository persistentValueRepository) {
         super("persistence-actions", typeId);
         this.persistentValueRepository = persistentValueRepository;
     }

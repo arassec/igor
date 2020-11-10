@@ -1,0 +1,38 @@
+<html>
+<head>
+    <title>igor Test Environment</title>
+</head>
+<body>
+    <h1>Igor Test Environment</h1>
+    <h2>Web</h2>
+    <h3>HTTP(S)</h3>
+    A local NGINX server is available providing the following test environment:
+    <ul>
+        <li><a href="http://localhost/igor-web.html">HTML test file</a> (http://localhost/igor-web.html)</li>
+        <li><a href="http://localhost/igor-web.json">JSON test file</a> (http://localhost/igor-web.json)</li>
+        <li><a href="http://localhost/igor-web.txt">TXT test file</a> (http://localhost/igor-web.txt)</li>
+    </ul>
+    HTTP Basic Authentication can be tested with the following URLs:
+    <ul>
+        <li><a href="http://localhost/auth/igor-web.html">HTML test file</a> (http://localhost/auth/igor-web.html)</li>
+        <li><a href="http://localhost/auth/igor-web.json">JSON test file</a> (http://localhost/auth/igor-web.json)</li>
+        <li><a href="http://localhost/auth/igor-web.txt">TXT test file</a> (http://localhost/auth/igor-web.txt)</li>
+    </ul>
+    Redirects to HTTPS can be tested with the following links
+    <ul>
+        <li><a href="http://localhost/redirect/igor-web.html">HTML test file</a> (http://localhost/redirect/igor-web.html)</li>
+        <li><a href="http://localhost/redirect/igor-web.json">JSON test file</a> (http://localhost/redirect/igor-web.json)</li>
+        <li><a href="http://localhost/redirect/igor-web.txt">TXT test file</a> (http://localhost/redirect/igor-web.txt)</li>
+    </ul>
+    The files are also served via HTTPS:
+    <ul>
+        <li><a href="https://localhost/igor-web.html">HTML test file</a> (https://localhost/igor-web.html)</li>
+        <li><a href="https://localhost/igor-web.json">JSON test file</a> (https://localhost/igor-web.json)</li>
+        <li><a href="https://localhost/igor-web.txt">TXT test file</a> (https://localhost/igor-web.txt)</li>
+    </ul>
+
+    <h2>Message Handling</h2>
+    <h3>RabbitMQ</h3>
+    A <a href="http://localhost:15672">local RabbitMQ</a> server is available.
+</body>
+</html>

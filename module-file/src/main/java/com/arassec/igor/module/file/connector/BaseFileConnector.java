@@ -33,7 +33,7 @@ public abstract class BaseFileConnector extends BaseConnector implements FileCon
      *
      * @param typeId The type ID.
      */
-    public BaseFileConnector(String typeId) {
+    protected BaseFileConnector(String typeId) {
         super("file-connectors", typeId);
     }
 

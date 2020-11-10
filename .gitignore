@@ -66,5 +66,6 @@ documentation/docs/user/module-misc
 documentation/docs/user/module-file
 documentation/docs/user/module-message
 documentation/docs/user/module-web
-application/src/test/e2e/cypress/screenshots
-application/src/test/e2e/cypress/videos
+e2e/cypress/screenshots
+e2e/cypress/videos
+e2e/debug.log

@@ -39,7 +39,7 @@ public abstract class BaseTrigger extends BaseIgorComponent implements Trigger {
      * @param categoryId The category ID.
      * @param typeId     The type ID.
      */
-    public BaseTrigger(String categoryId, String typeId) {
+    protected BaseTrigger(String categoryId, String typeId) {
         super(categoryId, typeId);
     }
 

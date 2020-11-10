@@ -104,7 +104,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
      *
      * @param typeId The type ID.
      */
-    public BaseFtpFileConnector(String typeId) {
+    protected BaseFtpFileConnector(String typeId) {
         super(typeId);
     }
 

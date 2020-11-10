@@ -23,7 +23,7 @@ before_install:
   - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
 
 script:
-  - if [ -z "$TRAVIS_TAG" ]; then ./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=arassec_igor; fi
+  - if [ -z "$TRAVIS_TAG" ]; then ./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Pe2e -Dsonar.projectKey=arassec_igor; fi
 
 deploy:
   - provider: script

@@ -7,7 +7,7 @@
             </layout-row>
         </p>
 
-        <div class="" slot="body">
+        <div class="" slot="body" v-if="jobExecution">
             <h2>Time and state</h2>
             <div class="table execution-core">
                 <div class="tr">

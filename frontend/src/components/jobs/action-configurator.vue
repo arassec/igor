@@ -2,7 +2,7 @@
     <div class="sticky max-width">
         <core-panel class="min-height">
             <layout-row>
-                <h1 slot="left" class="truncate">
+                <h1 slot="left" class="truncate" data-e2e="title">
                     <font-awesome-icon icon="wrench" class="margin-right"/>
                     {{ action.name.length > 0 ? action.name : action.type.value }}
                 </h1>
@@ -19,7 +19,8 @@
                 <div class="tr">
                     <div class="td"><label>Name</label></div>
                     <div class="td">
-                        <input type="text" autocomplete="off" v-model="action.name" class="full-width"/>
+                        <input type="text" autocomplete="off" v-model="action.name" class="full-width"
+                               data-e2e="name-input"/>
                     </div>
                 </div>
                 <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
@@ -51,7 +52,8 @@
                         <div class="td"><label>Category</label></div>
                         <div class="td">
                             <select v-model="action.category" v-on:change="loadTypesOfCategory(action.category.key, true).then(() => {
-                                        loadParametersOfType(action.type.key)})">
+                                        loadParametersOfType(action.type.key)})"
+                                    data-e2e="action-category-selector">
                                 <option v-for="category in actionCategories" v-bind:value="category"
                                         v-bind:key="category.key">
                                     {{ category.value }}
@@ -62,7 +64,8 @@
                     <div class="tr">
                         <div class="td">Type</div>
                         <div class="td">
-                            <select v-model="action.type" v-on:change="loadParametersOfType(action.type.key)">
+                            <select v-model="action.type" v-on:change="loadParametersOfType(action.type.key)"
+                                    data-e2e="action-type-selector">
                                 <option v-for="type in actionTypes" v-bind:value="type"
                                         v-bind:key="type.key">
                                     {{ type.value }}

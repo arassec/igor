@@ -24,7 +24,7 @@
                                     v-on:delete-action="showDeleteAction"/>
                 </transition>
             </div>
-            <div slot="footer" class="sticky">
+            <div slot="content" class="sticky">
                 <transition v-on:after-leave="blendInConfiguration"
                             name="animate-css-transition"
                             enter-active-class="animated slideInLeft"
@@ -36,9 +36,11 @@
                                 Job Executions
                             </h1>
                             <layout-row>
-                                <input-button slot="left" icon="chevron-left" v-on:clicked="showExecutions = false"/>
+                                <input-button slot="left" icon="chevron-left" v-on:clicked="showExecutions = false"
+                                    data-e2e="show-job-configuration-button"/>
                                 <input-button slot="left" icon="save" v-on:clicked="saveConfiguration"
-                                              class="margin-left"/>
+                                              class="margin-left"
+                                    data-e2e="save-job-button"/>
                             </layout-row>
                         </core-panel>
                         <core-panel v-if="showExecutions && jobExecutionsPage.items.length > 0">
@@ -192,6 +194,8 @@
             </layout-row>
         </modal-dialog>
 
+        <background-icon icon="tools"/>
+
     </core-container>
 </template>
 <script>
@@ -213,10 +217,12 @@ import JobNavigation from "../components/jobs/job-navigation";
 import CorePanel from "../components/common/core-panel";
 import FormatUtils from "../utils/utils";
 import DocumentationContainer from "../components/common/documentation-container";
+import BackgroundIcon from "@/components/common/background-icon";
 
 export default {
     name: 'job-editor',
     components: {
+        BackgroundIcon,
         DocumentationContainer,
         CorePanel,
         JobNavigation,

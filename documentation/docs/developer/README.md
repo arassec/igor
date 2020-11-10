@@ -28,15 +28,17 @@ Now your application should start and igor's web frontend should be available wi
 
 Although possible, it is not recommended embedding igor into a larger application with their own database.
 
-## Building Igor
+# Developing Igor
 
-### Requirements
+## Requirements
 If you not only want to extend igor but modify its core, you can do this by following these steps. 
 
 To ease development of igor's frontend, which is written in Vue.js, you should install **{{ $themeConfig.igorNodeVersion }}**
 (or a later version) in addition to **{{ $themeConfig.igorJavaVersion }}**.
 
-### Backend
+To execute the end-to-end tests manually you have to install [Docker](https://www.docker.com/) on your machine.
+
+## Backend
 The first step is to checkout igor's source code from GitHub:
 ``` shell script
 $> git clone https://github.com/arassec/igor.git
@@ -44,7 +46,7 @@ $> git clone https://github.com/arassec/igor.git
 
 Next build the whole project using java:
 ``` shell script
-$> cd igor && ./mvnw clean install
+$> ./mvnw clean install
 ```
 
 You can start igor now with the following main class from within your IDE:
@@ -53,26 +55,34 @@ com.arassec.igor.application.IgorApplication
 ```
 The backend's REST API will now be available under: `http://localhost:8080/api`
 
-### Frontend
-In order to start the frontend you have to change to the `frontend` directory and run `npm`:
+## Frontend
+In order to start the frontend you have to change to the `frontend` directory and run:
 ``` shell script
-$> cd frontend && npm run serve
+$> npm install
+$> npm run serve
 ```
 The frontend is now available under: `http://localhost:8081/`
 
-### End-To-End Tests
+## End-To-End Tests
 During a normal build, the end-to-end tests are executed by maven using Cypress via testcontainers.
 
-You can execute them manually by starting the backend and frontend as described above and then performing the following steps:
-
-The end-to-end tests are located in the application module under `src/test/e2e`.
-
-First install Cypress via `npm`
+For local execution, a `docker-compose.yml` is available under `application/src/test/resources` to provide the necessary services.
+You can start the test environment with the following command:
 ``` shell script
-$> cd ../application/src/test/e2e && npm install
+$> docker-compose up
 ```
 
-After Cypress is installed successfully, you can start the GUI with the following command (executed from within the e2e directory):
+You can then execute the end-to-end tests manually by starting the backend and frontend as described above,
+and then performing the following steps:
+
+The end-to-end tests are located in the application module under `application/src/test/e2e`.
+
+First install Cypress in that directory using `npm`
+``` shell script
+$> npm install
+```
+
+After Cypress is installed successfully, you can start the Cypress GUI with the following command (executed from within the e2e directory):
 ``` shell script
 $> npm run cypress:open
 ```

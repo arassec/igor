@@ -27,7 +27,7 @@ public abstract class BaseScheduledTrigger extends BaseTrigger implements Schedu
      * @param categoryId The category ID.
      * @param typeId     The type ID.
      */
-    public BaseScheduledTrigger(String categoryId, String typeId) {
+    protected BaseScheduledTrigger(String categoryId, String typeId) {
         super(categoryId, typeId);
     }
 
