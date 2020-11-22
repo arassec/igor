@@ -16,7 +16,8 @@ On top of the page is the overview's action bar.
 ![connector overview action bar](./images/connector/connector-overview-action-bar.png)
 
 On the left is a filter element:
-- **Name Filter:** The name filter can be used to filter the displayed connectors by their name.
+
+![connector name filter](./images/connector/connector-name-filter.png) The name filter can be used to filter the displayed connectors by their name.
 
 On the right part of the action bar are buttons to perform the following actions:
 

@@ -72,6 +72,13 @@ public class Job {
     private int historyLimit = 5;
 
     /**
+     * Limits the data items during simulated job executions.
+     */
+    @Builder.Default
+    @Positive
+    private int simulationLimit = 25;
+
+    /**
      * A trigger for the job.
      */
     @Valid
@@ -109,10 +116,11 @@ public class Job {
      *
      * @return The meta-data for the job run.
      */
-    public static Map<String, Object> createMetaData(String jobId, Trigger trigger) {
+    public static Map<String, Object> createMetaData(String jobId, Trigger trigger, int simulationLimit) {
         Map<String, Object> metaData = new HashMap<>();
         metaData.put(DataKey.JOB_ID.getKey(), jobId);
         metaData.put(DataKey.TIMESTAMP.getKey(), Instant.now().toEpochMilli());
+        metaData.put(DataKey.SIMULATION_LIMIT.getKey(), simulationLimit);
         Map<String, Object> triggerMetaData = trigger != null ? trigger.getMetaData() : Map.of();
         triggerMetaData.forEach(metaData::put);
         return metaData;
@@ -290,7 +298,7 @@ public class Job {
      */
     private void createInitialDataItem(BlockingQueue<Map<String, Object>> triggerInputQueue, String jobId, Map<String, Object> triggerData) {
         Map<String, Object> dataItem = new HashMap<>();
-        dataItem.put(DataKey.META.getKey(), createMetaData(jobId, trigger));
+        dataItem.put(DataKey.META.getKey(), createMetaData(jobId, trigger, simulationLimit));
         dataItem.put(DataKey.DATA.getKey(), triggerData);
         boolean added = false;
         while (!added) {

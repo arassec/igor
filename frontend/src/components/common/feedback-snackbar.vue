@@ -5,7 +5,7 @@
                 <p slot="left">
                     {{ feedback.message }}
                 </p>
-                <input-button slot="right" icon="times" v-on:clicked="clearFeedback"/>
+                <input-button slot="right" icon="times" v-on:clicked="clearFeedback" data-e2e="dismiss-snackbar-button"/>
             </layout-row>
 
         </div>

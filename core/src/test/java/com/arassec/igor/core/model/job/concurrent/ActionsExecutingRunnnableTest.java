@@ -46,7 +46,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests actually running the runnable.")
     void testRun() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null));
+        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null, 25));
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         inputQueue.offer(inputData);
@@ -89,7 +89,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests completing the runnable.")
     void testComplete() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null));
+        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null, 25));
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingQueue<>();

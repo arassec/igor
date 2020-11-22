@@ -82,9 +82,11 @@ public class CustomManualTrigger extends BaseTrigger {
 
 This trigger will be available in igor under the Category- and Type-ID we set in the constructor.
 
-![custom manual trigger](./images/custom-manual-trigger.png)
+Category|Type
+---|---
+Demo-Triggers|Custom-Manual-Trigger
 
-The configured parameter will be added to each data item in the `metaData` segment.
+The demo parameter will be added to each data item in the `metaData` segment.
 
 ``` json
 {
@@ -93,6 +95,7 @@ The configured parameter will be added to each data item in the `metaData` segme
     "jobId": "2400f526-b5b2-4d7e-b1f7-12e8cb886944",
     "demoParam": "user input",
     "simulation": true,
+    "simulationLimit": 25,
     "timestamp": 1599587099204
   }
 }
@@ -134,9 +137,11 @@ public class CustomScheduledTrigger extends BaseScheduledTrigger {
 }
 ```
 
-This trigger will be available under the same category as the previous one.
+This trigger will be available under the same category as the previous one:
 
-![custom scheduled trigger](./images/custom-scheduled-trigger.png)
+Category|Type
+---|---
+Demo-Triggers|Custom-Scheduled-Trigger
 
 According to our code, the configured parameter will be added to each data item in the `data` segment.
 
@@ -148,6 +153,7 @@ According to our code, the configured parameter will be added to each data item 
   "meta": {
     "jobId": "2400f526-b5b2-4d7e-b1f7-12e8cb886944",
     "simulation": true,
+    "simulationLimit": 25,
     "timestamp": 1599837870589
   }
 }
@@ -160,10 +166,10 @@ The code of our custom event trigger looks like this:
 
 ``` java
 /**
- * A custom trigger for manual job execution.
+ * A custom trigger for jobs that are scheduled by events.
  */
 @IgorComponent
-public class CustomManualTrigger extends BaseTrigger {
+public class CustomEventTrigger extends BaseEventTrigger {
 
     /**
      * A sample parameter.
@@ -174,8 +180,8 @@ public class CustomManualTrigger extends BaseTrigger {
     /**
      * Creates a new component instance.
      */
-    public CustomManualTrigger() {
-        super("Demo-Triggers", "Custom-Manual-Trigger");
+    public CustomEventTrigger() {
+        super("Demo-Triggers", "Custom-Event-Trigger");
     }
 
     /**
@@ -186,12 +192,22 @@ public class CustomManualTrigger extends BaseTrigger {
         return Map.of("demoParam", demoParam);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Object> getData() {
+        return Map.of("demoParam", demoParam);
+    }
+
 }
 ```
 
 Again, the trigger will be available under the category as the previous two.
 
-![custom event trigger](./images/custom-event-trigger.png)
+Category|Type
+---|---
+Demo-Triggers|Custom-Event-Trigger
 
 Since scheduled triggers add the configured simulation input to the data items, the processed data item in a
 simulated job execution will contain both configurations in the `data` segment: 
@@ -206,6 +222,7 @@ simulated job execution will contain both configurations in the `data` segment:
     "jobId": "a1f005d2-7ffc-4e0d-a2c9-9ea7e51e16c8",
     "demoParam": "user input",
     "simulation": true,
+    "simulationLimit": 25,
     "timestamp": 1599838823466
   }
 }

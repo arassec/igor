@@ -64,8 +64,21 @@ public class CustomAction extends BaseAction {
 
 This action will be available in igor under the Category- and Type-ID we set in the constructor.
 
-![custom action](./images/custom-action.png)
+Category|Type
+---|---
+Demo-Actions|Custom-Action
 
 The processed data item of our action looks like this, if the checkbox is selected by the user:
 
-![custom action sim result](./images/custom-action-sim-result.png)
+``` json
+{
+  "data": {},
+  "meta": {
+    "jobId": "2400f526-b5b2-4d7e-b1f7-12e8cb886944",
+    "simulation": true,
+    "simulationLimit": 25,
+    "timestamp": 1605884485974
+  },
+  "message": "A custom action's message"
+}
+```

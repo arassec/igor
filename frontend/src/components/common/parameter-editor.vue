@@ -78,7 +78,7 @@
                 </div>
             </template>
             <div v-if="advancedParametersExist()" class="arrow-container">
-                <font-awesome-icon class="arrow" data-e2e="toggle-advanced-parameters"
+                <font-awesome-icon class="arrow" :class="arrowColor()" data-e2e="toggle-advanced-parameters"
                                    v-bind:icon="showAdvancedParameters ? 'chevron-up' : 'chevron-down'"
                                    v-on:click="showAdvancedParameters = !showAdvancedParameters"/>
             </div>
@@ -237,6 +237,16 @@ export default {
                     }
                 }
             }
+        },
+        arrowColor: function () {
+            if (this.validationErrors && this.parentId in this.validationErrors) {
+                for (let index = 0; index < this.parameters.length; index++) {
+                    if (this.parameters[index].advanced && this.parameters[index].name in this.validationErrors[this.parentId]) {
+                        return 'arrow-alert';
+                    }
+                }
+            }
+            return '';
         }
     },
     created: function () {
@@ -271,6 +281,10 @@ export default {
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
     color: var(--color-font);
     opacity: 1; /* Firefox */
+}
+
+.arrow-alert {
+    color: var(--color-alert);
 }
 
 </style>

@@ -14,7 +14,7 @@ There is only one method a custom connector must implement:
  */
 void testConfiguration();
 ```
-When the user hits the ![test](./images/test-button.png) button in the connector editor, this method is executed.
+When the user hits the ![test](../user/images/common/test-button.png) button in the connector editor, this method is executed.
 You should implement a reasonable configuration check, e.g. connect to a service you are adding.
 In case the configuration is not working, an Exception should be thrown.
 
@@ -76,7 +76,9 @@ Note that the `getGoogleResult()` method can be annoted with `@IgorSimulationSaf
 
 This connector will be available in igor under the Category- and Type-ID we set in the constructor.
 
-![custom connector](./images/custom-connector.png)
+Category|Type
+---|---
+Demo-Connectors|Custom-Connector
 
 ## Usage
 
@@ -121,10 +123,24 @@ public class SearchAction extends BaseAction {
 
 This action will be available in igor under the Category- and Type-ID we set in the constructor.
 
-![search action](./images/search-action.png)
+Category|Type
+---|---
+Demo-Actions|Search-Action
 
 The new connector instance can be configured as parameter for the action.
 
 The processed data item of our action then looks like this:
 
-![search action sim result](./images/search-action-sim-result.png)
+``` json
+{
+  "data": {},
+  "meta": {
+    "jobId": "2400f526-b5b2-4d7e-b1f7-12e8cb886944",
+    "simulation": true,
+    "simulationLimit": 25,
+    "timestamp": 1605884415869
+  },
+  "message": "A custom action's message",
+  "searchResults": "<!DOCTYPE html><html lang=en><meta charset=utf-8><"
+}
+```

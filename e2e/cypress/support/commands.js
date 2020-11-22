@@ -176,6 +176,16 @@ Cypress.Commands.add('openJobOverview', () => {
         .contains('Job Overview');
 });
 
+Cypress.Commands.add('openJobEditor', (job) => {
+    cy.visit('/');
+
+    cy.wait(['@getJobs'])
+
+    cy.get(`[data-e2e=tile-${job}]`)
+        .should('be.visible')
+        .click();
+});
+
 Cypress.Commands.add('chooseCategory', (type, value) => {
     cy.get(`[data-e2e=${type}-category-selector]:visible`)
         .select(value);
@@ -217,4 +227,47 @@ Cypress.Commands.add('addAction', (name, category, type, parameters, advancedPar
     cy.setParameters(parameters, false);
 
     cy.setParameters(advancedParameters, true);
+})
+
+Cypress.Commands.add('selectAction', (actionNameKebap) => {
+    cy.get(`[data-e2e=action-${actionNameKebap}]`)
+        .should('be.visible')
+        .click();
+})
+
+Cypress.Commands.add('deleteJob', (jobName, jobKebap) => {
+    cy.openJobOverview();
+
+    cy.get(`[data-e2e=delete-${jobKebap}]`)
+        .should('be.visible')
+        .click();
+
+    cy.get('[data-e2e=delete-job-confirm-button')
+        .should('be.visible')
+        .click();
+
+    cy.wait('@deleteJob')
+
+    cy.get('[data-e2e=snackbar]')
+        .should('be.visible')
+        .contains(`Job '${jobName}' has been deleted.`);
+})
+
+Cypress.Commands.add('simulateJob', () => {
+    cy.get('[data-e2e=test-job-button]')
+        .should('be.visible')
+        .click()
+
+    cy.wait('@simulateJob')
+
+    cy.get('[data-e2e=snackbar]')
+        .should('be.visible')
+        .contains(`Simulation OK.`);
+
+    cy.get('[data-e2e=dismiss-snackbar-button')
+        .should('be.visible')
+        .click();
+
+    cy.get('[data-e2e=snackbar]')
+        .should('not.be.visible')
 })

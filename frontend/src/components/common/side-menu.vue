@@ -1,6 +1,6 @@
 <template>
     <core-content class="side-menu">
-        <div data-e2e="connector-navigator">
+        <div data-e2e="side-menu">
             <core-panel v-if="hasHeaderSlot">
                 <h1 class="no-margin">
                     <slot name="title"/>

@@ -52,7 +52,7 @@ describe('Creates user doc connector images.', () => {
                 .should('be.visible')
                 .screenshot(targetDir + 'connector-editor-configurator')
 
-            cy.get('[data-e2e=connector-navigator]')
+            cy.get('[data-e2e=side-menu]')
                 .should('be.visible')
                 .screenshot(targetDir + 'connector-editor-navigator')
         });

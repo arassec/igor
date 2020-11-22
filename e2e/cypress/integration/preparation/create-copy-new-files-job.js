@@ -1,13 +1,18 @@
-import {ftpServerKebap, localFilesystemKebap, rabbitMqServerKebap} from "../../support/before";
+import {
+    ftpServerKebap,
+    jobCopyNewFilesKebap,
+    jobCopyNewFilesName,
+    rabbitMqServerKebap,
+    scpConnectorKebap
+} from "../../support/before";
 
 describe('Initializes the test environment\'s \'Copy New Files\' job.', () => {
 
     it('Creates the job if required.', function () {
         cy.openJobOverview();
-        cy.get('body').then((body) => {
-            if (body.find('[data-e2e=tile-copy-new-files]').length === 0) {
-                cy.route('GET', '/api/type/**').as('getTypes')
 
+        cy.get('body').then((body) => {
+            if (body.find(`[data-e2e=tile-${jobCopyNewFilesKebap}]`).length === 0) {
                 cy.get('[data-e2e=add-job-button]')
                     .should('be.visible')
                     .click();
@@ -17,10 +22,10 @@ describe('Initializes the test environment\'s \'Copy New Files\' job.', () => {
                 cy.get('[data-e2e=job-name-input] input')
                     .should('be.visible')
                     .clear()
-                    .type('Copy New Files');
+                    .type(jobCopyNewFilesName);
 
                 cy.get('[data-e2e=job-title]')
-                    .contains("Copy New Files");
+                    .contains(jobCopyNewFilesName);
 
                 cy.chooseCategory('trigger', 'Util');
 
@@ -67,8 +72,8 @@ describe('Initializes the test environment\'s \'Copy New Files\' job.', () => {
                         'source': ftpServerKebap,
                         'sourceDirectory': '{{}{{}data.directory{}}{}}',
                         'sourceFilename': '{{}{{}data.filename{}}{}}',
-                        'target': localFilesystemKebap,
-                        'targetDirectory': '/volume1/data/test',
+                        'target': scpConnectorKebap,
+                        'targetDirectory': '/tmp/',
                         'targetFilename': '{{}{{}data.filename{}}{}}'
                     });
 
@@ -89,7 +94,20 @@ describe('Initializes the test environment\'s \'Copy New Files\' job.', () => {
                     .click();
 
                 cy.get('[data-e2e=snackbar]')
-                    .contains(`Job 'Copy New Files' saved.`);
+                    .should('be.visible')
+                    .contains(`Job '${jobCopyNewFilesName}' saved.`);
+
+                cy.get('[data-e2e=run-job-button]')
+                    .should('be.visible')
+                    .click();
+
+                cy.get('[data-e2e=run-job-confirm-button]')
+                    .should('be.visible')
+                    .click();
+
+                cy.get('[data-e2e=snackbar]')
+                    .should('be.visible')
+                    .contains(`Job '${jobCopyNewFilesName}' started manually.`);
             }
         });
     });

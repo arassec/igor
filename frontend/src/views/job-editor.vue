@@ -1,7 +1,7 @@
 <template>
     <core-container>
 
-        <side-menu v-if="jobConfiguration">
+        <side-menu v-if="jobConfiguration" data-e2e="job-editor-navigator">
             <div slot="content" class="sticky">
                 <transition v-on:after-leave="blendInExecutions"
                             name="animate-css-transition"
@@ -29,7 +29,7 @@
                             name="animate-css-transition"
                             enter-active-class="animated slideInLeft"
                             leave-active-class="animated slideOutLeft">
-                    <div v-if="showExecutions">
+                    <div v-if="showExecutions" data-e2e="job-editor-executions">
                         <core-panel class="executions-top-panel">
                             <h1>
                                 <font-awesome-icon icon="tasks" class="margin-right fa-fw"/>
@@ -37,17 +37,18 @@
                             </h1>
                             <layout-row>
                                 <input-button slot="left" icon="chevron-left" v-on:clicked="showExecutions = false"
-                                    data-e2e="show-job-configuration-button"/>
+                                              data-e2e="show-job-configuration-button"/>
                                 <input-button slot="left" icon="save" v-on:clicked="saveConfiguration"
                                               class="margin-left"
-                                    data-e2e="save-job-button"/>
+                                              data-e2e="save-job-button"/>
                             </layout-row>
                         </core-panel>
                         <core-panel v-if="showExecutions && jobExecutionsPage.items.length > 0">
                             <feedback-box
                                 v-for="(jobExecution, index) in jobExecutionsPage.items"
                                 :key="index" :alert="jobExecution.state === 'FAILED'" :clickable="true"
-                                v-on:feedback-clicked="openExecutionDetailsDialog(jobExecution)">
+                                v-on:feedback-clicked="openExecutionDetailsDialog(jobExecution)"
+                                :data-e2e="'job-execution-' + index">
                                 <div slot="left">
                                     <font-awesome-icon icon="circle-notch" class="fa-spin fa-fw"
                                                        v-if="jobExecution.state === 'RUNNING'"/>
@@ -65,7 +66,8 @@
                                                   v-if="jobExecution.state === 'WAITING' || jobExecution.state === 'RUNNING' || jobExecution.state === 'ACTIVE'"/>
                                     <input-button slot="right" icon="check"
                                                   v-on:clicked="openMarkJobExecutionResolvedDialog(jobExecution)"
-                                                  v-if="jobExecution.state === 'FAILED'"/>
+                                                  v-if="jobExecution.state === 'FAILED'"
+                                                  :data-e2e="'job-execution-' + index + '-mark-resolved-button'"/>
                                 </div>
                             </feedback-box>
                         </core-panel>
@@ -143,7 +145,7 @@
             </div>
             <layout-row slot="footer">
                 <input-button slot="left" v-on:clicked="showRunDialog = false" icon="times"/>
-                <input-button slot="right" v-on:clicked="runJob()" icon="check"/>
+                <input-button slot="right" v-on:clicked="runJob()" icon="check" data-e2e="run-job-confirm-button"/>
             </layout-row>
         </modal-dialog>
 

@@ -4,6 +4,8 @@
 - Added E2E tests with Cypress
 - Fixed missing 'Import connector' functionality
 - Fixed detecting changes in connector configurator.
+- Updated documentation.
+- Minor layout changes.
 
 ## Version 0.2.3
 - UI refactoring: 

@@ -36,8 +36,6 @@ The trigger creates an initial data item to start the job.
 The data item is passed to different, configurable **actions**, that modify the data to the user's needs.
 Actions can also be used to load data from, or store modified data items in, external services using **connectors** for these services..
 
-<br/>
-
 ![igor overview image](./overview.png)
 
 # Quick Start

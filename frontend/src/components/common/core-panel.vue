@@ -16,7 +16,6 @@ export default {
   .panel {
     color: var(--color-font);
     background-color: var(--color-background);
-    margin-bottom: .5em;
   }
 
   .core-panel-small {

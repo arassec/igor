@@ -4,6 +4,7 @@
   "description": "job-description",
   "active": true,
   "historyLimit": 666,
+  "simulationLimit": 25,
   "trigger": {
     "id": "trigger-id",
     "typeId": "trigger-type-id",

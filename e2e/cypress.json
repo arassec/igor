@@ -1,12 +1,17 @@
 {
-  "baseUrl": "http://localhost:8080",
-  "viewportWidth": 1300,
-  "viewportHeight": 900,
+  "baseUrl": "http://localhost:9090",
+  "viewportWidth": 1920,
+  "viewportHeight": 1080,
   "trashAssetsBeforeRuns": true,
   "env": {
-    "nginx_http_port": 80,
+    "nginx_host": "igor-nginx",
+    "nginx_port": 80,
+    "rabbitmq_host": "igor-rabbitmq",
     "rabbitmq_port": 5672,
-    "vsftpd_port": 21
+    "vsftpd_host": "igor-vsftpd",
+    "vsftpd_port": 21,
+    "sshd_host": "igor-sshd",
+    "sshd_port": 22
   },
   "watchForFileChanges": false,
   "testFiles": [

@@ -99,7 +99,8 @@ module.exports = {
                 {
                     title: "Getting Started",
                     children: [
-                        ""
+                        "",
+                        "developing"
                     ]
                 },
                 {
@@ -122,7 +123,7 @@ module.exports = {
                 {
                     title: "File Handling",
                     children: [
-                        "copyfiles"
+                        "copynewfiles"
                     ]
                 }
             ]

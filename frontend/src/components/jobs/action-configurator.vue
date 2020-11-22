@@ -1,5 +1,5 @@
 <template>
-    <div class="sticky max-width">
+    <div class="sticky max-width" :data-e2e="dataE2eName()">
         <core-panel class="min-height">
             <layout-row>
                 <h1 slot="left" class="truncate" data-e2e="title">
@@ -41,7 +41,7 @@
         </core-panel>
 
         <div>
-            <core-panel>
+            <core-panel class="spacer-top">
                 <layout-row>
                     <h2 slot="left">Action</h2>
                     <icon-button slot="right" icon="question" v-show="hasDocumentation(action.type.key)"
@@ -76,7 +76,7 @@
                 </div>
             </core-panel>
 
-            <core-panel>
+            <core-panel class="spacer-top">
                 <h2>Action Parameters</h2>
                 <div v-if="action.parameters.length">
                     <parameter-editor
@@ -100,6 +100,7 @@ import ParameterEditor from '../common/parameter-editor'
 import IgorBackend from '../../utils/igor-backend.js'
 import IconButton from "../common/icon-button";
 import LayoutRow from "../common/layout-row";
+import Utils from "@/utils/utils";
 
 export default {
     name: 'action-configurator',
@@ -158,6 +159,13 @@ export default {
                 }
             }
             return false;
+        },
+        dataE2eName: function () {
+            if (this.action.name) {
+                return 'action-configurator-' + Utils.toKebabCase(this.action.name);
+            } else {
+                return 'action-configurator-' + Utils.toKebabCase(this.action.type.value);
+            }
         }
     },
     watch: {

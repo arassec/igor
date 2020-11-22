@@ -240,7 +240,7 @@ public class JobRestController extends BaseRestController {
         final Map<String, Object> triggerData = triggerProxy != null ? triggerProxy.getData() : Map.of();
 
         Map<String, Object> item = new HashMap<>();
-        item.put(DataKey.META.getKey(), Job.createMetaData(simulationJob.getId(), triggerProxy));
+        item.put(DataKey.META.getKey(), Job.createMetaData(simulationJob.getId(), triggerProxy, job.getSimulationLimit()));
         item.put(DataKey.DATA.getKey(), triggerData);
         jobResult.getResults().add(item);
 

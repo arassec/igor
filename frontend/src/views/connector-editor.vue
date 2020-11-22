@@ -15,7 +15,7 @@
                 <input-button slot="right" v-on:clicked="testConfiguration()" icon="plug"
                               data-e2e="connector-editor-test"/>
             </layout-row>
-            <core-panel slot="footer">
+            <core-panel slot="footer" class="spacer-top">
                 <p
                     v-if="referencingJobsPage && referencingJobsPage.items && referencingJobsPage.items.length > 0">
                     <label class="list-label">Used by the following jobs:</label>
@@ -63,7 +63,7 @@
                     </div>
                 </core-panel>
 
-                <core-panel>
+                <core-panel class="spacer-top">
                     <layout-row>
                         <h2 slot="left">Connector</h2>
                         <icon-button slot="right" icon="question"
@@ -101,7 +101,7 @@
                     </div>
                 </core-panel>
 
-                <core-panel>
+                <core-panel class="spacer-top">
                     <h2>Connector Parameters</h2>
                     <parameter-editor v-if="Object.keys(connectorConfiguration.parameters).length > 0"
                                       :parent-id="connectorConfiguration.id"

@@ -99,7 +99,7 @@ public abstract class BaseHttpFileConnector extends BaseFileConnector {
      *
      * @param typeId The type ID.
      */
-    public BaseHttpFileConnector(String typeId) {
+    protected BaseHttpFileConnector(String typeId) {
         super(typeId);
     }
 

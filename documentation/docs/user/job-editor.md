@@ -24,26 +24,43 @@ The top element contains buttons for the following actions:
 
 ![save button](./images/common/save-button.png) Saves the job.
 
-![run button](./images/job/run-button.png) Runs the job.
+![run job button](./images/job/run-job-button.png) Runs the job.
+
+The 'run job' button might be disabled for the following reasons, indicated by the button's icon:
+
+![run job disabled inactive](./images/job/run-job-button-inactive.png) The job is inactive.
+
+![run job disabled waiting](./images/job/run-job-button-waiting.png) The job is waiting for a free execution slot.
+
+![run job disabled running](./images/job/run-job-button-running.png) The job is already running.
+
+![run job disabled active](./images/job/run-job-button-active.png) The job is triggered by events and already active.
+
+![run job disabled failed](./images/job/run-job-button-failed.png) The job failed previously and is fault-intolerant.
 
 Below the top element is the list of actions. 
 The list can be ordered by drag-and-drop.
-new Actions can be added to the job by pressing the ![new action](./images/job/add-new-action-button.png) button.
+new Actions can be added to the job by pressing the ![add action](./images/job/add-action-button.png) button.
+
+## Job Executions
 
 The ![switch navigator button](./images/job/switch-navigator-button.png) opens or closes the job execution history.
 It contains an entry for each past job execution.
-The number of displayed executions can be configured for the job.
+
+![job editor executions](./images/job/job-editor-executions.png)
+
+The number of saved execution entries can be configured for the job.
 Details can be opened by clicking on an execution entry.
 
 If an execution failed, its entry is red.
-By clicking the ![mark resolved](./images/job/mark-resolved-button.png) button, the job execution can manually be marked as resolved and will no longer be displayed in red.
+By clicking the ![mark resolved](./images/job/mark-resolved-button.png) button, the job execution can manually be marked as resolved.
 
 ::: tip
 A job will not run if failed executions exist. 
-You can either resolve the failed executions manually or configure the job to be fault tolerant (which is an advanced job parameter).
+You can either resolve the failed executions manually or configure the job to be fault tolerant (which is an advanced job configuration parameter).
 
 Fault tolerant jobs are executed even if previous executions failed. 
-A successful job execution will mark all previously failed executions as resolved.
+A successful job execution will automatically mark all previously failed executions as resolved.
 :::
  
 ## Parameters Editor

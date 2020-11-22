@@ -1,5 +1,5 @@
 <template>
-    <modal-dialog v-if="wip.message.length > 0">
+    <modal-dialog v-if="wip.message.length > 0" data-e2e="wip-modal">
         <h1 slot="footer"><font-awesome-icon icon="circle-notch" class="fa-spin"/> {{wip.message}}</h1>
     </modal-dialog>
 </template>

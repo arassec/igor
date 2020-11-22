@@ -2,11 +2,9 @@
     <div id="app-content" data-e2e="app-content">
         <nav>
             <div class="main-menu">
-                <router-link to="/">
+                <router-link to="/" class="top-logo-link">
                     <div class="top-logo-container">
-                        <img src="@/assets/igor-logo-top.png" class="top-logo"/>
-                        <!--<font-awesome-icon icon="bars" class="top-logo-icon"></font-awesome-icon>-->
-                        <div class="top-logo-label">Igor</div>
+                        <img alt="igor-logo" src="@/assets/igor-logo-top.png" class="top-logo"/>
                     </div>
                 </router-link>
                 <ul>
@@ -134,24 +132,15 @@ nav h1 {
     float: right;
 }
 
+.top-logo-link {
+    margin-right: 6em;
+}
+
 .top-logo {
     height: 2.4em;
     position: absolute;
     top: 3px;
-    left: 0;
-}
-
-.top-logo-icon {
-    color: var(--color-font);
-    text-decoration: none;
-    font-size: 175%;
-    margin: .1em 0 0 1.8em;
-}
-
-.top-logo-label {
-    color: var(--color-font);
-    font-size: 150%;
-    margin: .05em 0 0 2em;
+    left: 3px;
 }
 
 .top-logo-container div {

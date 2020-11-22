@@ -1,5 +1,5 @@
 <template>
-    <navigation-item class="action-row" v-on:clicked="$emit('action-is-selected', action.id)" :class="style"
+    <navigation-item class="spacer-top" v-on:clicked="$emit('action-is-selected', action.id)" :class="style"
                      :data-e2e="dataE2eName">
         <font-awesome-icon slot="left" icon="grip-vertical" class="margin-right fa-fw move-icon"/>
         <label slot="center" class="action-label">{{ action.name.length > 0 ? action.name : action.type.value }}</label>
@@ -48,10 +48,6 @@ export default {
 .action-label {
     display: inline-block;
     padding: .2em 0 .2em 0;
-}
-
-.action-row {
-    border-top: .1em solid var(--color-font);
 }
 
 .move-icon {

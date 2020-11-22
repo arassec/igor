@@ -181,12 +181,14 @@ class JobTest {
     void testCreateMetaData() {
         Trigger triggerMock = mock(Trigger.class);
         when(triggerMock.getMetaData()).thenReturn(Map.of(DataKey.SIMULATION.getKey(), true));
-        Map<String, Object> metaData = Job.createMetaData("job-id", null);
+        Map<String, Object> metaData = Job.createMetaData("job-id", null, 25);
         assertEquals("job-id", metaData.get(DataKey.JOB_ID.getKey()));
         assertNotNull(metaData.get(DataKey.TIMESTAMP.getKey()));
         assertNull(metaData.get(DataKey.SIMULATION.getKey()));
-        metaData = Job.createMetaData("job-id", triggerMock);
+        assertEquals(25, metaData.get(DataKey.SIMULATION_LIMIT.getKey()));
+        metaData = Job.createMetaData("job-id", triggerMock, 42);
         assertEquals(true, metaData.get(DataKey.SIMULATION.getKey()));
+        assertEquals(42, metaData.get(DataKey.SIMULATION_LIMIT.getKey()));
     }
 
 }

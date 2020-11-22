@@ -25,19 +25,19 @@
             <layout-row>
                 <input-button slot="left" v-on:clicked="$emit('cancel')" icon="times"/>
                 <input-button slot="right" v-on:clicked="deleteJob ? $emit('delete-plus') : $emit('delete')"
-                              icon="check"/>
+                              icon="check" data-e2e="delete-job-confirm-button"/>
             </layout-row>
         </div>
     </modal-dialog>
 </template>
 
 <script>
-    import ModalDialog from "../common/modal-dialog";
-    import LayoutRow from "../common/layout-row";
-    import InputButton from "../common/input-button";
-    import IgorBackend from "../../utils/igor-backend.js";
+import ModalDialog from "../common/modal-dialog";
+import LayoutRow from "../common/layout-row";
+import InputButton from "../common/input-button";
+import IgorBackend from "../../utils/igor-backend.js";
 
-    export default {
+export default {
         name: "delete-job-dialog",
         components: {InputButton, LayoutRow, ModalDialog},
         props: ['jobId', 'jobName'],

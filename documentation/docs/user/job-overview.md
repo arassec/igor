@@ -16,8 +16,10 @@ On top of the page is the overview's action bar.
 ![job overview action bar](./images/job/job-overview-action-bar.png)
 
 On the left part are filter elements:
-- **Name Filter:** The name filter can be used to filter the displayed jobs by their name.
-- **State Filter:** The buttons of the state filter can be used to filter jobs by their execution state.
+
+![job name filter](./images/job/job-name-filter.png) The name filter can be used to filter the displayed jobs by their name.
+
+![job state filter](./images/job/job-state-filter.png) The buttons of the state filter can be used to filter jobs by their execution state.
 
 On the right part of the action bar are buttons to perform the following actions:
 
@@ -43,17 +45,19 @@ The tile contains the following buttons to modify the job:
 
 ![duplicate job](./images/common/duplicate-button.png) Opens the job editor with a duplicated job configuration.
 
-![run job](./images/job/run-button-dark.png) Runs the job.
+![run job](./images/job/run-job-button.png) Runs the job.
 
 The 'run job' button might be disabled for the following reasons, indicated by the button's icon:
 
-![run job disabled waiting](./images/job/run-button-dark-waiting.png) The job is waiting for a free execution slot.
+![run job disabled inactive](./images/job/run-job-button-inactive.png) The job is inactive.
 
-![run job disabled running](./images/job/run-button-dark-running.png) The job is already running.
+![run job disabled waiting](./images/job/run-job-button-waiting.png) The job is waiting for a free execution slot.
 
-![run job disabled active](./images/job/run-button-dark-active.png) The job is triggered by events and already active.
+![run job disabled running](./images/job/run-job-button-running.png) The job is already running.
 
-![run job disabled failed](./images/job/run-button-dark-failed.png) The job failed previously and is fault-intolerant.
+![run job disabled active](./images/job/run-job-button-active.png) The job is triggered by events and already active.
+
+![run job disabled failed](./images/job/run-job-button-failed.png) The job failed previously and is fault-intolerant.
 
 Information about the last job execution is displayed at the bottom of the job tile.
 You can open detailed information by clicking on it. 

@@ -1,23 +1,26 @@
 <template>
     <core-container class="wrap">
 
-        <action-bar>
+        <action-bar data-e2e="job-overview-action-bar">
             <div slot="left" class="action-bar-container">
-                <input-filter :filter-key="'job-name-filter'" :filter="filterJobName" :label="'Name filter:'"/>
-                <label id="state-filter-label">State filter:</label>
-                <toggle-button icon="circle-notch"
-                               :label="'Running/Active (' + executionsOverview.numRunning + '/' + executionsOverview.numSlots + ')'"
-                               bgcolor="var(--color-foreground)" class="margin-right"
-                               fontcolor="var(--color-font)" v-on:selected="filterJobStateRunning"
-                               :selected="stateFilter.running"/>
-                <toggle-button icon="hourglass" :label="'Waiting (' + executionsOverview.numWaiting + ')'"
-                               bgcolor="var(--color-foreground)" class="margin-right"
-                               fontcolor="var(--color-font)" v-on:selected="filterJobStateWaiting"
-                               :selected="stateFilter.waiting"/>
-                <toggle-button icon="bolt" :label="'Failed (' + executionsOverview.numFailed + ')'"
-                               bgcolor="var(--color-alert)" class="margin-right"
-                               fontcolor="var(--color-font)" v-on:selected="filterJobStateFailed"
-                               :selected="stateFilter.failed"/>
+                <input-filter :filter-key="'job-name-filter'" :filter="filterJobName" :label="'Name filter:'"
+                              data-e2e="job-name-filter"/>
+                <div data-e2e="job-state-filter">
+                    <label id="state-filter-label">State filter:</label>
+                    <toggle-button icon="circle-notch"
+                                   :label="'Running/Active (' + executionsOverview.numRunning + '/' + executionsOverview.numSlots + ')'"
+                                   bgcolor="var(--color-foreground)" class="margin-right"
+                                   fontcolor="var(--color-font)" v-on:selected="filterJobStateRunning"
+                                   :selected="stateFilter.running"/>
+                    <toggle-button icon="hourglass" :label="'Waiting (' + executionsOverview.numWaiting + ')'"
+                                   bgcolor="var(--color-foreground)" class="margin-right"
+                                   fontcolor="var(--color-font)" v-on:selected="filterJobStateWaiting"
+                                   :selected="stateFilter.waiting"/>
+                    <toggle-button icon="bolt" :label="'Failed (' + executionsOverview.numFailed + ')'"
+                                   bgcolor="var(--color-alert)" class="margin-right"
+                                   fontcolor="var(--color-font)" v-on:selected="filterJobStateFailed"
+                                   :selected="stateFilter.failed"/>
+                </div>
             </div>
             <div slot="right">
                 <router-link :to="'job-editor'">
@@ -25,8 +28,9 @@
                                   data-e2e="add-job-button"/>
                 </router-link>
                 <input-button icon="file-upload" label="Import job" class="margin-right"
-                              v-on:clicked="openShowImportDialog"/>
-                <input-button icon="clipboard" label="Show schedule" v-on:clicked="openScheduleDialog"/>
+                              v-on:clicked="openShowImportDialog" data-e2e="import-job-button"/>
+                <input-button icon="clipboard" label="Show schedule" v-on:clicked="openScheduleDialog"
+                              data-e2e="show-schedule-button"/>
             </div>
         </action-bar>
 
@@ -41,16 +45,20 @@
                         <layout-row slot="menu">
                             <div slot="left">
                                 <input-button icon="trash" v-on:clicked="openDeleteJobDialog(job.id, job.name)"
-                                              class="margin-right"/>
+                                              class="margin-right"
+                                              :data-e2e="dataE2EName('delete-', job.name)"/>
                                 <input-button icon="file-download" v-on:clicked="openExportDialog(job.id, job.name)"
-                                              class="margin-right"/>
+                                              class="margin-right"
+                                              :data-e2e="dataE2EName('export-', job.name)"/>
                                 <input-button icon="clone" v-on:clicked="duplicateJob(job.id)"
-                                              class="margin-right"/>
+                                              class="margin-right"
+                                              :data-e2e="dataE2EName('duplicate-', job.name)"/>
                             </div>
                             <div slot="right">
-                                <input-button :icon="getJobPlayIcon(job)"
+                                <input-button :icon="getRunJobIcon(job)"
                                               v-on:clicked="openRunJobDialog(job.id, job.name)"
-                                              :disabled="isJobPlayDisabled(job)"/>
+                                              :disabled="isRunJobDisabled(job)"
+                                              :data-e2e="dataE2EName('run-', job.name)"/>
                             </div>
                         </layout-row>
                         <div slot="action" :class="isJobInState(job, ['FAILED']) ? 'alert' : 'info'">
@@ -133,7 +141,8 @@
             </layout-row>
         </modal-dialog>
 
-        <modal-dialog v-show="showExportDialog" @close="showExportDialog = false" v-on:cancel="showExportDialog = false">
+        <modal-dialog v-show="showExportDialog" @close="showExportDialog = false"
+                      v-on:cancel="showExportDialog = false">
             <h1 slot="header">Export job?</h1>
             <div slot="body">
                 <div class="paragraph">
@@ -177,7 +186,8 @@
                         v-on:last="loadSchedule(schedulePage.totalPages -1)"/>
         </modal-dialog>
 
-        <modal-dialog v-show="showImportDialog" @close="showImportDialog = false" v-on:cancel="showImportDialog = false">
+        <modal-dialog v-show="showImportDialog" @close="showImportDialog = false"
+                      v-on:cancel="showImportDialog = false">
             <h1 slot="header">Import data?</h1>
             <div slot="body">
                 <div class="paragraph">
@@ -311,7 +321,7 @@ export default {
             }
             return states.includes(job.execution.state);
         },
-        getJobPlayIcon: function (job) {
+        getRunJobIcon: function (job) {
             if (this.isJobInState(job, 'ACTIVE')) {
                 return 'sign-in-alt'
             } else if (this.isJobInState(job, 'WAITING')) {
@@ -323,9 +333,9 @@ export default {
             }
             return 'play';
         },
-        isJobPlayDisabled: function (job) {
+        isRunJobDisabled: function (job) {
             return (this.isJobInState(job, ['WAITING', 'RUNNING', 'ACTIVE'])
-                || (job.hasFailedExecutions && !job.faultTolerant));
+                || (job.hasFailedExecutions && !job.faultTolerant) || !job.active);
         },
         loadJobs: async function (page) {
             if (page === undefined) {
@@ -499,6 +509,9 @@ export default {
                 this.jobExecutionEventSource.close();
             }
             this.showExecutionDetailsDialog = false
+        },
+        dataE2EName: function (prefix, suffix) {
+            return prefix + Utils.toKebabCase(suffix);
         },
         initJobListEventSource: function () {
             if (this.jobListEventSource) {

@@ -63,6 +63,29 @@ class ActionProxyTest {
     }
 
     /**
+     * Tests the simulation limit configuration.
+     */
+    @Test
+    @DisplayName("Tests the simulation limit configuration.")
+    void testSimulationLimit() {
+        Action actionMock = mock(Action.class);
+        ActionProxy actionProxy = new ActionProxy(actionMock);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(DataKey.META.getKey(), Map.of(DataKey.SIMULATION_LIMIT.getKey(), 1));
+
+        JobExecution jobExecution = new JobExecution();
+
+        when(actionMock.process(anyMap(), eq(jobExecution))).thenReturn(List.of(data, data, data));
+
+        List<Map<String, Object>> resultData = actionProxy.process(data, jobExecution);
+        assertEquals(1, resultData.size());
+
+        resultData = actionProxy.process(data, jobExecution);
+        assertEquals(0, resultData.size());
+    }
+
+    /**
      * Tests exception handling during processing.
      */
     @Test

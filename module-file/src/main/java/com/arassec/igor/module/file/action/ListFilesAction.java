@@ -12,7 +12,6 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,13 +46,6 @@ public class ListFilesAction extends BaseFileAction {
     private String fileEnding;
 
     /**
-     * Limits the data items during simulated job executions.
-     */
-    @Positive
-    @IgorParam(advanced = true, defaultValue = "25")
-    private int simulationLimit;
-
-    /**
      * Creates a new component instance.
      */
     public ListFilesAction() {
@@ -74,10 +66,6 @@ public class ListFilesAction extends BaseFileAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         List<FileInfo> fileInfos = source.listFiles(directory, fileEnding);
-
-        if (isSimulation(data) && fileInfos.size() > simulationLimit) {
-            fileInfos = fileInfos.subList(0, simulationLimit);
-        }
 
         if (!directory.endsWith("/")) {
             directory += "/";

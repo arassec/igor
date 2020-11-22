@@ -43,7 +43,7 @@ class BaseActionTest {
         Trigger triggerMock = mock(Trigger.class);
         when(triggerMock.getMetaData()).thenReturn(Map.of(DataKey.SIMULATION.getKey(), true));
 
-        Map<String, Object> meta = Job.createMetaData("job-id", triggerMock);
+        Map<String, Object> meta = Job.createMetaData("job-id", triggerMock, 25);
         Map<String, Object> data = new HashMap<>();
 
         testData.put(DataKey.META.getKey(), meta);

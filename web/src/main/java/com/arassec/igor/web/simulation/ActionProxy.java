@@ -31,6 +31,11 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     /**
+     * Keeps track of the number of processed data items to limit them according to the simulation limit configuration.
+     */
+    private int processed;
+
+    /**
      * Creates a new proxy instance.
      *
      * @param delegate The proxied action.
@@ -50,12 +55,30 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         try {
+
+            int simulationLimit = -1;
+            processed++;
+            if (data.containsKey(DataKey.META.getKey())) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> metaData = (Map<String, Object>) data.get(DataKey.META.getKey());
+                if (metaData.containsKey(DataKey.SIMULATION_LIMIT.getKey())) {
+                    simulationLimit = (int) metaData.get(DataKey.SIMULATION_LIMIT.getKey());
+                    if (processed > simulationLimit) {
+                        return List.of();
+                    }
+                }
+            }
+
             data.remove(DataKey.SIMULATION_LOG.getKey());
             List<Map<String, Object>> resultData = delegate.process(data, jobExecution);
-            if (resultData != null) {
-                collectedData.addAll(objectMapper.readValue(objectMapper.writeValueAsString(resultData), new TypeReference<>() {
-                }));
+
+            if (simulationLimit > 0 && resultData.size() > simulationLimit) {
+                resultData = resultData.subList(0, simulationLimit);
             }
+
+            collectedData.addAll(objectMapper.readValue(objectMapper.writeValueAsString(resultData), new TypeReference<>() {
+            }));
+
             return resultData;
         } catch (Exception e) {
             setErrorCause(StacktraceFormatter.format(e));
@@ -152,6 +175,7 @@ public class ActionProxy extends BaseProxy<Action> implements Action {
      */
     @Override
     public void reset() {
+        processed = 0;
         delegate.reset();
     }
 

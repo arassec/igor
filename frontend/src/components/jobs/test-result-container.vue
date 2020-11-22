@@ -1,6 +1,6 @@
 <template>
     <core-content>
-        <div class="test-result-container">
+        <div class="test-result-container" data-e2e="job-editor-simulation-results">
             <layout-row>
                 <div slot="left">
                     <h1>Simulation results</h1>
@@ -34,42 +34,42 @@ export default {
     components: {CoreContent, InputButton, LayoutRow},
     props: ['selectedTestResults'],
     methods: {
-      format: function (code) {
-        return JSON.stringify(code, null, 2)
-      }
+        format: function (code) {
+            return JSON.stringify(code, null, 2)
+        }
     }
-  }
+}
 </script>
 
 <style scoped>
 
-    .content {
-        z-index: 2;
-        flex-grow: 2;
-        margin-right: 0;
-        overflow: hidden;
-    }
+.content {
+    z-index: 2;
+    flex-grow: 2;
+    margin-right: 0;
+    overflow: hidden;
+}
 
-    .test-result-container {
-        color: var(--color-font);
-        background-color: var(--color-background);
-        padding: 1em;
-    }
+.test-result-container {
+    color: var(--color-font);
+    background-color: var(--color-background);
+    padding: 1em;
+}
 
-    pre {
-        overflow: auto;
-        height: auto;
-        word-break: normal !important;
-        word-wrap: normal !important;
-        white-space: pre !important;
-    }
+pre {
+    overflow: auto;
+    height: auto;
+    word-break: normal !important;
+    word-wrap: normal !important;
+    white-space: pre !important;
+}
 
-    .normal-bg {
-        background-color: var(--color-foreground)
-    }
+.normal-bg {
+    background-color: var(--color-foreground)
+}
 
-    .error-bg {
-        background-color: var(--color-alert)
-    }
+.error-bg {
+    background-color: var(--color-alert)
+}
 
 </style>

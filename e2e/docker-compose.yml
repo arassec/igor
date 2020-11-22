@@ -1,6 +1,13 @@
 version: "3"
 
 services:
+  igor:
+    image: "arassec/igor"
+    container_name: "igor"
+    ports:
+      - "9090:8080"
+    networks:
+      - igor-e2e
   rabbitmq:
     image: "rabbitmq:3-management-alpine"
     container_name: "igor-rabbitmq"
@@ -10,6 +17,8 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=igor
       - RABBITMQ_DEFAULT_PASS=igor
+    networks:
+      - igor-e2e
   nginx:
     image: "nginx:stable-alpine"
     container_name: "igor-nginx"
@@ -20,21 +29,39 @@ services:
       - ./environment/nginx/webdata:/usr/share/nginx/html:ro
       - ./environment/nginx/ssl:/etc/nginx/certs
       - ./environment/nginx/conf:/etc/nginx/conf.d
+    networks:
+      - igor-e2e
   vsftpd:
     image: "fauria/vsftpd"
     container_name: "igor-vsftpd"
     ports:
+      - "20:20"
       - "21:21"
+      - "21100-21110:21100-21110"
     volumes:
       - ./environment/vsftpd:/home/vsftpd
     environment:
       - FTP_USER=igor
       - FTP_PASS=igor
       - LOCAL_UMASK=0777
-  igor:
-    image: "arassec/igor"
-    container_name: "igor"
+      - PASV_MIN_PORT=21100
+      - PASV_MAX_PORT=21110
+    networks:
+      - igor-e2e
+  sshd:
+    image: "panubo/sshd:1.3.0"
+    container_name: "igor-sshd"
     ports:
-      - "8080:8080"
+      - "22:22"
     volumes:
-      - ../dbdata:/dbdata:rw
+      - ./environment/sshd/entrypoint:/etc/entrypoint.d:ro
+    environment:
+      - SSH_ENABLE_PASSWORD_AUTH=true
+      - SSH_USERS=igor:1000:1000:/bin/bash
+    networks:
+      - igor-e2e
+
+networks:
+  igor-e2e:
+    name: igor-e2e
+    driver: bridge

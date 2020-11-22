@@ -1,5 +1,5 @@
 <template>
-    <div class="sticky max-width" v-if="jobConfiguration">
+    <div class="sticky max-width" v-if="jobConfiguration" data-e2e="job-configurator">
 
         <core-panel>
             <layout-row>
@@ -14,7 +14,8 @@
                     <div class="td"><label>Active</label></div>
                     <div class="td align-left">
                         <font-awesome-icon :icon="jobConfiguration.active ? 'check-square' : 'square'"
-                                           v-on:click="jobConfiguration.active = !jobConfiguration.active"/>
+                                           v-on:click="jobConfiguration.active = !jobConfiguration.active"
+                                           data-e2e="job-active-button"/>
                     </div>
                 </div>
                 <div class="tr">
@@ -27,17 +28,28 @@
                     </div>
                 </div>
                 <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
-                    <div class="td"><label for="description-input">Description</label></div>
+                    <div class="text-top td"><label for="description-input">Description</label></div>
                     <div class="td">
-                        <input id="description-input" type="text" autocomplete="off"
-                               v-model="jobConfiguration.description"/>
+                        <textarea rows="8" cols="35" id="description-input" autocomplete="off"
+                                  v-model="jobConfiguration.description" class="textarea"/>
                     </div>
                 </div>
                 <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
                     <div class="td"><label for="numexechistory-input">History Limit</label></div>
                     <div class="td">
-                        <input id="numexechistory-input" type="text" autocomplete="off"
-                               v-model.number="jobConfiguration.historyLimit"/>
+                        <input-validated id="numexechistory-input" :type="'text'"
+                                         :parent-id="jobConfiguration.id" :property-id="'historyLimit'"
+                                         :validation-errors="validationErrors"
+                                         v-model.number="jobConfiguration.historyLimit"/>
+                    </div>
+                </div>
+                <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
+                    <div class="td"><label for="numsimlimit-input">Simulation Limit</label></div>
+                    <div class="td">
+                        <input-validated id="numsimlimit-input" :type="text"
+                                         :parent-id="jobConfiguration.id" :property-id="'simulationLimit'"
+                                         :validation-errors="validationErrors"
+                                         v-model.number="jobConfiguration.simulationLimit"/>
                     </div>
                 </div>
                 <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
@@ -45,21 +57,23 @@
                     <div class="td align-left">
                         <font-awesome-icon id="faulttolerant-input"
                                            :icon="jobConfiguration.faultTolerant ? 'check-square' : 'square'"
-                                           v-on:click="jobConfiguration.faultTolerant = !jobConfiguration.faultTolerant"/>
+                                           v-on:click="jobConfiguration.faultTolerant = !jobConfiguration.faultTolerant"
+                                           data-e2e="job-faulttolerant-button"/>
                     </div>
                 </div>
                 <div class="tr">
                     <div class="td align-left">
-                        <font-awesome-icon class="arrow"
+                        <font-awesome-icon class="arrow" :class="arrowColor()"
                                            v-bind:icon="showAdvancedParameters ? 'chevron-up' : 'chevron-down'"
-                                           v-on:click="showAdvancedParameters = !showAdvancedParameters"/>
+                                           v-on:click="showAdvancedParameters = !showAdvancedParameters"
+                                           data-e2e="toggle-advanced-job-parameters"/>
                     </div>
                 </div>
             </div>
         </core-panel>
 
         <div>
-            <core-panel>
+            <core-panel class="spacer-top">
                 <layout-row>
                     <h2 slot="left">Trigger</h2>
                     <icon-button slot="right" icon="question"
@@ -97,7 +111,7 @@
                 </div>
             </core-panel>
 
-            <core-panel>
+            <core-panel class="spacer-top">
                 <h2>Trigger Parameters</h2>
                 <div v-if="jobConfiguration.trigger.parameters.length">
                     <parameter-editor
@@ -186,6 +200,13 @@ export default {
                 }
             }
             return false;
+        },
+        arrowColor: function () {
+            if (this.validationErrors && this.jobConfiguration.id in this.validationErrors
+                && (('historyLimit' in this.validationErrors[this.jobConfiguration.id]) || ('simulationLimit' in this.validationErrors[this.jobConfiguration.id]))) {
+                return 'arrow-alert';
+            }
+            return '';
         }
     },
     async mounted() {
@@ -200,6 +221,20 @@ export default {
 
 .arrow:hover {
     cursor: pointer;
+}
+
+.arrow-alert {
+    color: var(--color-alert);
+}
+
+.textarea {
+    width: 100%;
+    height: 100%;
+    resize: vertical;
+}
+
+.text-top {
+    vertical-align: top;
 }
 
 </style>

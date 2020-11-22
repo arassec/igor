@@ -228,4 +228,8 @@ export default {
         text-align: left;
     }
 
+    .spacer-top {
+        border-top: .1em solid var(--color-font);
+    }
+
 </style>
