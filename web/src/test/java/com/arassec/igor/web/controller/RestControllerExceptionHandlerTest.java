@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
  * Tests the {@link RestControllerExceptionHandler}.
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Controler exception handling tests.")
+@DisplayName("Controller exception handling tests.")
 class RestControllerExceptionHandlerTest {
 
     /**
@@ -42,6 +42,9 @@ class RestControllerExceptionHandlerTest {
      */
     private RestControllerExceptionHandler exceptionHandler;
 
+    /**
+     * Initializes the test environment.
+     */
     @BeforeEach
     void initialize() {
         exceptionHandler = new RestControllerExceptionHandler(new ObjectMapper(),

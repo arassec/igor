@@ -63,5 +63,4 @@ services:
 
 networks:
   igor-e2e:
-    name: igor-e2e
     driver: bridge
