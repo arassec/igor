@@ -108,7 +108,7 @@
                     name="animate-css-transition"
                     enter-active-class="animated slideInRight"
                     leave-active-class="animated slideOutRight">
-            <test-result-container v-show="showTestResults && testResults != null"
+            <simulation-result-container v-show="showTestResults && testResults != null"
                                    v-on:close="closeTestResults"
                                    v-bind:selected-test-results="selectedTestResults"/>
         </transition>
@@ -121,7 +121,8 @@
                                      v-on:close="closeDocumentation"/>
         </transition>
 
-        <job-execution-details v-show="showExecutionDetailsDialog"
+        <job-execution-details v-if="selectedJobExecution"
+                               v-show="showExecutionDetailsDialog"
                                v-bind:job-execution="selectedJobExecution"
                                v-on:close="closeExecutionDetailsDialog()"/>
 
@@ -208,7 +209,7 @@ import ActionConfigurator from '../components/jobs/action-configurator'
 import ModalDialog from '../components/common/modal-dialog'
 import LayoutRow from '../components/common/layout-row'
 import InputButton from '../components/common/input-button'
-import TestResultContainer from '../components/jobs/test-result-container'
+import SimulationResultContainer from '../components/jobs/simulation-result-container'
 import SideMenu from '../components/common/side-menu'
 import FeedbackBox from '../components/common/feedback-box'
 import JobExecutionDetails from '../components/jobs/job-execution-details'
@@ -232,7 +233,7 @@ export default {
         JobExecutionDetails,
         FeedbackBox,
         SideMenu,
-        TestResultContainer,
+        SimulationResultContainer,
         InputButton,
         LayoutRow,
         ModalDialog,

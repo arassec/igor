@@ -82,3 +82,7 @@ On the right of the page, the simulation results are displayed.
 ![job editor simulation results](./images/job/job-editor-simulation-results.png)
 
 Each data item of the simulated job run is shown as it is supplied to the selected component.
+
+By clicking on keys in the result JSON, a mustache template for the respective key is entered into the input above the simulation results.
+
+A click on ![copy to clipboard button](./images/job/copy-to-clipboard-button.png) copies the mustache template to the clipboard.

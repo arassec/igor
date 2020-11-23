@@ -82,7 +82,7 @@ describe('Creates user doc job images.', () => {
                 .screenshot(targetDir + 'job-overview-action-bar');
         });
 
-        it('Create job-name-filter.png and job-state-filter.png', function() {
+        it('Create job-name-filter.png and job-state-filter.png', function () {
             cy.openJobOverview();
 
             cy.get('[data-e2e=job-name-filter]')
@@ -374,6 +374,15 @@ describe('Creates user doc job images.', () => {
 
             cy.deleteJob(jobName, jobKebap)
         });
-    });
 
+        it.only('Create copy-to-clipboard.png', function () {
+            cy.openJobEditor(jobCopyNewFilesKebap);
+
+            cy.simulateJob();
+
+            cy.get('[data-e2e=copy-to-clipboard-button]')
+                .should('be.visible')
+                .screenshot(targetDir + 'copy-to-clipboard-button')
+        });
+    });
 });

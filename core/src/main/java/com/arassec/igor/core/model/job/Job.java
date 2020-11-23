@@ -111,8 +111,9 @@ public class Job {
     /**
      * Creates the meta-data part of a data item.
      *
-     * @param jobId   The job's ID.
-     * @param trigger The job's trigger.
+     * @param jobId           The job's ID.
+     * @param trigger         The job's trigger.
+     * @param simulationLimit Maximum number of simulation results that should be processed by any action.
      *
      * @return The meta-data for the job run.
      */

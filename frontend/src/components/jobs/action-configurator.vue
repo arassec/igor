@@ -25,9 +25,9 @@
                 </div>
                 <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
                     <div class="td"><label for="description-input">Description</label></div>
-                    <div class="td">
-                        <input id="description-input" type="text" autocomplete="off"
-                               v-model="action.description"/>
+                    <div class="text-top td">
+                        <textarea rows="8" cols="35" id="description-input" autocomplete="off"
+                                  v-model="action.description" class="textarea"/>
                     </div>
                 </div>
                 <div class="tr">
@@ -193,6 +193,16 @@ export default {
 
 .arrow:hover {
     cursor: pointer;
+}
+
+.textarea {
+    width: 100%;
+    height: 100%;
+    resize: vertical;
+}
+
+.text-top {
+    vertical-align: top;
 }
 
 </style>

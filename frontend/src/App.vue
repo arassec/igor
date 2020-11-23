@@ -154,10 +154,6 @@ export default {
         background-color: var(--color-alert);
     }
 
-    .shadow {
-        box-shadow: .1em .1em .25em 0 rgba(163, 163, 163, 0.75);
-    }
-
     .disabled {
         opacity: .5;
     }

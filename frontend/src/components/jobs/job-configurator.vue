@@ -21,7 +21,7 @@
                 <div class="tr">
                     <div class="td"><label for="name">Name*</label></div>
                     <div class="td">
-                        <input-validated id="name" :type="'text'" v-model="jobConfiguration.name"
+                        <input-validated id="name" type="text" v-model="jobConfiguration.name"
                                          :parent-id="jobConfiguration.id" :property-id="'name'"
                                          :validation-errors="validationErrors"
                                          data-e2e="job-name-input"/>
@@ -37,7 +37,7 @@
                 <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
                     <div class="td"><label for="numexechistory-input">History Limit</label></div>
                     <div class="td">
-                        <input-validated id="numexechistory-input" :type="'text'"
+                        <input-validated id="numexechistory-input" type="text"
                                          :parent-id="jobConfiguration.id" :property-id="'historyLimit'"
                                          :validation-errors="validationErrors"
                                          v-model.number="jobConfiguration.historyLimit"/>
@@ -46,7 +46,7 @@
                 <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
                     <div class="td"><label for="numsimlimit-input">Simulation Limit</label></div>
                     <div class="td">
-                        <input-validated id="numsimlimit-input" :type="text"
+                        <input-validated id="numsimlimit-input" type="text"
                                          :parent-id="jobConfiguration.id" :property-id="'simulationLimit'"
                                          :validation-errors="validationErrors"
                                          v-model.number="jobConfiguration.simulationLimit"/>

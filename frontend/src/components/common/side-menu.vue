@@ -1,6 +1,6 @@
 <template>
     <core-content class="side-menu">
-        <div data-e2e="side-menu">
+        <div data-e2e="side-menu" class="sticky">
             <core-panel v-if="hasHeaderSlot">
                 <h1 class="no-margin">
                     <slot name="title"/>
@@ -46,12 +46,6 @@ export default {
     padding-top: 1.5em;
     z-index: 666;
     background-color: var(--color-background);
-}
-
-.sticky {
-    z-index: 5;
-    position: sticky;
-    top: 0;
 }
 
 </style>

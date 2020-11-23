@@ -211,7 +211,8 @@
             </layout-row>
         </modal-dialog>
 
-        <job-execution-details v-show="showExecutionDetailsDialog"
+        <job-execution-details v-if="selectedJobExecution"
+                               v-show="showExecutionDetailsDialog"
                                v-bind:job-execution="selectedJobExecution"
                                v-on:close="closeExecutionDetailsDialog()"/>
 

@@ -1,0 +1,446 @@
+{
+  "id": "762ba709-0300-4e04-8087-bb02b59cf491",
+  "name": "Copy New Files",
+  "active": true,
+  "historyLimit": 5,
+  "simulationLimit": 25,
+  "trigger": {
+    "id": "57c64e6a-4185-401a-9a73-6507eb3bf784",
+    "category": {
+      "key": "util-triggers",
+      "value": "Util"
+    },
+    "type": {
+      "key": "cron-trigger",
+      "value": "CRON",
+      "documentationAvailable": true
+    },
+    "parameters": [
+      {
+        "name": "cronExpression",
+        "subtype": "CRON",
+        "type": "java.lang.String",
+        "value": "0 */15 * * * *",
+        "connector": false
+      },
+      {
+        "name": "metaData",
+        "advanced": true,
+        "subtype": "MULTI_LINE",
+        "type": "java.lang.String",
+        "value": null,
+        "connector": false
+      },
+      {
+        "name": "data",
+        "advanced": true,
+        "subtype": "MULTI_LINE",
+        "type": "java.lang.String",
+        "value": null,
+        "connector": false
+      }
+    ]
+  },
+  "actions": [
+    {
+      "id": "7effe07f-2f9f-437d-87a2-1b6a34a3501f",
+      "name": "List Files",
+      "description": "",
+      "active": true,
+      "category": {
+        "key": "file-actions",
+        "value": "File"
+      },
+      "type": {
+        "key": "list-files-action",
+        "value": "List Files",
+        "documentationAvailable": true
+      },
+      "parameters": [
+        {
+          "name": "source",
+          "required": true,
+          "categoryCandidates": [
+            {
+              "key": "file-connectors",
+              "value": "File",
+              "typeCandidates": [
+                {
+                  "key": "ftp-file-connector",
+                  "value": "FTP"
+                },
+                {
+                  "key": "ftps-file-connector",
+                  "value": "FTPS"
+                },
+                {
+                  "key": "localfs-file-connector",
+                  "value": "Filesystem"
+                },
+                {
+                  "key": "http-file-connector",
+                  "value": "HTTP"
+                },
+                {
+                  "key": "https-file-connector",
+                  "value": "HTTPS"
+                },
+                {
+                  "key": "scp-file-connector",
+                  "value": "SCP"
+                },
+                {
+                  "key": "sftp-file-connector",
+                  "value": "SFTP"
+                }
+              ]
+            }
+          ],
+          "value": "53fb172f-a8b6-4a9c-8cac-8b1c59efd565",
+          "connectorName": "FTP Server",
+          "connector": true
+        },
+        {
+          "name": "directory",
+          "required": true,
+          "type": "java.lang.String",
+          "value": ".",
+          "connector": false
+        },
+        {
+          "name": "fileEnding",
+          "advanced": true,
+          "type": "java.lang.String",
+          "value": "txt",
+          "connector": false
+        }
+      ]
+    },
+    {
+      "id": "109e73c4-65c6-41f3-ae32-1638f38930a1",
+      "name": "Filename Filter",
+      "description": "",
+      "active": true,
+      "category": {
+        "key": "util-actions",
+        "value": "Util"
+      },
+      "type": {
+        "key": "filter-by-regexp-action",
+        "value": "Filter by Regular Expression",
+        "documentationAvailable": true
+      },
+      "parameters": [
+        {
+          "name": "input",
+          "required": true,
+          "type": "java.lang.String",
+          "value": "{{data.filename}}",
+          "connector": false
+        },
+        {
+          "name": "expression",
+          "required": true,
+          "type": "java.lang.String",
+          "value": ".*backup.*",
+          "connector": false
+        },
+        {
+          "name": "dropMatching",
+          "advanced": true,
+          "required": true,
+          "type": "boolean",
+          "value": true,
+          "connector": false
+        },
+        {
+          "name": "numThreads",
+          "advanced": true,
+          "required": true,
+          "type": "int",
+          "value": 1,
+          "connector": false
+        }
+      ]
+    },
+    {
+      "id": "eb0a0bb3-7129-4999-bebb-5d73a8432ce2",
+      "name": "Filter Already Copied Files",
+      "description": "",
+      "active": true,
+      "category": {
+        "key": "persistence-actions",
+        "value": "Persistence"
+      },
+      "type": {
+        "key": "filter-persisted-value-action",
+        "value": "Filter Persisted Value",
+        "documentationAvailable": true
+      },
+      "parameters": [
+        {
+          "name": "input",
+          "required": true,
+          "type": "java.lang.String",
+          "value": "{{data.filename}}",
+          "connector": false
+        },
+        {
+          "name": "numThreads",
+          "advanced": true,
+          "required": true,
+          "type": "int",
+          "value": 1,
+          "connector": false
+        }
+      ]
+    },
+    {
+      "id": "57cf28e3-4034-448c-b02b-589e59884f26",
+      "name": "Copy File",
+      "description": "",
+      "active": true,
+      "category": {
+        "key": "file-actions",
+        "value": "File"
+      },
+      "type": {
+        "key": "copy-file-action",
+        "value": "Copy File",
+        "documentationAvailable": true
+      },
+      "parameters": [
+        {
+          "name": "source",
+          "required": true,
+          "categoryCandidates": [
+            {
+              "key": "file-connectors",
+              "value": "File",
+              "typeCandidates": [
+                {
+                  "key": "ftp-file-connector",
+                  "value": "FTP"
+                },
+                {
+                  "key": "ftps-file-connector",
+                  "value": "FTPS"
+                },
+                {
+                  "key": "localfs-file-connector",
+                  "value": "Filesystem"
+                },
+                {
+                  "key": "http-file-connector",
+                  "value": "HTTP"
+                },
+                {
+                  "key": "https-file-connector",
+                  "value": "HTTPS"
+                },
+                {
+                  "key": "scp-file-connector",
+                  "value": "SCP"
+                },
+                {
+                  "key": "sftp-file-connector",
+                  "value": "SFTP"
+                }
+              ]
+            }
+          ],
+          "value": "53fb172f-a8b6-4a9c-8cac-8b1c59efd565",
+          "connectorName": "FTP Server",
+          "connector": true
+        },
+        {
+          "name": "sourceDirectory",
+          "required": true,
+          "type": "java.lang.String",
+          "value": "{{data.directory}}",
+          "connector": false
+        },
+        {
+          "name": "sourceFilename",
+          "required": true,
+          "type": "java.lang.String",
+          "value": "{{data.filename}}",
+          "connector": false
+        },
+        {
+          "name": "target",
+          "required": true,
+          "categoryCandidates": [
+            {
+              "key": "file-connectors",
+              "value": "File",
+              "typeCandidates": [
+                {
+                  "key": "ftp-file-connector",
+                  "value": "FTP"
+                },
+                {
+                  "key": "ftps-file-connector",
+                  "value": "FTPS"
+                },
+                {
+                  "key": "localfs-file-connector",
+                  "value": "Filesystem"
+                },
+                {
+                  "key": "http-file-connector",
+                  "value": "HTTP"
+                },
+                {
+                  "key": "https-file-connector",
+                  "value": "HTTPS"
+                },
+                {
+                  "key": "scp-file-connector",
+                  "value": "SCP"
+                },
+                {
+                  "key": "sftp-file-connector",
+                  "value": "SFTP"
+                }
+              ]
+            }
+          ],
+          "value": "393e61c8-ddc9-453b-a769-ce2a232f5b78",
+          "connectorName": "SCP Connector",
+          "connector": true
+        },
+        {
+          "name": "targetDirectory",
+          "required": true,
+          "type": "java.lang.String",
+          "value": "/tmp/",
+          "connector": false
+        },
+        {
+          "name": "targetFilename",
+          "required": true,
+          "type": "java.lang.String",
+          "value": "{{data.filename}}",
+          "connector": false
+        },
+        {
+          "name": "appendTransferSuffix",
+          "advanced": true,
+          "required": true,
+          "type": "boolean",
+          "value": true,
+          "connector": false
+        },
+        {
+          "name": "appendFiletypeSuffix",
+          "advanced": true,
+          "required": true,
+          "type": "boolean",
+          "value": false,
+          "connector": false
+        },
+        {
+          "name": "numThreads",
+          "advanced": true,
+          "required": true,
+          "type": "int",
+          "value": 1,
+          "connector": false
+        }
+      ]
+    },
+    {
+      "id": "65f4a5b4-d980-4fef-8529-b4a5e973cb9f",
+      "name": "Send Message",
+      "description": "",
+      "active": true,
+      "category": {
+        "key": "message-actions",
+        "value": "Message"
+      },
+      "type": {
+        "key": "send-message-action",
+        "value": "Send Message",
+        "documentationAvailable": true
+      },
+      "parameters": [
+        {
+          "name": "messageConnector",
+          "required": true,
+          "categoryCandidates": [
+            {
+              "key": "message-connectors",
+              "value": "Message",
+              "typeCandidates": [
+                {
+                  "key": "rabbitmq-message-connector",
+                  "value": "RabbitMQ"
+                }
+              ]
+            }
+          ],
+          "value": "8b3f06ac-35e0-4ef5-9ce9-8e1af413923b",
+          "connectorName": "RabbitMQ Server",
+          "connector": true
+        },
+        {
+          "name": "messageTemplate",
+          "subtype": "MULTI_LINE",
+          "type": "java.lang.String",
+          "value": "{\n  \"file\": \"{{data.filename}}\"\n}",
+          "connector": false
+        },
+        {
+          "name": "numThreads",
+          "advanced": true,
+          "required": true,
+          "type": "int",
+          "value": 1,
+          "connector": false
+        }
+      ]
+    },
+    {
+      "id": "a9cbdedb-28be-4730-9e00-3a47438f32a8",
+      "name": "Save Filename",
+      "description": "",
+      "active": true,
+      "category": {
+        "key": "persistence-actions",
+        "value": "Persistence"
+      },
+      "type": {
+        "key": "persist-value-action",
+        "value": "Persist Value",
+        "documentationAvailable": true
+      },
+      "parameters": [
+        {
+          "name": "input",
+          "required": true,
+          "type": "java.lang.String",
+          "value": "{{data.filename}}",
+          "connector": false
+        },
+        {
+          "name": "numValuesToKeep",
+          "required": true,
+          "type": "int",
+          "value": 5000,
+          "connector": false
+        },
+        {
+          "name": "numThreads",
+          "advanced": true,
+          "required": true,
+          "type": "int",
+          "value": 1,
+          "connector": false
+        }
+      ]
+    }
+  ],
+  "running": false,
+  "faultTolerant": true
+}

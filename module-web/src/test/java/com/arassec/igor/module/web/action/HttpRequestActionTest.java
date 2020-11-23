@@ -42,14 +42,14 @@ class HttpRequestActionTest {
     @DisplayName("Tests initializing the action.")
     void testInitialize() {
         HttpRequestAction action = new HttpRequestAction();
-        action.setHeaders("a=b\nc=d\nalpha\r\ne=f");
+        action.setHeaders("a: b\nc:d\nalpha\r\ne:f");
 
         action.initialize("job-id", new JobExecution());
 
         assertEquals(3, action.getParsedHeaders().size());
-        assertEquals("a=b", action.getParsedHeaders().get(0));
-        assertEquals("c=d", action.getParsedHeaders().get(1));
-        assertEquals("e=f", action.getParsedHeaders().get(2));
+        assertEquals("a: b", action.getParsedHeaders().get(0));
+        assertEquals("c:d", action.getParsedHeaders().get(1));
+        assertEquals("e:f", action.getParsedHeaders().get(2));
     }
 
     /**
@@ -81,7 +81,7 @@ class HttpRequestActionTest {
         action.setHttpConnector(httpConnector);
         action.setUrl("http://localhost:" + httpServer.port() + "/test");
         action.setMethod("POST");
-        action.setHeaders("X-Igor-Test={{variable}}");
+        action.setHeaders("X-Igor-Test: {{variable}}");
         action.setBody("The POST request body: {{variable}}");
         action.setTargetKey("webResponse");
 

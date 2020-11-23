@@ -131,7 +131,7 @@ public class HttpRequestAction extends BaseAction {
         if (StringUtils.hasText(headers)) {
             String[] headerParts = headers.split("\\r?\\n");
             for (String header : headerParts) {
-                if (header.contains("=")) {
+                if (header.contains(":")) {
                     parsedHeaders.add(header);
                 }
             }
@@ -150,8 +150,8 @@ public class HttpRequestAction extends BaseAction {
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
                 .uri(URI.create(requestUrl))
                 .method(this.method, HttpRequest.BodyPublishers.ofString(content));
-        parsedHeaders.forEach(header -> httpRequestBuilder.header(getString(data, header.split("=")[0]),
-                getString(data, header.split("=")[1])));
+        parsedHeaders.forEach(header -> httpRequestBuilder.header(getString(data, header.split(":")[0]),
+                getString(data, header.split(":")[1])));
         addBasicAuthHeaderIfConfigured(httpRequestBuilder);
 
         if (isSimulation(data) && simulationSafe && SIMULATION_UNSAFE_METHODS.contains(method)) {

@@ -1,6 +1,9 @@
 # Changelog
 
 ## Version {{ $themeConfig.igorVersion }}
+- Added 'mustache-selector' for JSON simulation results.
+
+## Version 0.2.4
 - Added E2E tests with Cypress
 - Fixed missing 'Import connector' functionality
 - Fixed detecting changes in connector configurator.
