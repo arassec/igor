@@ -11,6 +11,7 @@ import com.arassec.igor.persistence.dao.ConnectorDao;
 import com.arassec.igor.persistence.dao.JobConnectorReferenceDao;
 import com.arassec.igor.persistence.dao.JobDao;
 import com.arassec.igor.persistence.entity.JobConnectorReferenceEntity;
+import com.arassec.igor.persistence.entity.JobConnectorReferenceView;
 import com.arassec.igor.persistence.entity.JobEntity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -224,13 +225,10 @@ public class JdbcJobRepository implements JobRepository {
     public Set<Pair<String, String>> findReferencedConnectors(String jobId) {
         Set<Pair<String, String>> result = new HashSet<>();
 
-        List<JobConnectorReferenceEntity> connectorReferences = jobConnectorReferenceDao.findByJobId(jobId);
+        List<JobConnectorReferenceView> connectorReferences = jobConnectorReferenceDao.findByJobId(jobId);
         if (connectorReferences != null) {
-            connectorReferences.forEach(connectorReference -> {
-                String connectorId = connectorReference.getJobConnectorReferenceIdentity().getConnectorId();
-                String connectorName = connectorDao.findNameById(connectorId);
-                result.add(new Pair<>(connectorId, connectorName));
-            });
+            connectorReferences.forEach(connectorReference ->
+                    result.add(new Pair<>(connectorReference.getConnectorId(), connectorReference.getConnectorName())));
         }
 
         return result;

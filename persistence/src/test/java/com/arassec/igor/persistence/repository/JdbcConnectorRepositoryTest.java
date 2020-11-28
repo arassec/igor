@@ -5,10 +5,8 @@ import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.persistence.dao.ConnectorDao;
 import com.arassec.igor.persistence.dao.JobConnectorReferenceDao;
-import com.arassec.igor.persistence.dao.JobDao;
 import com.arassec.igor.persistence.entity.ConnectorEntity;
-import com.arassec.igor.persistence.entity.JobConnectorReferenceEntity;
-import com.arassec.igor.persistence.entity.JobConnectorReferenceIdentity;
+import com.arassec.igor.persistence.entity.JobConnectorReferenceView;
 import com.arassec.igor.persistence.test.TestConnector;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,11 +43,6 @@ class JdbcConnectorRepositoryTest {
     private ConnectorDao connectorDao;
 
     /**
-     * The DAO for jobs.
-     */
-    private JobDao jobDao;
-
-    /**
      * DAO for job-connector-references.
      */
     private JobConnectorReferenceDao jobConnectorReferenceDao;
@@ -64,11 +57,10 @@ class JdbcConnectorRepositoryTest {
      */
     @BeforeEach
     void initialize() {
-        jobDao = mock(JobDao.class);
         connectorDao = mock(ConnectorDao.class);
         jobConnectorReferenceDao = mock(JobConnectorReferenceDao.class);
         persistenceConnectorMapper = mock(ObjectMapper.class);
-        repository = new JdbcConnectorRepository(connectorDao, jobDao, jobConnectorReferenceDao, persistenceConnectorMapper);
+        repository = new JdbcConnectorRepository(connectorDao, jobConnectorReferenceDao, persistenceConnectorMapper);
     }
 
     /**
@@ -296,17 +288,16 @@ class JdbcConnectorRepositoryTest {
     void testFindReferencingJobs() {
         assertNotNull(repository.findReferencingJobs(null, 1, 2));
 
-        JobConnectorReferenceEntity entity = new JobConnectorReferenceEntity();
-        entity.setJobConnectorReferenceIdentity(new JobConnectorReferenceIdentity("job-id", "connector-id"));
+        JobConnectorReferenceView entity = mock(JobConnectorReferenceView.class);
+        when(entity.getJobId()).thenReturn("job-id");
+        when(entity.getJobName()).thenReturn("job-name");
 
         @SuppressWarnings("unchecked")
-        Page<JobConnectorReferenceEntity> page = mock(Page.class);
+        Page<JobConnectorReferenceView> page = mock(Page.class);
         when(page.hasContent()).thenReturn(true);
         when(page.get()).thenReturn(Stream.of(entity));
 
         when(jobConnectorReferenceDao.findByConnectorId(eq("connector-id"), any(Pageable.class))).thenReturn(page);
-
-        when(jobDao.findNameById(eq("job-id"))).thenReturn("job-name");
 
         ModelPage<Pair<String, String>> referencingJobs = repository.findReferencingJobs("connector-id", 1, 2);
 

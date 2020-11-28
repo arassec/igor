@@ -6,12 +6,12 @@ import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.persistence.dao.ConnectorDao;
 import com.arassec.igor.persistence.dao.JobConnectorReferenceDao;
-import com.arassec.igor.persistence.dao.JobDao;
 import com.arassec.igor.persistence.entity.ConnectorEntity;
-import com.arassec.igor.persistence.entity.JobConnectorReferenceEntity;
+import com.arassec.igor.persistence.entity.JobConnectorReferenceView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 /**
  * {@link ConnectorRepository} implementation that uses JDBC to persist {@link Connector}s.
  */
+@Slf4j
 @Component
 @Transactional
 @RequiredArgsConstructor
@@ -43,11 +44,6 @@ public class JdbcConnectorRepository implements ConnectorRepository {
      * The DAO for connectors.
      */
     private final ConnectorDao connectorDao;
-
-    /**
-     * The DAO for jobs.
-     */
-    private final JobDao jobDao;
 
     /**
      * DAO for job-connector-references.
@@ -203,13 +199,12 @@ public class JdbcConnectorRepository implements ConnectorRepository {
      */
     @Override
     public ModelPage<Pair<String, String>> findReferencingJobs(String id, int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Page<JobConnectorReferenceEntity> connectorReferences = jobConnectorReferenceDao.findByConnectorId(id, pageable);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("j.name"));
+        Page<JobConnectorReferenceView> connectorReferences = jobConnectorReferenceDao.findByConnectorId(id, pageable);
         if (connectorReferences != null && connectorReferences.hasContent()) {
             ModelPage<Pair<String, String>> result = new ModelPage<>(pageNumber, pageSize, connectorReferences.getTotalPages(), null);
             result.setItems(connectorReferences.get()
-                    .map(reference -> new Pair<>(reference.getJobConnectorReferenceIdentity().getJobId(),
-                            jobDao.findNameById(reference.getJobConnectorReferenceIdentity().getJobId())))
+                    .map(reference -> new Pair<>(reference.getJobId(), reference.getJobName()))
                     .collect(Collectors.toList()));
             return result;
         }

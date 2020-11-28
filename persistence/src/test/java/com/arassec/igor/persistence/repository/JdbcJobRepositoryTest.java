@@ -7,7 +7,7 @@ import com.arassec.igor.persistence.dao.ConnectorDao;
 import com.arassec.igor.persistence.dao.JobConnectorReferenceDao;
 import com.arassec.igor.persistence.dao.JobDao;
 import com.arassec.igor.persistence.entity.JobConnectorReferenceEntity;
-import com.arassec.igor.persistence.entity.JobConnectorReferenceIdentity;
+import com.arassec.igor.persistence.entity.JobConnectorReferenceView;
 import com.arassec.igor.persistence.entity.JobEntity;
 import com.arassec.igor.persistence.test.TestAction;
 import com.arassec.igor.persistence.test.TestConnector;
@@ -275,12 +275,11 @@ class JdbcJobRepositoryTest {
     void testFindReferencedConnectors() {
         assertTrue(repository.findReferencedConnectors(null).isEmpty());
 
-        JobConnectorReferenceEntity entity = new JobConnectorReferenceEntity();
-        entity.setJobConnectorReferenceIdentity(new JobConnectorReferenceIdentity("job-id", "connector-id"));
+        JobConnectorReferenceView entity = mock(JobConnectorReferenceView.class);
+        when(entity.getConnectorId()).thenReturn("connector-id");
+        when(entity.getConnectorName()).thenReturn("connector-name");
 
         when(jobConnectorReferenceDao.findByJobId(eq("job-id"))).thenReturn(List.of(entity));
-
-        when(connectorDao.findNameById(eq("connector-id"))).thenReturn("connector-name");
 
         Set<Pair<String, String>> referencedConnectors = repository.findReferencedConnectors("job-id");
 
