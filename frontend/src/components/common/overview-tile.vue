@@ -1,6 +1,6 @@
 <template>
     <a class="overview-tile" :data-e2e="tileDataE2E">
-        <div class="content">
+        <div class="content" :class="!active ? 'disabled' : ''">
             <div class="title" v-on:click="$emit('clicked')">
                 <fit-text>
                     <slot name="title"/>
