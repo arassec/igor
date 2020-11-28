@@ -3,6 +3,7 @@
                      :data-e2e="dataE2eName">
         <font-awesome-icon slot="left" icon="grip-vertical" class="margin-right fa-fw move-icon"/>
         <label slot="center" class="action-label">{{ action.name.length > 0 ? action.name : action.type.value }}</label>
+        <font-awesome-icon v-if="simulationResults && simulationResults.errorCause" slot="right" icon="plug" class="simulation-error"></font-awesome-icon>
         <icon-button slot="right" icon="trash" v-on:clicked="$emit('delete-action', action.id)"/>
     </navigation-item>
 </template>
@@ -15,7 +16,7 @@ import Utils from "../../utils/utils";
 export default {
     name: "action-navigation-item",
     components: {IconButton, NavigationItem},
-    props: ['action', 'selectedActionId', 'validationErrors'],
+    props: ['action', 'selectedActionId', 'validationErrors', 'simulationResults'],
     computed: {
         actionSelected: function () {
             return this.selectedActionId === this.action.id;
@@ -62,6 +63,10 @@ export default {
 .inactive {
     background-color: var(--color-background);
     opacity: 0.75;
+}
+
+.simulation-error {
+    color: var(--color-alert);
 }
 
 </style>

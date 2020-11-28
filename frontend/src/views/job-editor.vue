@@ -13,6 +13,7 @@
                                     :job-running-or-waiting="jobRunningOrWaiting"
                                     :validation-errors="validationErrors"
                                     :job-executions-page="jobExecutionsPage"
+                                    :simulation-results="testResults"
                                     v-on:cancel-configuration="cancelConfiguration"
                                     v-on:test-configuration="testConfiguration"
                                     v-on:save-configuration="saveConfiguration"

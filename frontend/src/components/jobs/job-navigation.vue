@@ -19,6 +19,7 @@
             <action-navigation-item v-for="action of jobConfiguration.actions" :key="action.id" :action="action"
                                     :selected-action-id="selectedActionId"
                                     :validation-errors="validationErrors"
+                                    :simulation-results="getActionSimulationResults(action.id)"
                                     v-on:action-is-selected="$emit('action-is-selected', $event)"
                                     v-on:delete-action="$emit('delete-action', $event)"/>
         </draggable>
@@ -44,7 +45,15 @@ import ActionNavigationItem from "./action-navigation-item";
 export default {
     name: "job-navigation",
     components: {ActionNavigationItem, LayoutRow, AddItemButton, JobNavigationItem, draggable},
-    props: ['jobConfiguration', 'validationErrors', 'selectedActionId', 'jobRunningOrWaiting', 'jobExecutionsPage'],
+    props: ['jobConfiguration', 'validationErrors', 'selectedActionId', 'jobRunningOrWaiting', 'jobExecutionsPage', 'simulationResults'],
+    methods: {
+        getActionSimulationResults: function(actionId) {
+            if (this.simulationResults && this.simulationResults.hasOwnProperty(actionId)) {
+                return this.simulationResults[actionId];
+            }
+            return null;
+        }
+    },
     computed: {
         jobSelected: function () {
             return (this.selectedActionId === null);

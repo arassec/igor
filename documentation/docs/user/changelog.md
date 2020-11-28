@@ -5,6 +5,7 @@
 - 'Split Array' action now takes a mustache template as 'Array selector' configuration parameter instead of a JSON-Path query.
 - Inactive jobs are now greyed out on the job overview page.
 - Referencing jobs in the connector editor are now ordered alphabetically.
+- Errors during simulated job executions are now shown in the job navigator.
 
 ## Version 0.2.5
 - Added 'mustache-selector' for JSON simulation results.
