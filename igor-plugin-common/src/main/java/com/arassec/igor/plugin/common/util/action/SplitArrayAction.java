@@ -29,7 +29,7 @@ public class SplitArrayAction extends BaseUtilAction {
      */
     @NotEmpty
     @IgorParam
-    private String jsonPathQuery;
+    private String arraySelector;
 
     /**
      * Creates a new component instance.
@@ -55,7 +55,7 @@ public class SplitArrayAction extends BaseUtilAction {
 
         DocumentContext documentContext = JsonPath.parse(data);
 
-        String query = getString(data, jsonPathQuery);
+        String query = arraySelector.replace("{{", "$.").replace("}}", "");
 
         Object queryResult = documentContext.read(query);
         if (queryResult instanceof List) {

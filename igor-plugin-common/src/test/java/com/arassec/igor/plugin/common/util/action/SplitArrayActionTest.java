@@ -30,7 +30,7 @@ class SplitArrayActionTest {
         Map<String, Object> data = Map.of("data", content);
 
         SplitArrayAction splitArrayAction = new SplitArrayAction();
-        splitArrayAction.setJsonPathQuery("$.data.content");
+        splitArrayAction.setArraySelector("{{data.content}}");
 
         List<Map<String, Object>> result = splitArrayAction.process(data, new JobExecution());
 
@@ -52,7 +52,7 @@ class SplitArrayActionTest {
         Map<String, Object> data = Map.of("data", content);
 
         SplitArrayAction splitArrayAction = new SplitArrayAction();
-        splitArrayAction.setJsonPathQuery("$.data.content");
+        splitArrayAction.setArraySelector("{{data.content}}");
 
         List<Map<String, Object>> result = splitArrayAction.process(data, new JobExecution());
 

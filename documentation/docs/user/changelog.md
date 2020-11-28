@@ -2,6 +2,7 @@
 
 ## Version {{ $themeConfig.igorVersion }}
 - Refactored modules into plugins.
+- 'Split Array' action now takes a mustache template as 'Array selector' configuration parameter instead of a JSON-Path query.
 
 ## Version 0.2.5
 - Added 'mustache-selector' for JSON simulation results.
