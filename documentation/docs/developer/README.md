@@ -25,5 +25,3 @@ Then add the following dependency to your project's `pom.xml` file:
 &lt;/dependency&gt;</code></pre></div>
 
 Now your application should start and igor's web frontend should be available with the standard features of the respective version.
-
-Although possible, it is not recommended embedding igor into a larger application with their own database.

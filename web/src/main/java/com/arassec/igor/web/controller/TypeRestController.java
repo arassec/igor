@@ -43,9 +43,41 @@ public class TypeRestController extends BaseRestController {
      *
      * @return Set of types.
      */
-    @GetMapping("{category}")
-    public List<TypeData> getTypes(Locale locale, @PathVariable("category") String category) {
-        return igorComponentRegistry.getTypesOfCategory(category).stream()
+    @GetMapping("action/{category}")
+    public List<TypeData> getActionTypes(Locale locale, @PathVariable("category") String category) {
+        return igorComponentRegistry.getActionTypesOfCategory(category).stream()
+                .map(typeId -> createTypeData(locale, typeId))
+                .sorted(Comparator.comparing(TypeData::getValue))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns all types of a certain category as {@link KeyLabelStore}s.
+     *
+     * @param locale   The user's locale for i18n.
+     * @param category The category to use.
+     *
+     * @return Set of types.
+     */
+    @GetMapping("trigger/{category}")
+    public List<TypeData> getTriggerTypes(Locale locale, @PathVariable("category") String category) {
+        return igorComponentRegistry.getTriggerTypesOfCategory(category).stream()
+                .map(typeId -> createTypeData(locale, typeId))
+                .sorted(Comparator.comparing(TypeData::getValue))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns all types of a certain category as {@link KeyLabelStore}s.
+     *
+     * @param locale   The user's locale for i18n.
+     * @param category The category to use.
+     *
+     * @return Set of types.
+     */
+    @GetMapping("connector/{category}")
+    public List<TypeData> getConnectorTypes(Locale locale, @PathVariable("category") String category) {
+        return igorComponentRegistry.getConnectorTypesOfCategory(category).stream()
                 .map(typeId -> createTypeData(locale, typeId))
                 .sorted(Comparator.comparing(TypeData::getValue))
                 .collect(Collectors.toList());

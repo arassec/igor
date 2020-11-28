@@ -56,6 +56,12 @@ class IgorComponentRegistryTest {
     private Trigger triggerMock;
 
     /**
+     * A connector mock.
+     */
+    @Mock
+    private Connector connectorMock;
+
+    /**
      * Igor's core configuration properties.
      */
     @Mock
@@ -72,10 +78,13 @@ class IgorComponentRegistryTest {
         when(triggerMock.getTypeId()).thenReturn("trigger-type-id");
         when(triggerMock.getCategoryId()).thenReturn("trigger-category-id");
 
+        when(connectorMock.getTypeId()).thenReturn("connector-type-id");
+        when(connectorMock.getCategoryId()).thenReturn("connector-category-id");
+
         applicationContextMock = mock(ApplicationContext.class);
 
         igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock), List.of(triggerMock),
-                List.of(new TestConnectorImpl()), igorCoreProperties);
+                List.of(new TestConnectorImpl(), connectorMock), igorCoreProperties);
         igorComponentRegistry.afterPropertiesSet();
         igorComponentRegistry.setApplicationContext(applicationContextMock);
     }
@@ -93,14 +102,36 @@ class IgorComponentRegistryTest {
     }
 
     /**
-     * Tests getting types in a category.
+     * Tests getting action types in a category.
      */
     @Test
-    @DisplayName("Tests getting types of a category")
-    void testGetTypesOfCategory() {
-        assertTrue(igorComponentRegistry.getTypesOfCategory("unknown-category").isEmpty());
-        Set<String> typesOfCategory = igorComponentRegistry.getTypesOfCategory("action-category-id");
+    @DisplayName("Tests getting action types of a category")
+    void testGetActionTypesOfCategory() {
+        assertTrue(igorComponentRegistry.getActionTypesOfCategory("unknown-category").isEmpty());
+        Set<String> typesOfCategory = igorComponentRegistry.getActionTypesOfCategory("action-category-id");
         assertEquals("action-type-id", typesOfCategory.iterator().next());
+    }
+
+    /**
+     * Tests getting trigger types in a category.
+     */
+    @Test
+    @DisplayName("Tests getting trigger types of a category")
+    void testGetTriggerTypesOfCategory() {
+        assertTrue(igorComponentRegistry.getActionTypesOfCategory("unknown-category").isEmpty());
+        Set<String> typesOfCategory = igorComponentRegistry.getTriggerTypesOfCategory("trigger-category-id");
+        assertEquals("trigger-type-id", typesOfCategory.iterator().next());
+    }
+
+    /**
+     * Tests getting connector types in a category.
+     */
+    @Test
+    @DisplayName("Tests getting connector types of a category")
+    void testGetConnectorTypesOfCategory() {
+        assertTrue(igorComponentRegistry.getActionTypesOfCategory("unknown-category").isEmpty());
+        Set<String> typesOfCategory = igorComponentRegistry.getConnectorTypesOfCategory("connector-category-id");
+        assertEquals("connector-type-id", typesOfCategory.iterator().next());
     }
 
     /**

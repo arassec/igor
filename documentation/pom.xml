@@ -89,61 +89,46 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-resources-misc</id>
+                        <id>copy-resources-plugin-common</id>
                         <phase>initialize</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>docs/user/module-misc</outputDirectory>
+                            <outputDirectory>docs/user/igor-plugin-common</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/module-misc/src/main/resources/doc</directory>
+                                    <directory>${project.parent.basedir}/igor-plugin-common/src/main/resources/doc</directory>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-resources-file</id>
+                        <id>copy-resources-plugin-file</id>
                         <phase>initialize</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>docs/user/module-file</outputDirectory>
+                            <outputDirectory>docs/user/igor-plugin-file</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/module-file/src/main/resources/doc</directory>
+                                    <directory>${project.parent.basedir}/igor-plugin-file/src/main/resources/doc</directory>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-resources-message</id>
+                        <id>copy-resources-plugin-message</id>
                         <phase>initialize</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>docs/user/module-message</outputDirectory>
+                            <outputDirectory>docs/user/igor-plugin-message</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/module-message/src/main/resources/doc</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-resources-web</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>docs/user/module-web</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.parent.basedir}/module-web/src/main/resources/doc</directory>
+                                    <directory>${project.parent.basedir}/igor-plugin-message/src/main/resources/doc</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -161,19 +146,15 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>docs/user/module-file</directory>
+                            <directory>docs/user/igor-plugin-common</directory>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>docs/user/module-message</directory>
+                            <directory>docs/user/igor-plugin-file</directory>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>docs/user/module-misc</directory>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>docs/user/module-web</directory>
+                            <directory>docs/user/igor-plugin-message</directory>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                     </filesets>

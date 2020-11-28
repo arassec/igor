@@ -1,0 +1,236 @@
+package com.arassec.igor.plugin.common.file.action;
+
+import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
+import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.plugin.common.file.connector.FallbackFileConnector;
+import com.arassec.igor.plugin.common.file.connector.FileConnector;
+import com.arassec.igor.plugin.common.file.connector.FileStreamData;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * Copies a file from one connector to another.
+ */
+@Slf4j
+@Setter
+@Getter
+@IgorComponent
+public class CopyFileAction extends BaseFileAction {
+
+    /**
+     * Key for the copy file action's data.
+     */
+    public static final String KEY_COPY_FILE_ACTION = "copiedFile";
+
+    /**
+     * Key to the source file's name.
+     */
+    public static final String KEY_SOURCE_FILENAME = "sourceFilename";
+
+    /**
+     * Key to the source file's directory.
+     */
+    public static final String KEY_SOURCE_DIRECTORY = "sourceDirectory";
+
+    /**
+     * Key to the target file's name.
+     */
+    public static final String KEY_TARGET_FILENAME = "targetFilename";
+
+    /**
+     * Key to the target directory.
+     */
+    public static final String KEY_TARGET_DIRECTORY = "targetDirectory";
+
+    /**
+     * File-suffix appended to files during transfer.
+     */
+    private static final String IN_TRANSFER_SUFFIX = ".igor";
+
+    /**
+     * The connector providing the file to copy.
+     */
+    @NotNull
+    @IgorParam
+    private FileConnector source;
+
+    /**
+     * Source directory to copy the file from.
+     */
+    @NotBlank
+    @IgorParam(defaultValue = DIRECTORY_TEMPLATE)
+    private String sourceDirectory;
+
+    /**
+     * Source file to copy.
+     */
+    @NotBlank
+    @IgorParam(defaultValue = FILENAME_TEMPLATE)
+    private String sourceFilename;
+
+    /**
+     * The destination for the copied file.
+     */
+    @NotNull
+    @IgorParam
+    private FileConnector target;
+
+    /**
+     * The target directory to copy/move the file to.
+     */
+    @NotBlank
+    @IgorParam
+    private String targetDirectory;
+
+    /**
+     * The target file name.
+     */
+    @NotBlank
+    @IgorParam
+    private String targetFilename;
+
+    /**
+     * Enables a ".igor" file suffix during file transfer. The suffix will be removed after the file has been copied completely.
+     */
+    @IgorParam(advanced = true)
+    private boolean appendTransferSuffix = true;
+
+    /**
+     * If set to {@code true}, igor appends a filetype suffix if avaliable (e.g. '.html' or '.jpeg').
+     */
+    @IgorParam(advanced = true)
+    private boolean appendFiletypeSuffix = false;
+
+    /**
+     * Creates a new component instance.
+     */
+    public CopyFileAction() {
+        super("copy-file-action");
+        source = new FallbackFileConnector();
+        target = new FallbackFileConnector();
+    }
+
+    /**
+     * Copies the supplied source file to the destination connector. During transfer the file is optionally saved with the suffix
+     * ".igor", which will be removed after successful transfer.
+     *
+     * @param data         The data to process.
+     * @param jobExecution The job execution log.
+     *
+     * @return The manipulated data.
+     */
+    @Override
+    public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
+
+        ResolvedData resolvedData = resolveData(data, sourceFilename, sourceDirectory, targetFilename, targetDirectory);
+        if (resolvedData == null) {
+            return List.of(data);
+        }
+
+        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor(resolvedData.getSourceFilename(), 0);
+        jobExecution.addWorkInProgress(workInProgressMonitor);
+
+        try {
+            String sourceFileWithPath = getFilePath(resolvedData.getSourceDirectory(), resolvedData.getSourceFilename());
+
+            FileStreamData fileStreamData = source.readStream(sourceFileWithPath);
+
+            if (fileStreamData == null || fileStreamData.getData() == null) {
+                throw new IgorException("Not valid or not a file!");
+            }
+
+            String targetFileWithSuffix = appendSuffixIfRequired(resolvedData.getTargetFilename(), fileStreamData.getFilenameSuffix());
+
+            String targetFileWithPath = getFilePath(resolvedData.getTargetDirectory(), targetFileWithSuffix);
+
+            log.debug("Copying file '{}' to '{}'", sourceFileWithPath, targetFileWithPath);
+
+            String targetFileInTransfer = targetFileWithPath;
+            if (appendTransferSuffix) {
+                targetFileInTransfer += IN_TRANSFER_SUFFIX;
+            }
+
+            target.writeStream(targetFileInTransfer, fileStreamData, workInProgressMonitor, jobExecution);
+
+            source.finalizeStream(fileStreamData);
+
+            if (appendTransferSuffix) {
+                target.move(targetFileInTransfer, targetFileWithPath);
+            }
+
+            log.debug("File '{}' copied to '{}'", sourceFileWithPath, targetFileWithPath);
+
+            Map<String, Object> actionData = new HashMap<>();
+            actionData.put(KEY_SOURCE_FILENAME, resolvedData.getSourceFilename());
+            actionData.put(KEY_SOURCE_DIRECTORY, resolvedData.getSourceDirectory());
+            actionData.put(KEY_TARGET_FILENAME, targetFileWithSuffix);
+            actionData.put(KEY_TARGET_DIRECTORY, resolvedData.getTargetDirectory());
+            data.put(KEY_COPY_FILE_ACTION, actionData);
+        } finally {
+            jobExecution.removeWorkInProgress(workInProgressMonitor);
+        }
+
+        return List.of(data);
+    }
+
+    /**
+     * Appends the name of the source file to the destination path, thus creating the target file.
+     *
+     * @param file   The file.
+     * @param suffix An optional file suffix to append to the filename.
+     *
+     * @return The file with the appended suffix.
+     */
+    private String appendSuffixIfRequired(String file, String suffix) {
+        String targetFile = file;
+        if (!StringUtils.isEmpty(suffix) && !targetFile.contains(".") && appendFiletypeSuffix) {
+            if (!suffix.startsWith("\\.")) {
+                suffix = "." + suffix;
+            }
+            targetFile += suffix;
+        }
+        return targetFile;
+    }
+
+    /**
+     * Combines the provided directory with the provided file. Adds a separator if needed.
+     *
+     * @param directory The path to the source directory.
+     * @param file      The filename.
+     *
+     * @return The path with the added filename.
+     */
+    private String getFilePath(String directory, String file) {
+        if (directory == null) {
+            directory = "";
+        }
+        if (!directory.endsWith("/")) {
+            directory += "/";
+        }
+
+        // Cleanup slashes in the filename. The HTTP-FileConnector introduced those as part of its implementation.
+        if (file.contains("/")) {
+            String[] fileParts = file.split("/");
+            if (file.length() == 1) {
+                file = "index";
+            } else {
+                file = fileParts[fileParts.length - 1];
+            }
+        }
+
+        return directory + file;
+    }
+
+}

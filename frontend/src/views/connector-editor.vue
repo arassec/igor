@@ -252,7 +252,7 @@ export default {
             })
         },
         loadTypesOfCategory: async function (category, selectFirst) {
-            await IgorBackend.getData('/api/type/' + category.key).then((types) => {
+            await IgorBackend.getData('/api/type/connector/' + category.key).then((types) => {
                 for (let i = this.connectorTypes.length; i > 0; i--) {
                     this.connectorTypes.pop()
                 }

@@ -11,23 +11,18 @@ String getTypeId();
 Both properties are strings and can be freely assigned. 
 The category and type of a component are selected in the user interface with dropdown-boxes.
 
-::: warning
-You must not assign the same category ID to different component types. 
-I.e. don't use 'my-custom-category' on both, a trigger and an action component!  
-:::
-
 If you want to add your custom component to an existing category, you should set the corresponding category ID or better yet, inherit from the appropriate base class.
 
 |Component Type|Category|Category-ID|Base Class to Extend|
 |---|---|---|---|
-|Trigger|Util|"util-triggers"|BaseUtilTrigger.class|
-|Trigger|Web|"web-triggers"|-|
-|Action|Util|"util-actions"|BaseUtilAction.class|
-|Action|File|"file-actions"|BaseFileAction.class|
-|Action|Message|"message-actions"|BaseMessageAction.class|
-|Action|Persistence|"persistence-actions"|BasePersistenceAction.class|
-|Connector|File|"file-connectors"|BaseFileConnector.class|
-|Connector|Message|"message-connectors"|BaseMessageConnector.class|
+|Trigger|Util|"util"|BaseUtilTrigger.class|
+|Trigger|Web|"web"|-|
+|Action|Util|"util"|BaseUtilAction.class|
+|Action|File|"file"|BaseFileAction.class|
+|Action|Message|"message"|BaseMessageAction.class|
+|Action|Persistence|"persistence"|BasePersistenceAction.class|
+|Connector|File|"file"|BaseFileConnector.class|
+|Connector|Message|"message"|BaseMessageConnector.class|
 
 If you give your component a type ID that is already taken, igor will throw an exception during startup.
 

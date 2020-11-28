@@ -1,6 +1,9 @@
 # Changelog
 
 ## Version {{ $themeConfig.igorVersion }}
+- Refactored modules into plugins.
+
+## Version 0.2.5
 - Added 'mustache-selector' for JSON simulation results.
 
 ## Version 0.2.4

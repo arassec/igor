@@ -37,25 +37,19 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>module-misc</artifactId>
+            <artifactId>igor-plugin-common</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>module-file</artifactId>
+            <artifactId>igor-plugin-file</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>module-message</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>module-web</artifactId>
+            <artifactId>igor-plugin-message</artifactId>
             <version>${project.version}</version>
         </dependency>
 

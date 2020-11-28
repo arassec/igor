@@ -49,47 +49,47 @@ module.exports = {
                             title: "Triggers",
                             sidebarDepth: 0,
                             children: [
-                                "module-misc/cron-trigger",
-                                "module-misc/manual-trigger",
-                                "module-web/web-hook-trigger"
+                                "igor-plugin-common/cron-trigger",
+                                "igor-plugin-common/manual-trigger",
+                                "igor-plugin-common/web-hook-trigger"
                             ]
                         },
                         {
                             title: "Actions",
                             sidebarDepth: 0,
                             children: [
-                                "module-misc/filter-persisted-value-action",
-                                "module-misc/persist-value-action",
-                                "module-misc/filter-by-regexp-action",
-                                "module-misc/filter-by-timestamp-action",
-                                "module-misc/limit-action",
-                                "module-misc/log-action",
-                                "module-misc/pause-action",
-                                "module-misc/skip-action",
-                                "module-misc/sort-by-timestamp-pattern-action",
-                                "module-misc/split-array-action",
-                                "module-file/copy-file-action",
-                                "module-file/delete-file-action",
-                                "module-file/list-files-action",
-                                "module-file/move-file-action",
-                                "module-file/read-file-action",
-                                "module-message/send-message-action",
-                                "module-web/http-request-action"
+                                "igor-plugin-common/filter-persisted-value-action",
+                                "igor-plugin-common/persist-value-action",
+                                "igor-plugin-common/filter-by-regexp-action",
+                                "igor-plugin-common/filter-by-timestamp-action",
+                                "igor-plugin-common/limit-action",
+                                "igor-plugin-common/log-action",
+                                "igor-plugin-common/pause-action",
+                                "igor-plugin-common/skip-action",
+                                "igor-plugin-common/sort-by-timestamp-pattern-action",
+                                "igor-plugin-common/split-array-action",
+                                "igor-plugin-common/copy-file-action",
+                                "igor-plugin-common/delete-file-action",
+                                "igor-plugin-common/list-files-action",
+                                "igor-plugin-common/move-file-action",
+                                "igor-plugin-common/read-file-action",
+                                "igor-plugin-common/send-message-action",
+                                "igor-plugin-common/http-request-action"
                             ]
                         },
                         {
                             title: "Connectors",
                             sidebarDepth: 0,
                             children: [
-                                "module-file/ftp-file-connector",
-                                "module-file/ftps-file-connector",
-                                "module-file/localfs-file-connector",
-                                "module-file/http-file-connector",
-                                "module-file/https-file-connector",
-                                "module-file/scp-file-connector",
-                                "module-file/sftp-file-connector",
-                                "module-message/rabbitmq-message-connector",
-                                "module-web/http-web-connector"
+                                "igor-plugin-common/localfs-file-connector",
+                                "igor-plugin-file/ftp-file-connector",
+                                "igor-plugin-file/ftps-file-connector",
+                                "igor-plugin-file/http-file-connector",
+                                "igor-plugin-file/https-file-connector",
+                                "igor-plugin-file/scp-file-connector",
+                                "igor-plugin-file/sftp-file-connector",
+                                "igor-plugin-message/rabbitmq-message-connector",
+                                "igor-plugin-common/http-web-connector"
                             ]
                         }
                     ]

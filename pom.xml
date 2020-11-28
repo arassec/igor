@@ -76,11 +76,10 @@
     <modules>
         <module>core</module>
         <module>persistence</module>
-        <module>module-misc</module>
-        <module>module-file</module>
-        <module>module-message</module>
-        <module>module-web</module>
         <module>frontend</module>
+        <module>igor-plugin-common</module>
+        <module>igor-plugin-file</module>
+        <module>igor-plugin-message</module>
         <module>documentation</module>
         <module>web</module>
         <module>igor-spring-boot-starter</module>
@@ -216,25 +215,6 @@
                 <version>1.9.3</version>
             </dependency>
 
-            <!-- module-file -->
-            <dependency>
-                <groupId>commons-net</groupId>
-                <artifactId>commons-net</artifactId>
-                <version>3.7.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.jcraft</groupId>
-                <artifactId>jsch</artifactId>
-                <version>0.1.55</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jsoup</groupId>
-                <artifactId>jsoup</artifactId>
-                <version>1.13.1</version>
-            </dependency>
-
             <!-- web -->
             <dependency>
                 <groupId>org.glassfish</groupId>
@@ -290,6 +270,25 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-ui</artifactId>
                 <version>1.5.0</version>
+            </dependency>
+
+            <!-- plugin-file -->
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>3.7.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.jcraft</groupId>
+                <artifactId>jsch</artifactId>
+                <version>0.1.55</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>1.13.1</version>
             </dependency>
 
         </dependencies>

@@ -62,10 +62,9 @@ application.properties
 documentation/package-lock.json
 documentation/docs/.vuepress/components
 documentation/docs/user/core
-documentation/docs/user/module-misc
-documentation/docs/user/module-file
-documentation/docs/user/module-message
-documentation/docs/user/module-web
+documentation/docs/user/igor-plugin-common
+documentation/docs/user/igor-plugin-file
+documentation/docs/user/igor-plugin-message
 e2e/cypress/screenshots
 e2e/cypress/videos
 e2e/debug.log

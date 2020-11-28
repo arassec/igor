@@ -59,19 +59,28 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     private final Map<Class<? extends IgorComponent>, Set<String>> categoriesByComponentType = new HashMap<>();
 
     /**
-     * Contains all available component types in a certain category (e.g. Category 'File-Actions'-ID -> 'List-Files'-ID,
-     * 'Copy-File'-ID etc.).
+     * Contains all available type IDs for a certain action category.
      */
-    private final Map<String, Set<String>> typesByCategoryKey = new HashMap<>();
+    private final Map<String, Set<String>> actionTypesByCategoryKey = new HashMap<>();
+
+    /**
+     * Contains all available type IDs for a certain trigger category.
+     */
+    private final Map<String, Set<String>> triggerTypesByCategoryKey = new HashMap<>();
+
+    /**
+     * Contains all available type IDs for a certain connector category.
+     */
+    private final Map<String, Set<String>> connectorTypesByCategoryKey = new HashMap<>();
 
     /**
      * Initializes the component registry.
      */
     @Override
     public void afterPropertiesSet() {
-        initializeComponent(Action.class, actions);
-        initializeComponent(Trigger.class, triggers);
-        initializeComponent(Connector.class, connectors);
+        initializeComponent(Action.class, actions, actionTypesByCategoryKey);
+        initializeComponent(Trigger.class, triggers, triggerTypesByCategoryKey);
+        initializeComponent(Connector.class, connectors, connectorTypesByCategoryKey);
     }
 
     /**
@@ -99,15 +108,43 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     }
 
     /**
-     * Returns the types of a specific category of components, e.g. all types of {@link Trigger}s.
+     * Returns the action types of a specific category, e.g. all types of {@link Action}s for cateogry 'util'.
      *
      * @param categoryKey The category's key.
      *
      * @return Set of types or an empty set, if none are available.
      */
-    public Set<String> getTypesOfCategory(String categoryKey) {
-        if (typesByCategoryKey.containsKey(categoryKey)) {
-            return typesByCategoryKey.get(categoryKey);
+    public Set<String> getActionTypesOfCategory(String categoryKey) {
+        if (actionTypesByCategoryKey.containsKey(categoryKey)) {
+            return actionTypesByCategoryKey.get(categoryKey);
+        }
+        return Set.of();
+    }
+
+    /**
+     * Returns the trigger types of a specific category, e.g. all types of {@link Trigger}s for cateogry 'util'.
+     *
+     * @param categoryKey The category's key.
+     *
+     * @return Set of types or an empty set, if none are available.
+     */
+    public Set<String> getTriggerTypesOfCategory(String categoryKey) {
+        if (triggerTypesByCategoryKey.containsKey(categoryKey)) {
+            return triggerTypesByCategoryKey.get(categoryKey);
+        }
+        return Set.of();
+    }
+
+    /**
+     * Returns the connector types of a specific category, e.g. all types of {@link Connector}s for cateogry 'file'.
+     *
+     * @param categoryKey The category's key.
+     *
+     * @return Set of types or an empty set, if none are available.
+     */
+    public Set<String> getConnectorTypesOfCategory(String categoryKey) {
+        if (connectorTypesByCategoryKey.containsKey(categoryKey)) {
+            return connectorTypesByCategoryKey.get(categoryKey);
         }
         return Set.of();
     }
@@ -227,19 +264,22 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * Initializes categories and types of a specific igor component, e.g. {@link Connector}.
      *
      * @param componentType The type of the component to initialize.
+     * @param components List of components of that type (e.g. all Actions on the classpath).
+     * @param typeByCategoryStore Map to store all component type IDs, indexed by category.
      */
-    private void initializeComponent(Class<? extends IgorComponent> componentType, List<? extends IgorComponent> components) {
+    private void initializeComponent(Class<? extends IgorComponent> componentType, List<? extends IgorComponent> components,
+                                     Map<String, Set<String>> typeByCategoryStore) {
         categoriesByComponentType.put(componentType, new HashSet<>());
 
         for (IgorComponent component : components) {
 
             categoriesByComponentType.get(componentType).add(component.getCategoryId());
 
-            if (!typesByCategoryKey.containsKey(component.getCategoryId())) {
-                typesByCategoryKey.put(component.getCategoryId(), new HashSet<>());
+            if (!typeByCategoryStore.containsKey(component.getCategoryId())) {
+                typeByCategoryStore.put(component.getCategoryId(), new HashSet<>());
             }
 
-            typesByCategoryKey.get(component.getCategoryId()).add(component.getTypeId());
+            typeByCategoryStore.get(component.getCategoryId()).add(component.getTypeId());
         }
     }
 
