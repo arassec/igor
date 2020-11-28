@@ -67,6 +67,7 @@ export default {
 
 .simulation-error {
     color: var(--color-alert);
+    margin-right: .25em;
 }
 
 </style>
