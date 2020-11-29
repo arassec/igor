@@ -112,7 +112,8 @@ describe('Creates user doc job images.', () => {
     });
 
     describe('Creates Job-Editor images.', () => {
-        it('Create job-editor.png, job-editor-configurator.png, job-editor-navigator.png, job-editor-executions.png and job-editor-simulation-results.png', function () {
+        it.only('Create job-editor.png, job-editor-configurator.png, job-editor-navigator.png, job-editor-executions.png, '
+            + 'job-editor-simulation-results.png and job-editor-simulation-results-json.png', function () {
             cy.openJobEditor(jobCopyNewFilesKebap);
 
             cy.simulateJob();
@@ -129,9 +130,19 @@ describe('Creates user doc job images.', () => {
                 .should('be.visible')
                 .screenshot(targetDir + 'job-editor-navigator')
 
+            cy.selectAction('list-files');
+
             cy.get('[data-e2e=job-editor-simulation-results]')
                 .should('be.visible')
                 .screenshot(targetDir + 'job-editor-simulation-results')
+
+            cy.get('[data-e2e=show-sim-results-json-1]')
+                .should('be.visible')
+                .click();
+
+            cy.get('[data-e2e=simulation-results-container-1]')
+                .should('be.visible')
+                .screenshot(targetDir + 'job-editor-simulation-results-json');
 
             cy.get('[data-e2e=show-job-executions-button]')
                 .should('be.visible')

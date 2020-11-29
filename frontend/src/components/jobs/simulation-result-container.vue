@@ -28,8 +28,8 @@
             </div>
             <div v-else-if="selectedSimulationResults.results.length > 0 && !selectedSimulationResults.errorCause"
                  v-for="(result, index) in selectedSimulationResults.results" v-bind:key="index"
-                 class="simulation-result-container spacer-top">
-                <simulation-result :data="result" v-on:node-selected="createMustacheSelector"></simulation-result>
+                 class="simulation-result-container spacer-top" :data-e2e="'simulation-results-container-' + index">
+                <simulation-result :data="result" :index="index" v-on:node-selected="createMustacheSelector"></simulation-result>
             </div>
             <div v-else-if="selectedSimulationResults.errorCause" class="simulation-result-container spacer-top">
         <pre class="error-bg">
