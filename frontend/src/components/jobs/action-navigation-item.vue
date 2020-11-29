@@ -3,7 +3,8 @@
                      :data-e2e="dataE2eName">
         <font-awesome-icon slot="left" icon="grip-vertical" class="margin-right fa-fw move-icon"/>
         <label slot="center" class="action-label">{{ action.name.length > 0 ? action.name : action.type.value }}</label>
-        <font-awesome-icon v-if="simulationResults && simulationResults.errorCause" slot="right" icon="plug" class="simulation-error"></font-awesome-icon>
+        <font-awesome-icon v-if="simulationResults && (simulationResults.errorCause || simulationResults.stale)"
+                           slot="right" icon="plug" class="simulation-error"></font-awesome-icon>
         <icon-button slot="right" icon="trash" v-on:clicked="$emit('delete-action', action.id)"/>
     </navigation-item>
 </template>

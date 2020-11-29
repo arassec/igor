@@ -6,6 +6,7 @@
 - Inactive jobs are now greyed out on the job overview page.
 - Referencing jobs in the connector editor are now ordered alphabetically.
 - Errors during simulated job executions are now shown in the job navigator.
+- Simulation results of the last action are added as 'stale' to newly created actions.
 
 ## Version 0.2.5
 - Added 'mustache-selector' for JSON simulation results.

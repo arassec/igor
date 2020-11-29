@@ -16,21 +16,24 @@
                         data-e2e="copy-to-clipboard-button"/>
                 </div>
             </div>
-            <div v-if="!selectedTestResults" class="simulation-result-container spacer-top">
+            <div v-if="selectedSimulationResults && selectedSimulationResults.stale" class="simulation-result-container spacer-top error-bg">
+                Stale simulation results. Please simulate the job again to update the results.
+            </div>
+            <div v-if="!selectedSimulationResults" class="simulation-result-container spacer-top">
                 No simulation results available.
             </div>
-            <div v-else-if="selectedTestResults.results.length === 0 && !selectedTestResults.errorCause"
+            <div v-else-if="selectedSimulationResults.results.length === 0 && !selectedSimulationResults.errorCause"
                  class="simulation-result-container spacer-top">
                 No simulation results available.
             </div>
-            <div v-else-if="selectedTestResults.results.length > 0 && !selectedTestResults.errorCause"
-                 v-for="(result, index) in selectedTestResults.results" v-bind:key="index"
+            <div v-else-if="selectedSimulationResults.results.length > 0 && !selectedSimulationResults.errorCause"
+                 v-for="(result, index) in selectedSimulationResults.results" v-bind:key="index"
                  class="simulation-result-container spacer-top">
                 <simulation-result :data="result" v-on:node-selected="createMustacheSelector"></simulation-result>
             </div>
-            <div v-else-if="selectedTestResults.errorCause" class="simulation-result-container spacer-top">
+            <div v-else-if="selectedSimulationResults.errorCause" class="simulation-result-container spacer-top">
         <pre class="error-bg">
-<code>{{ selectedTestResults.errorCause }}</code></pre>
+<code>{{ selectedSimulationResults.errorCause }}</code></pre>
             </div>
         </div>
     </core-content>
@@ -45,7 +48,7 @@ import SimulationResult from "@/components/jobs/simulation-result";
 export default {
     name: 'simulation-result-container',
     components: {SimulationResult, CoreContent, InputButton, LayoutRow},
-    props: ['selectedTestResults'],
+    props: ['selectedSimulationResults'],
     data: function () {
         return {
             mustacheSelector: null

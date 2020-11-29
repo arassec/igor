@@ -13,9 +13,9 @@
                                     :job-running-or-waiting="jobRunningOrWaiting"
                                     :validation-errors="validationErrors"
                                     :job-executions-page="jobExecutionsPage"
-                                    :simulation-results="testResults"
+                                    :simulation-results="simulationResults"
                                     v-on:cancel-configuration="cancelConfiguration"
-                                    v-on:test-configuration="testConfiguration"
+                                    v-on:test-configuration="simulateJob"
                                     v-on:save-configuration="saveConfiguration"
                                     v-on:show-executions="showConfiguration = false"
                                     v-on:run-job="showRunDialog = true"
@@ -109,12 +109,12 @@
                     name="animate-css-transition"
                     enter-active-class="animated slideInRight"
                     leave-active-class="animated slideOutRight">
-            <simulation-result-container v-show="showTestResults && testResults != null"
-                                   v-on:close="closeTestResults"
-                                   v-bind:selected-test-results="selectedTestResults"/>
+            <simulation-result-container v-show="showSimulationResults && simulationResults != null"
+                                   v-on:close="closeSimulationResults"
+                                   v-bind:selected-simulation-results="selectedSimulationResults"/>
         </transition>
 
-        <transition v-on:after-leave="blendInTestResults"
+        <transition v-on:after-leave="blendInSimulationResults"
                     name="animate-css-transition"
                     enter-active-class="animated slideInRight"
                     leave-active-class="animated slideOutRight">
@@ -252,13 +252,13 @@ export default {
             showRunDialog: false,
             showExecutions: false,
             showConfiguration: true,
-            showTestResults: false,
-            shouldShowTestResults: false,
+            showSimulationResults: false,
+            shouldShowSimulationResults: false,
             showDocumentation: false,
             shouldShowDocumentation: false,
             selectedActionId: null,
-            testResults: null,
-            selectedTestResults: null,
+            simulationResults: null,
+            selectedSimulationResults: null,
             originalJobConfiguration: null,
             jobConfiguration: null,
             validationErrors: {},
@@ -302,9 +302,9 @@ export default {
         blendInConfiguration: function () {
             this.showConfiguration = true;
         },
-        blendInTestResults: function () {
-            if (this.shouldShowTestResults) {
-                this.showTestResults = true;
+        blendInSimulationResults: function () {
+            if (this.shouldShowSimulationResults) {
+                this.showSimulationResults = true;
             }
         },
         blendInDocumentation: function () {
@@ -341,10 +341,10 @@ export default {
                 }
             });
         },
-        testConfiguration: async function () {
+        simulateJob: async function () {
             this.showDocumentation = false;
-            this.testResults = null;
-            this.selectedTestResults = null;
+            this.simulationResults = null;
+            this.selectedSimulationResults = null;
             await IgorBackend.postData('/api/job/simulate', this.jobConfiguration, 'Simulating job',
                 'Simulation OK.', 'Simulation Failed!').then((result) => {
                 if (result.status === 400) {
@@ -355,11 +355,11 @@ export default {
                     }
                 } else {
                     this.validationErrors = {};
-                    this.testResults = result.data;
+                    this.simulationResults = result.data;
                 }
-                this.showTestResults = true;
+                this.showSimulationResults = true;
             });
-            this.updateSelectedTestResult()
+            this.updateSelectedSimulationResult()
         },
         cancelConfiguration: function () {
             this.$router.push({name: 'job-overview'})
@@ -367,15 +367,21 @@ export default {
         selectJob: function () {
             this.selectedActionId = null;
             this.showDocumentation = false;
-            this.updateSelectedTestResult()
+            this.updateSelectedSimulationResult()
         },
         selectAction: function (actionId) {
             this.selectedActionId = actionId;
             this.showDocumentation = false;
-            this.updateSelectedTestResult()
+            this.updateSelectedSimulationResult()
         },
         addAction: async function () {
             let action = await IgorBackend.getData('/api/job/action/prototype');
+            if (this.simulationResults) {
+                let staleSimulationResult = JSON.parse(
+                    JSON.stringify(this.simulationResults[this.jobConfiguration.actions[this.jobConfiguration.actions.length - 1].id]));
+                staleSimulationResult['stale'] = true;
+                this.simulationResults[action.id] = staleSimulationResult;
+            }
             this.jobConfiguration.actions.push(action);
             this.selectAction(action.id)
         },
@@ -388,27 +394,27 @@ export default {
             this.$delete(this.jobConfiguration.actions, Utils.findActionIndex(this.jobConfiguration, this.selectedActionId));
             this.showDeleteActionDialog = false;
             this.selectedActionId = null;
-            this.testResults = null;
+            this.simulationResults = null;
         },
-        updateSelectedTestResult: function () {
-            if (this.testResults != null) {
+        updateSelectedSimulationResult: function () {
+            if (this.simulationResults != null) {
                 let actionId = this.selectedActionId;
 
                 // The job has been selected, use the trigger's test data:
                 if (actionId === null) {
-                    if (this.testResults[this.jobConfiguration.id]) {
-                        this.selectedTestResults = this.testResults[this.jobConfiguration.id]
+                    if (this.simulationResults[this.jobConfiguration.id]) {
+                        this.selectedSimulationResults = this.simulationResults[this.jobConfiguration.id]
                     } else {
-                        this.selectedTestResults = null;
+                        this.selectedSimulationResults = null;
                     }
                     return
                 }
 
                 // An Action has been selected:
-                if (actionId != null && this.testResults[actionId] != null) {
-                    this.selectedTestResults = this.testResults[actionId];
+                if (actionId != null && this.simulationResults[actionId] != null) {
+                    this.selectedSimulationResults = this.simulationResults[actionId];
                 } else {
-                    this.selectedTestResults = null;
+                    this.selectedSimulationResults = null;
                 }
             }
         },
@@ -482,8 +488,8 @@ export default {
         },
         openDocumentation: async function (filename) {
             this.documentation = await IgorBackend.getData('/api/doc/' + filename);
-            if (this.showTestResults) {
-                this.showTestResults = false;
+            if (this.showSimulationResults) {
+                this.showSimulationResults = false;
                 this.shouldShowDocumentation = true;
             } else {
                 this.showDocumentation = true;
@@ -495,8 +501,8 @@ export default {
             }
         },
         closeDocumentation: function () {
-            if (this.testResults) {
-                this.shouldShowTestResults = true;
+            if (this.simulationResults) {
+                this.shouldShowSimulationResults = true;
                 this.shouldShowDocumentation = false;
                 this.showDocumentation = false;
             } else {
@@ -504,11 +510,11 @@ export default {
                 this.shouldShowDocumentation = false;
             }
         },
-        closeTestResults: function () {
-            if (this.testResults) {
-                this.testResults = null;
-                this.shouldShowTestResults = false;
-                this.showTestResults = false;
+        closeSimulationResults: function () {
+            if (this.simulationResults) {
+                this.simulationResults = null;
+                this.shouldShowSimulationResults = false;
+                this.showSimulationResults = false;
             }
         },
         initJobListEventSource: function () {
