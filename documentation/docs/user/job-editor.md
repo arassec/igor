@@ -89,4 +89,5 @@ Clicking on a data item's arrow opens the item's JSON in a tree view.
 
 By clicking on keys in the result JSON, a mustache template for the respective key is entered into the input above the simulation results.
 
-A click on ![copy to clipboard button](./images/job/copy-to-clipboard-button.png) copies the mustache template to the clipboard.
+The template is automatically copied to the clipboard.
+After manual modifications, a click on ![copy to clipboard button](./images/job/copy-to-clipboard-button.png) copies the mustache template again to the clipboard.

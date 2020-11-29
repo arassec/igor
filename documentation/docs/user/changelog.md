@@ -8,6 +8,7 @@
 - Errors during simulated job executions are now shown in the job navigator.
 - Simulation results of the last action are added as 'stale' to newly created actions.
 - Simulation results are now shown in an accordion component.
+- Mustache template selections from the simulation results are automatically copied to the clipboard.
 
 ## Version 0.2.5
 - Added 'mustache-selector' for JSON simulation results.

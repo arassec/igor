@@ -67,6 +67,11 @@ export default {
             element.setSelectionRange(0, 99999);
             document.execCommand('copy');
         }
+    },
+    updated() {
+        this.$nextTick(function () {
+            this.copyToClipboard();
+        })
     }
 }
 </script>
