@@ -5,13 +5,14 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.plugin.common.CommonDataKey;
+import com.arassec.igor.plugin.common.CommonUtils;
 import com.arassec.igor.plugin.common.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.common.file.connector.FileConnector;
 import com.arassec.igor.plugin.common.file.connector.FileStreamData;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -28,36 +29,6 @@ import java.util.Map;
 @Getter
 @IgorComponent
 public class CopyFileAction extends BaseFileAction {
-
-    /**
-     * Key for the copy file action's data.
-     */
-    public static final String KEY_COPY_FILE_ACTION = "copiedFile";
-
-    /**
-     * Key to the source file's name.
-     */
-    public static final String KEY_SOURCE_FILENAME = "sourceFilename";
-
-    /**
-     * Key to the source file's directory.
-     */
-    public static final String KEY_SOURCE_DIRECTORY = "sourceDirectory";
-
-    /**
-     * Key to the target file's name.
-     */
-    public static final String KEY_TARGET_FILENAME = "targetFilename";
-
-    /**
-     * Key to the target directory.
-     */
-    public static final String KEY_TARGET_DIRECTORY = "targetDirectory";
-
-    /**
-     * File-suffix appended to files during transfer.
-     */
-    private static final String IN_TRANSFER_SUFFIX = ".igor";
 
     /**
      * The connector providing the file to copy.
@@ -143,7 +114,7 @@ public class CopyFileAction extends BaseFileAction {
         jobExecution.addWorkInProgress(workInProgressMonitor);
 
         try {
-            String sourceFileWithPath = getFilePath(resolvedData.getSourceDirectory(), resolvedData.getSourceFilename());
+            String sourceFileWithPath = CommonUtils.combineFilePath(resolvedData.getSourceDirectory(), resolvedData.getSourceFilename());
 
             FileStreamData fileStreamData = source.readStream(sourceFileWithPath);
 
@@ -151,15 +122,16 @@ public class CopyFileAction extends BaseFileAction {
                 throw new IgorException("Not valid or not a file!");
             }
 
-            String targetFileWithSuffix = appendSuffixIfRequired(resolvedData.getTargetFilename(), fileStreamData.getFilenameSuffix());
+            String targetFileWithSuffix = CommonUtils.appendSuffixIfRequired(resolvedData.getTargetFilename(),
+                    fileStreamData.getFilenameSuffix(), appendFiletypeSuffix);
 
-            String targetFileWithPath = getFilePath(resolvedData.getTargetDirectory(), targetFileWithSuffix);
+            String targetFileWithPath = CommonUtils.combineFilePath(resolvedData.getTargetDirectory(), targetFileWithSuffix);
 
             log.debug("Copying file '{}' to '{}'", sourceFileWithPath, targetFileWithPath);
 
             String targetFileInTransfer = targetFileWithPath;
             if (appendTransferSuffix) {
-                targetFileInTransfer += IN_TRANSFER_SUFFIX;
+                targetFileInTransfer += CommonUtils.FILE_IN_TRANSFER_SUFFIX;
             }
 
             target.writeStream(targetFileInTransfer, fileStreamData, workInProgressMonitor, jobExecution);
@@ -173,64 +145,16 @@ public class CopyFileAction extends BaseFileAction {
             log.debug("File '{}' copied to '{}'", sourceFileWithPath, targetFileWithPath);
 
             Map<String, Object> actionData = new HashMap<>();
-            actionData.put(KEY_SOURCE_FILENAME, resolvedData.getSourceFilename());
-            actionData.put(KEY_SOURCE_DIRECTORY, resolvedData.getSourceDirectory());
-            actionData.put(KEY_TARGET_FILENAME, targetFileWithSuffix);
-            actionData.put(KEY_TARGET_DIRECTORY, resolvedData.getTargetDirectory());
-            data.put(KEY_COPY_FILE_ACTION, actionData);
+            actionData.put(CommonDataKey.SOURCE_FILENAME.getKey(), resolvedData.getSourceFilename());
+            actionData.put(CommonDataKey.SOURCE_DIRECTORY.getKey(), resolvedData.getSourceDirectory());
+            actionData.put(CommonDataKey.TARGET_FILENAME.getKey(), targetFileWithSuffix);
+            actionData.put(CommonDataKey.TARGET_DIRECTORY.getKey(), resolvedData.getTargetDirectory());
+            data.put(CommonDataKey.COPIED_FILE.getKey(), actionData);
         } finally {
             jobExecution.removeWorkInProgress(workInProgressMonitor);
         }
 
         return List.of(data);
-    }
-
-    /**
-     * Appends the name of the source file to the destination path, thus creating the target file.
-     *
-     * @param file   The file.
-     * @param suffix An optional file suffix to append to the filename.
-     *
-     * @return The file with the appended suffix.
-     */
-    private String appendSuffixIfRequired(String file, String suffix) {
-        String targetFile = file;
-        if (!StringUtils.isEmpty(suffix) && !targetFile.contains(".") && appendFiletypeSuffix) {
-            if (!suffix.startsWith("\\.")) {
-                suffix = "." + suffix;
-            }
-            targetFile += suffix;
-        }
-        return targetFile;
-    }
-
-    /**
-     * Combines the provided directory with the provided file. Adds a separator if needed.
-     *
-     * @param directory The path to the source directory.
-     * @param file      The filename.
-     *
-     * @return The path with the added filename.
-     */
-    private String getFilePath(String directory, String file) {
-        if (directory == null) {
-            directory = "";
-        }
-        if (!directory.endsWith("/")) {
-            directory += "/";
-        }
-
-        // Cleanup slashes in the filename. The HTTP-FileConnector introduced those as part of its implementation.
-        if (file.contains("/")) {
-            String[] fileParts = file.split("/");
-            if (file.length() == 1) {
-                file = "index";
-            } else {
-                file = fileParts[fileParts.length - 1];
-            }
-        }
-
-        return directory + file;
     }
 
 }

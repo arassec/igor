@@ -9,8 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests the {@link HttpConnector}.
@@ -184,6 +183,8 @@ class HttpConnectorTest {
                 .dynamicHttpsPort()
                 .trustStorePath("src/test/resources/igor-tests-keystore.jks")
                 .trustStorePassword("password")
+                .keystorePath("src/test/resources/igor-tests-keystore.jks")
+                .keystorePassword("password")
                 .needClientAuth(true));
 
         server.start();
@@ -203,7 +204,13 @@ class HttpConnectorTest {
         httpConnector.initialize("job-id", new JobExecution());
 
         // Should throw exception because of the self-signed server certificate used by wiremock:
-        assertThrows(IgorException.class, httpConnector::testConfiguration);
+        try {
+            httpConnector.testConfiguration();
+            fail("Should have thrown an IgorException due to missing client certificate!");
+        } catch (IgorException e) {
+            // Extra check here, to make sure the request really failed because of the missing certificate!
+            assertTrue(e.getMessage().contains("handshake_failure"));
+        }
 
         // Use the test keystore as client certificate repository:
         httpConnector.setKeymanagerKeystore("src/test/resources/igor-tests-keystore.jks");

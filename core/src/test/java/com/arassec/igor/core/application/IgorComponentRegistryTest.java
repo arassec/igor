@@ -2,10 +2,13 @@ package com.arassec.igor.core.application;
 
 import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.action.MissingComponentAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.connector.Connector;
+import com.arassec.igor.core.model.connector.MissingComponentConnector;
 import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.trigger.MissingComponentTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.IgorException;
 import lombok.Getter;
@@ -169,7 +172,9 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting an Action instance.")
     void testGetActionInstance() {
-        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.createActionInstance("unknown-type-id", null));
+        Action actionInstance = igorComponentRegistry.createActionInstance("unknown-type-id", null);
+        assertTrue(actionInstance instanceof MissingComponentAction);
+
         igorComponentRegistry.createActionInstance("action-type-id", null);
         verify(applicationContextMock, times(1)).getBean(eq(actionMock.getClass()));
     }
@@ -180,7 +185,9 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting a Connector instance.")
     void testGetConnectorInstance() {
-        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.createConnectorInstance("unknown-type-id", null));
+        Connector connectorInstance = igorComponentRegistry.createConnectorInstance("unknown-type-id", null);
+        assertTrue(connectorInstance instanceof MissingComponentConnector);
+
         igorComponentRegistry.createConnectorInstance("connector-type-id", null);
         verify(applicationContextMock, times(1)).getBean(eq(TestConnectorImpl.class));
     }
@@ -204,7 +211,9 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting a Trigger instance.")
     void testGetTriggerInstance() {
-        assertThrows(IllegalArgumentException.class, () -> igorComponentRegistry.createTriggerInstance("unknown-type-id", null));
+        Trigger triggerInstance = igorComponentRegistry.createTriggerInstance("unknown-type-id", null);
+        assertTrue(triggerInstance instanceof MissingComponentTrigger);
+
         igorComponentRegistry.createTriggerInstance("trigger-type-id", null);
         verify(applicationContextMock, times(1)).getBean(eq(triggerMock.getClass()));
     }

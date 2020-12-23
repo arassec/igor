@@ -112,7 +112,7 @@ describe('Creates user doc job images.', () => {
     });
 
     describe('Creates Job-Editor images.', () => {
-        it.only('Create job-editor.png, job-editor-configurator.png, job-editor-navigator.png, job-editor-executions.png, '
+        it('Create job-editor.png, job-editor-configurator.png, job-editor-navigator.png, job-editor-executions.png, '
             + 'job-editor-simulation-results.png and job-editor-simulation-results-json.png', function () {
             cy.openJobEditor(jobCopyNewFilesKebap);
 
@@ -386,7 +386,7 @@ describe('Creates user doc job images.', () => {
             cy.deleteJob(jobName, jobKebap)
         });
 
-        it.only('Create copy-to-clipboard.png', function () {
+        it('Create copy-to-clipboard.png', function () {
             cy.openJobEditor(jobCopyNewFilesKebap);
 
             cy.simulateJob();

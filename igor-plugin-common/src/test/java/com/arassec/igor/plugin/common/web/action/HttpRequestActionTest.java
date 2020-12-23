@@ -6,7 +6,6 @@ import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.common.web.connector.HttpConnector;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,15 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("'HTTP Request' action tests.")
 class HttpRequestActionTest {
-
-    /**
-     * Initializes the test environment.
-     */
-    @BeforeAll
-    public static void initialize() {
-        // Disable host name verification for tests:
-        System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
-    }
 
     /**
      * Tests initializing the action.

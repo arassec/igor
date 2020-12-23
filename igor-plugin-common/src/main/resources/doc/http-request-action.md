@@ -54,12 +54,12 @@ The following parameters can be configured for the 'HTTP Request' action:
 Parameter | Description
 ---|:---|
 Http connector | An 'HTTP Connector' that is configured to execute the request.
-url | The HTTP(S) URL to execute the request against.
-method | The HTTP method. Can be one of 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE' or 'PATCH'.
-headers | The HTTP headers to use for the request. Headers must be entered as 'key: value'-pairs, with each header in a separate line.
-body | The HTTP body to use for the request.
-username | A username for HTTP Basic Authentication. If set together with a password, a HTTP Authorization header with the encoded password will be added to every request.
-password | A password for HTTP Basic Authentication.
+Url | The HTTP(S) URL to execute the request against.
+Method | The HTTP method. Can be one of 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE' or 'PATCH'.
+Headers | The HTTP headers to use for the request. Headers must be entered as 'key: value'-pairs, with each header in a separate line.
+Body | The HTTP body to use for the request.
+Username | A username for HTTP Basic Authentication. If set together with a password, a HTTP Authorization header with the encoded password will be added to every request.
+Password | A password for HTTP Basic Authentication.
 Target key | The name of the key the web request's results will be stored in.
 Ignore errors | If checked, igor will ignore the HTTP result code and treat every response as HTTP 200 ('OK').
 Simulation safe | If checked, HTTP POST, PUT and DELETE will not be executed by the action during simulated job executions.

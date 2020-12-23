@@ -5,6 +5,7 @@ import com.arassec.igor.plugin.common.CommonActionBaseTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -106,6 +107,16 @@ class SortByTimestampPatternActionTest extends CommonActionBaseTest {
         assertEquals(2, completedData.size());
         assertEquals("20191229185100-gamma.jpeg", completedData.get(0).get("filename"));
         assertEquals("alpha_20200113185100_beta.jpeg", completedData.get(1).get("filename"));
+    }
+
+    @Test
+    @DisplayName("Tests resetting the action")
+    void testReset() {
+        SortByTimestampPatternAction action = new SortByTimestampPatternAction();
+        action.getCollectedData().add(new HashMap<>());
+        assertEquals(1, action.getCollectedData().size());
+        action.reset();
+        assertEquals(0, action.getCollectedData().size());
     }
 
 }

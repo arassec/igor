@@ -3,12 +3,19 @@ package com.arassec.igor.core.application;
 import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.action.MissingComponentAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.Connector;
+import com.arassec.igor.core.model.connector.MissingComponentConnector;
 import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.trigger.MissingComponentTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
+import com.arassec.igor.core.util.IgorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.implementation.InvocationHandlerAdapter;
+import net.bytebuddy.matcher.ElementMatchers;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -17,6 +24,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -198,7 +207,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
             applyParameters(action, parameters);
             return action;
         }
-        throw new IllegalArgumentException("No action found for type ID: " + typeId);
+        return new MissingComponentAction("No action available for type ID: " + typeId);
     }
 
     /**
@@ -216,7 +225,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
             applyParameters(connector, parameters);
             return connector;
         }
-        throw new IllegalArgumentException("No connector found for type ID: " + typeId);
+        return new MissingComponentConnector("No connector available for type ID: " + typeId);
     }
 
     /**
@@ -234,7 +243,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
             applyParameters(trigger, parameters);
             return trigger;
         }
-        throw new IllegalArgumentException("No trigger found for type ID: " + typeId);
+        return new MissingComponentTrigger("No trigger available for type ID: " + typeId);
     }
 
     /**
@@ -263,8 +272,8 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     /**
      * Initializes categories and types of a specific igor component, e.g. {@link Connector}.
      *
-     * @param componentType The type of the component to initialize.
-     * @param components List of components of that type (e.g. all Actions on the classpath).
+     * @param componentType       The type of the component to initialize.
+     * @param components          List of components of that type (e.g. all Actions on the classpath).
      * @param typeByCategoryStore Map to store all component type IDs, indexed by category.
      */
     private void initializeComponent(Class<? extends IgorComponent> componentType, List<? extends IgorComponent> components,
@@ -286,20 +295,61 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     /**
      * Sets the supplied parameters at the supplied instance.
      *
-     * @param instance           The instance to apply the parameters to.
-     * @param parameters         The parameters to set.
+     * @param instance   The instance to apply the parameters to.
+     * @param parameters The parameters to set.
      */
     private void applyParameters(Object instance, Map<String, Object> parameters) {
         if (instance != null) {
             ReflectionUtils.doWithFields(instance.getClass(), field -> {
                 ReflectionUtils.makeAccessible(field);
                 if (parameters != null && parameters.containsKey(field.getName())) {
-                    ReflectionUtils.setField(field, instance, parameters.get(field.getName()));
+                    Object parameterValue = parameters.get(field.getName());
+                    if (parameterValue instanceof MissingComponentConnector) {
+                        parameterValue = handleMissingConnector(field);
+                    }
+                    ReflectionUtils.setField(field, instance, parameterValue);
                 } else if (field.isAnnotationPresent(IgorParam.class) && parameters == null) {
                     convertToObject(field.getType(), field.getAnnotation(IgorParam.class).defaultValue())
                             .ifPresent(o -> ReflectionUtils.setField(field, instance, o));
                 }
             });
+        }
+    }
+
+    /**
+     * Creates a replacement connector for a missing connector.
+     *
+     * @param field The field that the replacement connector is used for.
+     *
+     * @return A proxy to fill the missing connector.
+     */
+    private Object handleMissingConnector(Field field) {
+        try {
+            return new ByteBuddy()
+                    .subclass(field.getType())
+                    .implement(Connector.class)
+                    .method(ElementMatchers.any())
+                    .intercept(InvocationHandlerAdapter.of((proxy, method, args) -> {
+                        switch (method.getName()) {
+                            case "getName":
+                                return "Missing Connector!";
+                            case "equals":
+                                return false;
+                            case "hashCode":
+                                return 1;
+                            case "toString":
+                                return "";
+                            default:
+                                return null;
+                        }
+                    }))
+                    .make()
+                    .load(this.getClass().getClassLoader())
+                    .getLoaded()
+                    .getDeclaredConstructor()
+                    .newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new IgorException("Could not process missing connector component!", e);
         }
     }
 

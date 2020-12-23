@@ -46,7 +46,7 @@ public enum DataKey {
      * The key as String.
      */
     @Getter
-    private String key;
+    private final String key;
 
     /**
      * Creates a new instance.

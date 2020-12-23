@@ -88,14 +88,14 @@
                     <label for="import-file-selector" id="import-file-select">
                         <font-awesome-icon icon="folder-open"/>
                         Select file
-                        <input id="import-file-selector" type="file" @change="importFileChanged"/>
+                        <input id="import-file-selector" type="file" @change="importFileChanged" data-e2e="import-connector-file-input"/>
                     </label>
-                    <label v-if="importFile != null">{{ importFile.name }}</label>
+                    <label v-if="importFile != null" data-e2e="import-connector-chosen-file">{{ importFile.name }}</label>
                 </div>
             </div>
             <layout-row slot="footer">
                 <input-button slot="left" v-on:clicked="showImportDialog = false" icon="times"/>
-                <input-button slot="right" v-on:clicked="executeImport" icon="check"/>
+                <input-button slot="right" v-on:clicked="executeImport" icon="check" data-e2e="import-connector-confirm"/>
             </layout-row>
         </modal-dialog>
 
@@ -202,7 +202,7 @@ export default {
         duplicateConnector: async function (id) {
             let connectorConfiguration = await IgorBackend.getData('/api/connector/' + id);
             connectorConfiguration.name = 'Copy of ' + connectorConfiguration.name;
-            delete connectorConfiguration.id;
+            connectorConfiguration.id = Utils.uuidv4();
             this.$root.$data.store.setConnectorData(connectorConfiguration);
             this.$router.push({name: 'connector-editor'})
         },
@@ -223,7 +223,7 @@ export default {
                 let reader = new FileReader();
                 reader.onload = (e) => {
                     this.showImportDialog = false;
-                    IgorBackend.postData('/api/transfer', JSON.parse(e.target.result), 'Importing Connector', 'Import finished', 'Import failed').then(() => {
+                    IgorBackend.postData('/api/transfer', JSON.parse(e.target.result), 'Importing Connector', 'Import finished.', 'Import failed').then(() => {
                         this.importFile = null
                         this.loadConnectors();
                     });

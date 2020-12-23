@@ -3,6 +3,7 @@ package com.arassec.igor.plugin.common.file.action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.plugin.common.CommonDataKey;
 import com.arassec.igor.plugin.common.file.connector.FileConnector;
 import com.arassec.igor.plugin.common.file.connector.FileStreamData;
 import org.junit.jupiter.api.DisplayName;
@@ -50,12 +51,12 @@ class CopyFileActionTest extends FileActionBaseTest {
         assertEquals(1, processedData.size());
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> data = (Map<String, Object>) processedData.get(0).get(CopyFileAction.KEY_COPY_FILE_ACTION);
+        Map<String, Object> data = (Map<String, Object>) processedData.get(0).get(CommonDataKey.COPIED_FILE.getKey());
         assertAll("Copy file information is added to the data object.",
-                () -> assertEquals("/directory/test/", data.get(CopyFileAction.KEY_SOURCE_DIRECTORY)),
-                () -> assertEquals("filename.txt", data.get(CopyFileAction.KEY_SOURCE_FILENAME)),
-                () -> assertEquals("target/", data.get(CopyFileAction.KEY_TARGET_DIRECTORY)),
-                () -> assertEquals("copy-file-action-alpha.txt", data.get(CopyFileAction.KEY_TARGET_FILENAME))
+                () -> assertEquals("/directory/test/", data.get(CommonDataKey.SOURCE_DIRECTORY.getKey())),
+                () -> assertEquals("filename.txt", data.get(CommonDataKey.SOURCE_FILENAME.getKey())),
+                () -> assertEquals("target/", data.get(CommonDataKey.TARGET_DIRECTORY.getKey())),
+                () -> assertEquals("copy-file-action-alpha.txt", data.get(CommonDataKey.TARGET_FILENAME.getKey()))
         );
 
         verify(targetFileConnectorMock, times(1)).writeStream(eq("target/copy-file-action-alpha.txt.igor"),
@@ -78,13 +79,13 @@ class CopyFileActionTest extends FileActionBaseTest {
         fileStreamData.setFilenameSuffix("jpeg");
 
         FileConnector sourceFileConnectorMock = mock(FileConnector.class);
-        when(sourceFileConnectorMock.readStream(eq("/slashes"))).thenReturn(fileStreamData);
+        when(sourceFileConnectorMock.readStream(eq("/file"))).thenReturn(fileStreamData);
         FileConnector targetFileConnectorMock = mock(FileConnector.class);
 
         CopyFileAction action = new CopyFileAction();
         action.setSource(sourceFileConnectorMock);
         action.setSourceDirectory(null);
-        action.setSourceFilename("file/with/slashes");
+        action.setSourceFilename("file");
         action.setTarget(targetFileConnectorMock);
         action.setTargetDirectory("target");
         action.setTargetFilename("copy-file-action-test");
@@ -97,12 +98,12 @@ class CopyFileActionTest extends FileActionBaseTest {
         assertEquals(1, processedData.size());
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> data = (Map<String, Object>) processedData.get(0).get(CopyFileAction.KEY_COPY_FILE_ACTION);
+        Map<String, Object> data = (Map<String, Object>) processedData.get(0).get(CommonDataKey.COPIED_FILE.getKey());
         assertAll("Copy file information is added to the data object.",
-                () -> assertEquals("/", data.get(CopyFileAction.KEY_SOURCE_DIRECTORY)),
-                () -> assertEquals("file/with/slashes", data.get(CopyFileAction.KEY_SOURCE_FILENAME)),
-                () -> assertEquals("target/", data.get(CopyFileAction.KEY_TARGET_DIRECTORY)),
-                () -> assertEquals("copy-file-action-test.jpeg", data.get(CopyFileAction.KEY_TARGET_FILENAME))
+                () -> assertEquals("/", data.get(CommonDataKey.SOURCE_DIRECTORY.getKey())),
+                () -> assertEquals("file", data.get(CommonDataKey.SOURCE_FILENAME.getKey())),
+                () -> assertEquals("target/", data.get(CommonDataKey.TARGET_DIRECTORY.getKey())),
+                () -> assertEquals("copy-file-action-test.jpeg", data.get(CommonDataKey.TARGET_FILENAME.getKey()))
         );
 
         verify(targetFileConnectorMock, times(1)).writeStream(eq("target/copy-file-action-test.jpeg"),

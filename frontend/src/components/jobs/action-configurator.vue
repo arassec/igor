@@ -158,7 +158,7 @@ export default {
                     return this.actionTypes[i].documentationAvailable;
                 }
             }
-            return false;
+            return typeId === 'missing-component-action';
         },
         dataE2eName: function () {
             if (this.action.name) {

@@ -1,30 +1,27 @@
 package com.arassec.igor.plugin.common.web.action;
 
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.common.CommonCategory;
-import com.arassec.igor.plugin.common.web.connector.FallbackHttpConnector;
-import com.arassec.igor.plugin.common.web.connector.HttpConnector;
 import lombok.Getter;
 import lombok.Setter;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
-import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Action to issue an HTTP(S) request using a
@@ -32,7 +29,7 @@ import java.util.*;
 @Getter
 @Setter
 @IgorComponent
-public class HttpRequestAction extends BaseAction {
+public class HttpRequestAction extends BaseWebAction {
 
     /**
      * Key for the web request action's data.
@@ -45,57 +42,24 @@ public class HttpRequestAction extends BaseAction {
     private static final Set<String> SIMULATION_UNSAFE_METHODS = Set.of("POST", "PUT", "DELETE", "PATCH");
 
     /**
-     * The connector to use for requests.
-     */
-    @NotNull
-    @IgorParam
-    private HttpConnector httpConnector;
-
-    /**
-     * The URL to request.
-     */
-    @NotBlank
-    @IgorParam
-    private String url;
-
-    /**
      * The HTTP method to use.
      */
     @NotBlank
     @Pattern(regexp = "GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH")
-    @IgorParam(defaultValue = "GET")
+    @IgorParam(value = 3, defaultValue = "GET")
     private String method;
 
     /**
      * The request's headers.
      */
-    @IgorParam(advanced = true, subtype = ParameterSubtype.MULTI_LINE)
+    @IgorParam(value = 4, advanced = true, subtype = ParameterSubtype.MULTI_LINE)
     private String headers;
 
     /**
      * The request's body.
      */
-    @IgorParam(advanced = true, subtype = ParameterSubtype.MULTI_LINE)
+    @IgorParam(value = 5, advanced = true, subtype = ParameterSubtype.MULTI_LINE)
     private String body;
-
-    /**
-     * A username for authentication.
-     */
-    @IgorParam(advanced = true)
-    private String username;
-
-    /**
-     * The password for authentication.
-     */
-    @IgorParam(advanced = true, secured = true)
-    private String password;
-
-    /**
-     * The target key to put the web response in the data item.
-     */
-    @NotBlank
-    @IgorParam(advanced = true, defaultValue = DEFAULT_KEY_WEB_RESPONSE)
-    private String targetKey;
 
     /**
      * Enables igor to treat any HTTP result code as if it was HTTP 200.
@@ -110,16 +74,17 @@ public class HttpRequestAction extends BaseAction {
     private boolean simulationSafe;
 
     /**
-     * Contains the parsed headers.
+     * The target key to put the web response in the data item.
      */
-    private List<String> parsedHeaders = new LinkedList<>();
+    @NotBlank
+    @IgorParam(value = Integer.MAX_VALUE - 1, advanced = true, defaultValue = DEFAULT_KEY_WEB_RESPONSE)
+    private String targetKey;
 
     /**
      * Creates a new HTTP connector instance.
      */
     public HttpRequestAction() {
-        super(CommonCategory.WEB.getId(), "http-request-action");
-        httpConnector = new FallbackHttpConnector();
+        super("http-request-action");
         body = "";
     }
 
@@ -129,14 +94,7 @@ public class HttpRequestAction extends BaseAction {
     @Override
     public void initialize(String jobId, JobExecution jobExecution) {
         super.initialize(jobId, jobExecution);
-        if (StringUtils.hasText(headers)) {
-            String[] headerParts = headers.split("\\r?\\n");
-            for (String header : headerParts) {
-                if (header.contains(":")) {
-                    parsedHeaders.add(header);
-                }
-            }
-        }
+        parseHeaders(headers);
     }
 
     /**
@@ -189,16 +147,6 @@ public class HttpRequestAction extends BaseAction {
         }
 
         return List.of(data);
-    }
-
-    /**
-     * Creates an authorization header with the configured username and password and adds it to the builder.
-     */
-    private void addBasicAuthHeaderIfConfigured(HttpRequest.Builder httpRequestBuilder) {
-        if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
-            httpRequestBuilder.header("Authorization",
-                    "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes()));
-        }
     }
 
 }

@@ -1,0 +1,1 @@
+{"jobJsons":[],"connectorJsons":["{\"id\":\"7f029185-e52b-4c1d-ba2e-95b0dcc16dc4\",\"name\":\"E2E Import Connector Test\",\"category\":{\"key\":\"file\",\"value\":\"File\"},\"type\":{\"key\":\"localfs-file-connector\",\"value\":\"Filesystem\",\"documentationAvailable\":true},\"parameters\":[]}"]}

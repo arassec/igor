@@ -45,7 +45,7 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      * Defines the number of threads the action should be processed with.
      */
     @Positive
-    @IgorParam(advanced = true, defaultValue = "1")
+    @IgorParam(value = Integer.MAX_VALUE, advanced = true, defaultValue = "1")
     protected int numThreads;
 
     /**

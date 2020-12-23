@@ -12,7 +12,7 @@ public class FileStreamData {
 
     /**
      * Contains additional information about the connection to the source connector. This is sometimes required, e.g. to close an
-     * SSH session propertly after the file hast been copied.
+     * SSH session propertly after the file has been copied.
      */
     private Object sourceConnectionData;
 

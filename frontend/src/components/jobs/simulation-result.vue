@@ -44,7 +44,7 @@ export default {
     },
     computed: {
         placeholderJson: function () {
-            return JSON.stringify(this.data);
+            return JSON.stringify(this.data).substr(0, 200);
         }
     }
 }

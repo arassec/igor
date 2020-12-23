@@ -199,7 +199,7 @@ export default {
                     return this.triggerTypes[i].documentationAvailable;
                 }
             }
-            return false;
+            return typeKey === 'missing-component-trigger';
         },
         arrowColor: function () {
             if (this.validationErrors && this.jobConfiguration.id in this.validationErrors

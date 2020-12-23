@@ -84,8 +84,6 @@ module.exports = {
                                 "igor-plugin-common/localfs-file-connector",
                                 "igor-plugin-file/ftp-file-connector",
                                 "igor-plugin-file/ftps-file-connector",
-                                "igor-plugin-file/http-file-connector",
-                                "igor-plugin-file/https-file-connector",
                                 "igor-plugin-file/scp-file-connector",
                                 "igor-plugin-file/sftp-file-connector",
                                 "igor-plugin-message/rabbitmq-message-connector",

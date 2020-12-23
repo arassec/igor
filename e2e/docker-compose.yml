@@ -46,6 +46,8 @@ services:
       - LOCAL_UMASK=0777
       - PASV_MIN_PORT=21100
       - PASV_MAX_PORT=21110
+      - PASV_ADDRESS=igor-vsftpd
+      - PASV_ADDR_RESOLVE=YES
     networks:
       - igor-e2e
   sshd:

@@ -17,6 +17,7 @@
   "testFiles": [
     "preparation/create-connectors.js",
     "preparation/create-copy-new-files-job.js",
-    "documentation/*.*"
+    "documentation/*.spec.js",
+    "connector-overview/*.spec.js"
   ]
 }

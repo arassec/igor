@@ -9,6 +9,9 @@
 - Simulation results of the last action are added as 'stale' to newly created actions.
 - Simulation results are now shown in an accordion component.
 - Mustache template selections from the simulation results are automatically copied to the clipboard.
+- Added 'HTTP File Download' action.
+- Removed 'HTTP(S) File' connector.
+- Unknown components (e.g. due to removed plugins) no longer cause exceptions during startup, but are indicated in the UI.
 
 ## Version 0.2.5
 - Added 'mustache-selector' for JSON simulation results.

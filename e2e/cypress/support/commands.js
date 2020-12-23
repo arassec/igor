@@ -24,6 +24,8 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
+import 'cypress-file-upload';
+
 Cypress.Commands.add('openConnectorOverview', () => {
     cy.visit('/');
 
@@ -269,5 +271,5 @@ Cypress.Commands.add('simulateJob', () => {
         .click();
 
     cy.get('[data-e2e=snackbar]')
-        .should('not.be.visible')
+        .should('not.exist')
 })
