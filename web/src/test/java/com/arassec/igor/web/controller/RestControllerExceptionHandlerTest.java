@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -99,10 +100,10 @@ class RestControllerExceptionHandlerTest {
                 new FieldError("provider", "unknown.field", "id-validation-failed")
         ));
 
-        MethodArgumentNotValidException exceptionMock = mock(MethodArgumentNotValidException.class);
-        when(exceptionMock.getBindingResult()).thenReturn(bindingResultMock);
+        MethodArgumentNotValidException exception =
+                new MethodArgumentNotValidException(mock(MethodParameter.class), bindingResultMock);
 
-        ResponseEntity<Object> responseEntity = exceptionHandler.handleMethodArgumentNotValid(exceptionMock,
+        ResponseEntity<Object> responseEntity = exceptionHandler.handleMethodArgumentNotValid(exception,
                 mock(HttpHeaders.class), HttpStatus.OK, mock(WebRequest.class));
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -127,10 +128,10 @@ class RestControllerExceptionHandlerTest {
                 new ObjectError("job", UniqueJobName.MESSAGE_KEY)
         ));
 
-        MethodArgumentNotValidException exceptionMock = mock(MethodArgumentNotValidException.class);
-        when(exceptionMock.getBindingResult()).thenReturn(bindingResultMock);
+        MethodArgumentNotValidException exception =
+                new MethodArgumentNotValidException(mock(MethodParameter.class), bindingResultMock);
 
-        ResponseEntity<Object> responseEntity = exceptionHandler.handleMethodArgumentNotValid(exceptionMock,
+        ResponseEntity<Object> responseEntity = exceptionHandler.handleMethodArgumentNotValid(exception,
                 mock(HttpHeaders.class), HttpStatus.OK, mock(WebRequest.class));
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -145,7 +146,7 @@ class RestControllerExceptionHandlerTest {
                 new ObjectError("connector", UniqueConnectorName.MESSAGE_KEY)
         ));
 
-        responseEntity = exceptionHandler.handleMethodArgumentNotValid(exceptionMock,
+        responseEntity = exceptionHandler.handleMethodArgumentNotValid(exception,
                 mock(HttpHeaders.class), HttpStatus.OK, mock(WebRequest.class));
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertEquals("{connector-id={name=a connector with the same name already exists}}",
@@ -166,10 +167,10 @@ class RestControllerExceptionHandlerTest {
                 new ObjectError("beta", "beta-invalid")
         ));
 
-        MethodArgumentNotValidException exceptionMock = mock(MethodArgumentNotValidException.class);
-        when(exceptionMock.getBindingResult()).thenReturn(bindingResultMock);
+        MethodArgumentNotValidException exception =
+                new MethodArgumentNotValidException(mock(MethodParameter.class), bindingResultMock);
 
-        ResponseEntity<Object> responseEntity = exceptionHandler.handleMethodArgumentNotValid(exceptionMock,
+        ResponseEntity<Object> responseEntity = exceptionHandler.handleMethodArgumentNotValid(exception,
                 mock(HttpHeaders.class), HttpStatus.OK, mock(WebRequest.class));
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());

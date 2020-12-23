@@ -10,8 +10,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.MessageSource;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
 import java.util.List;
 import java.util.Locale;
@@ -29,17 +27,6 @@ class WebConfigurationTest {
      * The configuration under test.
      */
     private final WebConfiguration webConfiguration = new WebConfiguration();
-
-    /**
-     * Tests creation of a locale-resolver.
-     */
-    @Test
-    @DisplayName("Tests creation of a locale-resolver.")
-    void testLocaleResolverCreation() {
-        LocaleResolver localeResolver = webConfiguration.localeResolver();
-        assertTrue(localeResolver instanceof AcceptHeaderLocaleResolver);
-        assertEquals(Locale.ROOT, ((AcceptHeaderLocaleResolver) localeResolver).getDefaultLocale());
-    }
 
     /**
      * Tests message-source creation.
