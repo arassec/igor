@@ -3,6 +3,7 @@ package com.arassec.igor.web.controller;
 import com.arassec.igor.core.application.ConnectorManager;
 import com.arassec.igor.core.application.JobManager;
 import com.arassec.igor.core.model.connector.Connector;
+import com.arassec.igor.core.model.connector.MissingComponentConnector;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
@@ -59,7 +60,11 @@ public class ConnectorRestController {
 
             result.setItems(connectorsPage.getItems().stream().map(connector -> {
                 ModelPage<Pair<String, String>> referencingJobs = connectorManager.getReferencingJobs(connector.getId(), 0, 1);
-                return new ConnectorListEntry(connector.getId(), connector.getName(),
+                String connectorName = connector.getName();
+                if (connector instanceof MissingComponentConnector) {
+                    connectorName = "missing.connector " + connectorName;
+                }
+                return new ConnectorListEntry(connector.getId(), connectorName,
                         (referencingJobs != null && !referencingJobs.getItems().isEmpty()));
             }).collect(Collectors.toList()));
 

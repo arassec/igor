@@ -41,7 +41,7 @@ public class LocalFilesystemFileConnector extends BaseFileConnector {
     public List<FileInfo> listFiles(String directory, String fileEnding) {
         try {
             final PathMatcher matcher;
-            if (StringUtils.isEmpty(fileEnding)) {
+            if (!StringUtils.hasLength(fileEnding)) {
                 matcher = FileSystems.getDefault().getPathMatcher("glob:**/*");
             } else {
                 matcher = FileSystems.getDefault().getPathMatcher("glob:**/*." + fileEnding);

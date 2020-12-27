@@ -2,12 +2,14 @@ package com.arassec.igor.core.application;
 
 import com.arassec.igor.core.IgorCoreProperties;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.action.MissingComponentAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.connector.MissingComponentConnector;
 import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.MissingComponentTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.IgorException;
@@ -86,7 +88,7 @@ class IgorComponentRegistryTest {
 
         applicationContextMock = mock(ApplicationContext.class);
 
-        igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock), List.of(triggerMock),
+        igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock, new TestAction()), List.of(triggerMock),
                 List.of(new TestConnectorImpl(), connectorMock), igorCoreProperties);
         igorComponentRegistry.afterPropertiesSet();
         igorComponentRegistry.setApplicationContext(applicationContextMock);
@@ -121,7 +123,7 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting trigger types of a category")
     void testGetTriggerTypesOfCategory() {
-        assertTrue(igorComponentRegistry.getActionTypesOfCategory("unknown-category").isEmpty());
+        assertTrue(igorComponentRegistry.getTriggerTypesOfCategory("unknown-category").isEmpty());
         Set<String> typesOfCategory = igorComponentRegistry.getTriggerTypesOfCategory("trigger-category-id");
         assertEquals("trigger-type-id", typesOfCategory.iterator().next());
     }
@@ -132,7 +134,7 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting connector types of a category")
     void testGetConnectorTypesOfCategory() {
-        assertTrue(igorComponentRegistry.getActionTypesOfCategory("unknown-category").isEmpty());
+        assertTrue(igorComponentRegistry.getConnectorTypesOfCategory("unknown-category").isEmpty());
         Set<String> typesOfCategory = igorComponentRegistry.getConnectorTypesOfCategory("connector-category-id");
         assertEquals("connector-type-id", typesOfCategory.iterator().next());
     }
@@ -239,6 +241,24 @@ class IgorComponentRegistryTest {
         assertEquals(1, candidates.size());
         assertEquals(1, candidates.get(expected.getCategoryId()).size());
         assertEquals(expected.getTypeId(), candidates.get(expected.getCategoryId()).iterator().next());
+    }
+
+    /**
+     * Tests handling of missing connectors.
+     */
+    @Test
+    @DisplayName("Tests handling of missing connectors.")
+    void testHandleMissingConnectors() {
+        when(applicationContextMock.getBean(eq(TestAction.class))).thenReturn(new TestAction());
+
+        Map<String, Object> parameters = Map.of("missingConnector", new MissingComponentConnector("component-registry-test"));
+
+        TestAction action = (TestAction) igorComponentRegistry.createActionInstance("missing-connector-action-type", parameters);
+
+        Connector missingConnector = action.getMissingConnector();
+
+        assertEquals("Missing Connector!", missingConnector.getName());
+        assertEquals("Missing Connector!", missingConnector.toString());
     }
 
     /**
@@ -407,6 +427,35 @@ class IgorComponentRegistryTest {
         public void testConfiguration() throws IgorException {
         }
 
+    }
+
+    /**
+     * Action-Implementation for testing handling of missing connectors.
+     */
+    @Getter
+    @Setter
+    private static class TestAction extends BaseAction {
+
+        /**
+         * Parameter to test handling of missing connectors.
+         */
+        @IgorParam
+        private Connector missingConnector;
+
+        /**
+         * Creates a new component instance.
+         */
+        protected TestAction() {
+            super("missing-connector-action-category", "missing-connector-action-type");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
+            return List.of();
+        }
     }
 
 }

@@ -21,7 +21,7 @@ public @interface MissingComponent {
     /**
      * The message that indicates a failed validation.
      */
-    String MESSAGE_KEY = "com.arassec.igor.validation.missing-component";
+    String MESSAGE_KEY = "{com.arassec.igor.validation.missing-component}";
 
     /**
      * Returns the message key.

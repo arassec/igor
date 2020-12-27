@@ -325,20 +325,23 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      */
     private Object handleMissingConnector(Field field) {
         try {
+            List<Class<?>> implementations = new LinkedList<>();
+            if (!field.getType().equals(Connector.class)) {
+                implementations.add(Connector.class);
+            }
             return new ByteBuddy()
                     .subclass(field.getType())
-                    .implement(Connector.class)
+                    .implement(implementations)
                     .method(ElementMatchers.any())
                     .intercept(InvocationHandlerAdapter.of((proxy, method, args) -> {
                         switch (method.getName()) {
                             case "getName":
+                            case "toString":
                                 return "Missing Connector!";
                             case "equals":
                                 return false;
                             case "hashCode":
                                 return 1;
-                            case "toString":
-                                return "";
                             default:
                                 return null;
                         }

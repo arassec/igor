@@ -7,7 +7,7 @@ import com.arassec.igor.core.util.validation.MissingComponent;
 import lombok.Getter;
 
 /**
- * Placeholder trigger for triggers, that could not be found by igor.
+ * Placeholder connector for connectors, that could not be found by igor.
  */
 public class MissingComponentConnector extends BaseConnector {
 
@@ -24,7 +24,6 @@ public class MissingComponentConnector extends BaseConnector {
      */
     public MissingComponentConnector(String errorCause) {
         super("core", "missing-component-connector");
-        setName("MISSING COMPONENT: ");
         this.errorCause = errorCause;
     }
 

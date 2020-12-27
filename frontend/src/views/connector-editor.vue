@@ -9,7 +9,7 @@
             <layout-row slot="header">
                 <input-button slot="left" v-on:clicked="returnToJobConfiguration()" icon="arrow-left"
                               class="margin-right"
-                              disabled="inJobConfiguration" data-e2e="connector-editor-return-to-job"/>
+                              :disabled="!inJobConfiguration" data-e2e="connector-editor-return-to-job"/>
                 <input-button slot="left" v-on:clicked="saveConfiguration()" icon="save"
                               data-e2e="connector-editor-save"/>
                 <input-button slot="right" v-on:clicked="testConfiguration()" icon="plug"

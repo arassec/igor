@@ -21,8 +21,8 @@
             <div class="tiles">
                 <div v-for="connector of connectorsPage.items" :key="connector.id">
                     <overview-tile v-on:clicked="editConnector(connector.id)" :active="connector.used"
-                                   :title-content="connector.name">
-                        <div slot="title">{{ connector.name }}</div>
+                                   :title-content="connector.name.replace('missing.connector', 'Missing Connector:')">
+                        <div slot="title">{{ connector.name.replace('missing.connector', 'Missing Connector:') }}</div>
                         <layout-row slot="menu">
                             <div slot="left">
                                 <input-button icon="trash"
