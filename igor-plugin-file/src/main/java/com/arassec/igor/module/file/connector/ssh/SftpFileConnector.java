@@ -4,8 +4,8 @@ import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.common.file.connector.FileInfo;
-import com.arassec.igor.plugin.common.file.connector.FileStreamData;
+import com.arassec.igor.plugin.core.file.connector.FileInfo;
+import com.arassec.igor.plugin.core.file.connector.FileStreamData;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -46,8 +46,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
             channel.connect();
             List<ChannelSftp.LsEntry> files = new LinkedList<>();
             channel.ls(directory, entry -> {
-                if ((fileEnding == null || StringUtils.isEmpty(fileEnding) || entry.getFilename().endsWith(fileEnding))
-                        && !entry.getAttrs().isDir()) {
+                if ((!StringUtils.hasText(fileEnding) || entry.getFilename().endsWith(fileEnding)) && !entry.getAttrs().isDir()) {
                     files.add(entry);
                 }
                 return ChannelSftp.LsEntrySelector.CONTINUE;

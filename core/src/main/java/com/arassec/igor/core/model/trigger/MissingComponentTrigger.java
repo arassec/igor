@@ -1,8 +1,8 @@
 package com.arassec.igor.core.model.trigger;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.annotation.validation.MissingComponent;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
-import com.arassec.igor.core.util.validation.MissingComponent;
 import lombok.Getter;
 
 /**
@@ -20,6 +20,8 @@ public class MissingComponentTrigger extends BaseTrigger {
 
     /**
      * Creates a new component instance.
+     *
+     * @param errorCause Description of the original error cause.
      */
     public MissingComponentTrigger(String errorCause) {
         super("core", "missing-component-trigger");

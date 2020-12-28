@@ -1,8 +1,8 @@
 package com.arassec.igor.core.model.trigger;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.annotation.validation.ValidCronExpression;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
-import com.arassec.igor.core.util.validation.ValidCronExpression;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;

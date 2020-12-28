@@ -2,12 +2,12 @@ package com.arassec.igor.core.model.job;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.annotation.validation.UniqueJobName;
 import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
-import com.arassec.igor.core.util.validation.UniqueJobName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

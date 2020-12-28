@@ -95,10 +95,10 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>docs/user/igor-plugin-common</outputDirectory>
+                            <outputDirectory>docs/user/igor-plugin-core</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/igor-plugin-common/src/main/resources/doc</directory>
+                                    <directory>${project.parent.basedir}/igor-plugin-core/src/main/resources/doc</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -146,7 +146,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>docs/user/igor-plugin-common</directory>
+                            <directory>docs/user/igor-plugin-core</directory>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>

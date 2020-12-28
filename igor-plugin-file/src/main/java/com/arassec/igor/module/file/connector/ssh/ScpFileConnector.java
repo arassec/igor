@@ -5,8 +5,8 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.common.file.connector.FileInfo;
-import com.arassec.igor.plugin.common.file.connector.FileStreamData;
+import com.arassec.igor.plugin.core.file.connector.FileInfo;
+import com.arassec.igor.plugin.core.file.connector.FileStreamData;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
@@ -75,7 +75,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
         final String dir = directory.endsWith("/") ? directory : directory + "/";
         int numResultsToSkip = 1; // Without filter the total number of files is the first line of the result
         String command = "cd " + dir + " && ls -Alp --time-style=full-iso | grep -v /";
-        if (!StringUtils.isEmpty(fileEnding)) {
+        if (StringUtils.hasText(fileEnding)) {
             numResultsToSkip = 0;
             command += " *." + fileEnding;
         }
@@ -85,7 +85,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
                     .map(lsResult -> new FileInfo(extractFilename(lsResult), extractLastModified(lsResult)))
                     .collect(Collectors.toList());
         } catch (IgorException e) {
-            if (!StringUtils.isEmpty(fileEnding) && e.getMessage().contains("No such file or directory")) {
+            if (StringUtils.hasText(fileEnding) && e.getMessage().contains("No such file or directory")) {
                 return new LinkedList<>();
             } else {
                 throw e;

@@ -1,8 +1,8 @@
 package com.arassec.igor.web.controller;
 
+import com.arassec.igor.core.model.annotation.validation.UniqueConnectorName;
+import com.arassec.igor.core.model.annotation.validation.UniqueJobName;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.core.util.validation.UniqueConnectorName;
-import com.arassec.igor.core.util.validation.UniqueJobName;
 import com.arassec.igor.web.mapper.WebMapperKey;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -158,9 +158,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     private void appendUniqueNameViolationError(Map<String, Object> validatedJson, ObjectError objectError,
                                                 Map<String, Map<String, String>> target) {
         String id = (String) validatedJson.get("id");
-        if (!target.containsKey(id)) {
-            target.put(id, new HashMap<>());
-        }
+        target.computeIfAbsent(id, k -> new HashMap<>());
         String errorMessage = Optional.ofNullable(objectError.getDefaultMessage()).orElse("name already in use");
         target.get(id).put("name", messageSource.getMessage(errorMessage, null,
                 LocaleContextHolder.getLocale()));

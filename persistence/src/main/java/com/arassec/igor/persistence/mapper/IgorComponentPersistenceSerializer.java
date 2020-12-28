@@ -94,7 +94,7 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
         if (value == null) {
             return;
         }
-        if (value instanceof String && StringUtils.isEmpty(value)) {
+        if (value instanceof String && !StringUtils.hasText((String) value)) {
             return;
         }
         jsonGenerator.writeStartObject();

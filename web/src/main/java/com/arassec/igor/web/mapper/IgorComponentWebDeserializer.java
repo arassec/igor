@@ -132,7 +132,7 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
         if (value == null) {
             return false;
         }
-        return !(value instanceof String) || !StringUtils.isEmpty(value);
+        return !(value instanceof String) || StringUtils.hasText((String) value);
     }
 
     /**

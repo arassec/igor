@@ -1,9 +1,9 @@
 package com.arassec.igor.core.model.connector;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.annotation.validation.MissingComponent;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.core.util.validation.MissingComponent;
 import lombok.Getter;
 
 /**
@@ -21,6 +21,8 @@ public class MissingComponentConnector extends BaseConnector {
 
     /**
      * Creates a new component instance.
+     *
+     * @param errorCause Description of the original error cause.
      */
     public MissingComponentConnector(String errorCause) {
         super("core", "missing-component-connector");

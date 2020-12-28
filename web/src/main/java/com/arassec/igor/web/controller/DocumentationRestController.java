@@ -33,7 +33,7 @@ public class DocumentationRestController {
     @GetMapping(value = "{key}", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> readDoc(@PathVariable String key) {
         String doc = DocumentationUtil.readDocumentation(key, LocaleContextHolder.getLocale());
-        if (!StringUtils.isEmpty(doc)) {
+        if (StringUtils.hasText(doc)) {
             return new ResponseEntity<>(doc, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);

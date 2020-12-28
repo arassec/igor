@@ -1,6 +1,9 @@
 # Changelog
 
 ## Version {{ $themeConfig.igorVersion }}
+- Refactored common-plugin into core-plugin.
+
+## Version 0.2.6
 - Refactored modules into plugins.
 - 'Split Array' action now takes a mustache template as 'Array selector' configuration parameter instead of a JSON-Path query.
 - Inactive jobs are now greyed out on the job overview page.

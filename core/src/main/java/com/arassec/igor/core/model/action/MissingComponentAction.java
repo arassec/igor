@@ -1,10 +1,10 @@
 package com.arassec.igor.core.model.action;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.annotation.validation.MissingComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.core.util.validation.MissingComponent;
 import lombok.Getter;
 
 import java.util.List;
@@ -25,6 +25,8 @@ public class MissingComponentAction extends BaseAction {
 
     /**
      * Creates a new component instance.
+     *
+     * @param errorCause Description of the original error cause.
      */
     public MissingComponentAction(String errorCause) {
         super("core", "missing-component-action");

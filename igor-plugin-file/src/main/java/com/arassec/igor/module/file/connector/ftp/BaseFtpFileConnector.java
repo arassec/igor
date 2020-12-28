@@ -4,9 +4,9 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.common.file.connector.BaseFileConnector;
-import com.arassec.igor.plugin.common.file.connector.FileInfo;
-import com.arassec.igor.plugin.common.file.connector.FileStreamData;
+import com.arassec.igor.plugin.core.file.connector.BaseFileConnector;
+import com.arassec.igor.plugin.core.file.connector.FileInfo;
+import com.arassec.igor.plugin.core.file.connector.FileStreamData;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.net.ftp.FTP;
@@ -119,7 +119,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
             List<FileInfo> result;
 
             FTPFile[] ftpFiles = ftpClient.listFiles(directory,
-                    ftpFile -> StringUtils.isEmpty(fileEnding) || ftpFile.getName().endsWith(fileEnding));
+                    ftpFile -> !StringUtils.hasText(fileEnding) || ftpFile.getName().endsWith(fileEnding));
             if (ftpFiles != null && ftpFiles.length > 0) {
                 result = Stream.of(ftpFiles).filter(Objects::nonNull).filter(FTPFile::isFile).map(ftpFile -> {
                     Instant mTime = Instant.ofEpochMilli(ftpFile.getTimestamp().getTime().getTime());

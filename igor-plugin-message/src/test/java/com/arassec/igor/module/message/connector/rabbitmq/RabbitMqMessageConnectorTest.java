@@ -1,7 +1,7 @@
 package com.arassec.igor.module.message.connector.rabbitmq;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.common.message.connector.Message;
+import com.arassec.igor.plugin.core.message.connector.Message;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

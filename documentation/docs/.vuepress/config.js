@@ -49,45 +49,45 @@ module.exports = {
                             title: "Triggers",
                             sidebarDepth: 0,
                             children: [
-                                "igor-plugin-common/cron-trigger",
-                                "igor-plugin-common/manual-trigger",
-                                "igor-plugin-common/web-hook-trigger"
+                                "igor-plugin-core/cron-trigger",
+                                "igor-plugin-core/manual-trigger",
+                                "igor-plugin-core/web-hook-trigger"
                             ]
                         },
                         {
                             title: "Actions",
                             sidebarDepth: 0,
                             children: [
-                                "igor-plugin-common/filter-persisted-value-action",
-                                "igor-plugin-common/persist-value-action",
-                                "igor-plugin-common/filter-by-regexp-action",
-                                "igor-plugin-common/filter-by-timestamp-action",
-                                "igor-plugin-common/limit-action",
-                                "igor-plugin-common/log-action",
-                                "igor-plugin-common/pause-action",
-                                "igor-plugin-common/skip-action",
-                                "igor-plugin-common/sort-by-timestamp-pattern-action",
-                                "igor-plugin-common/split-array-action",
-                                "igor-plugin-common/copy-file-action",
-                                "igor-plugin-common/delete-file-action",
-                                "igor-plugin-common/list-files-action",
-                                "igor-plugin-common/move-file-action",
-                                "igor-plugin-common/read-file-action",
-                                "igor-plugin-common/send-message-action",
-                                "igor-plugin-common/http-request-action"
+                                "igor-plugin-core/filter-persisted-value-action",
+                                "igor-plugin-core/persist-value-action",
+                                "igor-plugin-core/filter-by-regexp-action",
+                                "igor-plugin-core/filter-by-timestamp-action",
+                                "igor-plugin-core/limit-action",
+                                "igor-plugin-core/log-action",
+                                "igor-plugin-core/pause-action",
+                                "igor-plugin-core/skip-action",
+                                "igor-plugin-core/sort-by-timestamp-pattern-action",
+                                "igor-plugin-core/split-array-action",
+                                "igor-plugin-core/copy-file-action",
+                                "igor-plugin-core/delete-file-action",
+                                "igor-plugin-core/list-files-action",
+                                "igor-plugin-core/move-file-action",
+                                "igor-plugin-core/read-file-action",
+                                "igor-plugin-core/send-message-action",
+                                "igor-plugin-core/http-request-action"
                             ]
                         },
                         {
                             title: "Connectors",
                             sidebarDepth: 0,
                             children: [
-                                "igor-plugin-common/localfs-file-connector",
+                                "igor-plugin-core/localfs-file-connector",
                                 "igor-plugin-file/ftp-file-connector",
                                 "igor-plugin-file/ftps-file-connector",
                                 "igor-plugin-file/scp-file-connector",
                                 "igor-plugin-file/sftp-file-connector",
                                 "igor-plugin-message/rabbitmq-message-connector",
-                                "igor-plugin-common/http-web-connector"
+                                "igor-plugin-core/http-web-connector"
                             ]
                         }
                     ]

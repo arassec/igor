@@ -254,7 +254,7 @@ public class JobRestController extends BaseRestController {
             }
         });
 
-        if (!StringUtils.isEmpty(jobResult.getErrorCause()) || !jobResult.getResults().isEmpty()) {
+        if (StringUtils.hasText(jobResult.getErrorCause()) || !jobResult.getResults().isEmpty()) {
             result.put(job.getId(), jobResult);
         }
 

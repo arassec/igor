@@ -77,7 +77,7 @@
         <module>core</module>
         <module>persistence</module>
         <module>frontend</module>
-        <module>igor-plugin-common</module>
+        <module>igor-plugin-core</module>
         <module>igor-plugin-file</module>
         <module>igor-plugin-message</module>
         <module>documentation</module>

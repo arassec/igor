@@ -173,7 +173,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                     writeConnectorParameter(jsonGenerator, value, candidates);
                 } else {
                     jsonGenerator.writeStringField(WebMapperKey.TYPE.getKey(), field.getType().getName());
-                    if (value instanceof String && StringUtils.isEmpty(value)) {
+                    if (value instanceof String && !StringUtils.hasText((String) value)) {
                         jsonGenerator.writeObjectField(WebMapperKey.VALUE.getKey(), null);
                     } else {
                         jsonGenerator.writeObjectField(WebMapperKey.VALUE.getKey(), value);

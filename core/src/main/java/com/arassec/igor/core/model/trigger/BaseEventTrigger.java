@@ -1,8 +1,8 @@
 package com.arassec.igor.core.model.trigger;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.annotation.validation.ValidJsonObject;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
-import com.arassec.igor.core.util.validation.ValidJsonObject;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
 

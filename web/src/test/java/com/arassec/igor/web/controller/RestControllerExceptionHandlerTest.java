@@ -1,10 +1,10 @@
 package com.arassec.igor.web.controller;
 
+import com.arassec.igor.core.model.annotation.validation.UniqueConnectorName;
+import com.arassec.igor.core.model.annotation.validation.UniqueJobName;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.util.IgorConfigHelper;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.core.util.validation.UniqueConnectorName;
-import com.arassec.igor.core.util.validation.UniqueJobName;
 import com.arassec.igor.web.mapper.WebMapperKey;
 import com.arassec.igor.web.test.TestConnector;
 import com.fasterxml.jackson.databind.ObjectMapper;

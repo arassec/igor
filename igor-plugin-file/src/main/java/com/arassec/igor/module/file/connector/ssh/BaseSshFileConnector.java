@@ -2,7 +2,7 @@ package com.arassec.igor.module.file.connector.ssh;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.common.file.connector.BaseFileConnector;
+import com.arassec.igor.plugin.core.file.connector.BaseFileConnector;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -87,7 +87,7 @@ public abstract class BaseSshFileConnector extends BaseFileConnector {
             Session session = jsch.getSession(username, host, port);
             session.setPassword(password);
             session.setConfig("StrictHostKeyChecking", strictHostkeyChecking ? "yes" : "no");
-            if (!StringUtils.isEmpty(preferredAuthentications)) {
+            if (StringUtils.hasText(preferredAuthentications)) {
                 session.setConfig("PreferredAuthentications", preferredAuthentications);
             }
             session.connect(timeout);
