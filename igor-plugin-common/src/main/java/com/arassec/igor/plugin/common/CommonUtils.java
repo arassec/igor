@@ -19,16 +19,17 @@ public class CommonUtils {
     }
 
     /**
-     * Appends the name of the source file to the destination path, thus creating the final name.
+     * Appends the suffix to the provided filename if required and the suffix is provided.
      *
-     * @param file   The file.
-     * @param suffix An optional file suffix to append to the filename, if the file has no suffix of its own.
+     * @param file                 The file.
+     * @param suffix               An optional file suffix to append to the filename.
+     * @param appendFiletypeSuffix Set to {@code true}, if the suffix should be added (if it exists), {@code false} otherwise.
      *
      * @return The file with the appended suffix.
      */
     public static String appendSuffixIfRequired(String file, String suffix, boolean appendFiletypeSuffix) {
         String targetFile = file;
-        if (!StringUtils.isEmpty(suffix) && appendFiletypeSuffix) {
+        if (StringUtils.hasText(suffix) && appendFiletypeSuffix) {
             if (!suffix.startsWith(".")) {
                 suffix = "." + suffix;
             }

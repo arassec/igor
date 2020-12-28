@@ -6,22 +6,30 @@ package com.arassec.igor.persistence.entity;
 public interface JobConnectorReferenceView {
 
     /**
-     * The job's ID.
+     * Returns the job's ID.
+     *
+     * @return The job's ID.
      */
     String getJobId();
 
     /**
-     * The job's name.
+     * Returns the job's name.
+     *
+     * @return The job's name.
      */
     String getJobName();
 
     /**
-     * The connector's ID.
+     * Returns the connector's ID.
+     *
+     * @return The connector's ID.
      */
     String getConnectorId();
 
     /**
-     * The connector's name.
+     * Returns the connector's name.
+     *
+     * @return The connector's name.
      */
     String getConnectorName();
 

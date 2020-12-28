@@ -6,8 +6,9 @@
 </template>
 
 <script>
-    import LayoutRow from "./layout-row";
-    export default {
+import LayoutRow from "./layout-row";
+
+export default {
         name: "action-bar",
         components: {LayoutRow}
     }
@@ -19,7 +20,7 @@
         width: 100%;
         background-color: var(--color-background);
         flex-shrink: 0;
-        padding: .25em;
+        padding: .5em;
     }
 
 </style>

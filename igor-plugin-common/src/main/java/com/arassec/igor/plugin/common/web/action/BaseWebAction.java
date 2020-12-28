@@ -82,9 +82,11 @@ public abstract class BaseWebAction extends BaseAction {
 
     /**
      * Creates an authorization header with the configured username and password and adds it to the builder.
+     *
+     * @param httpRequestBuilder The HTTP Request-Build to add the Basic-Auth header to.
      */
     protected void addBasicAuthHeaderIfConfigured(HttpRequest.Builder httpRequestBuilder) {
-        if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
+        if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
             httpRequestBuilder.header("Authorization",
                     "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes()));
         }

@@ -54,8 +54,6 @@ File Handling | Message Handling | Web
 ---|---|---
 FTP | RabbitMQ | HTTP(S)
 FTPS |  |
-HTTP |  |
-HTTPS |  |
 Local Filesystem | | 
 SCP |  |
 SFTP | |

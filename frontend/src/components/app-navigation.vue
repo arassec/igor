@@ -2,34 +2,26 @@
     <div id="app-content" data-e2e="app-content">
         <nav>
             <div class="main-menu">
-                <router-link to="/" class="top-logo-link">
-                    <div class="top-logo-container">
-                        <img alt="igor-logo" src="@/assets/igor-logo-top.png" class="top-logo"/>
-                    </div>
-                </router-link>
                 <ul>
                     <li>
-                        <router-link to="/" data-e2e="navigation-job-overview">
-                            <font-awesome-icon icon="toolbox"/>
-                            Jobs
-                        </router-link>
+                        <app-navigation-item target="/" data-e-to-e="navigation-job-overview"
+                                             icon="toolbox" label="Jobs"/>
                     </li>
                     <li>
-                        <router-link to="/connector-overview" data-e2e="navigation-connector-overview">
-                            <font-awesome-icon icon="link"/>
-                            Connectors
-                        </router-link>
+                        <app-navigation-item target="/connector-overview" data-e-to-e="navigation-connector-overview"
+                                             icon="link" label="Connectors"/>
                     </li>
                 </ul>
+
             </div>
             <div class="title">
-                <div>
-                    <h1 class="heading" data-e2e="navigation-heading">{{ heading }}</h1>
-                    <a class="documentation-link" target="_blank" rel="noopener noreferrer"
-                       href="/igor/index.html">
-                        v{{ version }} Reference Documentation
-                    </a>
-                </div>
+                <h1 class="heading" data-e2e="navigation-heading">{{ heading }}</h1>
+                <a class="documentation-link" target="_blank" rel="noopener noreferrer" href="/igor/index.html">
+                    <div class="top-logo-container">
+                        <img alt="igor-logo" src="@/assets/igor-logo-top.png" class="top-logo"/>
+                        <label class="version">v{{ version }}</label>
+                    </div>
+                </a>
             </div>
         </nav>
 
@@ -40,10 +32,11 @@
 
 <script>
 import {version} from '../../package.json';
+import AppNavigationItem from "@/components/app-navigation-item";
 
 export default {
     name: 'app-navigation',
-    components: {},
+    components: {AppNavigationItem},
     data: function () {
         return {
             importFile: null,
@@ -87,6 +80,11 @@ export default {
 
 .title {
     flex-basis: 50%;
+    display: flex;
+}
+
+.title ul {
+    float: right;
 }
 
 nav {
@@ -95,60 +93,48 @@ nav {
     flex-direction: row;
     background-color: var(--color-background);
     border-bottom: 2px solid var(--color-font);
-    height: 2.8em;
 }
 
 nav ul {
     flex-grow: 1;
-    margin-left: 2em;
 }
 
 nav ul li {
     float: left;
-    margin-left: .5em;
-}
-
-nav ul li a {
-    color: var(--color-font);
-    text-decoration: none;
-    font-size: 120%;
-    outline: none;
-    padding: 0.2em;
-}
-
-nav ul li:hover a {
-    background-color: var(--color-foreground);
 }
 
 nav h1 {
     flex-grow: 2;
-    font-size: 175%;
-    margin: 0 1.5em 0 -5em;
+    font-size: 350%;
+    margin: 0 0 0 -2em;
 }
 
-.documentation-link {
-    margin: -2.5em .25em 0 0;
-    font-size: 85%;
-    float: right;
-}
-
-.top-logo-link {
-    margin-right: 6em;
+.top-logo-container {
+    display: flex;
+    flex-direction: column;
 }
 
 .top-logo {
-    height: 2.4em;
-    position: absolute;
-    top: 3px;
-    left: 3px;
+    height: 4em;
+    float: right;
+    padding: .25em;
 }
 
-.top-logo-container div {
+.version {
+    margin: -.75em 0 0 1em;
+    font-size: 75%;
+}
+
+.version:hover {
+    cursor: pointer;
+}
+
+.documentation-link {
     text-decoration: none;
 }
 
-.top-logo-container:hover {
-    cursor: pointer;
+.documentation-link:hover {
+    background-color: var(--color-foreground);
 }
 
 </style>
