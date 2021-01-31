@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -36,7 +35,7 @@ class MoveFileActionTest extends FileActionBaseTest {
 
         moveFileAction.process(createData(), new JobExecution());
 
-        verify(fileConnectorMock, times(1)).move(eq("/directory/test/filename.txt"), eq("/dev/null/deleted.txt"));
+        verify(fileConnectorMock, times(1)).move("/directory/test/filename.txt", "/dev/null/deleted.txt");
     }
 
     /**

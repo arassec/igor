@@ -28,7 +28,7 @@ class JobRunningCallableTest {
         Job calledJob = jobRunningCallable.call();
 
         assertEquals(jobMock, calledJob);
-        verify(jobMock, times(1)).start(eq(jobExecution));
+        verify(jobMock, times(1)).start(jobExecution);
     }
 
 }

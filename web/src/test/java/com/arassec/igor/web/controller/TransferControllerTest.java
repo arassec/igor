@@ -42,9 +42,9 @@ class TransferControllerTest extends RestControllerBaseTest {
         Job job = new Job();
         job.setId("job-id");
 
-        when(jobManager.load(eq("job-id"))).thenReturn(job);
-        when(jobManager.getReferencedConnectors(eq("job-id"))).thenReturn(Set.of(new Pair<>("connector-id", "connector-name")));
-        when(connectorManager.load(eq("connector-id"))).thenReturn(new TestConnector());
+        when(jobManager.load("job-id")).thenReturn(job);
+        when(jobManager.getReferencedConnectors("job-id")).thenReturn(Set.of(new Pair<>("connector-id", "connector-name")));
+        when(connectorManager.load("connector-id")).thenReturn(new TestConnector());
         when(igorComponentRegistry.createConnectorInstance(anyString(), anyMap())).thenReturn(new TestConnector());
 
         MvcResult mvcResult = mockMvc.perform(get("/api/transfer/job/job-id").contentType(MediaType.APPLICATION_OCTET_STREAM))
@@ -106,7 +106,7 @@ class TransferControllerTest extends RestControllerBaseTest {
         TestConnector connector = new TestConnector();
         connector.setId("connector-id");
 
-        when(connectorManager.load(eq("connector-id"))).thenReturn(connector);
+        when(connectorManager.load("connector-id")).thenReturn(connector);
 
         MvcResult mvcResult = mockMvc.perform(get("/api/transfer/connector/connector-id").contentType(MediaType.APPLICATION_OCTET_STREAM))
                 .andExpect(status().isOk()).andReturn();

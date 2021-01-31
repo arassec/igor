@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,7 +31,7 @@ class CategoryRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests retrieval of connector categories.")
     @SneakyThrows(Exception.class)
     void testGetConnectorCategories() {
-        when(igorComponentRegistry.getCategoriesOfComponentType(eq(Connector.class))).thenReturn(Set.of("two", "one"));
+        when(igorComponentRegistry.getCategoriesOfComponentType(Connector.class)).thenReturn(Set.of("two", "one"));
 
         MvcResult mvcResult = mockMvc.perform(get("/api/category/connector")).andExpect(status().isOk()).andReturn();
 
@@ -51,7 +50,7 @@ class CategoryRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests retrieval of action categories.")
     @SneakyThrows(Exception.class)
     void testGetActionCategories() {
-        when(igorComponentRegistry.getCategoriesOfComponentType(eq(Action.class))).thenReturn(Set.of("two", "one"));
+        when(igorComponentRegistry.getCategoriesOfComponentType(Action.class)).thenReturn(Set.of("two", "one"));
 
         MvcResult mvcResult = mockMvc.perform(get("/api/category/action")).andExpect(status().isOk()).andReturn();
 
@@ -70,7 +69,7 @@ class CategoryRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests retrieval of trigger categories.")
     @SneakyThrows(Exception.class)
     void testGetTriggerCategories() {
-        when(igorComponentRegistry.getCategoriesOfComponentType(eq(Trigger.class))).thenReturn(Set.of("two", "one"));
+        when(igorComponentRegistry.getCategoriesOfComponentType(Trigger.class)).thenReturn(Set.of("two", "one"));
 
         MvcResult mvcResult = mockMvc.perform(get("/api/category/trigger")).andExpect(status().isOk()).andReturn();
 

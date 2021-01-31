@@ -16,7 +16,6 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,9 +40,9 @@ public abstract class MapperBaseTest {
     @BeforeEach
     void initialize() {
         ApplicationContext applicationContextMock = mock(ApplicationContext.class);
-        when(applicationContextMock.getBean(eq(TestConnector.class))).thenReturn(new TestConnector());
-        when(applicationContextMock.getBean(eq(TestTrigger.class))).thenReturn(new TestTrigger());
-        when(applicationContextMock.getBean(eq(TestAction.class))).thenReturn(new TestAction());
+        when(applicationContextMock.getBean(TestConnector.class)).thenReturn(new TestConnector());
+        when(applicationContextMock.getBean(TestTrigger.class)).thenReturn(new TestTrigger());
+        when(applicationContextMock.getBean(TestAction.class)).thenReturn(new TestAction());
 
         IgorComponentRegistry igorComponentRegistry = new IgorComponentRegistry(List.of(new TestAction()),
                 List.of(new TestTrigger()), List.of(new TestConnector()), null);
@@ -55,7 +54,7 @@ public abstract class MapperBaseTest {
         connectorObjectMapper = persistenceConfiguration.persistenceConnectorMapper(igorComponentRegistry, new TestSecurityProvider());
 
         ConnectorRepository connectorRepositoryMock = mock(ConnectorRepository.class);
-        when(connectorRepositoryMock.findById(eq(TestConnector.CONNECTOR_ID))).thenReturn(new TestConnector());
+        when(connectorRepositoryMock.findById(TestConnector.CONNECTOR_ID)).thenReturn(new TestConnector());
 
         jobObjectMapper = persistenceConfiguration.persistenceJobMapper(igorComponentRegistry, connectorRepositoryMock, new TestSecurityProvider());
     }

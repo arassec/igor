@@ -14,9 +14,9 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-    environment:
-      - RABBITMQ_DEFAULT_USER=igor
-      - RABBITMQ_DEFAULT_PASS=igor
+    volumes:
+      - ./environment/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./environment/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
     networks:
       - igor-e2e
   nginx:

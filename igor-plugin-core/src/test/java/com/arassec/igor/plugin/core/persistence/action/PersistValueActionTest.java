@@ -92,7 +92,7 @@ class PersistValueActionTest extends CoreActionBaseTest {
 
         action.setNumValuesToKeep(5);
         action.shutdown(JOB_ID, new JobExecution());
-        verify(persistentValueRepositoryMock, times(1)).cleanup(eq(JOB_ID), eq(5));
+        verify(persistentValueRepositoryMock, times(1)).cleanup(JOB_ID, 5);
     }
 
     /**

@@ -23,7 +23,6 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -93,9 +92,9 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
                         JobExecution.builder().id(789L).jobId("job-id")
                                 .executionState(JobExecutionState.WAITING).created(Instant.now()).build()));
 
-        when(jobManager.getJobExecutionsOfJob(eq("job-id"), eq(666), eq(42))).thenReturn(jobExecutions);
+        when(jobManager.getJobExecutionsOfJob("job-id", 666, 42)).thenReturn(jobExecutions);
 
-        when(jobManager.load(eq("job-id"))).thenReturn(Job.builder().name("job-name").build());
+        when(jobManager.load("job-id")).thenReturn(Job.builder().name("job-name").build());
 
         MvcResult mvcResult = mvcResult = mockMvc.perform(get("/api/execution/job/job-id")
                 .param("pageNumber", "666")
@@ -151,7 +150,7 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
                         JobExecution.builder().id(789L).jobId("job-id")
                                 .executionState(JobExecutionState.WAITING).created(Instant.now()).build()));
 
-        when(jobManager.getJobExecutionsOfJob(eq("job-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(jobExecutions);
+        when(jobManager.getJobExecutionsOfJob("job-id", 0, Integer.MAX_VALUE)).thenReturn(jobExecutions);
 
         mockMvc.perform(get("/api/execution/job/job-id/FAILED/count")).andExpect(status().isOk())
                 .andExpect(content().string("2"));
@@ -166,7 +165,7 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
     void testGetDetailedExecution() {
         mockMvc.perform(get("/api/execution/details/123")).andExpect(status().isBadRequest());
 
-        when(jobManager.getJobExecution(eq(123L))).thenReturn(JobExecution.builder().id(456L).build());
+        when(jobManager.getJobExecution(123L)).thenReturn(JobExecution.builder().id(456L).build());
 
         MvcResult mvcResult = mockMvc.perform(get("/api/execution/details/123")).andExpect(status().isOk()).andReturn();
 
@@ -183,7 +182,7 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
     void testCancelExecution() {
         mockMvc.perform(post("/api/execution/-123/cancel")).andExpect(status().isBadRequest());
         mockMvc.perform(post("/api/execution/123/cancel")).andExpect(status().isNoContent());
-        verify(jobManager, times(1)).cancelExecution(eq(123L));
+        verify(jobManager, times(1)).cancelExecution(123L);
     }
 
     /**
@@ -196,13 +195,13 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
         mockMvc.perform(
                 put("/api/execution/123/job-id/" + JobExecutionState.FAILED.name() + "/" + JobExecutionState.CANCELLED.name()))
                 .andExpect(status().isNoContent());
-        verify(jobManager, times(1)).updateJobExecutionState(eq(123L), eq(JobExecutionState.CANCELLED));
+        verify(jobManager, times(1)).updateJobExecutionState(123L, JobExecutionState.CANCELLED);
 
         mockMvc.perform(
                 put("/api/execution/123/job-id/" + JobExecutionState.FAILED.name() + "/" + JobExecutionState.RESOLVED.name())
                         .param("updateAllOfJob", "true"))
                 .andExpect(status().isNoContent());
-        verify(jobManager, times(1)).updateAllJobExecutionsOfJob(eq("job-id"), eq(JobExecutionState.FAILED), eq(JobExecutionState.RESOLVED));
+        verify(jobManager, times(1)).updateAllJobExecutionsOfJob("job-id", JobExecutionState.FAILED, JobExecutionState.RESOLVED);
     }
 
     /**
@@ -225,7 +224,7 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
                         Job.builder().currentJobExecution(jobExecution).build())
         );
 
-        verify(emitterMock, times(1)).send(eq(jobExecution));
+        verify(emitterMock, times(1)).send(jobExecution);
     }
 
     /**

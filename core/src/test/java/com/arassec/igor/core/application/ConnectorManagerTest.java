@@ -55,7 +55,7 @@ class ConnectorManagerTest {
     @DisplayName("Tests saving a connector.")
     void testSave() {
         connectorManager.save(connectorMock);
-        verify(connectorRepository, times(1)).upsert(eq(connectorMock));
+        verify(connectorRepository, times(1)).upsert(connectorMock);
     }
 
     /**
@@ -64,7 +64,7 @@ class ConnectorManagerTest {
     @Test
     @DisplayName("Tests loading a connector.")
     void testLoad() {
-        when(connectorRepository.findById(eq("connector-id"))).thenReturn(connectorMock);
+        when(connectorRepository.findById("connector-id")).thenReturn(connectorMock);
         Connector loadedConnector = connectorManager.load("connector-id");
         assertEquals(connectorMock, loadedConnector);
     }
@@ -76,7 +76,7 @@ class ConnectorManagerTest {
     @DisplayName("Tests loading a page of connectors.")
     void testLoadPage() {
         ModelPage<Connector> modelPage = new ModelPage<>();
-        when(connectorRepository.findPage(eq(1), eq(5), eq("connector-filter"))).thenReturn(modelPage);
+        when(connectorRepository.findPage(1, 5, "connector-filter")).thenReturn(modelPage);
         ModelPage<Connector> loadedPage = connectorManager.loadPage(1, 5, "connector-filter");
         assertEquals(modelPage, loadedPage);
     }
@@ -87,7 +87,7 @@ class ConnectorManagerTest {
     @Test
     @DisplayName("Tests loading a connector by its name.")
     void testLoadByName() {
-        when(connectorRepository.findByName(eq("connector-name"))).thenReturn(connectorMock);
+        when(connectorRepository.findByName("connector-name")).thenReturn(connectorMock);
         Connector loadedConnector = connectorManager.loadByName("connector-name");
         assertEquals(connectorMock, loadedConnector);
     }

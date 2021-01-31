@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,12 +31,12 @@ class UniqueJobNameValidatorTest {
 
         Job job = Job.builder().name("job").id("id").build();
         Job existingJob = Job.builder().name("job").id("id").build();
-        when(jobRepositoryMock.findByName(eq("job"))).thenReturn(existingJob);
+        when(jobRepositoryMock.findByName("job")).thenReturn(existingJob);
 
         assertTrue(validator.isValid(job, null));
 
         existingJob = Job.builder().name("job").id("other-id").build();
-        when(jobRepositoryMock.findByName(eq("job"))).thenReturn(existingJob);
+        when(jobRepositoryMock.findByName("job")).thenReturn(existingJob);
 
         assertFalse(validator.isValid(job, null));
     }

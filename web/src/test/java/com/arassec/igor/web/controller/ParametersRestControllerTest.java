@@ -68,7 +68,7 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
     @SneakyThrows(Exception.class)
     void testGetActionParameters() {
         when(igorComponentRegistry.createActionInstance(eq("type-id"), isNull())).thenReturn(new TestAction());
-        when(igorComponentRegistry.getConnectorParameterCategoryAndType(eq(TestConnectorInterface.class))).thenReturn(
+        when(igorComponentRegistry.getConnectorParameterCategoryAndType(TestConnectorInterface.class)).thenReturn(
                 Map.of("two", Set.of("three", "b"), "one", Set.of("four")));
 
         MvcResult mvcResult = mockMvc.perform(get("/api/parameters/action/type-id")).andExpect(status().isOk()).andReturn();

@@ -145,7 +145,7 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests creating a job instance as prototype.")
     void testCreateJobPrototype() {
-        doReturn(triggerMock).when(applicationContextMock).getBean(eq(triggerMock.getClass()));
+        doReturn(triggerMock).when(applicationContextMock).getBean(triggerMock.getClass());
 
         Job jobPrototype = igorComponentRegistry.createJobPrototype();
 
@@ -160,7 +160,7 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests creating a connector instance as prototype.")
     void testCreateActionPrototype() {
-        doReturn(actionMock).when(applicationContextMock).getBean(eq(actionMock.getClass()));
+        doReturn(actionMock).when(applicationContextMock).getBean(actionMock.getClass());
 
         Action actionPrototype = igorComponentRegistry.createActionPrototype();
 
@@ -191,7 +191,7 @@ class IgorComponentRegistryTest {
         assertTrue(connectorInstance instanceof MissingComponentConnector);
 
         igorComponentRegistry.createConnectorInstance("connector-type-id", null);
-        verify(applicationContextMock, times(1)).getBean(eq(TestConnectorImpl.class));
+        verify(applicationContextMock, times(1)).getBean(TestConnectorImpl.class);
     }
 
     /**
@@ -202,7 +202,7 @@ class IgorComponentRegistryTest {
     void testGetConnectorInstanceWithParameters() {
         Map<String, Object> params = new HashMap<>();
         params.put("intParam", 666);
-        when(applicationContextMock.getBean(eq(TestConnectorImpl.class))).thenReturn(new TestConnectorImpl());
+        when(applicationContextMock.getBean(TestConnectorImpl.class)).thenReturn(new TestConnectorImpl());
         TestConnectorImpl connectorInstance = (TestConnectorImpl) igorComponentRegistry.createConnectorInstance("connector-type-id", params);
         assertEquals(666, connectorInstance.getIntParam());
     }
@@ -217,7 +217,7 @@ class IgorComponentRegistryTest {
         assertTrue(triggerInstance instanceof MissingComponentTrigger);
 
         igorComponentRegistry.createTriggerInstance("trigger-type-id", null);
-        verify(applicationContextMock, times(1)).getBean(eq(triggerMock.getClass()));
+        verify(applicationContextMock, times(1)).getBean(triggerMock.getClass());
     }
 
     /**
@@ -249,7 +249,7 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests handling of missing connectors.")
     void testHandleMissingConnectors() {
-        when(applicationContextMock.getBean(eq(TestAction.class))).thenReturn(new TestAction());
+        when(applicationContextMock.getBean(TestAction.class)).thenReturn(new TestAction());
 
         Map<String, Object> parameters = Map.of("missingConnector", new MissingComponentConnector("component-registry-test"));
 
@@ -267,7 +267,7 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests setting the default value on new instances.")
     void testDefaultValueHandling() {
-        when(applicationContextMock.getBean(eq(TestConnectorImpl.class))).thenReturn(new TestConnectorImpl());
+        when(applicationContextMock.getBean(TestConnectorImpl.class)).thenReturn(new TestConnectorImpl());
 
         TestConnectorImpl connector = (TestConnectorImpl) igorComponentRegistry.createConnectorInstance("connector-type-id",
                 null);

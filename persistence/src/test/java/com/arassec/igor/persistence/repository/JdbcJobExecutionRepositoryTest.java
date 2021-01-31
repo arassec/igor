@@ -95,11 +95,11 @@ class JdbcJobExecutionRepositoryTest {
         entity.setId(123L);
         when(jobExecutionDao.save(any(JobExecutionEntity.class))).thenReturn(entity);
 
-        when(jobExecutionDao.findById(eq(123L))).thenReturn(Optional.of(entity));
+        when(jobExecutionDao.findById(123L)).thenReturn(Optional.of(entity));
 
         repository.upsert(jobExecution);
 
-        verify(jobExecutionDao, times(1)).save(eq(entity));
+        verify(jobExecutionDao, times(1)).save(entity);
     }
 
     /**
@@ -117,7 +117,7 @@ class JdbcJobExecutionRepositoryTest {
         jobExecution.setJobId("job-id");
         jobExecution.setExecutionState(JobExecutionState.RUNNING);
 
-        when(persistenceJobMapper.writeValueAsString(eq(jobExecution))).thenThrow(mock(JsonProcessingException.class));
+        when(persistenceJobMapper.writeValueAsString(jobExecution)).thenThrow(mock(JsonProcessingException.class));
 
         assertThrows(IllegalStateException.class, () -> repository.upsert(jobExecution));
 
@@ -143,7 +143,7 @@ class JdbcJobExecutionRepositoryTest {
         entity.setState(JobExecutionState.WAITING.name());
         entity.setContent("{}");
 
-        when(jobExecutionDao.findById(eq(123L))).thenReturn(Optional.of(entity));
+        when(jobExecutionDao.findById(123L)).thenReturn(Optional.of(entity));
 
         JobExecution jobExecution = new JobExecution();
         when(persistenceJobMapper.readValue(anyString(), eq(JobExecution.class))).thenReturn(jobExecution);
@@ -177,7 +177,7 @@ class JdbcJobExecutionRepositoryTest {
 
         when(jobExecutionDao.findByJobId(eq("job-id"), argCap.capture())).thenReturn(page);
 
-        when(persistenceJobMapper.readValue(eq("execution-json"), eq(JobExecution.class))).thenReturn(new JobExecution());
+        when(persistenceJobMapper.readValue("execution-json", JobExecution.class)).thenReturn(new JobExecution());
 
         ModelPage<JobExecution> allOfJobPage = repository.findAllOfJob("job-id", 1, 2);
 
@@ -201,7 +201,7 @@ class JdbcJobExecutionRepositoryTest {
     @DisplayName("Tests counting job executions with a given state of a given job.")
     @SneakyThrows
     void testCountAllOfJobInState() {
-        when(jobExecutionDao.countAllOfJobInState(eq("job-id"), eq(JobExecutionState.FAILED.name()))).thenReturn(23);
+        when(jobExecutionDao.countAllOfJobInState("job-id", JobExecutionState.FAILED.name())).thenReturn(23);
         assertEquals(23, repository.countAllOfJobInState("job-id", JobExecutionState.FAILED));
     }
 
@@ -219,10 +219,10 @@ class JdbcJobExecutionRepositoryTest {
         jobExecutionEntity.setState(JobExecutionState.FINISHED.name());
         jobExecutionEntity.setContent("execution-json");
 
-        when(jobExecutionDao.findByJobIdAndStateOrderByIdDesc(eq("job-id"), eq("FINISHED"))).thenReturn(List.of(jobExecutionEntity));
+        when(jobExecutionDao.findByJobIdAndStateOrderByIdDesc("job-id", "FINISHED")).thenReturn(List.of(jobExecutionEntity));
 
         JobExecution jobExecution = new JobExecution();
-        when(persistenceJobMapper.readValue(eq("execution-json"), eq(JobExecution.class))).thenReturn(jobExecution);
+        when(persistenceJobMapper.readValue("execution-json", JobExecution.class)).thenReturn(jobExecution);
 
         List<JobExecution> allOfJobInState = repository.findAllOfJobInState("job-id", JobExecutionState.FINISHED);
 
@@ -254,7 +254,7 @@ class JdbcJobExecutionRepositoryTest {
 
         when(jobExecutionDao.findByState(eq(JobExecutionState.RUNNING.name()), argCap.capture())).thenReturn(page);
 
-        when(persistenceJobMapper.readValue(eq("execution-json"), eq(JobExecution.class))).thenReturn(new JobExecution());
+        when(persistenceJobMapper.readValue("execution-json", JobExecution.class)).thenReturn(new JobExecution());
 
         ModelPage<JobExecution> inStatePage = repository.findInState(JobExecutionState.RUNNING, 1, 2);
 
@@ -299,8 +299,8 @@ class JdbcJobExecutionRepositoryTest {
 
         repository.cleanup("job-id", 1);
 
-        verify(jobExecutionDao, times(1)).deleteByJobIdAndStateNotAndIdBefore(eq("job-id"),
-                eq(JobExecutionState.FAILED.name()), eq(4L));
+        verify(jobExecutionDao, times(1)).deleteByJobIdAndStateNotAndIdBefore("job-id",
+                JobExecutionState.FAILED.name(), 4L);
     }
 
     /**
@@ -334,7 +334,7 @@ class JdbcJobExecutionRepositoryTest {
         JobExecutionEntity entity = new JobExecutionEntity();
         entity.setState(JobExecutionState.FAILED.name());
 
-        when(jobExecutionDao.findById(eq(123L))).thenReturn(Optional.of(entity));
+        when(jobExecutionDao.findById(123L)).thenReturn(Optional.of(entity));
 
         repository.updateJobExecutionState(123L, JobExecutionState.RESOLVED);
 
@@ -358,7 +358,7 @@ class JdbcJobExecutionRepositoryTest {
 
         List<JobExecutionEntity> entities = List.of(new JobExecutionEntity(), new JobExecutionEntity());
 
-        when(jobExecutionDao.findByJobIdAndStateOrderByIdDesc(eq("job-id"), eq(JobExecutionState.FAILED.name()))).thenReturn(entities);
+        when(jobExecutionDao.findByJobIdAndStateOrderByIdDesc("job-id", JobExecutionState.FAILED.name())).thenReturn(entities);
 
         repository.updateAllJobExecutionsOfJob("job-id", JobExecutionState.FAILED, JobExecutionState.RESOLVED);
 
@@ -371,7 +371,7 @@ class JdbcJobExecutionRepositoryTest {
     @Test
     @DisplayName("Tests counting jobs with a given state.")
     void testCoutJobWithState() {
-        when(jobExecutionDao.countDistinctJobIdByState(eq(JobExecutionState.RUNNING.name()))).thenReturn(42);
+        when(jobExecutionDao.countDistinctJobIdByState(JobExecutionState.RUNNING.name())).thenReturn(42);
         assertEquals(42, repository.countJobsWithState(JobExecutionState.RUNNING));
     }
 

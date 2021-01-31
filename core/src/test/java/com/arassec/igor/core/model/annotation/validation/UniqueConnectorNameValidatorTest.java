@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,7 +32,7 @@ class UniqueConnectorNameValidatorTest {
         assertTrue(validator.isValid(connectorMock, null));
 
         when(connectorMock.getName()).thenReturn("connector-mock");
-        when(connectorRepositoryMock.findByName(eq("connector-mock"))).thenReturn(existingConnectorMock);
+        when(connectorRepositoryMock.findByName("connector-mock")).thenReturn(existingConnectorMock);
 
         when(connectorMock.getId()).thenReturn("id");
         when(existingConnectorMock.getId()).thenReturn("id");

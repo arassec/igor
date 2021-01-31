@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +30,7 @@ class ListFilesActionTest {
     @DisplayName("Tests the action with mustache template parameters.")
     void testProcess() {
         FileConnector fileConnectorMock = mock(FileConnector.class);
-        when(fileConnectorMock.listFiles(eq("/dir"), eq("jpg"))).thenReturn(
+        when(fileConnectorMock.listFiles("/dir", "jpg")).thenReturn(
                 List.of(new FileInfo("fileA.jpg", "12345"), new FileInfo("fileB.jpg", "67890"))
         );
 

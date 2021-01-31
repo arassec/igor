@@ -28,7 +28,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -101,7 +100,7 @@ class JobExecutorTest {
         runningJobs.put("running-job-id", runningJob);
 
         when(jobExecutionRepository
-                .findInState(eq(JobExecutionState.WAITING), eq(0), eq(Integer.MAX_VALUE)))
+                .findInState(JobExecutionState.WAITING, 0, Integer.MAX_VALUE))
                 .thenReturn(new ModelPage<>(1, 0, 1, List.of()));
 
         jobExecutor.update();
@@ -138,11 +137,11 @@ class JobExecutorTest {
         ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobs", runningJobs);
 
         // Another job is waiting for execution:
-        when(jobExecutionRepository.findInState(eq(JobExecutionState.WAITING), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(jobExecutionRepository.findInState(JobExecutionState.WAITING, 0, Integer.MAX_VALUE)).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(JobExecution.builder().id(1L).jobId("job-id").build()))
         );
         Job waitingJob = Job.builder().id("waiting-job-id").name("waiting-job-name").build();
-        when(jobRepository.findById(eq("job-id"))).thenReturn(waitingJob);
+        when(jobRepository.findById("job-id")).thenReturn(waitingJob);
 
         // update has to check the number of available slots;
         jobExecutor.update();
@@ -172,18 +171,18 @@ class JobExecutorTest {
         Job job = new Job();
         job.setCurrentJobExecution(executedExecution);
         job.setId("job-id");
-        lenient().when(jobRepository.findById(eq("job-id"))).thenReturn(job);
+        lenient().when(jobRepository.findById("job-id")).thenReturn(job);
         // Third execution: delayed due to slot capacity:
         JobExecution delayedExecution = JobExecution.builder().build();
 
-        when(jobExecutionRepository.findInState(eq(JobExecutionState.WAITING), eq(0), eq(Integer.MAX_VALUE)))
+        when(jobExecutionRepository.findInState(JobExecutionState.WAITING, 0, Integer.MAX_VALUE))
                 .thenReturn(new ModelPage<>(0, 3, 1, List.of(ignoredExecution, executedExecution, delayedExecution)));
 
         jobExecutor.update();
 
-        verify(jobExecutionRepository, times(0)).upsert(eq(ignoredExecution));
-        verify(jobExecutionRepository, times(1)).upsert(eq(executedExecution));
-        verify(jobExecutionRepository, times(0)).upsert(eq(delayedExecution));
+        verify(jobExecutionRepository, times(0)).upsert(ignoredExecution);
+        verify(jobExecutionRepository, times(1)).upsert(executedExecution);
+        verify(jobExecutionRepository, times(0)).upsert(delayedExecution);
 
         // The job might finished before the test checks the execution state. Thus both states are valid results!
         assertTrue((JobExecutionState.RUNNING.equals(executedExecution.getExecutionState())) ||
@@ -209,13 +208,13 @@ class JobExecutorTest {
 
         JobExecution jobExecution = JobExecution.builder().jobId("job-id").build();
 
-        when(jobExecutionRepository.findInState(eq(JobExecutionState.WAITING), eq(0),
-                eq(Integer.MAX_VALUE))).thenReturn(new ModelPage<>(0, 1, 1,
+        when(jobExecutionRepository.findInState(JobExecutionState.WAITING, 0,
+                Integer.MAX_VALUE)).thenReturn(new ModelPage<>(0, 1, 1,
                 List.of(jobExecution)));
 
         EventTrigger eventTriggerMock = mock(EventTrigger.class);
 
-        when(jobRepository.findById(eq("job-id"))).thenReturn(
+        when(jobRepository.findById("job-id")).thenReturn(
                 Job.builder().trigger(eventTriggerMock).build());
 
         jobExecutor.update();
@@ -295,13 +294,13 @@ class JobExecutorTest {
         ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobFutures", runningJobFutures);
 
         when(jobExecutionRepository
-                .findInState(eq(JobExecutionState.WAITING), eq(0), eq(Integer.MAX_VALUE)))
+                .findInState(JobExecutionState.WAITING, 0, Integer.MAX_VALUE))
                 .thenReturn(new ModelPage<>(1, 0, 1, List.of()));
 
         jobExecutor.update();
 
-        verify(jobExecutionRepository, times(1)).updateAllJobExecutionsOfJob(eq("job-id"),
-                eq(JobExecutionState.FAILED), eq(JobExecutionState.RESOLVED));
+        verify(jobExecutionRepository, times(1)).updateAllJobExecutionsOfJob("job-id",
+                JobExecutionState.FAILED, JobExecutionState.RESOLVED);
     }
 
     /**
@@ -332,7 +331,7 @@ class JobExecutorTest {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     void testProcessFinishedErrorHandling() {
-        when(jobExecutionRepository.findInState(eq(JobExecutionState.WAITING), eq(0), eq(Integer.MAX_VALUE)))
+        when(jobExecutionRepository.findInState(JobExecutionState.WAITING, 0, Integer.MAX_VALUE))
                 .thenReturn(new ModelPage<>(1,0,1, List.of()));
 
         // Test InterruptedException:

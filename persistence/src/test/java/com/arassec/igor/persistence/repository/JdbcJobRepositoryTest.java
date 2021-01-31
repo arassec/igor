@@ -100,7 +100,7 @@ class JdbcJobRepositoryTest {
         verify(jobDao, times(1)).save(argCap.capture());
         assertEquals("job-json", argCap.getValue().getContent());
 
-        verify(jobConnectorReferenceDao, times(1)).deleteByJobId(eq(savedJob.getId()));
+        verify(jobConnectorReferenceDao, times(1)).deleteByJobId(savedJob.getId());
 
         ArgumentCaptor<JobConnectorReferenceEntity> argCapTwo = ArgumentCaptor.forClass(JobConnectorReferenceEntity.class);
         verify(jobConnectorReferenceDao, times(1)).save(argCapTwo.capture());
@@ -120,10 +120,10 @@ class JdbcJobRepositoryTest {
         job.setId("job-id");
         job.setName("job-name");
 
-        when(persistenceJobMapper.writeValueAsString(eq(job))).thenReturn("job-json");
+        when(persistenceJobMapper.writeValueAsString(job)).thenReturn("job-json");
 
         // With Job-ID but without persisted job (i.e. upsert during import)
-        when(jobDao.findById(eq("job-id"))).thenReturn(Optional.empty());
+        when(jobDao.findById("job-id")).thenReturn(Optional.empty());
 
         Job upsertedJob = repository.upsert(job);
 
@@ -138,7 +138,7 @@ class JdbcJobRepositoryTest {
         assertEquals(job.getName(), upsertedJob.getName());
 
         // "normal" upsert: provided ID and existing, persisted job:
-        when(jobDao.findById(eq("job-id"))).thenReturn(Optional.of(new JobEntity()));
+        when(jobDao.findById("job-id")).thenReturn(Optional.of(new JobEntity()));
 
         repository.upsert(job);
 
@@ -156,16 +156,16 @@ class JdbcJobRepositoryTest {
     @DisplayName("Tests finding a job by its ID.")
     @SneakyThrows(JsonProcessingException.class)
     void testFindById() {
-        when(jobDao.findById(eq("job-id"))).thenReturn(Optional.empty());
+        when(jobDao.findById("job-id")).thenReturn(Optional.empty());
         assertNull(repository.findById("job-id"));
 
         JobEntity jobEntity = new JobEntity();
         jobEntity.setContent("job-json");
 
-        when(jobDao.findById(eq("job-id"))).thenReturn(Optional.of(jobEntity));
+        when(jobDao.findById("job-id")).thenReturn(Optional.of(jobEntity));
 
         Job job = new Job();
-        when(persistenceJobMapper.readValue(eq("job-json"), eq(Job.class))).thenReturn(job);
+        when(persistenceJobMapper.readValue("job-json", Job.class)).thenReturn(job);
 
         Job foundJob = repository.findById("job-id");
         assertEquals(job, foundJob);
@@ -183,10 +183,10 @@ class JdbcJobRepositoryTest {
 
         JobEntity jobEntity = new JobEntity();
         jobEntity.setContent("job-json");
-        when(jobDao.findByName(eq("job-name"))).thenReturn(jobEntity);
+        when(jobDao.findByName("job-name")).thenReturn(jobEntity);
 
         Job job = new Job();
-        when(persistenceJobMapper.readValue(eq("job-json"), eq(Job.class))).thenReturn(job);
+        when(persistenceJobMapper.readValue("job-json", Job.class)).thenReturn(job);
 
         Job foundJob = repository.findByName("job-name");
         assertEquals(job, foundJob);
@@ -204,7 +204,7 @@ class JdbcJobRepositoryTest {
         List<JobEntity> entityList = List.of(new JobEntity(), new JobEntity());
         entityList.forEach(entity -> entity.setContent("job-json"));
         when(jobDao.findAll()).thenReturn(entityList);
-        when(persistenceJobMapper.readValue(eq("job-json"), eq(Job.class))).thenReturn(new Job());
+        when(persistenceJobMapper.readValue("job-json", Job.class)).thenReturn(new Job());
 
         List<Job> allJobs = repository.findAll();
         assertEquals(2, allJobs.size());
@@ -234,7 +234,7 @@ class JdbcJobRepositoryTest {
         entityList.forEach(entity -> entity.setContent("job-json"));
         when(entityPage.getContent()).thenReturn(entityList);
 
-        when(persistenceJobMapper.readValue(eq("job-json"), eq(Job.class))).thenReturn(new Job());
+        when(persistenceJobMapper.readValue("job-json", Job.class)).thenReturn(new Job());
 
         when(jobDao.findAll(any(Pageable.class))).thenReturn(entityPage);
 
@@ -263,8 +263,8 @@ class JdbcJobRepositoryTest {
     @DisplayName("Tests deleting a job by its ID.")
     void testDeleteById() {
         repository.deleteById("job-id");
-        verify(jobDao, times(1)).deleteById(eq("job-id"));
-        verify(jobConnectorReferenceDao, times(1)).deleteByJobId(eq("job-id"));
+        verify(jobDao, times(1)).deleteById("job-id");
+        verify(jobConnectorReferenceDao, times(1)).deleteByJobId("job-id");
     }
 
     /**
@@ -279,7 +279,7 @@ class JdbcJobRepositoryTest {
         when(entity.getConnectorId()).thenReturn("connector-id");
         when(entity.getConnectorName()).thenReturn("connector-name");
 
-        when(jobConnectorReferenceDao.findByJobId(eq("job-id"))).thenReturn(List.of(entity));
+        when(jobConnectorReferenceDao.findByJobId("job-id")).thenReturn(List.of(entity));
 
         Set<Pair<String, String>> referencedConnectors = repository.findReferencedConnectors("job-id");
 

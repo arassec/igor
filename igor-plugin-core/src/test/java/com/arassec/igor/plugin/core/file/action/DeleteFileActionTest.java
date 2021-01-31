@@ -37,7 +37,7 @@ class DeleteFileActionTest extends FileActionBaseTest {
         assertEquals(1, processedData.size());
         assertEquals(data, processedData.get(0));
 
-        verify(fileConnectorMock, times(1)).delete(eq("/directory/test/filename.txt"));
+        verify(fileConnectorMock, times(1)).delete("/directory/test/filename.txt");
     }
 
     /**

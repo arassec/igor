@@ -13,7 +13,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -57,7 +56,7 @@ class IgorComponentUtilTest {
         IgorComponentUtil.initializeConnectors(null, "job-id", jobExecution);
 
         IgorComponentUtil.initializeConnectors(testAction, "job-id", jobExecution);
-        verify(testConnector, times(1)).initialize(eq("job-id"), eq(jobExecution));
+        verify(testConnector, times(1)).initialize("job-id", jobExecution);
     }
 
     /**
@@ -70,7 +69,7 @@ class IgorComponentUtilTest {
         IgorComponentUtil.shutdownConnectors(null, "job-id", jobExecution);
 
         IgorComponentUtil.shutdownConnectors(testAction, "job-id", jobExecution);
-        verify(testConnector, times(1)).shutdown(eq("job-id"), eq(jobExecution));
+        verify(testConnector, times(1)).shutdown("job-id", jobExecution);
     }
 
     /**

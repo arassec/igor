@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,7 +25,7 @@ class ReadFileActionTest extends FileActionBaseTest {
     @DisplayName("Tests processing the action with mustache template parameters.")
     void testProcess() {
         FileConnector fileConnectorMock = mock(FileConnector.class);
-        when(fileConnectorMock.read(eq("/directory/test/filename.txt"))).thenReturn("igor-junit-test");
+        when(fileConnectorMock.read("/directory/test/filename.txt")).thenReturn("igor-junit-test");
 
         ReadFileAction action = new ReadFileAction();
         action.setSource(fileConnectorMock);

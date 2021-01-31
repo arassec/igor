@@ -82,9 +82,9 @@ class JdbcPersistentValueRepositoryTest {
         entity.setCreated(Instant.now());
         entity.setContent("must-be-replaced");
 
-        when(persistentValueDao.findById(eq(123L))).thenReturn(Optional.of(entity));
+        when(persistentValueDao.findById(123L)).thenReturn(Optional.of(entity));
 
-        when(persistentValueDao.save(eq(entity))).thenReturn(entity);
+        when(persistentValueDao.save(entity)).thenReturn(entity);
 
         PersistentValue persistedValue = repository.upsert("job-id", value);
 
@@ -107,7 +107,7 @@ class JdbcPersistentValueRepositoryTest {
         PersistentValue value = new PersistentValue();
         value.setContent("content");
 
-        when(persistentValueDao.findByJobIdAndContent(eq("job-id"), eq("content"))).thenReturn(new PersistentValueEntity());
+        when(persistentValueDao.findByJobIdAndContent("job-id", "content")).thenReturn(new PersistentValueEntity());
 
         assertTrue(repository.isPersisted("job-id", value));
     }
@@ -121,9 +121,9 @@ class JdbcPersistentValueRepositoryTest {
         repository.cleanup("job-id", 3);
         verify(persistentValueDao, times(0)).deleteByJobIdAndIdBefore(eq("job-id"), anyLong());
 
-        when(persistentValueDao.findMostRecentIds(eq("job-id"), eq(3))).thenReturn(List.of(123, 456, 789));
+        when(persistentValueDao.findMostRecentIds("job-id", 3)).thenReturn(List.of(123, 456, 789));
         repository.cleanup("job-id", 3);
-        verify(persistentValueDao, times(1)).deleteByJobIdAndIdBefore(eq("job-id"), eq(789L));
+        verify(persistentValueDao, times(1)).deleteByJobIdAndIdBefore("job-id", 789L);
     }
 
     /**
@@ -136,7 +136,7 @@ class JdbcPersistentValueRepositoryTest {
         verify(persistentValueDao, times(0)).deleteByJobId(anyString());
 
         repository.deleteByJobId("job-id");
-        verify(persistentValueDao, times(1)).deleteByJobId(eq("job-id"));
+        verify(persistentValueDao, times(1)).deleteByJobId("job-id");
     }
 
 }

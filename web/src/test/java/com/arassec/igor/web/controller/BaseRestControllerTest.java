@@ -84,7 +84,7 @@ class BaseRestControllerTest {
 
         // If the supplied job doesn't provide an execution, the repository is queried for one:
         JobExecution persistedJobExecution = JobExecution.builder().build();
-        when(jobManagerMock.getJobExecutionsOfJob(eq("job-id"), eq(0), eq(1))).thenReturn(
+        when(jobManagerMock.getJobExecutionsOfJob("job-id", 0, 1)).thenReturn(
                 new ModelPage<>(1, 1, 1, List.of(persistedJobExecution)));
 
         jobExecution = controller.determineJobExecution(jobManagerMock, Job.builder().id("job-id").build());

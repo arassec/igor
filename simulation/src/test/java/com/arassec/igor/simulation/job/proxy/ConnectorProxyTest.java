@@ -63,7 +63,7 @@ class ConnectorProxyTest {
 
         connectorProxy.initialize(jobId, jobExecution);
 
-        verify(connectorMock, times(1)).initialize(eq(jobId), eq(jobExecution));
+        verify(connectorMock, times(1)).initialize(jobId, jobExecution);
     }
 
     /**
@@ -82,7 +82,7 @@ class ConnectorProxyTest {
 
         connectorProxy.shutdown(jobId, jobExecution);
 
-        verify(connectorMock, times(1)).shutdown(eq(jobId), eq(jobExecution));
+        verify(connectorMock, times(1)).shutdown(jobId, jobExecution);
     }
 
     @Getter

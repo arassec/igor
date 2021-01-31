@@ -10,7 +10,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -33,7 +32,7 @@ class TriggerProxyTest {
 
         triggerProxy.initialize("job-id", jobExecution);
 
-        verify(triggerMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
+        verify(triggerMock, times(1)).initialize("job-id", jobExecution);
 
         assertEquals(10, triggerProxy.getSimulationLimit());
     }

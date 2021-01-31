@@ -41,7 +41,7 @@ class BaseProxyTest {
     void testShutdown() {
         JobExecution jobExecution = new JobExecution();
         actionProxy.shutdown("job-id", jobExecution);
-        verify(actionMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
+        verify(actionMock, times(1)).shutdown("job-id", jobExecution);
     }
 
     /**
@@ -74,7 +74,7 @@ class BaseProxyTest {
         verify(actionMock, times(1)).getId();
 
         actionProxy.setId("id");
-        verify(actionMock, times(1)).setId(eq("id"));
+        verify(actionMock, times(1)).setId("id");
     }
 
 }

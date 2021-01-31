@@ -86,8 +86,8 @@ class JobTest {
 
         job.start(jobExecution);
 
-        verify(triggerMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
-        verify(triggerMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
+        verify(triggerMock, times(1)).initialize("job-id", jobExecution);
+        verify(triggerMock, times(1)).shutdown("job-id", jobExecution);
     }
 
     /**
@@ -150,7 +150,7 @@ class JobTest {
         assertEquals(JobExecutionState.FINISHED, jobExecution.getExecutionState());
 
         verify(actionMock, times(1)).complete();
-        verify(actionMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
+        verify(actionMock, times(1)).shutdown("job-id", jobExecution);
 
         testExecutor.shutdown();
     }
@@ -218,11 +218,11 @@ class JobTest {
 
         job.start(jobExecution);
 
-        verify(triggerMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
-        verify(actionMock, times(1)).initialize(eq("job-id"), eq(jobExecution));
+        verify(triggerMock, times(1)).initialize("job-id", jobExecution);
+        verify(actionMock, times(1)).initialize("job-id", jobExecution);
         verify(actionMock, times(1)).process(anyMap(), eq(jobExecution));
-        verify(actionMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
-        verify(triggerMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
+        verify(actionMock, times(1)).shutdown("job-id", jobExecution);
+        verify(triggerMock, times(1)).shutdown("job-id", jobExecution);
     }
 
     /**

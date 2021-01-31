@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -50,7 +49,7 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
         TestConnector testConnector = new TestConnector();
         testConnector.setId("connector-id");
         testConnector.setName("connector-name");
-        when(connectorManager.loadPage(eq(666), eq(2), eq("name-filter"))).thenReturn(
+        when(connectorManager.loadPage(666, 2, "name-filter")).thenReturn(
                 new ModelPage<>(666, 2, 1, List.of(testConnector)));
 
         mvcResult = mockMvc.perform(get("/api/connector")
@@ -81,7 +80,7 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
     @SneakyThrows(Exception.class)
     void testGetConnectorsInCategory() {
         TestConnector testConnector = new TestConnector();
-        when(connectorManager.loadAllOfType(eq(Set.of("category-id")), eq(666), eq(1))).thenReturn(
+        when(connectorManager.loadAllOfType(Set.of("category-id"), 666, 1)).thenReturn(
                 new ModelPage<>(666, 1, 1, List.of(testConnector))
         );
 
@@ -110,7 +109,7 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
         mockMvc.perform(get("/api/connector/connector-id")).andExpect(status().isNotFound());
 
         TestConnector testConnector = new TestConnector();
-        when(connectorManager.load(eq("connector-id"))).thenReturn(testConnector);
+        when(connectorManager.load("connector-id")).thenReturn(testConnector);
 
         MvcResult mvcResult = mockMvc.perform(get("/api/connector/connector-id")).andExpect(status().isOk()).andReturn();
 
@@ -128,17 +127,17 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
     void testDeleteConnector() {
         // Unused Connector:
         mockMvc.perform(delete("/api/connector/connectorA-id")).andExpect(status().isNoContent());
-        verify(connectorManager, times(1)).deleteConnector(eq("connectorA-id"));
+        verify(connectorManager, times(1)).deleteConnector("connectorA-id");
 
         // Job using the connector is deactivated:
-        when(connectorManager.getReferencingJobs(eq("connectorB-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(connectorManager.getReferencingJobs("connectorB-id", 0, Integer.MAX_VALUE)).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(new Pair<>("job-id", "job-name")))
         );
 
-        when(jobManager.load(eq("job-id"))).thenReturn(Job.builder().active(true).build());
+        when(jobManager.load("job-id")).thenReturn(Job.builder().active(true).build());
 
         mockMvc.perform(delete("/api/connector/connectorB-id")).andExpect(status().isNoContent());
-        verify(connectorManager, times(1)).deleteConnector(eq("connectorB-id"));
+        verify(connectorManager, times(1)).deleteConnector("connectorB-id");
 
         ArgumentCaptor<Job> argCap = ArgumentCaptor.forClass(Job.class);
         verify(jobManager, times(1)).save(argCap.capture());
@@ -148,8 +147,8 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
         // Job using the connector is deleted:
         mockMvc.perform(delete("/api/connector/connectorB-id").queryParam("deleteAffectedJobs", "true"))
                 .andExpect(status().isNoContent());
-        verify(connectorManager, times(2)).deleteConnector(eq("connectorB-id"));
-        verify(jobManager, times(1)).delete(eq("job-id"));
+        verify(connectorManager, times(2)).deleteConnector("connectorB-id");
+        verify(jobManager, times(1)).delete("job-id");
     }
 
     /**
@@ -174,7 +173,7 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
                 .andExpect(jsonPath("$.id").value("connector-id"))
                 .andExpect(jsonPath("$.name").value("connector-name"));
 
-        verify(connectorManager, times(1)).save(eq(testConnector));
+        verify(connectorManager, times(1)).save(testConnector);
 
         // Connector with same name already exists:
         TestConnector existingConnector = new TestConnector();
@@ -209,12 +208,12 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
                 .andExpect(jsonPath("$.id").value("connector-id"))
                 .andExpect(jsonPath("$.name").value("update-test"));
 
-        verify(connectorManager, times(1)).save(eq(testConnector));
+        verify(connectorManager, times(1)).save(testConnector);
 
         // Existing name, different connector:
         TestConnector existingconnector = new TestConnector();
         existingconnector.setId("existing-connector-id");
-        when(connectorRepository.findByName(eq("update-test"))).thenReturn(existingconnector);
+        when(connectorRepository.findByName("update-test")).thenReturn(existingconnector);
 
         mockMvc.perform(post("/api/connector")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -259,7 +258,7 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
 
         TestConnector testConnector = new TestConnector();
         testConnector.setId("connector-id");
-        when(connectorManager.loadByName(eq("connector name"))).thenReturn(testConnector);
+        when(connectorManager.loadByName("connector name")).thenReturn(testConnector);
 
         // Same connector:
         mockMvc.perform(get("/api/connector/check/" + Base64.getEncoder().encodeToString("connector name".getBytes()) + "/connector-id"))
@@ -282,7 +281,7 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
         mockMvc.perform(get("/api/connector/connector-id/job-references")).andExpect(status().isOk())
                 .andExpect(content().string("{\"number\":0,\"size\":2147483647,\"totalPages\":0,\"items\":[]}"));
 
-        when(connectorManager.getReferencingJobs(eq("connector-id"), eq(666), eq(2))).thenReturn(
+        when(connectorManager.getReferencingJobs("connector-id", 666, 2)).thenReturn(
                 new ModelPage<>(666, 2, 1, List.of(
                         new Pair<>("job1-id", "job1-name"), new Pair<>("job2-id", "job2-name")))
         );

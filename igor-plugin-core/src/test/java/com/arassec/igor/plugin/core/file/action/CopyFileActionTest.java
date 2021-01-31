@@ -34,7 +34,7 @@ class CopyFileActionTest extends FileActionBaseTest {
         fileStreamData.setData(new ByteArrayInputStream("test".getBytes()));
 
         FileConnector sourceFileConnectorMock = mock(FileConnector.class);
-        when(sourceFileConnectorMock.readStream(eq("/directory/test/filename.txt"))).thenReturn(fileStreamData);
+        when(sourceFileConnectorMock.readStream("/directory/test/filename.txt")).thenReturn(fileStreamData);
         FileConnector targetFileConnectorMock = mock(FileConnector.class);
 
         CopyFileAction action = new CopyFileAction();
@@ -62,10 +62,10 @@ class CopyFileActionTest extends FileActionBaseTest {
         verify(targetFileConnectorMock, times(1)).writeStream(eq("target/copy-file-action-alpha.txt.igor"),
                 eq(fileStreamData), any(WorkInProgressMonitor.class), any(JobExecution.class));
 
-        verify(sourceFileConnectorMock, times(1)).finalizeStream(eq(fileStreamData));
+        verify(sourceFileConnectorMock, times(1)).finalizeStream(fileStreamData);
 
-        verify(targetFileConnectorMock, times(1)).move(eq("target/copy-file-action-alpha.txt.igor"),
-                eq("target/copy-file-action-alpha.txt"));
+        verify(targetFileConnectorMock, times(1)).move("target/copy-file-action-alpha.txt.igor",
+                "target/copy-file-action-alpha.txt");
     }
 
     /**
@@ -79,7 +79,7 @@ class CopyFileActionTest extends FileActionBaseTest {
         fileStreamData.setFilenameSuffix("jpeg");
 
         FileConnector sourceFileConnectorMock = mock(FileConnector.class);
-        when(sourceFileConnectorMock.readStream(eq("/file"))).thenReturn(fileStreamData);
+        when(sourceFileConnectorMock.readStream("/file")).thenReturn(fileStreamData);
         FileConnector targetFileConnectorMock = mock(FileConnector.class);
 
         CopyFileAction action = new CopyFileAction();
@@ -109,7 +109,7 @@ class CopyFileActionTest extends FileActionBaseTest {
         verify(targetFileConnectorMock, times(1)).writeStream(eq("target/copy-file-action-test.jpeg"),
                 eq(fileStreamData), any(WorkInProgressMonitor.class), any(JobExecution.class));
 
-        verify(sourceFileConnectorMock, times(1)).finalizeStream(eq(fileStreamData));
+        verify(sourceFileConnectorMock, times(1)).finalizeStream(fileStreamData);
 
         verify(targetFileConnectorMock, times(0)).move(anyString(), anyString());
     }

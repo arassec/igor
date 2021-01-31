@@ -73,7 +73,7 @@ class JdbcConnectorRepositoryTest {
         Connector connector = new TestConnector();
         connector.setName("connector-name");
 
-        when(persistenceConnectorMapper.writeValueAsString(eq(connector))).thenReturn("connector-json");
+        when(persistenceConnectorMapper.writeValueAsString(connector)).thenReturn("connector-json");
 
         Connector savedConnector = repository.upsert(connector);
 
@@ -98,10 +98,10 @@ class JdbcConnectorRepositoryTest {
         connector.setId("connector-id");
         connector.setName("connector-name");
 
-        when(persistenceConnectorMapper.writeValueAsString(eq(connector))).thenReturn("connector-json");
+        when(persistenceConnectorMapper.writeValueAsString(connector)).thenReturn("connector-json");
 
         // With Connector-ID but without persisted connector (i.e. upsert during import)
-        when(connectorDao.findById(eq("connector-id"))).thenReturn(Optional.empty());
+        when(connectorDao.findById("connector-id")).thenReturn(Optional.empty());
         Connector upsertedConnector = repository.upsert(connector);
 
         assertEquals("connector-id", upsertedConnector.getId());
@@ -116,11 +116,11 @@ class JdbcConnectorRepositoryTest {
 
         // "normal" upsert: provided ID and existing, persisted connector:
         ConnectorEntity connectorEntity = new ConnectorEntity();
-        when(connectorDao.findById(eq("connector-id"))).thenReturn(Optional.of(connectorEntity));
+        when(connectorDao.findById("connector-id")).thenReturn(Optional.of(connectorEntity));
 
         repository.upsert(connector);
 
-        verify(connectorDao, times(1)).save(eq(connectorEntity));
+        verify(connectorDao, times(1)).save(connectorEntity);
         assertEquals("connector-json", connectorEntity.getContent());
     }
 
@@ -131,15 +131,15 @@ class JdbcConnectorRepositoryTest {
     @DisplayName("Tests finding a connector by its ID.")
     @SneakyThrows(JsonProcessingException.class)
     void testFindById() {
-        when(connectorDao.findById(eq("connector-id"))).thenReturn(Optional.empty());
+        when(connectorDao.findById("connector-id")).thenReturn(Optional.empty());
         assertNull(repository.findById("connector-id"));
 
         ConnectorEntity connectorEntity = new ConnectorEntity();
         connectorEntity.setContent("connector-json");
-        when(connectorDao.findById(eq("connector-id"))).thenReturn(Optional.of(connectorEntity));
+        when(connectorDao.findById("connector-id")).thenReturn(Optional.of(connectorEntity));
 
         Connector connector = new TestConnector();
-        when(persistenceConnectorMapper.readValue(eq("connector-json"), eq(Connector.class))).thenReturn(connector);
+        when(persistenceConnectorMapper.readValue("connector-json", Connector.class)).thenReturn(connector);
 
         assertEquals(connector, repository.findById("connector-id"));
     }
@@ -156,10 +156,10 @@ class JdbcConnectorRepositoryTest {
         ConnectorEntity connectorEntity = new ConnectorEntity();
         connectorEntity.setContent("connector-json");
 
-        when(connectorDao.findByName(eq("connector-name"))).thenReturn(connectorEntity);
+        when(connectorDao.findByName("connector-name")).thenReturn(connectorEntity);
 
         Connector connector = new TestConnector();
-        when(persistenceConnectorMapper.readValue(eq("connector-json"), eq(Connector.class))).thenReturn(connector);
+        when(persistenceConnectorMapper.readValue("connector-json", Connector.class)).thenReturn(connector);
 
         assertEquals(connector, repository.findByName("connector-name"));
     }
@@ -178,7 +178,7 @@ class JdbcConnectorRepositoryTest {
 
         when(connectorDao.findAll()).thenReturn(List.of(connectorEntity));
 
-        when(persistenceConnectorMapper.readValue(eq("connector-json"), eq(Connector.class))).thenReturn(new TestConnector());
+        when(persistenceConnectorMapper.readValue("connector-json", Connector.class)).thenReturn(new TestConnector());
 
         assertEquals(1, repository.findAll().size());
         assertTrue(repository.findAll().get(0) instanceof TestConnector);
@@ -218,7 +218,7 @@ class JdbcConnectorRepositoryTest {
         ArgumentCaptor<Pageable> argCap = ArgumentCaptor.forClass(Pageable.class);
         when(connectorDao.findAll(argCap.capture())).thenReturn(page);
 
-        when(persistenceConnectorMapper.readValue(eq("connector-json"), eq(Connector.class))).thenReturn(new TestConnector());
+        when(persistenceConnectorMapper.readValue("connector-json", Connector.class)).thenReturn(new TestConnector());
 
         ModelPage<Connector> resultPage = repository.findPage(1, 2, null);
 
@@ -254,7 +254,7 @@ class JdbcConnectorRepositoryTest {
         ArgumentCaptor<Pageable> argCap = ArgumentCaptor.forClass(Pageable.class);
         when(connectorDao.findByNameContainingIgnoreCase(eq("name-filter"), argCap.capture())).thenReturn(page);
 
-        when(persistenceConnectorMapper.readValue(eq("connector-json"), eq(Connector.class))).thenReturn(new TestConnector());
+        when(persistenceConnectorMapper.readValue("connector-json", Connector.class)).thenReturn(new TestConnector());
 
         ModelPage<Connector> resultPage = repository.findPage(1, 2, "name-filter");
 
@@ -276,8 +276,8 @@ class JdbcConnectorRepositoryTest {
     @DisplayName("Tests deleting a connector.")
     void testDeleteById() {
         repository.deleteById("connector-id");
-        verify(connectorDao, times(1)).deleteById(eq("connector-id"));
-        verify(jobConnectorReferenceDao, times(1)).deleteByConnectorId(eq("connector-id"));
+        verify(connectorDao, times(1)).deleteById("connector-id");
+        verify(jobConnectorReferenceDao, times(1)).deleteByConnectorId("connector-id");
     }
 
     /**

@@ -64,7 +64,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
                         Job.builder().id("job-id").name("job-name").active(true).build()
                 )));
 
-        when(jobManager.countExecutionsOfJobInState(eq("job-id"), eq(JobExecutionState.FAILED))).thenReturn(3);
+        when(jobManager.countExecutionsOfJobInState("job-id", JobExecutionState.FAILED)).thenReturn(3);
 
         mockMvc.perform(get("/api/job")
                 .queryParam("pageNumber", "1")
@@ -164,7 +164,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
     void testGetJob() {
         mockMvc.perform(get("/api/job/job-id")).andExpect(status().isNotFound());
 
-        when(jobManager.load(eq("job-id"))).thenReturn(Job.builder().id("job-id").name("job-name").build());
+        when(jobManager.load("job-id")).thenReturn(Job.builder().id("job-id").name("job-name").build());
 
         MvcResult mvcResult = mockMvc.perform(get("/api/job/job-id")).andExpect(status().isOk()).andReturn();
 
@@ -194,7 +194,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
         assertEquals("saved-job", result.getName());
 
         // Job name is already taken:
-        when(jobManager.loadByName(eq("job-name"))).thenReturn(Job.builder().build());
+        when(jobManager.loadByName("job-name")).thenReturn(Job.builder().build());
 
         mockMvc.perform(post("/api/job")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -222,7 +222,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
         assertEquals("saved-job", result.getName());
 
         // Job name is already taken by another job:
-        when(jobManager.loadByName(eq("job-name"))).thenReturn(Job.builder().id("job-id").build());
+        when(jobManager.loadByName("job-name")).thenReturn(Job.builder().id("job-id").build());
 
         mockMvc.perform(post("/api/job")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -243,7 +243,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
         Future<Map<String, SimulationResult>> futureMock = mock(Future.class);
         when(futureMock.get()).thenReturn(Map.of("a", new SimulationResult(List.of(), "error-cause")));
 
-        when(jobSimulator.simulateJob(eq(job))).thenReturn(futureMock);
+        when(jobSimulator.simulateJob(job)).thenReturn(futureMock);
 
         mockMvc.perform(post("/api/job/simulate")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -260,7 +260,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
     @SneakyThrows
     void testCancelSimulations() {
         mockMvc.perform(delete("/api/job/simulate/job-id")).andExpect(status().isOk());
-        verify(jobSimulator, times(1)).cancelAllSimulations(eq("job-id"));
+        verify(jobSimulator, times(1)).cancelAllSimulations("job-id");
     }
 
     /**
@@ -274,7 +274,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("false"));
 
-        when(jobManager.loadByName(eq("job name"))).thenReturn(Job.builder().id("job-id").build());
+        when(jobManager.loadByName("job name")).thenReturn(Job.builder().id("job-id").build());
 
         // Same job:
         mockMvc.perform(get("/api/job/check/" + Base64.getEncoder().encodeToString("job name".getBytes()) + "/job-id"))
@@ -296,15 +296,15 @@ class JobRestControllerTest extends RestControllerBaseTest {
     void testDeleteJob() {
         mockMvc.perform(delete("/api/job/job-id").queryParam("deleteExclusiveConnectors", "false"))
                 .andExpect(status().isNoContent());
-        verify(jobManager, times(1)).delete(eq("job-id"));
+        verify(jobManager, times(1)).delete("job-id");
 
-        when(jobManager.getReferencedConnectors(eq("other-job-id"))).thenReturn(Set.of(new Pair<>("single-ref-id",
+        when(jobManager.getReferencedConnectors("other-job-id")).thenReturn(Set.of(new Pair<>("single-ref-id",
                 "single-ref-connector"), new Pair<>("multi-ref-id", "multi-ref-connector")));
 
-        when(connectorManager.getReferencingJobs(eq("single-ref-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(connectorManager.getReferencingJobs("single-ref-id", 0, Integer.MAX_VALUE)).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(new Pair<>("other-job-id", "other-job-name")))
         );
-        when(connectorManager.getReferencingJobs(eq("multi-ref-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(connectorManager.getReferencingJobs("multi-ref-id", 0, Integer.MAX_VALUE)).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(new Pair<>("other-job-id", "other-job-name"),
                         new Pair<>("yet-another-job-id", "yet-another-job-name")))
         );
@@ -312,9 +312,9 @@ class JobRestControllerTest extends RestControllerBaseTest {
         mockMvc.perform(delete("/api/job/other-job-id").queryParam("deleteExclusiveConnectors", "true"))
                 .andExpect(status().isNoContent());
 
-        verify(connectorManager, times(1)).deleteConnector(eq("single-ref-id"));
+        verify(connectorManager, times(1)).deleteConnector("single-ref-id");
 
-        verify(jobManager, times(1)).delete(eq("other-job-id"));
+        verify(jobManager, times(1)).delete("other-job-id");
     }
 
     /**
@@ -333,14 +333,14 @@ class JobRestControllerTest extends RestControllerBaseTest {
                 .andExpect(status().isOk()).andReturn();
         Job result = convert(mvcResult, Job.class);
         assertEquals(savedJob, result);
-        verify(jobManager, times(0)).enqueue(eq(savedJob));
+        verify(jobManager, times(0)).enqueue(savedJob);
 
         savedJob.setActive(true);
         mockMvc.perform(post("/api/job/run")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(Job.builder().id("job-id").name("job-name").build())))
                 .andExpect(status().isOk());
-        verify(jobManager, times(1)).enqueue(eq(savedJob));
+        verify(jobManager, times(1)).enqueue(savedJob);
     }
 
     /**
@@ -354,12 +354,12 @@ class JobRestControllerTest extends RestControllerBaseTest {
                 .andExpect(status().isBadRequest());
 
         Job job = Job.builder().active(true).build();
-        when(jobManager.load(eq("job-id"))).thenReturn(job);
+        when(jobManager.load("job-id")).thenReturn(job);
 
         mockMvc.perform(post("/api/job/run/job-id"))
                 .andExpect(status().isNoContent());
 
-        verify(jobManager, times(1)).enqueue(eq(job));
+        verify(jobManager, times(1)).enqueue(job);
     }
 
     /**
@@ -394,20 +394,20 @@ class JobRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests getting exclusive connectors of a job.")
     @SneakyThrows
     void testGetExclusiveconnectors() {
-        when(jobManager.getReferencedConnectors(eq("test-job-id"))).thenReturn(Set.of(
+        when(jobManager.getReferencedConnectors("test-job-id")).thenReturn(Set.of(
                 new Pair<>("connectorC-id", "connectorC"),
                 new Pair<>("connectorB-id", "connectorB"),
                 new Pair<>("connectorA-id", "connectorA")
         ));
 
-        when(connectorManager.getReferencingJobs(eq("connectorA-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(connectorManager.getReferencingJobs("connectorA-id", 0, Integer.MAX_VALUE)).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(new Pair<>("test-job-id", "test-job-name")))
         );
-        when(connectorManager.getReferencingJobs(eq("connectorB-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(connectorManager.getReferencingJobs("connectorB-id", 0, Integer.MAX_VALUE)).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(new Pair<>("test-job-id", "test-job-name"),
                         new Pair<>("another-job-id", "another-job-name")))
         );
-        when(connectorManager.getReferencingJobs(eq("connectorC-id"), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
+        when(connectorManager.getReferencingJobs("connectorC-id", 0, Integer.MAX_VALUE)).thenReturn(
                 new ModelPage<>(0, 1, 1, List.of(new Pair<>("test-job-id", "test-job-name")))
         );
 
@@ -502,9 +502,9 @@ class JobRestControllerTest extends RestControllerBaseTest {
                 "jobStreamEmitters"))).add(emitterMock);
 
         when(jobManager.getNumSlots()).thenReturn(1);
-        when(jobManager.countJobExecutions(eq(JobExecutionState.RUNNING))).thenReturn(2);
-        when(jobManager.countJobExecutions(eq(JobExecutionState.WAITING))).thenReturn(3);
-        when(jobManager.countJobExecutions(eq(JobExecutionState.FAILED))).thenReturn(4);
+        when(jobManager.countJobExecutions(JobExecutionState.RUNNING)).thenReturn(2);
+        when(jobManager.countJobExecutions(JobExecutionState.WAITING)).thenReturn(3);
+        when(jobManager.countJobExecutions(JobExecutionState.FAILED)).thenReturn(4);
 
         jobRestController.onJobEvent(
                 new JobEvent(JobEventType.STATE_CHANGE,
@@ -555,9 +555,9 @@ class JobRestControllerTest extends RestControllerBaseTest {
                 "jobStreamEmitters"))).add(emitterMock);
 
         when(jobManager.getNumSlots()).thenReturn(1);
-        when(jobManager.countJobExecutions(eq(JobExecutionState.RUNNING))).thenReturn(2);
-        when(jobManager.countJobExecutions(eq(JobExecutionState.WAITING))).thenReturn(3);
-        when(jobManager.countJobExecutions(eq(JobExecutionState.FAILED))).thenReturn(4);
+        when(jobManager.countJobExecutions(JobExecutionState.RUNNING)).thenReturn(2);
+        when(jobManager.countJobExecutions(JobExecutionState.WAITING)).thenReturn(3);
+        when(jobManager.countJobExecutions(JobExecutionState.FAILED)).thenReturn(4);
 
         jobRestController.onJobEvent(
                 new JobEvent(JobEventType.DELETE, Job.builder().id("job-id").name("job-name").build())

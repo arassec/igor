@@ -52,7 +52,7 @@ class ActionProxyTest {
         inputData.put("test", "input");
         inputData.put(DataKey.SIMULATION_LOG.getKey(), "simulation-log");
 
-        when(actionMock.process(eq(inputData), eq(jobExecution))).thenReturn(data);
+        when(actionMock.process(inputData, jobExecution)).thenReturn(data);
 
         List<Map<String, Object>> resultData = actionProxy.process(inputData, jobExecution);
 
@@ -150,7 +150,7 @@ class ActionProxyTest {
         Action actionMock = mock(Action.class);
         ActionProxy actionProxy = new ActionProxy(actionMock, 10);
         actionProxy.setNumThreads(23);
-        verify(actionMock, times(1)).setNumThreads(eq(23));
+        verify(actionMock, times(1)).setNumThreads(23);
     }
 
     /**
@@ -174,7 +174,7 @@ class ActionProxyTest {
         Action actionMock = mock(Action.class);
         ActionProxy actionProxy = new ActionProxy(actionMock, 10);
         actionProxy.setActive(true);
-        verify(actionMock, times(1)).setActive(eq(true));
+        verify(actionMock, times(1)).setActive(true);
     }
 
     /**
@@ -188,7 +188,7 @@ class ActionProxyTest {
 
         actionProxy.setName("test-action-name");
 
-        verify(actionMock, times(1)).setName(eq("test-action-name"));
+        verify(actionMock, times(1)).setName("test-action-name");
 
         actionProxy.getName();
 
@@ -206,7 +206,7 @@ class ActionProxyTest {
 
         actionProxy.setDescription("test-description");
 
-        verify(actionMock, times(1)).setDescription(eq("test-description"));
+        verify(actionMock, times(1)).setDescription("test-description");
     }
 
     /**

@@ -28,7 +28,7 @@ class SshInputStreamWrapperTest {
 
         byte[] buffer = new byte[16];
 
-        when(inputStreamMock.read(eq(buffer), eq(0), eq(1))).thenReturn(1);
+        when(inputStreamMock.read(buffer, 0, 1)).thenReturn(1);
 
         // First byte is read:
         assertEquals(1, wrapper.read(buffer, 0, 1));
@@ -42,7 +42,7 @@ class SshInputStreamWrapperTest {
         // Read more than 'filesize':
         wrapper = new SshInputStreamWrapper(inputStreamMock, 2);
 
-        when(inputStreamMock.read(eq(buffer), eq(0), eq(2))).thenReturn(2);
+        when(inputStreamMock.read(buffer, 0, 2)).thenReturn(2);
 
         assertEquals(2, wrapper.read(buffer, 0, 10));
         assertEquals(-1, wrapper.read(buffer, 0, 1));
@@ -80,6 +80,5 @@ class SshInputStreamWrapperTest {
 
         assertEquals(123, wrapper.read());
     }
-
 
 }

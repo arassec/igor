@@ -141,9 +141,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         if (id == null) {
             return;
         }
-        if (!target.containsKey(id)) {
-            target.put(id, new HashMap<>());
-        }
+        target.computeIfAbsent(id, s -> new HashMap<>());
         target.get(id).put(extractProperty(fieldError.getField()),
                 messageSource.getMessage(Optional.ofNullable(fieldError.getDefaultMessage()).orElse("invalid value"), null,
                         LocaleContextHolder.getLocale()));
