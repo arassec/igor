@@ -16,15 +16,21 @@ public class TypeData extends KeyLabelStore {
     private boolean documentationAvailable;
 
     /**
+     * Indicates whether or not the component supports incoming events.
+     */
+    private boolean supportsEvents;
+
+    /**
      * Creates a new TypeData instance.
      *
      * @param key                    The type's ID.
      * @param value                  The type's label.
      * @param documentationAvailable Set to {@code true} if documentation is available, {@code false} otherwise.
      */
-    public TypeData(String key, String value, boolean documentationAvailable) {
+    public TypeData(String key, String value, boolean documentationAvailable, boolean supportsEvents) {
         super(key, value);
         this.documentationAvailable = documentationAvailable;
+        this.supportsEvents = supportsEvents;
     }
 
 }

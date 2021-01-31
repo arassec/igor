@@ -8,7 +8,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -18,13 +18,17 @@ import static org.mockito.Mockito.*;
 class BaseEventTriggerTest {
 
     /**
+     * The base class under test.
+     */
+    private final BaseEventTrigger baseEventTrigger = mock(BaseEventTrigger.class,
+            withSettings().useConstructor("category-id", "type-id").defaultAnswer(CALLS_REAL_METHODS));
+
+    /**
      * Tests the {@link BaseEventTrigger}'s constructor.
      */
     @Test
     @DisplayName("Tests the base-event-trigger's constructor.")
     void testBaseEventTrigger() {
-        BaseEventTrigger baseEventTrigger = mock(BaseEventTrigger.class,
-                withSettings().useConstructor("category-id", "type-id").defaultAnswer(CALLS_REAL_METHODS));
         assertEquals("category-id", baseEventTrigger.getCategoryId());
         assertEquals("type-id", baseEventTrigger.getTypeId());
     }
@@ -35,31 +39,31 @@ class BaseEventTriggerTest {
     @Test
     @DisplayName("Tests setting the event queue.")
     void testSetEventQueue() {
-        BaseEventTrigger baseEventTrigger = mock(BaseEventTrigger.class,
-                withSettings().useConstructor("category-id", "type-id").defaultAnswer(CALLS_REAL_METHODS));
         LinkedBlockingQueue<Map<String, Object>> queue = new LinkedBlockingQueue<>();
         baseEventTrigger.setEventQueue(queue);
         assertEquals(queue, ReflectionTestUtils.getField(baseEventTrigger, "eventQueue"));
     }
 
     /**
-     * Tests getting simulation data.
+     * Tests processing an event.
      */
     @Test
-    @DisplayName("Tests getting simulation data.")
-    void testGetSimulationData() {
-        BaseEventTrigger baseEventTrigger = mock(BaseEventTrigger.class,
-                withSettings().useConstructor("category-id", "type-id").defaultAnswer(CALLS_REAL_METHODS));
+    @DisplayName("Tests processing an event.")
+    void testProcessEvent() {
+        LinkedBlockingQueue<Map<String, Object>> queue = new LinkedBlockingQueue<>();
+        baseEventTrigger.setEventQueue(queue);
 
-        assertEquals(Map.of(), baseEventTrigger.getSimulationData());
+        baseEventTrigger.processEvent(null);
 
-        baseEventTrigger.setSimulationData("{a:\"b\",\nc:\"d\",\ne:42\n}");
+        Map<String, Object> eventData = queue.poll();
+        assertNotNull(eventData);
+        assertTrue(eventData.isEmpty());
 
-        Map<String, Object> data = baseEventTrigger.getSimulationData();
-        assertEquals(3, data.size());
-        assertEquals("b", data.get("a"));
-        assertEquals("d", data.get("c"));
-        assertEquals(42, data.get("e"));
+        baseEventTrigger.processEvent(Map.of("A", "B"));
+
+        eventData = queue.poll();
+        assertNotNull(eventData);
+        assertEquals("B", eventData.get("A"));
     }
 
 }

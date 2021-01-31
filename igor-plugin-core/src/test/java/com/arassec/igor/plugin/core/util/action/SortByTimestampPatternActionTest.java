@@ -5,12 +5,10 @@ import com.arassec.igor.plugin.core.CoreActionBaseTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests the {@link SortByTimestampPatternAction}.
@@ -59,7 +57,6 @@ class SortByTimestampPatternActionTest extends CoreActionBaseTest {
 
         action.getCollectedData().add(Map.of("timestamp", "2019-12-29T14:13:12"));
         action.getCollectedData().add(Map.of("timestamp", "2014-04-13T03:00:00"));
-        action.getCollectedData().add(Map.of("INVALID", "INVALID"));
         action.getCollectedData().add(Map.of("timestamp", "2019-12-29T14:13:11"));
 
         action.setSortAscending(true);
@@ -109,14 +106,14 @@ class SortByTimestampPatternActionTest extends CoreActionBaseTest {
         assertEquals("alpha_20200113185100_beta.jpeg", completedData.get(1).get("filename"));
     }
 
+    /**
+     * Tests that the action doesn't support events.
+     */
     @Test
-    @DisplayName("Tests resetting the action")
-    void testReset() {
+    @DisplayName("Tests that the action doesn't support events.")
+    void testSupportsEvents() {
         SortByTimestampPatternAction action = new SortByTimestampPatternAction();
-        action.getCollectedData().add(new HashMap<>());
-        assertEquals(1, action.getCollectedData().size());
-        action.reset();
-        assertEquals(0, action.getCollectedData().size());
+        assertFalse(action.supportsEvents());
     }
 
 }

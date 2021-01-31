@@ -29,4 +29,14 @@ class LimitActionTest extends CoreActionBaseTest {
         assertTrue(limitAction.process(createData(), new JobExecution()).isEmpty());
     }
 
+    /**
+     * Tests that the action doesn't support events.
+     */
+    @Test
+    @DisplayName("Tests that the action doesn't support events.")
+    void testSupportsEvents() {
+        LimitAction limitAction = new LimitAction();
+        assertFalse(limitAction.supportsEvents());
+    }
+
 }

@@ -51,6 +51,7 @@ module.exports = {
                             children: [
                                 "igor-plugin-core/cron-trigger",
                                 "igor-plugin-core/manual-trigger",
+                                "igor-plugin-core/message-trigger",
                                 "igor-plugin-core/web-hook-trigger"
                             ]
                         },

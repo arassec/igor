@@ -23,12 +23,15 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.support.CronSequenceGenerator;
+import org.springframework.scheduling.support.CronExpression;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
@@ -274,11 +277,15 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
                 .filter(job -> job.getTrigger() instanceof ScheduledTrigger).sorted((jobOne, jobTwo) -> {
                     String firstCron = ((ScheduledTrigger) jobOne.getTrigger()).getCronExpression();
                     String secondCron = ((ScheduledTrigger) jobTwo.getTrigger()).getCronExpression();
-                    CronSequenceGenerator cronTriggerOne = new CronSequenceGenerator(firstCron);
-                    Date nextRunOne = cronTriggerOne.next(Calendar.getInstance().getTime());
-                    CronSequenceGenerator cronTriggerTwo = new CronSequenceGenerator(secondCron);
-                    Date nextRunTwo = cronTriggerTwo.next(Calendar.getInstance().getTime());
-                    return nextRunOne.compareTo(nextRunTwo);
+                    CronExpression cronTriggerOne = CronExpression.parse(firstCron);
+                    LocalDateTime nextRunOne = cronTriggerOne.next(LocalDateTime.now());
+                    CronExpression cronTriggerTwo = CronExpression.parse(secondCron);
+                    LocalDateTime nextRunTwo = cronTriggerTwo.next(LocalDateTime.now());
+                    if (nextRunOne != null && nextRunTwo != null) {
+                        return nextRunOne.compareTo(nextRunTwo);
+                    } else {
+                        return 0;
+                    }
                 }).collect(Collectors.toList());
     }
 

@@ -1,14 +1,11 @@
 package com.arassec.igor.core.model.trigger;
 
-import com.arassec.igor.core.model.annotation.IgorParam;
-import com.arassec.igor.core.model.annotation.validation.ValidJsonObject;
-import com.arassec.igor.core.model.job.misc.ParameterSubtype;
-import lombok.Setter;
-import org.springframework.util.StringUtils;
+import com.arassec.igor.core.util.IgorException;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Base for event based triggers. Provides sensible default implementations for most event based triggers.
@@ -16,17 +13,9 @@ import java.util.Queue;
 public abstract class BaseEventTrigger extends BaseTrigger implements EventTrigger {
 
     /**
-     * Contains the user configured event data that is used during simulated job executions.
-     */
-    @ValidJsonObject
-    @Setter
-    @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
-    private String simulationData;
-
-    /**
      * The job's event queue.
      */
-    protected Queue<Map<String, Object>> eventQueue;
+    protected BlockingQueue<Map<String, Object>> eventQueue;
 
     /**
      * Creates a new component instance.
@@ -42,7 +31,7 @@ public abstract class BaseEventTrigger extends BaseTrigger implements EventTrigg
      * {@inheritDoc}
      */
     @Override
-    public void setEventQueue(Queue<Map<String, Object>> queue) {
+    public void setEventQueue(BlockingQueue<Map<String, Object>> queue) {
         this.eventQueue = queue;
     }
 
@@ -51,23 +40,12 @@ public abstract class BaseEventTrigger extends BaseTrigger implements EventTrigg
      */
     @Override
     public void processEvent(Map<String, Object> eventData) {
-        eventQueue.add(Objects.requireNonNullElseGet(eventData, Map::of));
-    }
-
-    /**
-     * Returns the simulation data entered by the user. The entered data is processed line by line and expected to be in the form
-     * of 'key=value' pairs. Data not matching that pattern is ignored.
-     *
-     * @return A map of simulation data.
-     */
-    @Override
-    public Map<String, Object> getSimulationData() {
-        if (StringUtils.hasText(simulationData)) {
-            Map<String, Object> triggerData = convertJsonString(simulationData);
-            getData().forEach(triggerData::put); // Add custom trigger's data.
-            return triggerData;
+        try {
+            eventQueue.put(Objects.requireNonNullElseGet(eventData, HashMap::new));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IgorException("Interrupted during message processing!");
         }
-        return getData();
     }
 
 }

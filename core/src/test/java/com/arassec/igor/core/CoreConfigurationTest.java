@@ -45,12 +45,12 @@ class CoreConfigurationTest {
      * Tests I18N.
      */
     @Test
-    @DisplayName("Tests module-misc I18N.")
+    @DisplayName("Tests module-core I18N.")
     void testI18n() {
         CoreConfiguration configuration = new CoreConfiguration();
         MessageSource messageSource = configuration.coreMessageSource();
         assertEquals("a job with the same name already exists",
-                messageSource.getMessage("com.arassec.igor.validation.unique-job-name", null, Locale.getDefault()));
+                messageSource.getMessage("com.arassec.igor.core.validation.unique-job-name", null, Locale.getDefault()));
     }
 
 }

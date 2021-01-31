@@ -21,7 +21,7 @@ public @interface UniqueConnectorName {
     /**
      * The message that indicates a failed validation.
      */
-    String MESSAGE_KEY = "com.arassec.igor.validation.unique-connector-name";
+    String MESSAGE_KEY = "com.arassec.igor.core.validation.unique-connector-name";
 
     /**
      * Returns the message key.

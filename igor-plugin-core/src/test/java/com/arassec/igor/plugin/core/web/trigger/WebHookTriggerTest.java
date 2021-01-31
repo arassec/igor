@@ -1,14 +1,13 @@
 package com.arassec.igor.plugin.core.web.trigger;
 
+import com.arassec.igor.core.model.trigger.EventType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Map;
-import java.util.Queue;
-
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the {@link WebHookTriggerTest}.
@@ -18,24 +17,15 @@ import static org.mockito.Mockito.*;
 class WebHookTriggerTest {
 
     /**
-     * Tests processing an event.
+     * Tests initialization of the trigger.
      */
     @Test
-    @DisplayName("Tests processing an event.")
-    void testProcessEvent() {
-        @SuppressWarnings("unchecked")
-        Queue<Map<String, Object>> queueMock = mock(Queue.class);
-
+    @DisplayName("Tests initialization of the trigger.")
+    void testInitilization() {
         WebHookTrigger webHookTrigger = new WebHookTrigger();
-        webHookTrigger.setEventQueue(queueMock);
-
-        Map<String, Object> data = Map.of();
-        webHookTrigger.processEvent(null);
-        verify(queueMock, times(1)).add(eq(data));
-
-        data = Map.of("key", "value");
-        webHookTrigger.processEvent(data);
-        verify(queueMock, times(1)).add(eq(data));
+        assertEquals(CoreCategory.WEB.getId(), webHookTrigger.getCategoryId());
+        assertEquals("web-hook-trigger", webHookTrigger.getTypeId());
+        assertEquals(EventType.WEB_HOOK, webHookTrigger.getSupportedEventType());
     }
 
 }

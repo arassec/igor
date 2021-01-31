@@ -1,7 +1,5 @@
 package com.arassec.igor.core.model;
 
-import com.arassec.igor.core.model.job.execution.JobExecution;
-
 import javax.validation.constraints.NotEmpty;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,22 +39,6 @@ public abstract class BaseIgorComponent implements IgorComponent {
     protected BaseIgorComponent(String categoryId, String typeId) {
         this.categoryId = categoryId;
         this.typeId = typeId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialize(String jobId, JobExecution jobExecution) {
-        // nothing to do here...
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void shutdown(String jobId, JobExecution jobExecution) {
-        // nothing to do here...
     }
 
     /**

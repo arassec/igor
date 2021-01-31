@@ -31,6 +31,5 @@ export default new Router({
             component: JobEditor,
             props: true
         }
-
     ]
 });

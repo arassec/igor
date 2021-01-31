@@ -103,26 +103,27 @@ public class HttpRequestAction extends BaseWebAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
+        String requestMethod = getString(data, method);
         String requestUrl = getString(data, url);
         String content = getString(data, body);
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
                 .uri(URI.create(requestUrl))
-                .method(this.method, HttpRequest.BodyPublishers.ofString(content));
+                .method(requestMethod, HttpRequest.BodyPublishers.ofString(content));
         parsedHeaders.forEach(header -> httpRequestBuilder.header(getString(data, header.split(":")[0]),
                 getString(data, header.split(":")[1])));
         addBasicAuthHeaderIfConfigured(httpRequestBuilder);
 
-        if (isSimulation(data) && simulationSafe && SIMULATION_UNSAFE_METHODS.contains(method)) {
-            data.put(DataKey.SIMULATION_LOG.getKey(), "Would have executed '" + method + "' against: " + requestUrl);
+        if (isSimulation(data) && simulationSafe && SIMULATION_UNSAFE_METHODS.contains(requestMethod)) {
+            data.put(DataKey.SIMULATION_LOG.getKey(), "Would have executed '" + requestMethod + "' against: " + requestUrl);
         } else {
             try {
                 HttpResponse<String> httpResponse = httpConnector.getHttpClient().send(httpRequestBuilder.build(),
                         HttpResponse.BodyHandlers.ofString());
 
                 if (!ignoreErrors && (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 226)) {
-                    throw new IgorException("Received HTTP error code on web request for url '" + requestUrl + "': "
-                            + httpResponse.statusCode());
+                    throw new IgorException("Received HTTP " + httpResponse.statusCode() + " on " + requestMethod + " request for" +
+                            " url '" + requestUrl + "': " + " with body: " + content);
                 }
 
                 String responseBody = httpResponse.body();

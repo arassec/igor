@@ -15,17 +15,16 @@ public class ConnectorWebDeserializer extends IgorComponentWebDeserializer<Conne
      * Creates a new deserializer instance.
      *
      * @param igorComponentRegistry The component registry.
-     * @param simulationMode        Set to {@code true} if the resulting  components are used during simulated job runs.
      */
-    public ConnectorWebDeserializer(IgorComponentRegistry igorComponentRegistry, boolean simulationMode) {
-        super(Connector.class, igorComponentRegistry, null, simulationMode);
+    public ConnectorWebDeserializer(IgorComponentRegistry igorComponentRegistry) {
+        super(Connector.class, igorComponentRegistry, null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    Connector createInstance(String typeId, Map<String, Object> parameters, boolean simulationMode) {
+    Connector createInstance(String typeId, Map<String, Object> parameters) {
         return igorComponentRegistry.createConnectorInstance(typeId, parameters);
     }
 

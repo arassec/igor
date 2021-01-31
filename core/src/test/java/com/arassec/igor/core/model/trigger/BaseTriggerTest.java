@@ -15,13 +15,17 @@ import static org.mockito.Mockito.*;
 class BaseTriggerTest {
 
     /**
+     * The base class under test.
+     */
+    private final BaseTrigger baseTrigger = mock(BaseTrigger.class,
+            withSettings().useConstructor("category-id", "type-id").defaultAnswer(CALLS_REAL_METHODS));
+
+    /**
      * Tests the {@link BaseTrigger}'s constructor.
      */
     @Test
     @DisplayName("Tests the base-trigger's constructor.")
     void testBaseTrigger() {
-        BaseTrigger baseTrigger = mock(BaseTrigger.class,
-                withSettings().useConstructor("category-id", "type-id").defaultAnswer(CALLS_REAL_METHODS));
         assertEquals("category-id", baseTrigger.getCategoryId());
         assertEquals("type-id", baseTrigger.getTypeId());
     }
@@ -32,8 +36,6 @@ class BaseTriggerTest {
     @Test
     @DisplayName("Tests getting meta-data.")
     void testGetMetaData() {
-        BaseTrigger baseTrigger = mock(BaseTrigger.class,
-                withSettings().useConstructor("category-id", "type-id").defaultAnswer(CALLS_REAL_METHODS));
         assertEquals(Map.of(), baseTrigger.getMetaData());
     }
 
@@ -43,8 +45,6 @@ class BaseTriggerTest {
     @Test
     @DisplayName("Tests getting data.")
     void testGetData() {
-        BaseTrigger baseTrigger = mock(BaseTrigger.class,
-                withSettings().useConstructor("category-id", "type-id").defaultAnswer(CALLS_REAL_METHODS));
         assertEquals(Map.of(), baseTrigger.getData());
     }
 

@@ -37,7 +37,7 @@ public abstract class CoreActionBaseTest {
         item.put(PARAM_KEY, PARAM_VALUE);
 
         Map<String, Object> result = new HashMap<>();
-        result.put(DataKey.META.getKey(), Job.createMetaData(JOB_ID, null, 25));
+        result.put(DataKey.META.getKey(), Job.createMetaData(JOB_ID, null));
         result.put(DataKey.DATA.getKey(), item);
 
         return result;

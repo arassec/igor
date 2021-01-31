@@ -56,7 +56,8 @@ public interface IgorComponent {
      * @param jobId        The job's ID.
      * @param jobExecution Contains the state of the job execution.
      */
-    void initialize(String jobId, JobExecution jobExecution);
+    default void initialize(String jobId, JobExecution jobExecution) {
+    }
 
     /**
      * Shuts the component down at the end of the job execution.
@@ -64,6 +65,7 @@ public interface IgorComponent {
      * @param jobId        The job's ID.
      * @param jobExecution Contains the state of the job execution.
      */
-    void shutdown(String jobId, JobExecution jobExecution);
+    default void shutdown(String jobId, JobExecution jobExecution) {
+    }
 
 }

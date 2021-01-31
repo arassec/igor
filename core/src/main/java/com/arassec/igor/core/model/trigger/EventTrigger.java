@@ -1,19 +1,21 @@
 package com.arassec.igor.core.model.trigger;
 
+import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
+
 import java.util.Map;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Defines a {@link Trigger}, that consumes events and hands them over to an active job for processing.
  */
-public interface EventTrigger extends Trigger {
+public interface EventTrigger extends Trigger, ProcessingFinishedCallback {
 
     /**
      * Sets the queue to put events in on arrival.
      *
      * @param queue The job's input queue. Entries put into the queue will be processed by the job containing the trigger.
      */
-    void setEventQueue(Queue<Map<String, Object>> queue);
+    void setEventQueue(BlockingQueue<Map<String, Object>> queue);
 
     /**
      * Processes the supplied event data and hands it over to the job.
@@ -23,10 +25,12 @@ public interface EventTrigger extends Trigger {
     void processEvent(Map<String, Object> eventData);
 
     /**
-     * Returns simulation data. Used during simulated job executions to simulate the event data normally received by the trigger.
+     * Returns the event type  supported by this trigger.
      *
-     * @return A JSON-Object containing event-like data for simulated job executions.
+     * @return The supported event type.
      */
-    Map<String, Object> getSimulationData();
+    default EventType getSupportedEventType() {
+        return EventType.NONE;
+    }
 
 }

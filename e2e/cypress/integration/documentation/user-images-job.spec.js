@@ -277,7 +277,7 @@ describe('Creates user doc job images.', () => {
 
             cy.chooseType('trigger', 'Manual');
 
-            cy.addAction('Pause', 'Util', 'Pause');
+            cy.addAction('Pause', 'Test', 'Pause');
 
             cy.get('[data-e2e=job-configuration]')
                 .should('be.visible')
@@ -336,7 +336,7 @@ describe('Creates user doc job images.', () => {
             deleteActiveJob('5');
         });
 
-        it('Create run-job-button-running.png', function () {
+        it.only('Create run-job-button-running.png', function () {
             let jobName = 'E2E Running Job'
             let jobKebap = 'e-2-e-running-job'
 
@@ -360,7 +360,7 @@ describe('Creates user doc job images.', () => {
 
             cy.chooseType('trigger', 'Manual');
 
-            cy.addAction('Pause', 'Util', 'Pause',
+            cy.addAction('Pause', 'Test', 'Pause',
                 {
                     'milliseconds': 60000
                 });

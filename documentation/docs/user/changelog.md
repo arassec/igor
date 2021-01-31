@@ -2,10 +2,12 @@
 
 ## Version {{ $themeConfig.igorVersion }}
 - Refactored common-plugin into core-plugin.
+- Added new 'Message' trigger.
+- Event-triggered jobs now use real events during simulated job executions.
+- Added new core component category: 'test'. 
 
 ## Version 0.2.6
 - Refactored modules into plugins.
-- 'Split Array' action now takes a mustache template as 'Array selector' configuration parameter instead of a JSON-Path query.
 - Inactive jobs are now greyed out on the job overview page.
 - Referencing jobs in the connector editor are now ordered alphabetically.
 - Errors during simulated job executions are now shown in the job navigator.
@@ -15,6 +17,10 @@
 - Added 'HTTP File Download' action.
 - Removed 'HTTP(S) File' connector.
 - Unknown components (e.g. due to removed plugins) no longer cause exceptions during startup, but are indicated in the UI.
+
+::: danger Breaking Changes
+- 'Split Array' action now takes a mustache template as 'Array selector' configuration parameter instead of a JSON-Path query.
+:::
 
 ## Version 0.2.5
 - Added 'mustache-selector' for JSON simulation results.
@@ -42,7 +48,10 @@
 - Added new property to 'Filter by Regular Expression' action to drop matching items if configured.
 
 ## Version 0.2.1
+::: danger Breaking Changes
 - Replaced JSON-Path support in parameters with Mustache templates.
+:::
+
 
 ## Version 0.2.0
 - Added Skip action to skip the first 'n' data items of a stream.

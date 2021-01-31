@@ -32,7 +32,8 @@ export const store = {
   },
   wip: {
     timeout: undefined,
-    message: ''
+    message: '',
+    cancelCallback: undefined
   },
   connectorData: {
     connectorConfiguration: null
@@ -72,8 +73,9 @@ export const store = {
     this.feedback.alert = false
     this.routeChanged = false
   },
-  setWip (message) {
+  setWip (message, cancelCallback) {
     let component = this
+    this.wip.cancelCallback = cancelCallback;
     this.wip.timeout = setTimeout(function () {
       component.wip.message = message
     }, 250)
@@ -83,8 +85,9 @@ export const store = {
   },
   clearWip () {
     if (this.wip.timeout !== undefined) {
-      clearTimeout(this.wip.timeout)
+      clearTimeout(this.wip.timeout);
     }
+    this.wip.cancelCallback = undefined;
     this.wip.message = ''
   },
   setConnectorData (connectorConfiguration) {

@@ -40,7 +40,8 @@
                         <input-validated id="numexechistory-input" type="text"
                                          :parent-id="jobConfiguration.id" :property-id="'historyLimit'"
                                          :validation-errors="validationErrors"
-                                         v-model.number="jobConfiguration.historyLimit"/>
+                                         v-model.number="jobConfiguration.historyLimit"
+                                         :is-number="true"/>
                     </div>
                 </div>
                 <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
@@ -49,7 +50,8 @@
                         <input-validated id="numsimlimit-input" type="text"
                                          :parent-id="jobConfiguration.id" :property-id="'simulationLimit'"
                                          :validation-errors="validationErrors"
-                                         v-model.number="jobConfiguration.simulationLimit"/>
+                                         v-model.number="jobConfiguration.simulationLimit"
+                                         :is-number="true"/>
                     </div>
                 </div>
                 <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
@@ -108,6 +110,14 @@
                             </select>
                         </div>
                     </div>
+                </div>
+                <div class="info-box" v-if="jobConfiguration.trigger.type.supportsEvents">
+                    <label>This trigger fires on events.
+                        The job will stay in 'active' state and listen for incoming events after start.<br/><br/>
+                        Not all actions are available for event-triggered jobs!<br/><br/>
+                        In order to simulate the job, you will have to provide incoming events to the trigger.
+                        If the job is already active, incoming events might be processed by the simulated job execution!
+                    </label>
                 </div>
             </core-panel>
 
@@ -235,6 +245,12 @@ export default {
 
 .text-top {
     vertical-align: top;
+}
+
+.info-box {
+    background-color: var(--color-foreground);
+    padding: .25em;
+    margin: -1em .15em .5em .15em;
 }
 
 </style>

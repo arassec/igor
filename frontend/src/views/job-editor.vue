@@ -98,6 +98,7 @@
                                  :key="action.id"
                                  :action="action"
                                  :validation-errors="validationErrors"
+                                 :event-trigger="jobConfiguration.trigger.type.supportsEvents"
                                  v-on:create-connector="createConnector"
                                  v-on:open-documentation="openDocumentation"
                                  v-on:switch-documentation="switchDocumentation"
@@ -345,9 +346,21 @@ export default {
             this.showDocumentation = false;
             this.simulationResults = null;
             this.selectedSimulationResults = null;
-            await IgorBackend.postData('/api/job/simulate', this.jobConfiguration, 'Simulating job',
-                'Simulation OK.', 'Simulation Failed!').then((result) => {
+            let message = 'Simulating job';
+            if (this.jobConfiguration.trigger.type.supportsEvents) {
+                message = 'Simulating job - Waiting for incoming events...'
+            }
+            let component = this;
+            const CancelToken = window.axios.CancelToken;
+            const source = CancelToken.source();
+            await IgorBackend.postData('/api/job/simulate', this.jobConfiguration, message,
+                'Simulation OK.', 'Simulation Failed!', () => {
+                    component.showDocumentation = false;
+                    source.cancel("Simulation cancelled by user!");
+                    IgorBackend.deleteData('/api/job/simulate/' + component.jobConfiguration.id, "Cancelling simulation...", "Simulation canceled.", "Cancelling failed!");
+                }, source.token).then((result) => {
                 if (result.status === 400) {
+                    component.showDocumentation = false;
                     if (result.data === undefined || result.data === "") {
                         this.validationErrors = {};
                     } else {
@@ -429,6 +442,7 @@ export default {
                     this.validationErrors = {};
                     this.jobConfiguration = result.data;
                     this.showConfiguration = false;
+                    this.originalJobConfiguration = JSON.stringify(this.jobConfiguration);
                 }
             })
         },

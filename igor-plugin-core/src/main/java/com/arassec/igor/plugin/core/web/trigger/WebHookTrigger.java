@@ -2,6 +2,7 @@ package com.arassec.igor.plugin.core.web.trigger;
 
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.trigger.BaseEventTrigger;
+import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.plugin.core.CoreCategory;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +18,14 @@ public class WebHookTrigger extends BaseEventTrigger {
      */
     public WebHookTrigger() {
         super(CoreCategory.WEB.getId(), "web-hook-trigger");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public EventType getSupportedEventType() {
+        return EventType.WEB_HOOK;
     }
 
 }

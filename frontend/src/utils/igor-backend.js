@@ -24,24 +24,31 @@ export default {
             }
         }
     },
-    postData: async function (url, payload, wipMessage, successMessage, errorMessage) {
-        if (wipMessage) {
-            store.setWip(wipMessage)
+    postData: async function (url, payload, wipMessage, successMessage, errorMessage, cancelCallback, cancelTokenSource) {
+        if (wipMessage || cancelCallback) {
+            store.setWip(wipMessage, cancelCallback)
         }
         let result = {
             status: 0,
             data: {}
         }
         try {
-            let response = await window.axios.post(url, payload);
+            let response;
+            if (cancelTokenSource) {
+                response = await window.axios.post(url, payload, {cancelToken: cancelTokenSource.token});
+            } else {
+                response = await window.axios.post(url, payload);
+            }
             store.setFeedback(successMessage, false);
             result.status = response.status;
             result.data = response.data;
             return result;
         } catch (error) {
-            result.status = error.response.status;
-            result.data = error.response.data;
-            store.setFeedback(errorMessage, true)
+            if (!window.axios.isCancel(error)) {
+                result.status = error.response.status;
+                result.data = error.response.data;
+                store.setFeedback(errorMessage, true)
+            }
             return result;
         } finally {
             if (wipMessage) {
@@ -66,14 +73,18 @@ export default {
         }
     },
     deleteData: async function (url, wipMessage, successMessage, errorMessage) {
-        store.setWip(wipMessage)
+        if (wipMessage) {
+            store.setWip(wipMessage)
+        }
         await window.axios.delete(url).then(() => {
-            store.setFeedback(successMessage, false)
+            if (successMessage) {
+                store.setFeedback(successMessage, false)
+            }
         }).catch((error) => {
             if (error.response.data) {
-                store.setFeedback(errorMessage + '(' + error.response.data + ')', true)
+                store.setFeedback(errorMessage + ' (' + error.response.data + ')', true)
             } else {
-                store.setFeedback(errorMessage + '(' + error + ')', true)
+                store.setFeedback(errorMessage + ' (' + error + ')', true)
             }
         }).finally(() => {
             store.clearWip()

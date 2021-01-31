@@ -11,11 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class IgorPersistencePropertiesTest {
 
     /**
-     * Tests the core properties default values.
+     * Tests the persistence properties default values.
      */
     @Test
-    @DisplayName("Tests the core properties default values.")
-    void testCorePropertiesDefaults() {
+    @DisplayName("Tests the persistence properties default values.")
+    void testPersistencePropertiesDefaults() {
         IgorPersistenceProperties igorPersistenceProperties = new IgorPersistenceProperties();
         assertNull(igorPersistenceProperties.getLocalSecurityToken());
     }

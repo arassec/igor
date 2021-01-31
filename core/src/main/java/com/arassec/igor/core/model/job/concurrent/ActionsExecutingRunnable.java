@@ -19,17 +19,17 @@ public class ActionsExecutingRunnable implements Runnable {
     /**
      * The actions of this thread.
      */
-    private List<Action> actions;
+    private final List<Action> actions;
 
     /**
      * The queue with incoming data objects.
      */
-    private BlockingQueue<Map<String, Object>> inputQueue;
+    private final BlockingQueue<Map<String, Object>> inputQueue;
 
     /**
      * The queue where processed data objects are put in.
      */
-    private BlockingQueue<Map<String, Object>> outputQueue;
+    private final BlockingQueue<Map<String, Object>> outputQueue;
 
     /**
      * Indicates whether this thread should keep working or cancel its work.
@@ -39,7 +39,7 @@ public class ActionsExecutingRunnable implements Runnable {
     /**
      * The job execution.
      */
-    private JobExecution jobExecution;
+    private final JobExecution jobExecution;
 
     /**
      * Creates a new ActionsExecutingRunnable.
@@ -103,13 +103,6 @@ public class ActionsExecutingRunnable implements Runnable {
     }
 
     /**
-     * Resets all actions.
-     */
-    public void reset() {
-        actions.forEach(Action::reset);
-    }
-
-    /**
      * Shuts this thread down by preventing it to read more data from the input queue.
      */
     public void shutdown() {
@@ -127,6 +120,7 @@ public class ActionsExecutingRunnable implements Runnable {
             return;
         }
 
+        // Contains all data items which an action has to process:
         List<Map<String, Object>> workingItems = new LinkedList<>(items);
 
         for (Action action : actions) {
@@ -139,13 +133,20 @@ public class ActionsExecutingRunnable implements Runnable {
                 if (partialActionResult != null && !partialActionResult.isEmpty()) {
                     actionResult.addAll(partialActionResult);
                 }
+                // Invokes a callback after the data item has been processed where applicable:
+                if (action.getProcessingFinishedCallback() != null) {
+                    action.getProcessingFinishedCallback().processingFinished(workingItem);
+                }
             }
 
+            // The action processed all incoming working items:
             workingItems.clear();
 
             if (actionResult.isEmpty()) {
+                // If the current action returned nothing, the remaining actions will not be called any more.
                 break;
             } else {
+                // The results of the current action is the input for the following action:
                 workingItems.addAll(actionResult);
             }
         }

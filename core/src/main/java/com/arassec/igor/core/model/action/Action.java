@@ -2,6 +2,7 @@ package com.arassec.igor.core.model.action;
 
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,9 @@ public interface Action extends IgorComponent {
      *
      * @return List of final data that should be processed by later actions.
      */
-    List<Map<String, Object>> complete();
+    default List<Map<String, Object>> complete() {
+        return List.of();
+    }
 
     /**
      * An optional name of the action.
@@ -86,10 +89,29 @@ public interface Action extends IgorComponent {
     void setActive(boolean active);
 
     /**
-     * Resets the action to its initial state. A job that is triggered by events is not finished after processing an event. This
-     * method is responsible to reset the action to an initial state, so that the next event will be processed as if the job had
-     * been newly created.
+     * Returns whether the action supports an event stream or not.
+     * <p>
+     * Not all actions support jobs that are triggered by continuous incoming events, e.g. sorting might only work if all data
+     * items are known to the action.
+     *
+     * @return {@code true} if the action can be used in event-triggered jobs, {@code false} otherwise.
      */
-    void reset();
+    default boolean supportsEvents() {
+        return true;
+    }
+
+    /**
+     * Sets a processing finished callback to the action which is invoked after the action finishes processing a data item.
+     *
+     * @param processingFinishedCallback The callback to invoke after processing a data item.
+     */
+    void setProcessingFinishedCallback(ProcessingFinishedCallback processingFinishedCallback);
+
+    /**
+     * Returns the callback which is invoked after processing a data item finishes.
+     *
+     * @return The {@link ProcessingFinishedCallback} if set or {@code null} otherwise.
+     */
+    ProcessingFinishedCallback getProcessingFinishedCallback();
 
 }

@@ -317,7 +317,9 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     }
 
     /**
-     * Creates a replacement connector for a missing connector.
+     * Creates a drop-in replacement for a missing connector. In case the original connector is not available any more (e.g. due
+     * to a deleted plugin), this method returns a fitting connector mock, so that igor can display the problem to the user
+     * instead of throwing an exception during startup.
      *
      * @param field The field that the replacement connector is used for.
      *

@@ -56,7 +56,7 @@ Parameter | Description
 Http connector | An 'HTTP Connector' that is configured to execute the request.
 Url | The HTTP(S) URL to execute the request against.
 Method | The HTTP method. Can be one of 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE' or 'PATCH'.
-Headers | The HTTP headers to use for the request. Headers must be entered as 'key: value'-pairs, with each header in a separate line.
+Headers | The HTTP headers to use for the request. Headers must be entered as 'key: value'-pairs, with each header in a separate line. Mustache templates are **not** supported in headers.
 Body | The HTTP body to use for the request.
 Username | A username for HTTP Basic Authentication. If set together with a password, a HTTP Authorization header with the encoded password will be added to every request.
 Password | A password for HTTP Basic Authentication.

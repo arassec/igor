@@ -3,12 +3,14 @@ package com.arassec.igor.web.controller;
 import com.arassec.igor.core.application.ConnectorManager;
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.application.JobManager;
-import com.arassec.igor.core.model.DataKey;
+import com.arassec.igor.core.application.simulation.JobSimulator;
+import com.arassec.igor.core.application.simulation.SimulationResult;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
+import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.ModelPageHelper;
 import com.arassec.igor.core.util.Pair;
@@ -17,18 +19,13 @@ import com.arassec.igor.core.util.event.JobEventType;
 import com.arassec.igor.web.model.JobExecutionOverview;
 import com.arassec.igor.web.model.JobListEntry;
 import com.arassec.igor.web.model.ScheduleEntry;
-import com.arassec.igor.web.model.simulation.SimulationResult;
-import com.arassec.igor.web.simulation.ActionProxy;
-import com.arassec.igor.web.simulation.TriggerProxy;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.support.CronSequenceGenerator;
-import org.springframework.util.StringUtils;
+import org.springframework.scheduling.support.CronExpression;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -36,9 +33,12 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -76,14 +76,14 @@ public class JobRestController extends BaseRestController {
     private final ConnectorManager connectorManager;
 
     /**
-     * Job-Mapper for simulation runs.
-     */
-    private final ObjectMapper simulationObjectMapper;
-
-    /**
      * The registry for igor components.
      */
     private final IgorComponentRegistry igorComponentRegistry;
+
+    /**
+     * Simulator for job executions.
+     */
+    private final JobSimulator jobSimulator;
 
     /**
      * Contains {@link SseEmitter} of job stream requests.
@@ -211,54 +211,25 @@ public class JobRestController extends BaseRestController {
      */
     @PostMapping("simulate")
     public Map<String, SimulationResult> simulateJob(@Valid @RequestBody Job job) {
-
-        Map<String, SimulationResult> result = new HashMap<>();
-
-        Job simulationJob;
+        Future<Map<String, SimulationResult>> simulationResultFuture = jobSimulator.simulateJob(job);
         try {
-            // The method parameter has been deserialized with the regular object mapper to support bean validation. But to
-            // simulate the job, proxies are required, which are added by the 'simulation object mapper'. Thus we have to first
-            // convert the original job to a JSON string and afterwards back to a Job object, but this time with simulation
-            // proxies inside...
-            simulationJob = simulationObjectMapper.readValue(simulationObjectMapper.writeValueAsString(job), Job.class);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Could not simulate job run!", e);
+            return simulationResultFuture.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IgorException("Interrupted during job simulation!", e);
+        } catch (ExecutionException e) {
+            throw new IgorException("Exception during job simulation!", e);
         }
+    }
 
-        JobExecution jobExecution = new JobExecution();
-
-        simulationJob.start(jobExecution);
-
-        SimulationResult jobResult = new SimulationResult();
-
-        if (jobExecution.getErrorCause() != null) {
-            jobResult.setErrorCause(jobExecution.getErrorCause());
-        }
-
-        TriggerProxy triggerProxy = (TriggerProxy) simulationJob.getTrigger();
-
-        final Map<String, Object> triggerData = triggerProxy != null ? triggerProxy.getData() : Map.of();
-
-        Map<String, Object> item = new HashMap<>();
-        item.put(DataKey.META.getKey(), Job.createMetaData(simulationJob.getId(), triggerProxy, job.getSimulationLimit()));
-        item.put(DataKey.DATA.getKey(), triggerData);
-        jobResult.getResults().add(item);
-
-        simulationJob.getActions().forEach(action -> {
-            ActionProxy actionProxy = (ActionProxy) action;
-            SimulationResult actionResult = new SimulationResult();
-            actionResult.setErrorCause(actionProxy.getErrorCause());
-            actionProxy.getCollectedData().forEach(jsonObject -> actionResult.getResults().add(jsonObject));
-            if (action.getId() != null) {
-                result.put(action.getId(), actionResult);
-            }
-        });
-
-        if (StringUtils.hasText(jobResult.getErrorCause()) || !jobResult.getResults().isEmpty()) {
-            result.put(job.getId(), jobResult);
-        }
-
-        return result;
+    /**
+     * Cancels a simulation of the supplied job.
+     *
+     * @param jobId The job's ID.
+     */
+    @DeleteMapping("simulate/{jobId}")
+    public void cancelSimulations(@PathVariable String jobId) {
+        jobSimulator.cancelAllSimulations(jobId);
     }
 
     /**
@@ -343,9 +314,11 @@ public class JobRestController extends BaseRestController {
         List<ScheduleEntry> jobSchedule = new LinkedList<>();
         jobManager.loadScheduled().stream().filter(job -> job.getTrigger() instanceof ScheduledTrigger).forEach(job -> {
             String cronExpression = ((ScheduledTrigger) job.getTrigger()).getCronExpression();
-            CronSequenceGenerator cronTrigger = new CronSequenceGenerator(cronExpression);
-            Date nextRun = cronTrigger.next(Calendar.getInstance().getTime());
-            jobSchedule.add(new ScheduleEntry(job.getId(), job.getName(), Instant.ofEpochMilli(nextRun.getTime())));
+            CronExpression cronTrigger = CronExpression.parse(cronExpression);
+            LocalDateTime localDateTime =
+                    Optional.ofNullable(cronTrigger.next(LocalDateTime.now())).orElseThrow(() -> new IgorException("Unable to " +
+                            "determine schedule for job!"));
+            jobSchedule.add(new ScheduleEntry(job.getId(), job.getName(), localDateTime.toInstant(ZoneOffset.UTC)));
         });
         jobSchedule.sort(Comparator.comparing(ScheduleEntry::getNextRun));
         return ModelPageHelper.getModelPage(jobSchedule, pageNumber, pageSize);
@@ -407,7 +380,7 @@ public class JobRestController extends BaseRestController {
         jobStreamEmitters.forEach(emitter -> events.forEach(event -> {
             try {
                 emitter.send(event);
-            } catch (IOException e) {
+            } catch (IOException | IllegalStateException e) {
                 deadJobStreamEmitters.add(emitter);
             }
         }));

@@ -24,7 +24,7 @@ public @interface ValidJsonObject {
      * @return The message key.
      */
     @SuppressWarnings("unused")
-    String message() default "{com.arassec.igor.validation.json-object}";
+    String message() default "com.arassec.igor.core.validation.json-object";
 
     /**
      * Possible bean validation groups.

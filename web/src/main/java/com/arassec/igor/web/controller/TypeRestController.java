@@ -1,6 +1,7 @@
 package com.arassec.igor.web.controller;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.web.model.KeyLabelStore;
 import com.arassec.igor.web.model.TypeData;
 import com.arassec.igor.web.util.DocumentationUtil;
@@ -45,8 +46,14 @@ public class TypeRestController extends BaseRestController {
      */
     @GetMapping("action/{category}")
     public List<TypeData> getActionTypes(Locale locale, @PathVariable("category") String category) {
+        // IntelliJ suggests to use peek() instead of map(), but SonarLint doesn't like peek()...
+        //noinspection SimplifyStreamApiCallChains
         return igorComponentRegistry.getActionTypesOfCategory(category).stream()
                 .map(typeId -> createTypeData(locale, typeId))
+                .map(typeData -> {
+                    typeData.setSupportsEvents(igorComponentRegistry.createActionInstance(typeData.getKey(), null).supportsEvents());
+                    return typeData;
+                })
                 .sorted(Comparator.comparing(TypeData::getValue))
                 .collect(Collectors.toList());
     }
@@ -61,8 +68,14 @@ public class TypeRestController extends BaseRestController {
      */
     @GetMapping("trigger/{category}")
     public List<TypeData> getTriggerTypes(Locale locale, @PathVariable("category") String category) {
+        // IntelliJ suggests to use peek() instead of map(), but SonarLint doesn't like peek()...
+        //noinspection SimplifyStreamApiCallChains
         return igorComponentRegistry.getTriggerTypesOfCategory(category).stream()
                 .map(typeId -> createTypeData(locale, typeId))
+                .map(typeData -> {
+                    typeData.setSupportsEvents(igorComponentRegistry.createTriggerInstance(typeData.getKey(), null) instanceof EventTrigger);
+                    return typeData;
+                })
                 .sorted(Comparator.comparing(TypeData::getValue))
                 .collect(Collectors.toList());
     }
@@ -93,7 +106,7 @@ public class TypeRestController extends BaseRestController {
      */
     private TypeData createTypeData(Locale locale, String typeId) {
         return new TypeData(typeId, messageSource.getMessage(typeId, null, locale),
-                DocumentationUtil.isDocumentationAvailable(typeId, LocaleContextHolder.getLocale()));
+                DocumentationUtil.isDocumentationAvailable(typeId, LocaleContextHolder.getLocale()), false);
     }
 
 }

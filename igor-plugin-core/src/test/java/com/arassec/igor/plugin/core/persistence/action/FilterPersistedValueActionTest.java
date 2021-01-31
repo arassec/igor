@@ -21,22 +21,6 @@ import static org.mockito.Mockito.*;
 class FilterPersistedValueActionTest extends CoreActionBaseTest {
 
     /**
-     * Tests the action failing safe if no value can be retrieved.
-     */
-    @Test
-    @DisplayName("Tests the action without a value.")
-    void testProcessNoValue() {
-        PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
-
-        FilterPersistedValueAction action = new FilterPersistedValueAction(persistentValueRepositoryMock);
-        action.setInput("{{data.INVALID}}");
-
-        List<Map<String, Object>> result = action.process(createData(), new JobExecution());
-        assertTrue(result.isEmpty());
-        verify(persistentValueRepositoryMock, times(0)).isPersisted(eq(JOB_ID), any(PersistentValue.class));
-    }
-
-    /**
      * Tests the action with an already persisted value.
      */
     @Test

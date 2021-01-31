@@ -18,10 +18,11 @@ class TypeDataTest {
     @Test
     @DisplayName("Tests the type-data model class.")
     void testKeyLabelStore() {
-        TypeData typeData = new TypeData("key", "label", true);
+        TypeData typeData = new TypeData("key", "label", true, true);
         assertEquals("key", typeData.getKey());
         assertEquals("label", typeData.getValue());
         assertTrue(typeData.isDocumentationAvailable());
+        assertTrue(typeData.isSupportsEvents());
     }
 
 }

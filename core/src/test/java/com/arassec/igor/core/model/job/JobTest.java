@@ -4,13 +4,19 @@ import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.IgorException;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -85,22 +91,68 @@ class JobTest {
     }
 
     /**
-     * Tests calling the {@link Job#cancel()} method.
+     * Tests execution state after cancelling a running job by calling the cancel() method.
      */
     @Test
-    @DisplayName("Tests cancelling a running job by calling the cancel() method.")
-    void testJobCancellationByMethod() {
+    @DisplayName("Tests execution state after cancelling a running job by calling the cancel() method.")
+    void testJobCancellationExecutionState() {
         Job job = new Job();
         job.setId("job-id");
+
+        job.cancel(); // nothing happens without a job execution...
 
         JobExecution jobExecution = new JobExecution();
         jobExecution.setExecutionState(JobExecutionState.RUNNING);
 
         job.setCurrentJobExecution(jobExecution);
 
-        job.cancel();
+        job.cancel(); // RUNNING -> CANCELLED
 
         assertEquals(JobExecutionState.CANCELLED, jobExecution.getExecutionState());
+
+        jobExecution.setExecutionState(JobExecutionState.ACTIVE);
+
+        job.cancel(); // ACTIVE -> FINISHED
+
+        assertEquals(JobExecutionState.FINISHED, jobExecution.getExecutionState());
+    }
+
+    /**
+     * Tests calling the {@link Job#cancel()} method and waiting for actions to finish.
+     */
+    @Test
+    @DisplayName("Tests calling the {@link Job#cancel()} method and waiting for actions to finish")
+    @SneakyThrows
+    void testJobCancellationByMethod() {
+        JobExecution jobExecution = new JobExecution();
+        jobExecution.setExecutionState(JobExecutionState.ACTIVE);
+
+        Trigger eventTriggerMock = mock(EventTrigger.class);
+
+        Action actionMock = mock(Action.class);
+        when(actionMock.isActive()).thenReturn(true);
+        when(actionMock.getNumThreads()).thenReturn(1);
+
+        Job job = Job.builder()
+                .id("job-id")
+                .trigger(eventTriggerMock)
+                .actions(List.of(actionMock)).build();
+
+        ExecutorService testExecutor = Executors.newSingleThreadExecutor();
+        testExecutor.execute(() -> job.start(jobExecution));
+
+        // Wait 100 ms until the job really started and waits for incoming events:
+        CountDownLatch waiter = new CountDownLatch(1);
+        waiter.await(100, TimeUnit.MILLISECONDS);
+
+        job.cancel();
+
+        assertEquals(JobExecutionState.FINISHED, jobExecution.getExecutionState());
+
+        verify(actionMock, times(1)).complete();
+        verify(actionMock, times(1)).shutdown(eq("job-id"), eq(jobExecution));
+
+        testExecutor.shutdown();
     }
 
     /**
@@ -181,14 +233,11 @@ class JobTest {
     void testCreateMetaData() {
         Trigger triggerMock = mock(Trigger.class);
         when(triggerMock.getMetaData()).thenReturn(Map.of(DataKey.SIMULATION.getKey(), true));
-        Map<String, Object> metaData = Job.createMetaData("job-id", null, 25);
+        Map<String, Object> metaData = Job.createMetaData("job-id", null);
         assertEquals("job-id", metaData.get(DataKey.JOB_ID.getKey()));
         assertNotNull(metaData.get(DataKey.TIMESTAMP.getKey()));
         assertNull(metaData.get(DataKey.SIMULATION.getKey()));
-        assertEquals(25, metaData.get(DataKey.SIMULATION_LIMIT.getKey()));
-        metaData = Job.createMetaData("job-id", triggerMock, 42);
-        assertEquals(true, metaData.get(DataKey.SIMULATION.getKey()));
-        assertEquals(42, metaData.get(DataKey.SIMULATION_LIMIT.getKey()));
+
     }
 
 }

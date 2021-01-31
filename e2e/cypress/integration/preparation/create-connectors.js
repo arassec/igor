@@ -37,7 +37,8 @@ describe('Initializes the test environment\'s connectors', () => {
                     'port': Cypress.env('rabbitmq_port'),
                     'username': 'igor',
                     'password': 'igor',
-                    'exchange': 'igor-test-exchange'
+                    'exchange': 'igor-test-exchange',
+                    'queue': 'igor-test-queue'
                 });
             }
         });

@@ -28,4 +28,14 @@ class SkipActionTest extends CoreActionBaseTest {
         assertFalse(skipAction.process(createData(), new JobExecution()).isEmpty());
     }
 
+    /**
+     * Tests that the action doesn't support events.
+     */
+    @Test
+    @DisplayName("Tests that the action doesn't support events.")
+    void testSupportsEvents() {
+        SkipAction skipAction = new SkipAction();
+        assertFalse(skipAction.supportsEvents());
+    }
+
 }

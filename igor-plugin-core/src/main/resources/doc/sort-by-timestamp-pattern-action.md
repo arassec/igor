@@ -37,3 +37,9 @@ Parameter | Configuration value
 Input | $.data.filename
 Pattern | [0-9]{14}
 Timestamp format | yyyyMMddHHmmss
+
+## Event-Triggered Jobs
+**This action is not available in event-triggered jobs!**
+
+Sorting is done by collecting all data items of one job execution and by sorting the resulting list.
+Since event triggered jobs don't stop their execution, the action would collect data items forever, and never forwarding them to following actions.

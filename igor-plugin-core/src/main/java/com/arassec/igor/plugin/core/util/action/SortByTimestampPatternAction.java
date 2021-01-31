@@ -208,12 +208,13 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     }
 
     /**
-     * Deletes all processed data items so that sorting can begin with the next data item.
+     * Sorting works on all data items in the stream. With events, the stream is unlimited and thus this action would wait
+     * forever for the job to finish.
+     *
+     * @return Always {@code false}.
      */
     @Override
-    public void reset() {
-        collectedData.clear();
+    public boolean supportsEvents() {
+        return false;
     }
-
-
 }

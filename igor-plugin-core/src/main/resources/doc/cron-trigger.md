@@ -5,11 +5,13 @@ The CRON trigger runs a job periodically according to its cron expression.
 Just like the UNIX cron daemon does.
 
 ## Parameters
-The following parameters can be configured for cron trigger:
+The following parameters can be configured for the cron trigger:
 
 Parameter | Description
 ---|:---|
 CRON expression | A CRON expression
+Meta data | Optional JSON that will be added to every data item created by the trigger under the 'meta' key.
+Data | Optional JSON that will be added to every data item created by the trigger under the 'data' key.
 
 A CRON expression consists of six fields:
 ```
@@ -28,7 +30,6 @@ character | means | explanation | example
 / | incremental | specify incremental values | "5/15" in the 'seconds' field means "the seconds 5, 20, 35 and 50"
 
 ## Examples
-
 CRON expression | Description
 ---|:---|
 0 0 * * * * | The top of every hour of every day.

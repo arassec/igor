@@ -10,14 +10,21 @@
 <script>
     export default {
         name: "input-validated",
-        props: ['text', 'type', 'disabled', 'propertyId', 'parentId', 'validationErrors'],
+        props: ['text', 'type', 'disabled', 'propertyId', 'parentId', 'validationErrors', 'isNumber'],
         model: {
             prop: "text",
             event: "input"
         },
         methods: {
             updateSelf(text) {
-                this.$emit("input", text);
+                if (this.isNumber) {
+                    let reg = /^-?\d+$/;
+                    if (reg.test(text) === true) {
+                        this.$emit("input", text);
+                    }
+                } else {
+                    this.$emit("input", text);
+                }
             },
             hasValidationErrors() {
                 if (this.validationErrors) {

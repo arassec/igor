@@ -60,3 +60,19 @@ $> java -jar igor.jar \
 ``` properties
 igor.persistence.local-security-token=f8c7fb78-3336-11e7-a919-92ebcb67fe33
 ```
+
+## Simulation Timeouts
+Simulated job executions run in the background and await input data, e.g. messages that are received by a message trigger.
+The configuration parameter `igor.simulation.timeout` sets the timeout in seconds until when simulated jobs will wait for input data.
+The default is to wait for 15 minutes until a simulated job is cancelled.
+
+### Example configuration with application parameter:
+``` shell script
+$> java -jar igor.jar \
+      --igor.simulation.timeout=300
+```
+
+### Example configuration with application.properties:
+``` properties
+igor.simulation.timeout=300
+```

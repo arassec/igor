@@ -6,6 +6,8 @@ import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
+import com.arassec.igor.core.model.trigger.EventTrigger;
+import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.web.model.KeyLabelStore;
 import com.arassec.igor.web.util.DocumentationUtil;
@@ -62,8 +64,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
         jsonGenerator.writeStringField(WebMapperKey.ID.getKey(), instance.getId());
         if (instance instanceof Connector && ((Connector) instance).getName() != null) {
             jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), ((Connector) instance).getName());
-        }
-        if (instance instanceof Action) {
+        } else if (instance instanceof Action) {
             if (((Action) instance).getName() != null) {
                 jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), ((Action) instance).getName());
             } else {
@@ -79,9 +80,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
         writeKeyLabelStore(jsonGenerator, WebMapperKey.CATEGORY.getKey(),
                 new KeyLabelStore(instance.getCategoryId(), messageSource.getMessage(instance.getCategoryId(), null,
                         LocaleContextHolder.getLocale())));
-        writeTypeData(jsonGenerator, WebMapperKey.TYPE.getKey(),
-                instance.getTypeId(), messageSource.getMessage(instance.getTypeId(), null,
-                        LocaleContextHolder.getLocale()));
+        writeTypeData(jsonGenerator, instance);
         writeParameters(jsonGenerator, instance);
         jsonGenerator.writeEndObject();
     }
@@ -106,18 +105,24 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      * Writes a {@link KeyLabelStore} to the serialized json.
      *
      * @param jsonGenerator The json generator.
-     * @param name          The name of the key-label-store.
-     * @param key           The key.
-     * @param label         The label.
+     * @param instance      The component instance.
      *
      * @throws IOException In case of serialization problems.
      */
-    private void writeTypeData(JsonGenerator jsonGenerator, String name, String key, String label) throws IOException {
-        jsonGenerator.writeObjectFieldStart(name);
-        jsonGenerator.writeStringField(WebMapperKey.KEY.getKey(), key);
-        jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), label);
+    private void writeTypeData(JsonGenerator jsonGenerator, IgorComponent instance) throws IOException {
+        jsonGenerator.writeObjectFieldStart(WebMapperKey.TYPE.getKey());
+        jsonGenerator.writeStringField(WebMapperKey.KEY.getKey(), instance.getTypeId());
+        jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), messageSource.getMessage(instance.getTypeId(), null,
+                LocaleContextHolder.getLocale()));
         jsonGenerator.writeBooleanField(WebMapperKey.DOCUMENTATION_AVAILABLE.getKey(),
-                DocumentationUtil.isDocumentationAvailable(key, LocaleContextHolder.getLocale()));
+                DocumentationUtil.isDocumentationAvailable(instance.getTypeId(), LocaleContextHolder.getLocale()));
+        if (instance instanceof Action) {
+            jsonGenerator.writeBooleanField(WebMapperKey.SUPPORTS_EVENTS.getKey(), ((Action) instance).supportsEvents());
+        } else if (instance instanceof EventTrigger) {
+            jsonGenerator.writeBooleanField(WebMapperKey.SUPPORTS_EVENTS.getKey(), true);
+        } else if (instance instanceof Trigger) {
+            jsonGenerator.writeBooleanField(WebMapperKey.SUPPORTS_EVENTS.getKey(), false);
+        }
         jsonGenerator.writeEndObject();
     }
 

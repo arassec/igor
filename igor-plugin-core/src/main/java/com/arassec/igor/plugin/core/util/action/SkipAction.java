@@ -60,11 +60,14 @@ public class SkipAction extends BaseUtilAction {
     }
 
     /**
-     * Resets the action so that the configured amount of data items is skiped again.
+     * Skipping items might not work as intended with streams of data items, because the limit is applied to a complete job
+     * execution, which is unlimited for streamed data items.
+     *
+     * @return Always {@code false}.
      */
     @Override
-    public void reset() {
-        processed = 0;
+    public boolean supportsEvents() {
+        return false;
     }
 
 }

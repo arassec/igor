@@ -125,7 +125,7 @@ class CopyFileActionTest extends FileActionBaseTest {
         CopyFileAction action = new CopyFileAction();
         action.setSource(sourceFileConnectorMock);
         action.setSourceDirectory("{{INVALID}}");
-        action.setSourceFilename("{{INVALID}}");
+        action.setSourceFilename(null);
         action.setTargetDirectory("target");
         action.setTargetFilename("copy-file-action-alpha.txt");
 

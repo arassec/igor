@@ -21,7 +21,7 @@ public @interface UniqueJobName {
     /**
      * The message that indicates a failed validation.
      */
-    String MESSAGE_KEY = "com.arassec.igor.validation.unique-job-name";
+    String MESSAGE_KEY = "com.arassec.igor.core.validation.unique-job-name";
 
     /**
      * Returns the message key.

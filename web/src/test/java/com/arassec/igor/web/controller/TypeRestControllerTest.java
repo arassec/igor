@@ -1,12 +1,15 @@
 package com.arassec.igor.web.controller;
 
+import com.arassec.igor.core.model.action.Action;
+import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,7 +28,11 @@ class TypeRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests retrieval of action types.")
     @SneakyThrows(Exception.class)
     void testGetActionTypes() {
+        Action actionMock = mock(Action.class);
+        when(actionMock.supportsEvents()).thenReturn(true);
+
         when(igorComponentRegistry.getActionTypesOfCategory(eq("123abc456"))).thenReturn(Set.of("two", "one"));
+        when(igorComponentRegistry.createActionInstance(anyString(), isNull())).thenReturn(actionMock);
 
         mockMvc.perform(get("/api/type/action/123abc456"))
                 .andExpect(status().isOk())
@@ -34,7 +41,8 @@ class TypeRestControllerTest extends RestControllerBaseTest {
                 .andExpect(jsonPath("$[0].documentationAvailable").value(false))
                 .andExpect(jsonPath("$[1].key").value("two"))
                 .andExpect(jsonPath("$[1].value").value("beta"))
-                .andExpect(jsonPath("$[1].documentationAvailable").value(false));
+                .andExpect(jsonPath("$[1].documentationAvailable").value(false))
+                .andExpect(jsonPath("$[1].supportsEvents").value(true));
     }
 
     /**
@@ -45,6 +53,7 @@ class TypeRestControllerTest extends RestControllerBaseTest {
     @SneakyThrows(Exception.class)
     void testGetTriggerTypes() {
         when(igorComponentRegistry.getTriggerTypesOfCategory(eq("123abc456"))).thenReturn(Set.of("two", "one"));
+        when(igorComponentRegistry.createTriggerInstance(anyString(), isNull())).thenReturn(mock(Trigger.class));
 
         mockMvc.perform(get("/api/type/trigger/123abc456"))
                 .andExpect(status().isOk())
@@ -53,7 +62,8 @@ class TypeRestControllerTest extends RestControllerBaseTest {
                 .andExpect(jsonPath("$[0].documentationAvailable").value(false))
                 .andExpect(jsonPath("$[1].key").value("two"))
                 .andExpect(jsonPath("$[1].value").value("beta"))
-                .andExpect(jsonPath("$[1].documentationAvailable").value(false));
+                .andExpect(jsonPath("$[1].documentationAvailable").value(false))
+                .andExpect(jsonPath("$[1].supportsEvents").value(false));
     }
 
     /**

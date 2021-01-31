@@ -24,7 +24,7 @@ public @interface ValidCronExpression {
      * @return The message key.
      */
     @SuppressWarnings("unused")
-    String message() default "{com.arassec.igor.validation.cron-expression}";
+    String message() default "com.arassec.igor.core.validation.cron-expression";
 
     /**
      * Possible bean validation groups.

@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,8 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests the {@link ActionsExecutingRunnable}.
@@ -46,7 +46,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests actually running the runnable.")
     void testRun() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null, 25));
+        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null));
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         inputQueue.offer(inputData);
@@ -89,7 +89,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests completing the runnable.")
     void testComplete() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null, 25));
+        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null));
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingQueue<>();
@@ -113,6 +113,43 @@ class ActionsExecutingRunnnableTest {
         actionsExecutingRunnable.complete();
 
         assertEquals(outputData, outputQueue.poll());
+    }
+
+    /**
+     * Tests running the runnable with an action with processing-finished-callback
+     */
+    @Test
+    @DisplayName("Tests running the runnable with an action with processing-finished-callback.")
+    void testRunWithProcessFinishedCallback() {
+        Map<String, Object> inputData = new HashMap<>();
+        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null));
+
+        BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
+        inputQueue.offer(inputData);
+
+        BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingQueue<>();
+
+        List<Action> actions = new LinkedList<>();
+        Action firstActionMock = mock(Action.class);
+        actions.add(firstActionMock);
+
+        ProcessingFinishedCallback processingFinishedCallbackMock = mock(ProcessingFinishedCallback.class);
+
+        when(firstActionMock.getProcessingFinishedCallback()).thenReturn(processingFinishedCallbackMock);
+
+        ActionsExecutingRunnable actionsExecutingRunnable = new ActionsExecutingRunnable(actions,
+                inputQueue, outputQueue, null);
+
+        when(firstActionMock.process(eq(inputData), nullable(JobExecution.class))).thenAnswer(invocationOnMock -> {
+            // Simulates the job saying: 'finish your work, but no new items will be published'
+            actionsExecutingRunnable.shutdown();
+            return List.of(Map.of());
+        });
+
+        actionsExecutingRunnable.run();
+
+        // The callback must have been called with the supplied data item:
+        verify(processingFinishedCallbackMock, times(1)).processingFinished(eq(inputData));
     }
 
 }

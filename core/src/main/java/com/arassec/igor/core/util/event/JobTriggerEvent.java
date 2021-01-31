@@ -1,28 +1,31 @@
 package com.arassec.igor.core.util.event;
 
-import lombok.AllArgsConstructor;
+import com.arassec.igor.core.model.trigger.EventType;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * An event triggering a job.
  */
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class JobTriggerEvent {
 
     /**
      * The ID of the job that should be triggered.
      */
-    private String jobId;
+    private final String jobId;
 
     /**
      * Optional event data.
      */
-    private Map<String, Object> eventData = new HashMap<>();
+    private final Map<String, Object> eventData;
+
+    /**
+     * The type of the event.
+     */
+    private final EventType eventType;
 
 }

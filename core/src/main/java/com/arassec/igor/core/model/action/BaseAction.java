@@ -3,12 +3,12 @@ package com.arassec.igor.core.model.action;
 import com.arassec.igor.core.model.BaseIgorComponent;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
 import com.jayway.jsonpath.JsonPath;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.MustacheException;
 
 import javax.validation.constraints.Positive;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,6 +42,11 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     private String description;
 
     /**
+     * Callback to call when processing of a data item finished.
+     */
+    private ProcessingFinishedCallback processingFinishedCallback;
+
+    /**
      * Defines the number of threads the action should be processed with.
      */
     @Positive
@@ -56,15 +61,6 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      */
     protected BaseAction(String categoryId, String typeId) {
         super(categoryId, typeId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<Map<String, Object>> complete() {
-        // Nothing to do here...
-        return List.of();
     }
 
     /**
@@ -135,7 +131,16 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      * {@inheritDoc}
      */
     @Override
-    public void reset() {
+    public void setProcessingFinishedCallback(ProcessingFinishedCallback processingFinishedCallback) {
+        this.processingFinishedCallback = processingFinishedCallback;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ProcessingFinishedCallback getProcessingFinishedCallback() {
+        return processingFinishedCallback;
     }
 
     /**
@@ -178,13 +183,13 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
 
     /**
      * Returns the result of the template executed against the provided data. If the template is invalid with regard to the input
-     * data, {@code null} is returned.
+     * data, it is returned without modifications.
      *
      * @param data     The data to execute the query on.
      * @param template The mustache template.
      *
-     * @return The template executed against the data or {@code null} if either of the input parameters is {@code null} or the
-     * template is invalid.
+     * @return The template executed against the data or the original template if either of the input parameters is {@code null}
+     * or the template is invalid.
      */
     protected String getString(Map<String, Object> data, String template) {
         if (data == null || template == null) {
@@ -193,7 +198,7 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
         try {
             return Mustache.compiler().compile(template).execute(data);
         } catch (MustacheException e) {
-            return null;
+            return template;
         }
     }
 

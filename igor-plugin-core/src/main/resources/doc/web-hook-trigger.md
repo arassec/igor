@@ -17,10 +17,10 @@ The following parameters can be configured for the web-hook trigger:
 
 Parameter | Description
 ---|:---|
-Simulation data | A list of "key=value" pairs that is used during simulated job runs as trigger input data. Each line must contain one "key=value" pair.
+Meta data | Optional JSON that will be added to every data item created by the trigger under the 'meta' key.
+Data | Optional JSON that will be added to every data item created by the trigger under the 'data' key.
 
 ## Examples
-
 Let's assume igor is running on localhost and reachable under port 8080.
 A job with ID `01d11f89-1b89-4fa0-8da4-cdd75229f8b5`, and the web-hook trigger attached to it, can be triggered by calling:
 
@@ -51,3 +51,8 @@ will result in the following data items:
   }
 }
 ```
+
+## Limitations and Caveats
+Not all actions are available for event-triggered jobs. 
+E.g. sorting by timestamp requires all data items, that should be sorted, to be known to the action.
+Since event-triggered jobs process a continuous stream of incoming events, there is no fixed number of data items to sort.

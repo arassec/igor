@@ -3,7 +3,7 @@ package com.arassec.igor.plugin.core;
 import lombok.Getter;
 
 /**
- * Defines categories for common components.
+ * Defines categories for core components.
  */
 public enum CoreCategory {
 
@@ -26,6 +26,11 @@ public enum CoreCategory {
      * The "Message" category.
      */
     MESSAGE("message"),
+
+    /**
+     * The "Test" category.
+     */
+    TEST("test"),
 
     /**
      * The "Persistence" category.

@@ -47,8 +47,8 @@ class DeleteFileActionTest extends FileActionBaseTest {
     @DisplayName("Tests the action with unresolved parameters.")
     void testProcessUnresolvedParameter() {
         DeleteFileAction action = new DeleteFileAction();
-        action.setDirectory("{{INVALID}}");
-        action.setFilename("{{INVALID}}");
+        action.setDirectory("/tmp");
+        action.setFilename(null);
 
         Map<String, Object> data = createData();
 

@@ -115,7 +115,12 @@ public enum WebMapperKey {
     /**
      * Contains general errors.
      */
-    GENERAL_ERROR("generalError");
+    GENERAL_ERROR("generalError"),
+
+    /**
+     * Indicates whether a component supports events or not.
+     */
+    SUPPORTS_EVENTS("supportsEvents");
 
     /**
      * Contains the key as String.

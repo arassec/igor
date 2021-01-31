@@ -65,41 +65,12 @@ public class WebConfiguration {
     @Bean
     public ObjectMapper objectMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository,
                                      MessageSource messageSource) {
-        return createObjectMapper(igorComponentRegistry, connectorRepository, messageSource, false);
-    }
-
-    /**
-     * Creates an {@link ObjectMapper} with enabled "simulation mode" to support simulated job executions.
-     *
-     * @param igorComponentRegistry Igor's component registry.
-     * @param connectorRepository   Repository for connectors.
-     * @param messageSource         Spring's message source for i18n.
-     *
-     * @return The {@link ObjectMapper} for simulated job runs.
-     */
-    @Bean
-    public ObjectMapper simulationObjectMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository, MessageSource messageSource) {
-        return createObjectMapper(igorComponentRegistry, connectorRepository, messageSource, true);
-    }
-
-    /**
-     * Creates an {@link ObjectMapper} with optional simulation mode enabled.
-     *
-     * @param simulationMode Set to {@code true} to support simulated job runs, {@code false} otherwise.
-     *
-     * @return A newly created {@link ObjectMapper} instance.
-     */
-    private ObjectMapper createObjectMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository,
-                                            MessageSource messageSource, boolean simulationMode) {
-
         SimpleModule mapperModule = new SimpleModule();
 
         mapperModule.addSerializer(new IgorComponentWebSerializer(messageSource, igorComponentRegistry));
-        mapperModule.addDeserializer(Connector.class, new ConnectorWebDeserializer(igorComponentRegistry, simulationMode));
-        mapperModule.addDeserializer(Action.class, new ActionWebDeserializer(igorComponentRegistry, connectorRepository,
-                simulationMode));
-        mapperModule.addDeserializer(Trigger.class, new TriggerWebDeserializer(igorComponentRegistry, connectorRepository,
-                simulationMode));
+        mapperModule.addDeserializer(Connector.class, new ConnectorWebDeserializer(igorComponentRegistry));
+        mapperModule.addDeserializer(Action.class, new ActionWebDeserializer(igorComponentRegistry, connectorRepository));
+        mapperModule.addDeserializer(Trigger.class, new TriggerWebDeserializer(igorComponentRegistry, connectorRepository));
 
         return new ObjectMapper()
                 .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)

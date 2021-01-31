@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.annotation.validation.UniqueJobName;
 import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
+import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.AllArgsConstructor;
@@ -20,9 +21,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Defines an igor job.
@@ -111,17 +110,15 @@ public class Job {
     /**
      * Creates the meta-data part of a data item.
      *
-     * @param jobId           The job's ID.
-     * @param trigger         The job's trigger.
-     * @param simulationLimit Maximum number of simulation results that should be processed by any action.
+     * @param jobId   The job's ID.
+     * @param trigger The job's trigger.
      *
      * @return The meta-data for the job run.
      */
-    public static Map<String, Object> createMetaData(String jobId, Trigger trigger, int simulationLimit) {
+    public static Map<String, Object> createMetaData(String jobId, Trigger trigger) {
         Map<String, Object> metaData = new HashMap<>();
         metaData.put(DataKey.JOB_ID.getKey(), jobId);
         metaData.put(DataKey.TIMESTAMP.getKey(), Instant.now().toEpochMilli());
-        metaData.put(DataKey.SIMULATION_LIMIT.getKey(), simulationLimit);
         Map<String, Object> triggerMetaData = trigger != null ? trigger.getMetaData() : Map.of();
         triggerMetaData.forEach(metaData::put);
         return metaData;
@@ -136,6 +133,9 @@ public class Job {
      */
     public void start(JobExecution jobExecution) {
         log.debug("Starting job: {} ({})", name, id);
+
+        boolean processingFinishedCallbackSet = setProcessingFinishedCallbackIfApplicable();
+
         currentJobExecution = Objects.requireNonNullElseGet(jobExecution, JobExecution::new);
         if (trigger instanceof EventTrigger) {
             currentJobExecution.setExecutionState(JobExecutionState.ACTIVE);
@@ -155,31 +155,37 @@ public class Job {
             List<ConcurrencyGroup> concurrencyGroups = createConcurrencyGroups(concurrencyLists, triggerInputQueue, id,
                     jobExecution);
 
-            // Initialize IgorComponents used by the job:
-            initialize(jobExecution);
-
             if (trigger instanceof EventTrigger) {
-                BlockingQueue<Map<String, Object>> triggerEventInputQueue = new LinkedBlockingQueue<>();
+                BlockingQueue<Map<String, Object>> triggerEventInputQueue = new LinkedBlockingQueue<>(1);
+                if (!concurrencyLists.isEmpty() && !concurrencyLists.get(0).isEmpty()) {
+                    triggerEventInputQueue = new LinkedBlockingQueue<>(concurrencyLists.get(0).get(0).getNumThreads());
+                }
                 ((EventTrigger) trigger).setEventQueue(triggerEventInputQueue);
+
+                // Initialize IgorComponents used by the job:
+                initialize(jobExecution);
+
                 // Block until igor is shut down and wait for trigger events...
                 while (JobExecutionState.ACTIVE.equals(currentJobExecution.getExecutionState())) {
                     Map<String, Object> triggerData = triggerEventInputQueue.poll(500, TimeUnit.MILLISECONDS);
                     if (triggerData != null) {
                         log.debug("Job '{}' ({}) triggered by event: {}", name, id, triggerData);
-                        currentJobExecution.setProcessedEvents(currentJobExecution.getProcessedEvents() + 1);
                         trigger.getData().forEach(triggerData::put); // A custom trigger might add additional data to the items.
-                        createInitialDataItem(triggerInputQueue, id, triggerData);
-                        concurrencyGroups.forEach(ConcurrencyGroup::reset);
+                        dispatchInitialDataItem(triggerInputQueue, id, triggerData, processingFinishedCallbackSet);
+                        currentJobExecution.setProcessedEvents(currentJobExecution.getProcessedEvents() + 1);
                     }
                 }
             } else {
+                // Initialize IgorComponents used by the job:
+                initialize(jobExecution);
+
                 // Read the data from the trigger and start working. This is used during simulated job runs to get the data from
                 // an event based trigger, too!
                 Map<String, Object> triggerData = Map.of();
                 if (trigger != null) {
                     triggerData = trigger.getData();
                 }
-                createInitialDataItem(triggerInputQueue, id, triggerData);
+                dispatchInitialDataItem(triggerInputQueue, id, triggerData, processingFinishedCallbackSet);
             }
 
             // Completes each action inside each concurrency group:
@@ -206,14 +212,39 @@ public class Job {
     }
 
     /**
-     * Cancels the job if it is currently running. The job might not stop immediately if it is executing a non-interruptible
-     * action. Check the job's isRunning method regularly to see when the job execution finished.
+     * Cancels the job if it is currently running. This may take some time until all actions finished their work.
      */
     public void cancel() {
-        if (currentJobExecution != null && JobExecutionState.RUNNING.equals(currentJobExecution.getExecutionState())) {
-            currentJobExecution.setExecutionState(JobExecutionState.CANCELLED);
-        } else if (currentJobExecution != null && JobExecutionState.ACTIVE.equals(currentJobExecution.getExecutionState())) {
-            currentJobExecution.setExecutionState(JobExecutionState.FINISHED);
+        if (currentJobExecution != null) {
+            if (JobExecutionState.RUNNING.equals(currentJobExecution.getExecutionState())) {
+                currentJobExecution.setExecutionState(JobExecutionState.CANCELLED);
+            } else if (JobExecutionState.ACTIVE.equals(currentJobExecution.getExecutionState())) {
+                currentJobExecution.setExecutionState(JobExecutionState.FINISHED);
+            }
+
+            Object cancelLock = new Object();
+
+            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+            executor.scheduleAtFixedRate(() -> {
+                synchronized (cancelLock) {
+                    log.trace("Checking if job {} is still running: {}", getId(), getName());
+                    if (!isRunning()) {
+                        cancelLock.notifyAll();
+                    }
+                }
+            }, 0, 100, TimeUnit.MILLISECONDS);
+
+            synchronized (cancelLock) {
+                try {
+                    while (isRunning()) {
+                        cancelLock.wait();
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+
+            executor.shutdown();
         }
     }
 
@@ -297,9 +328,10 @@ public class Job {
      * @param jobId             The job's ID.
      * @param triggerData       Data provided by an event trigger.
      */
-    private void createInitialDataItem(BlockingQueue<Map<String, Object>> triggerInputQueue, String jobId, Map<String, Object> triggerData) {
+    private void dispatchInitialDataItem(BlockingQueue<Map<String, Object>> triggerInputQueue, String jobId, Map<String,
+            Object> triggerData, boolean processingFinishedCallbackSet) {
         Map<String, Object> dataItem = new HashMap<>();
-        dataItem.put(DataKey.META.getKey(), createMetaData(jobId, trigger, simulationLimit));
+        dataItem.put(DataKey.META.getKey(), createMetaData(jobId, trigger));
         dataItem.put(DataKey.DATA.getKey(), triggerData);
         boolean added = false;
         while (!added) {
@@ -308,6 +340,11 @@ public class Job {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+        }
+        // This means we have to notify the trigger that the processing finished immediately, because there are no (active)
+        // actions...
+        if (this.getTrigger() instanceof ProcessingFinishedCallback && !processingFinishedCallbackSet) {
+            ((ProcessingFinishedCallback) this.getTrigger()).processingFinished(dataItem);
         }
     }
 
@@ -343,6 +380,24 @@ public class Job {
             IgorComponentUtil.shutdownConnectors(trigger, id, jobExecution);
             trigger.shutdown(id, jobExecution);
         }
+    }
+
+    /**
+     * Sets the trigger as 'processing finished' callback to the last action of the job, if the trigger is appropriate and actions
+     * exist.
+     *
+     * @return {@code true} if the callback has been set, {@code false} otherwise.
+     */
+    private boolean setProcessingFinishedCallbackIfApplicable() {
+        if (this.getTrigger() instanceof ProcessingFinishedCallback && !actions.isEmpty()) {
+            for (int i = (actions.size() - 1); i >= 0; i--) {
+                if (actions.get(i).isActive()) {
+                    actions.get(i).setProcessingFinishedCallback((ProcessingFinishedCallback) this.getTrigger());
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

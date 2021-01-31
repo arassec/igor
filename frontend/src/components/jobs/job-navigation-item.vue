@@ -2,7 +2,7 @@
     <div :class="style" v-on:click="$emit('job-is-selected')">
         <h1>
             <font-awesome-icon icon="toolbox" class="margin-right fa-fw"/>
-            Job Configuration
+            {{ job.name.length > 0 ? job.name : 'Job' }}
         </h1>
         <layout-row>
             <input-button slot="left" icon="chevron-left" v-on:clicked="$emit('show-executions')"

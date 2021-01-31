@@ -2,20 +2,13 @@ package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import com.arassec.igor.core.model.IgorComponent;
-import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.repository.ConnectorRepository;
-import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.web.simulation.ConnectorProxy;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.implementation.InvocationHandlerAdapter;
-import net.bytebuddy.matcher.ElementMatchers;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,24 +29,15 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
     private final transient ConnectorRepository connectorRepository;
 
     /**
-     * Can be set to {@code true} to deserialize components in simulation mode, i.e. wrap proxies around them for job
-     * simulations.
-     */
-    private final boolean simulationMode;
-
-    /**
      * Creates a new deserializer instance.
      *
      * @param connectorRepository The connector repository to load connectors from.
-     * @param simulationMode      Set to {@code true} if the resulting  components are used during simulated job runs.
      */
     IgorComponentWebDeserializer(Class<T> clazz, IgorComponentRegistry igorComponentRegistry,
-                                 ConnectorRepository connectorRepository,
-                                 boolean simulationMode) {
+                                 ConnectorRepository connectorRepository) {
         super(clazz);
         this.igorComponentRegistry = igorComponentRegistry;
         this.connectorRepository = connectorRepository;
-        this.simulationMode = simulationMode;
     }
 
     /**
@@ -72,7 +56,7 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
         Map<String, Object> parameters =
                 deserializeParameters((List<Map<String, Object>>) map.get(WebMapperKey.PARAMETERS.getKey()));
 
-        T instance = createInstance(typeId, parameters, simulationMode);
+        T instance = createInstance(typeId, parameters);
 
         if (instance == null) {
             throw new IllegalStateException("Could not create instance for type-id: " + typeId);
@@ -93,7 +77,7 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
      *
      * @return A newly created component instance.
      */
-    abstract T createInstance(String typeId, Map<String, Object> parameters, boolean simulationMode);
+    abstract T createInstance(String typeId, Map<String, Object> parameters);
 
     /**
      * Deserializes the JSON parameters.
@@ -143,28 +127,7 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
      * @return The newly created connector instance.
      */
     private Object deserializeConnectorParameter(Map<String, Object> jsonParameter) {
-        if (simulationMode) {
-            String connectorId = String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey()));
-            Connector connector = connectorRepository.findById(connectorId);
-            if (connector == null) {
-                throw new IllegalArgumentException("No connector with ID " + connectorId + " found!");
-            }
-            try {
-                return new ByteBuddy()
-                        .subclass(connector.getClass())
-                        .method(ElementMatchers.any())
-                        .intercept(InvocationHandlerAdapter.of(new ConnectorProxy(connector)))
-                        .make()
-                        .load(connector.getClass().getClassLoader())
-                        .getLoaded()
-                        .getDeclaredConstructor()
-                        .newInstance();
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new IgorException("Could not create connector proxy!", e);
-            }
-        } else {
-            return connectorRepository.findById(String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey())));
-        }
+        return connectorRepository.findById(String.valueOf(jsonParameter.get(WebMapperKey.VALUE.getKey())));
     }
 
     /**

@@ -46,7 +46,7 @@ class ReadFileActionTest extends FileActionBaseTest {
     @DisplayName("Tests the action with unresolved parameters.")
     void testProcessUnresolvedParameter() {
         ReadFileAction action = new ReadFileAction();
-        action.setFilename("{{INVALID}}");
+        action.setFilename(null);
 
         Map<String, Object> data = createData();
         List<Map<String, Object>> processedData = action.process(data, new JobExecution());

@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -80,7 +81,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
             private final AtomicInteger counter = new AtomicInteger();
 
             @Override
-            public Thread newThread(Runnable r) {
+            public Thread newThread(@NonNull Runnable r) {
                 Thread t = new Thread(r, String.format(THREAD_NAME_PATTERN, concurrencyGroupId, counter.incrementAndGet()));
                 t.setUncaughtExceptionHandler(ConcurrencyGroup.this);
                 return t;
@@ -100,14 +101,6 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     public void complete() {
         waitForEmptyInputQueue();
         runnables.forEach(ActionsExecutingRunnable::complete);
-    }
-
-    /**
-     * Calls {@link Action#reset()} on all actions of this concurrency group.
-     */
-    public void reset() {
-        waitForEmptyInputQueue();
-        runnables.forEach(ActionsExecutingRunnable::reset);
     }
 
     /**
@@ -179,14 +172,29 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      * Waits until the input queue has been emptied by the worker threads.
      */
     private void waitForEmptyInputQueue() {
-        while (!inputQueue.isEmpty()) {
-            if (jobExecution != null && !jobExecution.isRunningOrActive()) {
-                log.debug("Job cancelled. Not waiting for empty input queue in concurrency group: {}", concurrencyGroupId);
-                break;
+        if (jobExecution != null && !jobExecution.isRunningOrActive()) {
+            log.debug("Job cancelled. Not waiting for empty input queue in concurrency group: {}", concurrencyGroupId);
+            return;
+        }
+
+        Object waitLock = new Object();
+        ScheduledExecutorService waitCheckExecutor = Executors.newSingleThreadScheduledExecutor();
+
+        waitCheckExecutor.scheduleAtFixedRate(() -> {
+            synchronized (waitLock) {
+                log.trace("Checking for threads to finish their work to complete concurrency-group: {} ({})",
+                        concurrencyGroupId, inputQueue.size());
+                if (inputQueue.isEmpty()) {
+                    waitLock.notifyAll();
+                }
             }
-            log.trace("Waiting for threads to finish their work to complete concurrency-group: {}", concurrencyGroupId);
+        }, 0, 100, TimeUnit.MILLISECONDS);
+
+        synchronized (waitLock) {
             try {
-                Thread.sleep(500);
+                while (!inputQueue.isEmpty()) {
+                    waitLock.wait();
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

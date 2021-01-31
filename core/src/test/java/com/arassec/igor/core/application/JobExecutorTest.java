@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.trigger.EventTrigger;
+import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.core.repository.JobExecutionRepository;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.util.ModelPage;
@@ -25,7 +26,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -84,7 +84,7 @@ class JobExecutorTest {
     void testUpdateRemoveFinished() throws ExecutionException, InterruptedException {
         // Save the "running jobs" map for later verification:
         Map<String, Job> runningJobs = new HashMap<>();
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobs", runningJobs);
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobs", runningJobs);
 
         // Configuration of the finished job:
         JobExecution finishedJobExecution = JobExecution.builder().build();
@@ -97,7 +97,7 @@ class JobExecutorTest {
         when(finishedJobFuture.get()).thenReturn(runningJob);
         List<Future<Job>> runningJobFutures = new LinkedList<>();
         runningJobFutures.add(finishedJobFuture);
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobFutures", runningJobFutures);
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobFutures", runningJobFutures);
         runningJobs.put("running-job-id", runningJob);
 
         when(jobExecutionRepository
@@ -134,8 +134,8 @@ class JobExecutorTest {
         Job runningJob = Job.builder().id("running-job-id").name("running-job-name").build();
         runningJobs.put("running-job-id", runningJob);
 
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobFutures", runningJobFutures);
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobs", runningJobs);
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobFutures", runningJobFutures);
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobs", runningJobs);
 
         // Another job is waiting for execution:
         when(jobExecutionRepository.findInState(eq(JobExecutionState.WAITING), eq(0), eq(Integer.MAX_VALUE))).thenReturn(
@@ -205,7 +205,7 @@ class JobExecutorTest {
     void testUpdateActiveJob() {
         // Save the "running jobs" map for later verification:
         Map<String, Job> runningJobs = new HashMap<>();
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobs", runningJobs);
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobs", runningJobs);
 
         JobExecution jobExecution = JobExecution.builder().jobId("job-id").build();
 
@@ -213,8 +213,10 @@ class JobExecutorTest {
                 eq(Integer.MAX_VALUE))).thenReturn(new ModelPage<>(0, 1, 1,
                 List.of(jobExecution)));
 
+        EventTrigger eventTriggerMock = mock(EventTrigger.class);
+
         when(jobRepository.findById(eq("job-id"))).thenReturn(
-                Job.builder().trigger(mock(EventTrigger.class)).build());
+                Job.builder().trigger(eventTriggerMock).build());
 
         jobExecutor.update();
 
@@ -233,14 +235,8 @@ class JobExecutorTest {
         jobExecutor.cancel("unknown-job-id");
 
         Job job = mock(Job.class);
-        // Makes the executor wait for the job to finish!
-        AtomicInteger numInvocations = new AtomicInteger();
-        assertFalse(doAnswer(invocation -> {
-            numInvocations.getAndIncrement();
-            return !(numInvocations.get() > 3);
-        }).when(job).isRunning());
 
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobs", Map.of("job-id", job));
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobs", Map.of("job-id", job));
 
         jobExecutor.cancel("job-id");
 
@@ -262,7 +258,7 @@ class JobExecutorTest {
         Job job = new Job();
         JobExecution jobExecution = new JobExecution();
         job.setCurrentJobExecution(jobExecution);
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobs", Map.of("job-id", job));
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobs", Map.of("job-id", job));
 
         assertNull(jobExecutor.getJobExecution("unknown-job-id"));
         assertEquals(jobExecution, jobExecutor.getJobExecution("job-id"));
@@ -295,8 +291,8 @@ class JobExecutorTest {
         List<Future<Job>> runningJobFutures = new LinkedList<>();
         runningJobFutures.add(jobFuture);
 
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobs", runningJobs);
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobFutures", runningJobFutures);
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobs", runningJobs);
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobFutures", runningJobFutures);
 
         when(jobExecutionRepository
                 .findInState(eq(JobExecutionState.WAITING), eq(0), eq(Integer.MAX_VALUE)))
@@ -315,12 +311,13 @@ class JobExecutorTest {
     @DisplayName("Tests processing of Job-Trigger events.")
     void testOnJobTriggerEvent() {
         EventTrigger eventTriggerMock = mock(EventTrigger.class);
+        when(eventTriggerMock.getSupportedEventType()).thenReturn(EventType.WEB_HOOK);
 
         Job job = Job.builder().id("job-id").trigger(eventTriggerMock).build();
 
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobs", Map.of("job-id", job));
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobs", Map.of("job-id", job));
 
-        JobTriggerEvent jobTriggerEvent = new JobTriggerEvent("job-id", Map.of("a", 1));
+        JobTriggerEvent jobTriggerEvent = new JobTriggerEvent("job-id", Map.of("a", 1), EventType.WEB_HOOK);
 
         jobExecutor.onJobTriggerEvent(jobTriggerEvent);
 
@@ -343,7 +340,7 @@ class JobExecutorTest {
         when(futureMock.isDone()).thenReturn(true);
         when(futureMock.get()).thenThrow(new InterruptedException("Test-Exception"));
 
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobFutures", new ArrayList<>(List.of(futureMock)));
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobFutures", new ArrayList<>(List.of(futureMock)));
 
         assertDoesNotThrow(() -> jobExecutor.update());
 
@@ -352,7 +349,7 @@ class JobExecutorTest {
         when(futureMock.isDone()).thenReturn(true);
         when(futureMock.get()).thenThrow(new ExecutionException("Test-Exception", new Exception()));
 
-        ReflectionTestUtils.setField(jobExecutor, "runningOrActiveJobFutures", new ArrayList<>(List.of(futureMock)));
+        ReflectionTestUtils.setField(jobExecutor, "currentlyProcessedJobFutures", new ArrayList<>(List.of(futureMock)));
 
         assertDoesNotThrow(() -> jobExecutor.update());
     }

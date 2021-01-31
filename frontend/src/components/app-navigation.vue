@@ -60,7 +60,7 @@ export default {
             }
         },
         version: function () {
-            return version;
+            return version.replace('-SNAPSHOT', '');
         }
     }
 }

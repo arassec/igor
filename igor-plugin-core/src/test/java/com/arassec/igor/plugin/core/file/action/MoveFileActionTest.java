@@ -49,7 +49,7 @@ class MoveFileActionTest extends FileActionBaseTest {
         moveFileAction.setSourceDirectory("/tmp");
         moveFileAction.setSourceFilename("{{INVALID}}");
         moveFileAction.setTargetDirectory("/dev/null");
-        moveFileAction.setTargetFilename("{{INVALID}}");
+        moveFileAction.setTargetFilename(null);
 
         Map<String, Object> data = createData();
         List<Map<String, Object>> processedData = moveFileAction.process(data, new JobExecution());

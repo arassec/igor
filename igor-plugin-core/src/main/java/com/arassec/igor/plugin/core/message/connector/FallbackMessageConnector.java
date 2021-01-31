@@ -29,6 +29,14 @@ public class FallbackMessageConnector extends BaseMessageConnector {
      * Throws an {@link IllegalStateException} on every invocation!
      */
     @Override
+    public void enableMessageRetrieval() {
+        throw new IllegalStateException(ERROR_MESSAGE);
+    }
+
+    /**
+     * Throws an {@link IllegalStateException} on every invocation!
+     */
+    @Override
     public void testConfiguration() {
         throw new IllegalStateException(ERROR_MESSAGE);
     }

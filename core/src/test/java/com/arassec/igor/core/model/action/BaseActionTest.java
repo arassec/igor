@@ -2,6 +2,7 @@ package com.arassec.igor.core.model.action;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,7 +44,7 @@ class BaseActionTest {
         Trigger triggerMock = mock(Trigger.class);
         when(triggerMock.getMetaData()).thenReturn(Map.of(DataKey.SIMULATION.getKey(), true));
 
-        Map<String, Object> meta = Job.createMetaData("job-id", triggerMock, 25);
+        Map<String, Object> meta = Job.createMetaData("job-id", triggerMock);
         Map<String, Object> data = new HashMap<>();
 
         testData.put(DataKey.META.getKey(), meta);
@@ -51,6 +52,15 @@ class BaseActionTest {
         testData.put(DataKey.TIMESTAMP.getKey(), 1234567890);
 
         wrongData.put("foo", "bar");
+    }
+
+    /**
+     * Tests that always an empty list is returned by default when completing an action.
+     */
+    @Test
+    @DisplayName("Tests that always an empty list is returned by default when completing an action.")
+    void testComplete() {
+        assertTrue(baseAction.complete().isEmpty());
     }
 
     /**
@@ -136,6 +146,18 @@ class BaseActionTest {
         assertFalse(baseAction.isActive());
         baseAction.setActive(true);
         assertTrue(baseAction.isActive());
+    }
+
+    /**
+     * Tests setting and getting the action's 'processing finished' property.
+     */
+    @Test
+    @DisplayName("Tests setting and getting the action's 'processing finished' property.")
+    void testSetGetProcessingFinishedCallback() {
+        assertNull(baseAction.getProcessingFinishedCallback());
+        EventTrigger processingFinishedCallback = mock(EventTrigger.class);
+        baseAction.setProcessingFinishedCallback(processingFinishedCallback);
+        assertEquals(processingFinishedCallback, baseAction.getProcessingFinishedCallback());
     }
 
 }

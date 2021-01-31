@@ -3,7 +3,6 @@ package com.arassec.igor.web.controller;
 import com.arassec.igor.core.model.annotation.validation.UniqueConnectorName;
 import com.arassec.igor.core.model.annotation.validation.UniqueJobName;
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.util.IgorConfigHelper;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.web.mapper.WebMapperKey;
 import com.arassec.igor.web.test.TestConnector;
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -48,8 +48,12 @@ class RestControllerExceptionHandlerTest {
      */
     @BeforeEach
     void initialize() {
-        exceptionHandler = new RestControllerExceptionHandler(new ObjectMapper(),
-                IgorConfigHelper.createMessageSource("i18n/core-messages"));
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setBasenames("i18n/core-messages");
+        messageSource.setFallbackToSystemLocale(true);
+        messageSource.setUseCodeAsDefaultMessage(true);
+
+        exceptionHandler = new RestControllerExceptionHandler(new ObjectMapper(), messageSource);
     }
 
     /**

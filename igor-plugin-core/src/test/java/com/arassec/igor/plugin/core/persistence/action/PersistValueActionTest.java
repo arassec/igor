@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -43,10 +42,10 @@ class PersistValueActionTest extends CoreActionBaseTest {
     }
 
     /**
-     * Tests processing the action without a value to persist.
+     * Tests the action with an invalid template.
      */
     @Test
-    @DisplayName("Tests the action without a value to persist.")
+    @DisplayName("Tests the action with an invalid template.")
     void testProcessNoValue() {
         PersistentValueRepository persistentValueRepositoryMock = mock(PersistentValueRepository.class);
 
@@ -54,7 +53,10 @@ class PersistValueActionTest extends CoreActionBaseTest {
         action.setInput("{{" + DataKey.DATA.getKey() + ".INVALID}}");
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
-        assertTrue(result.isEmpty());
+
+        ArgumentCaptor<PersistentValue> argCap = ArgumentCaptor.forClass(PersistentValue.class);
+        verify(persistentValueRepositoryMock, times(1)).upsert(eq("job-id"), argCap.capture());
+        assertEquals("{{" + DataKey.DATA.getKey() + ".INVALID}}", argCap.getValue().getContent());
     }
 
     /**

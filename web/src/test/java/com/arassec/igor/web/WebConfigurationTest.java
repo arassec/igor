@@ -47,6 +47,8 @@ class WebConfigurationTest {
         assertEquals("alpha_de", messageSource.getMessage("keyA", null, Locale.GERMAN));
         assertEquals("alpha_de", messageSource.getMessage("keyA", null, Locale.GERMANY));
         assertEquals("beta", messageSource.getMessage("keyB", null, Locale.GERMAN));
+
+        assertEquals("unknown", messageSource.getMessage("unknown", null, Locale.GERMAN));
     }
 
     /**
@@ -60,14 +62,6 @@ class WebConfigurationTest {
         MessageSource messageSourceMock = mock(MessageSource.class);
 
         ObjectMapper objectMapper = webConfiguration.objectMapper(igorComponentRegistryMock, connectorRepositoryMock, messageSourceMock);
-
-        assertFalse(objectMapper.isEnabled(MapperFeature.DEFAULT_VIEW_INCLUSION));
-        assertFalse(objectMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
-        assertFalse(objectMapper.isEnabled(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS));
-        assertFalse(objectMapper.isEnabled(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS));
-        assertTrue(objectMapper.getRegisteredModuleIds().contains("com.fasterxml.jackson.datatype.jsr310.JavaTimeModule"));
-
-        objectMapper = webConfiguration.simulationObjectMapper(igorComponentRegistryMock, connectorRepositoryMock, messageSourceMock);
 
         assertFalse(objectMapper.isEnabled(MapperFeature.DEFAULT_VIEW_INCLUSION));
         assertFalse(objectMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));

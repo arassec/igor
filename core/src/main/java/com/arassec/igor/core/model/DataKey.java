@@ -33,11 +33,6 @@ public enum DataKey {
     SIMULATION("simulation"),
 
     /**
-     * The key for the simulation-limit property.
-     */
-    SIMULATION_LIMIT("simulationLimit"),
-
-    /**
      * The key for simulation log entries.
      */
     SIMULATION_LOG("simulationLog");

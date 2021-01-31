@@ -16,7 +16,8 @@
                                          :property-id="param.name"
                                          :validation-errors="validationErrors"
                                          v-on:keypress="checkNumber($event)"
-                                         :data-e2e="'parameter-' + param.name"/>
+                                         :data-e2e="'parameter-' + param.name"
+                                         :is-number="true"/>
 
                         <font-awesome-icon v-else-if="isBoolean(param.type)"
                                            :icon="param.value ? 'check-square' : 'square'"

@@ -10,6 +10,9 @@ Parameter | Description
 ---|:---|
 Message connector | The connector to use for sending the message.
 Message template | A template message that is used as message body. Parameters can be filled by using the template syntax explained below.
+Content encoding | Sets the encoding for messages sent by this connector.
+Content type | Specifies the content type of the message's content.
+Headers | Each line can contain a 'Header:Value'-pair which is used in messages sent by this action.
 Num threads | The number of threads this action uses to send messages.
 
 ## Mustache Template Parameters

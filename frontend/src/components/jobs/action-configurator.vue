@@ -105,7 +105,7 @@ import Utils from "@/utils/utils";
 export default {
     name: 'action-configurator',
     components: {LayoutRow, IconButton, CorePanel, ParameterEditor},
-    props: ['action', 'validationErrors'],
+    props: ['action', 'validationErrors', 'eventTrigger'],
     data: function () {
         return {
             showAdvancedParameters: false,
@@ -132,7 +132,9 @@ export default {
                 }
                 let component = this
                 Array.from(types).forEach(function (item) {
-                    component.actionTypes.push(item)
+                    if (!component.eventTrigger || item.supportsEvents) {
+                        component.actionTypes.push(item)
+                    }
                 })
                 if (selectFirst) {
                     this.action.type = this.actionTypes[0]

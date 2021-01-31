@@ -1,5 +1,6 @@
 package com.arassec.igor.web.controller;
 
+import com.arassec.igor.core.application.simulation.SimulationResult;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
@@ -10,7 +11,6 @@ import com.arassec.igor.core.util.event.JobEventType;
 import com.arassec.igor.web.model.JobExecutionOverview;
 import com.arassec.igor.web.model.JobListEntry;
 import com.arassec.igor.web.model.ScheduleEntry;
-import com.arassec.igor.web.simulation.ActionProxy;
 import com.arassec.igor.web.test.TestAction;
 import com.arassec.igor.web.test.TestTrigger;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -28,6 +28,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -236,33 +237,30 @@ class JobRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests simulating a job execution.")
     @SneakyThrows
     void testSimulateJob() {
-        Job jobSpy = spy(Job.class);
-
-        ActionProxy actionProxyMock = mock(ActionProxy.class);
-        when(actionProxyMock.getId()).thenReturn("action-id");
-        when(actionProxyMock.getErrorCause()).thenReturn("action-error-cause");
-        when(actionProxyMock.getCollectedData()).thenReturn(List.of(Map.of("action-key", "action-value")));
-
-        when(jobSpy.getActions()).thenReturn(List.of(actionProxyMock));
-
         Job job = Job.builder().id("job-id").name("job-name").build();
 
-        when(simulationObjectMapper.writeValueAsString(any(Job.class))).thenReturn(objectMapper.writeValueAsString(job));
-        when(simulationObjectMapper.readValue(anyString(), eq(Job.class))).thenReturn(jobSpy);
+        @SuppressWarnings("unchecked")
+        Future<Map<String, SimulationResult>> futureMock = mock(Future.class);
+        when(futureMock.get()).thenReturn(Map.of("a", new SimulationResult(List.of(), "error-cause")));
 
-        doAnswer(invocationOnMock -> {
-            JobExecution jobExecution = invocationOnMock.getArgument(0);
-            jobExecution.setErrorCause("job-error-cause");
-            return null;
-        }).when(jobSpy).start(any(JobExecution.class));
+        when(jobSimulator.simulateJob(eq(job))).thenReturn(futureMock);
 
         mockMvc.perform(post("/api/job/simulate")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(job)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.job-id.errorCause").value("job-error-cause"))
-                .andExpect(jsonPath("$.action-id.errorCause").value("action-error-cause"))
-                .andExpect(jsonPath("$.action-id.results[0].action-key").value("action-value"));
+                .andExpect(jsonPath("$.a.errorCause").value("error-cause"));
+    }
+
+    /**
+     * Tests cancelling all simulations of a job.
+     */
+    @Test
+    @DisplayName("Tests cancelling all simulations of a job.")
+    @SneakyThrows
+    void testCancelSimulations() {
+        mockMvc.perform(delete("/api/job/simulate/job-id")).andExpect(status().isOk());
+        verify(jobSimulator, times(1)).cancelAllSimulations(eq("job-id"));
     }
 
     /**
