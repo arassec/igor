@@ -10,7 +10,6 @@ import javax.validation.ConstraintValidatorContext;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -89,7 +88,7 @@ class ExistingQueueValidatorTest {
                 mock(ConstraintValidatorContext.ConstraintViolationBuilder.class);
 
         when(validatorContextMock.getDefaultConstraintMessageTemplate()).thenReturn("igor-test");
-        when(validatorContextMock.buildConstraintViolationWithTemplate(eq("igor-test"))).thenReturn(constraintViolationBuilderMock);
+        when(validatorContextMock.buildConstraintViolationWithTemplate("igor-test")).thenReturn(constraintViolationBuilderMock);
 
         ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext nodeBuilderCustomizableContextMock =
                 mock(ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext.class);
@@ -98,7 +97,7 @@ class ExistingQueueValidatorTest {
         assertFalse(validator.isValid(connectorMock, validatorContextMock));
 
         verify(validatorContextMock, times(1)).disableDefaultConstraintViolation();
-        verify(constraintViolationBuilderMock, times(1)).addPropertyNode(eq("queue"));
+        verify(constraintViolationBuilderMock, times(1)).addPropertyNode("queue");
         verify(nodeBuilderCustomizableContextMock, times(1)).addConstraintViolation();
     }
 

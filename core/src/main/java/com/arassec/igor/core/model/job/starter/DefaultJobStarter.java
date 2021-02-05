@@ -145,9 +145,10 @@ public class DefaultJobStarter implements JobStarter {
     /**
      * Creates the initial data item and starts processing it with the first action.
      *
-     * @param inputQueue  The input queue to put the first data item in.
-     * @param jobId       The job's ID.
-     * @param triggerData Data provided by an event trigger.
+     * @param inputQueue                    The input queue to put the first data item in.
+     * @param jobId                         The job's ID.
+     * @param triggerData                   Data provided by an event trigger.
+     * @param processingFinishedCallbackSet Indicates whether "processing finished" callbacks must be called or not.
      */
     protected void dispatchInitialDataItem(BlockingQueue<Map<String, Object>> inputQueue, String jobId, Map<String,
             Object> triggerData, boolean processingFinishedCallbackSet) {
