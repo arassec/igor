@@ -85,13 +85,12 @@ public class PersistValueAction extends BasePersistenceAction {
     /**
      * Cleans up the persisted values and keep only the {@link #numValuesToKeep} most recent values in the store.
      *
-     * @param jobId        The job's ID.
      * @param jobExecution The container for job execution details.
      */
     @Override
-    public void shutdown(String jobId, JobExecution jobExecution) {
+    public void shutdown(JobExecution jobExecution) {
         if (numValuesToKeep > 0) {
-            persistentValueRepository.cleanup(jobId, numValuesToKeep);
+            persistentValueRepository.cleanup(jobExecution.getJobId(), numValuesToKeep);
         }
     }
 

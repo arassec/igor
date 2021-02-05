@@ -66,4 +66,13 @@ class BaseEventTriggerTest {
         assertEquals("B", eventData.get("A"));
     }
 
+    /**
+     * Tests getting the default value for supported event types.
+     */
+    @Test
+    @DisplayName("Tests getting the default value for supported event type.")
+    void testGetSupportedEventType() {
+        assertEquals(EventType.NONE, baseEventTrigger.getSupportedEventType());
+    }
+
 }

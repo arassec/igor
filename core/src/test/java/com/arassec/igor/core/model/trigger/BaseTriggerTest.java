@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -46,6 +47,17 @@ class BaseTriggerTest {
     @DisplayName("Tests getting data.")
     void testGetData() {
         assertEquals(Map.of(), baseTrigger.getData());
+    }
+
+    /**
+     * Tests converting JSON.
+     */
+    @Test
+    @DisplayName("Tests converting JSON.")
+    void testConvertJsonString() {
+        Map<String, Object> json = baseTrigger.convertJsonString("{\"a\": 123}");
+        assertEquals(123, json.get("a"));
+        assertTrue(baseTrigger.convertJsonString("[]").isEmpty());
     }
 
 }

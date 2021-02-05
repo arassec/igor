@@ -34,7 +34,7 @@ class HttpRequestActionTest {
         HttpRequestAction action = new HttpRequestAction();
         action.setHeaders("a: b\nc:d\nalpha\r\ne:f");
 
-        action.initialize("job-id", new JobExecution());
+        action.initialize(new JobExecution());
 
         assertEquals(3, action.getParsedHeaders().size());
         assertEquals("a: b", action.getParsedHeaders().get(0));
@@ -61,11 +61,10 @@ class HttpRequestActionTest {
                         )
         );
 
-        String jobId = "job-id";
         JobExecution jobExecution = new JobExecution();
 
         HttpConnector httpConnector = new HttpConnector();
-        httpConnector.initialize(jobId, jobExecution);
+        httpConnector.initialize(jobExecution);
 
         HttpRequestAction action = new HttpRequestAction();
         action.setHttpConnector(httpConnector);
@@ -75,7 +74,7 @@ class HttpRequestActionTest {
         action.setBody("The POST request body: {{variable}}");
         action.setTargetKey("webResponse");
 
-        action.initialize(jobId, jobExecution);
+        action.initialize(jobExecution);
 
         Map<String, Object> data = new HashMap<>();
         data.put("variable", "variable-value");
@@ -114,18 +113,17 @@ class HttpRequestActionTest {
                         )
         );
 
-        String jobId = "job-id";
         JobExecution jobExecution = new JobExecution();
 
         HttpConnector httpConnector = new HttpConnector();
-        httpConnector.initialize(jobId, jobExecution);
+        httpConnector.initialize(jobExecution);
 
         HttpRequestAction action = new HttpRequestAction();
         action.setHttpConnector(httpConnector);
         action.setUrl("http://localhost:" + httpServer.port() + "/auth-test");
         action.setMethod("GET");
 
-        action.initialize(jobId, jobExecution);
+        action.initialize(jobExecution);
 
         Map<String, Object> data = new HashMap<>();
         assertThrows(IgorException.class, () -> action.process(data, jobExecution));
@@ -146,11 +144,10 @@ class HttpRequestActionTest {
     @Test
     @DisplayName("Tests sending an HTTP DELETE request while simulating the job.")
     void testHttpDeleteInSimulationMode() {
-        String jobId = "job-id";
         JobExecution jobExecution = new JobExecution();
 
         HttpConnector httpConnector = new HttpConnector();
-        httpConnector.initialize(jobId, jobExecution);
+        httpConnector.initialize(jobExecution);
 
         HttpRequestAction action = new HttpRequestAction();
         action.setHttpConnector(httpConnector);
@@ -158,7 +155,7 @@ class HttpRequestActionTest {
         action.setMethod("DELETE");
         action.setSimulationSafe(true);
 
-        action.initialize(jobId, jobExecution);
+        action.initialize(jobExecution);
 
         Map<String, Object> data = new HashMap<>();
         data.put(DataKey.META.getKey(), Map.of(DataKey.SIMULATION.getKey(), true));
@@ -176,11 +173,10 @@ class HttpRequestActionTest {
     @Test
     @DisplayName("Tests error handling.")
     void testErrorHandling() {
-        String jobId = "job-id";
         JobExecution jobExecution = new JobExecution();
 
         HttpConnector httpConnector = new HttpConnector();
-        httpConnector.initialize(jobId, jobExecution);
+        httpConnector.initialize(jobExecution);
 
         HttpRequestAction action = new HttpRequestAction();
         action.setHttpConnector(httpConnector);
@@ -188,7 +184,7 @@ class HttpRequestActionTest {
         action.setMethod("DELETE");
         action.setSimulationSafe(true);
 
-        action.initialize(jobId, jobExecution);
+        action.initialize(jobExecution);
 
         Map<String, Object> data = Map.of();
         assertThrows(IgorException.class, () -> action.process(data, jobExecution));

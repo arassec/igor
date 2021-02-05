@@ -147,8 +147,8 @@ public class HttpConnector extends BaseConnector {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, JobExecution jobExecution) {
-        super.initialize(jobId, jobExecution);
+    public void initialize(JobExecution jobExecution) {
+        super.initialize(jobExecution);
 
         HttpClient.Builder httpClientBuilder = HttpClient.newBuilder();
 
@@ -241,7 +241,7 @@ public class HttpConnector extends BaseConnector {
         if (!StringUtils.hasText(testUrl)) {
             return;
         }
-        initialize("test", new JobExecution());
+        initialize(new JobExecution());
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(testUrl)).GET().build();
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());

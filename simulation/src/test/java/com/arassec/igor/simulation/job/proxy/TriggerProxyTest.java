@@ -30,9 +30,9 @@ class TriggerProxyTest {
 
         JobExecution jobExecution = new JobExecution();
 
-        triggerProxy.initialize("job-id", jobExecution);
+        triggerProxy.initialize(jobExecution);
 
-        verify(triggerMock, times(1)).initialize("job-id", jobExecution);
+        verify(triggerMock, times(1)).initialize(jobExecution);
 
         assertEquals(10, triggerProxy.getSimulationLimit());
     }
@@ -44,7 +44,7 @@ class TriggerProxyTest {
     @DisplayName("Tests exception handling during proxy initialization.")
     void testInitializeFail() {
         TriggerProxy triggerProxy = new TriggerProxy(null, 10);
-        triggerProxy.initialize("job-id", new JobExecution());
+        triggerProxy.initialize(new JobExecution());
         assertNotNull(triggerProxy.getErrorCause());
     }
 

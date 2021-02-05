@@ -68,7 +68,7 @@ class HttpFileDownloadActionTest extends CoreActionBaseTest {
         HttpFileDownloadAction action = new HttpFileDownloadAction();
         action.setHeaders("a: b\nc:d\nalpha\r\ne:f");
 
-        action.initialize("job-id", new JobExecution());
+        action.initialize(new JobExecution());
 
         assertEquals(3, action.getParsedHeaders().size());
         assertEquals("a: b", action.getParsedHeaders().get(0));
@@ -81,6 +81,7 @@ class HttpFileDownloadActionTest extends CoreActionBaseTest {
      */
     @Test
     @SneakyThrows
+    @SuppressWarnings("unchecked")
     @DisplayName("Tests downloading a file without a content-length HTTP header in the server's response.")
     void testDownloadFileNoContentLengthHeader() {
         // Prepare the data item:
@@ -138,6 +139,7 @@ class HttpFileDownloadActionTest extends CoreActionBaseTest {
      */
     @Test
     @SneakyThrows
+    @SuppressWarnings("unchecked")
     @DisplayName("Tests downloading a file with a content-length HTTP header in the server's response.")
     void testDownloadFileWithContentLengthHeader() {
         // Configure the action under test:
@@ -203,6 +205,7 @@ class HttpFileDownloadActionTest extends CoreActionBaseTest {
         InputStream inputStreamMock = mock(InputStream.class);
 
         // First response containing an input stream:
+        @SuppressWarnings("unchecked")
         HttpResponse<InputStream> inputStreamHttpResponse = mock(HttpResponse.class);
         when(inputStreamHttpResponse.statusCode()).thenReturn(200);
         when(inputStreamHttpResponse.headers()).thenReturn(httpHeaders);

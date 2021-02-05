@@ -54,7 +54,7 @@ class MessageTriggerTest {
     @Test
     @DisplayName("Tests initialization.")
     void testInitialization() {
-        trigger.initialize("job-id", new JobExecution());
+        trigger.initialize(new JobExecution());
         verify(messageConnectorMock, times(1)).enableMessageRetrieval();
     }
 
@@ -66,7 +66,7 @@ class MessageTriggerTest {
     void testProcessingFinished() {
         Map<String, Object> dataItem = Map.of("a", "b");
         trigger.processingFinished(dataItem);
-        verify(messageConnectorMock, times(1)).processingFinished(eq(dataItem));
+        verify(messageConnectorMock, times(1)).processingFinished(dataItem);
     }
 
     /**

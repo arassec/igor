@@ -178,7 +178,7 @@ class IgorComponentRegistryTest {
         assertTrue(actionInstance instanceof MissingComponentAction);
 
         igorComponentRegistry.createActionInstance("action-type-id", null);
-        verify(applicationContextMock, times(1)).getBean(eq(actionMock.getClass()));
+        verify(applicationContextMock, times(1)).getBean(actionMock.getClass());
     }
 
     /**

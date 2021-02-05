@@ -58,12 +58,11 @@ class ConnectorProxyTest {
         Connector connectorProxy = (Connector) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Connector.class},
                 new ConnectorProxy(connectorMock));
 
-        String jobId = "job-id";
         JobExecution jobExecution = new JobExecution();
 
-        connectorProxy.initialize(jobId, jobExecution);
+        connectorProxy.initialize(jobExecution);
 
-        verify(connectorMock, times(1)).initialize(jobId, jobExecution);
+        verify(connectorMock, times(1)).initialize(jobExecution);
     }
 
     /**
@@ -77,17 +76,16 @@ class ConnectorProxyTest {
         Connector connectorProxy = (Connector) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Connector.class},
                 new ConnectorProxy(connectorMock));
 
-        String jobId = "job-id";
         JobExecution jobExecution = new JobExecution();
 
-        connectorProxy.shutdown(jobId, jobExecution);
+        connectorProxy.shutdown(jobExecution);
 
-        verify(connectorMock, times(1)).shutdown(jobId, jobExecution);
+        verify(connectorMock, times(1)).shutdown(jobExecution);
     }
 
     @Getter
     @Setter
-    private class TestConnector extends BaseConnector implements Connector {
+    private static class TestConnector extends BaseConnector implements Connector {
 
         /**
          * Property to support testing if the testConfiguration method has been invoked.
@@ -112,6 +110,7 @@ class ConnectorProxyTest {
         /**
          * {@inheritDoc}
          */
+        @SuppressWarnings("unused")
         public Integer simulationSafeMethod() {
             return 666;
         }
@@ -119,6 +118,7 @@ class ConnectorProxyTest {
         /**
          * {@inheritDoc}
          */
+        @SuppressWarnings("unused")
         public String simulationUnsafeMethod() {
             return "this-should-not-be-returned-in-simulations";
         }
@@ -126,6 +126,7 @@ class ConnectorProxyTest {
         /**
          * {@inheritDoc}
          */
+        @SuppressWarnings("unused")
         @IgorSimulationSafe
         public String directlyAnnotatedSimulationSafeMethod() {
             return "real-value-from-connector";

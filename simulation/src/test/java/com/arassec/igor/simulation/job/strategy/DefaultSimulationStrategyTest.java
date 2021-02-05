@@ -33,8 +33,8 @@ class DefaultSimulationStrategyTest {
         Map<String, SimulationResult> result = strategy.simulate(jobMock, jobExecution);
 
         assertNotNull(result);
-        verify(proxyProviderMock, times(1)).applyProxies(eq(jobMock));
-        verify(jobMock, times(1)).start(eq(jobExecution));
+        verify(proxyProviderMock, times(1)).applyProxies(jobMock);
+        verify(jobMock, times(1)).start(jobExecution);
     }
 
 }

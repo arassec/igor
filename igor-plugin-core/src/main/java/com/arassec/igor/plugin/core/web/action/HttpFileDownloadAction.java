@@ -108,8 +108,8 @@ public class HttpFileDownloadAction extends BaseWebAction {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, JobExecution jobExecution) {
-        super.initialize(jobId, jobExecution);
+    public void initialize(JobExecution jobExecution) {
+        super.initialize(jobExecution);
         parseHeaders(headers);
         targetKey = CoreDataKey.DOWNLOADED_FILE.getKey();
     }

@@ -1,6 +1,5 @@
 package com.arassec.igor.core.model.job;
 
-import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -86,8 +84,8 @@ class JobTest {
 
         job.start(jobExecution);
 
-        verify(triggerMock, times(1)).initialize("job-id", jobExecution);
-        verify(triggerMock, times(1)).shutdown("job-id", jobExecution);
+        verify(triggerMock, times(1)).initialize(jobExecution);
+        verify(triggerMock, times(1)).shutdown(jobExecution);
     }
 
     /**
@@ -150,7 +148,7 @@ class JobTest {
         assertEquals(JobExecutionState.FINISHED, jobExecution.getExecutionState());
 
         verify(actionMock, times(1)).complete();
-        verify(actionMock, times(1)).shutdown("job-id", jobExecution);
+        verify(actionMock, times(1)).shutdown(jobExecution);
 
         testExecutor.shutdown();
     }
@@ -162,7 +160,7 @@ class JobTest {
     @DisplayName("Tests failing safe on execution errors.")
     void testFailSafe() {
         Trigger triggerMock = mock(Trigger.class);
-        doThrow(new IgorException("Test-Exception!")).when(triggerMock).initialize(anyString(), any(JobExecution.class));
+        doThrow(new IgorException("Test-Exception!")).when(triggerMock).initialize(any(JobExecution.class));
 
         Job job = Job.builder().id("job-id").trigger(triggerMock).build();
         JobExecution jobExecution = new JobExecution();
@@ -218,26 +216,11 @@ class JobTest {
 
         job.start(jobExecution);
 
-        verify(triggerMock, times(1)).initialize("job-id", jobExecution);
-        verify(actionMock, times(1)).initialize("job-id", jobExecution);
+        verify(triggerMock, times(1)).initialize(jobExecution);
+        verify(actionMock, times(1)).initialize(jobExecution);
         verify(actionMock, times(1)).process(anyMap(), eq(jobExecution));
-        verify(actionMock, times(1)).shutdown("job-id", jobExecution);
-        verify(triggerMock, times(1)).shutdown("job-id", jobExecution);
-    }
-
-    /**
-     * Tests creating the meta-data for a job's data item.
-     */
-    @Test
-    @DisplayName("Tests creating job meta-data.")
-    void testCreateMetaData() {
-        Trigger triggerMock = mock(Trigger.class);
-        when(triggerMock.getMetaData()).thenReturn(Map.of(DataKey.SIMULATION.getKey(), true));
-        Map<String, Object> metaData = Job.createMetaData("job-id", null);
-        assertEquals("job-id", metaData.get(DataKey.JOB_ID.getKey()));
-        assertNotNull(metaData.get(DataKey.TIMESTAMP.getKey()));
-        assertNull(metaData.get(DataKey.SIMULATION.getKey()));
-
+        verify(actionMock, times(1)).shutdown(jobExecution);
+        verify(triggerMock, times(1)).shutdown(jobExecution);
     }
 
 }

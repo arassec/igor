@@ -60,7 +60,7 @@ class ExchangeAndOrQueueSetValidatorTest {
                 mock(ConstraintValidatorContext.ConstraintViolationBuilder.class);
 
         when(validatorContextMock.getDefaultConstraintMessageTemplate()).thenReturn("igor-test");
-        when(validatorContextMock.buildConstraintViolationWithTemplate(eq("igor-test"))).thenReturn(constraintViolationBuilderMock);
+        when(validatorContextMock.buildConstraintViolationWithTemplate("igor-test")).thenReturn(constraintViolationBuilderMock);
 
         ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext nodeBuilderCustomizableContextMock =
                 mock(ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext.class);
@@ -69,7 +69,7 @@ class ExchangeAndOrQueueSetValidatorTest {
         assertFalse(validator.isValid(connectorMock, validatorContextMock));
 
         verify(validatorContextMock, times(1)).disableDefaultConstraintViolation();
-        verify(constraintViolationBuilderMock, times(1)).addPropertyNode(eq("exchange"));
+        verify(constraintViolationBuilderMock, times(1)).addPropertyNode("exchange");
         verify(nodeBuilderCustomizableContextMock, times(1)).addConstraintViolation();
     }
 

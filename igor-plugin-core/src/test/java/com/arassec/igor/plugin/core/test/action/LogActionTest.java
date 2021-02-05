@@ -25,7 +25,7 @@ class LogActionTest extends CoreActionBaseTest {
     @DisplayName("Tests action initialization.")
     void testInitialize() {
         LogAction logAction = new LogAction();
-        logAction.initialize("job-id", new JobExecution());
+        logAction.initialize(JobExecution.builder().jobId("job-id").build());
         assertEquals("job-id", logAction.getJobId());
     }
 

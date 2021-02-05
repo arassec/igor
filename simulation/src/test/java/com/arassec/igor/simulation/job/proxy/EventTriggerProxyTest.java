@@ -47,7 +47,7 @@ class EventTriggerProxyTest {
     void testSetEventQueue() {
         BlockingDeque<Map<String, Object>> eventQueue = new LinkedBlockingDeque<>();
         eventTriggerProxy.setEventQueue(eventQueue);
-        verify(delegateMock, times(1)).setEventQueue(eq(eventQueue));
+        verify(delegateMock, times(1)).setEventQueue(eventQueue);
     }
 
     /**
@@ -62,14 +62,14 @@ class EventTriggerProxyTest {
 
         assertEquals(1, eventTriggerProxy.getProcessed());
         assertEquals(1, eventTriggerProxy.getSimulationTriggerData().size());
-        verify(delegateMock, times(1)).processEvent(eq(data));
+        verify(delegateMock, times(1)).processEvent(data);
 
         // Simulation limit is set to 1, so this call must be blocked:
         eventTriggerProxy.processEvent(data);
 
         assertEquals(2, eventTriggerProxy.getProcessed());
         assertEquals(1, eventTriggerProxy.getSimulationTriggerData().size());
-        verify(delegateMock, times(1)).processEvent(eq(data));
+        verify(delegateMock, times(1)).processEvent(data);
     }
 
     /**
@@ -80,7 +80,7 @@ class EventTriggerProxyTest {
     void testProcessingFinished() {
         Map<String, Object> data = new HashMap<>();
         eventTriggerProxy.processingFinished(data);
-        verify(delegateMock, times(1)).processingFinished(eq(data));
+        verify(delegateMock, times(1)).processingFinished(data);
     }
 
     /**

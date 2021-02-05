@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -33,14 +32,14 @@ class EventTriggeredSimulationStrategyTest {
         doAnswer(invocationOnMock -> {
             jobExecution.setProcessedEvents(1);
             return null;
-        }).when(jobMock).start(eq(jobExecution));
+        }).when(jobMock).start(jobExecution);
 
         EventTriggeredSimulationStrategy strategy = new EventTriggeredSimulationStrategy(proxyProviderMock);
 
         Map<String, SimulationResult> result = strategy.simulate(jobMock, jobExecution);
 
         assertNotNull(result);
-        verify(proxyProviderMock, times(1)).applyProxies(eq(jobMock));
+        verify(proxyProviderMock, times(1)).applyProxies(jobMock);
     }
 
 }

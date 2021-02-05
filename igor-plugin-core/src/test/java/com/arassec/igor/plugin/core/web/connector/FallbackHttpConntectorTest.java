@@ -22,7 +22,7 @@ class FallbackHttpConntectorTest {
 
         JobExecution jobExecution = new JobExecution();
 
-        assertThrows(IllegalStateException.class, () -> connector.initialize("job-id", jobExecution));
+        assertThrows(IllegalStateException.class, () -> connector.initialize(jobExecution));
         assertThrows(IllegalStateException.class, connector::testConfiguration);
         assertThrows(IllegalStateException.class, connector::getHttpClient);
     }

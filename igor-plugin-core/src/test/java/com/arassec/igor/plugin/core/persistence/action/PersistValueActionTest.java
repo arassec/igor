@@ -52,7 +52,7 @@ class PersistValueActionTest extends CoreActionBaseTest {
         PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
         action.setInput("{{" + DataKey.DATA.getKey() + ".INVALID}}");
 
-        List<Map<String, Object>> result = action.process(createData(), new JobExecution());
+        action.process(createData(), new JobExecution());
 
         ArgumentCaptor<PersistentValue> argCap = ArgumentCaptor.forClass(PersistentValue.class);
         verify(persistentValueRepositoryMock, times(1)).upsert(eq("job-id"), argCap.capture());
@@ -87,11 +87,13 @@ class PersistValueActionTest extends CoreActionBaseTest {
 
         PersistValueAction action = new PersistValueAction(persistentValueRepositoryMock);
 
-        action.shutdown(JOB_ID, new JobExecution());
+        JobExecution jobExecution = JobExecution.builder().jobId(JOB_ID).build();
+
+        action.shutdown(jobExecution);
         verify(persistentValueRepositoryMock, times(0)).cleanup(eq(JOB_ID), anyInt());
 
         action.setNumValuesToKeep(5);
-        action.shutdown(JOB_ID, new JobExecution());
+        action.shutdown(jobExecution);
         verify(persistentValueRepositoryMock, times(1)).cleanup(JOB_ID, 5);
     }
 

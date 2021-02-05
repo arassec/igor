@@ -34,7 +34,7 @@ class IgorComponentUtilTest {
     /**
      * A {@link JobExecution} for testing.
      */
-    private JobExecution jobExecution;
+    private JobExecution jobExecution = JobExecution.builder().jobId("job-id").build();
 
     /**
      * Initializes the test environment.
@@ -53,10 +53,10 @@ class IgorComponentUtilTest {
     @DisplayName("Tests connector shutdown")
     void testShutdownConnectors() {
         // Initialize should handle null-input:
-        IgorComponentUtil.initializeConnectors(null, "job-id", jobExecution);
+        IgorComponentUtil.initializeConnectors(null, jobExecution);
 
-        IgorComponentUtil.initializeConnectors(testAction, "job-id", jobExecution);
-        verify(testConnector, times(1)).initialize("job-id", jobExecution);
+        IgorComponentUtil.initializeConnectors(testAction, jobExecution);
+        verify(testConnector, times(1)).initialize(jobExecution);
     }
 
     /**
@@ -66,10 +66,10 @@ class IgorComponentUtilTest {
     @DisplayName("Tests connector initialization")
     void testInitializeConnector() {
         // Shutdown should handle null-input:
-        IgorComponentUtil.shutdownConnectors(null, "job-id", jobExecution);
+        IgorComponentUtil.shutdownConnectors(null, jobExecution);
 
-        IgorComponentUtil.shutdownConnectors(testAction, "job-id", jobExecution);
-        verify(testConnector, times(1)).shutdown("job-id", jobExecution);
+        IgorComponentUtil.shutdownConnectors(testAction, jobExecution);
+        verify(testConnector, times(1)).shutdown(jobExecution);
     }
 
     /**

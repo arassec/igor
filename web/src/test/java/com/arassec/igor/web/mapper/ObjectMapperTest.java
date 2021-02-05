@@ -27,7 +27,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,9 +47,9 @@ class ObjectMapperTest {
     @BeforeEach
     void initialize() {
         ApplicationContext applicationContextMock = mock(ApplicationContext.class);
-        when(applicationContextMock.getBean(eq(TestConnector.class))).thenReturn(new TestConnector());
-        when(applicationContextMock.getBean(eq(TestTrigger.class))).thenReturn(new TestTrigger());
-        when(applicationContextMock.getBean(eq(TestAction.class))).thenReturn(new TestAction());
+        when(applicationContextMock.getBean(TestConnector.class)).thenReturn(new TestConnector());
+        when(applicationContextMock.getBean(TestTrigger.class)).thenReturn(new TestTrigger());
+        when(applicationContextMock.getBean(TestAction.class)).thenReturn(new TestAction());
 
         IgorComponentRegistry igorComponentRegistry = new IgorComponentRegistry(List.of(new TestAction()),
                 List.of(new TestTrigger()), List.of(new TestConnector()), null);
@@ -58,7 +57,7 @@ class ObjectMapperTest {
         igorComponentRegistry.afterPropertiesSet();
 
         ConnectorRepository connectorRepositoryMock = mock(ConnectorRepository.class);
-        when(connectorRepositoryMock.findById(eq(TestConnector.CONNECTOR_ID))).thenReturn(new TestConnector());
+        when(connectorRepositoryMock.findById(TestConnector.CONNECTOR_ID)).thenReturn(new TestConnector());
 
         WebConfiguration webConfiguration = new WebConfiguration();
 

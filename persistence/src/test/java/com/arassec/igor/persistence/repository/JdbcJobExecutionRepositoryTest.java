@@ -313,7 +313,7 @@ class JdbcJobExecutionRepositoryTest {
         verify(jobExecutionDao, times(0)).deleteByJobId(anyString());
 
         repository.deleteByJobId("job-id");
-        verify(jobExecutionDao, times(1)).deleteByJobId(eq("job-id"));
+        verify(jobExecutionDao, times(1)).deleteByJobId("job-id");
     }
 
     /**

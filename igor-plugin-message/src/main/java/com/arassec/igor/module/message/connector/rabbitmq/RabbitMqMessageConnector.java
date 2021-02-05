@@ -163,9 +163,9 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, JobExecution jobExecution) {
-        super.initialize(jobId, jobExecution);
-        this.jobId = jobId;
+    public void initialize(JobExecution jobExecution) {
+        super.initialize(jobExecution);
+        this.jobId = jobExecution.getJobId();
         if (connectionFactory == null) {
             connectionFactory = createConnectionFactory();
         }
@@ -222,8 +222,8 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
      * {@inheritDoc}
      */
     @Override
-    public void shutdown(String jobId, JobExecution jobExecution) {
-        super.shutdown(jobId, jobExecution);
+    public void shutdown(JobExecution jobExecution) {
+        super.shutdown(jobExecution);
         if (rabbitTemplate != null) {
             rabbitTemplate.destroy();
         }

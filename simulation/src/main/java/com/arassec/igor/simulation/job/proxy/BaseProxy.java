@@ -53,10 +53,10 @@ public abstract class BaseProxy<T extends IgorComponent> implements IgorComponen
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, JobExecution jobExecution) {
+    public void initialize(JobExecution jobExecution) {
         try {
-            delegate.initialize(jobId, jobExecution);
-            IgorComponentUtil.initializeConnectors(delegate, jobId, jobExecution);
+            delegate.initialize(jobExecution);
+            IgorComponentUtil.initializeConnectors(delegate, jobExecution);
         } catch (Exception e) {
             setErrorCause(StacktraceFormatter.format(e));
         }
@@ -66,10 +66,10 @@ public abstract class BaseProxy<T extends IgorComponent> implements IgorComponen
      * {@inheritDoc}
      */
     @Override
-    public void shutdown(String jobId, JobExecution jobExecution) {
+    public void shutdown(JobExecution jobExecution) {
         try {
-            delegate.shutdown(jobId, jobExecution);
-            IgorComponentUtil.shutdownConnectors(delegate, jobId, jobExecution);
+            delegate.shutdown(jobExecution);
+            IgorComponentUtil.shutdownConnectors(delegate, jobExecution);
         } catch (Exception e) {
             errorCause = StacktraceFormatter.format(e);
         }

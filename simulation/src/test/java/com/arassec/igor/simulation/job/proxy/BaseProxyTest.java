@@ -40,8 +40,8 @@ class BaseProxyTest {
     @DisplayName("Tests shutting down the proxy.")
     void testShutdown() {
         JobExecution jobExecution = new JobExecution();
-        actionProxy.shutdown("job-id", jobExecution);
-        verify(actionMock, times(1)).shutdown("job-id", jobExecution);
+        actionProxy.shutdown(jobExecution);
+        verify(actionMock, times(1)).shutdown(jobExecution);
     }
 
     /**
@@ -51,7 +51,7 @@ class BaseProxyTest {
     @DisplayName("Tests error handling during shutdown.")
     void testShutdownFail() {
         ActionProxy actionProxy = new ActionProxy(null, 10);
-        actionProxy.shutdown("job-id", new JobExecution());
+        actionProxy.shutdown(new JobExecution());
         assertNotNull(actionProxy.getErrorCause());
     }
 

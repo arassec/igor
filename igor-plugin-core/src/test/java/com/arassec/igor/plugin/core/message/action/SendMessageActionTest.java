@@ -45,4 +45,30 @@ class SendMessageActionTest extends MessageActionBaseTest {
         assertEquals("{'key': '" + PARAM_VALUE + "'}", argCap.getValue().getContent());
     }
 
+    /**
+     * Tests processing the action with message headers.
+     */
+    @Test
+    @DisplayName("Tests processing the action with message headers.")
+    void testProcessHeaders() {
+        MessageConnector messageConnectorMock = mock(MessageConnector.class);
+
+        SendMessageAction action = new SendMessageAction();
+        action.setMessageConnector(messageConnectorMock);
+        action.setMessageTemplate("message-template");
+        action.setHeaders("a: b\nc: d\ne\nf=g");
+
+
+        ArgumentCaptor<Message> argCap = ArgumentCaptor.forClass(Message.class);
+
+        List<Map<String, Object>> result = action.process(createData(), new JobExecution());
+
+        verify(messageConnectorMock, times(1)).sendMessage(argCap.capture());
+        assertEquals(1, result.size());
+
+        Message sentMessage = argCap.getValue();
+        assertEquals("b", sentMessage.getHeaders().get("a"));
+        assertEquals("d", sentMessage.getHeaders().get("c"));
+    }
+
 }

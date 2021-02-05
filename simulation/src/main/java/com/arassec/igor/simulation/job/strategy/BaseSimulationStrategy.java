@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.job.starter.DefaultJobStarter;
 import com.arassec.igor.simulation.job.proxy.ActionProxy;
 import com.arassec.igor.simulation.job.proxy.ProxyProvider;
 import com.arassec.igor.simulation.job.proxy.TriggerProxy;
@@ -54,7 +55,7 @@ public abstract class BaseSimulationStrategy implements SimulationStrategy {
 
             simulationTriggerData.forEach(dataItem -> {
                 Map<String, Object> item = new HashMap<>();
-                item.put(DataKey.META.getKey(), Job.createMetaData(job.getId(), triggerProxy));
+                item.put(DataKey.META.getKey(), DefaultJobStarter.createMetaData(job.getId(), triggerProxy));
                 item.put(DataKey.DATA.getKey(), dataItem);
                 jobResult.getResults().add(item);
             });

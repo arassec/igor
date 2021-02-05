@@ -36,9 +36,9 @@ public class LogAction extends BaseTestAction {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(String jobId, JobExecution jobExecution) {
-        super.initialize(jobId, jobExecution);
-        this.jobId = jobId;
+    public void initialize(JobExecution jobExecution) {
+        super.initialize(jobExecution);
+        this.jobId = jobExecution.getJobId();
     }
 
     /**

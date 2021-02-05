@@ -27,8 +27,8 @@ class ActionProxyTest {
     void testInitialize() {
         Action actionMock = mock(Action.class);
         ActionProxy actionProxy = new ActionProxy(actionMock, 10);
-        actionProxy.initialize("1",  new JobExecution());
-        verify(actionMock, times(1)).initialize(eq("1"), any(JobExecution.class));
+        actionProxy.initialize(new JobExecution());
+        verify(actionMock, times(1)).initialize(any(JobExecution.class));
         assertEquals(10, actionProxy.getSimulationLimit());
     }
 

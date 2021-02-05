@@ -1,12 +1,13 @@
 package com.arassec.igor.core.model.job;
 
-import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.annotation.validation.UniqueJobName;
 import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
-import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
+import com.arassec.igor.core.model.job.starter.DefaultJobStarter;
+import com.arassec.igor.core.model.job.starter.EventTriggeredJobStarter;
+import com.arassec.igor.core.model.job.starter.JobStarter;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.AllArgsConstructor;
@@ -20,8 +21,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Defines an igor job.
@@ -108,23 +113,6 @@ public class Job {
     private boolean faultTolerant = true;
 
     /**
-     * Creates the meta-data part of a data item.
-     *
-     * @param jobId   The job's ID.
-     * @param trigger The job's trigger.
-     *
-     * @return The meta-data for the job run.
-     */
-    public static Map<String, Object> createMetaData(String jobId, Trigger trigger) {
-        Map<String, Object> metaData = new HashMap<>();
-        metaData.put(DataKey.JOB_ID.getKey(), jobId);
-        metaData.put(DataKey.TIMESTAMP.getKey(), Instant.now().toEpochMilli());
-        Map<String, Object> triggerMetaData = trigger != null ? trigger.getMetaData() : Map.of();
-        triggerMetaData.forEach(metaData::put);
-        return metaData;
-    }
-
-    /**
      * Starts the job. Depending on the trigger type (scheduled vs event based) the job will either run once and will be finished
      * after the last data item has been processed, or it will remain in state {@link JobExecutionState#ACTIVE} until it is
      * manually stopped or igor is shut down.
@@ -134,59 +122,24 @@ public class Job {
     public void start(JobExecution jobExecution) {
         log.debug("Starting job: {} ({})", name, id);
 
-        boolean processingFinishedCallbackSet = setProcessingFinishedCallbackIfApplicable();
-
-        currentJobExecution = Objects.requireNonNullElseGet(jobExecution, JobExecution::new);
+        currentJobExecution = Objects.requireNonNullElseGet(jobExecution, () -> JobExecution.builder().jobId(id).build());
         if (trigger instanceof EventTrigger) {
             currentJobExecution.setExecutionState(JobExecutionState.ACTIVE);
         } else {
             currentJobExecution.setExecutionState(JobExecutionState.RUNNING);
         }
         currentJobExecution.setStarted(Instant.now());
+
         running = true;
         try {
-
-            // Scan all actions to create lists of actions that belong to the same concurrency group (i.e. use the same
-            // number of threads):
-            List<List<Action>> concurrencyLists = createConcurrencyLists();
-
-            // Create concurrency groups which start the threads that process the actions:
-            BlockingQueue<Map<String, Object>> triggerInputQueue = new LinkedBlockingQueue<>();
-            List<ConcurrencyGroup> concurrencyGroups = createConcurrencyGroups(concurrencyLists, triggerInputQueue, id,
-                    jobExecution);
-
+            // Starts processing data items:
+            JobStarter jobStarter;
             if (trigger instanceof EventTrigger) {
-                BlockingQueue<Map<String, Object>> triggerEventInputQueue = new LinkedBlockingQueue<>(1);
-                if (!concurrencyLists.isEmpty() && !concurrencyLists.get(0).isEmpty()) {
-                    triggerEventInputQueue = new LinkedBlockingQueue<>(concurrencyLists.get(0).get(0).getNumThreads());
-                }
-                ((EventTrigger) trigger).setEventQueue(triggerEventInputQueue);
-
-                // Initialize IgorComponents used by the job:
-                initialize(jobExecution);
-
-                // Block until igor is shut down and wait for trigger events...
-                while (JobExecutionState.ACTIVE.equals(currentJobExecution.getExecutionState())) {
-                    Map<String, Object> triggerData = triggerEventInputQueue.poll(500, TimeUnit.MILLISECONDS);
-                    if (triggerData != null) {
-                        log.debug("Job '{}' ({}) triggered by event: {}", name, id, triggerData);
-                        trigger.getData().forEach(triggerData::put); // A custom trigger might add additional data to the items.
-                        dispatchInitialDataItem(triggerInputQueue, id, triggerData, processingFinishedCallbackSet);
-                        currentJobExecution.setProcessedEvents(currentJobExecution.getProcessedEvents() + 1);
-                    }
-                }
+                jobStarter = new EventTriggeredJobStarter(trigger, actions, currentJobExecution);
             } else {
-                // Initialize IgorComponents used by the job:
-                initialize(jobExecution);
-
-                // Read the data from the trigger and start working. This is used during simulated job runs to get the data from
-                // an event based trigger, too!
-                Map<String, Object> triggerData = Map.of();
-                if (trigger != null) {
-                    triggerData = trigger.getData();
-                }
-                dispatchInitialDataItem(triggerInputQueue, id, triggerData, processingFinishedCallbackSet);
+                jobStarter = new DefaultJobStarter(trigger, actions, currentJobExecution);
             }
+            List<ConcurrencyGroup> concurrencyGroups = jobStarter.process();
 
             // Completes each action inside each concurrency group:
             concurrencyGroups.forEach(ConcurrencyGroup::complete);
@@ -204,7 +157,7 @@ public class Job {
             log.error("Exception during job execution!", e);
             currentJobExecution.fail(e);
         } finally {
-            shutdown(jobExecution);
+            shutdown(currentJobExecution);
             currentJobExecution.setFinished(Instant.now());
             running = false;
             log.debug("Finished job: {} ({}): {}", name, id, currentJobExecution);
@@ -249,106 +202,6 @@ public class Job {
     }
 
     /**
-     * Combines actions to a list that should be executed with the same number of threads. Keeps the order of the actions.
-     *
-     * @return {@link Action}s grouped by the number of threads they should execute with.
-     */
-    private List<List<Action>> createConcurrencyLists() {
-        List<List<Action>> concurrencyLists = new LinkedList<>();
-
-        // Initialized with -1 so that at least one concurrency-group is created.
-        int lastNumThreads = -1;
-
-        for (Action action : actions) {
-            if (!action.isActive()) {
-                continue;
-            }
-            if (action.getNumThreads() != lastNumThreads) {
-                List<Action> concurrencyList = new LinkedList<>();
-                concurrencyList.add(action);
-                concurrencyLists.add(concurrencyList);
-                lastNumThreads = action.getNumThreads();
-            } else {
-                concurrencyLists.get(concurrencyLists.size() - 1).add(action);
-            }
-        }
-
-        return concurrencyLists;
-    }
-
-    /**
-     * Creates concurrency groups, i.e. actions with the same amount of threads to process data and linked via queues.
-     *
-     * @param concurrencyLists  The ordered list of actions that should be executed with the same number of threads.
-     * @param triggerInputQueue The initial input queue in which the trigger's data item will be put.
-     * @param jobId             The job's ID.
-     * @param jobExecution      The container for job execution data.
-     *
-     * @return List of {@link ConcurrencyGroup}s.
-     */
-    private List<ConcurrencyGroup> createConcurrencyGroups(List<List<Action>> concurrencyLists, BlockingQueue<Map<String,
-            Object>> triggerInputQueue, String jobId, JobExecution jobExecution) {
-        List<ConcurrencyGroup> concurrencyGroups = new LinkedList<>();
-        BlockingQueue<Map<String, Object>> inputQueue = triggerInputQueue;
-
-        for (List<Action> concurrencyList : concurrencyLists) {
-            String concurrencyGroupId = String
-                    .format(CONCURRENCY_GROUP_ID_PATTERN, jobId, getId(), concurrencyLists.indexOf(concurrencyList));
-            ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueue, concurrencyGroupId,
-                    jobExecution);
-            inputQueue = concurrencyGroup.getOutputQueue();
-            concurrencyGroups.add(concurrencyGroup);
-        }
-
-        return concurrencyGroups;
-    }
-
-    /**
-     * Initializes igor components before a job run.
-     *
-     * @param jobExecution Container for execution information.
-     */
-    private void initialize(JobExecution jobExecution) {
-        if (trigger != null) {
-            trigger.initialize(id, jobExecution);
-            IgorComponentUtil.initializeConnectors(trigger, id, jobExecution);
-        }
-        if (!actions.isEmpty()) {
-            actions.stream().filter(Action::isActive).forEach(action -> {
-                action.initialize(id, jobExecution);
-                IgorComponentUtil.initializeConnectors(action, id, jobExecution);
-            });
-        }
-    }
-
-    /**
-     * Creates the initial data item and starts processing it with the first action.
-     *
-     * @param triggerInputQueue The input queue to put the trigger's data in.
-     * @param jobId             The job's ID.
-     * @param triggerData       Data provided by an event trigger.
-     */
-    private void dispatchInitialDataItem(BlockingQueue<Map<String, Object>> triggerInputQueue, String jobId, Map<String,
-            Object> triggerData, boolean processingFinishedCallbackSet) {
-        Map<String, Object> dataItem = new HashMap<>();
-        dataItem.put(DataKey.META.getKey(), createMetaData(jobId, trigger));
-        dataItem.put(DataKey.DATA.getKey(), triggerData);
-        boolean added = false;
-        while (!added) {
-            try {
-                added = triggerInputQueue.offer(dataItem, 100, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        // This means we have to notify the trigger that the processing finished immediately, because there are no (active)
-        // actions...
-        if (this.getTrigger() instanceof ProcessingFinishedCallback && !processingFinishedCallbackSet) {
-            ((ProcessingFinishedCallback) this.getTrigger()).processingFinished(dataItem);
-        }
-    }
-
-    /**
      * Awaits thread termination of each concurrency group.
      *
      * @param concurrencyGroups List of concurrency group to wait for.
@@ -372,32 +225,14 @@ public class Job {
     private void shutdown(JobExecution jobExecution) {
         if (!actions.isEmpty()) {
             actions.stream().filter(Action::isActive).forEach(action -> {
-                IgorComponentUtil.shutdownConnectors(action, id, jobExecution);
-                action.shutdown(id, jobExecution);
+                IgorComponentUtil.shutdownConnectors(action, jobExecution);
+                action.shutdown(jobExecution);
             });
         }
         if (trigger != null) {
-            IgorComponentUtil.shutdownConnectors(trigger, id, jobExecution);
-            trigger.shutdown(id, jobExecution);
+            IgorComponentUtil.shutdownConnectors(trigger, jobExecution);
+            trigger.shutdown(jobExecution);
         }
-    }
-
-    /**
-     * Sets the trigger as 'processing finished' callback to the last action of the job, if the trigger is appropriate and actions
-     * exist.
-     *
-     * @return {@code true} if the callback has been set, {@code false} otherwise.
-     */
-    private boolean setProcessingFinishedCallbackIfApplicable() {
-        if (this.getTrigger() instanceof ProcessingFinishedCallback && !actions.isEmpty()) {
-            for (int i = (actions.size() - 1); i >= 0; i--) {
-                if (actions.get(i).isActive()) {
-                    actions.get(i).setProcessingFinishedCallback((ProcessingFinishedCallback) this.getTrigger());
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
 }

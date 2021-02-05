@@ -141,7 +141,7 @@ class ConnectorManagerTest {
     @DisplayName("Tests deleting a connector.")
     void testDelete() {
         connectorManager.deleteConnector("connector-id");
-        verify(connectorRepository, times(1)).deleteById(eq("connector-id"));
+        verify(connectorRepository, times(1)).deleteById("connector-id");
     }
 
     /**
@@ -151,7 +151,7 @@ class ConnectorManagerTest {
     @DisplayName("Tests finding referencing jobs.")
     void testGetReferencingJobs() {
         connectorManager.getReferencingJobs("id", 1, 5);
-        verify(connectorRepository, times(1)).findReferencingJobs(eq("id"), eq(1), eq(5));
+        verify(connectorRepository, times(1)).findReferencingJobs("id", 1, 5);
     }
 
 }

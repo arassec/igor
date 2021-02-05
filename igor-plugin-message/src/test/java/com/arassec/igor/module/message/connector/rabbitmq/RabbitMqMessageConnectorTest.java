@@ -53,13 +53,16 @@ class RabbitMqMessageConnectorTest {
 
         assertNull(rabbitMqMessageConnector.getRabbitTemplate());
 
-        rabbitMqMessageConnector.initialize("job-id", new JobExecution());
+        rabbitMqMessageConnector.initialize(new JobExecution());
 
         RabbitTemplate rabbitTemplate = rabbitMqMessageConnector.getRabbitTemplate();
         assertNotNull(rabbitMqMessageConnector.getRabbitTemplate());
 
-        rabbitMqMessageConnector.initialize("job-id", new JobExecution());
+        rabbitMqMessageConnector.initialize(new JobExecution());
         assertEquals(rabbitTemplate, rabbitMqMessageConnector.getRabbitTemplate());
+
+        rabbitMqMessageConnector.initialize(JobExecution.builder().jobId("job-id").build());
+        assertEquals("job-id", rabbitMqMessageConnector.getJobId());
     }
 
     /**
@@ -150,13 +153,13 @@ class RabbitMqMessageConnectorTest {
         RabbitMqMessageConnector rabbitMqMessageConnector = new RabbitMqMessageConnector(applicationEventPublisher);
 
         // should work without exception:
-        rabbitMqMessageConnector.shutdown("job-id", new JobExecution());
+        rabbitMqMessageConnector.shutdown(new JobExecution());
 
         // should shutdown established connections:
         rabbitMqMessageConnector.setRabbitTemplate(rabbitTemplateSpy);
         rabbitMqMessageConnector.setConnectionFactory(connectionFactorySpy);
 
-        rabbitMqMessageConnector.shutdown("job-id", new JobExecution());
+        rabbitMqMessageConnector.shutdown(new JobExecution());
 
         verify(rabbitTemplateSpy, times(1)).destroy();
         verify(connectionFactorySpy, times(1)).destroy();
@@ -237,7 +240,7 @@ class RabbitMqMessageConnectorTest {
         rabbitMqMessageConnector.processingFinished(dataItem);
 
         assertFalse(rabbitMqMessageConnector.getChannels().containsKey(123L));
-        verify(channelMock, times(1)).basicAck(eq(123L), eq(false));
+        verify(channelMock, times(1)).basicAck(123L, false);
     }
 
 }

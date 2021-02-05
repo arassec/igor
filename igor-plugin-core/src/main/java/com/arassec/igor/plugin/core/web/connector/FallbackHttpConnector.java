@@ -17,11 +17,10 @@ public class FallbackHttpConnector extends HttpConnector {
     /**
      * Always throws an exception to prevent usage in real jobs.
      *
-     * @param jobId        Ignored Job-ID.
      * @param jobExecution Ignore job execution.
      */
     @Override
-    public void initialize(String jobId, JobExecution jobExecution) {
+    public void initialize(JobExecution jobExecution) {
         throw new IllegalStateException(ERROR_MESSAGE);
     }
 

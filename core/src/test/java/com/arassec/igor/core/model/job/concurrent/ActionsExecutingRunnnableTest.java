@@ -2,9 +2,9 @@ package com.arassec.igor.core.model.job.concurrent;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
-import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
+import com.arassec.igor.core.model.job.starter.DefaultJobStarter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +46,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests actually running the runnable.")
     void testRun() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null));
+        inputData.put(DataKey.META.getKey(), DefaultJobStarter.createMetaData("job-id", null));
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         inputQueue.offer(inputData);
@@ -89,7 +89,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests completing the runnable.")
     void testComplete() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null));
+        inputData.put(DataKey.META.getKey(), DefaultJobStarter.createMetaData("job-id", null));
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingQueue<>();
@@ -122,7 +122,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests running the runnable with an action with processing-finished-callback.")
     void testRunWithProcessFinishedCallback() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), Job.createMetaData("job-id", null));
+        inputData.put(DataKey.META.getKey(), DefaultJobStarter.createMetaData("job-id", null));
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         inputQueue.offer(inputData);
@@ -149,7 +149,7 @@ class ActionsExecutingRunnnableTest {
         actionsExecutingRunnable.run();
 
         // The callback must have been called with the supplied data item:
-        verify(processingFinishedCallbackMock, times(1)).processingFinished(eq(inputData));
+        verify(processingFinishedCallbackMock, times(1)).processingFinished(inputData);
     }
 
 }

@@ -58,7 +58,7 @@ class StandardJobSimulatorTest {
 
         SimulationStrategy simulationStrategyMock = mock(SimulationStrategy.class);
 
-        when(simulationStrategyFactory.determineSimulationStrategy(eq(job))).thenReturn(simulationStrategyMock);
+        when(simulationStrategyFactory.determineSimulationStrategy(job)).thenReturn(simulationStrategyMock);
 
         standardJobSimulator.simulateJob(job);
 
@@ -110,7 +110,7 @@ class StandardJobSimulatorTest {
         Map<String, Object> eventData = new HashMap<>();
         JobTriggerEvent validEvent = new JobTriggerEvent("job-id", eventData, EventType.MESSAGE);
         standardJobSimulator.onJobTriggerEvent(validEvent);
-        verify(eventTriggerMock, times(1)).processEvent(eq(eventData));
+        verify(eventTriggerMock, times(1)).processEvent(eventData);
     }
 
     /**

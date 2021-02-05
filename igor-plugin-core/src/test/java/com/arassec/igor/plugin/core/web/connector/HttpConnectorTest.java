@@ -73,14 +73,14 @@ class HttpConnectorTest {
         httpConnector.setTestUrl("https://localhost:" + wireMockServer.httpsPort() + "/ok");
         httpConnector.setCertificateVerification(true);
 
-        httpConnector.initialize("job-id", new JobExecution());
+        httpConnector.initialize(new JobExecution());
 
         // Should throw exception because of the self-signed server certificate used by wiremock:
         assertThrows(IgorException.class, httpConnector::testConfiguration);
 
         // Ignoring the problem should work:
         httpConnector.setCertificateVerification(false);
-        httpConnector.initialize("job-id", new JobExecution());
+        httpConnector.initialize(new JobExecution());
 
         assertDoesNotThrow(httpConnector::testConfiguration);
 
@@ -89,7 +89,7 @@ class HttpConnectorTest {
         httpConnector.setTrustmanagerKeystore("src/test/resources/igor-tests-keystore.jks");
         httpConnector.setTrustmanagerPassword("password");
         httpConnector.setTrustmanagerType("jks");
-        httpConnector.initialize("job-id", new JobExecution());
+        httpConnector.initialize(new JobExecution());
 
         assertDoesNotThrow(httpConnector::testConfiguration);
     }
@@ -112,11 +112,11 @@ class HttpConnectorTest {
         );
 
         httpConnector.setFollowRedirects(false);
-        httpConnector.initialize("job-id", new JobExecution());
+        httpConnector.initialize(new JobExecution());
         assertThrows(IgorException.class, httpConnector::testConfiguration);
 
         httpConnector.setFollowRedirects(true);
-        httpConnector.initialize("job-id", new JobExecution());
+        httpConnector.initialize(new JobExecution());
         assertDoesNotThrow(httpConnector::testConfiguration);
     }
 
@@ -156,13 +156,13 @@ class HttpConnectorTest {
         httpConnector.setTestUrl("http://localhost:" + proxiedServer.port() + "/proxied");
 
         // Without the proxy, an exception must be thrown:
-        httpConnector.initialize("job-id", new JobExecution());
+        httpConnector.initialize(new JobExecution());
         assertThrows(IgorException.class, httpConnector::testConfiguration);
 
         // With the proxy, the request ist served from '/ok' with HTTP 200:
         httpConnector.setProxyHost("localhost");
         httpConnector.setProxyPort(httpProxy.port());
-        httpConnector.initialize("job-id", new JobExecution());
+        httpConnector.initialize(new JobExecution());
         assertDoesNotThrow(httpConnector::testConfiguration);
 
         proxiedServer.resetAll();
@@ -201,7 +201,7 @@ class HttpConnectorTest {
         httpConnector.setCertificateVerification(false);
         httpConnector.setTestUrl("https://localhost:" + server.httpsPort() + "/ok");
 
-        httpConnector.initialize("job-id", new JobExecution());
+        httpConnector.initialize(new JobExecution());
 
         // Should throw exception because of the self-signed server certificate used by wiremock:
         try {
@@ -216,7 +216,7 @@ class HttpConnectorTest {
         httpConnector.setKeymanagerKeystore("src/test/resources/igor-tests-keystore.jks");
         httpConnector.setKeymanagerPassword("password");
         httpConnector.setKeymanagerType("jks");
-        httpConnector.initialize("job-id", new JobExecution());
+        httpConnector.initialize(new JobExecution());
 
         assertDoesNotThrow(httpConnector::testConfiguration);
 

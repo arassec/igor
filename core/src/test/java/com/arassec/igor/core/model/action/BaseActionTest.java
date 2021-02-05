@@ -1,7 +1,7 @@
 package com.arassec.igor.core.model.action;
 
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.job.Job;
+import com.arassec.igor.core.model.job.starter.DefaultJobStarter;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.SneakyThrows;
@@ -44,7 +44,7 @@ class BaseActionTest {
         Trigger triggerMock = mock(Trigger.class);
         when(triggerMock.getMetaData()).thenReturn(Map.of(DataKey.SIMULATION.getKey(), true));
 
-        Map<String, Object> meta = Job.createMetaData("job-id", triggerMock);
+        Map<String, Object> meta = DefaultJobStarter.createMetaData("job-id", triggerMock);
         Map<String, Object> data = new HashMap<>();
 
         testData.put(DataKey.META.getKey(), meta);
@@ -158,6 +158,15 @@ class BaseActionTest {
         EventTrigger processingFinishedCallback = mock(EventTrigger.class);
         baseAction.setProcessingFinishedCallback(processingFinishedCallback);
         assertEquals(processingFinishedCallback, baseAction.getProcessingFinishedCallback());
+    }
+
+    /**
+     * Tests the default value of event support.
+     */
+    @Test
+    @DisplayName("Tests the default value of event support.")
+    void testSupportsEvents() {
+        assertTrue(baseAction.supportsEvents());
     }
 
 }

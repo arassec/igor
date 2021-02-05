@@ -40,12 +40,11 @@ public class MessageTrigger extends BaseEventTrigger {
     /**
      * Initializes the trigger by registering it as message processor.
      *
-     * @param jobId        The job's ID.
      * @param jobExecution The current {@link JobExecution}.
      */
     @Override
-    public void initialize(String jobId, JobExecution jobExecution) {
-        super.initialize(jobId, jobExecution);
+    public void initialize(JobExecution jobExecution) {
+        super.initialize(jobExecution);
         messageConnector.enableMessageRetrieval();
     }
 

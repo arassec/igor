@@ -36,15 +36,16 @@ class BaseIgorComponentTest {
     @Test
     @DisplayName("Tests initialization.")
     void testInitialize() {
-        assertDoesNotThrow(() -> baseIgorComponent.initialize("job-id", new JobExecution()));
+        assertDoesNotThrow(() -> baseIgorComponent.initialize(JobExecution.builder().jobId("job-id").build()));
     }
+
     /**
      * Tests shutdown.
      */
     @Test
     @DisplayName("Tests shutdown.")
     void testShutdown() {
-        assertDoesNotThrow(() -> baseIgorComponent.shutdown("job-id", new JobExecution()));
+        assertDoesNotThrow(() -> baseIgorComponent.shutdown(JobExecution.builder().jobId("job-id").build()));
     }
 
 }
