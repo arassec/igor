@@ -13,7 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.AmqpIOException;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -178,7 +178,7 @@ class RabbitMqMessageConnectorTest {
         rabbitMqMessageConnector.setPassword("invalid");
         rabbitMqMessageConnector.setConnectionTimeout(1);
 
-        assertThrows(AmqpIOException.class, rabbitMqMessageConnector::testConfiguration);
+        assertThrows(AmqpException.class, rabbitMqMessageConnector::testConfiguration);
     }
 
     /**
