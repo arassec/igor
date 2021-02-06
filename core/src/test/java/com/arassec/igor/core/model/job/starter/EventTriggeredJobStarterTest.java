@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -58,8 +58,10 @@ class EventTriggeredJobStarterTest {
         }).when(eventTrigger).initialize(jobExecution);
 
         // Stop the process after the data item has been processed:
+        AtomicBoolean eventProcessed = new AtomicBoolean(false);
         doAnswer(invocationOnMock -> {
             log.debug("Dummy data item has been processed. Setting job state to {}", JobExecutionState.CANCELLED.toString());
+            eventProcessed.set(true);
             jobExecution.setExecutionState(JobExecutionState.CANCELLED);
             return null;
         }).when(jobExecution).setProcessedEvents(1);
@@ -71,14 +73,8 @@ class EventTriggeredJobStarterTest {
         assertNotNull(concurrencyGroups);
         assertEquals(1, concurrencyGroups.size());
 
-        // Wait for all threads to finish...
-        ConcurrencyGroup concurrencyGroup = concurrencyGroups.get(0);
-        concurrencyGroup.complete();
-        concurrencyGroup.shutdown();
-        concurrencyGroup.awaitTermination();
-
         verify(action, times(1)).initialize(jobExecution);
-        verify(action, times(1)).process(any(), eq(jobExecution));
+        assertTrue(eventProcessed.get());
     }
 
 }
