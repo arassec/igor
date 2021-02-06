@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import java.io.IOException;
 
@@ -42,9 +43,12 @@ class FtpsFileConnectorTest extends FtpFileConnectorBaseTest {
 
     /**
      * Tests connecting to an FTPS server.
+     * <p>
+     * The test is flaky during CI builds and hence disabled there...
      */
     @Test
     @DisplayName("Tests connecting to an FTPS server.")
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     void testConnect() {
         assertDoesNotThrow(() -> connector.connect());
     }
