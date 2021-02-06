@@ -13,9 +13,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up JDK 11
       uses: actions/setup-java@v1
       with:
         java-version: 11
+
     - name: Build with Maven
-      run: ./mvnw org.jacoco:jacoco-maven-plugin:prepare-agent package --no-transfer-progress --file pom.xml
+      run: ./mvnw org.jacoco:jacoco-maven-plugin:prepare-agent package --no-transfer-progress
+
+    - name: Analyze with SonarCloud
+      run: ./mvnw verify sonar:sonar -Dsonar.projectKey=arassec_igor -Dsonar.organization=arassec -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN --no-transfer-progress
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
