@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.trigger.EventTrigger;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
@@ -28,6 +30,7 @@ class EventTriggeredJobStarterTest {
      * Tests processing the job.
      */
     @Test
+    @SneakyThrows
     @DisplayName("Tests processing the job.")
     void testProcess() {
         Action action = mock(Action.class);
@@ -66,6 +69,13 @@ class EventTriggeredJobStarterTest {
         List<ConcurrencyGroup> concurrencyGroups = eventTriggeredJobStarter.process();
 
         assertNotNull(concurrencyGroups);
+        assertEquals(1, concurrencyGroups.size());
+
+        // Wait for all threads to finish...
+        ConcurrencyGroup concurrencyGroup = concurrencyGroups.get(0);
+        concurrencyGroup.complete();
+        concurrencyGroup.shutdown();
+        concurrencyGroup.awaitTermination();
 
         verify(action, times(1)).initialize(jobExecution);
         verify(action, times(1)).process(any(), eq(jobExecution));
