@@ -17,11 +17,11 @@ jobs:
 
       - name: Configure GPG Key
         run: |
-          echo $MAVEN_GPG_PRIVATE_KEY | base64 --decode | gpg --import --no-tty --batch
-          echo $MAVEN_GPG_OWNERTRUST | base64 --decode | gpg --import-ownertrust
+          mkdir -p ~/.gnupg/
+          printf "$MAVEN_GPG_PRIVATE_KEY" | base64 --decode > ~/.gnupg/private.key
+          gpg --import --no-tty --batch ~/.gnupg/private.key
         env:
           MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
-          MAVEN_GPG_OWNERTRUST: ${{ secrets.MAVEN_GPG_OWNERTRUST }}
 
       - name: Set up Apache Maven Central
         uses: actions/setup-java@v1
