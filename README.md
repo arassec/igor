@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <a href="https://travis-ci.com/arassec/igor">
-    <img src="https://img.shields.io/travis/com/arassec/igor" alt="build-state"/>
+  <a href="https://github.com/arassec/igor/actions?query=workflow%3ABuild">
+    <img src="https://github.com/arassec/igor/workflows/Build/badge.svg?branch=master" alt="build-state"/>
   </a>
   <a href="https://sonarcloud.io/dashboard?id=arassec_igor">
     <img src="https://img.shields.io/sonar/quality_gate/arassec_igor?server=http%3A%2F%2Fsonarcloud.io" alt="quality-state"/>
