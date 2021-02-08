@@ -26,7 +26,8 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Build and Publish to Apache Maven Central
-        run: ./mvnw org.jacoco:jacoco-maven-plugin:prepare-agent clean deploy -Prelease -Drevision=$RELEASE_VERSION --no-transfer-progress
+        # run: ./mvnw org.jacoco:jacoco-maven-plugin:prepare-agent clean deploy -Prelease -Drevision=$RELEASE_VERSION --no-transfer-progress
+        run: ./mvnw org.jacoco:jacoco-maven-plugin:prepare-agent clean install -Drevision=$RELEASE_VERSION --no-transfer-progress
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -38,8 +39,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: application/target/igor-$RELEASE_VERSION.jar
-          release_name: 'Version $RELEASE_VERSION'
+          file: application/target/igor-${{ env.RELEASE_VERSION }}.jar
+          release_name: 'Version ${{ env.RELEASE_VERSION }}'
           tag: ${{ github.ref }}
           overwrite: true
 
