@@ -26,6 +26,7 @@ public class TypeData extends KeyLabelStore {
      * @param key                    The type's ID.
      * @param value                  The type's label.
      * @param documentationAvailable Set to {@code true} if documentation is available, {@code false} otherwise.
+     * @param supportsEvents         Set to {@code true} if this component type supports event-based job execution.
      */
     public TypeData(String key, String value, boolean documentationAvailable, boolean supportsEvents) {
         super(key, value);

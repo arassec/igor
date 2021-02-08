@@ -153,6 +153,8 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
 
     /**
      * Creates a new component instance.
+     *
+     * @param applicationEventPublisher Spring's event publisher.
      */
     public RabbitMqMessageConnector(ApplicationEventPublisher applicationEventPublisher) {
         super("rabbitmq-message-connector");
