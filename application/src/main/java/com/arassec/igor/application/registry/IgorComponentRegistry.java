@@ -1,6 +1,6 @@
-package com.arassec.igor.core.application;
+package com.arassec.igor.application.registry;
 
-import com.arassec.igor.core.IgorCoreProperties;
+import com.arassec.igor.core.IgorApplicationProperties;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.action.MissingComponentAction;
@@ -59,7 +59,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     /**
      * Igor's core configuration properties.
      */
-    private final IgorCoreProperties igorCoreProperties;
+    private final IgorApplicationProperties igorCoreProperties;
 
     /**
      * Contains the categories of a certain component type (e.g. Action.class -> Action-Categories or Connector.class ->

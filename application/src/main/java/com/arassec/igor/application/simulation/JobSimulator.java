@@ -1,4 +1,4 @@
-package com.arassec.igor.core.application.simulation;
+package com.arassec.igor.application.simulation;
 
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.util.event.JobTriggerEvent;

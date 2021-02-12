@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "igor.core")
-public class IgorCoreProperties {
+public class IgorApplicationProperties {
 
     /**
      * Maximum number of parallel jobs.

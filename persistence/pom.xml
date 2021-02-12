@@ -19,7 +19,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>application</artifactId>
             <version>${project.version}</version>
         </dependency>
 

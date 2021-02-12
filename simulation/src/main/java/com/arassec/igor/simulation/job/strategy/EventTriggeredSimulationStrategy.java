@@ -1,6 +1,6 @@
 package com.arassec.igor.simulation.job.strategy;
 
-import com.arassec.igor.core.application.simulation.SimulationResult;
+import com.arassec.igor.application.simulation.SimulationResult;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.simulation.job.proxy.ProxyProvider;

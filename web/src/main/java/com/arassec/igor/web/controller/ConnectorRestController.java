@@ -1,7 +1,7 @@
 package com.arassec.igor.web.controller;
 
-import com.arassec.igor.core.application.ConnectorManager;
-import com.arassec.igor.core.application.JobManager;
+import com.arassec.igor.application.manager.ConnectorManager;
+import com.arassec.igor.application.manager.JobManager;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.connector.MissingComponentConnector;
 import com.arassec.igor.core.model.job.Job;

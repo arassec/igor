@@ -1,6 +1,6 @@
 package com.arassec.igor.web.controller;
 
-import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.application.registry.IgorComponentRegistry;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.web.model.KeyLabelStore;
 import com.arassec.igor.web.model.TypeData;

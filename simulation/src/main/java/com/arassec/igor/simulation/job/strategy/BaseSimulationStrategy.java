@@ -1,6 +1,6 @@
 package com.arassec.igor.simulation.job.strategy;
 
-import com.arassec.igor.core.application.simulation.SimulationResult;
+import com.arassec.igor.application.simulation.SimulationResult;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.job.Job;

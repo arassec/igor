@@ -1,4 +1,4 @@
-package com.arassec.igor.core.application.simulation;
+package com.arassec.igor.application.simulation;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

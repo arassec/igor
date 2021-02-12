@@ -1,6 +1,7 @@
-package com.arassec.igor.core.application;
+package com.arassec.igor.application.manager;
 
-import com.arassec.igor.core.IgorCoreProperties;
+import com.arassec.igor.application.exec.JobExecutor;
+import com.arassec.igor.core.IgorApplicationProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
@@ -51,7 +52,7 @@ class JobManagerTest {
      * Mocked core configuration properties.
      */
     @Mock
-    private IgorCoreProperties igorCoreProperties;
+    private IgorApplicationProperties igorCoreProperties;
 
     /**
      * Repository for jobs.

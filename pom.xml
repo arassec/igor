@@ -75,6 +75,7 @@
 
     <modules>
         <module>core</module>
+        <module>application</module>
         <module>persistence</module>
         <module>frontend</module>
         <module>simulation</module>

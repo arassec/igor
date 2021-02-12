@@ -1,6 +1,6 @@
 package com.arassec.igor.web.controller;
 
-import com.arassec.igor.core.application.JobManager;
+import com.arassec.igor.application.manager.JobManager;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;

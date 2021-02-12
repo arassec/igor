@@ -13,7 +13,7 @@
     <packaging>jar</packaging>
 
     <name>core</name>
-    <description>Contains the basic data model and functionality of igor.</description>
+    <description>Contains the basic data model of igor.</description>
 
     <dependencies>
 

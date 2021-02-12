@@ -1,4 +1,4 @@
-package com.arassec.igor.core.application.simulation;
+package com.arassec.igor.application.simulation;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

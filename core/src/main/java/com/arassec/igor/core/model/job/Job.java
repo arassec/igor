@@ -122,13 +122,14 @@ public class Job {
     public void start(JobExecution jobExecution) {
         log.debug("Starting job: {} ({})", name, id);
 
-        currentJobExecution = Objects.requireNonNullElseGet(jobExecution, () -> JobExecution.builder().jobId(id).build());
+        currentJobExecution = Objects.requireNonNullElseGet(jobExecution, () -> JobExecution.builder().build());
         if (trigger instanceof EventTrigger) {
             currentJobExecution.setExecutionState(JobExecutionState.ACTIVE);
         } else {
             currentJobExecution.setExecutionState(JobExecutionState.RUNNING);
         }
         currentJobExecution.setStarted(Instant.now());
+        currentJobExecution.setJobId(id);
 
         running = true;
         try {

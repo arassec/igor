@@ -1,6 +1,6 @@
-package com.arassec.igor.core.application;
+package com.arassec.igor.application.registry;
 
-import com.arassec.igor.core.IgorCoreProperties;
+import com.arassec.igor.core.IgorApplicationProperties;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.action.MissingComponentAction;
@@ -70,7 +70,7 @@ class IgorComponentRegistryTest {
      * Igor's core configuration properties.
      */
     @Mock
-    private IgorCoreProperties igorCoreProperties;
+    private IgorApplicationProperties igorCoreProperties;
 
     /**
      * Initializes the test environment.

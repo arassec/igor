@@ -1,10 +1,10 @@
 package com.arassec.igor.web.controller;
 
-import com.arassec.igor.core.application.ConnectorManager;
-import com.arassec.igor.core.application.IgorComponentRegistry;
-import com.arassec.igor.core.application.JobManager;
-import com.arassec.igor.core.application.simulation.JobSimulator;
-import com.arassec.igor.core.application.simulation.SimulationResult;
+import com.arassec.igor.application.manager.ConnectorManager;
+import com.arassec.igor.application.manager.JobManager;
+import com.arassec.igor.application.registry.IgorComponentRegistry;
+import com.arassec.igor.application.simulation.JobSimulator;
+import com.arassec.igor.application.simulation.SimulationResult;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;

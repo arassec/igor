@@ -1,7 +1,7 @@
 package com.arassec.igor.persistence;
 
 
-import com.arassec.igor.core.application.IgorComponentRegistry;
+import com.arassec.igor.application.registry.IgorComponentRegistry;
 import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.persistence.security.SecurityProvider;
 import com.fasterxml.jackson.databind.DeserializationFeature;

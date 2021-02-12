@@ -1,4 +1,4 @@
-package com.arassec.igor.core.application;
+package com.arassec.igor.application.manager;
 
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.repository.ConnectorRepository;

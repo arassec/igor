@@ -1,6 +1,6 @@
-package com.arassec.igor.core.application;
+package com.arassec.igor.application.exec;
 
-import com.arassec.igor.core.IgorCoreProperties;
+import com.arassec.igor.core.IgorApplicationProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
@@ -38,7 +38,7 @@ public class JobExecutor {
     /**
      * Igor's core configuration properties.
      */
-    private final IgorCoreProperties igorCoreProperties;
+    private final IgorApplicationProperties igorCoreProperties;
 
     /**
      * Repository for jobs.
@@ -78,7 +78,7 @@ public class JobExecutor {
      * @param jobExecutionRepository    Repository for job executions.
      * @param applicationEventPublisher Publisher for application events.
      */
-    public JobExecutor(IgorCoreProperties igorCoreProperties, JobRepository jobRepository,
+    public JobExecutor(IgorApplicationProperties igorCoreProperties, JobRepository jobRepository,
                        JobExecutionRepository jobExecutionRepository, ApplicationEventPublisher applicationEventPublisher) {
         this.igorCoreProperties = igorCoreProperties;
         this.jobRepository = jobRepository;
@@ -171,7 +171,7 @@ public class JobExecutor {
      *
      * @return The {@link JobExecution} or {@code null}, if none could be found.
      */
-    JobExecution getJobExecution(String jobId) {
+    public JobExecution getJobExecution(String jobId) {
         if (currentlyProcessedJobs.containsKey(jobId)) {
             return currentlyProcessedJobs.get(jobId).getCurrentJobExecution();
         }

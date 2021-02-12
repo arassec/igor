@@ -6,9 +6,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
  * Igor's core configuration.
@@ -16,7 +14,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @Configuration
 @ComponentScan
 @EnableScheduling
-@EnableConfigurationProperties(IgorCoreProperties.class)
+@EnableConfigurationProperties(IgorApplicationProperties.class)
 public class CoreConfiguration {
 
     /**
@@ -27,19 +25,6 @@ public class CoreConfiguration {
     @Bean
     public MessageSource coreMessageSource() {
         return IgorConfigHelper.createMessageSource("i18n/core-messages");
-    }
-
-    /**
-     * Creates a new {@link TaskScheduler} for igor's jobs.
-     *
-     * @return A newly created {@link TaskScheduler}.
-     */
-    @Bean
-    public TaskScheduler jobScheduler() {
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setThreadNamePrefix("jobScheduler");
-        scheduler.setPoolSize(10);
-        return scheduler;
     }
 
 }

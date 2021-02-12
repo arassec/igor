@@ -29,17 +29,17 @@ spring.datasource.driver-class-name=org.postgresql.Driver
 ## Job Queue Size
 By default, igor runs up to 5 jobs in parallel. 
 Depending on the hardware igor runs on, more jobs can be configured. 
-This can be done with the parameter `igor.core.job-queue-size` 
+This can be done with the parameter `igor.application.job-queue-size` 
 
 ### Example configuration with application parameter:
 ``` shell script
 $> java -jar igor.jar \
-      --igor.core.job-queue-size=25
+      --igor.application.job-queue-size=25
 ```
 
 ### Example configuration with application.properties:
 ``` properties
-igor.core.job-queue-size=25
+igor.application.job-queue-size=25
 ```
 
 ## Encrypting Configuration values
