@@ -84,7 +84,7 @@
         <module>documentation</module>
         <module>web</module>
         <module>igor-spring-boot-starter</module>
-        <module>application</module>
+        <module>igor-standalone</module>
         <module>e2e</module>
     </modules>
 

@@ -1,4 +1,4 @@
-package com.arassec.igor.application;
+package com.arassec.igor.standalone;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
  * Starts the igor application.
  */
 @SpringBootApplication
-public class IgorApplication {
+public class IgorStandaloneApplication {
 
     /**
      * Starts the igor application.
@@ -21,7 +21,7 @@ public class IgorApplication {
      */
     @SuppressWarnings("squid:S4823") // Spring will take care of command line parameters...
     public static void main(String[] args) {
-        SpringApplication.run(IgorApplication.class, args);
+        SpringApplication.run(IgorStandaloneApplication.class, args);
     }
 
     /**
@@ -36,7 +36,7 @@ public class IgorApplication {
     public OpenAPI customOpenAPI(@Value("${application-description}") String appDescription, @Value("${application-version}") String appVersion) {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Igor application API")
+                        .title("Igor Application API")
                         .version(appVersion)
                         .description(appDescription)
                         .license(new License().name("MIT").url("https://github.com/arassec/igor/blob/master/LICENSE")));

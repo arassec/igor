@@ -20,9 +20,9 @@ You can simply download it and run it from the console.
 
 <div class="language-text"><pre>
 <code># download the executable jar from GitHub
-$> wget https://github.com/arassec/igor/releases/download/{{ $themeConfig.igorVersion }}/igor-{{ $themeConfig.igorVersion }}.jar
+$> wget https://github.com/arassec/igor/releases/download/{{ $themeConfig.igorVersion }}/igor-standalone-{{ $themeConfig.igorVersion }}.jar
 # Start the jar with java
-$> java -jar igor-{{ $themeConfig.igorVersion }}.jar 
+$> java -jar igor-standalone-{{ $themeConfig.igorVersion }}.jar 
 </code></pre></div>
 
 ## From Source
@@ -36,5 +36,5 @@ $> git clone https://github.com/arassec/igor.git
 $> cd igor && ./mvnw clean install
 
 # run the application
-$> java -jar application/target/igor-0.0.0-SNAPSHOT.jar
+$> java -jar igor-standalone/target/igor-0.0.0-SNAPSHOT.jar
 ```

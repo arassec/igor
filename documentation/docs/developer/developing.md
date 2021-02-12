@@ -21,7 +21,7 @@ $> ./mvnw clean install -Pe2e
 
 You can start igor now with the following main class from within your IDE:
 ```
-com.arassec.igor.application.IgorApplication
+com.arassec.igor.standalone.IgorStandaloneApplication
 ```
 The backend's REST API will now be available under: `http://localhost:8080/api`
 

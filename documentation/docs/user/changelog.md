@@ -1,6 +1,9 @@
 # Changelog
 
 ## Version {{ $themeConfig.igorVersion }}
+- Refactored application module into igor-standalone module.
+
+## Version 0.3.0
 - Refactored common-plugin into core-plugin.
 - Added new 'Message' trigger.
 - Event-triggered jobs now use real events during simulated job executions.

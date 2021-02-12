@@ -1,4 +1,4 @@
-package com.arassec.igor.application;
+package com.arassec.igor.standalone;
 
 import com.arassec.igor.core.application.IgorComponentRegistry;
 import org.junit.jupiter.api.Test;
@@ -11,11 +11,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Tests the {@link IgorApplication}.
+ * Tests the {@link IgorStandaloneApplication}.
  */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:file:./target/dbdata/igor;AUTO_SERVER=true"})
-class IgorApplicationTest {
+class IgorStandaloneApplicationTest {
 
     /**
      * The spring application context.
