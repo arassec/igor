@@ -32,16 +32,6 @@
             <artifactId>validation-api</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.samskivert</groupId>
-            <artifactId>jmustache</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy</artifactId>
-        </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>ch.qos.logback</groupId>

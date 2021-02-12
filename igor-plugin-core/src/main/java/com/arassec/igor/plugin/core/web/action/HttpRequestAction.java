@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.plugin.core.CoreUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minidev.json.JSONArray;
@@ -103,15 +104,15 @@ public class HttpRequestAction extends BaseWebAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String requestMethod = getString(data, method);
-        String requestUrl = getString(data, url);
-        String content = getString(data, body);
+        String requestMethod = CoreUtils.getString(data, method);
+        String requestUrl = CoreUtils.getString(data, url);
+        String content = CoreUtils.getString(data, body);
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
-                .uri(URI.create(requestUrl))
-                .method(requestMethod, HttpRequest.BodyPublishers.ofString(content));
-        parsedHeaders.forEach(header -> httpRequestBuilder.header(getString(data, header.split(":")[0]),
-                getString(data, header.split(":")[1])));
+            .uri(URI.create(requestUrl))
+            .method(requestMethod, HttpRequest.BodyPublishers.ofString(content));
+        parsedHeaders.forEach(header -> httpRequestBuilder.header(CoreUtils.getString(data, header.split(":")[0]),
+            CoreUtils.getString(data, header.split(":")[1])));
         addBasicAuthHeaderIfConfigured(httpRequestBuilder);
 
         if (isSimulation(data) && simulationSafe && SIMULATION_UNSAFE_METHODS.contains(requestMethod)) {
@@ -119,11 +120,11 @@ public class HttpRequestAction extends BaseWebAction {
         } else {
             try {
                 HttpResponse<String> httpResponse = httpConnector.getHttpClient().send(httpRequestBuilder.build(),
-                        HttpResponse.BodyHandlers.ofString());
+                    HttpResponse.BodyHandlers.ofString());
 
                 if (!ignoreErrors && (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 226)) {
                     throw new IgorException("Received HTTP " + httpResponse.statusCode() + " on " + requestMethod + " request for" +
-                            " url '" + requestUrl + "': " + " with body: " + content);
+                        " url '" + requestUrl + "': " + " with body: " + content);
                 }
 
                 String responseBody = httpResponse.body();
@@ -138,7 +139,7 @@ public class HttpRequestAction extends BaseWebAction {
                     responseData.put("body", responseBody);
                 }
 
-                data.put(getString(data, targetKey), responseData);
+                data.put(CoreUtils.getString(data, targetKey), responseData);
             } catch (IOException e) {
                 throw new IgorException("Could not request URL: " + url, e);
             } catch (InterruptedException e) {

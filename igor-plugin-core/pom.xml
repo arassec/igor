@@ -19,8 +19,13 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>application</artifactId>
+            <artifactId>core</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.samskivert</groupId>
+            <artifactId>jmustache</artifactId>
         </dependency>
 
         <!-- Testing -->

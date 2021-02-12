@@ -3,6 +3,7 @@ package com.arassec.igor.plugin.core.util.action;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CoreUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -90,9 +91,9 @@ public class FilterByTimestampAction extends BaseUtilAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String resolvedInput = getString(data, input);
-        String resolvedTimeUnit = getString(data, timeUnit);
-        String resolvedTimestampFormat = getString(data, timestampFormat);
+        String resolvedInput = CoreUtils.getString(data, input);
+        String resolvedTimeUnit = CoreUtils.getString(data, timeUnit);
+        String resolvedTimestampFormat = CoreUtils.getString(data, timestampFormat);
 
         if (resolvedInput == null || resolvedTimeUnit == null || resolvedTimestampFormat == null) {
             log.debug("Missing required data for filtering: {} / {} / {}", resolvedInput, resolvedTimeUnit, resolvedTimestampFormat);

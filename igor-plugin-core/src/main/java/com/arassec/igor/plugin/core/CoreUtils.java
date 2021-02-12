@@ -1,9 +1,13 @@
 package com.arassec.igor.plugin.core;
 
+import com.samskivert.mustache.Mustache;
+import com.samskivert.mustache.MustacheException;
 import org.springframework.util.StringUtils;
 
+import java.util.Map;
+
 /**
- * Utility to help with problems in the common plugin.
+ * Utility to help with problems in the core plugin and descendant plugins.
  */
 public class CoreUtils {
 
@@ -54,6 +58,27 @@ public class CoreUtils {
             directory += "/";
         }
         return directory + file;
+    }
+
+    /**
+     * Returns the result of the template executed against the provided data. If the template is invalid with regard to the input
+     * data, it is returned without modifications.
+     *
+     * @param data     The data to execute the query on.
+     * @param template The mustache template.
+     *
+     * @return The template executed against the data or the original template if either of the input parameters is {@code null}
+     * or the template is invalid.
+     */
+    public static String getString(Map<String, Object> data, String template) {
+        if (data == null || template == null) {
+            return null;
+        }
+        try {
+            return Mustache.compiler().compile(template).execute(data);
+        } catch (MustacheException e) {
+            return template;
+        }
     }
 
 }

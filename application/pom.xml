@@ -28,6 +28,11 @@
             <artifactId>spring-boot</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>ch.qos.logback</groupId>

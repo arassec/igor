@@ -3,6 +3,7 @@ package com.arassec.igor.plugin.core.file.action;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CoreUtils;
 import lombok.Data;
 
 import java.util.Map;
@@ -60,9 +61,9 @@ public abstract class BaseFileAction extends BaseAction {
     ResolvedData resolveData(Map<String, Object> data, String sourceFilename, String sourceDirectory, String targetFilename, String targetDirectory) {
         ResolvedData result = new ResolvedData();
 
-        result.setSourceFilename(getString(data, sourceFilename));
+        result.setSourceFilename(CoreUtils.getString(data, sourceFilename));
         result.setSourceDirectory(resolveDirectory(data, sourceDirectory));
-        result.setTargetFilename(getString(data, targetFilename));
+        result.setTargetFilename(CoreUtils.getString(data, targetFilename));
         result.setTargetDirectory(resolveDirectory(data, targetDirectory));
 
         if (result.getSourceFilename() == null || result.getTargetFilename() == null) {
@@ -86,7 +87,7 @@ public abstract class BaseFileAction extends BaseAction {
      * @return The resolved file path.
      */
     String resolveFilePath(Map<String, Object> data, String filename, String directory) {
-        String resolvedFilename = getString(data, filename);
+        String resolvedFilename = CoreUtils.getString(data, filename);
         String resolvedDirectory = resolveDirectory(data, directory);
 
         if (resolvedFilename == null) {
@@ -136,7 +137,7 @@ public abstract class BaseFileAction extends BaseAction {
      * @return A directory (or path) as String.
      */
     private String resolveDirectory(Map<String, Object> data, String query) {
-        String resolvedDirectory = getString(data, query);
+        String resolvedDirectory = CoreUtils.getString(data, query);
 
         if (resolvedDirectory == null) {
             resolvedDirectory = "/";

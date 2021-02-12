@@ -89,20 +89,6 @@ class BaseActionTest {
     }
 
     /**
-     * Tests retrieving Strings from the supplied action data.
-     */
-    @Test
-    @DisplayName("Tests retrieving Strings from the data.")
-    void testGetString() {
-        assertNull(baseAction.getString(null, "{{test}}"));
-        assertNull(baseAction.getString(testData, null));
-        assertEquals("original-input", baseAction.getString(testData, "original-input"));
-        assertEquals("job-id", baseAction.getString(testData, "{{" + DataKey.META.getKey() + "."
-                + DataKey.JOB_ID.getKey() + "}}"));
-        assertEquals("1234567890", baseAction.getString(testData, "{{" + DataKey.TIMESTAMP.getKey() + "}}"));
-    }
-
-    /**
      * Tests setting and getting the action's name.
      */
     @Test

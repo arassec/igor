@@ -120,14 +120,14 @@ public class HttpFileDownloadAction extends BaseWebAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String requestUrl = getString(data, url);
-        String destination = getString(data, targetDirectory);
-        String filename = getString(data, targetFilename);
-        String resolvedTargetKey = getString(data, targetKey);
+        String requestUrl = CoreUtils.getString(data, url);
+        String destination = CoreUtils.getString(data, targetDirectory);
+        String filename = CoreUtils.getString(data, targetFilename);
+        String resolvedTargetKey = CoreUtils.getString(data, targetKey);
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder().GET().uri(URI.create(requestUrl));
-        parsedHeaders.forEach(header -> httpRequestBuilder.header(getString(data, header.split(":")[0]),
-                getString(data, header.split(":")[1])));
+        parsedHeaders.forEach(header -> httpRequestBuilder.header(CoreUtils.getString(data, header.split(":")[0]),
+            CoreUtils.getString(data, header.split(":")[1])));
         addBasicAuthHeaderIfConfigured(httpRequestBuilder);
 
         try {
@@ -135,11 +135,11 @@ public class HttpFileDownloadAction extends BaseWebAction {
             jobExecution.addWorkInProgress(workInProgressMonitor);
 
             HttpResponse<InputStream> httpResponse = httpConnector.getHttpClient().send(httpRequestBuilder.build(),
-                    HttpResponse.BodyHandlers.ofInputStream());
+                HttpResponse.BodyHandlers.ofInputStream());
 
             if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 226) {
                 throw new IgorException("Received HTTP error code on download file request for url '" + requestUrl + "': "
-                        + httpResponse.statusCode());
+                    + httpResponse.statusCode());
             }
 
             FileStreamData fileStreamData = new FileStreamData();
@@ -147,7 +147,7 @@ public class HttpFileDownloadAction extends BaseWebAction {
             setFilesizeAndData(httpResponse, fileStreamData, httpRequestBuilder, requestUrl);
 
             String targetFileWithSuffix = CoreUtils.appendSuffixIfRequired(filename,
-                    fileStreamData.getFilenameSuffix(), appendFiletypeSuffix);
+                fileStreamData.getFilenameSuffix(), appendFiletypeSuffix);
 
             String targetFileWithPath = CoreUtils.combineFilePath(destination, targetFileWithSuffix);
 
@@ -224,11 +224,11 @@ public class HttpFileDownloadAction extends BaseWebAction {
                 httpResponse.body().close();
 
                 HttpResponse<String> httpStringResponse = httpConnector.getHttpClient().send(httpRequestBuilder.build(),
-                        HttpResponse.BodyHandlers.ofString());
+                    HttpResponse.BodyHandlers.ofString());
 
                 if (httpStringResponse.statusCode() < 200 || httpStringResponse.statusCode() > 226) {
                     throw new IgorException("Received HTTP error code on download file (string) request for url '"
-                            + requestUrl + "': " + httpResponse.statusCode());
+                        + requestUrl + "': " + httpResponse.statusCode());
                 }
 
                 String fileContent = httpStringResponse.body();

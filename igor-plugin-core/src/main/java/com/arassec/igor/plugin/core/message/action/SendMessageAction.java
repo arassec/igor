@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
+import com.arassec.igor.plugin.core.CoreUtils;
 import com.arassec.igor.plugin.core.message.connector.FallbackMessageConnector;
 import com.arassec.igor.plugin.core.message.connector.Message;
 import com.arassec.igor.plugin.core.message.connector.MessageConnector;
@@ -81,7 +82,7 @@ public class SendMessageAction extends BaseMessageAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String content = getString(data, messageTemplate);
+        String content = CoreUtils.getString(data, messageTemplate);
 
         Message message = new Message();
         message.setContentType(contentType);

@@ -3,6 +3,7 @@ package com.arassec.igor.plugin.core.util.action;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CoreUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -60,8 +61,8 @@ public class FilterByRegExpAction extends BaseUtilAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String resolvedInput = getString(data, input);
-        String resolvedExpression = getString(data, expression);
+        String resolvedInput = CoreUtils.getString(data, input);
+        String resolvedExpression = CoreUtils.getString(data, expression);
 
         if (resolvedInput == null || resolvedExpression == null) {
             log.debug("Missing required data for filtering: {} / {}", resolvedInput, resolvedExpression);

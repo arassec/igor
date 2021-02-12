@@ -3,6 +3,7 @@ package com.arassec.igor.plugin.core.util.action;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CoreUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -152,17 +153,17 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     private ZonedDateTime extractDateTime(Map<String, Object> data, Pattern p, DateTimeFormatter formatter,
                                           boolean applyDefaultTimezone) {
 
-        String resolvedInput = getString(data, input);
+        String resolvedInput = CoreUtils.getString(data, input);
         if (resolvedInput == null) {
             log.debug("Missing data to extract date-time: {}", input);
             return null;
         }
 
-        String rawValue = getString(data, resolvedInput);
+        String rawValue = CoreUtils.getString(data, resolvedInput);
 
         Pattern pn = p;
         if (pn == null) {
-            String resolvedPattern = getString(data, pattern);
+            String resolvedPattern = CoreUtils.getString(data, pattern);
             if (resolvedPattern == null) {
                 log.debug("Missing pattern to extract date-time: {}", pattern);
                 return null;
@@ -172,7 +173,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
 
         DateTimeFormatter df = formatter;
         if (df == null) {
-            String resolvedTimestampFormat = getString(data, timestampFormat);
+            String resolvedTimestampFormat = CoreUtils.getString(data, timestampFormat);
             if (resolvedTimestampFormat == null) {
                 log.debug("Missing timestamp format to extract date-time: {}", timestampFormat);
                 return null;

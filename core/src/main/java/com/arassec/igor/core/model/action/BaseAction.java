@@ -5,8 +5,6 @@ import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
 import com.jayway.jsonpath.JsonPath;
-import com.samskivert.mustache.Mustache;
-import com.samskivert.mustache.MustacheException;
 
 import javax.validation.constraints.Positive;
 import java.util.Map;
@@ -15,16 +13,6 @@ import java.util.Map;
  * Base action that implements common functionality of an action. Specific actions should be derived from this class.
  */
 public abstract class BaseAction extends BaseIgorComponent implements Action {
-
-    /**
-     * Template for the Job-ID.
-     */
-    private static final String JOB_ID_TEMPLATE = "{{" + DataKey.META.getKey() + "." + DataKey.JOB_ID.getKey() + "}}";
-
-    /**
-     * Template for the simulation property that indicates a simulated job run.
-     */
-    private static final String SIMULATION_TEMPLATE = "{{" + DataKey.META.getKey() + "." + DataKey.SIMULATION.getKey() + "}}";
 
     /**
      * Activates or deactivates an action.
@@ -150,10 +138,14 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      *
      * @return The job's ID.
      */
+    @SuppressWarnings("unchecked")
     protected String getJobId(Map<String, Object> data) {
-        if (data != null && !data.isEmpty()) {
-            String jobId = getString(data, JOB_ID_TEMPLATE);
-            if (jobId != null && !JOB_ID_TEMPLATE.equals(jobId)) {
+        if (data != null
+            && !data.isEmpty()
+            && data.containsKey(DataKey.META.getKey())
+            && ((Map<String, Object>) data.get(DataKey.META.getKey())).containsKey(DataKey.JOB_ID.getKey())) {
+            String jobId = String.valueOf(((Map<String, Object>) data.get(DataKey.META.getKey())).get(DataKey.JOB_ID.getKey()));
+            if (jobId != null) {
                 return jobId;
             }
         }
@@ -167,39 +159,22 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      *
      * @return {@code true} if the data is processed during a simulated job run, {@code false} otherwise.
      */
+    @SuppressWarnings("unchecked")
     protected boolean isSimulation(Map<String, Object> data) {
-        if (data == null || data.isEmpty()) {
+        if (data == null
+            || data.isEmpty()
+            || !data.containsKey(DataKey.META.getKey())
+            || !((Map<String, Object>) data.get(DataKey.META.getKey())).containsKey(DataKey.SIMULATION.getKey())) {
             return false;
         }
 
-        String result = getString(data, SIMULATION_TEMPLATE);
+        String result = String.valueOf(((Map<String, Object>) data.get(DataKey.META.getKey())).get(DataKey.SIMULATION.getKey()));
 
-        if (result == null || SIMULATION_TEMPLATE.equals(result)) {
+        if (result == null) {
             return false;
         }
 
         return Boolean.parseBoolean(result);
-    }
-
-    /**
-     * Returns the result of the template executed against the provided data. If the template is invalid with regard to the input
-     * data, it is returned without modifications.
-     *
-     * @param data     The data to execute the query on.
-     * @param template The mustache template.
-     *
-     * @return The template executed against the data or the original template if either of the input parameters is {@code null}
-     * or the template is invalid.
-     */
-    protected String getString(Map<String, Object> data, String template) {
-        if (data == null || template == null) {
-            return null;
-        }
-        try {
-            return Mustache.compiler().compile(template).execute(data);
-        } catch (MustacheException e) {
-            return template;
-        }
     }
 
     /**
