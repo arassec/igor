@@ -10,17 +10,10 @@ import java.util.Map;
 public interface Trigger extends IgorComponent {
 
     /**
-     * Returns meta-data from the trigger that is added to each data item.
+     * Creates the initial data item that is used as input for following actions.
      *
-     * @return The trigger's meta-data.
+     * @return The initial data item.
      */
-    Map<String, Object> getMetaData();
-
-    /**
-     * Returns data from the trigger that is added to each data item.
-     *
-     * @return Trigger-data.
-     */
-    Map<String, Object> getData();
+    Map<String, Object> createDataItem();
 
 }

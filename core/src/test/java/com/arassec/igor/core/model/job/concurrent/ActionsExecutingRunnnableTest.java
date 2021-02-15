@@ -1,10 +1,8 @@
 package com.arassec.igor.core.model.job.concurrent;
 
-import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
-import com.arassec.igor.core.model.job.starter.DefaultJobStarter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +44,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests actually running the runnable.")
     void testRun() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), DefaultJobStarter.createMetaData("job-id", null));
+        inputData.put("test", "input");
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         inputQueue.offer(inputData);
@@ -63,7 +61,7 @@ class ActionsExecutingRunnnableTest {
         actions.add(secondActionMock);
 
         ActionsExecutingRunnable actionsExecutingRunnable = new ActionsExecutingRunnable(actions,
-                inputQueue, outputQueue, null);
+            inputQueue, outputQueue, null);
 
         when(firstActionMock.process(eq(inputData), nullable(JobExecution.class))).thenAnswer(invocationOnMock -> {
             // Simulates the job saying: 'finish your work, but no new items will be published'
@@ -89,7 +87,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests completing the runnable.")
     void testComplete() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), DefaultJobStarter.createMetaData("job-id", null));
+        inputData.put("test", "input");
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingQueue<>();
@@ -104,7 +102,7 @@ class ActionsExecutingRunnnableTest {
         actions.add(secondActionMock);
 
         ActionsExecutingRunnable actionsExecutingRunnable = new ActionsExecutingRunnable(actions,
-                inputQueue, outputQueue, null);
+            inputQueue, outputQueue, null);
 
         when(firstActionMock.complete()).thenReturn(List.of(inputData));
 
@@ -122,7 +120,7 @@ class ActionsExecutingRunnnableTest {
     @DisplayName("Tests running the runnable with an action with processing-finished-callback.")
     void testRunWithProcessFinishedCallback() {
         Map<String, Object> inputData = new HashMap<>();
-        inputData.put(DataKey.META.getKey(), DefaultJobStarter.createMetaData("job-id", null));
+        inputData.put("test", "input");
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
         inputQueue.offer(inputData);
@@ -138,7 +136,7 @@ class ActionsExecutingRunnnableTest {
         when(firstActionMock.getProcessingFinishedCallback()).thenReturn(processingFinishedCallbackMock);
 
         ActionsExecutingRunnable actionsExecutingRunnable = new ActionsExecutingRunnable(actions,
-                inputQueue, outputQueue, null);
+            inputQueue, outputQueue, null);
 
         when(firstActionMock.process(eq(inputData), nullable(JobExecution.class))).thenAnswer(invocationOnMock -> {
             // Simulates the job saying: 'finish your work, but no new items will be published'

@@ -11,13 +11,14 @@ import com.arassec.igor.module.message.connector.rabbitmq.validation.ExchangeAnd
 import com.arassec.igor.module.message.connector.rabbitmq.validation.ExistingQueue;
 import com.arassec.igor.plugin.core.message.connector.BaseMessageConnector;
 import com.arassec.igor.plugin.core.message.connector.Message;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONValue;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -51,6 +52,11 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
      * Publisher for events based on job changes.
      */
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    /**
+     * Jackson's ObjectMapper for JSON handling.
+     */
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * The RabbitMQ host.
@@ -266,13 +272,20 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
         String messageContent = new String(message.getBody());
         log.debug("Received message from RabbitMQ:\n{}", messageContent);
 
-        Object parsed = JSONValue.parse(messageContent);
         Map<String, Object> metaData = new HashMap<>();
         metaData.put("deliveryTag", message.getMessageProperties().getDeliveryTag());
         message.getMessageProperties().getHeaders().forEach(metaData::put);
 
         Map<String, Object> dataItem = new HashMap<>();
-        dataItem.put("message", parsed);
+        try {
+            JsonNode jsonNode = objectMapper.readTree(messageContent);
+            dataItem.put("message", objectMapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>() {
+            }));
+        } catch (JsonProcessingException e) {
+            dataItem.put("message", messageContent);
+        }
+
+
         dataItem.put("messageMeta", metaData);
 
         channels.put(message.getMessageProperties().getDeliveryTag(), channel);
@@ -288,12 +301,14 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
     @Override
     public void processingFinished(Map<String, Object> dataItem) {
         try {
-            Long deliveryTag = JsonPath.parse(dataItem).read("$.data.messageMeta.deliveryTag", Long.class);
-            if (deliveryTag != null && channels.containsKey(deliveryTag)) {
+            JsonNode jsonNode = objectMapper.convertValue(dataItem, JsonNode.class);
+            JsonNode deliveryTagNode = jsonNode.at("/data/messageMeta/deliveryTag");
+            Long deliveryTag = deliveryTagNode.asLong();
+            if (channels.containsKey(deliveryTag)) {
                 channels.get(deliveryTag).basicAck(deliveryTag, false);
                 channels.remove(deliveryTag);
             }
-        } catch (PathNotFoundException | IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             throw new IgorException("Could not ACK message from RabbitMQ: " + dataItem);
         }
     }

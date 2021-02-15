@@ -1,6 +1,5 @@
 package com.arassec.igor.core.model.job.starter;
 
-import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.execution.JobExecution;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -113,20 +111,6 @@ class DefaultJobStarterTest {
         assertNotNull(concurrencyGroups);
         verify(trigger, times(1)).initialize(jobExecution);
         verify(action, times(1)).initialize(jobExecution);
-    }
-
-    /**
-     * Tests creating the meta-data for a job's data item.
-     */
-    @Test
-    @DisplayName("Tests creating job meta-data.")
-    void testCreateMetaData() {
-        Trigger triggerMock = mock(Trigger.class);
-        when(triggerMock.getMetaData()).thenReturn(Map.of(DataKey.SIMULATION.getKey(), true));
-        Map<String, Object> metaData = DefaultJobStarter.createMetaData("job-id", null);
-        assertEquals("job-id", metaData.get(DataKey.JOB_ID.getKey()));
-        assertNotNull(metaData.get(DataKey.TIMESTAMP.getKey()));
-        assertNull(metaData.get(DataKey.SIMULATION.getKey()));
     }
 
 }

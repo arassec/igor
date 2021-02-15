@@ -227,7 +227,7 @@ class RabbitMqMessageConnectorTest {
 
         // empty data item:
         final Map<String, Object> emptyDataItem = Map.of();
-        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.processingFinished(emptyDataItem));
+        assertDoesNotThrow(() -> rabbitMqMessageConnector.processingFinished(emptyDataItem));
 
         // channel doesn't exist:
         Map<String, Object> dataItem = Map.of("data", Map.of("messageMeta", Map.of("deliveryTag", 123L)));

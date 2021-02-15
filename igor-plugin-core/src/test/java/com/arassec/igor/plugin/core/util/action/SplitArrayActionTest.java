@@ -42,6 +42,27 @@ class SplitArrayActionTest {
     }
 
     /**
+     * Tests splitting a complex JSON-Array into multiple data items.
+     */
+    @Test
+    @DisplayName("Tests splitting a complex JSON-Array into multiple data items.")
+    @SuppressWarnings("unchecked")
+    void testProcessComplex() {
+        List<Map<String, Object>> elements = List.of(Map.of("a", "b"), Map.of("c", "d"));
+        Map<String, Object> data = Map.of("data", elements);
+
+        SplitArrayAction splitArrayAction = new SplitArrayAction();
+        splitArrayAction.setArraySelector("{{data}}");
+
+        List<Map<String, Object>> result = splitArrayAction.process(data, new JobExecution());
+
+        assertEquals(2, result.size());
+
+        assertEquals("b", ((Map<String, Object>) result.get(0).get("data")).get("a"));
+        assertEquals("d", ((Map<String, Object>) result.get(1).get("data")).get("c"));
+    }
+
+    /**
      * Tests splitting invalid input.
      */
     @Test

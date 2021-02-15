@@ -2,19 +2,17 @@ package com.arassec.igor.plugin.core;
 
 
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.job.starter.DefaultJobStarter;
+import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.Trigger;
+import com.arassec.igor.plugin.core.util.trigger.ManualTrigger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests the {@link CoreUtils}.
@@ -25,21 +23,19 @@ class CoreUtilsTest {
     /**
      * The data for testing.
      */
-    private static final Map<String, Object> testData = new HashMap<>();
+    private static Map<String, Object> testData;
 
     /**
      * Initializes the test environment.
      */
+    @SuppressWarnings("unchecked")
     @BeforeAll
     static void initialize() {
-        Trigger triggerMock = mock(Trigger.class);
-        when(triggerMock.getMetaData()).thenReturn(Map.of(DataKey.SIMULATION.getKey(), true));
+        Trigger trigger = new ManualTrigger();
+        trigger.initialize(JobExecution.builder().jobId("job-id").build());
 
-        Map<String, Object> meta = DefaultJobStarter.createMetaData("job-id", triggerMock);
-        Map<String, Object> data = new HashMap<>();
-
-        testData.put(DataKey.META.getKey(), meta);
-        testData.put(DataKey.DATA.getKey(), data);
+        testData = trigger.createDataItem();
+        ((Map<String, Object>) testData.get(DataKey.META.getKey())).put(DataKey.SIMULATION.getKey(), true);
         testData.put(DataKey.TIMESTAMP.getKey(), 1122334455);
     }
 

@@ -1,5 +1,8 @@
 package com.arassec.igor.plugin.core;
 
+import com.arassec.igor.core.util.IgorException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.MustacheException;
 import org.springframework.util.StringUtils;
@@ -78,6 +81,23 @@ public class CoreUtils {
             return Mustache.compiler().compile(template).execute(data);
         } catch (MustacheException e) {
             return template;
+        }
+    }
+
+    /**
+     * Creates a deep copy of the supplied map.
+     *
+     * @param data The map to clone.
+     *
+     * @return A new Map instance with copied content.
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> clone(Map<String, Object> data) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(mapper.writeValueAsString(data), Map.class);
+        } catch (JsonProcessingException e) {
+            throw new IgorException("Could not clone data item!", e);
         }
     }
 

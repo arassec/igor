@@ -4,7 +4,6 @@ import com.arassec.igor.core.model.BaseIgorComponent;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
-import com.jayway.jsonpath.JsonPath;
 
 import javax.validation.constraints.Positive;
 import java.util.Map;
@@ -175,17 +174,6 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
         }
 
         return Boolean.parseBoolean(result);
-    }
-
-    /**
-     * Creates a deep copy of the supplied map.
-     *
-     * @param data The map to clone.
-     *
-     * @return A new Map instance with copied content.
-     */
-    protected Map<String, Object> clone(Map<String, Object> data) {
-        return JsonPath.parse(JsonPath.parse(data).jsonString()).json();
     }
 
 }

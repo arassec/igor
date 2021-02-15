@@ -3,10 +3,7 @@ package com.arassec.igor.core.model.trigger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -29,35 +26,6 @@ class BaseTriggerTest {
     void testBaseTrigger() {
         assertEquals("category-id", baseTrigger.getCategoryId());
         assertEquals("type-id", baseTrigger.getTypeId());
-    }
-
-    /**
-     * Tests getting meta-data.
-     */
-    @Test
-    @DisplayName("Tests getting meta-data.")
-    void testGetMetaData() {
-        assertEquals(Map.of(), baseTrigger.getMetaData());
-    }
-
-    /**
-     * Tests getting data.
-     */
-    @Test
-    @DisplayName("Tests getting data.")
-    void testGetData() {
-        assertEquals(Map.of(), baseTrigger.getData());
-    }
-
-    /**
-     * Tests converting JSON.
-     */
-    @Test
-    @DisplayName("Tests converting JSON.")
-    void testConvertJsonString() {
-        Map<String, Object> json = baseTrigger.convertJsonString("{\"a\": 123}");
-        assertEquals(123, json.get("a"));
-        assertTrue(baseTrigger.convertJsonString("[]").isEmpty());
     }
 
 }

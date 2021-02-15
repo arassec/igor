@@ -1,94 +1,78 @@
 {
-  "id": "job-id",
-  "name": "job-name",
-  "description": "job-description",
-  "active": true,
-  "historyLimit": 666,
-  "simulationLimit": 25,
-  "trigger": {
-    "id": "trigger-id",
-    "category": {
-      "key": "trigger-category-id",
-      "value": "Trigger Category"
-    },
-    "type": {
-      "key": "trigger-type-id",
-      "value": "Trigger Type",
-      "documentationAvailable": false,
-      "supportsEvents": false
-    },
-    "parameters": [
-      {
-        "name": "testParam",
-        "required": true,
-        "type": "java.lang.Integer",
-        "value": null,
-        "connector": false
-      },
-      {
-        "name": "metaData",
-        "advanced": true,
-        "subtype": "MULTI_LINE",
-        "type": "java.lang.String",
-        "value": null,
-        "connector": false
-      },
-      {
-        "name": "data",
-        "advanced": true,
-        "subtype": "MULTI_LINE",
-        "type": "java.lang.String",
-        "value": null,
-        "connector": false
-      }
-    ]
-  },
-  "actions": [
-    {
-      "id": "action-id",
-      "name": "action-name",
-      "description": "action-description",
-      "active": true,
-      "category": {
-        "key": "action-category-id",
-        "value": "Action Category"
-      },
-      "type": {
-        "key": "action-type-id",
-        "value": "Action Type",
-        "documentationAvailable": false,
-        "supportsEvents": true
-      },
-      "parameters": [
-        {
-          "name": "testConnector",
-          "categoryCandidates": [
-            {
-              "key": "connector-category-id",
-              "value": "Connector Category",
-              "typeCandidates": [
-                {
-                  "key": "connector-type-id",
-                  "value": "Connector Type"
-                }
-              ]
-            }
-          ],
-          "value": "connector-id",
-          "connectorName": null,
-          "connector": true
+    "id": "job-id",
+    "name": "job-name",
+    "description": "job-description",
+    "active": true,
+    "historyLimit": 666,
+    "simulationLimit": 25,
+    "trigger": {
+        "id": "trigger-id",
+        "category": {
+            "key": "trigger-category-id",
+            "value": "Trigger Category"
         },
+        "type": {
+            "key": "trigger-type-id",
+            "value": "Trigger Type",
+            "documentationAvailable": false,
+            "supportsEvents": false
+        },
+        "parameters": [
+            {
+                "name": "testParam",
+                "required": true,
+                "type": "java.lang.Integer",
+                "value": null,
+                "connector": false
+            }
+        ]
+    },
+    "actions": [
         {
-          "name": "numThreads",
-          "advanced": true,
-          "required": true,
-          "type": "int",
-          "value": 0,
-          "connector": false
+            "id": "action-id",
+            "name": "action-name",
+            "description": "action-description",
+            "active": true,
+            "category": {
+                "key": "action-category-id",
+                "value": "Action Category"
+            },
+            "type": {
+                "key": "action-type-id",
+                "value": "Action Type",
+                "documentationAvailable": false,
+                "supportsEvents": true
+            },
+            "parameters": [
+                {
+                    "name": "testConnector",
+                    "categoryCandidates": [
+                        {
+                            "key": "connector-category-id",
+                            "value": "Connector Category",
+                            "typeCandidates": [
+                                {
+                                    "key": "connector-type-id",
+                                    "value": "Connector Type"
+                                }
+                            ]
+                        }
+                    ],
+                    "value": "connector-id",
+                    "connectorName": null,
+                    "connector": true
+                },
+                {
+                    "name": "numThreads",
+                    "advanced": true,
+                    "required": true,
+                    "type": "int",
+                    "value": 0,
+                    "connector": false
+                }
+            ]
         }
-      ]
-    }
-  ],
-  "running": false,
-  "faultTolerant": true
+    ],
+    "running": false,
+    "faultTolerant": true
 }

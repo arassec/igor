@@ -3,8 +3,10 @@ package com.arassec.igor.plugin.core.util.action;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,11 @@ import java.util.Map;
 @Setter
 @IgorComponent
 public class SplitArrayAction extends BaseUtilAction {
+
+    /**
+     * Jackson's ObjectMapper for JSON processing.
+     */
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * The JSON-Path query to the array element.
@@ -47,22 +54,26 @@ public class SplitArrayAction extends BaseUtilAction {
      *
      * @return Data items for each array element.
      */
-    @SuppressWarnings({"rawtypes"})
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
         List<Map<String, Object>> result = new LinkedList<>();
 
-        DocumentContext documentContext = JsonPath.parse(data);
+        // e.g. {{data.content.array}} -> /data/content/array
+        String arrayPointer = arraySelector.replace("{{", "/").replace(".", "/").replace("}}", "");
+        // e.g. /data/content/array -> /data/content
+        String parentPointer = arrayPointer.substring(0, arrayPointer.lastIndexOf("/"));
+        // e.g. /data/content/array -> array
+        String leafName = arrayPointer.substring(arrayPointer.lastIndexOf("/") + 1);
 
-        String query = arraySelector.replace("{{", "$.").replace("}}", "");
+        JsonNode jsonNode = objectMapper.convertValue(data, JsonNode.class);
+        JsonNode array = jsonNode.at(arrayPointer);
 
-        Object queryResult = documentContext.read(query);
-        if (queryResult instanceof List) {
-            for (Object element : (List) queryResult) {
-                documentContext.set(query, element);
-                result.add(JsonPath.parse(documentContext.jsonString()).json());
-            }
+        for (JsonNode element : array) {
+            JsonNode clonedJsonNode = objectMapper.convertValue(data, JsonNode.class);
+            ((ObjectNode) clonedJsonNode.at(parentPointer)).set(leafName, element);
+            result.add(objectMapper.convertValue(clonedJsonNode, new TypeReference<>() {
+            }));
         }
 
         return result;

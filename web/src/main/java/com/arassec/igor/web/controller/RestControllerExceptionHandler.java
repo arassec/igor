@@ -4,9 +4,8 @@ import com.arassec.igor.core.model.annotation.validation.UniqueConnectorName;
 import com.arassec.igor.core.model.annotation.validation.UniqueJobName;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.web.mapper.WebMapperKey;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -15,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -186,13 +186,13 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
      * @return The ID of the component containing the invalid property.
      */
     private String extractId(Map<String, Object> target, String validationPath) {
-        String jsonPath = validationPath.substring(0, validationPath.lastIndexOf('.') + 1) + "id";
-        try {
-            return JsonPath.parse(target).read(jsonPath);
-        } catch (PathNotFoundException e) {
-            // Fallback, to return something:
-            return validationPath.replace(".", "_");
+        String jsonPointer = "/" + validationPath.substring(0, validationPath.lastIndexOf('.') + 1).replace(".", "/") + "id";
+        JsonNode jsonNode = objectMapper.convertValue(target, JsonNode.class);
+        String result = jsonNode.at(jsonPointer).asText();
+        if (!StringUtils.hasText(result)) {
+            result = validationPath.replace(".", "_").substring(0, validationPath.length());
         }
+        return result;
     }
 
     /**

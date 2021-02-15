@@ -50,19 +50,19 @@ public class EventTriggeredJobStarter extends DefaultJobStarter {
 
         // Block until igor is shut down and wait for trigger events:
         while (JobExecutionState.ACTIVE.equals(jobExecution.getExecutionState())) {
-            Map<String, Object> triggerData;
+            Map<String, Object> eventData;
             try {
                 // Receive the data item from the trigger...
-                triggerData = triggerEventInputQueue.poll(500, TimeUnit.MILLISECONDS);
+                eventData = triggerEventInputQueue.poll(500, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new IgorException("Interrupted during event polling!", e);
             }
-            if (triggerData != null) {
-                log.debug("Job '{}' triggered by event: {}", jobExecution.getJobId(), triggerData);
-                trigger.getData().forEach(triggerData::put); // A custom trigger might add additional data to the items.
+            if (eventData != null) {
+                log.debug("Job '{}' triggered by event: {}", jobExecution.getJobId(), eventData);
+                trigger.createDataItem().forEach(eventData::put); // A custom trigger might add additional data to the items.
                 // ...and dispatch it to the waiting actions.
-                dispatchInitialDataItem(initialInputQueue, jobExecution.getJobId(), triggerData, processingFinishedCallbackSet);
+                dispatchInitialDataItem(initialInputQueue, jobExecution.getJobId(), eventData, processingFinishedCallbackSet);
                 jobExecution.setProcessedEvents(jobExecution.getProcessedEvents() + 1);
             }
         }

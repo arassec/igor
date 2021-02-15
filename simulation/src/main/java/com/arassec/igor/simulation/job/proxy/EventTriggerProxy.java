@@ -2,10 +2,7 @@ package com.arassec.igor.simulation.job.proxy;
 
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.EventType;
-import lombok.Getter;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
@@ -14,12 +11,6 @@ import java.util.concurrent.BlockingQueue;
  * items.
  */
 public class EventTriggerProxy extends TriggerProxy implements EventTrigger {
-
-    /**
-     * Contains the data items received by the trigger during a simulated job execution.
-     */
-    @Getter
-    private final List<Map<String, Object>> triggerDataItems = new LinkedList<>();
 
     /**
      * Creates a new instance.
@@ -48,9 +39,7 @@ public class EventTriggerProxy extends TriggerProxy implements EventTrigger {
         if (processed > simulationLimit) {
             return;
         }
-        Map<String, Object> data = delegate.getData();
-        eventData.forEach(data::put);
-        triggerDataItems.add(data);
+        getCollectedData().add(eventData);
         ((EventTrigger) delegate).processEvent(eventData);
     }
 
@@ -60,14 +49,6 @@ public class EventTriggerProxy extends TriggerProxy implements EventTrigger {
     @Override
     public void processingFinished(Map<String, Object> dataItem) {
         ((EventTrigger) delegate).processingFinished(dataItem);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<Map<String, Object>> getSimulationTriggerData() {
-        return triggerDataItems;
     }
 
     /**

@@ -5,7 +5,7 @@ import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +15,11 @@ import java.util.Map;
 @Getter
 @Setter
 public class TriggerProxy extends BaseProxy<Trigger> implements Trigger {
+
+    /**
+     * The collected Data.
+     */
+    private List<Map<String, Object>> collectedData = new LinkedList<>();
 
     /**
      * Creates a new instance.
@@ -27,44 +32,17 @@ public class TriggerProxy extends BaseProxy<Trigger> implements Trigger {
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the simulation-key in the data item's meta data to {@code true}.
+     *
+     * @return The initial data item.
      */
     @Override
-    public Map<String, Object> getMetaData() {
-        return createMetaData(delegate.getMetaData());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, Object> getData() {
-        return delegate.getData();
-    }
-
-    /**
-     * Returns the triggers simulation data.
-     *
-     * @return List of data items created by the trigger.
-     */
-    public List<Map<String, Object>> getSimulationTriggerData() {
-        return List.of(delegate.getData());
-    }
-
-    /**
-     * Marks data items as "in simulation mode".
-     *
-     * @param delegateMetaData The delegate's meta-data.
-     *
-     * @return Meta-data for the data items.
-     */
-    private Map<String, Object> createMetaData(Map<String, Object> delegateMetaData) {
-        Map<String, Object> metaData = new HashMap<>();
-        metaData.put(DataKey.SIMULATION.getKey(), true);
-        if (delegateMetaData != null) {
-            delegateMetaData.forEach(metaData::put);
-        }
-        return metaData;
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> createDataItem() {
+        Map<String, Object> dataItem = delegate.createDataItem();
+        ((Map<String, Object>) dataItem.get(DataKey.META.getKey())).put(DataKey.SIMULATION.getKey(), true);
+        collectedData.add(dataItem);
+        return dataItem;
     }
 
 }

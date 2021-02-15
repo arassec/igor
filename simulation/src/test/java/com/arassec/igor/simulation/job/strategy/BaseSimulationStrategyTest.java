@@ -36,7 +36,7 @@ class BaseSimulationStrategyTest {
     void testExtractSimulationResult() {
         List<Map<String, Object>> triggerData = List.of(Map.of("trigger", "data"));
         TriggerProxy triggerProxy = mock(TriggerProxy.class);
-        when(triggerProxy.getSimulationTriggerData()).thenReturn(triggerData);
+        when(triggerProxy.getCollectedData()).thenReturn(triggerData);
 
         List<Map<String, Object>> actionData = List.of(Map.of("action", "data"));
         ActionProxy actionProxy = mock(ActionProxy.class);
@@ -53,7 +53,7 @@ class BaseSimulationStrategyTest {
 
         SimulationResult jobResult = result.get("job-id");
         assertEquals("test-job-error", jobResult.getErrorCause());
-        assertEquals(triggerData.get(0).toString(), jobResult.getResults().get(0).get("data").toString());
+        assertEquals(triggerData.get(0).toString(), jobResult.getResults().get(0).toString());
 
         SimulationResult actionResult = result.get("action-id");
         assertEquals("test-action-error", actionResult.getErrorCause());

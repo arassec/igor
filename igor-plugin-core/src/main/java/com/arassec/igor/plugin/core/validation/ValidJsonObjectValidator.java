@@ -1,7 +1,7 @@
-package com.arassec.igor.core.model.annotation.validation;
+package com.arassec.igor.plugin.core.validation;
 
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -12,7 +12,12 @@ import javax.validation.ConstraintValidatorContext;
 public class ValidJsonObjectValidator implements ConstraintValidator<ValidJsonObject, String> {
 
     /**
-     * Uses {@link net.minidev.json.JSONObject} to validate the supplied string.
+     * Jackson's {@link ObjectMapper}.
+     */
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Uses {@link ObjectMapper#readTree(String)} to validate the supplied string.
      *
      * @param input                      The input to validate.
      * @param constraintValidatorContext The validator context.
@@ -24,8 +29,12 @@ public class ValidJsonObjectValidator implements ConstraintValidator<ValidJsonOb
         if (input == null || input.isBlank()) {
             return true;
         }
-        Object parsed = JSONValue.parse(input);
-        return parsed instanceof JSONObject;
+        try {
+            objectMapper.readTree(input);
+            return true;
+        } catch (JsonProcessingException e) {
+            return false;
+        }
     }
 
 }

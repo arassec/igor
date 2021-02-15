@@ -1,6 +1,5 @@
 package com.arassec.igor.core.model.job.starter;
 
-import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.IgorComponentUtil;
 import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
@@ -9,8 +8,6 @@ import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
 import com.arassec.igor.core.model.trigger.Trigger;
 import lombok.Data;
 
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -89,23 +86,6 @@ public class DefaultJobStarter implements JobStarter {
     }
 
     /**
-     * Creates the meta-data part of a data item.
-     *
-     * @param jobId   The job's ID.
-     * @param trigger The job's trigger.
-     *
-     * @return The meta-data for the job run.
-     */
-    public static Map<String, Object> createMetaData(String jobId, Trigger trigger) {
-        Map<String, Object> metaData = new HashMap<>();
-        metaData.put(DataKey.JOB_ID.getKey(), jobId);
-        metaData.put(DataKey.TIMESTAMP.getKey(), Instant.now().toEpochMilli());
-        Map<String, Object> triggerMetaData = trigger != null ? trigger.getMetaData() : Map.of();
-        triggerMetaData.forEach(metaData::put);
-        return metaData;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -114,12 +94,12 @@ public class DefaultJobStarter implements JobStarter {
         initialize(jobExecution);
 
         // Read the data from the trigger and start working.
-        Map<String, Object> triggerData = Map.of();
+        Map<String, Object> dataItem = Map.of();
         if (trigger != null) {
-            triggerData = trigger.getData();
+            dataItem = trigger.createDataItem();
         }
 
-        dispatchInitialDataItem(initialInputQueue, jobExecution.getJobId(), triggerData, processingFinishedCallbackSet);
+        dispatchInitialDataItem(initialInputQueue, jobExecution.getJobId(), dataItem, processingFinishedCallbackSet);
 
         return concurrencyGroups;
     }
@@ -147,18 +127,15 @@ public class DefaultJobStarter implements JobStarter {
      *
      * @param inputQueue                    The input queue to put the first data item in.
      * @param jobId                         The job's ID.
-     * @param triggerData                   Data provided by an event trigger.
+     * @param initialDataItem               Data item provided by the trigger.
      * @param processingFinishedCallbackSet Indicates whether "processing finished" callbacks must be called or not.
      */
     protected void dispatchInitialDataItem(BlockingQueue<Map<String, Object>> inputQueue, String jobId, Map<String,
-            Object> triggerData, boolean processingFinishedCallbackSet) {
-        Map<String, Object> dataItem = new HashMap<>();
-        dataItem.put(DataKey.META.getKey(), DefaultJobStarter.createMetaData(jobId, trigger));
-        dataItem.put(DataKey.DATA.getKey(), triggerData);
+        Object> initialDataItem, boolean processingFinishedCallbackSet) {
         boolean added = false;
         while (!added) {
             try {
-                added = inputQueue.offer(dataItem, 100, TimeUnit.MILLISECONDS);
+                added = inputQueue.offer(initialDataItem, 100, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -166,7 +143,7 @@ public class DefaultJobStarter implements JobStarter {
         // This means we have to notify the trigger that the processing finished immediately, because there are no (active)
         // actions...
         if (trigger instanceof ProcessingFinishedCallback && !processingFinishedCallbackSet) {
-            ((ProcessingFinishedCallback) trigger).processingFinished(dataItem);
+            ((ProcessingFinishedCallback) trigger).processingFinished(initialDataItem);
         }
     }
 
@@ -211,15 +188,15 @@ public class DefaultJobStarter implements JobStarter {
      * @return List of {@link ConcurrencyGroup}s.
      */
     private List<ConcurrencyGroup> createConcurrencyGroups(List<List<Action>> concurrencyLists, BlockingQueue<Map<String,
-            Object>> inputQueue, JobExecution jobExecution) {
+        Object>> inputQueue, JobExecution jobExecution) {
         List<ConcurrencyGroup> result = new LinkedList<>();
         BlockingQueue<Map<String, Object>> inputQueueHolder = inputQueue;
 
         for (List<Action> concurrencyList : concurrencyLists) {
             String concurrencyGroupId = String
-                    .format(CONCURRENCY_GROUP_ID_PATTERN, jobExecution.getJobId(), concurrencyLists.indexOf(concurrencyList));
+                .format(CONCURRENCY_GROUP_ID_PATTERN, jobExecution.getJobId(), concurrencyLists.indexOf(concurrencyList));
             ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueueHolder, concurrencyGroupId,
-                    jobExecution);
+                jobExecution);
             inputQueueHolder = concurrencyGroup.getOutputQueue();
             result.add(concurrencyGroup);
         }

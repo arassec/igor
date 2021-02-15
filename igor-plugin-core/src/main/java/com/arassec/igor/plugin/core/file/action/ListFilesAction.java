@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CoreUtils;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileInfo;
@@ -74,7 +75,7 @@ public class ListFilesAction extends BaseFileAction {
         List<Map<String, Object>> result = new LinkedList<>();
 
         fileInfos.forEach(fileInfo -> {
-            Map<String, Object> newDataItem = clone(data);
+            Map<String, Object> newDataItem = CoreUtils.clone(data);
 
             Map<String, Object> item = new HashMap<>();
             String filename = fileInfo.getFilename();

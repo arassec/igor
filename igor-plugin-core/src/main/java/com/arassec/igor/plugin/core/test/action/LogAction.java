@@ -6,7 +6,6 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -54,7 +53,7 @@ public class LogAction extends BaseTestAction {
         if (isSimulation(data)) {
             data.put(DataKey.SIMULATION_LOG.getKey(), "Logged data item in loglevel DEBUG!");
         }
-        log.debug("{} - Processed data item:\n{}", jobId, JSONObject.toJSONString(data));
+        log.debug("{} - Processed data item:\n{}", jobId, data);
         return List.of(data);
     }
 

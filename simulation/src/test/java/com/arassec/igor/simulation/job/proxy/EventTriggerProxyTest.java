@@ -61,14 +61,14 @@ class EventTriggerProxyTest {
         eventTriggerProxy.processEvent(data);
 
         assertEquals(1, eventTriggerProxy.getProcessed());
-        assertEquals(1, eventTriggerProxy.getSimulationTriggerData().size());
+        assertEquals(1, eventTriggerProxy.getCollectedData().size());
         verify(delegateMock, times(1)).processEvent(data);
 
         // Simulation limit is set to 1, so this call must be blocked:
         eventTriggerProxy.processEvent(data);
 
         assertEquals(2, eventTriggerProxy.getProcessed());
-        assertEquals(1, eventTriggerProxy.getSimulationTriggerData().size());
+        assertEquals(1, eventTriggerProxy.getCollectedData().size());
         verify(delegateMock, times(1)).processEvent(data);
     }
 

@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.annotation.validation;
+package com.arassec.igor.plugin.core.validation;
 
 
 import org.junit.jupiter.api.DisplayName;
@@ -21,10 +21,10 @@ class ValidJsonObjectValidatorTest {
     void testIsValid() {
         ValidJsonObjectValidator validJsonObjectValidator = new ValidJsonObjectValidator();
 
-        assertFalse(validJsonObjectValidator.isValid("invalid-json", null));
-
         assertTrue(validJsonObjectValidator.isValid(null, null));
         assertTrue(validJsonObjectValidator.isValid("", null));
+
+        assertFalse(validJsonObjectValidator.isValid("invalid-json", null));
 
         assertTrue(validJsonObjectValidator.isValid("{\"a\": 123, \"b\": \"c\"}", null));
     }

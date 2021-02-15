@@ -7,11 +7,12 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -41,6 +42,11 @@ public class HttpRequestAction extends BaseWebAction {
      * Contains all HTTP methods which are unsafe to be executed during simulated job executions.
      */
     private static final Set<String> SIMULATION_UNSAFE_METHODS = Set.of("POST", "PUT", "DELETE", "PATCH");
+
+    /**
+     * Jackson's {@link ObjectMapper} to parse response JSON.
+     */
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * The HTTP method to use.
@@ -127,17 +133,9 @@ public class HttpRequestAction extends BaseWebAction {
                         " url '" + requestUrl + "': " + " with body: " + content);
                 }
 
-                String responseBody = httpResponse.body();
-                Object parsedResponseBody = JSONValue.parse(responseBody);
-
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("headers", httpResponse.headers().map());
-
-                if (parsedResponseBody instanceof JSONObject || parsedResponseBody instanceof JSONArray) {
-                    responseData.put("body", parsedResponseBody);
-                } else {
-                    responseData.put("body", responseBody);
-                }
+                responseData.put("body", parseResponseBody(httpResponse));
 
                 data.put(CoreUtils.getString(data, targetKey), responseData);
             } catch (IOException e) {
@@ -149,6 +147,23 @@ public class HttpRequestAction extends BaseWebAction {
         }
 
         return List.of(data);
+    }
+
+    /**
+     * Tries to parse the response body as JSON and returns it if possible.
+     *
+     * @param httpResponse The received HTTP response.
+     *
+     * @return The
+     */
+    private Object parseResponseBody(HttpResponse<String> httpResponse) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(httpResponse.body());
+            return objectMapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>() {
+            });
+        } catch (JsonProcessingException e) {
+            return httpResponse.body();
+        }
     }
 
 }

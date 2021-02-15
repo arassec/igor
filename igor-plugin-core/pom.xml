@@ -19,13 +19,18 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>application</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.samskivert</groupId>
             <artifactId>jmustache</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <!-- Testing -->

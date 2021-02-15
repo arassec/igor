@@ -1,11 +1,9 @@
 package com.arassec.igor.simulation.job.strategy;
 
 import com.arassec.igor.application.simulation.SimulationResult;
-import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.core.model.job.starter.DefaultJobStarter;
 import com.arassec.igor.simulation.job.proxy.ActionProxy;
 import com.arassec.igor.simulation.job.proxy.ProxyProvider;
 import com.arassec.igor.simulation.job.proxy.TriggerProxy;
@@ -49,16 +47,8 @@ public abstract class BaseSimulationStrategy implements SimulationStrategy {
 
         if (job.getTrigger() instanceof TriggerProxy) {
             TriggerProxy triggerProxy = (TriggerProxy) job.getTrigger();
-
-            final List<Map<String, Object>> simulationTriggerData = triggerProxy != null ? triggerProxy.getSimulationTriggerData() :
-                    List.of();
-
-            simulationTriggerData.forEach(dataItem -> {
-                Map<String, Object> item = new HashMap<>();
-                item.put(DataKey.META.getKey(), DefaultJobStarter.createMetaData(job.getId(), triggerProxy));
-                item.put(DataKey.DATA.getKey(), dataItem);
-                jobResult.getResults().add(item);
-            });
+            final List<Map<String, Object>> simulationTriggerData = triggerProxy.getCollectedData();
+            simulationTriggerData.forEach(dataItem -> jobResult.getResults().add(dataItem));
         }
 
         job.getActions().forEach(action -> {

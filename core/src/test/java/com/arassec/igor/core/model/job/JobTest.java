@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -120,6 +121,7 @@ class JobTest {
      */
     @Test
     @DisplayName("Tests calling the {@link Job#cancel()} method and waiting for actions to finish")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @SneakyThrows
     void testJobCancellationByMethod() {
         JobExecution jobExecution = new JobExecution();
@@ -204,6 +206,7 @@ class JobTest {
     @DisplayName("Tests running a minimal job.")
     void testRunMinimalJob() {
         Trigger triggerMock = mock(Trigger.class);
+        when(triggerMock.createDataItem()).thenReturn(Map.of("test", "input"));
 
         Action actionMock = mock(Action.class);
         when(actionMock.isActive()).thenReturn(true);

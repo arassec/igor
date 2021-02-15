@@ -1,7 +1,9 @@
 package com.arassec.igor.plugin.core;
 
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.job.starter.DefaultJobStarter;
+import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.core.model.trigger.Trigger;
+import com.arassec.igor.plugin.core.util.trigger.ManualTrigger;
 import com.jayway.jsonpath.JsonPath;
 
 import java.util.HashMap;
@@ -36,8 +38,10 @@ public abstract class CoreActionBaseTest {
         Map<String, Object> item = new HashMap<>();
         item.put(PARAM_KEY, PARAM_VALUE);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put(DataKey.META.getKey(), DefaultJobStarter.createMetaData(JOB_ID, null));
+        Trigger trigger = new ManualTrigger();
+        trigger.initialize(JobExecution.builder().jobId(JOB_ID).build());
+
+        Map<String, Object> result = trigger.createDataItem();
         result.put(DataKey.DATA.getKey(), item);
 
         return result;
