@@ -2,6 +2,7 @@ package com.arassec.igor.plugin.core.file.connector;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
+import com.arassec.igor.plugin.core.CorePluginType;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class FallbackFileConnector extends BaseFileConnector {
      * Creates a new instance.
      */
     public FallbackFileConnector() {
-        super("fallback-file-connector");
+        super(CorePluginType.FALLBACK_FILE_CONNECTOR.getId());
     }
 
     /**

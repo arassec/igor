@@ -1,8 +1,7 @@
 package com.arassec.igor.application;
 
 
-import com.arassec.igor.core.IgorApplicationProperties;
-import com.arassec.igor.core.util.IgorConfigHelper;
+import com.arassec.igor.application.util.IgorConfigHelper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -22,13 +21,13 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 public class ApplicationConfiguration {
 
     /**
-     * Creates a new {@link MessageSource} for i18n.
+     * Creates a new {@link MessageSource} for i18n for the core module.
      *
      * @return The newly created instance.
      */
     @Bean
-    public MessageSource applicationMessageSource() {
-        return IgorConfigHelper.createMessageSource("i18n/application-messages");
+    public MessageSource coreMessageSource() {
+        return IgorConfigHelper.createMessageSource("i18n/core-messages");
     }
 
     /**

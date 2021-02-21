@@ -12,11 +12,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests the {@link HttpConnector}.
+ * Tests the {@link StandardHttpConnector}.
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("'HTTP' connector tests.")
-class HttpConnectorTest {
+class StandardHttpConnectorTest {
 
     /**
      * A wiremock server for testing.
@@ -69,7 +69,7 @@ class HttpConnectorTest {
     @Test
     @DisplayName("Tests the connector's SSL configuration capabilities.")
     void testSslConfiguration() {
-        HttpConnector httpConnector = new HttpConnector();
+        StandardHttpConnector httpConnector = new StandardHttpConnector();
         httpConnector.setTestUrl("https://localhost:" + wireMockServer.httpsPort() + "/ok");
         httpConnector.setCertificateVerification(true);
 
@@ -101,7 +101,7 @@ class HttpConnectorTest {
     @Test
     @DisplayName("Tests handling redirects with the connector.")
     void testRedirectHandling() {
-        HttpConnector httpConnector = new HttpConnector();
+        StandardHttpConnector httpConnector = new StandardHttpConnector();
         httpConnector.setTestUrl("https://localhost:" + wireMockServer.httpsPort() + "/redirect");
         httpConnector.setCertificateVerification(false);
 
@@ -151,7 +151,7 @@ class HttpConnectorTest {
                 )
         );
 
-        HttpConnector httpConnector = new HttpConnector();
+        StandardHttpConnector httpConnector = new StandardHttpConnector();
         // This URL is not stubbed!
         httpConnector.setTestUrl("http://localhost:" + proxiedServer.port() + "/proxied");
 
@@ -197,7 +197,7 @@ class HttpConnectorTest {
                 )
         );
 
-        HttpConnector httpConnector = new HttpConnector();
+        StandardHttpConnector httpConnector = new StandardHttpConnector();
         httpConnector.setCertificateVerification(false);
         httpConnector.setTestUrl("https://localhost:" + server.httpsPort() + "/ok");
 
@@ -230,7 +230,7 @@ class HttpConnectorTest {
     @Test
     @DisplayName("Tests testing the connector without a configuration.")
     void testTestConfigurationWithoutConfiguration() {
-        HttpConnector httpConnector = new HttpConnector();
+        StandardHttpConnector httpConnector = new StandardHttpConnector();
         assertDoesNotThrow(httpConnector::testConfiguration);
     }
 

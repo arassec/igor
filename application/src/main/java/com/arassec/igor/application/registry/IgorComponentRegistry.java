@@ -1,6 +1,6 @@
 package com.arassec.igor.application.registry;
 
-import com.arassec.igor.core.IgorApplicationProperties;
+import com.arassec.igor.application.IgorApplicationProperties;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.action.MissingComponentAction;
@@ -57,9 +57,9 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     private final List<Connector> connectors;
 
     /**
-     * Igor's core configuration properties.
+     * Igor's application configuration properties.
      */
-    private final IgorApplicationProperties igorCoreProperties;
+    private final IgorApplicationProperties igorApplicationProperties;
 
     /**
      * Contains the categories of a certain component type (e.g. Action.class -> Action-Categories or Connector.class ->
@@ -165,7 +165,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      */
     public Job createJobPrototype() {
         Trigger trigger = createTriggerInstance(triggers.stream()
-                .filter(triggerCandidate -> triggerCandidate.getTypeId().equals(igorCoreProperties.getDefaultTrigger()))
+                .filter(triggerCandidate -> triggerCandidate.getTypeId().equals(igorApplicationProperties.getDefaultTrigger()))
                 .findFirst()
                 .orElse(triggers.get(0)).getTypeId(), null);
         trigger.setId(UUID.randomUUID().toString());
@@ -185,7 +185,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      */
     public Action createActionPrototype() {
         Action action = createActionInstance(actions.stream()
-                .filter(actionCandidate -> actionCandidate.getTypeId().equals(igorCoreProperties.getDefaultAction()))
+                .filter(actionCandidate -> actionCandidate.getTypeId().equals(igorApplicationProperties.getDefaultAction()))
                 .findFirst()
                 .orElse(actions.get(0)).getTypeId(), null);
         action.setId(UUID.randomUUID().toString());

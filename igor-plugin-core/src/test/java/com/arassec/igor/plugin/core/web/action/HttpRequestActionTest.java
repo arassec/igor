@@ -3,7 +3,7 @@ package com.arassec.igor.plugin.core.web.action;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.core.web.connector.HttpConnector;
+import com.arassec.igor.plugin.core.web.connector.StandardHttpConnector;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.junit.jupiter.api.DisplayName;
@@ -63,7 +63,7 @@ class HttpRequestActionTest {
 
         JobExecution jobExecution = new JobExecution();
 
-        HttpConnector httpConnector = new HttpConnector();
+        StandardHttpConnector httpConnector = new StandardHttpConnector();
         httpConnector.initialize(jobExecution);
 
         HttpRequestAction action = new HttpRequestAction();
@@ -115,7 +115,7 @@ class HttpRequestActionTest {
 
         JobExecution jobExecution = new JobExecution();
 
-        HttpConnector httpConnector = new HttpConnector();
+        StandardHttpConnector httpConnector = new StandardHttpConnector();
         httpConnector.initialize(jobExecution);
 
         HttpRequestAction action = new HttpRequestAction();
@@ -146,7 +146,7 @@ class HttpRequestActionTest {
     void testHttpDeleteInSimulationMode() {
         JobExecution jobExecution = new JobExecution();
 
-        HttpConnector httpConnector = new HttpConnector();
+        StandardHttpConnector httpConnector = new StandardHttpConnector();
         httpConnector.initialize(jobExecution);
 
         HttpRequestAction action = new HttpRequestAction();
@@ -175,7 +175,7 @@ class HttpRequestActionTest {
     void testErrorHandling() {
         JobExecution jobExecution = new JobExecution();
 
-        HttpConnector httpConnector = new HttpConnector();
+        StandardHttpConnector httpConnector = new StandardHttpConnector();
         httpConnector.initialize(jobExecution);
 
         HttpRequestAction action = new HttpRequestAction();

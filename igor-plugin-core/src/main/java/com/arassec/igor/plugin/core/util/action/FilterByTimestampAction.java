@@ -1,8 +1,9 @@
 package com.arassec.igor.plugin.core.util.action;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CoreUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -76,7 +77,7 @@ public class FilterByTimestampAction extends BaseUtilAction {
      * Creates a new component instance.
      */
     public FilterByTimestampAction() {
-        super("filter-by-timestamp-action");
+        super(CorePluginType.FILTER_BY_TIMESTAMP_ACTION.getId());
     }
 
     /**

@@ -2,7 +2,7 @@ package com.arassec.igor.plugin.core.test.action;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreActionBaseTest;
-import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CorePluginCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,7 @@ class DuplicateActionTest extends CoreActionBaseTest {
     @DisplayName("Tests initialization of the action.")
     void testInitialize() {
         DuplicateAction action = new DuplicateAction();
-        assertEquals(CoreCategory.TEST.getId(), action.getCategoryId());
+        assertEquals(CorePluginCategory.TEST.getId(), action.getCategoryId());
         assertEquals("duplicate-action", action.getTypeId());
     }
 

@@ -1,7 +1,8 @@
 package com.arassec.igor.module.file.connector.ftp;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.module.file.FilePluginType;
 import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ public class FtpFileConnector extends BaseFtpFileConnector {
      * Creates a new component instance.
      */
     public FtpFileConnector() {
-        super("ftp-file-connector");
+        super(FilePluginType.FTP_FILE_CONNECTOR.getId());
     }
 
     /**

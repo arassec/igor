@@ -4,9 +4,10 @@ import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 /**
  * Utility class for the work with {@link com.arassec.igor.core.model.IgorComponent}s.
@@ -29,7 +30,8 @@ public class IgorComponentUtil {
         if (igorComponent == null) {
             return;
         }
-        ReflectionUtils.doWithFields(igorComponent.getClass(), field -> processField(igorComponent, jobExecution, field, true));
+        Arrays.stream(igorComponent.getClass().getDeclaredFields()).forEach(field -> processField(igorComponent, jobExecution, field,
+            true));
     }
 
     /**
@@ -42,7 +44,8 @@ public class IgorComponentUtil {
         if (igorComponent == null) {
             return;
         }
-        ReflectionUtils.doWithFields(igorComponent.getClass(), field -> processField(igorComponent, jobExecution, field, false));
+        Arrays.stream(igorComponent.getClass().getDeclaredFields()).forEach(field -> processField(igorComponent, jobExecution, field,
+            false));
     }
 
     /**
@@ -57,7 +60,11 @@ public class IgorComponentUtil {
                                      Field field, boolean initialize) {
         if (field.isAnnotationPresent(IgorParam.class)) {
             try {
-                ReflectionUtils.makeAccessible(field);
+                if ((!Modifier.isPublic(field.getModifiers()) ||
+                    !Modifier.isPublic(field.getDeclaringClass().getModifiers()) ||
+                    Modifier.isFinal(field.getModifiers())) && !field.canAccess(igorComponent)) {
+                    field.setAccessible(true); //NOSONAR - @IgorParam-fields must not necessarily be accessible!
+                }
                 Object value = field.get(igorComponent);
                 if (value instanceof Connector) {
                     if (initialize) {

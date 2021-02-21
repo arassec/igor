@@ -1,6 +1,5 @@
 package com.arassec.igor.application;
 
-import com.arassec.igor.core.IgorApplicationProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

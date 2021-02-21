@@ -48,12 +48,6 @@
             <artifactId>jsch</artifactId>
         </dependency>
 
-        <!-- HTTP/HTTPS -->
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-        </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>ch.qos.logback</groupId>

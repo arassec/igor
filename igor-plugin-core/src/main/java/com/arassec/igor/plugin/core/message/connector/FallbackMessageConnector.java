@@ -1,5 +1,7 @@
 package com.arassec.igor.plugin.core.message.connector;
 
+import com.arassec.igor.plugin.core.CorePluginType;
+
 /**
  * Can be used as fallback for any {@link javax.validation.constraints.NotNull} connector parameter.
  */
@@ -14,7 +16,7 @@ public class FallbackMessageConnector extends BaseMessageConnector {
      * Creates a new component instance.
      */
     public FallbackMessageConnector() {
-        super("fallback-message-connector");
+        super(CorePluginType.FALLBACK_MESSAGE_CONNECTOR.getId());
     }
 
     /**

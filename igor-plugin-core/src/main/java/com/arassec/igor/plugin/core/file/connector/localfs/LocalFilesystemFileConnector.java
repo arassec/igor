@@ -1,9 +1,10 @@
 package com.arassec.igor.plugin.core.file.connector.localfs;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.file.connector.BaseFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileInfo;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
@@ -31,7 +32,7 @@ public class LocalFilesystemFileConnector extends BaseFileConnector {
      * Creates a new component instance.
      */
     public LocalFilesystemFileConnector() {
-        super("localfs-file-connector");
+        super(CorePluginType.LOCAL_FILESYSTEM_CONNECTOR.getId());
     }
 
     /**

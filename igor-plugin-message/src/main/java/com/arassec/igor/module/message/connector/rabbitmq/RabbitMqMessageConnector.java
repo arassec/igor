@@ -1,12 +1,13 @@
 package com.arassec.igor.module.message.connector.rabbitmq;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.util.event.JobTriggerEvent;
+import com.arassec.igor.module.message.MessagePluginType;
 import com.arassec.igor.module.message.connector.rabbitmq.validation.ExchangeAndOrQueueSet;
 import com.arassec.igor.module.message.connector.rabbitmq.validation.ExistingQueue;
 import com.arassec.igor.plugin.core.message.connector.BaseMessageConnector;
@@ -163,7 +164,7 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
      * @param applicationEventPublisher Spring's event publisher.
      */
     public RabbitMqMessageConnector(ApplicationEventPublisher applicationEventPublisher) {
-        super("rabbitmq-message-connector");
+        super(MessagePluginType.RABBITMQ_MESSAGE_CONNECTOR.getId());
         this.applicationEventPublisher = applicationEventPublisher;
     }
 

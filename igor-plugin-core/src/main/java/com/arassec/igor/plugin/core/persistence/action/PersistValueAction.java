@@ -1,11 +1,12 @@
 package com.arassec.igor.plugin.core.persistence.action;
 
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
 import com.arassec.igor.core.repository.PersistentValueRepository;
+import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CoreUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,7 +47,7 @@ public class PersistValueAction extends BasePersistenceAction {
      * @param persistentValueRepository The repository for persisted values.
      */
     public PersistValueAction(PersistentValueRepository persistentValueRepository) {
-        super("persist-value-action", persistentValueRepository);
+        super(CorePluginType.PERSIST_VALUE_ACTION.getId(), persistentValueRepository);
     }
 
     /**

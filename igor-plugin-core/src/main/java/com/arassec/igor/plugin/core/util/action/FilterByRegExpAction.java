@@ -1,8 +1,9 @@
 package com.arassec.igor.plugin.core.util.action;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CoreUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,7 +47,7 @@ public class FilterByRegExpAction extends BaseUtilAction {
      * Creates a new component instance.
      */
     public FilterByRegExpAction() {
-        super("filter-by-regexp-action");
+        super(CorePluginType.FILTER_BY_REGEXP_ACTION.getId());
     }
 
     /**

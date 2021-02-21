@@ -1,12 +1,13 @@
 package com.arassec.igor.plugin.core.web.action;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreDataKey;
+import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CoreUtils;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
@@ -32,7 +33,7 @@ import java.util.*;
 @Getter
 @Setter
 @IgorComponent
-public class HttpFileDownloadAction extends BaseWebAction {
+public class HttpFileDownloadAction extends BaseHttpAction {
 
     /**
      * Key for the web request action's data.
@@ -100,7 +101,7 @@ public class HttpFileDownloadAction extends BaseWebAction {
      * Creates a new component instance.
      */
     public HttpFileDownloadAction() {
-        super("http-file-download-action");
+        super(CorePluginType.HTTP_FILE_DOWNLOAD_ACTION.getId());
         target = new FallbackFileConnector();
     }
 

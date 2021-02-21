@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.annotation.validation;
+package com.arassec.igor.plugin.core.validation;
 
 import org.springframework.scheduling.support.CronTrigger;
 
@@ -11,7 +11,7 @@ import javax.validation.ConstraintValidatorContext;
 public class ValidCronExpressionValidator implements ConstraintValidator<ValidCronExpression, String> {
 
     /**
-     * Uses Spring's {@link CronTrigger} to validate the supplied CRON expression.
+     * Validates the supplied CRON expression.
      *
      * @param cronExpression             The expression to validate.
      * @param constraintValidatorContext The validator context.
@@ -32,4 +32,5 @@ public class ValidCronExpressionValidator implements ConstraintValidator<ValidCr
 
         return true;
     }
+
 }

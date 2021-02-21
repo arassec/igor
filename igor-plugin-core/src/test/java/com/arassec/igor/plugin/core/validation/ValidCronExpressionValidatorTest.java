@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.annotation.validation;
+package com.arassec.igor.plugin.core.validation;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

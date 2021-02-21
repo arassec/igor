@@ -1,4 +1,4 @@
-package com.arassec.igor.core.util;
+package com.arassec.igor.application.util;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,8 @@
 package com.arassec.igor.web;
 
 import com.arassec.igor.application.registry.IgorComponentRegistry;
+import com.arassec.igor.application.util.IgorConfigHelper;
 import com.arassec.igor.core.repository.ConnectorRepository;
-import com.arassec.igor.core.util.IgorConfigHelper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

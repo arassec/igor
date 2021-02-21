@@ -2,7 +2,7 @@ package com.arassec.igor.plugin.core.web.action;
 
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
-import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CorePluginCategory;
 import com.arassec.igor.plugin.core.web.connector.FallbackHttpConnector;
 import com.arassec.igor.plugin.core.web.connector.HttpConnector;
 import lombok.Getter;
@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Setter
 @Getter
-public abstract class BaseWebAction extends BaseAction {
+public abstract class BaseHttpAction extends BaseAction {
 
     /**
      * The connector to use for requests.
@@ -59,8 +59,8 @@ public abstract class BaseWebAction extends BaseAction {
      *
      * @param typeId The type ID.
      */
-    protected BaseWebAction(String typeId) {
-        super(CoreCategory.WEB.getId(), typeId);
+    protected BaseHttpAction(String typeId) {
+        super(CorePluginCategory.WEB.getId(), typeId);
         httpConnector = new FallbackHttpConnector();
     }
 
@@ -88,7 +88,7 @@ public abstract class BaseWebAction extends BaseAction {
     protected void addBasicAuthHeaderIfConfigured(HttpRequest.Builder httpRequestBuilder) {
         if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
             httpRequestBuilder.header("Authorization",
-                    "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes()));
+                "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes()));
         }
     }
 

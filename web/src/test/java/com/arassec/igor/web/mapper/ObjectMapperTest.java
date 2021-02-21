@@ -1,10 +1,10 @@
 package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.application.registry.IgorComponentRegistry;
+import com.arassec.igor.application.util.IgorConfigHelper;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.repository.ConnectorRepository;
-import com.arassec.igor.core.util.IgorConfigHelper;
 import com.arassec.igor.web.WebConfiguration;
 import com.arassec.igor.web.test.TestAction;
 import com.arassec.igor.web.test.TestConnector;

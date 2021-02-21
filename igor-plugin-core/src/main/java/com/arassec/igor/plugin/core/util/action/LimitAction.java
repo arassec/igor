@@ -1,8 +1,9 @@
 package com.arassec.igor.plugin.core.util.action;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CorePluginType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class LimitAction extends BaseUtilAction {
      * Creates a new component instance.
      */
     public LimitAction() {
-        super("limit-action");
+        super(CorePluginType.LIMIT_ACTION.getId());
         // Limiting is always done single threaded:
         setNumThreads(1);
         getUnEditableProperties().add("numThreads");

@@ -9,10 +9,10 @@ import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Tests the {@link IgorPluginCoreConfiguration}.
+ * Tests the {@link IgorCorePluginConfiguration}.
  */
 @DisplayName("'Core Plugin'-configuration tests.")
-class IgorPluginCoreConfigurationTest {
+class IgorCorePluginConfigurationTest {
 
     /**
      * Tests I18N of the common plugin.
@@ -20,7 +20,7 @@ class IgorPluginCoreConfigurationTest {
     @Test
     @DisplayName("Tests core plugin I18N.")
     void testI18n() {
-        IgorPluginCoreConfiguration configuration = new IgorPluginCoreConfiguration();
+        IgorCorePluginConfiguration configuration = new IgorCorePluginConfiguration();
         MessageSource messageSource = configuration.pluginCoreMessageSource();
         assertEquals("Filter by Regular Expression", messageSource.getMessage("filter-by-regexp-action", null, Locale.getDefault()));
     }

@@ -1,11 +1,12 @@
 package com.arassec.igor.plugin.core.file.action;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreDataKey;
+import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CoreUtils;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
@@ -88,7 +89,7 @@ public class CopyFileAction extends BaseFileAction {
      * Creates a new component instance.
      */
     public CopyFileAction() {
-        super("copy-file-action");
+        super(CorePluginType.COPY_FILE_ACTION.getId());
         source = new FallbackFileConnector();
         target = new FallbackFileConnector();
     }

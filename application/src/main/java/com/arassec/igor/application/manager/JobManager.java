@@ -1,7 +1,7 @@
 package com.arassec.igor.application.manager;
 
+import com.arassec.igor.application.IgorApplicationProperties;
 import com.arassec.igor.application.execution.JobExecutor;
-import com.arassec.igor.core.IgorApplicationProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 public class JobManager implements ApplicationListener<ContextRefreshedEvent>, DisposableBean {
 
     /**
-     * Igor's core configuration properties.
+     * Igor's application configuration properties.
      */
     private final IgorApplicationProperties igorCoreProperties;
 

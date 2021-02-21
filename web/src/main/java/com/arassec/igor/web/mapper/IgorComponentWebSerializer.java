@@ -122,6 +122,8 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
             jsonGenerator.writeBooleanField(WebMapperKey.SUPPORTS_EVENTS.getKey(), true);
         } else if (instance instanceof Trigger) {
             jsonGenerator.writeBooleanField(WebMapperKey.SUPPORTS_EVENTS.getKey(), false);
+        } else if (instance instanceof Connector) {
+            jsonGenerator.writeBooleanField(WebMapperKey.SUPPORTS_EVENTS.getKey(), false);
         }
         jsonGenerator.writeEndObject();
     }

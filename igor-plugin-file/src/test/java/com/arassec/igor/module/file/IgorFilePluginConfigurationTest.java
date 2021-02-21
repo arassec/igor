@@ -9,10 +9,10 @@ import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Tests the {@link IgorPluginFileConfiguration}.
+ * Tests the {@link IgorFilePluginConfiguration}.
  */
 @DisplayName("'File Plugin'-configuration tests.")
-class IgorPluginFileConfigurationTest {
+class IgorFilePluginConfigurationTest {
 
     /**
      * Tests I18N of the file plugin.
@@ -20,7 +20,7 @@ class IgorPluginFileConfigurationTest {
     @Test
     @DisplayName("Tests file plugin I18N.")
     void testI18n() {
-        IgorPluginFileConfiguration configuration = new IgorPluginFileConfiguration();
+        IgorFilePluginConfiguration configuration = new IgorFilePluginConfiguration();
         MessageSource messageSource = configuration.pluginFileMessageSource();
         assertEquals("SFTP", messageSource.getMessage("sftp-file-connector", null, Locale.getDefault()));
     }

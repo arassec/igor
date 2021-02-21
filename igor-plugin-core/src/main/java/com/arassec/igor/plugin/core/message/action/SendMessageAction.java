@@ -1,9 +1,10 @@
 package com.arassec.igor.plugin.core.message.action;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
+import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CoreUtils;
 import com.arassec.igor.plugin.core.message.connector.FallbackMessageConnector;
 import com.arassec.igor.plugin.core.message.connector.Message;
@@ -65,7 +66,7 @@ public class SendMessageAction extends BaseMessageAction {
      * Creates a new component instance.
      */
     public SendMessageAction() {
-        super("send-message-action");
+        super(CorePluginType.SEND_MESSAGE_ACTION.getId());
         messageConnector = new FallbackMessageConnector();
         messageTemplate = "";
     }

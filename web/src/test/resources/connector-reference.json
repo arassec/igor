@@ -1,67 +1,68 @@
 {
-  "id": "connector-id",
-  "name": "connector-name",
-  "category": {
-    "key": "connector-category-id",
-    "value": "Connector Category"
-  },
-  "type": {
-    "key": "connector-type-id",
-    "value": "Connector Type",
-    "documentationAvailable": false
-  },
-  "parameters": [
-    {
-      "name": "intParam",
-      "required": true,
-      "type": "int",
-      "value": 0,
-      "connector": false
+    "id": "connector-id",
+    "name": "connector-name",
+    "category": {
+        "key": "connector-category-id",
+        "value": "Connector Category"
     },
-    {
-      "name": "integerParam",
-      "type": "java.lang.Integer",
-      "value": null,
-      "connector": false
+    "type": {
+        "key": "connector-type-id",
+        "value": "Connector Type",
+        "documentationAvailable": false,
+        "supportsEvents": false
     },
-    {
-      "name": "longParam",
-      "required": true,
-      "type": "long",
-      "value": 0,
-      "connector": false
-    },
-    {
-      "name": "longObjectParam",
-      "type": "java.lang.Long",
-      "value": null,
-      "connector": false
-    },
-    {
-      "name": "booleanParam",
-      "required": true,
-      "type": "boolean",
-      "value": false,
-      "connector": false
-    },
-    {
-      "name": "booleanObjectParam",
-      "type": "java.lang.Boolean",
-      "value": null,
-      "connector": false
-    },
-    {
-      "name": "stringParam",
-      "type": "java.lang.String",
-      "value": null,
-      "connector": false
-    },
-    {
-      "name": "securedStringParam",
-      "secured": true,
-      "type": "java.lang.String",
-      "value": null,
-      "connector": false
-    }
-  ]
+    "parameters": [
+        {
+            "name": "intParam",
+            "required": true,
+            "type": "int",
+            "value": 0,
+            "connector": false
+        },
+        {
+            "name": "integerParam",
+            "type": "java.lang.Integer",
+            "value": null,
+            "connector": false
+        },
+        {
+            "name": "longParam",
+            "required": true,
+            "type": "long",
+            "value": 0,
+            "connector": false
+        },
+        {
+            "name": "longObjectParam",
+            "type": "java.lang.Long",
+            "value": null,
+            "connector": false
+        },
+        {
+            "name": "booleanParam",
+            "required": true,
+            "type": "boolean",
+            "value": false,
+            "connector": false
+        },
+        {
+            "name": "booleanObjectParam",
+            "type": "java.lang.Boolean",
+            "value": null,
+            "connector": false
+        },
+        {
+            "name": "stringParam",
+            "type": "java.lang.String",
+            "value": null,
+            "connector": false
+        },
+        {
+            "name": "securedStringParam",
+            "secured": true,
+            "type": "java.lang.String",
+            "value": null,
+            "connector": false
+        }
+    ]
 }

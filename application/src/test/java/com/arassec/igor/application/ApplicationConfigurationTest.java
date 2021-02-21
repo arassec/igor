@@ -1,18 +1,20 @@
 package com.arassec.igor.application;
 
-import com.arassec.igor.core.CoreConfiguration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
+import java.util.Locale;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests the {@link CoreConfiguration} functionality.
+ * Tests the {@link ApplicationConfiguration} functionality.
  */
 class ApplicationConfigurationTest {
 
@@ -35,21 +37,20 @@ class ApplicationConfigurationTest {
     @Test
     @DisplayName("Tests required annotations are present.")
     void testAnnotations() {
-        assertTrue(CoreConfiguration.class.isAnnotationPresent(Configuration.class));
-        assertTrue(CoreConfiguration.class.isAnnotationPresent(EnableScheduling.class));
+        assertTrue(ApplicationConfiguration.class.isAnnotationPresent(Configuration.class));
+        assertTrue(ApplicationConfiguration.class.isAnnotationPresent(EnableScheduling.class));
     }
 
     /**
-     * Tests I18N.
+     * Tests I18N of core messages.
      */
-    /*
     @Test
-    @DisplayName("Tests module-core I18N.")
+    @DisplayName("Tests I18N of core messages.")
     void testI18n() {
-        CoreConfiguration configuration = new CoreConfiguration();
+        ApplicationConfiguration configuration = new ApplicationConfiguration();
         MessageSource messageSource = configuration.coreMessageSource();
         assertEquals("a job with the same name already exists",
                 messageSource.getMessage("com.arassec.igor.core.validation.unique-job-name", null, Locale.getDefault()));
     }
-*/
+
 }

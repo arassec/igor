@@ -4,7 +4,7 @@ import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CorePluginCategory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public abstract class BaseFileConnector extends BaseConnector implements FileCon
      * @param typeId The type ID.
      */
     protected BaseFileConnector(String typeId) {
-        super(CoreCategory.FILE.getId(), typeId);
+        super(CorePluginCategory.FILE.getId(), typeId);
     }
 
     /**

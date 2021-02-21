@@ -1,9 +1,10 @@
 package com.arassec.igor.module.file.connector.ssh;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.module.file.FilePluginType;
 import com.arassec.igor.plugin.core.file.connector.FileInfo;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
 import com.jcraft.jsch.ChannelSftp;
@@ -32,7 +33,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
      * Creates a new component instance.
      */
     public SftpFileConnector() {
-        super("sftp-file-connector");
+        super(FilePluginType.SFTP_FILE_CONNECTOR.getId());
     }
 
     /**

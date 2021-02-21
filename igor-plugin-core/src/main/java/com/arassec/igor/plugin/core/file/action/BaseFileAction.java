@@ -2,7 +2,7 @@ package com.arassec.igor.plugin.core.file.action;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.BaseAction;
-import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CorePluginCategory;
 import com.arassec.igor.plugin.core.CoreUtils;
 import lombok.Data;
 
@@ -44,7 +44,7 @@ public abstract class BaseFileAction extends BaseAction {
      * @param typeId The type ID.
      */
     protected BaseFileAction(String typeId) {
-        super(CoreCategory.FILE.getId(), typeId);
+        super(CorePluginCategory.FILE.getId(), typeId);
     }
 
     /**

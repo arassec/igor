@@ -5,7 +5,6 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.NonNull;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -81,7 +80,8 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
             private final AtomicInteger counter = new AtomicInteger();
 
             @Override
-            public Thread newThread(@NonNull Runnable r) {
+            @SuppressWarnings("NullableProblems")
+            public Thread newThread(Runnable r) {
                 Thread t = new Thread(r, String.format(THREAD_NAME_PATTERN, concurrencyGroupId, counter.incrementAndGet()));
                 t.setUncaughtExceptionHandler(ConcurrencyGroup.this);
                 return t;

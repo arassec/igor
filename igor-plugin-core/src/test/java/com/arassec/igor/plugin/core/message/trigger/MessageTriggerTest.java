@@ -2,7 +2,7 @@ package com.arassec.igor.plugin.core.message.trigger;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.EventType;
-import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CorePluginCategory;
 import com.arassec.igor.plugin.core.message.connector.FallbackMessageConnector;
 import com.arassec.igor.plugin.core.message.connector.MessageConnector;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +44,7 @@ class MessageTriggerTest {
     @DisplayName("Tests instance creation.")
     void testInstanceCreation() {
         MessageTrigger messageTrigger = new MessageTrigger();
-        assertEquals(CoreCategory.MESSAGE.getId(), messageTrigger.getCategoryId());
+        assertEquals(CorePluginCategory.MESSAGE.getId(), messageTrigger.getCategoryId());
         assertTrue(messageTrigger.getMessageConnector() instanceof FallbackMessageConnector);
     }
 

@@ -2,7 +2,7 @@ package com.arassec.igor.plugin.core.persistence.action;
 
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.repository.PersistentValueRepository;
-import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CorePluginCategory;
 
 /**
  * Base class for actions that work with persistence connectors.
@@ -21,7 +21,7 @@ public abstract class BasePersistenceAction extends BaseAction {
      * @param persistentValueRepository The repository for persisted values.
      */
     protected BasePersistenceAction(String typeId, PersistentValueRepository persistentValueRepository) {
-        super(CoreCategory.PERSISTENCE.getId(), typeId);
+        super(CorePluginCategory.PERSISTENCE.getId(), typeId);
         this.persistentValueRepository = persistentValueRepository;
     }
 

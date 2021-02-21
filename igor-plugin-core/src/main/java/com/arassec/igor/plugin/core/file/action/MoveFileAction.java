@@ -1,8 +1,9 @@
 package com.arassec.igor.plugin.core.file.action;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import lombok.Getter;
@@ -62,7 +63,7 @@ public class MoveFileAction extends BaseFileAction {
      * Creates a new component instance.
      */
     public MoveFileAction() {
-        super("move-file-action");
+        super(CorePluginType.MOVE_FILE_ACTION.getId());
         source = new FallbackFileConnector();
     }
 

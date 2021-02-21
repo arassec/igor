@@ -1,4 +1,4 @@
-package com.arassec.igor.core.model.annotation;
+package com.arassec.igor.application.annotation;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -9,9 +9,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotates a class as igor component. It can be used on classes that inherit from
- * {@link com.arassec.igor.core.model.trigger.Trigger}, {@link com.arassec.igor.core.model.action.Action} or
- * {@link com.arassec.igor.core.model.connector.Connector}.
+ * Annotates a class as igor component. It can be used on classes that inherit from {@link
+ * com.arassec.igor.core.model.trigger.Trigger}, {@link com.arassec.igor.core.model.action.Action} or {@link
+ * com.arassec.igor.core.model.connector.Connector}.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

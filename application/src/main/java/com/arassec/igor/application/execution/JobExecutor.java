@@ -1,6 +1,6 @@
 package com.arassec.igor.application.execution;
 
-import com.arassec.igor.core.IgorApplicationProperties;
+import com.arassec.igor.application.IgorApplicationProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
@@ -36,9 +36,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class JobExecutor {
 
     /**
-     * Igor's core configuration properties.
+     * Igor's application configuration properties.
      */
-    private final IgorApplicationProperties igorCoreProperties;
+    private final IgorApplicationProperties igorApplicationProperties;
 
     /**
      * Repository for jobs.
@@ -73,19 +73,19 @@ public class JobExecutor {
     /**
      * Creates a new JobExecutor instance.
      *
-     * @param igorCoreProperties        Core configuration properties of igor.
+     * @param igorApplicationProperties        Core configuration properties of igor.
      * @param jobRepository             Repository for jobs.
      * @param jobExecutionRepository    Repository for job executions.
      * @param applicationEventPublisher Publisher for application events.
      */
-    public JobExecutor(IgorApplicationProperties igorCoreProperties, JobRepository jobRepository,
+    public JobExecutor(IgorApplicationProperties igorApplicationProperties, JobRepository jobRepository,
                        JobExecutionRepository jobExecutionRepository, ApplicationEventPublisher applicationEventPublisher) {
-        this.igorCoreProperties = igorCoreProperties;
+        this.igorApplicationProperties = igorApplicationProperties;
         this.jobRepository = jobRepository;
         this.jobExecutionRepository = jobExecutionRepository;
         this.applicationEventPublisher = applicationEventPublisher;
         threadPoolExecutor = (ThreadPoolExecutor) Executors
-                .newFixedThreadPool(igorCoreProperties.getJobQueueSize(), runnable -> new Thread(runnable, "job-executor-thread"));
+                .newFixedThreadPool(igorApplicationProperties.getJobQueueSize(), runnable -> new Thread(runnable, "job-executor-thread"));
     }
 
     /**
@@ -102,7 +102,7 @@ public class JobExecutor {
                 new JobEvent(JobEventType.STATE_REFRESH, value)));
 
         // Check if we can run another job:
-        int freeSlots = igorCoreProperties.getJobQueueSize() - currentlyProcessedJobs.size();
+        int freeSlots = igorApplicationProperties.getJobQueueSize() - currentlyProcessedJobs.size();
 
         ModelPage<JobExecution> waitingJobExecutions = jobExecutionRepository
                 .findInState(JobExecutionState.WAITING, 0, Integer.MAX_VALUE);

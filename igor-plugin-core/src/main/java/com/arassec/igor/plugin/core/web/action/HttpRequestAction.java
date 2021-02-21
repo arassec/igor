@@ -1,11 +1,12 @@
 package com.arassec.igor.plugin.core.web.action;
 
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CoreUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -31,7 +32,7 @@ import java.util.Set;
 @Getter
 @Setter
 @IgorComponent
-public class HttpRequestAction extends BaseWebAction {
+public class HttpRequestAction extends BaseHttpAction {
 
     /**
      * Key for the web request action's data.
@@ -91,7 +92,7 @@ public class HttpRequestAction extends BaseWebAction {
      * Creates a new HTTP connector instance.
      */
     public HttpRequestAction() {
-        super("http-request-action");
+        super(CorePluginType.HTTP_REQUEST_ACTION.getId());
         body = "";
     }
 

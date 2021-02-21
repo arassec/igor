@@ -1,6 +1,6 @@
 package com.arassec.igor.application.execution;
 
-import com.arassec.igor.core.IgorApplicationProperties;
+import com.arassec.igor.application.IgorApplicationProperties;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
@@ -43,10 +43,10 @@ class JobExecutorTest {
     private JobExecutor jobExecutor;
 
     /**
-     * Mocked core configuration properties.
+     * Mocked application configuration properties.
      */
     @Mock
-    private IgorApplicationProperties igorCoreProperties;
+    private IgorApplicationProperties igorApplicationProperties;
 
     /**
      * Mocked repository for jobs.
@@ -71,8 +71,8 @@ class JobExecutorTest {
      */
     @BeforeEach
     void initialize() {
-        when(igorCoreProperties.getJobQueueSize()).thenReturn(1);
-        jobExecutor = new JobExecutor(igorCoreProperties, jobRepository, jobExecutionRepository, applicationEventPublisher);
+        when(igorApplicationProperties.getJobQueueSize()).thenReturn(1);
+        jobExecutor = new JobExecutor(igorApplicationProperties, jobRepository, jobExecutionRepository, applicationEventPublisher);
     }
 
     /**

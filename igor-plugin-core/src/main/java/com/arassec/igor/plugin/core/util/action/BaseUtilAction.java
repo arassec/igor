@@ -1,7 +1,7 @@
 package com.arassec.igor.plugin.core.util.action;
 
 import com.arassec.igor.core.model.action.BaseAction;
-import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CorePluginCategory;
 
 /**
  * Base class for actions that don't really fit into any other category.
@@ -24,7 +24,7 @@ public abstract class BaseUtilAction extends BaseAction {
      * @param typeId The type ID.
      */
     protected BaseUtilAction(String typeId) {
-        super(CoreCategory.UTIL.getId(), typeId);
+        super(CorePluginCategory.UTIL.getId(), typeId);
     }
 
 }

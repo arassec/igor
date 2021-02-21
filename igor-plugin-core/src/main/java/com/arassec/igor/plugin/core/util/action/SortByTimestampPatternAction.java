@@ -1,8 +1,9 @@
 package com.arassec.igor.plugin.core.util.action;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CoreUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -66,7 +67,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * Creates a new instance.
      */
     public SortByTimestampPatternAction() {
-        super("sort-by-timestamp-pattern-action");
+        super(CorePluginType.SORT_BY_TIMESTAMP_PATTERN_ACTION.getId());
         // Sorting is always done single threaded:
         setNumThreads(1);
         getUnEditableProperties().add("numThreads");

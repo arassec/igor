@@ -1,6 +1,6 @@
 package com.arassec.igor.application.registry;
 
-import com.arassec.igor.core.IgorApplicationProperties;
+import com.arassec.igor.application.IgorApplicationProperties;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.action.MissingComponentAction;
@@ -67,10 +67,10 @@ class IgorComponentRegistryTest {
     private Connector connectorMock;
 
     /**
-     * Igor's core configuration properties.
+     * Igor's application configuration properties.
      */
     @Mock
-    private IgorApplicationProperties igorCoreProperties;
+    private IgorApplicationProperties igorApplicationProperties;
 
     /**
      * Initializes the test environment.
@@ -89,7 +89,7 @@ class IgorComponentRegistryTest {
         applicationContextMock = mock(ApplicationContext.class);
 
         igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock, new TestAction()), List.of(triggerMock),
-                List.of(new TestConnectorImpl(), connectorMock), igorCoreProperties);
+                List.of(new TestConnectorImpl(), connectorMock), igorApplicationProperties);
         igorComponentRegistry.afterPropertiesSet();
         igorComponentRegistry.setApplicationContext(applicationContextMock);
     }

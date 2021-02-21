@@ -1,9 +1,10 @@
 package com.arassec.igor.plugin.core.web.trigger;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.trigger.BaseEventTrigger;
 import com.arassec.igor.core.model.trigger.EventType;
-import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CorePluginCategory;
+import com.arassec.igor.plugin.core.CorePluginType;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,7 +18,7 @@ public class WebHookTrigger extends BaseEventTrigger {
      * Creates a new component instance.
      */
     public WebHookTrigger() {
-        super(CoreCategory.WEB.getId(), "web-hook-trigger");
+        super(CorePluginCategory.WEB.getId(), CorePluginType.WEB_HOOK_TRIGGER.getId());
     }
 
     /**

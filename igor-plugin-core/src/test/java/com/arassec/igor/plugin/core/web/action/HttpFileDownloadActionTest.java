@@ -7,7 +7,7 @@ import com.arassec.igor.plugin.core.CoreDataKey;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import com.arassec.igor.plugin.core.web.connector.FallbackHttpConnector;
-import com.arassec.igor.plugin.core.web.connector.HttpConnector;
+import com.arassec.igor.plugin.core.web.connector.StandardHttpConnector;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,10 +37,10 @@ import static org.mockito.Mockito.*;
 class HttpFileDownloadActionTest extends CoreActionBaseTest {
 
     /**
-     * Mock for the action's {@link HttpConnector}.
+     * Mock for the action's {@link StandardHttpConnector}.
      */
     @Mock
-    private HttpConnector httpConnector;
+    private StandardHttpConnector httpConnector;
 
     /**
      * Mock for the action's "target" property.

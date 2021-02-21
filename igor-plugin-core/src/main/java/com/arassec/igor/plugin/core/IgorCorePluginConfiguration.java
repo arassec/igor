@@ -1,6 +1,6 @@
 package com.arassec.igor.plugin.core;
 
-import com.arassec.igor.core.util.IgorConfigHelper;
+import com.arassec.igor.application.util.IgorConfigHelper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan
-public class IgorPluginCoreConfiguration {
+public class IgorCorePluginConfiguration {
 
     /**
      * Creates a new {@link MessageSource} for i18n.

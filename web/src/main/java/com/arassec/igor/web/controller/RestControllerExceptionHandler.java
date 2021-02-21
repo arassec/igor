@@ -62,7 +62,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         result.put(WebMapperKey.GENERAL_ERROR.getKey(), runtimeException.getMessage());
         log.warn("Caught exception during request!", runtimeException);
         return handleExceptionInternal(runtimeException, result,
-                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, webRequest);
+            new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, webRequest);
     }
 
     /**
@@ -78,7 +78,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         Map<String, Object> result = new HashMap<>();
         result.put(WebMapperKey.GENERAL_ERROR.getKey(), runtimeException.getMessage());
         return handleExceptionInternal(runtimeException, result,
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, webRequest);
+            new HttpHeaders(), HttpStatus.BAD_REQUEST, webRequest);
     }
 
     /**
@@ -116,7 +116,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                 // Special case: the custom "UniqueXyzName"-validators pass their validation result as ObjectError (because
                 // bean validation doesn't support field validation with references to other fields, e.g. a job's ID).
                 if (UniqueJobName.MESSAGE_KEY.equals(objectError.getDefaultMessage())
-                        || UniqueConnectorName.MESSAGE_KEY.equals(objectError.getDefaultMessage())) {
+                    || UniqueConnectorName.MESSAGE_KEY.equals(objectError.getDefaultMessage())) {
                     appendUniqueNameViolationError(validatedJson, objectError, result);
                 } else {
                     appendObjectError(objectError, result);
@@ -126,7 +126,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         });
 
         return handleExceptionInternal(methodArgumentNotValidException, result,
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, webRequest);
+            new HttpHeaders(), HttpStatus.BAD_REQUEST, webRequest);
     }
 
     /**
@@ -143,8 +143,8 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         }
         target.computeIfAbsent(id, s -> new HashMap<>());
         target.get(id).put(extractProperty(fieldError.getField()),
-                messageSource.getMessage(Optional.ofNullable(fieldError.getDefaultMessage()).orElse("invalid value"), null,
-                        LocaleContextHolder.getLocale()));
+            messageSource.getMessage(Optional.ofNullable(fieldError.getDefaultMessage()).orElse("invalid value"), null,
+                LocaleContextHolder.getLocale()));
     }
 
     /**
@@ -160,7 +160,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         target.computeIfAbsent(id, k -> new HashMap<>());
         String errorMessage = Optional.ofNullable(objectError.getDefaultMessage()).orElse("name already in use");
         target.get(id).put("name", messageSource.getMessage(errorMessage, null,
-                LocaleContextHolder.getLocale()));
+            LocaleContextHolder.getLocale()));
     }
 
     /**
@@ -174,7 +174,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
             target.put(WebMapperKey.GENERAL_VALIDATION_ERRORS.getKey(), new HashMap<>());
         }
         target.get(WebMapperKey.GENERAL_VALIDATION_ERRORS.getKey()).put(objectError.getObjectName(),
-                Optional.ofNullable(objectError.getDefaultMessage()).orElse("validation error"));
+            Optional.ofNullable(objectError.getDefaultMessage()).orElse("validation error"));
     }
 
     /**
@@ -186,7 +186,11 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
      * @return The ID of the component containing the invalid property.
      */
     private String extractId(Map<String, Object> target, String validationPath) {
-        String jsonPointer = "/" + validationPath.substring(0, validationPath.lastIndexOf('.') + 1).replace(".", "/") + "id";
+        String jsonPointer = "/" + validationPath
+            .substring(0, validationPath.lastIndexOf('.') + 1)
+            .replace(".", "/")
+            .replace("[", "/")
+            .replace("]", "") + "id";
         JsonNode jsonNode = objectMapper.convertValue(target, JsonNode.class);
         String result = jsonNode.at(jsonPointer).asText();
         if (!StringUtils.hasText(result)) {

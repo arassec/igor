@@ -1,11 +1,11 @@
 package com.arassec.igor.plugin.core.message.trigger;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.BaseEventTrigger;
 import com.arassec.igor.core.model.trigger.EventType;
-import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CorePluginCategory;
 import com.arassec.igor.plugin.core.message.connector.FallbackMessageConnector;
 import com.arassec.igor.plugin.core.message.connector.MessageConnector;
 import lombok.Getter;
@@ -33,7 +33,7 @@ public class MessageTrigger extends BaseEventTrigger {
      * Creates a new component instance.
      */
     protected MessageTrigger() {
-        super(CoreCategory.MESSAGE.getId(), "message-trigger");
+        super(CorePluginCategory.MESSAGE.getId(), "message-trigger");
         this.messageConnector = new FallbackMessageConnector();
     }
 

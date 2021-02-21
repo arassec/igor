@@ -1,6 +1,6 @@
 package com.arassec.igor.plugin.core.message.connector;
 
-import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CorePluginCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ class BaseMessageConnectorTest {
     @Test
     @DisplayName("Tests initialization.")
     void testInitialization() {
-        assertEquals(CoreCategory.MESSAGE.getId(), baseMessageConnector.getCategoryId());
+        assertEquals(CorePluginCategory.MESSAGE.getId(), baseMessageConnector.getCategoryId());
         assertEquals("type-id", baseMessageConnector.getTypeId());
     }
 

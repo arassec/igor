@@ -1,8 +1,9 @@
 package com.arassec.igor.plugin.core.test.action;
 
-import com.arassec.igor.core.model.annotation.IgorComponent;
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CoreUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +32,7 @@ public class DuplicateAction extends BaseTestAction {
      * Creates a new component instance.
      */
     protected DuplicateAction() {
-        super("duplicate-action");
+        super(CorePluginType.DUPLICATE_ACTION.getId());
     }
 
     /**

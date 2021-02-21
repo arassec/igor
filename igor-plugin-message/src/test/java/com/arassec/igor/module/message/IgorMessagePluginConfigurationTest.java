@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests the module configuration.
  */
 @DisplayName("Tests the message plugin's configuration.")
-class IgorPluginMessageConfigurationTest {
+class IgorMessagePluginConfigurationTest {
 
     /**
      * Tests resolution of I18N keys to display texts.
@@ -20,7 +20,7 @@ class IgorPluginMessageConfigurationTest {
     @Test
     @DisplayName("Tests I18N of the message plugin.")
     void testI18n() {
-        IgorPluginMessageConfiguration configuration = new IgorPluginMessageConfiguration();
+        IgorMessagePluginConfiguration configuration = new IgorMessagePluginConfiguration();
         MessageSource messageSource = configuration.messageMessageSource();
         assertEquals("RabbitMQ", messageSource.getMessage("rabbitmq-message-connector", null, Locale.getDefault()));
     }

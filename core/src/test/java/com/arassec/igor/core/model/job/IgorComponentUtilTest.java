@@ -47,11 +47,11 @@ class IgorComponentUtilTest {
     }
 
     /**
-     * Tests connector shutdown
+     * Tests connector initialization
      */
     @Test
-    @DisplayName("Tests connector shutdown")
-    void testShutdownConnectors() {
+    @DisplayName("Tests connector initialization")
+    void testInitializeConnector() {
         // Initialize should handle null-input:
         IgorComponentUtil.initializeConnectors(null, jobExecution);
 
@@ -60,11 +60,11 @@ class IgorComponentUtilTest {
     }
 
     /**
-     * Tests connector initialization
+     * Tests connector shutdown
      */
     @Test
-    @DisplayName("Tests connector initialization")
-    void testInitializeConnector() {
+    @DisplayName("Tests connector shutdown")
+    void testShutdownConnectors() {
         // Shutdown should handle null-input:
         IgorComponentUtil.shutdownConnectors(null, jobExecution);
 

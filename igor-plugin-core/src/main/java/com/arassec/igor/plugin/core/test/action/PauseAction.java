@@ -1,9 +1,10 @@
 package com.arassec.igor.plugin.core.test.action;
 
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CorePluginType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,7 @@ public class PauseAction extends BaseTestAction {
      * Creates a new component instance.
      */
     public PauseAction() {
-        super("pause-action");
+        super(CorePluginType.PAUSE_ACTION.getId());
         random = new SecureRandom();
     }
 

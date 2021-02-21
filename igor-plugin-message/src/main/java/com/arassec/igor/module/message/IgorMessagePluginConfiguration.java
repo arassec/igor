@@ -1,17 +1,17 @@
-package com.arassec.igor.module.file;
+package com.arassec.igor.module.message;
 
-import com.arassec.igor.core.util.IgorConfigHelper;
+import com.arassec.igor.application.util.IgorConfigHelper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for the igor 'file' module.
+ * Configuration for the igor 'message' plugin.
  */
 @Configuration
 @ComponentScan
-public class IgorPluginFileConfiguration {
+public class IgorMessagePluginConfiguration {
 
     /**
      * Creates a new {@link MessageSource} for i18n.
@@ -19,8 +19,8 @@ public class IgorPluginFileConfiguration {
      * @return The newly created instance.
      */
     @Bean
-    public MessageSource pluginFileMessageSource() {
-        return IgorConfigHelper.createMessageSource("i18n/plugin-file-labels");
+    public MessageSource messageMessageSource() {
+        return IgorConfigHelper.createMessageSource("i18n/plugin-message-labels");
     }
 
 }

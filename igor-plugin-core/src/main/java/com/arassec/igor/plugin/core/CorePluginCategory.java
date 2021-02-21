@@ -3,9 +3,9 @@ package com.arassec.igor.plugin.core;
 import lombok.Getter;
 
 /**
- * Defines categories for core components.
+ * Defines categories for components of the 'core' plugin.
  */
-public enum CoreCategory {
+public enum CorePluginCategory {
 
     /**
      * The "Util" category.
@@ -48,7 +48,7 @@ public enum CoreCategory {
      *
      * @param id The ID to use.
      */
-    CoreCategory(String id) {
+    CorePluginCategory(String id) {
         this.id = id;
     }
 

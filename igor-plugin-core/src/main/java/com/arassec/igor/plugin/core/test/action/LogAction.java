@@ -1,8 +1,9 @@
 package com.arassec.igor.plugin.core.test.action;
 
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.annotation.IgorComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import com.arassec.igor.plugin.core.CorePluginType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ public class LogAction extends BaseTestAction {
      * Creates a new component instance.
      */
     public LogAction() {
-        super("log-action");
+        super(CorePluginType.LOG_ACTION.getId());
     }
 
     /**

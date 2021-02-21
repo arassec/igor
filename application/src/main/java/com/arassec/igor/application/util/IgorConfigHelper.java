@@ -1,4 +1,4 @@
-package com.arassec.igor.core.util;
+package com.arassec.igor.application.util;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
