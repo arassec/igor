@@ -8,7 +8,7 @@ import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreDataKey;
 import com.arassec.igor.plugin.core.CorePluginType;
-import com.arassec.igor.plugin.core.CoreUtils;
+import com.arassec.igor.plugin.core.CorePluginUtils;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
@@ -121,14 +121,14 @@ public class HttpFileDownloadAction extends BaseHttpAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String requestUrl = CoreUtils.getString(data, url);
-        String destination = CoreUtils.getString(data, targetDirectory);
-        String filename = CoreUtils.getString(data, targetFilename);
-        String resolvedTargetKey = CoreUtils.getString(data, targetKey);
+        String requestUrl = CorePluginUtils.getString(data, url);
+        String destination = CorePluginUtils.getString(data, targetDirectory);
+        String filename = CorePluginUtils.getString(data, targetFilename);
+        String resolvedTargetKey = CorePluginUtils.getString(data, targetKey);
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder().GET().uri(URI.create(requestUrl));
-        parsedHeaders.forEach(header -> httpRequestBuilder.header(CoreUtils.getString(data, header.split(":")[0]),
-            CoreUtils.getString(data, header.split(":")[1])));
+        parsedHeaders.forEach(header -> httpRequestBuilder.header(CorePluginUtils.getString(data, header.split(":")[0]),
+            CorePluginUtils.getString(data, header.split(":")[1])));
         addBasicAuthHeaderIfConfigured(httpRequestBuilder);
 
         try {
@@ -147,16 +147,16 @@ public class HttpFileDownloadAction extends BaseHttpAction {
             fileStreamData.setFilenameSuffix(determineFilenameSuffix(httpResponse));
             setFilesizeAndData(httpResponse, fileStreamData, httpRequestBuilder, requestUrl);
 
-            String targetFileWithSuffix = CoreUtils.appendSuffixIfRequired(filename,
+            String targetFileWithSuffix = CorePluginUtils.appendSuffixIfRequired(filename,
                 fileStreamData.getFilenameSuffix(), appendFiletypeSuffix);
 
-            String targetFileWithPath = CoreUtils.combineFilePath(destination, targetFileWithSuffix);
+            String targetFileWithPath = CorePluginUtils.combineFilePath(destination, targetFileWithSuffix);
 
             log.debug("Downloading file '{}' to '{}'", requestUrl, targetFileWithPath);
 
             String targetFileInTransfer = targetFileWithPath;
             if (appendTransferSuffix) {
-                targetFileInTransfer += CoreUtils.FILE_IN_TRANSFER_SUFFIX;
+                targetFileInTransfer += CorePluginUtils.FILE_IN_TRANSFER_SUFFIX;
             }
 
             target.writeStream(targetFileInTransfer, fileStreamData, workInProgressMonitor, jobExecution);

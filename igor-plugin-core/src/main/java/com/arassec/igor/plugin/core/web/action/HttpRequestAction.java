@@ -7,7 +7,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CorePluginType;
-import com.arassec.igor.plugin.core.CoreUtils;
+import com.arassec.igor.plugin.core.CorePluginUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -111,15 +111,15 @@ public class HttpRequestAction extends BaseHttpAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String requestMethod = CoreUtils.getString(data, method);
-        String requestUrl = CoreUtils.getString(data, url);
-        String content = CoreUtils.getString(data, body);
+        String requestMethod = CorePluginUtils.getString(data, method);
+        String requestUrl = CorePluginUtils.getString(data, url);
+        String content = CorePluginUtils.getString(data, body);
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(requestUrl))
             .method(requestMethod, HttpRequest.BodyPublishers.ofString(content));
-        parsedHeaders.forEach(header -> httpRequestBuilder.header(CoreUtils.getString(data, header.split(":")[0]),
-            CoreUtils.getString(data, header.split(":")[1])));
+        parsedHeaders.forEach(header -> httpRequestBuilder.header(CorePluginUtils.getString(data, header.split(":")[0]),
+            CorePluginUtils.getString(data, header.split(":")[1])));
         addBasicAuthHeaderIfConfigured(httpRequestBuilder);
 
         if (isSimulation(data) && simulationSafe && SIMULATION_UNSAFE_METHODS.contains(requestMethod)) {
@@ -138,7 +138,7 @@ public class HttpRequestAction extends BaseHttpAction {
                 responseData.put("headers", httpResponse.headers().map());
                 responseData.put("body", parseResponseBody(httpResponse));
 
-                data.put(CoreUtils.getString(data, targetKey), responseData);
+                data.put(CorePluginUtils.getString(data, targetKey), responseData);
             } catch (IOException e) {
                 throw new IgorException("Could not request URL: " + url, e);
             } catch (InterruptedException e) {

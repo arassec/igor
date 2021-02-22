@@ -2,6 +2,10 @@ package com.arassec.igor.simulation.job.proxy;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.trigger.Trigger;
+import com.arassec.igor.core.util.IgorException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,7 +45,15 @@ public class TriggerProxy extends BaseProxy<Trigger> implements Trigger {
     public Map<String, Object> createDataItem() {
         Map<String, Object> dataItem = delegate.createDataItem();
         ((Map<String, Object>) dataItem.get(DataKey.META.getKey())).put(DataKey.SIMULATION.getKey(), true);
-        collectedData.add(dataItem);
+
+        // Clone the initial data item because it might get modified by actions:
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            collectedData.add(objectMapper.readValue(objectMapper.writeValueAsString(dataItem), new TypeReference<>() {}));
+        } catch (JsonProcessingException e) {
+            throw new IgorException("Could not clone initial data item!", e);
+        }
+
         return dataItem;
     }
 

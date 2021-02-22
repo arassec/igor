@@ -3,6 +3,7 @@
 ## Version {{ $themeConfig.igorVersion }}
 - Refactored application module into igor-standalone module.
 - Removed json-path, jmustache and byte-buddy dependencies from core module.
+- Added 'Add Data' action. 
 
 ::: danger Breaking Changes
 - Removed 'data' and 'meta' parameters from all triggers. Use the new 'Add data' action instead!

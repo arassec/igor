@@ -2,6 +2,7 @@ package com.arassec.igor.plugin.core;
 
 import com.arassec.igor.core.util.IgorException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.MustacheException;
@@ -12,7 +13,7 @@ import java.util.Map;
 /**
  * Utility to help with problems in the core plugin and descendant plugins.
  */
-public class CoreUtils {
+public class CorePluginUtils {
 
     /**
      * File-suffix appended to files during transfer.
@@ -20,9 +21,14 @@ public class CoreUtils {
     public static final String FILE_IN_TRANSFER_SUFFIX = ".igor";
 
     /**
+     * Jackson's ObjectMapper to convert JSON.
+     */
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
      * Creates a new instance.
      */
-    private CoreUtils() {
+    private CorePluginUtils() {
     }
 
     /**
@@ -91,13 +97,25 @@ public class CoreUtils {
      *
      * @return A new Map instance with copied content.
      */
-    @SuppressWarnings("unchecked")
     public static Map<String, Object> clone(Map<String, Object> data) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(mapper.writeValueAsString(data), Map.class);
+            return objectMapper.readValue(objectMapper.writeValueAsString(data), new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new IgorException("Could not clone data item!", e);
+        }
+    }
+
+    /**
+     * Converts the supplied JSON into a Map.
+     *
+     * @param json The JSON to convert.
+     * @return The JSON as Map.
+     */
+    public static Map<String, Object> getData(String json) {
+        try {
+            return objectMapper.readValue(json, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            throw new IgorException("Could not convert JSON string.", e);
         }
     }
 

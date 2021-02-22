@@ -6,7 +6,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
 import com.arassec.igor.core.repository.PersistentValueRepository;
 import com.arassec.igor.plugin.core.CorePluginType;
-import com.arassec.igor.plugin.core.CoreUtils;
+import com.arassec.igor.plugin.core.CorePluginUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +53,7 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
         String jobId = getJobId(data);
-        String resolvedInput = CoreUtils.getString(data, input);
+        String resolvedInput = CorePluginUtils.getString(data, input);
 
         if (resolvedInput == null) {
             log.debug("Not enough data to filter: {}", input);

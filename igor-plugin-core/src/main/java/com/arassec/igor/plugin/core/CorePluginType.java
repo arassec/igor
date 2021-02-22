@@ -8,6 +8,11 @@ import lombok.Getter;
 public enum CorePluginType {
 
     /**
+     * Type of the "Add Data" action.
+     */
+    ADD_DATA_ACTION("add-data-action"),
+
+    /**
      * Type of the "Web-Hook" trigger.
      */
     WEB_HOOK_TRIGGER("web-hook-trigger"),

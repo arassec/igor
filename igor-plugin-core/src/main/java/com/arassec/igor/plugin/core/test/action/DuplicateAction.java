@@ -4,7 +4,7 @@ import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CorePluginType;
-import com.arassec.igor.plugin.core.CoreUtils;
+import com.arassec.igor.plugin.core.CorePluginUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,7 +42,7 @@ public class DuplicateAction extends BaseTestAction {
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         List<Map<String, Object>> result = new LinkedList<>();
         for (int i = 0; i < amount; i++) {
-            Map<String, Object> clone = CoreUtils.clone(data);
+            Map<String, Object> clone = CorePluginUtils.clone(data);
             clone.put("index", i);
             result.add(clone);
         }

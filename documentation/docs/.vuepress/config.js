@@ -75,7 +75,8 @@ module.exports = {
                                 "igor-plugin-core/move-file-action",
                                 "igor-plugin-core/read-file-action",
                                 "igor-plugin-core/send-message-action",
-                                "igor-plugin-core/http-request-action"
+                                "igor-plugin-core/http-request-action",
+                                "igor-plugin-core/add-data-action"
                             ]
                         },
                         {

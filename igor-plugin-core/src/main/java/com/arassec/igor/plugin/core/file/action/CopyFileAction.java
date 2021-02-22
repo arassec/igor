@@ -7,7 +7,7 @@ import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreDataKey;
 import com.arassec.igor.plugin.core.CorePluginType;
-import com.arassec.igor.plugin.core.CoreUtils;
+import com.arassec.igor.plugin.core.CorePluginUtils;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
@@ -115,7 +115,7 @@ public class CopyFileAction extends BaseFileAction {
         jobExecution.addWorkInProgress(workInProgressMonitor);
 
         try {
-            String sourceFileWithPath = CoreUtils.combineFilePath(resolvedData.getSourceDirectory(), resolvedData.getSourceFilename());
+            String sourceFileWithPath = CorePluginUtils.combineFilePath(resolvedData.getSourceDirectory(), resolvedData.getSourceFilename());
 
             FileStreamData fileStreamData = source.readStream(sourceFileWithPath);
 
@@ -123,16 +123,16 @@ public class CopyFileAction extends BaseFileAction {
                 throw new IgorException("Not valid or not a file!");
             }
 
-            String targetFileWithSuffix = CoreUtils.appendSuffixIfRequired(resolvedData.getTargetFilename(),
+            String targetFileWithSuffix = CorePluginUtils.appendSuffixIfRequired(resolvedData.getTargetFilename(),
                     fileStreamData.getFilenameSuffix(), appendFiletypeSuffix);
 
-            String targetFileWithPath = CoreUtils.combineFilePath(resolvedData.getTargetDirectory(), targetFileWithSuffix);
+            String targetFileWithPath = CorePluginUtils.combineFilePath(resolvedData.getTargetDirectory(), targetFileWithSuffix);
 
             log.debug("Copying file '{}' to '{}'", sourceFileWithPath, targetFileWithPath);
 
             String targetFileInTransfer = targetFileWithPath;
             if (appendTransferSuffix) {
-                targetFileInTransfer += CoreUtils.FILE_IN_TRANSFER_SUFFIX;
+                targetFileInTransfer += CorePluginUtils.FILE_IN_TRANSFER_SUFFIX;
             }
 
             target.writeStream(targetFileInTransfer, fileStreamData, workInProgressMonitor, jobExecution);
