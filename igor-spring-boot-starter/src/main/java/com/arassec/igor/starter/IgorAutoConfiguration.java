@@ -1,10 +1,10 @@
 package com.arassec.igor.starter;
 
 import com.arassec.igor.application.ApplicationConfiguration;
-import com.arassec.igor.module.file.IgorFilePluginConfiguration;
-import com.arassec.igor.module.message.IgorMessagePluginConfiguration;
 import com.arassec.igor.persistence.PersistenceConfiguration;
 import com.arassec.igor.plugin.core.IgorCorePluginConfiguration;
+import com.arassec.igor.plugin.file.IgorFilePluginConfiguration;
+import com.arassec.igor.plugin.message.IgorMessagePluginConfiguration;
 import com.arassec.igor.simulation.SimulationConfiguration;
 import com.arassec.igor.web.WebConfiguration;
 import org.springframework.context.annotation.Configuration;
