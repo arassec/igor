@@ -4,7 +4,6 @@ import com.arassec.igor.plugin.core.CorePluginCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -28,15 +27,6 @@ class BaseMessageConnectorTest {
     void testInitialization() {
         assertEquals(CorePluginCategory.MESSAGE.getId(), baseMessageConnector.getCategoryId());
         assertEquals("type-id", baseMessageConnector.getTypeId());
-    }
-
-    /**
-     * Tests the default implementation of message retrieval enabling.
-     */
-    @Test
-    @DisplayName("Tests the default implementation of message retrieval enabling.")
-    void testEnableMessageRetrieval() {
-        assertDoesNotThrow(baseMessageConnector::enableMessageRetrieval);
     }
 
 }

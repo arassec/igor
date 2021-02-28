@@ -1,4 +1,4 @@
-package com.arassec.igor.plugin.core.message.connector;
+package com.arassec.igor.plugin.message.connector;
 
 import lombok.Data;
 
@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Models a message to send with a {@link MessageConnector}.
+ * Models a RabbitMQ message to send with a igor.
  */
 @Data
-public class Message {
+public class RabbitMqMessage {
 
     /**
      * The message's headers.

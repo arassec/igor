@@ -1,10 +1,9 @@
-package com.arassec.igor.plugin.message.connector.rabbitmq;
+package com.arassec.igor.plugin.message.connector;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.util.event.JobTriggerEvent;
-import com.arassec.igor.plugin.core.message.connector.Message;
 import com.rabbitmq.client.Channel;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +30,7 @@ import static org.mockito.Mockito.*;
  * Tests the {@link RabbitMqMessageConnector}.
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Tests the RabbitMQ-Message-Connector.")
+@DisplayName("Tests the RabbitMQ-RabbitMqMessage-Connector.")
 class RabbitMqMessageConnectorTest {
 
     /**
@@ -73,27 +72,24 @@ class RabbitMqMessageConnectorTest {
     void testSendMessage() {
         RabbitMqMessageConnector rabbitMqMessageConnector = new RabbitMqMessageConnector(applicationEventPublisher);
 
-        Message emptyMessage = new Message();
-        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage(emptyMessage));
-
-        rabbitMqMessageConnector.setExchange("test-exchange");
-
-        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage(null));
-        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage(emptyMessage));
+        RabbitMqMessage emptyMessage = new RabbitMqMessage();
+        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage(null, emptyMessage));
+        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage("",null));
+        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage("", emptyMessage));
 
         rabbitMqMessageConnector.setRoutingKey("test-routing-key");
 
         RabbitTemplate rabbitTemplateMock = mock(RabbitTemplate.class);
         rabbitMqMessageConnector.setRabbitTemplate(rabbitTemplateMock);
 
-        Message message = new Message();
+        RabbitMqMessage message = new RabbitMqMessage();
         message.setContentEncoding(StandardCharsets.UTF_8.displayName());
         message.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
         message.getHeaders().put("a", "b");
         message.getHeaders().put("c", "d");
         message.setContent("test-message");
 
-        rabbitMqMessageConnector.sendMessage(message);
+        rabbitMqMessageConnector.sendMessage("test-exchange", message);
 
         ArgumentCaptor<org.springframework.amqp.core.Message> argCap =
                 ArgumentCaptor.forClass(org.springframework.amqp.core.Message.class);
@@ -117,25 +113,25 @@ class RabbitMqMessageConnectorTest {
         RabbitMqMessageConnector rabbitMqMessageConnector = new RabbitMqMessageConnector(applicationEventPublisher);
 
         // missing queue:
-        assertThrows(IgorException.class, rabbitMqMessageConnector::enableMessageRetrieval);
-        rabbitMqMessageConnector.setQueue("test-queue");
+        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.enableMessageRetrieval(null));
+        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.enableMessageRetrieval(""));
 
         // missing host:
-        assertThrows(IgorException.class, rabbitMqMessageConnector::enableMessageRetrieval);
+        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.enableMessageRetrieval("queue"));
         rabbitMqMessageConnector.setHost("host");
 
         // missing username:
-        assertThrows(IgorException.class, rabbitMqMessageConnector::enableMessageRetrieval);
+        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.enableMessageRetrieval("queue"));
         rabbitMqMessageConnector.setUsername("username");
 
         // missing password:
-        assertThrows(IgorException.class, rabbitMqMessageConnector::enableMessageRetrieval);
+        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.enableMessageRetrieval("queue"));
         rabbitMqMessageConnector.setPassword("password");
 
         assertNull(rabbitMqMessageConnector.getConnectionFactory());
         assertNull(rabbitMqMessageConnector.getMessageListenerContainer());
 
-        rabbitMqMessageConnector.enableMessageRetrieval();
+        rabbitMqMessageConnector.enableMessageRetrieval("queue");
 
         assertNotNull(rabbitMqMessageConnector.getConnectionFactory());
         assertNotNull(rabbitMqMessageConnector.getMessageListenerContainer());
@@ -230,7 +226,7 @@ class RabbitMqMessageConnectorTest {
         assertDoesNotThrow(() -> rabbitMqMessageConnector.processingFinished(emptyDataItem));
 
         // channel doesn't exist:
-        Map<String, Object> dataItem = Map.of("data", Map.of("messageMeta", Map.of("deliveryTag", 123L)));
+        Map<String, Object> dataItem = Map.of("messageMeta", Map.of("deliveryTag", 123L));
         rabbitMqMessageConnector.processingFinished(dataItem);
 
         // channel exists:

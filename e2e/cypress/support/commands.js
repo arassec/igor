@@ -231,6 +231,16 @@ Cypress.Commands.add('addAction', (name, category, type, parameters, advancedPar
     cy.setParameters(advancedParameters, true);
 })
 
+Cypress.Commands.add('chooseTrigger', (category, type, parameters, advancedParameters) => {
+    cy.chooseCategory('trigger', category);
+
+    cy.chooseType('trigger', type);
+
+    cy.setParameters(parameters, false);
+
+    cy.setParameters(advancedParameters, true);
+})
+
 Cypress.Commands.add('selectAction', (actionNameKebap) => {
     cy.get(`[data-e2e=action-${actionNameKebap}]`)
         .should('be.visible')
@@ -272,4 +282,13 @@ Cypress.Commands.add('simulateJob', () => {
 
     cy.get('[data-e2e=snackbar]')
         .should('not.exist')
+})
+
+Cypress.Commands.add('saveJob', () => {
+    cy.get('[data-e2e=save-job-button').click();
+
+    cy.wait(['@saveJob'])
+
+    cy.get('[data-e2e=snackbar]')
+        .contains(`saved.`);
 })

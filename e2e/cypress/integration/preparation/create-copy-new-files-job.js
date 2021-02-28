@@ -77,9 +77,10 @@ describe('Initializes the test environment\'s \'Copy New Files\' job.', () => {
                         'targetFilename': '{{}{{}data.filename{}}{}}'
                     });
 
-                cy.addAction('Send Message', 'Message', 'Send Message',
+                cy.addAction('Send Message', 'Message', 'Send RabbitMQ Message',
                     {
                         'messageConnector': rabbitMqServerKebap,
+                        'exchange': 'igor-exchange',
                         'messageTemplate': '{{}{enter}  "file": "{{}{{}data.filename{}}{}}"{enter}{}}'
                     });
 

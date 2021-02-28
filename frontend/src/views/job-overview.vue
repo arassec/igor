@@ -61,7 +61,8 @@
                                               :data-e2e="dataE2EName('run-', job.name)"/>
                             </div>
                         </layout-row>
-                        <div slot="action" :class="isJobInState(job, ['FAILED']) ? 'alert' : 'info'">
+                        <div slot="action" :class="isJobInState(job, ['FAILED']) ? 'alert' : 'info'"
+                            :data-e2e="dataE2EName('state-', job.name)">
                             <icon-button icon="times" v-on:clicked="openCancelJobDialog(job.execution.id, job.name)"
                                          v-if="isJobInState(job, ['WAITING', 'RUNNING', 'ACTIVE'])" class="right"/>
                             <icon-button icon="check"
@@ -101,7 +102,7 @@
             </div>
             <layout-row slot="footer">
                 <input-button slot="left" v-on:clicked="showRunDialog = false" icon="times"/>
-                <input-button slot="right" v-on:clicked="runJob()" icon="check"/>
+                <input-button slot="right" v-on:clicked="runJob()" icon="check" data-e2e="confirm-run-job-manually-button"/>
             </layout-row>
         </modal-dialog>
 

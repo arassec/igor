@@ -2,13 +2,10 @@ package com.arassec.igor.simulation.job.proxy;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.trigger.Trigger;
-import com.arassec.igor.core.util.IgorException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,19 +38,27 @@ public class TriggerProxy extends BaseProxy<Trigger> implements Trigger {
      * @return The initial data item.
      */
     @Override
-    @SuppressWarnings("unchecked")
     public Map<String, Object> createDataItem() {
-        Map<String, Object> dataItem = delegate.createDataItem();
-        ((Map<String, Object>) dataItem.get(DataKey.META.getKey())).put(DataKey.SIMULATION.getKey(), true);
+        Map<String, Object> dataItem = getDataItem();
 
         // Clone the initial data item because it might get modified by actions:
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            collectedData.add(objectMapper.readValue(objectMapper.writeValueAsString(dataItem), new TypeReference<>() {}));
-        } catch (JsonProcessingException e) {
-            throw new IgorException("Could not clone initial data item!", e);
-        }
+        collectedData.add(getDataItem());
 
+        return dataItem;
+    }
+
+    /**
+     * Returns the initial data item.
+     *
+     * @return The initial data item.
+     */
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> getDataItem() {
+        Map<String, Object> dataItem = delegate.createDataItem();
+        if (!dataItem.containsKey(DataKey.META.getKey())) {
+            dataItem.put(DataKey.META.getKey(), new HashMap<String, Object>());
+        }
+        ((Map<String, Object>) dataItem.get(DataKey.META.getKey())).put(DataKey.SIMULATION.getKey(), true);
         return dataItem;
     }
 

@@ -1,4 +1,4 @@
-package com.arassec.igor.plugin.core.message.action;
+package com.arassec.igor.plugin.message.action;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.job.execution.JobExecution;

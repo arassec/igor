@@ -76,7 +76,7 @@ public class HttpRequestAction extends BaseHttpAction {
     private boolean ignoreErrors;
 
     /**
-     * Doesn't execute non-idempotent web requests if {@code true}.
+     * Only executes idempotent web requests if {@code true}.
      */
     @IgorParam(advanced = true, defaultValue = "true")
     private boolean simulationSafe;

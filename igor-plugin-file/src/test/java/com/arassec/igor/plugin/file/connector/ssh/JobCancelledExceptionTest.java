@@ -19,7 +19,7 @@ class JobCancelledExceptionTest {
     @DisplayName("Tests the constructor argument of the exception.")
     void testConstructorArgument() {
         JobCancelledException exception = new JobCancelledException("exception-message");
-        assertTrue(StacktraceFormatter.format(exception).startsWith("com.arassec.igor.module.file.connector.ssh" +
+        assertTrue(StacktraceFormatter.format(exception).startsWith("com.arassec.igor.plugin.file.connector.ssh" +
                 ".JobCancelledException: exception-message"));
     }
 

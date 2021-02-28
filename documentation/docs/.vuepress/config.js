@@ -51,8 +51,8 @@ module.exports = {
                             children: [
                                 "igor-plugin-core/cron-trigger",
                                 "igor-plugin-core/manual-trigger",
-                                "igor-plugin-core/message-trigger",
-                                "igor-plugin-core/web-hook-trigger"
+                                "igor-plugin-core/web-hook-trigger",
+                                "igor-plugin-message/rabbitmq-message-trigger"
                             ]
                         },
                         {
@@ -74,22 +74,23 @@ module.exports = {
                                 "igor-plugin-core/list-files-action",
                                 "igor-plugin-core/move-file-action",
                                 "igor-plugin-core/read-file-action",
-                                "igor-plugin-core/send-message-action",
                                 "igor-plugin-core/http-request-action",
-                                "igor-plugin-core/add-data-action"
+                                "igor-plugin-core/add-data-action",
+                                "igor-plugin-message/rabbitmq-send-message-action"
                             ]
                         },
                         {
                             title: "Connectors",
                             sidebarDepth: 0,
                             children: [
+                                "igor-plugin-core/http-web-connector",
                                 "igor-plugin-core/localfs-file-connector",
                                 "igor-plugin-file/ftp-file-connector",
                                 "igor-plugin-file/ftps-file-connector",
                                 "igor-plugin-file/scp-file-connector",
                                 "igor-plugin-file/sftp-file-connector",
-                                "igor-plugin-message/rabbitmq-message-connector",
-                                "igor-plugin-core/http-web-connector"
+                                "igor-plugin-message/rabbitmq-message-connector"
+
                             ]
                         }
                     ]

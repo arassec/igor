@@ -1,17 +1,15 @@
-package com.arassec.igor.plugin.message.connector.rabbitmq;
+package com.arassec.igor.plugin.message.connector;
 
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
+import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.util.event.JobTriggerEvent;
 import com.arassec.igor.plugin.core.message.connector.BaseMessageConnector;
-import com.arassec.igor.plugin.core.message.connector.Message;
 import com.arassec.igor.plugin.message.MessagePluginType;
-import com.arassec.igor.plugin.message.connector.rabbitmq.validation.ExchangeAndOrQueueSet;
-import com.arassec.igor.plugin.message.connector.rabbitmq.validation.ExistingQueue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,13 +37,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Message connector to process messages via RabbitMQ.
+ * RabbitMqMessage connector to process messages via RabbitMQ.
  */
 @Getter
 @Setter
 @Slf4j
-@ExchangeAndOrQueueSet
-@ExistingQueue
 @IgorComponent
 public class RabbitMqMessageConnector extends BaseMessageConnector implements ChannelAwareMessageListener {
 
@@ -86,18 +82,6 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
     @NotBlank
     @IgorParam(secured = true)
     private String password;
-
-    /**
-     * The exchange messages are sent to.
-     */
-    @IgorParam
-    private String exchange;
-
-    /**
-     * The queue messages are received from.
-     */
-    @IgorParam
-    private String queue;
 
     /**
      * The optional routing key for messages.
@@ -186,8 +170,7 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void sendMessage(Message message) {
+    public void sendMessage(String exchange, RabbitMqMessage message) {
         if (!StringUtils.hasText(exchange)) {
             throw new IgorException("No RabbitMQ exchange configured to send messages to!");
         }
@@ -209,8 +192,8 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void enableMessageRetrieval() {
+    @IgorSimulationSafe
+    public void enableMessageRetrieval(String queue) {
         if (!StringUtils.hasText(queue)) {
             throw new IgorException("No RabbitMQ queue configured to listen for messages!");
         }
@@ -299,11 +282,11 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
      *
      * @param dataItem The data item representing the received message.
      */
-    @Override
+    @IgorSimulationSafe
     public void processingFinished(Map<String, Object> dataItem) {
         try {
             JsonNode jsonNode = objectMapper.convertValue(dataItem, JsonNode.class);
-            JsonNode deliveryTagNode = jsonNode.at("/data/messageMeta/deliveryTag");
+            JsonNode deliveryTagNode = jsonNode.at("/messageMeta/deliveryTag");
             Long deliveryTag = deliveryTagNode.asLong();
             if (channels.containsKey(deliveryTag)) {
                 channels.get(deliveryTag).basicAck(deliveryTag, false);

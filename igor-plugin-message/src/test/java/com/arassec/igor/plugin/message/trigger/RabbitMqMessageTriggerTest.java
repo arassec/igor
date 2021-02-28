@@ -1,10 +1,9 @@
-package com.arassec.igor.plugin.core.message.trigger;
+package com.arassec.igor.plugin.message.trigger;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.plugin.core.CorePluginCategory;
-import com.arassec.igor.plugin.core.message.connector.FallbackMessageConnector;
-import com.arassec.igor.plugin.core.message.connector.MessageConnector;
+import com.arassec.igor.plugin.message.connector.RabbitMqMessageConnector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,28 +11,28 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 /**
- * Tests the {@link MessageTrigger}.
+ * Tests the {@link RabbitMqMessageTrigger}.
  */
-@DisplayName("'Message trigger' tests.")
-class MessageTriggerTest {
+@DisplayName("'RabbitMqMessage trigger' tests.")
+class RabbitMqMessageTriggerTest {
 
     /**
      * The trigger under test.
      */
-    private final MessageTrigger trigger = new MessageTrigger();
+    private final RabbitMqMessageTrigger trigger = new RabbitMqMessageTrigger();
 
     /**
      * Mock of the message connector used in the trigger.
      */
-    private MessageConnector messageConnectorMock;
+    private RabbitMqMessageConnector messageConnectorMock;
 
     @BeforeEach
     void initialize() {
-        messageConnectorMock = mock(MessageConnector.class);
+        messageConnectorMock = mock(RabbitMqMessageConnector.class);
         trigger.setMessageConnector(messageConnectorMock);
     }
 
@@ -43,9 +42,9 @@ class MessageTriggerTest {
     @Test
     @DisplayName("Tests instance creation.")
     void testInstanceCreation() {
-        MessageTrigger messageTrigger = new MessageTrigger();
+        RabbitMqMessageTrigger messageTrigger = new RabbitMqMessageTrigger();
         assertEquals(CorePluginCategory.MESSAGE.getId(), messageTrigger.getCategoryId());
-        assertTrue(messageTrigger.getMessageConnector() instanceof FallbackMessageConnector);
+        assertNotNull(messageTrigger.getMessageConnector());
     }
 
     /**
@@ -54,8 +53,9 @@ class MessageTriggerTest {
     @Test
     @DisplayName("Tests initialization.")
     void testInitialization() {
+        trigger.setQueue("test-queue");
         trigger.initialize(new JobExecution());
-        verify(messageConnectorMock, times(1)).enableMessageRetrieval();
+        verify(messageConnectorMock, times(1)).enableMessageRetrieval("test-queue");
     }
 
     /**

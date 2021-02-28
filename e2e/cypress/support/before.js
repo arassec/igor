@@ -11,6 +11,10 @@ export const scpConnectorKebap='scp-connector'
 
 export const jobCopyNewFilesName='Copy New Files'
 export const jobCopyNewFilesKebap='copy-new-files'
+export const jobRabbitMqSenderName='RabbitMQ Sender'
+export const jobRabbitMqSenderKebap="rabbit-mq-sender"
+export const jobRabbitMqReceiverName='RabbitMQ Receiver'
+export const jobRabbitMqReceiverKebap="rabbit-mq-receiver"
 
 beforeEach(() => {
     cy.server();

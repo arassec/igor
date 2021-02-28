@@ -6,7 +6,7 @@ import com.arassec.igor.plugin.core.CorePluginCategory;
 /**
  * Base class for message based actions.
  */
-abstract class BaseMessageAction extends BaseAction {
+public abstract class BaseMessageAction extends BaseAction {
 
     /**
      * Creates a new component instance.

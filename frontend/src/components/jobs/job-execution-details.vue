@@ -3,7 +3,7 @@
         <p slot="header">
             <layout-row>
                 <h1 slot="left">Job Execution Details</h1>
-                <input-button slot="right" icon="times" v-on:clicked="$emit('close')" />
+                <input-button slot="right" icon="times" v-on:clicked="$emit('close')" data-e2e="close-execution-details-button" />
             </layout-row>
         </p>
 
@@ -34,7 +34,7 @@
                     <div class="td">Duration:</div>
                     <div class="td align-left">{{calculateDuration(jobExecution.started, jobExecution.finished)}}</div>
                 </div>
-                <div class="tr" v-if="jobExecution.processedEvents > 0">
+                <div class="tr" v-if="jobExecution.processedEvents > 0" data-e2e="job-execution-details-events">
                     <div class="td">Processed Events:</div>
                     <div class="td align-left">{{jobExecution.processedEvents}}</div>
                 </div>

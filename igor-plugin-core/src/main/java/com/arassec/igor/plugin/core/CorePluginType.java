@@ -103,16 +103,6 @@ public enum CorePluginType {
     FILTER_PERSISTENT_VALUE_ACTION("filter-persisted-value-action"),
 
     /**
-     * Type of the "Fallback Message" connector.
-     */
-    FALLBACK_MESSAGE_CONNECTOR("fallback-message-connector"),
-
-    /**
-     * Type of the "Send Message" action.
-     */
-    SEND_MESSAGE_ACTION("send-message-action"),
-
-    /**
      * Type of the "Fallback File" connector.
      */
     FALLBACK_FILE_CONNECTOR("fallback-file-connector"),

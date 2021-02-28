@@ -39,8 +39,23 @@ public class EventTriggerProxy extends TriggerProxy implements EventTrigger {
         if (processed > simulationLimit) {
             return;
         }
-        getCollectedData().add(eventData);
+
+        // Add the message data to the collected data item here. During real job execution, this is done by the job.
+        // This is only to display the initial data items to the user, during the simulated job execution, the original
+        // ones created by the job will be used.
+        Map<String, Object> dataItem = getDataItem();
+        eventData.forEach(dataItem::put);
+        getCollectedData().add(dataItem);
+
         ((EventTrigger) delegate).processEvent(eventData);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Object> createDataItem() {
+        return getDataItem();
     }
 
     /**

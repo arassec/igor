@@ -40,7 +40,7 @@
   "policies": [],
   "queues": [
     {
-      "name": "igor-test-queue",
+      "name": "igor-queue",
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
@@ -51,7 +51,7 @@
   ],
   "exchanges": [
     {
-      "name": "igor-test-exchange",
+      "name": "igor-exchange",
       "vhost": "/",
       "type": "direct",
       "durable": true,
@@ -62,9 +62,9 @@
   ],
   "bindings": [
     {
-      "source": "igor-test-exchange",
+      "source": "igor-exchange",
       "vhost": "/",
-      "destination": "igor-test-queue",
+      "destination": "igor-queue",
       "destination_type": "queue",
       "routing_key": "",
       "arguments": {}

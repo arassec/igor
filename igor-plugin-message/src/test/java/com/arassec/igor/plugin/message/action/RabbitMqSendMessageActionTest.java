@@ -1,8 +1,8 @@
-package com.arassec.igor.plugin.core.message.action;
+package com.arassec.igor.plugin.message.action;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.message.connector.Message;
-import com.arassec.igor.plugin.core.message.connector.MessageConnector;
+import com.arassec.igor.plugin.message.connector.RabbitMqMessage;
+import com.arassec.igor.plugin.message.connector.RabbitMqMessageConnector;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,11 +17,11 @@ import static org.mockito.Mockito.*;
 
 
 /**
- * Tests the {@link SendMessageAction}.
+ * Tests the {@link RabbitMqSendMessageAction}.
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("'Send message' action tests.")
-class SendMessageActionTest extends MessageActionBaseTest {
+class RabbitMqSendMessageActionTest extends MessageActionBaseTest {
 
     /**
      * Tests processing the action with mustache template parameter.
@@ -29,17 +29,18 @@ class SendMessageActionTest extends MessageActionBaseTest {
     @Test
     @DisplayName("Tests processing the action with mustache template parameter.")
     void testProcess() {
-        MessageConnector messageConnectorMock = mock(MessageConnector.class);
+        RabbitMqMessageConnector messageConnectorMock = mock(RabbitMqMessageConnector.class);
 
-        SendMessageAction action = new SendMessageAction();
+        RabbitMqSendMessageAction action = new RabbitMqSendMessageAction();
         action.setMessageConnector(messageConnectorMock);
+        action.setExchange("test-exchange");
         action.setMessageTemplate("{'key': '{{data." + PARAM_KEY + "}}'}");
 
-        ArgumentCaptor<Message> argCap = ArgumentCaptor.forClass(Message.class);
+        ArgumentCaptor<RabbitMqMessage> argCap = ArgumentCaptor.forClass(RabbitMqMessage.class);
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
-        verify(messageConnectorMock, times(1)).sendMessage(argCap.capture());
+        verify(messageConnectorMock, times(1)).sendMessage(eq("test-exchange"), argCap.capture());
 
         assertEquals(1, result.size());
         assertEquals("{'key': '" + PARAM_VALUE + "'}", argCap.getValue().getContent());
@@ -51,22 +52,22 @@ class SendMessageActionTest extends MessageActionBaseTest {
     @Test
     @DisplayName("Tests processing the action with message headers.")
     void testProcessHeaders() {
-        MessageConnector messageConnectorMock = mock(MessageConnector.class);
+        RabbitMqMessageConnector messageConnectorMock = mock(RabbitMqMessageConnector.class);
 
-        SendMessageAction action = new SendMessageAction();
+        RabbitMqSendMessageAction action = new RabbitMqSendMessageAction();
         action.setMessageConnector(messageConnectorMock);
+        action.setExchange("test-exchange");
         action.setMessageTemplate("message-template");
         action.setHeaders("a: b\nc: d\ne\nf=g");
 
-
-        ArgumentCaptor<Message> argCap = ArgumentCaptor.forClass(Message.class);
+        ArgumentCaptor<RabbitMqMessage> argCap = ArgumentCaptor.forClass(RabbitMqMessage.class);
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
-        verify(messageConnectorMock, times(1)).sendMessage(argCap.capture());
+        verify(messageConnectorMock, times(1)).sendMessage(eq("test-exchange"), argCap.capture());
         assertEquals(1, result.size());
 
-        Message sentMessage = argCap.getValue();
+        RabbitMqMessage sentMessage = argCap.getValue();
         assertEquals("b", sentMessage.getHeaders().get("a"));
         assertEquals("d", sentMessage.getHeaders().get("c"));
     }

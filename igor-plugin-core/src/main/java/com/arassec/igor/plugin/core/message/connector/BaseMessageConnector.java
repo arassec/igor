@@ -6,7 +6,7 @@ import com.arassec.igor.plugin.core.CorePluginCategory;
 /**
  * Base class for message based connector implementations.
  */
-public abstract class BaseMessageConnector extends BaseConnector implements MessageConnector {
+public abstract class BaseMessageConnector extends BaseConnector {
 
     /**
      * Creates a new component instance.

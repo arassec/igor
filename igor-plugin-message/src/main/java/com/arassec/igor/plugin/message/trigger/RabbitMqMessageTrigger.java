@@ -1,4 +1,4 @@
-package com.arassec.igor.plugin.core.message.trigger;
+package com.arassec.igor.plugin.message.trigger;
 
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
@@ -6,11 +6,12 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.BaseEventTrigger;
 import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.plugin.core.CorePluginCategory;
-import com.arassec.igor.plugin.core.message.connector.FallbackMessageConnector;
-import com.arassec.igor.plugin.core.message.connector.MessageConnector;
+import com.arassec.igor.plugin.message.MessagePluginType;
+import com.arassec.igor.plugin.message.connector.RabbitMqMessageConnector;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 
@@ -20,21 +21,28 @@ import java.util.Map;
 @Getter
 @Setter
 @IgorComponent
-public class MessageTrigger extends BaseEventTrigger {
+public class RabbitMqMessageTrigger extends BaseEventTrigger {
 
     /**
      * The connector that is used to receive messages.
      */
     @NotNull
     @IgorParam
-    private MessageConnector messageConnector;
+    private RabbitMqMessageConnector messageConnector;
+
+    /**
+     * The queue to retrieve messages from.
+     */
+    @NotEmpty
+    @IgorParam
+    private String queue;
 
     /**
      * Creates a new component instance.
      */
-    protected MessageTrigger() {
-        super(CorePluginCategory.MESSAGE.getId(), "message-trigger");
-        this.messageConnector = new FallbackMessageConnector();
+    protected RabbitMqMessageTrigger() {
+        super(CorePluginCategory.MESSAGE.getId(), MessagePluginType.RABBITMQ_MESSAGE_TRIGGER.getId());
+        messageConnector = new RabbitMqMessageConnector(null);
     }
 
     /**
@@ -45,7 +53,7 @@ public class MessageTrigger extends BaseEventTrigger {
     @Override
     public void initialize(JobExecution jobExecution) {
         super.initialize(jobExecution);
-        messageConnector.enableMessageRetrieval();
+        messageConnector.enableMessageRetrieval(queue);
     }
 
     /**

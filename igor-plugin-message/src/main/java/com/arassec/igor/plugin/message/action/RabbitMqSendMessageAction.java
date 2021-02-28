@@ -1,14 +1,14 @@
-package com.arassec.igor.plugin.core.message.action;
+package com.arassec.igor.plugin.message.action;
 
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
-import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CorePluginUtils;
-import com.arassec.igor.plugin.core.message.connector.FallbackMessageConnector;
-import com.arassec.igor.plugin.core.message.connector.Message;
-import com.arassec.igor.plugin.core.message.connector.MessageConnector;
+import com.arassec.igor.plugin.core.message.action.BaseMessageAction;
+import com.arassec.igor.plugin.message.MessagePluginType;
+import com.arassec.igor.plugin.message.connector.RabbitMqMessage;
+import com.arassec.igor.plugin.message.connector.RabbitMqMessageConnector;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +26,21 @@ import java.util.Map;
 @Getter
 @Setter
 @IgorComponent
-public class SendMessageAction extends BaseMessageAction {
+public class RabbitMqSendMessageAction extends BaseMessageAction {
 
     /**
      * The connector to use for message sending.
      */
     @NotNull
     @IgorParam
-    private MessageConnector messageConnector;
+    private RabbitMqMessageConnector messageConnector;
+
+    /**
+     * The exchange to send messages to.
+     */
+    @NotEmpty
+    @IgorParam
+    private String exchange;
 
     /**
      * The message template to use.
@@ -63,11 +70,17 @@ public class SendMessageAction extends BaseMessageAction {
     private String headers;
 
     /**
+     * Only sends messages during simulated job executions if set to {@code false}.
+     */
+    @IgorParam(advanced = true, defaultValue = "true")
+    private boolean simulationSafe;
+
+    /**
      * Creates a new component instance.
      */
-    public SendMessageAction() {
-        super(CorePluginType.SEND_MESSAGE_ACTION.getId());
-        messageConnector = new FallbackMessageConnector();
+    public RabbitMqSendMessageAction() {
+        super(MessagePluginType.RABBITMQ_SEND_MESSAGE_ACTION.getId());
+        messageConnector = new RabbitMqMessageConnector(null);
         messageTemplate = "";
     }
 
@@ -85,7 +98,7 @@ public class SendMessageAction extends BaseMessageAction {
 
         String content = CorePluginUtils.getString(data, messageTemplate);
 
-        Message message = new Message();
+        RabbitMqMessage message = new RabbitMqMessage();
         message.setContentType(contentType);
         message.setContentEncoding(contentEncoding);
         message.setContent(content);
@@ -100,9 +113,11 @@ public class SendMessageAction extends BaseMessageAction {
             }
         }
 
-        messageConnector.sendMessage(message);
+        if (!isSimulation(data) || !simulationSafe) {
+            messageConnector.sendMessage(exchange, message);
+        }
 
-        log.trace("Message sent:\n{}", content);
+        log.trace("RabbitMqMessage sent:\n{}", content);
 
         return List.of(data);
     }
