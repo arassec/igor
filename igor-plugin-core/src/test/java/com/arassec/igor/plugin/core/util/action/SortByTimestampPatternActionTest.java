@@ -23,9 +23,7 @@ class SortByTimestampPatternActionTest extends CoreActionBaseTest {
     @DisplayName("Tests the action's configuration.")
     void testConfiguration() {
         SortByTimestampPatternAction action = new SortByTimestampPatternAction();
-        assertEquals(1, action.getUnEditableProperties().size());
-        assertEquals("numThreads", action.getUnEditableProperties().iterator().next());
-        assertEquals(1, action.getNumThreads());
+        assertTrue(action.enforceSingleThread());
     }
 
     /**

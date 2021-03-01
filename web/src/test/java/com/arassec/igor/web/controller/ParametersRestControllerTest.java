@@ -76,7 +76,7 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
         List<Map<String, Object>> parameters = convert(mvcResult, new TypeReference<>() {
         });
 
-        assertEquals(2, parameters.size());
+        assertEquals(1, parameters.size());
 
         assertEquals("testConnector", parameters.get(0).get(WebMapperKey.NAME.getKey()));
 
@@ -104,12 +104,6 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
         assertEquals("gamma", secondTypeCandidates.get(1).get(WebMapperKey.VALUE.getKey()));
 
         assertEquals(true, parameters.get(0).get(WebMapperKey.CONNECTOR.getKey()));
-
-        assertEquals("numThreads", parameters.get(1).get(WebMapperKey.NAME.getKey()));
-        assertEquals("int", parameters.get(1).get(WebMapperKey.TYPE.getKey()));
-        assertEquals(0, parameters.get(1).get(WebMapperKey.VALUE.getKey()));
-        assertEquals(true, parameters.get(1).get(WebMapperKey.ADVANCED.getKey()));
-        assertEquals(true, parameters.get(1).get(WebMapperKey.REQUIRED.getKey()));
     }
 
     /**

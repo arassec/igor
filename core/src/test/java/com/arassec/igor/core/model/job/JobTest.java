@@ -131,7 +131,6 @@ class JobTest {
 
         Action actionMock = mock(Action.class);
         when(actionMock.isActive()).thenReturn(true);
-        when(actionMock.getNumThreads()).thenReturn(1);
 
         Job job = Job.builder()
                 .id("job-id")
@@ -210,7 +209,6 @@ class JobTest {
 
         Action actionMock = mock(Action.class);
         when(actionMock.isActive()).thenReturn(true);
-        when(actionMock.getNumThreads()).thenReturn(1);
 
         Job job = Job.builder().id("job-id").trigger(triggerMock).actions(List.of(actionMock)).build();
 

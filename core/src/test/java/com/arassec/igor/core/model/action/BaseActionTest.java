@@ -114,10 +114,8 @@ class BaseActionTest {
     @Test
     @DisplayName("Tests setting and getting the action's number of threads.")
     @SneakyThrows
-    void testSetGetNumThreads() {
-        assertEquals(0, baseAction.getNumThreads());
-        baseAction.setNumThreads(5);
-        assertEquals(5, baseAction.getNumThreads());
+    void testEnforceSingleThread() {
+        assertFalse(baseAction.enforceSingleThread());
     }
 
     /**

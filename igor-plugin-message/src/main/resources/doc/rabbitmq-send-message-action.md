@@ -16,7 +16,6 @@ Message template | A template message that is used as message body. Parameters c
 Content encoding | Sets the encoding for messages sent by this connector.
 Content type | Specifies the content type of the message's content.
 Headers | Each line can contain a 'Header:Value'-pair which is used in messages sent by this action.
-Num threads | The number of threads this action uses to send messages.
 
 ## Mustache Template Parameters
 

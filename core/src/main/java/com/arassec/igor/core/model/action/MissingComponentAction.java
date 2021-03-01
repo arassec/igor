@@ -32,7 +32,6 @@ public class MissingComponentAction extends BaseAction {
      */
     public MissingComponentAction(String errorCause) {
         super(CoreCategory.CORE.getId(), CoreType.MISSING_COMPONENT_ACTION.getId());
-        getUnEditableProperties().add("numThreads");
         setActive(true);
         this.errorCause = errorCause;
     }

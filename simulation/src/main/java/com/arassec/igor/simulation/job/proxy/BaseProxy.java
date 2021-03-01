@@ -7,8 +7,6 @@ import com.arassec.igor.core.util.StacktraceFormatter;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Set;
-
 /**
  * Base class for {@link IgorComponent} proxies.
  *
@@ -73,14 +71,6 @@ public abstract class BaseProxy<T extends IgorComponent> implements IgorComponen
         } catch (Exception e) {
             errorCause = StacktraceFormatter.format(e);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<String> getUnEditableProperties() {
-        return delegate.getUnEditableProperties();
     }
 
     /**

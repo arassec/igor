@@ -11,7 +11,6 @@ The following parameters can be configured for the action:
 Parameter | Description
 ---|:---|
 Json | The JSON to add to the data item. The configured JSON must not be an array!
-Num threads | The number of threads this action should be executed with.
 
 ## Examples
 

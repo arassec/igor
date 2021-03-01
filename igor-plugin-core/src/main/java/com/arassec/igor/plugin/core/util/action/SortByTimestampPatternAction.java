@@ -68,9 +68,6 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      */
     public SortByTimestampPatternAction() {
         super(CorePluginType.SORT_BY_TIMESTAMP_PATTERN_ACTION.getId());
-        // Sorting is always done single threaded:
-        setNumThreads(1);
-        getUnEditableProperties().add("numThreads");
     }
 
     /**
@@ -200,16 +197,6 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     }
 
     /**
-     * Returns always 1, because the action needs to collect all data to sort in a single thread.
-     *
-     * @return Always {@code 1}.
-     */
-    @Override
-    public int getNumThreads() {
-        return 1;
-    }
-
-    /**
      * Sorting works on all data items in the stream. With events, the stream is unlimited and thus this action would wait
      * forever for the job to finish.
      *
@@ -219,4 +206,15 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     public boolean supportsEvents() {
         return false;
     }
+
+    /**
+     * Skipping is always done single-threaded.
+     *
+     * @return Always {@code true}.
+     */
+    @Override
+    public boolean enforceSingleThread() {
+        return true;
+    }
+
 }

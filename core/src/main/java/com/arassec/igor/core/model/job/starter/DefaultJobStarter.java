@@ -68,8 +68,9 @@ public class DefaultJobStarter implements JobStarter {
      * @param trigger      The job's trigger.
      * @param actions      The job's actions.
      * @param jobExecution The current job execution.
+     * @param numThreads   The number of threads the job should execute with.
      */
-    public DefaultJobStarter(Trigger trigger, List<Action> actions, JobExecution jobExecution) {
+    public DefaultJobStarter(Trigger trigger, List<Action> actions, JobExecution jobExecution, int numThreads) {
         if (actions == null) {
             throw new IllegalArgumentException("Actions must not be null!");
         }
@@ -81,8 +82,8 @@ public class DefaultJobStarter implements JobStarter {
         this.jobExecution = jobExecution;
         this.processingFinishedCallbackSet = setProcessingFinishedCallbackIfApplicable();
         this.initialInputQueue = new LinkedBlockingQueue<>();
-        this.concurrencyLists = createConcurrencyLists();
-        this.concurrencyGroups = createConcurrencyGroups(concurrencyLists, initialInputQueue, jobExecution);
+        this.concurrencyLists = createConcurrencyLists(numThreads);
+        this.concurrencyGroups = createConcurrencyGroups(concurrencyLists, initialInputQueue, jobExecution, numThreads);
     }
 
     /**
@@ -99,7 +100,7 @@ public class DefaultJobStarter implements JobStarter {
             dataItem = trigger.createDataItem();
         }
 
-        dispatchInitialDataItem(initialInputQueue, jobExecution.getJobId(), dataItem, processingFinishedCallbackSet);
+        dispatchInitialDataItem(initialInputQueue, dataItem, processingFinishedCallbackSet);
 
         return concurrencyGroups;
     }
@@ -126,11 +127,10 @@ public class DefaultJobStarter implements JobStarter {
      * Creates the initial data item and starts processing it with the first action.
      *
      * @param inputQueue                    The input queue to put the first data item in.
-     * @param jobId                         The job's ID.
      * @param initialDataItem               Data item provided by the trigger.
      * @param processingFinishedCallbackSet Indicates whether "processing finished" callbacks must be called or not.
      */
-    protected void dispatchInitialDataItem(BlockingQueue<Map<String, Object>> inputQueue, String jobId, Map<String,
+    protected void dispatchInitialDataItem(BlockingQueue<Map<String, Object>> inputQueue, Map<String,
         Object> initialDataItem, boolean processingFinishedCallbackSet) {
         boolean added = false;
         while (!added) {
@@ -153,9 +153,11 @@ public class DefaultJobStarter implements JobStarter {
      * <p>
      * Keeps the order of the actions.
      *
+     * @param numThreads The number of threads the job' actions should execute with.
+     *
      * @return {@link Action}s grouped by the number of threads they should execute with.
      */
-    private List<List<Action>> createConcurrencyLists() {
+    private List<List<Action>> createConcurrencyLists(int numThreads) {
         List<List<Action>> result = new LinkedList<>();
 
         // Initialized with -1 so that at least one concurrency-group is created.
@@ -165,11 +167,12 @@ public class DefaultJobStarter implements JobStarter {
             if (!action.isActive()) {
                 continue;
             }
-            if (action.getNumThreads() != lastNumThreads) {
+            int threads = action.enforceSingleThread() ? 1 : numThreads;
+            if (threads != lastNumThreads) {
                 List<Action> concurrencyList = new LinkedList<>();
                 concurrencyList.add(action);
                 result.add(concurrencyList);
-                lastNumThreads = action.getNumThreads();
+                lastNumThreads = threads;
             } else {
                 result.get(result.size() - 1).add(action);
             }
@@ -184,11 +187,12 @@ public class DefaultJobStarter implements JobStarter {
      * @param concurrencyLists The ordered list of actions that should be executed with the same number of threads.
      * @param inputQueue       The initial input queue in which the first data item will be put.
      * @param jobExecution     The container for job execution data.
+     * @param numThreads       The number of threads the job' actions should execute with.
      *
      * @return List of {@link ConcurrencyGroup}s.
      */
     private List<ConcurrencyGroup> createConcurrencyGroups(List<List<Action>> concurrencyLists, BlockingQueue<Map<String,
-        Object>> inputQueue, JobExecution jobExecution) {
+        Object>> inputQueue, JobExecution jobExecution, int numThreads) {
         List<ConcurrencyGroup> result = new LinkedList<>();
         BlockingQueue<Map<String, Object>> inputQueueHolder = inputQueue;
 
@@ -196,7 +200,7 @@ public class DefaultJobStarter implements JobStarter {
             String concurrencyGroupId = String
                 .format(CONCURRENCY_GROUP_ID_PATTERN, jobExecution.getJobId(), concurrencyLists.indexOf(concurrencyList));
             ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueueHolder, concurrencyGroupId,
-                jobExecution);
+                jobExecution, numThreads);
             inputQueueHolder = concurrencyGroup.getOutputQueue();
             result.add(concurrencyGroup);
         }

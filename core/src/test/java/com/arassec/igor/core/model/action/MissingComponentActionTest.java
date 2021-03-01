@@ -27,7 +27,6 @@ class MissingComponentActionTest {
         assertEquals("missing-component-action", component.getTypeId());
         assertEquals("unit-test-error-cause", component.getErrorCause());
         assertTrue(component.isActive());
-        assertTrue(component.getUnEditableProperties().contains("numThreads"));
     }
 
     /**

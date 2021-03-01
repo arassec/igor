@@ -53,8 +53,6 @@ public class ListFilesAction extends BaseFileAction {
     public ListFilesAction() {
         super(CorePluginType.LIST_FILES_ACTION.getId());
         source = new FallbackFileConnector();
-        setNumThreads(1);
-        getUnEditableProperties().add("numThreads");
     }
 
     /**
@@ -97,4 +95,13 @@ public class ListFilesAction extends BaseFileAction {
 
         return result;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean enforceSingleThread() {
+        return true;
+    }
+
 }

@@ -34,7 +34,6 @@ class EventTriggeredJobStarterTest {
     @DisplayName("Tests processing the job.")
     void testProcess() {
         Action action = mock(Action.class);
-        when(action.getNumThreads()).thenReturn(1);
         when(action.isActive()).thenReturn(true);
 
         EventTrigger eventTrigger = mock(EventTrigger.class);
@@ -66,7 +65,8 @@ class EventTriggeredJobStarterTest {
             return null;
         }).when(jobExecution).setProcessedEvents(1);
 
-        EventTriggeredJobStarter eventTriggeredJobStarter = new EventTriggeredJobStarter(eventTrigger, List.of(action), jobExecution);
+        EventTriggeredJobStarter eventTriggeredJobStarter = new EventTriggeredJobStarter(eventTrigger, List.of(action),
+            jobExecution, 1);
 
         List<ConcurrencyGroup> concurrencyGroups = eventTriggeredJobStarter.process();
 

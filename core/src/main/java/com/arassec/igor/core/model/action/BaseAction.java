@@ -2,10 +2,8 @@ package com.arassec.igor.core.model.action;
 
 import com.arassec.igor.core.model.BaseIgorComponent;
 import com.arassec.igor.core.model.DataKey;
-import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
 
-import javax.validation.constraints.Positive;
 import java.util.Map;
 
 /**
@@ -32,13 +30,6 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
      * Callback to call when processing of a data item finished.
      */
     private ProcessingFinishedCallback processingFinishedCallback;
-
-    /**
-     * Defines the number of threads the action should be processed with.
-     */
-    @Positive
-    @IgorParam(value = Integer.MAX_VALUE, advanced = true, defaultValue = "1")
-    protected int numThreads;
 
     /**
      * Creates a new component instance.
@@ -80,22 +71,6 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     @Override
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getNumThreads() {
-        return numThreads;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setNumThreads(int numThreads) {
-        this.numThreads = numThreads;
     }
 
     /**

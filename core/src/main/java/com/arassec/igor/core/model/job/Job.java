@@ -83,6 +83,13 @@ public class Job {
     private int simulationLimit = 25;
 
     /**
+     * The number of threads, actions are executed with.
+     */
+    @Builder.Default
+    @Positive
+    private int numThreads = 1;
+
+    /**
      * A trigger for the job.
      */
     @Valid
@@ -136,9 +143,9 @@ public class Job {
             // Starts processing data items:
             JobStarter jobStarter;
             if (trigger instanceof EventTrigger) {
-                jobStarter = new EventTriggeredJobStarter(trigger, actions, currentJobExecution);
+                jobStarter = new EventTriggeredJobStarter(trigger, actions, currentJobExecution, numThreads);
             } else {
-                jobStarter = new DefaultJobStarter(trigger, actions, currentJobExecution);
+                jobStarter = new DefaultJobStarter(trigger, actions, currentJobExecution, numThreads);
             }
             List<ConcurrencyGroup> concurrencyGroups = jobStarter.process();
 

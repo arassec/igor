@@ -1,8 +1,6 @@
 package com.arassec.igor.core.model;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Base class for {@link IgorComponent}s.
@@ -14,11 +12,6 @@ public abstract class BaseIgorComponent implements IgorComponent {
      */
     @NotEmpty
     protected String id;
-
-    /**
-     * Contains the names of properties which should not be editable.
-     */
-    private final Set<String> unEditableProperties = new HashSet<>();
 
     /**
      * This component's category ID.
@@ -55,14 +48,6 @@ public abstract class BaseIgorComponent implements IgorComponent {
     @Override
     public void setId(String id) {
         this.id = id;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<String> getUnEditableProperties() {
-        return unEditableProperties;
     }
 
     /**

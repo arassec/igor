@@ -11,4 +11,3 @@ Parameter | Description
 Source | A file-connector to delete the file from.
 Directory | The directory containing the file to delete. Either a fixed value or a mustache expression selecting a property from the data item. If a mustache expression is used, the property's value will be used as directory name.
 Filename | The name of the file to delete. Either a fixed value or a mustache expression selecting a property from the data item. If a mustache expression is used, the property's value will be used as filename.
-Num threads | The number of threads this action uses to process data items.

@@ -34,7 +34,6 @@ class ConcurrencyGroupTest {
     @DisplayName("Tests the concurrency-group lifecylce.")
     void testLifecycle() throws InterruptedException {
         Action actionMock = mock(Action.class);
-        when(actionMock.getNumThreads()).thenReturn(1);
         when(actionMock.process(anyMap(), nullable(JobExecution.class))).thenAnswer(invocationOnMock -> {
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> result = List.of((Map<String, Object>) invocationOnMock.getArgument(0));
@@ -43,7 +42,7 @@ class ConcurrencyGroupTest {
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
 
-        ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(List.of(actionMock), inputQueue, "group-id", null);
+        ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(List.of(actionMock), inputQueue, "group-id", null, 1);
 
         Map<String, Object> data = new HashMap<>();
         data.put("foo", "bar");
@@ -62,7 +61,7 @@ class ConcurrencyGroupTest {
     @Test
     @DisplayName("Tests awaiting termination.")
     void testAwaitTermination() {
-        ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(List.of(), new LinkedBlockingQueue<>(), "group-id", null);
+        ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(List.of(), new LinkedBlockingQueue<>(), "group-id", null, 1);
         assertFalse(concurrencyGroup.awaitTermination());
 
         JobExecution jobExecution = new JobExecution();
@@ -83,7 +82,8 @@ class ConcurrencyGroupTest {
         JobExecution jobExecution = new JobExecution();
         jobExecution.setExecutionState(JobExecutionState.CANCELLED);
 
-        ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(List.of(), new LinkedBlockingQueue<>(), "group-id", jobExecution);
+        ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(List.of(), new LinkedBlockingQueue<>(), "group-id",
+            jobExecution, 1);
 
         concurrencyGroup.uncaughtException(null, new IgorException("test-exception"));
 

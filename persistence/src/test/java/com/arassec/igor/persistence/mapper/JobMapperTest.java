@@ -46,7 +46,6 @@ class JobMapperTest extends MapperBaseTest {
         testAction.setName("action-name");
         testAction.setDescription("action-description");
         testAction.setActive(true);
-        testAction.setNumThreads(1);
 
         TestConnector testConnector = new TestConnector();
         testConnector.setId(TestConnector.CONNECTOR_ID);

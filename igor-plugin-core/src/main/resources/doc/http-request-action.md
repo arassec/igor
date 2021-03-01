@@ -63,4 +63,3 @@ Password | A password for HTTP Basic Authentication.
 Target key | The name of the key the web request's results will be stored in.
 Ignore errors | If checked, igor will ignore the HTTP result code and treat every response as HTTP 200 ('OK').
 Simulation safe | If checked, HTTP POST, PUT and DELETE will not be executed by the action during simulated job executions.
-Num threads | The number of threads this action uses to execute requests.

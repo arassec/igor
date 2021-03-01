@@ -134,23 +134,11 @@ class ActionProxyTest {
      */
     @Test
     @DisplayName("Tests getting the number of threads from the proxy.")
-    void testGetNumThreads() {
+    void testEnforceSingleThread() {
         Action actionMock = mock(Action.class);
         ActionProxy actionProxy = new ActionProxy(actionMock, 10);
-        actionProxy.getNumThreads();
-        verify(actionMock, times(1)).getNumThreads();
-    }
-
-    /**
-     * Tests setting the number of threads from the proxy.
-     */
-    @Test
-    @DisplayName("Tests setting the number of threads from the proxy.")
-    void testSetNumThreads() {
-        Action actionMock = mock(Action.class);
-        ActionProxy actionProxy = new ActionProxy(actionMock, 10);
-        actionProxy.setNumThreads(23);
-        verify(actionMock, times(1)).setNumThreads(23);
+        actionProxy.enforceSingleThread();
+        verify(actionMock, times(1)).enforceSingleThread();
     }
 
     /**

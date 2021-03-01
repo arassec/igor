@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
 import com.arassec.igor.core.util.IgorException;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -19,7 +20,13 @@ import java.util.concurrent.TimeUnit;
  * {@link JobStarter} for event-triggered jobs.
  */
 @Slf4j
+@EqualsAndHashCode(callSuper = true)
 public class EventTriggeredJobStarter extends DefaultJobStarter {
+
+    /**
+     * Stores the initial capacity of the queue that provides the trigger's input to the job.
+     */
+    private final int triggerEventInputQueueCapacity;
 
     /**
      * Creates a new instance.
@@ -27,9 +34,11 @@ public class EventTriggeredJobStarter extends DefaultJobStarter {
      * @param trigger      The job's trigger.
      * @param actions      The job's actions.
      * @param jobExecution The current job execution.
+     * @param numThreads   The number of threads the job should execute with.
      */
-    public EventTriggeredJobStarter(Trigger trigger, List<Action> actions, JobExecution jobExecution) {
-        super(trigger, actions, jobExecution);
+    public EventTriggeredJobStarter(Trigger trigger, List<Action> actions, JobExecution jobExecution, int numThreads) {
+        super(trigger, actions, jobExecution, numThreads);
+        triggerEventInputQueueCapacity = numThreads;
     }
 
     /**
@@ -41,7 +50,7 @@ public class EventTriggeredJobStarter extends DefaultJobStarter {
         // to put them in the input queue of the concurrency groups (i.e. hand them over to the actions).
         BlockingQueue<Map<String, Object>> triggerEventInputQueue = new LinkedBlockingQueue<>(1);
         if (!concurrencyLists.isEmpty() && !concurrencyLists.get(0).isEmpty()) {
-            triggerEventInputQueue = new LinkedBlockingQueue<>(concurrencyLists.get(0).get(0).getNumThreads());
+            triggerEventInputQueue = new LinkedBlockingQueue<>(triggerEventInputQueueCapacity);
         }
         ((EventTrigger) trigger).setEventQueue(triggerEventInputQueue);
 
@@ -62,7 +71,7 @@ public class EventTriggeredJobStarter extends DefaultJobStarter {
                 log.debug("Job '{}' triggered by event: {}", jobExecution.getJobId(), eventData);
                 trigger.createDataItem().forEach(eventData::put); // A custom trigger might add additional data to the items.
                 // ...and dispatch it to the waiting actions.
-                dispatchInitialDataItem(initialInputQueue, jobExecution.getJobId(), eventData, processingFinishedCallbackSet);
+                dispatchInitialDataItem(initialInputQueue, eventData, processingFinishedCallbackSet);
                 jobExecution.setProcessedEvents(jobExecution.getProcessedEvents() + 1);
             }
         }

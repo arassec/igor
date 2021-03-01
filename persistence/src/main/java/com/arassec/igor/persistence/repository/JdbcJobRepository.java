@@ -7,7 +7,6 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.repository.JobRepository;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
-import com.arassec.igor.persistence.dao.ConnectorDao;
 import com.arassec.igor.persistence.dao.JobConnectorReferenceDao;
 import com.arassec.igor.persistence.dao.JobDao;
 import com.arassec.igor.persistence.entity.JobConnectorReferenceEntity;
@@ -45,11 +44,6 @@ public class JdbcJobRepository implements JobRepository {
      * DAO for job entities.
      */
     private final JobDao jobDao;
-
-    /**
-     * DAO for connector entities.
-     */
-    private final ConnectorDao connectorDao;
 
     /**
      * DAO for job-connector-references.

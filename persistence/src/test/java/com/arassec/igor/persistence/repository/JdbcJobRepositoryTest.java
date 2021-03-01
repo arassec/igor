@@ -3,7 +3,6 @@ package com.arassec.igor.persistence.repository;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
-import com.arassec.igor.persistence.dao.ConnectorDao;
 import com.arassec.igor.persistence.dao.JobConnectorReferenceDao;
 import com.arassec.igor.persistence.dao.JobDao;
 import com.arassec.igor.persistence.entity.JobConnectorReferenceEntity;
@@ -47,11 +46,6 @@ class JdbcJobRepositoryTest {
     private JobDao jobDao;
 
     /**
-     * DAO for connector entities.
-     */
-    private ConnectorDao connectorDao;
-
-    /**
      * DAO for job-connector-references.
      */
     private JobConnectorReferenceDao jobConnectorReferenceDao;
@@ -67,10 +61,9 @@ class JdbcJobRepositoryTest {
     @BeforeEach
     void initialize() {
         jobDao = mock(JobDao.class);
-        connectorDao = mock(ConnectorDao.class);
         jobConnectorReferenceDao = mock(JobConnectorReferenceDao.class);
         persistenceJobMapper = mock(ObjectMapper.class);
-        repository = new JdbcJobRepository(jobDao, connectorDao, jobConnectorReferenceDao, persistenceJobMapper);
+        repository = new JdbcJobRepository(jobDao, jobConnectorReferenceDao, persistenceJobMapper);
     }
 
     /**

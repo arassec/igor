@@ -142,7 +142,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
         List<Field> parameters = new LinkedList<>();
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
             ReflectionUtils.makeAccessible(field);
-            if (field.isAnnotationPresent(IgorParam.class) && !instance.getUnEditableProperties().contains(field.getName())) {
+            if (field.isAnnotationPresent(IgorParam.class)) {
                 parameters.add(field);
             }
         });

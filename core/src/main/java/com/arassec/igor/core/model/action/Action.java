@@ -60,18 +60,13 @@ public interface Action extends IgorComponent {
     void setDescription(String description);
 
     /**
-     * Returns the number of threads this action should be executed with.
+     * Returns whether the action must be executed by a single thread ({@code true} or not {@code false}.
      *
-     * @return The number of threads.
+     * @return {@code true} if the action is required to run single threaded, {@code false} if multi-threading is supported.
      */
-    int getNumThreads();
-
-    /**
-     * Sets the number of threads this action should run with.
-     *
-     * @param numThreads The number of threads the action should run with.
-     */
-    void setNumThreads(int numThreads);
+    default boolean enforceSingleThread() {
+        return false;
+    }
 
     /**
      * Returns whether the action is active or not.

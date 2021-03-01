@@ -37,7 +37,7 @@ class TransferControllerTest extends RestControllerBaseTest {
     @SneakyThrows
     void testExportJob() {
         mockMvc.perform(get("/api/transfer/job/job-id").contentType(MediaType.APPLICATION_OCTET_STREAM))
-                .andExpect(status().isBadRequest()).andReturn();
+            .andExpect(status().isBadRequest()).andReturn();
 
         Job job = new Job();
         job.setId("job-id");
@@ -48,7 +48,7 @@ class TransferControllerTest extends RestControllerBaseTest {
         when(igorComponentRegistry.createConnectorInstance(anyString(), anyMap())).thenReturn(new TestConnector());
 
         MvcResult mvcResult = mockMvc.perform(get("/api/transfer/job/job-id").contentType(MediaType.APPLICATION_OCTET_STREAM))
-                .andExpect(status().isOk()).andReturn();
+            .andExpect(status().isOk()).andReturn();
 
         assertEquals("attachment; filename=job-id.igor.json", mvcResult.getResponse().getHeader(HttpHeaders.CONTENT_DISPOSITION));
         assertEquals(MediaType.APPLICATION_JSON_VALUE, mvcResult.getResponse().getContentType());
@@ -56,8 +56,8 @@ class TransferControllerTest extends RestControllerBaseTest {
         TransferData transferData = convert(mvcResult, TransferData.class);
 
         assertEquals(1, transferData.getJobJsons().size());
-        assertEquals("{\"id\":\"job-id\",\"active\":false,\"historyLimit\":5,\"simulationLimit\":25,\"actions\":[],\"running\":false," +
-                "\"faultTolerant\":true}", transferData.getJobJsons().get(0));
+        assertEquals("{\"id\":\"job-id\",\"active\":false,\"historyLimit\":5,\"simulationLimit\":25,\"numThreads\":1,"
+            + "\"actions\":[],\"running\":false,\"faultTolerant\":true}", transferData.getJobJsons().get(0));
 
         assertEquals(1, transferData.getConnectorJsons().size());
         assertNotNull(transferData.getConnectorJsons().get(0));
@@ -82,7 +82,7 @@ class TransferControllerTest extends RestControllerBaseTest {
         when(igorComponentRegistry.createConnectorInstance(eq(testConnector.getTypeId()), anyMap())).thenReturn(new TestConnector());
 
         mockMvc.perform(post("/api/transfer").content(content).contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().is(200)).andReturn();
+            .andExpect(status().is(200)).andReturn();
 
         ArgumentCaptor<Connector> argCap = ArgumentCaptor.forClass(Connector.class);
         verify(connectorManager, times(1)).save(argCap.capture());
@@ -101,7 +101,7 @@ class TransferControllerTest extends RestControllerBaseTest {
     @SneakyThrows
     void testExportConnector() {
         mockMvc.perform(get("/api/transfer/connector/connector-id").contentType(MediaType.APPLICATION_OCTET_STREAM))
-                .andExpect(status().isBadRequest()).andReturn();
+            .andExpect(status().isBadRequest()).andReturn();
 
         TestConnector connector = new TestConnector();
         connector.setId("connector-id");
@@ -109,10 +109,10 @@ class TransferControllerTest extends RestControllerBaseTest {
         when(connectorManager.load("connector-id")).thenReturn(connector);
 
         MvcResult mvcResult = mockMvc.perform(get("/api/transfer/connector/connector-id").contentType(MediaType.APPLICATION_OCTET_STREAM))
-                .andExpect(status().isOk()).andReturn();
+            .andExpect(status().isOk()).andReturn();
 
         assertEquals("attachment; filename=connector-id.igor.json",
-                mvcResult.getResponse().getHeader(HttpHeaders.CONTENT_DISPOSITION));
+            mvcResult.getResponse().getHeader(HttpHeaders.CONTENT_DISPOSITION));
         assertEquals(MediaType.APPLICATION_JSON_VALUE, mvcResult.getResponse().getContentType());
 
         TransferData transferData = convert(mvcResult, TransferData.class);
@@ -144,7 +144,7 @@ class TransferControllerTest extends RestControllerBaseTest {
         when(igorComponentRegistry.createConnectorInstance(eq(testConnector.getTypeId()), anyMap())).thenReturn(new TestConnector());
 
         mockMvc.perform(post("/api/transfer").content(content).contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().is(200)).andReturn();
+            .andExpect(status().is(200)).andReturn();
 
         verify(connectorManager, times(1)).save(any(TestConnector.class));
     }

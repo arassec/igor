@@ -3,8 +3,6 @@ package com.arassec.igor.core.model;
 import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 
-import java.util.Set;
-
 /**
  * Defines a component in the igor application.
  */
@@ -41,14 +39,6 @@ public interface IgorComponent {
      */
     @IgorSimulationSafe
     void setId(String id);
-
-    /**
-     * Returns all un-editable properties.
-     *
-     * @return Set of names of properties which should not be edited by the user.
-     */
-    @IgorSimulationSafe
-    Set<String> getUnEditableProperties();
 
     /**
      * Initializes the component before job executions.

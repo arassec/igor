@@ -38,9 +38,6 @@ public class SkipAction extends BaseUtilAction {
      */
     public SkipAction() {
         super(CorePluginType.SKIP_ACTION.getId());
-        // Skipping is always done single threaded:
-        setNumThreads(1);
-        getUnEditableProperties().add("numThreads");
     }
 
     /**
@@ -69,6 +66,16 @@ public class SkipAction extends BaseUtilAction {
     @Override
     public boolean supportsEvents() {
         return false;
+    }
+
+    /**
+     * Skipping is always done single-threaded.
+     *
+     * @return Always {@code true}.
+     */
+    @Override
+    public boolean enforceSingleThread() {
+        return true;
     }
 
 }

@@ -63,6 +63,16 @@
                                            data-e2e="job-faulttolerant-button"/>
                     </div>
                 </div>
+                <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
+                    <div class="td"><label for="numthreads-input">Num Threads</label></div>
+                    <div class="td align-left">
+                        <input-validated id="numthreads-input" type="text"
+                                         :parent-id="jobConfiguration.id" :property-id="'numThreads'"
+                                         :validation-errors="validationErrors"
+                                         v-model.number="jobConfiguration.numThreads"
+                                         :is-number="true"/>
+                    </div>
+                </div>
                 <div class="tr">
                     <div class="td align-left">
                         <font-awesome-icon class="arrow" :class="arrowColor()"

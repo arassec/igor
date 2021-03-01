@@ -64,19 +64,20 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      *                           actions. The output of the last action is put into the output queue.
      * @param concurrencyGroupId The ID of this concurrency-group.
      * @param jobExecution       The {@link JobExecution} containing the current state of the job run.
+     * @param numThreads         The number of threads the job' actions should execute with.
      */
     public ConcurrencyGroup(List<Action> actions, BlockingQueue<Map<String, Object>> inputQueue, String concurrencyGroupId,
-                            JobExecution jobExecution) {
+                            JobExecution jobExecution, int numThreads) {
         this.inputQueue = inputQueue;
         this.concurrencyGroupId = concurrencyGroupId;
         this.jobExecution = jobExecution;
 
-        int numThreads = 1;
-        if (actions != null && !actions.isEmpty()) {
-            numThreads = actions.get(0).getNumThreads();
+        int threads = numThreads;
+        if (actions != null && !actions.isEmpty() && actions.get(0).enforceSingleThread()) {
+            threads = 1;
         }
 
-        threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads, new ThreadFactory() {
+        threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threads, new ThreadFactory() {
             private final AtomicInteger counter = new AtomicInteger();
 
             @Override
@@ -88,7 +89,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
             }
         });
 
-        for (int i = 0; i < numThreads; i++) {
+        for (int i = 0; i < threads; i++) {
             ActionsExecutingRunnable runnable = new ActionsExecutingRunnable(actions, inputQueue, outputQueue, jobExecution);
             runnables.add(runnable);
             threadPoolExecutor.execute(runnable);
@@ -125,7 +126,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      */
     public boolean awaitTermination() {
         log.debug("Total/Active/Completed Threads in '{}': {}/{}/{}", concurrencyGroupId, threadPoolExecutor.getPoolSize(),
-                threadPoolExecutor.getActiveCount(), threadPoolExecutor.getCompletedTaskCount());
+            threadPoolExecutor.getActiveCount(), threadPoolExecutor.getCompletedTaskCount());
         try {
             if (jobExecution != null && !jobExecution.isRunningOrActive()) {
                 threadPoolExecutor.shutdownNow();
@@ -133,7 +134,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
             }
             boolean awaitTerminationResult = threadPoolExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS);
             log.debug("After awaitTermination: Total/Active/Completed Threads: {}/{}/{}", threadPoolExecutor.getPoolSize(),
-                    threadPoolExecutor.getActiveCount(), threadPoolExecutor.getCompletedTaskCount());
+                threadPoolExecutor.getActiveCount(), threadPoolExecutor.getCompletedTaskCount());
             return awaitTerminationResult;
         } catch (InterruptedException e) {
             log.error("Concurrency-Group interrupted during awaitTermination()!", e);
@@ -183,7 +184,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         waitCheckExecutor.scheduleAtFixedRate(() -> {
             synchronized (waitLock) {
                 log.trace("Checking for threads to finish their work to complete concurrency-group: {} ({})",
-                        concurrencyGroupId, inputQueue.size());
+                    concurrencyGroupId, inputQueue.size());
                 if (inputQueue.isEmpty()) {
                     waitLock.notifyAll();
                 }

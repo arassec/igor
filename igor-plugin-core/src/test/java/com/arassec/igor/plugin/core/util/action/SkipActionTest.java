@@ -38,4 +38,14 @@ class SkipActionTest extends CoreActionBaseTest {
         assertFalse(skipAction.supportsEvents());
     }
 
+    /**
+     * Tests, that the action always enforces single-thread execution.
+     */
+    @Test
+    @DisplayName("Tests, that the action always enforces single-thread execution.")
+    void testEnforceSingleThread() {
+        SkipAction skipAction = new SkipAction();
+        assertTrue(skipAction.enforceSingleThread());
+    }
+
 }

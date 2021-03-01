@@ -8,6 +8,7 @@
 ::: danger Breaking Changes
 - Removed 'data' and 'meta' parameters from all triggers. Use the new 'Add data' action instead!
 - Refactored message sending and retrieval: separate trigger and actions per message protocol (RabbitMQ).
+- 'Number of threads' per action is now a job configuration parameter and configured once for all actions.
 :::
 
 ## Version 0.3.0

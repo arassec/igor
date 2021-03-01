@@ -28,11 +28,11 @@ class DefaultJobStarterTest {
         List<Action> actions = List.of();
         JobExecution jobExecution = new JobExecution();
 
-        assertThrows(IllegalArgumentException.class, () -> new DefaultJobStarter(null, null, null));
-        assertThrows(IllegalArgumentException.class, () -> new DefaultJobStarter(null, null, jobExecution));
-        assertThrows(IllegalArgumentException.class, () -> new DefaultJobStarter(null, actions, null));
+        assertThrows(IllegalArgumentException.class, () -> new DefaultJobStarter(null, null, null, 1));
+        assertThrows(IllegalArgumentException.class, () -> new DefaultJobStarter(null, null, jobExecution, 1));
+        assertThrows(IllegalArgumentException.class, () -> new DefaultJobStarter(null, actions, null, 1));
 
-        assertDoesNotThrow(() -> new DefaultJobStarter(null, actions, jobExecution));
+        assertDoesNotThrow(() -> new DefaultJobStarter(null, actions, jobExecution, 1));
     }
 
     /**
@@ -43,25 +43,24 @@ class DefaultJobStarterTest {
     void testConcurrencyGroupCreation() {
         // First group:
         Action firstAction = mock(Action.class);
-        when(firstAction.getNumThreads()).thenReturn(2);
         when(firstAction.isActive()).thenReturn(true);
 
         // Ignored because inactive:
         Action secondAction = mock(Action.class);
-        when(secondAction.getNumThreads()).thenReturn(1);
+        when(secondAction.enforceSingleThread()).thenReturn(true);
+
+        Action thirdAction = mock(Action.class);
+        when(thirdAction.isActive()).thenReturn(true);
 
         // Second group:
-        Action thirdAction = mock(Action.class);
-        when(thirdAction.getNumThreads()).thenReturn(3);
-        when(thirdAction.isActive()).thenReturn(true);
         Action fourthAction = mock(Action.class);
-        when(fourthAction.getNumThreads()).thenReturn(3);
+        when(fourthAction.enforceSingleThread()).thenReturn(true);
         when(fourthAction.isActive()).thenReturn(true);
 
         List<Action> actions = List.of(firstAction, secondAction, thirdAction, fourthAction);
         JobExecution jobExecution = JobExecution.builder().jobId("job-id").build();
 
-        DefaultJobStarter defaultJobStarter = new DefaultJobStarter(null, actions, jobExecution);
+        DefaultJobStarter defaultJobStarter = new DefaultJobStarter(null, actions, jobExecution, 3);
 
         assertEquals(2, defaultJobStarter.getConcurrencyGroups().size());
     }
@@ -73,19 +72,18 @@ class DefaultJobStarterTest {
     @DisplayName("Tests handling of a processing finished callback.")
     void testProcessingFinishedCallbackHandling() {
         Action action = mock(Action.class);
-        when(action.getNumThreads()).thenReturn(1);
         when(action.isActive()).thenReturn(true);
 
         Trigger trigger = mock(Trigger.class);
 
-        DefaultJobStarter defaultJobStarter = new DefaultJobStarter(trigger, List.of(action), new JobExecution());
+        DefaultJobStarter defaultJobStarter = new DefaultJobStarter(trigger, List.of(action), new JobExecution(), 1);
 
         assertFalse(defaultJobStarter.isProcessingFinishedCallbackSet());
 
         Trigger processingFinishedCallback = mock(Trigger.class,
                 withSettings().extraInterfaces(ProcessingFinishedCallback.class));
 
-        defaultJobStarter = new DefaultJobStarter(processingFinishedCallback, List.of(action), new JobExecution());
+        defaultJobStarter = new DefaultJobStarter(processingFinishedCallback, List.of(action), new JobExecution(), 1);
 
         assertTrue(defaultJobStarter.isProcessingFinishedCallbackSet());
     }
@@ -97,14 +95,13 @@ class DefaultJobStarterTest {
     @DisplayName("Tests processing the job.")
     void testProcess() {
         Action action = mock(Action.class);
-        when(action.getNumThreads()).thenReturn(1);
         when(action.isActive()).thenReturn(true);
 
         Trigger trigger = mock(Trigger.class);
 
         JobExecution jobExecution = JobExecution.builder().build();
 
-        DefaultJobStarter defaultJobStarter = new DefaultJobStarter(trigger, List.of(action), jobExecution);
+        DefaultJobStarter defaultJobStarter = new DefaultJobStarter(trigger, List.of(action), jobExecution, 1);
 
         List<ConcurrencyGroup> concurrencyGroups = defaultJobStarter.process();
 

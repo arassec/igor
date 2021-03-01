@@ -5,6 +5,7 @@
     "active": true,
     "historyLimit": 666,
     "simulationLimit": 25,
+    "numThreads": 1,
     "trigger": {
         "id": "trigger-id",
         "category": {
@@ -61,14 +62,6 @@
                     "value": "connector-id",
                     "connectorName": null,
                     "connector": true
-                },
-                {
-                    "name": "numThreads",
-                    "advanced": true,
-                    "required": true,
-                    "type": "int",
-                    "value": 0,
-                    "connector": false
                 }
             ]
         }

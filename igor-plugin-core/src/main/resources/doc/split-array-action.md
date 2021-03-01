@@ -12,7 +12,6 @@ The action can be configured by the following parameters:
 Parameter | Description
 ---|:---|
 Array selector| A Mustache expression selecting a JSON-Array from the data item. The array is split and its content separated into individual data items.
-Num threads | The number of threads this action uses to process data items.
 
 ## Example
  

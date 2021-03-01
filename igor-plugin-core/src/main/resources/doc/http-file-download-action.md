@@ -36,4 +36,3 @@ Append filtype suffix | If checked, igor will try to determine the file type and
 Username | A username for HTTP Basic Authentication. If set together with a password, a HTTP Authorization header with the encoded password will be added to every request.
 Password | A password for HTTP Basic Authentication.
 Target key | The name of the key the action's results will be stored in.
-Num threads | The number of threads this action uses to execute requests.

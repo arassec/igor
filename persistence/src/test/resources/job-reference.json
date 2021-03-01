@@ -1,34 +1,31 @@
 {
-  "id": "job-id",
-  "name": "job-name",
-  "description": "job-description",
-  "active": true,
-  "historyLimit": 666,
-  "simulationLimit": 25,
-  "trigger": {
-    "id": "trigger-id",
-    "typeId": "trigger-type-id",
-    "parameters": []
-  },
-  "actions": [
-    {
-      "id": "action-id",
-      "typeId": "action-type-id",
-      "name": "action-name",
-      "description": "action-description",
-      "active": true,
-      "parameters": [
+    "id": "job-id",
+    "name": "job-name",
+    "description": "job-description",
+    "active": true,
+    "historyLimit": 666,
+    "simulationLimit": 25,
+    "numThreads": 1,
+    "trigger": {
+        "id": "trigger-id",
+        "typeId": "trigger-type-id",
+        "parameters": []
+    },
+    "actions": [
         {
-          "name": "testConnector",
-          "value": "connector-id",
-          "connector": true
-        },
-        {
-          "name": "numThreads",
-          "value": 1
+            "id": "action-id",
+            "typeId": "action-type-id",
+            "name": "action-name",
+            "description": "action-description",
+            "active": true,
+            "parameters": [
+                {
+                    "name": "testConnector",
+                    "value": "connector-id",
+                    "connector": true
+                }
+            ]
         }
-      ]
-    }
-  ],
-  "faultTolerant": true
+    ],
+    "faultTolerant": true
 }

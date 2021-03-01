@@ -60,10 +60,7 @@ class BaseProxyTest {
      */
     @Test
     @DisplayName("Tests getters and setters of the proxy.")
-    void testGetUneditableProperties() {
-        actionProxy.getUnEditableProperties();
-        verify(actionMock, times(1)).getUnEditableProperties();
-
+    void testGetGettersAndSetters() {
         actionProxy.getCategoryId();
         verify(actionMock, times(1)).getCategoryId();
 

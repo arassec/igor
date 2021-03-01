@@ -38,9 +38,6 @@ public class LimitAction extends BaseUtilAction {
      */
     public LimitAction() {
         super(CorePluginType.LIMIT_ACTION.getId());
-        // Limiting is always done single threaded:
-        setNumThreads(1);
-        getUnEditableProperties().add("numThreads");
     }
 
     /**
@@ -69,6 +66,16 @@ public class LimitAction extends BaseUtilAction {
     @Override
     public boolean supportsEvents() {
         return false;
+    }
+
+    /**
+     * Limiting is always done single-threaded.
+     *
+     * @return Always {@code true}.
+     */
+    @Override
+    public boolean enforceSingleThread() {
+        return true;
     }
 
 }
