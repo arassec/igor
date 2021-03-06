@@ -14,7 +14,7 @@
   "author": "Andreas Sensen",
   "license": "MIT",
   "devDependencies": {
-    "cypress": "^6.5.0",
+    "cypress": "^6.6.0",
     "cypress-file-upload": "^4.1.1"
   }
 }
