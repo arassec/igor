@@ -23,20 +23,20 @@
                                   class="list-entry"
                                   :clickable="true"
                                   v-on:feedback-clicked="editJob(referencingJob.key)">
-                        <div slot="left" class="max-width truncate">{{ referencingJob.value }}</div>
-                    </feedback-box>
-                    <list-pager :page="referencingJobsPage" v-if="referencingJobsPage.totalPages > 1"
-                                v-on:first="loadReferencingJobs(0)"
-                                v-on:previous="loadReferencingJobs(referencingJobsPage.number - 1)"
-                                v-on:next="loadReferencingJobs(referencingJobsPage.number + 1)"
-                                v-on:last="loadReferencingJobs(referencingJobsPage.totalPages -1)"/>
+                <div slot="left" class="max-width truncate">{{ referencingJob.value }}</div>
+                </feedback-box>
+                <list-pager :page="referencingJobsPage" v-if="referencingJobsPage.totalPages > 1"
+                            v-on:first="loadReferencingJobs(0)"
+                            v-on:previous="loadReferencingJobs(referencingJobsPage.number - 1)"
+                            v-on:next="loadReferencingJobs(referencingJobsPage.number + 1)"
+                            v-on:last="loadReferencingJobs(referencingJobsPage.totalPages -1)"/>
                 </p>
                 <label v-if="!referencingJobsPage || !referencingJobsPage.items
                     || referencingJobsPage.items.length === 0">No jobs are using this connector.</label>
             </core-panel>
         </side-menu>
 
-        <core-content class="configurator">
+        <core-content class="configurator fixed-width">
             <div class="max-width" data-e2e="connector-configurator">
                 <core-panel>
                     <layout-row>
@@ -114,8 +114,21 @@
             </div>
         </core-content>
 
-        <documentation-container :documentation="documentation" v-show="showDocumentation"
-                                 v-on:close="showDocumentation = false"/>
+        <transition v-on:after-leave="blendInDocumentation"
+                    name="animate-css-transition"
+                    enter-active-class="animated slideInRight"
+                    leave-active-class="animated slideOutRight">
+            <connectiontest-result-container :test-error="testError" v-if="showTestDetails"
+                                             v-on:close="closeTestDetails"/>
+        </transition>
+
+        <transition v-on:after-leave="blendInTestDetails"
+                    name="animate-css-transition"
+                    enter-active-class="animated slideInRight"
+                    leave-active-class="animated slideOutRight">
+            <documentation-container :documentation="documentation" v-show="showDocumentation"
+                                     v-on:close="closeDocumentation"/>
+        </transition>
 
         <modal-dialog v-if="showUnsavedValuesExistDialog" @close="showUnsavedValuesExistDialog = false">
             <h1 slot="header">Unsaved configuration</h1>
@@ -128,6 +141,7 @@
             </div>
         </modal-dialog>
 
+        <!--
         <modal-dialog v-if="showTestDetails" @close="showTestDetails = false"
                       v-on:cancel="showTestDetails = false">
             <layout-row slot="header">
@@ -139,6 +153,7 @@
                 <pre><code>{{ testError }}</code></pre>
             </div>
         </modal-dialog>
+        -->
 
         <background-icon icon="network-wired"/>
 
@@ -163,10 +178,12 @@ import IconButton from "../components/common/icon-button";
 import DocumentationContainer from "../components/common/documentation-container";
 import Utils from "../utils/utils";
 import InputValidated from "../components/common/input-validated";
+import ConnectiontestResultContainer from "@/components/connectors/connectiontest-result-container";
 
 export default {
     name: 'connector-editor',
     components: {
+        ConnectiontestResultContainer,
         InputValidated,
         DocumentationContainer,
         IconButton,
@@ -207,10 +224,12 @@ export default {
             },
             showUnsavedValuesExistDialog: false,
             nextRoute: null,
+            shouldShowDocumentation: false,
             showDocumentation: false,
             documentation: null,
+            shouldShowTestDetails: false,
             showTestDetails: false,
-            testError: null
+            testError: null,
         }
     },
     computed: {
@@ -219,6 +238,16 @@ export default {
         }
     },
     methods: {
+        blendInTestDetails: function () {
+            if (this.shouldShowTestDetails) {
+                this.showTestDetails = true;
+            }
+        },
+        blendInDocumentation: function () {
+            if (this.shouldShowDocumentation) {
+                this.showDocumentation = true;
+            }
+        },
         loadConnector: async function (id) {
             await IgorBackend.getData('/api/connector/' + id).then((connectorConfiguration) => {
                 this.connectorConfiguration = connectorConfiguration;
@@ -303,14 +332,17 @@ export default {
             }
         },
         testConfiguration: async function () {
+            this.showDocumentation = false;
+            this.showTestDetails = false;
+            this.testError = null;
             await IgorBackend.postData('/api/connector/test', this.connectorConfiguration, 'Testing connection', 'Connection OK.', 'Connection Failed!').then((result) => {
                 this.validationErrors = {};
                 if (result.status === 400) {
                     this.validationErrors = result.data;
                 } else if (result.status === 424 && 'generalError' in result.data) {
                     this.testError = result.data['generalError'];
-                    this.showTestDetails = true;
                 }
+                this.showTestDetails = true;
             })
         },
         saveConfiguration: async function () {
@@ -355,14 +387,33 @@ export default {
         },
         openDocumentation: async function (key) {
             this.documentation = await IgorBackend.getData('/api/doc/' + key);
-            this.showDocumentation = true;
-            this.testResults = null;
+            if (this.showTestDetails) {
+                this.showTestDetails = false;
+                this.shouldShowDocumentation = true
+            } else {
+                this.showDocumentation = true;
+            }
+        },
+        closeDocumentation: function () {
+            if (this.testError) {
+                this.shouldShowTestDetails = true;
+                this.shouldShowDocumentation = false;
+                this.showDocumentation = false;
+            } else {
+                this.showDocumentation = false;
+                this.shouldShowDocumentation = false;
+            }
         },
         switchDocumentation: async function (key) {
             if (this.showDocumentation) {
                 this.documentation = await IgorBackend.getData('/api/doc/' + key);
                 this.testResults = null;
             }
+        },
+        closeTestDetails: function () {
+            this.testError = null;
+            this.shouldShowTestDetails = false;
+            this.showTestDetails = false;
         }
     },
     mounted() {
@@ -420,6 +471,11 @@ export default {
     flex-grow: 2;
 }
 
+.fixed-width {
+    max-width: 35em;
+    min-width: 35em;
+}
+
 .list-label {
     margin-bottom: 5px;
     display: inline-block;
@@ -443,6 +499,14 @@ pre {
     word-wrap: normal !important;
     white-space: pre !important;
     background-color: var(--color-alert)
+}
+
+/* animate.css animation speed */
+.animated {
+    -webkit-animation-duration: var(--animate-css-duration);
+    animation-duration: var(--animate-css-duration);
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 
 </style>
