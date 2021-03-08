@@ -7,6 +7,7 @@ import com.arassec.igor.plugin.file.IgorFilePluginConfiguration;
 import com.arassec.igor.plugin.message.IgorMessagePluginConfiguration;
 import com.arassec.igor.simulation.SimulationConfiguration;
 import com.arassec.igor.web.WebConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.PropertySource;
  * Auto-Configuration for igor's Spring-Boot starter.
  */
 @Configuration
+@ComponentScan
 @Import({ApplicationConfiguration.class, PersistenceConfiguration.class, WebConfiguration.class, SimulationConfiguration.class,
     IgorCorePluginConfiguration.class, IgorMessagePluginConfiguration.class, IgorFilePluginConfiguration.class})
 @PropertySource("classpath:igor.properties")
