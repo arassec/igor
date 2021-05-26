@@ -76,7 +76,9 @@ module.exports = {
                                 "igor-plugin-core/read-file-action",
                                 "igor-plugin-core/http-request-action",
                                 "igor-plugin-core/add-data-action",
-                                "igor-plugin-message/rabbitmq-send-message-action"
+                                "igor-plugin-message/send-rabbitmq-message-action",
+                                "igor-plugin-message/send-email-message-action",
+                                "igor-plugin-message/receive-email-message-action"
                             ]
                         },
                         {
@@ -89,7 +91,9 @@ module.exports = {
                                 "igor-plugin-file/ftps-file-connector",
                                 "igor-plugin-file/scp-file-connector",
                                 "igor-plugin-file/sftp-file-connector",
-                                "igor-plugin-message/rabbitmq-message-connector"
+                                "igor-plugin-message/rabbitmq-message-connector",
+                                "igor-plugin-message/email-imap-message-connector",
+                                "igor-plugin-message/email-smtp-message-connector"
 
                             ]
                         }

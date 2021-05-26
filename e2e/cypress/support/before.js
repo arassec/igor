@@ -8,6 +8,10 @@ export const ftpServerName='FTP Server'
 export const ftpServerKebap='ftp-server'
 export const scpConnectorName='SCP Connector'
 export const scpConnectorKebap='scp-connector'
+export const emailSenderName='E-Mail Sender'
+export const emailSenderKebap='e-mail-sender'
+export const emailReceiverName='E-Mail Receiver'
+export const emailReceiverKebap='e-mail-receiver'
 
 export const jobCopyNewFilesName='Copy New Files'
 export const jobCopyNewFilesKebap='copy-new-files'
@@ -15,6 +19,10 @@ export const jobRabbitMqSenderName='RabbitMQ Sender'
 export const jobRabbitMqSenderKebap="rabbit-mq-sender"
 export const jobRabbitMqReceiverName='RabbitMQ Receiver'
 export const jobRabbitMqReceiverKebap="rabbit-mq-receiver"
+export const jobEmailSenderName='E-Mail Sender'
+export const jobEmailSenderKebap='e-mail-sender'
+export const jobEmailReceiverName='E-Mail Receiver'
+export const jobEmailReceiverKebap='e-mail-receiver'
 
 beforeEach(() => {
     cy.server();

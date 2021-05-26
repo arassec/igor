@@ -17,11 +17,11 @@ import static org.mockito.Mockito.*;
 
 
 /**
- * Tests the {@link RabbitMqSendMessageAction}.
+ * Tests the {@link SendRabbitMqMessageAction}.
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("'Send message' action tests.")
-class RabbitMqSendMessageActionTest extends MessageActionBaseTest {
+@DisplayName("'Send RabbitMQ message' action tests.")
+class SendRabbitMqMessageActionTest extends MessageActionBaseTest {
 
     /**
      * Tests processing the action with mustache template parameter.
@@ -31,7 +31,7 @@ class RabbitMqSendMessageActionTest extends MessageActionBaseTest {
     void testProcess() {
         RabbitMqMessageConnector messageConnectorMock = mock(RabbitMqMessageConnector.class);
 
-        RabbitMqSendMessageAction action = new RabbitMqSendMessageAction();
+        SendRabbitMqMessageAction action = new SendRabbitMqMessageAction();
         action.setMessageConnector(messageConnectorMock);
         action.setExchange("test-exchange");
         action.setMessageTemplate("{'key': '{{data." + PARAM_KEY + "}}'}");
@@ -54,7 +54,7 @@ class RabbitMqSendMessageActionTest extends MessageActionBaseTest {
     void testProcessHeaders() {
         RabbitMqMessageConnector messageConnectorMock = mock(RabbitMqMessageConnector.class);
 
-        RabbitMqSendMessageAction action = new RabbitMqSendMessageAction();
+        SendRabbitMqMessageAction action = new SendRabbitMqMessageAction();
         action.setMessageConnector(messageConnectorMock);
         action.setExchange("test-exchange");
         action.setMessageTemplate("message-template");

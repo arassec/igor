@@ -53,7 +53,7 @@ There are currently connectors for the following protocols and services:
 File Handling | Message Handling | Web
 ---|---|---
 FTP | RabbitMQ | HTTP(S)
-FTPS |  |
+FTPS | E-Mail |
 Local Filesystem | | 
 SCP |  |
 SFTP | |

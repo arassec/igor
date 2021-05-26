@@ -269,7 +269,6 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
             dataItem.put("message", messageContent);
         }
 
-
         dataItem.put("messageMeta", metaData);
 
         channels.put(message.getMessageProperties().getDeliveryTag(), channel);

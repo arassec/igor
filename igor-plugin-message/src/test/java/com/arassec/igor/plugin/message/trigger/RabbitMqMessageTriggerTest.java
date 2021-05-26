@@ -33,7 +33,7 @@ class RabbitMqMessageTriggerTest {
     @BeforeEach
     void initialize() {
         messageConnectorMock = mock(RabbitMqMessageConnector.class);
-        trigger.setMessageConnector(messageConnectorMock);
+        trigger.setRabbitMqConnector(messageConnectorMock);
     }
 
     /**
@@ -44,7 +44,7 @@ class RabbitMqMessageTriggerTest {
     void testInstanceCreation() {
         RabbitMqMessageTrigger messageTrigger = new RabbitMqMessageTrigger();
         assertEquals(CorePluginCategory.MESSAGE.getId(), messageTrigger.getCategoryId());
-        assertNotNull(messageTrigger.getMessageConnector());
+        assertNotNull(messageTrigger.getRabbitMqConnector());
     }
 
     /**
@@ -53,7 +53,7 @@ class RabbitMqMessageTriggerTest {
     @Test
     @DisplayName("Tests initialization.")
     void testInitialization() {
-        trigger.setQueue("test-queue");
+        trigger.setQueueName("test-queue");
         trigger.initialize(new JobExecution());
         verify(messageConnectorMock, times(1)).enableMessageRetrieval("test-queue");
     }

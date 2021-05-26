@@ -62,6 +62,19 @@ services:
       - SSH_USERS=igor:1000:1000:/bin/bash
     networks:
       - igor-e2e
+  mail:
+    image: "antespi/docker-imap-devel:latest"
+    container_name: "igor-mail"
+    ports:
+      - "25:25"
+      - "143:143"
+      - "993:993"
+    environment:
+      - MAILNAME=igor
+      - MAIL_ADDRESS=igor@igor-test.dev
+      - MAIL_PASS=igor
+    networks:
+      - igor-e2e
 
 networks:
   igor-e2e:

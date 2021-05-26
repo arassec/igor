@@ -7,6 +7,7 @@ import org.springframework.util.StreamUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
@@ -59,8 +60,8 @@ public class DocumentationUtil {
     public static String readDocumentation(String key, Locale locale) {
         ClassPathResource classPathResource = getClassPathResource(key, locale);
         if (classPathResource.exists()) {
-            try {
-                return StreamUtils.copyToString(classPathResource.getInputStream(), StandardCharsets.UTF_8);
+            try (InputStream inputStream = classPathResource.getInputStream()) {
+                return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
             } catch (IOException e) {
                 log.warn("Documentation could not be read although it should be available!", e);
             }

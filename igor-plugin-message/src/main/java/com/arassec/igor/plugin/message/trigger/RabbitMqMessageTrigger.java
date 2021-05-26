@@ -28,21 +28,21 @@ public class RabbitMqMessageTrigger extends BaseEventTrigger {
      */
     @NotNull
     @IgorParam
-    private RabbitMqMessageConnector messageConnector;
+    private RabbitMqMessageConnector rabbitMqConnector;
 
     /**
-     * The queue to retrieve messages from.
+     * The RabbitMQ queue to retrieve messages from.
      */
     @NotEmpty
     @IgorParam
-    private String queue;
+    private String queueName;
 
     /**
      * Creates a new component instance.
      */
     protected RabbitMqMessageTrigger() {
         super(CorePluginCategory.MESSAGE.getId(), MessagePluginType.RABBITMQ_MESSAGE_TRIGGER.getId());
-        messageConnector = new RabbitMqMessageConnector(null);
+        rabbitMqConnector = new RabbitMqMessageConnector(null);
     }
 
     /**
@@ -53,7 +53,7 @@ public class RabbitMqMessageTrigger extends BaseEventTrigger {
     @Override
     public void initialize(JobExecution jobExecution) {
         super.initialize(jobExecution);
-        messageConnector.enableMessageRetrieval(queue);
+        rabbitMqConnector.enableMessageRetrieval(queueName);
     }
 
     /**
@@ -63,7 +63,7 @@ public class RabbitMqMessageTrigger extends BaseEventTrigger {
      */
     @Override
     public void processingFinished(Map<String, Object> dataItem) {
-        messageConnector.processingFinished(dataItem);
+        rabbitMqConnector.processingFinished(dataItem);
     }
 
     /**

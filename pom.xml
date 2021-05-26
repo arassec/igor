@@ -62,7 +62,7 @@
 
         <java.version>11</java.version>
         <maven.compiler.release>11</maven.compiler.release>
-        <nodejs.version>v12.19.0</nodejs.version>
+        <nodejs.version>v14.3.0</nodejs.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -291,6 +291,20 @@
                 <groupId>com.jcraft</groupId>
                 <artifactId>jsch</artifactId>
                 <version>0.1.55</version>
+            </dependency>
+
+            <!-- plugin message -->
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>1.4.7</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.icegreen</groupId>
+                <artifactId>greenmail-junit5</artifactId>
+                <version>1.6.4</version>
+                <scope>test</scope>
             </dependency>
 
         </dependencies>

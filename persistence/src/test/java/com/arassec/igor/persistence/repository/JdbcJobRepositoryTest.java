@@ -131,6 +131,13 @@ class JdbcJobRepositoryTest {
         assertEquals(job.getName(), upsertedJob.getName());
 
         // "normal" upsert: provided ID and existing, persisted job:
+
+        TestConnector connector = new TestConnector();
+        connector.setId("connector-id");
+        TestAction action = new TestAction();
+        action.setTestConnector(connector); // Must be saved as job-connector-reference!
+        job.getActions().add(action);
+
         when(jobDao.findById("job-id")).thenReturn(Optional.of(new JobEntity()));
 
         repository.upsert(job);
@@ -140,6 +147,56 @@ class JdbcJobRepositoryTest {
 
         assertEquals(job.getName(), argCap.getValue().getName());
         assertEquals("job-json", argCap.getValue().getContent());
+
+        ArgumentCaptor<JobConnectorReferenceEntity> argCapRef = ArgumentCaptor.forClass(JobConnectorReferenceEntity.class);
+        verify(jobConnectorReferenceDao, times(1)).save(argCapRef.capture());
+        assertEquals("connector-id", argCapRef.getValue().getJobConnectorReferenceIdentity().getConnectorId());
+    }
+
+    /**
+     * Tests saving an existing entity with missing connector references.
+     */
+    @Test
+    @DisplayName("Tests saving an existing entity with missing connector references.")
+    @SneakyThrows(JsonProcessingException.class)
+    void testUpsertExistingMissingConnectorReference() {
+        Job job = new Job();
+        job.setId("job-id");
+        job.setName("job-name");
+
+        TestAction action = new TestAction();
+        action.setTestConnector(new TestConnector()); // Connector without ID after e.g. being deleted!
+        job.getActions().add(action);
+
+        when(persistenceJobMapper.writeValueAsString(job)).thenReturn("job-json");
+
+        // With Job-ID but without persisted job (i.e. upsert during import)
+        when(jobDao.findById("job-id")).thenReturn(Optional.empty());
+
+        Job upsertedJob = repository.upsert(job);
+
+        ArgumentCaptor<JobEntity> argCap = ArgumentCaptor.forClass(JobEntity.class);
+        verify(jobDao, times(1)).save(argCap.capture());
+
+        assertEquals("job-id", argCap.getValue().getId());
+        assertEquals(job.getName(), argCap.getValue().getName());
+        assertEquals("job-json", argCap.getValue().getContent());
+
+        assertEquals("job-id", upsertedJob.getId());
+        assertEquals(job.getName(), upsertedJob.getName());
+
+        // "normal" upsert: provided ID and existing, persisted job:
+        when(jobDao.findById("job-id")).thenReturn(Optional.of(new JobEntity()));
+
+        repository.upsert(job);
+
+        argCap = ArgumentCaptor.forClass(JobEntity.class);
+        verify(jobDao, times(2)).save(argCap.capture());
+
+        assertEquals(job.getName(), argCap.getValue().getName());
+        assertEquals("job-json", argCap.getValue().getContent());
+
+        verify(jobConnectorReferenceDao, times(0)).save(any());
     }
 
     /**

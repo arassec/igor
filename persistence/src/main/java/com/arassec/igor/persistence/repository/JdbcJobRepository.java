@@ -101,8 +101,9 @@ public class JdbcJobRepository implements JobRepository {
         List<String> referencedConnectors = new LinkedList<>(getConnectorIds(job.getTrigger()));
         job.getActions().forEach(action -> referencedConnectors.addAll(getConnectorIds(action)));
 
-        referencedConnectors.forEach(connectorId -> jobConnectorReferenceDao.save(new JobConnectorReferenceEntity(job.getId(),
-                connectorId)));
+        referencedConnectors.stream()
+            .filter(Objects::nonNull)
+            .forEach(connectorId -> jobConnectorReferenceDao.save(new JobConnectorReferenceEntity(job.getId(), connectorId)));
 
         return job;
     }
@@ -222,7 +223,7 @@ public class JdbcJobRepository implements JobRepository {
         List<JobConnectorReferenceView> connectorReferences = jobConnectorReferenceDao.findByJobId(jobId);
         if (connectorReferences != null) {
             connectorReferences.forEach(connectorReference ->
-                    result.add(new Pair<>(connectorReference.getConnectorId(), connectorReference.getConnectorName())));
+                result.add(new Pair<>(connectorReference.getConnectorId(), connectorReference.getConnectorName())));
         }
 
         return result;

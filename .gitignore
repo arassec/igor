@@ -50,16 +50,13 @@ yarn-error.log*
 *.sw*
 
 node
-package-lock.json
 
 ### igor specific ###
 
 dbdata/
-frontend/package-lock.json
 frontend/debug.log
 web/src/main/resources/static
 application.properties
-documentation/package-lock.json
 documentation/docs/.vuepress/components
 documentation/docs/user/core
 documentation/docs/user/igor-plugin-core

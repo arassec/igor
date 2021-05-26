@@ -26,7 +26,7 @@ import java.util.Map;
 @Getter
 @Setter
 @IgorComponent
-public class RabbitMqSendMessageAction extends BaseMessageAction {
+public class SendRabbitMqMessageAction extends BaseMessageAction {
 
     /**
      * The connector to use for message sending.
@@ -78,8 +78,8 @@ public class RabbitMqSendMessageAction extends BaseMessageAction {
     /**
      * Creates a new component instance.
      */
-    public RabbitMqSendMessageAction() {
-        super(MessagePluginType.RABBITMQ_SEND_MESSAGE_ACTION.getId());
+    public SendRabbitMqMessageAction() {
+        super(MessagePluginType.SEND_RABBITMQ_MESSAGE_ACTION.getId());
         messageConnector = new RabbitMqMessageConnector(null);
         messageTemplate = "";
     }

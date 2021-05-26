@@ -4,7 +4,7 @@
   "description": "Igor End-to-End tests.",
   "main": "index.js",
   "scripts": {
-    "cypress:local": "cypress open --config baseUrl=http://localhost:8081 --env nginx_host=localhost,rabbitmq_host=localhost,vsftpd_host=localhost,sshd_host=localhost,sshd_port=2222",
+    "cypress:local": "cypress open --config baseUrl=http://localhost:8081 --env nginx_host=localhost,rabbitmq_host=localhost,vsftpd_host=localhost,sshd_host=localhost,sshd_port=2222,mail_host=localhost",
     "cypress:e2e": "cypress run",
     "env:up": "docker-compose up -d",
     "env:down": "docker-compose down",
@@ -14,7 +14,7 @@
   "author": "Andreas Sensen",
   "license": "MIT",
   "devDependencies": {
-    "cypress": "^6.6.0",
+    "cypress": "^7.4.0",
     "cypress-file-upload": "^4.1.1"
   }
 }

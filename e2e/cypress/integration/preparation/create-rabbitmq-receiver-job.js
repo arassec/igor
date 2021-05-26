@@ -23,8 +23,8 @@ describe('Initializes the test environment\'s \'RabbitMQ Receiver\' job.', () =>
 
                 cy.chooseTrigger('Message', 'RabbitMQ Message',
                     {
-                        'messageConnector': rabbitMqServerKebap,
-                        'queue': 'igor-queue'
+                        'rabbitMqConnector': rabbitMqServerKebap,
+                        'queueName': 'igor-queue'
                     }, null);
 
                 cy.addAction('Pause', 'Test', 'Pause',
