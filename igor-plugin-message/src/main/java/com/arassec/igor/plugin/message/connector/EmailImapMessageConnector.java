@@ -182,7 +182,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
      * @throws MessagingException In case of errors during message processing.
      * @throws IOException        In case of errors during attachment processing.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "javasecurity:S2083"})
     private void processMessageParts(Part part, Map<String, Object> targetJson, boolean saveAttachments, String attachmentDirectory)
         throws MessagingException, IOException {
         if (part instanceof Message) {
@@ -216,7 +216,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
                         && Files.isWritable(Paths.get(attachmentDirectory, part.getFileName()))) {
             // It is the job admin's responsibility to configure the job in a way, that path
             // traversal attacks are prevented, e.g. by configuring a fixed 'attachamentDirectory' as apposed to a template.
-            //noinspection
+            // Hence the suppressed warning ("javasecurity:S2083")...
             try (var fos = new FileOutputStream(attachmentDirectory + part.getFileName())) {
                 FileCopyUtils.copy(part.getInputStream(), fos);
             }

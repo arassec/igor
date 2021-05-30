@@ -10,7 +10,6 @@ import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
@@ -111,11 +110,11 @@ public class HttpRequestAction extends BaseHttpAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String requestMethod = CorePluginUtils.getString(data, method);
-        String requestUrl = CorePluginUtils.getString(data, url);
-        String content = CorePluginUtils.getString(data, body);
+        var requestMethod = CorePluginUtils.getString(data, method);
+        var requestUrl = CorePluginUtils.getString(data, url);
+        var content = CorePluginUtils.getString(data, body);
 
-        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
+        var httpRequestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(requestUrl))
             .method(requestMethod, HttpRequest.BodyPublishers.ofString(content));
         parsedHeaders.forEach(header -> httpRequestBuilder.header(CorePluginUtils.getString(data, header.split(":")[0]),
@@ -159,7 +158,7 @@ public class HttpRequestAction extends BaseHttpAction {
      */
     private Object parseResponseBody(HttpResponse<String> httpResponse) {
         try {
-            JsonNode jsonNode = objectMapper.readTree(httpResponse.body());
+            var jsonNode = objectMapper.readTree(httpResponse.body());
             return objectMapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>() {
             });
         } catch (JsonProcessingException e) {

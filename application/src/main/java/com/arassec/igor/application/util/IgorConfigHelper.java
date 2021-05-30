@@ -22,7 +22,7 @@ public final class IgorConfigHelper {
      * @return A newly created {@link MessageSource}.
      */
     public static MessageSource createMessageSource(String... baseNames) {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        var messageSource = new ResourceBundleMessageSource();
         messageSource.setBasenames(baseNames);
         messageSource.setFallbackToSystemLocale(false);
         return messageSource;

@@ -1,8 +1,8 @@
-<p style="text-align: center;">
+<p align="center">
   <img width="256" src="https://raw.githubusercontent.com/arassec/igor/master/documentation/docs/.vuepress/public/logo.png" alt="igor-logo"/>
 </p>
 
-<p style="text-align: center;">
+<p align="center">
   <a href="https://github.com/arassec/igor/actions?query=workflow%3ABuild">
     <img src="https://github.com/arassec/igor/workflows/Build/badge.svg?branch=master" alt="build-state"/>
   </a>

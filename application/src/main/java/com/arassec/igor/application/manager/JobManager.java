@@ -94,7 +94,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
     public void onApplicationEvent(@NonNull ContextRefreshedEvent contextRefreshedEvent) {
         // If jobs are already 'running' (e.g. after a server restart) they are updated here:
         ModelPage<JobExecution> jobExecutions = jobExecutionRepository
-                .findInState(JobExecutionState.RUNNING, 0, Integer.MAX_VALUE);
+            .findInState(JobExecutionState.RUNNING, 0, Integer.MAX_VALUE);
         if (jobExecutions != null && jobExecutions.getItems() != null) {
             jobExecutions.getItems().forEach(jobExecution -> {
                 jobExecution.setErrorCause("Job interrupted due to application restart!");
@@ -105,7 +105,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
         }
         // Previously active jobs are simply marked as finished and re-activated.
         jobExecutions = jobExecutionRepository
-                .findInState(JobExecutionState.ACTIVE, 0, Integer.MAX_VALUE);
+            .findInState(JobExecutionState.ACTIVE, 0, Integer.MAX_VALUE);
         if (jobExecutions != null && jobExecutions.getItems() != null) {
             jobExecutions.getItems().forEach(jobExecution -> {
                 jobExecution.setExecutionState(JobExecutionState.FINISHED);
@@ -132,7 +132,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      * @return The saved {@link Job}.
      */
     public Job save(Job job) {
-        Job savedJob = jobRepository.upsert(job);
+        var savedJob = jobRepository.upsert(job);
         if (savedJob.isActive()) {
             // The trigger might have changed, so the job is unscheduled first and then re-scheduled according to its trigger.
             deactivate(savedJob);
@@ -151,7 +151,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      */
     public void delete(String id) {
         jobExecutor.cancel(id);
-        Job job = jobRepository.findById(id);
+        var job = jobRepository.findById(id);
         if (job != null) {
             deactivate(job);
             jobRepository.deleteById(id);
@@ -176,17 +176,17 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             throw new IllegalArgumentException("Job with ID required for run!");
         }
         List<JobExecution> runningJobExecutions = jobExecutionRepository
-                .findAllOfJobInState(job.getId(), JobExecutionState.RUNNING);
+            .findAllOfJobInState(job.getId(), JobExecutionState.RUNNING);
         List<JobExecution> waitingJobExecutions = jobExecutionRepository
-                .findAllOfJobInState(job.getId(), JobExecutionState.WAITING);
+            .findAllOfJobInState(job.getId(), JobExecutionState.WAITING);
         List<JobExecution> failedJobExecutions = jobExecutionRepository
-                .findAllOfJobInState(job.getId(), JobExecutionState.FAILED);
+            .findAllOfJobInState(job.getId(), JobExecutionState.FAILED);
         if (failedJobExecutions != null && !failedJobExecutions.isEmpty() && !job.isFaultTolerant()) {
             log.info("Job not enqueued due to previously failed executions and job's fault intolerance.");
         } else if ((runningJobExecutions == null || runningJobExecutions
-                .isEmpty()) && (waitingJobExecutions == null || waitingJobExecutions.isEmpty())) {
+            .isEmpty()) && (waitingJobExecutions == null || waitingJobExecutions.isEmpty())) {
             log.info("Enqueueing job: {} ({})", job.getName(), job.getId());
-            JobExecution jobExecution = new JobExecution();
+            var jobExecution = new JobExecution();
             jobExecution.setJobId(job.getId());
             jobExecution.setCreated(Instant.now());
             jobExecution.setExecutionState(JobExecutionState.WAITING);
@@ -195,7 +195,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE, job));
         } else {
             log.info("Job '{}' ({}) already executing or waiting for execution. Skipped execution until next time.",
-                    job.getName(), job.getId());
+                job.getName(), job.getId());
         }
     }
 
@@ -209,16 +209,16 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
         if (jobExecutionId == null) {
             throw new IllegalArgumentException("ID required to cancel job-execution!");
         }
-        JobExecution jobExecution = jobExecutionRepository.findById(jobExecutionId);
+        var jobExecution = jobExecutionRepository.findById(jobExecutionId);
         if (jobExecution != null) {
             if (JobExecutionState.WAITING.equals(jobExecution.getExecutionState())) {
                 jobExecution.setExecutionState(JobExecutionState.CANCELLED);
                 jobExecution.setFinished(Instant.now());
                 jobExecutionRepository.upsert(jobExecution);
                 applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE,
-                        jobRepository.findById(jobExecution.getJobId())));
+                    jobRepository.findById(jobExecution.getJobId())));
             } else if (JobExecutionState.RUNNING.equals(jobExecution.getExecutionState())
-                    || JobExecutionState.ACTIVE.equals(jobExecution.getExecutionState())) {
+                || JobExecutionState.ACTIVE.equals(jobExecution.getExecutionState())) {
                 jobExecutor.cancel(jobExecution.getJobId());
             }
         }
@@ -263,7 +263,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
                 return true;
             }
             return stateFilters.stream().filter(stateFilter -> (jobExecutionRepository.countAllOfJobInState(job.getId(),
-                    stateFilter) > 0)).map(result -> true).findFirst().orElse(false);
+                stateFilter) > 0)).map(result -> true).findFirst().orElse(false);
         }).collect(Collectors.toList());
         return ModelPageHelper.getModelPage(filteredList, pageNumber, pageSize);
     }
@@ -275,19 +275,19 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      */
     public List<Job> loadScheduled() {
         return jobRepository.findAll().stream().filter(Job::isActive)
-                .filter(job -> job.getTrigger() instanceof ScheduledTrigger).sorted((jobOne, jobTwo) -> {
-                    String firstCron = ((ScheduledTrigger) jobOne.getTrigger()).getCronExpression();
-                    String secondCron = ((ScheduledTrigger) jobTwo.getTrigger()).getCronExpression();
-                    CronExpression cronTriggerOne = CronExpression.parse(firstCron);
-                    LocalDateTime nextRunOne = cronTriggerOne.next(LocalDateTime.now());
-                    CronExpression cronTriggerTwo = CronExpression.parse(secondCron);
-                    LocalDateTime nextRunTwo = cronTriggerTwo.next(LocalDateTime.now());
-                    if (nextRunOne != null && nextRunTwo != null) {
-                        return nextRunOne.compareTo(nextRunTwo);
-                    } else {
-                        return 0;
-                    }
-                }).collect(Collectors.toList());
+            .filter(job -> job.getTrigger() instanceof ScheduledTrigger).sorted((jobOne, jobTwo) -> {
+                String firstCron = ((ScheduledTrigger) jobOne.getTrigger()).getCronExpression();
+                String secondCron = ((ScheduledTrigger) jobTwo.getTrigger()).getCronExpression();
+                var cronTriggerOne = CronExpression.parse(firstCron);
+                LocalDateTime nextRunOne = cronTriggerOne.next(LocalDateTime.now());
+                var cronTriggerTwo = CronExpression.parse(secondCron);
+                LocalDateTime nextRunTwo = cronTriggerTwo.next(LocalDateTime.now());
+                if (nextRunOne != null && nextRunTwo != null) {
+                    return nextRunOne.compareTo(nextRunTwo);
+                } else {
+                    return 0;
+                }
+            }).collect(Collectors.toList());
     }
 
     /**
@@ -311,9 +311,9 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      * @return The {@link JobExecution}.
      */
     public JobExecution getJobExecution(Long id) {
-        JobExecution jobExecution = jobExecutionRepository.findById(id);
+        var jobExecution = jobExecutionRepository.findById(id);
         if (jobExecution != null && jobExecution.isRunningOrActive()) {
-            JobExecution runningJobExecution = jobExecutor.getJobExecution(jobExecution.getJobId());
+            var runningJobExecution = jobExecutor.getJobExecution(jobExecution.getJobId());
             if (runningJobExecution != null) {
                 runningJobExecution.getWorkInProgress().forEach(jobExecution::addWorkInProgress);
                 jobExecution.setProcessedEvents(runningJobExecution.getProcessedEvents());
@@ -346,9 +346,9 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      */
     public void updateJobExecutionState(Long id, JobExecutionState newState) {
         jobExecutionRepository.updateJobExecutionState(id, newState);
-        JobExecution jobExecution = jobExecutionRepository.findById(id);
+        var jobExecution = jobExecutionRepository.findById(id);
         applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE,
-                jobRepository.findById(jobExecution.getJobId())));
+            jobRepository.findById(jobExecution.getJobId())));
     }
 
     /**

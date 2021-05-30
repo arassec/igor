@@ -114,7 +114,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
     @Override
     public List<FileInfo> listFiles(String directory, String fileEnding) {
         try {
-            FTPClient ftpClient = connect();
+            var ftpClient = connect();
 
             List<FileInfo> result;
 
@@ -122,7 +122,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
                     ftpFile -> !StringUtils.hasText(fileEnding) || ftpFile.getName().endsWith(fileEnding));
             if (ftpFiles != null && ftpFiles.length > 0) {
                 result = Stream.of(ftpFiles).filter(Objects::nonNull).filter(FTPFile::isFile).map(ftpFile -> {
-                    Instant mTime = Instant.ofEpochMilli(ftpFile.getTimestamp().getTime().getTime());
+                    var mTime = Instant.ofEpochMilli(ftpFile.getTimestamp().getTime().getTime());
                     return new FileInfo(ftpFile.getName(), formatInstant(mTime));
                 }).collect(Collectors.toList());
             } else {
@@ -142,8 +142,8 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
      */
     @Override
     public String read(String file) {
-        FTPClient ftpClient = connect();
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+        var ftpClient = connect();
+        try (var outputStream = new ByteArrayOutputStream()) {
             ftpClient.retrieveFile(file, outputStream);
             return outputStream.toString();
         } catch (IOException e) {
@@ -159,8 +159,8 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
     @Override
     public FileStreamData readStream(String file) {
         try {
-            FTPClient ftpClient = connect();
-            FileStreamData result = new FileStreamData();
+            var ftpClient = connect();
+            var result = new FileStreamData();
             FTPFile[] list = ftpClient.listFiles(file);
             if (list.length == 0) {
                 throw new IgorException("Could not retrieve file: " + file);
@@ -180,8 +180,8 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
     @Override
     public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor,
                             JobExecution jobExecution) {
-        FTPClient ftpClient = connect();
-        try (BufferedOutputStream outputStream = new BufferedOutputStream(ftpClient.storeFileStream(file))) {
+        var ftpClient = connect();
+        try (var outputStream = new BufferedOutputStream(ftpClient.storeFileStream(file))) {
             copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), workInProgressMonitor, jobExecution);
         } catch (IOException e) {
             throw new IgorException("Could not store file: " + file, e);
@@ -196,7 +196,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
         if (fileStreamData.getSourceConnectionData() instanceof FTPClient) {
-            FTPClient ftpClient = (FTPClient) fileStreamData.getSourceConnectionData();
+            var ftpClient = (FTPClient) fileStreamData.getSourceConnectionData();
             try {
                 if (!ftpClient.completePendingCommand()) {
                     ftpClient.logout();
@@ -217,7 +217,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
     @Override
     public void delete(String file) {
         try {
-            FTPClient ftpClient = connect();
+            var ftpClient = connect();
             if (!ftpClient.deleteFile(file)) {
                 throw new IgorException("Could not delete remote FTP file " + file);
             }
@@ -233,7 +233,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
     @Override
     public void move(String source, String target) {
         try {
-            FTPClient ftpClient = connect();
+            var ftpClient = connect();
             ftpClient.rename(source, target);
             disconnect(ftpClient);
         } catch (IOException e) {
@@ -246,7 +246,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
      */
     @Override
     public void testConfiguration() {
-        FTPClient ftpClient = connect();
+        var ftpClient = connect();
         disconnect(ftpClient);
     }
 

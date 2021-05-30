@@ -121,18 +121,18 @@ public class HttpFileDownloadAction extends BaseHttpAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String requestUrl = CorePluginUtils.getString(data, url);
-        String destination = CorePluginUtils.getString(data, targetDirectory);
-        String filename = CorePluginUtils.getString(data, targetFilename);
-        String resolvedTargetKey = CorePluginUtils.getString(data, targetKey);
+        var requestUrl = CorePluginUtils.getString(data, url);
+        var destination = CorePluginUtils.getString(data, targetDirectory);
+        var filename = CorePluginUtils.getString(data, targetFilename);
+        var resolvedTargetKey = CorePluginUtils.getString(data, targetKey);
 
-        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder().GET().uri(URI.create(requestUrl));
+        var httpRequestBuilder = HttpRequest.newBuilder().GET().uri(URI.create(requestUrl));
         parsedHeaders.forEach(header -> httpRequestBuilder.header(CorePluginUtils.getString(data, header.split(":")[0]),
             CorePluginUtils.getString(data, header.split(":")[1])));
         addBasicAuthHeaderIfConfigured(httpRequestBuilder);
 
         try {
-            WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor(filename, 0);
+            var workInProgressMonitor = new WorkInProgressMonitor(filename, 0);
             jobExecution.addWorkInProgress(workInProgressMonitor);
 
             HttpResponse<InputStream> httpResponse = httpConnector.getHttpClient().send(httpRequestBuilder.build(),
@@ -143,7 +143,7 @@ public class HttpFileDownloadAction extends BaseHttpAction {
                     + httpResponse.statusCode());
             }
 
-            FileStreamData fileStreamData = new FileStreamData();
+            var fileStreamData = new FileStreamData();
             fileStreamData.setFilenameSuffix(determineFilenameSuffix(httpResponse));
             setFilesizeAndData(httpResponse, fileStreamData, httpRequestBuilder, requestUrl);
 
@@ -232,7 +232,7 @@ public class HttpFileDownloadAction extends BaseHttpAction {
                         + requestUrl + "': " + httpResponse.statusCode());
                 }
 
-                String fileContent = httpStringResponse.body();
+                var fileContent = httpStringResponse.body();
 
                 fileStreamData.setFileSize(fileContent.getBytes().length);
                 fileStreamData.setData(new ByteArrayInputStream(fileContent.getBytes()));

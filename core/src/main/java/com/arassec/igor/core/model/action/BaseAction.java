@@ -118,7 +118,7 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
             && !data.isEmpty()
             && data.containsKey(DataKey.META.getKey())
             && ((Map<String, Object>) data.get(DataKey.META.getKey())).containsKey(DataKey.JOB_ID.getKey())) {
-            String jobId = String.valueOf(((Map<String, Object>) data.get(DataKey.META.getKey())).get(DataKey.JOB_ID.getKey()));
+            var jobId = String.valueOf(((Map<String, Object>) data.get(DataKey.META.getKey())).get(DataKey.JOB_ID.getKey()));
             if (jobId != null) {
                 return jobId;
             }
@@ -142,7 +142,7 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
             return false;
         }
 
-        String result = String.valueOf(((Map<String, Object>) data.get(DataKey.META.getKey())).get(DataKey.SIMULATION.getKey()));
+        var result = String.valueOf(((Map<String, Object>) data.get(DataKey.META.getKey())).get(DataKey.SIMULATION.getKey()));
 
         if (result == null) {
             return false;

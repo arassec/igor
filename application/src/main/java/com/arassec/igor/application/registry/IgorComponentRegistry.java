@@ -164,7 +164,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * @return A new job instance.
      */
     public Job createJobPrototype() {
-        Trigger trigger = createTriggerInstance(triggers.stream()
+        var trigger = createTriggerInstance(triggers.stream()
                 .filter(triggerCandidate -> triggerCandidate.getTypeId().equals(igorApplicationProperties.getDefaultTrigger()))
                 .findFirst()
                 .orElse(triggers.get(0)).getTypeId(), null);
@@ -184,7 +184,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * @return A new action instance.
      */
     public Action createActionPrototype() {
-        Action action = createActionInstance(actions.stream()
+        var action = createActionInstance(actions.stream()
                 .filter(actionCandidate -> actionCandidate.getTypeId().equals(igorApplicationProperties.getDefaultAction()))
                 .findFirst()
                 .orElse(actions.get(0)).getTypeId(), null);
@@ -203,7 +203,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     public Action createActionInstance(String typeId, Map<String, Object> parameters) {
         Optional<Action> optional = actions.stream().filter(action -> action.getTypeId().equals(typeId)).findFirst();
         if (optional.isPresent()) {
-            Action action = applicationContext.getBean(optional.get().getClass());
+            var action = applicationContext.getBean(optional.get().getClass());
             applyParameters(action, parameters);
             return action;
         }
