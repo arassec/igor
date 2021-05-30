@@ -19,10 +19,10 @@ footer: MIT Licensed | Copyright © 2017-present Andreas Sensen
 Igor is a tool for managing 'continuous workarounds'.
 
 It provides an easy to use, reliable place where you can put all those workarounds, which would 
-otherwise be solved by scattered scripts or code fragments across your applications and connectors. 
+otherwise be solved by scattered scripts or code fragments across your applications and services. 
 
 It is similar to [Node-RED](https://nodered.org/), [Huginn](https://github.com/huginn/huginn) or [Beehive](https://github.com/muesli/beehive), 
-i.e. it provides a "low-code" environment. 
+i.e. it provides a "low-code" environment for developers. 
 
 It's written in Java using [Spring Boot](https://spring.io/projects/spring-boot) and provides an easy-to-use web-frontend written in [vue.js](https://vuejs.org/).
 

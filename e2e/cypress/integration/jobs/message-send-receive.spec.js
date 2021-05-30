@@ -6,7 +6,7 @@ import {
 } from "../../support/before";
 
 describe('Tests message sending and receiving.', () => {
-    it('Tests sending and receiving messages with RabbitMQ.', function () {
+    it.only('Tests sending and receiving messages with RabbitMQ.', function () {
             cy.openJobEditor(jobRabbitMqReceiverKebap);
 
             let checked;
@@ -131,7 +131,7 @@ describe('Tests message sending and receiving.', () => {
                 .should('be.visible')
                 .click();
 
-            cy.get('.is-root > :nth-child(4) > :nth-child(1) > :nth-child(1) > .vjs-key')
+            cy.get(':nth-child(9) > .vjs-key')
                 .should('be.visible')
                 .contains('"message":')
         }

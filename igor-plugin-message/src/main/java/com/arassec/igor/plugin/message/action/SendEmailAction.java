@@ -88,12 +88,12 @@ public class SendEmailAction extends BaseMessageAction {
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
-        String fromResolved = CorePluginUtils.getString(data, from);
-        String toResolved = CorePluginUtils.getString(data, to);
-        String subjectResolved = CorePluginUtils.getString(data, subject);
-        String contentTypeResolved = CorePluginUtils.getString(data, contentType);
-        String bodyResolved = CorePluginUtils.getString(data, body);
-        String attachmentsResolved = CorePluginUtils.getString(data, attachments);
+        var fromResolved = CorePluginUtils.getString(data, from);
+        var toResolved = CorePluginUtils.getString(data, to);
+        var subjectResolved = CorePluginUtils.getString(data, subject);
+        var contentTypeResolved = CorePluginUtils.getString(data, contentType);
+        var bodyResolved = CorePluginUtils.getString(data, body);
+        var attachmentsResolved = CorePluginUtils.getString(data, attachments);
 
         List<String> attachmentsPrepared = new LinkedList<>();
         if (StringUtils.hasText(attachmentsResolved)) {

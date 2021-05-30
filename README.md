@@ -1,8 +1,8 @@
-<p align="center">
+<p style="text-align: center;">
   <img width="256" src="https://raw.githubusercontent.com/arassec/igor/master/documentation/docs/.vuepress/public/logo.png" alt="igor-logo"/>
 </p>
 
-<p align="center">
+<p style="text-align: center;">
   <a href="https://github.com/arassec/igor/actions?query=workflow%3ABuild">
     <img src="https://github.com/arassec/igor/workflows/Build/badge.svg?branch=master" alt="build-state"/>
   </a>
@@ -13,7 +13,7 @@
     <img src="https://img.shields.io/sonar/coverage/arassec_igor?server=http%3A%2F%2Fsonarcloud.io&color=success" alt="coverage-state"/>
   </a>
   <a href="https://maven-badges.herokuapp.com/maven-central/com.arassec.igor/application">
-    <img src="https://maven-badges.herokuapp.com/maven-central/com.arassec.igor/application/badge.svg"/>
+    <img src="https://maven-badges.herokuapp.com/maven-central/com.arassec.igor/application/badge.svg" alt="maven-central-version"/>
   </a>
 </p> 
 
@@ -22,10 +22,10 @@
 Igor is a tool for managing 'continuous workarounds'.
 
 It provides an easy to use, reliable place where you can put all those workarounds, which would 
-otherwise be solved by scattered scripts or code fragments across your applications and connectors. 
+otherwise be solved by scattered scripts or code fragments across your applications and services. 
 
 It is similar to [Node-RED](https://nodered.org/), [Huginn](https://github.com/huginn/huginn) or [Beehive](https://github.com/muesli/beehive), 
-i.e. it provides a "low-code" environment. 
+i.e. it provides a "low-code" environment for developers. 
 
 It's written in Java using [Spring Boot](https://spring.io/projects/spring-boot) and provides an easy-to-use web-frontend written in [vue.js](https://vuejs.org/).
 

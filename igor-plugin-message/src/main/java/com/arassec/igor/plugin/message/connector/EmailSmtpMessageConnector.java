@@ -44,7 +44,7 @@ public class EmailSmtpMessageConnector extends EmailBaseConnector {
      */
     @Override
     public void testConfiguration() {
-        Session session = createSession();
+        var session = createSession();
         try {
             session.getTransport("smtp").connect(host, username, password);
         } catch (MessagingException e) {
@@ -70,14 +70,14 @@ public class EmailSmtpMessageConnector extends EmailBaseConnector {
                 Message.RecipientType.TO, InternetAddress.parse(to));
             message.setSubject(subject);
 
-            MimeBodyPart contentPart = new MimeBodyPart();
+            var contentPart = new MimeBodyPart();
             contentPart.setContent(body, contentType);
 
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(contentPart);
 
             attachments.forEach(attachment -> {
-                MimeBodyPart attachmentPart = new MimeBodyPart();
+                var attachmentPart = new MimeBodyPart();
                 try {
                     attachmentPart.attachFile(attachment);
                     multipart.addBodyPart(attachmentPart);
@@ -101,7 +101,7 @@ public class EmailSmtpMessageConnector extends EmailBaseConnector {
      * @return A newly created {@link Session}.
      */
     private Session createSession() {
-        Properties properties = new Properties();
+        var properties = new Properties();
         properties.put("mail.smtp.auth", true);
         properties.put("mail.smtp.host", host);
         properties.put("mail.smtp.port", String.valueOf(port));

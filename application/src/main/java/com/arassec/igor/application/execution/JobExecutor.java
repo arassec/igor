@@ -108,7 +108,7 @@ public class JobExecutor {
                 .findInState(JobExecutionState.WAITING, 0, Integer.MAX_VALUE);
 
         for (JobExecution jobExecution : waitingJobExecutions.getItems()) {
-            Job job = jobRepository.findById(jobExecution.getJobId());
+            var job = jobRepository.findById(jobExecution.getJobId());
             if (job == null) {
                 continue;
             }
@@ -143,7 +143,7 @@ public class JobExecutor {
             throw new IllegalArgumentException("Cannot cancel a job without a job ID!");
         }
         if (currentlyProcessedJobs.containsKey(jobId)) {
-            Job job = currentlyProcessedJobs.get(jobId);
+            var job = currentlyProcessedJobs.get(jobId);
             job.cancel();
             applicationEventPublisher.publishEvent(new JobEvent(JobEventType.STATE_CHANGE, job));
         }
@@ -188,8 +188,8 @@ public class JobExecutor {
     private boolean processFinished(Future<Job> jobFuture) {
         try {
             if (jobFuture.isDone()) {
-                Job job = jobFuture.get();
-                JobExecution jobExecution = job.getCurrentJobExecution();
+                var job = jobFuture.get();
+                var jobExecution = job.getCurrentJobExecution();
                 if (JobExecutionState.FINISHED.equals(jobExecution.getExecutionState())
                         && job.isFaultTolerant()) {
                     jobExecutionRepository.updateAllJobExecutionsOfJob(job.getId(), JobExecutionState.FAILED, JobExecutionState.RESOLVED);

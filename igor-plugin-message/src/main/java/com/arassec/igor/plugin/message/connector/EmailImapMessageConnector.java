@@ -16,6 +16,8 @@ import javax.mail.*;
 import javax.validation.constraints.Positive;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,7 +59,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
      */
     @Override
     public void testConfiguration() {
-        Session session = createSession();
+        var session = createSession();
         try {
             session.getStore().connect();
         } catch (MessagingException e) {
@@ -83,7 +85,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
     public List<Map<String, Object>> retrieveEmails(String emailFolder, boolean onlyNew, boolean deleteProcessed,
                                                     boolean markReadAfterProcessing, boolean saveAttachments,
                                                     String attachmentDirectory) throws MessagingException {
-        String protocol = "imap";
+        var protocol = "imap";
         if (enableTls) {
             protocol = "imaps";
         }
@@ -101,7 +103,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
         try {
             List<Map<String, Object>> result = new LinkedList<>();
 
-            Session session = createSession();
+            var session = createSession();
 
             store = session.getStore(protocol);
             store.connect(username, password);
@@ -144,12 +146,12 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
      * @return A newly created {@link Session}.
      */
     private Session createSession() {
-        String protocol = "imap";
+        var protocol = "imap";
         if (enableTls) {
             protocol = "imaps";
         }
 
-        Properties properties = new Properties();
+        var properties = new Properties();
         properties.put(MAIL_PROPERTY_PREFIX + "store.protocol", protocol);
         properties.put(MAIL_PROPERTY_PREFIX + protocol + ".auth", true);
         properties.put(MAIL_PROPERTY_PREFIX + protocol + ".host", host);
@@ -184,7 +186,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
     private void processMessageParts(Part part, Map<String, Object> targetJson, boolean saveAttachments, String attachmentDirectory)
         throws MessagingException, IOException {
         if (part instanceof Message) {
-            Message message = ((Message) part);
+            var message = ((Message) part);
             if (message.getReplyTo().length >= 1) {
                 targetJson.put("from", message.getReplyTo()[0].toString());
             } else if (message.getFrom().length >= 1) {
@@ -195,7 +197,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
             Map<String, Object> headers = new HashMap<>();
             Enumeration<Header> allHeaders = message.getAllHeaders();
             while (allHeaders.hasMoreElements()) {
-                Header header = allHeaders.nextElement();
+                var header = allHeaders.nextElement();
                 headers.put(header.getName(), header.getValue());
             }
             targetJson.put("headers", headers);
@@ -205,13 +207,17 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
         Object content = part.getContent();
 
         if (content instanceof Multipart) {
-            Multipart multipart = (Multipart) content;
+            var multipart = (Multipart) content;
             int count = multipart.getCount();
-            for (int i = 0; i < count; i++) {
+            for (var i = 0; i < count; i++) {
                 processMessageParts(multipart.getBodyPart(i), targetJson, saveAttachments, attachmentDirectory);
             }
-        } else if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && saveAttachments && StringUtils.hasText(attachmentDirectory)) {
-            try (FileOutputStream fos = new FileOutputStream(attachmentDirectory + part.getFileName())) {
+        } else if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && saveAttachments && StringUtils.hasText(attachmentDirectory)
+                        && Files.isWritable(Paths.get(attachmentDirectory, part.getFileName()))) {
+            // It is the job admin's responsibility to configure the job in a way, that path
+            // traversal attacks are prevented, e.g. by configuring a fixed 'attachamentDirectory' as apposed to a template.
+            //noinspection
+            try (var fos = new FileOutputStream(attachmentDirectory + part.getFileName())) {
                 FileCopyUtils.copy(part.getInputStream(), fos);
             }
         } else if (content instanceof String) {

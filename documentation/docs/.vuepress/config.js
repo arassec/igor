@@ -135,7 +135,7 @@ module.exports = {
         },
         igorVersion: process.env.REVISION,
         igorJavaVersion: "Java 11",
-        igorNodeVersion: "Node.js 12.19.0 LTS"
+        igorNodeVersion: "Node.js 14.17.0 LTS"
     },
     dest: "./target/doc/",
     base: "/igor/"

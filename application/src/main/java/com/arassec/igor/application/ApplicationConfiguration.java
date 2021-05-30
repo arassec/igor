@@ -37,7 +37,7 @@ public class ApplicationConfiguration {
      */
     @Bean
     public TaskScheduler jobScheduler() {
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        var scheduler = new ThreadPoolTaskScheduler();
         scheduler.setThreadNamePrefix("jobScheduler");
         scheduler.setPoolSize(10);
         return scheduler;
