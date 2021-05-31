@@ -7,7 +7,6 @@ import com.arassec.igor.application.simulation.JobSimulator;
 import com.arassec.igor.application.simulation.SimulationResult;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.job.Job;
-import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.core.util.IgorException;
@@ -33,8 +32,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -102,10 +100,10 @@ public class JobRestController extends BaseRestController {
      */
     @GetMapping
     public ModelPage<JobListEntry> getJobs(
-            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-            @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize,
-            @RequestParam(value = "nameFilter", required = false) String nameFilter,
-            @RequestParam(value = "stateFilter", required = false) JobExecutionState[] stateFilter) {
+        @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+        @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize,
+        @RequestParam(value = "nameFilter", required = false) String nameFilter,
+        @RequestParam(value = "stateFilter", required = false) JobExecutionState[] stateFilter) {
 
         Set<JobExecutionState> jobExecutionStateFilter = new HashSet<>();
         if (stateFilter != null && stateFilter.length > 0) {
@@ -117,10 +115,10 @@ public class JobRestController extends BaseRestController {
             ModelPage<JobListEntry> result = new ModelPage<>(pageNumber, pageSize, jobsPage.getTotalPages(), null);
 
             result.setItems(jobsPage.getItems().stream().map(job -> {
-                JobExecution jobExecution = determineJobExecution(jobManager, job);
+                var jobExecution = determineJobExecution(jobManager, job);
                 return new JobListEntry(job.getId(), job.getName(), job.isActive(),
-                        (jobManager.countExecutionsOfJobInState(job.getId(), JobExecutionState.FAILED) > 0), job.isFaultTolerant(),
-                        convert(jobExecution, null));
+                    (jobManager.countExecutionsOfJobInState(job.getId(), JobExecutionState.FAILED) > 0), job.isFaultTolerant(),
+                    convert(jobExecution, null));
             }).collect(Collectors.toList()));
 
             return result;
@@ -160,7 +158,7 @@ public class JobRestController extends BaseRestController {
     public SseEmitter getJobStream(HttpServletResponse response) {
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
 
-        SseEmitter emitter = new SseEmitter(-1L);
+        var emitter = new SseEmitter(-1L);
         emitter.onCompletion(() -> jobStreamEmitters.remove(emitter));
         emitter.onTimeout(() -> jobStreamEmitters.remove(emitter));
 
@@ -183,7 +181,7 @@ public class JobRestController extends BaseRestController {
      */
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Job getJob(@PathVariable("id") String id) {
-        Job job = jobManager.load(id);
+        var job = jobManager.load(id);
         if (job != null) {
             return job;
         }
@@ -242,8 +240,8 @@ public class JobRestController extends BaseRestController {
      */
     @GetMapping("check/{name}/{id}")
     public Boolean checkJobName(@PathVariable("name") String encodedName, @PathVariable("id") String id) {
-        String name = new String(Base64.getDecoder().decode(encodedName));
-        Job existingJob = jobManager.loadByName(name);
+        var name = new String(Base64.getDecoder().decode(encodedName));
+        var existingJob = jobManager.loadByName(name);
         return existingJob != null && !(existingJob.getId().equals(id));
     }
 
@@ -274,7 +272,7 @@ public class JobRestController extends BaseRestController {
      */
     @PostMapping(value = "run", produces = MediaType.APPLICATION_JSON_VALUE)
     public Job runJob(@Valid @RequestBody Job job) {
-        Job savedJob = jobManager.save(job);
+        var savedJob = jobManager.save(job);
         if (savedJob.isActive()) {
             jobManager.enqueue(savedJob);
         }
@@ -289,7 +287,7 @@ public class JobRestController extends BaseRestController {
     @PostMapping("run/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void runJobFromId(@PathVariable("id") String id) {
-        Job job = jobManager.load(id);
+        var job = jobManager.load(id);
         if (job != null) {
             if (job.isActive()) {
                 jobManager.enqueue(job);
@@ -309,16 +307,16 @@ public class JobRestController extends BaseRestController {
      */
     @GetMapping("schedule")
     public ModelPage<ScheduleEntry> getSchedule(
-            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-            @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize) {
+        @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+        @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize) {
         List<ScheduleEntry> jobSchedule = new LinkedList<>();
         jobManager.loadScheduled().stream().filter(job -> job.getTrigger() instanceof ScheduledTrigger).forEach(job -> {
             String cronExpression = ((ScheduledTrigger) job.getTrigger()).getCronExpression();
-            CronExpression cronTrigger = CronExpression.parse(cronExpression);
-            LocalDateTime localDateTime =
-                    Optional.ofNullable(cronTrigger.next(LocalDateTime.now())).orElseThrow(() -> new IgorException("Unable to " +
-                            "determine schedule for job!"));
-            jobSchedule.add(new ScheduleEntry(job.getId(), job.getName(), localDateTime.toInstant(ZoneOffset.UTC)));
+            var cronTrigger = CronExpression.parse(cronExpression);
+            var offsetDateTime =
+                Optional.ofNullable(cronTrigger.next(OffsetDateTime.now()))
+                    .orElseThrow(() -> new IgorException("Unable to determine schedule for job!"));
+            jobSchedule.add(new ScheduleEntry(job.getId(), job.getName(), offsetDateTime.toInstant()));
         });
         jobSchedule.sort(Comparator.comparing(ScheduleEntry::getNextRun));
         return ModelPageHelper.getModelPage(jobSchedule, pageNumber, pageSize);
@@ -339,9 +337,9 @@ public class JobRestController extends BaseRestController {
         if (referencedConnectors != null && !referencedConnectors.isEmpty()) {
             referencedConnectors.forEach(referencedConnector -> {
                 ModelPage<Pair<String, String>> referencingJobs = connectorManager
-                        .getReferencingJobs(referencedConnector.getKey(), 0, Integer.MAX_VALUE);
+                    .getReferencingJobs(referencedConnector.getKey(), 0, Integer.MAX_VALUE);
                 if (referencingJobs != null && referencingJobs.getItems().size() == 1 && referencingJobs.getItems().iterator()
-                        .next().getKey().equals(id)) {
+                    .next().getKey().equals(id)) {
                     result.add(referencedConnector);
                 }
             });
@@ -361,12 +359,12 @@ public class JobRestController extends BaseRestController {
         List<SseEmitter.SseEventBuilder> events = new LinkedList<>();
 
         if (JobEventType.STATE_CHANGE.equals(jobEvent.getType()) ||
-                JobEventType.STATE_REFRESH.equals(jobEvent.getType())) {
-            JobExecution jobExecution = determineJobExecution(jobManager, jobEvent.getJob());
+            JobEventType.STATE_REFRESH.equals(jobEvent.getType())) {
+            var jobExecution = determineJobExecution(jobManager, jobEvent.getJob());
             events.add(SseEmitter.event().name(SSE_STATE_UPDATE).data(
-                    new JobListEntry(jobEvent.getJob().getId(), jobEvent.getJob().getName(),
-                            jobEvent.getJob().isActive(), (jobManager.countExecutionsOfJobInState(jobEvent.getJob().getId(),
-                            JobExecutionState.FAILED) > 0), jobEvent.getJob().isFaultTolerant(), convert(jobExecution, null))
+                new JobListEntry(jobEvent.getJob().getId(), jobEvent.getJob().getName(),
+                    jobEvent.getJob().isActive(), (jobManager.countExecutionsOfJobInState(jobEvent.getJob().getId(),
+                    JobExecutionState.FAILED) > 0), jobEvent.getJob().isFaultTolerant(), convert(jobExecution, null))
             ));
             if (JobEventType.STATE_CHANGE.equals(jobEvent.getType())) {
                 events.add(SseEmitter.event().name(SSE_EXECUTION_OVERVIEW).data(createJobExecutionOverview()));
@@ -393,10 +391,10 @@ public class JobRestController extends BaseRestController {
      * @return A {@link JobExecutionOverview}.
      */
     private JobExecutionOverview createJobExecutionOverview() {
-        JobExecutionOverview jobExecutionOverview = new JobExecutionOverview();
+        var jobExecutionOverview = new JobExecutionOverview();
         jobExecutionOverview.setNumSlots(jobManager.getNumSlots());
         jobExecutionOverview.setNumRunning(jobManager.countJobExecutions(JobExecutionState.RUNNING)
-                + jobManager.countJobExecutions(JobExecutionState.ACTIVE));
+            + jobManager.countJobExecutions(JobExecutionState.ACTIVE));
         jobExecutionOverview.setNumWaiting(jobManager.countJobExecutions(JobExecutionState.WAITING));
         jobExecutionOverview.setNumFailed(jobManager.countJobExecutions(JobExecutionState.FAILED));
         return jobExecutionOverview;
