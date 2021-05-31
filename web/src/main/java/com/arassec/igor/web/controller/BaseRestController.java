@@ -29,7 +29,7 @@ public abstract class BaseRestController {
         if (jobExecution == null) {
             return null;
         }
-        JobExecutionListEntry listEntry = new JobExecutionListEntry();
+        var listEntry = new JobExecutionListEntry();
         listEntry.setId(jobExecution.getId());
         listEntry.setJobId(jobExecution.getJobId());
         listEntry.setJobName(jobName);
@@ -61,7 +61,7 @@ public abstract class BaseRestController {
      * @return The most recent {@link JobExecution} if available, {@code null} otherwise.
      */
     protected JobExecution determineJobExecution(JobManager jobManager, Job job) {
-        JobExecution jobExecution = job.getCurrentJobExecution();
+        var jobExecution = job.getCurrentJobExecution();
         if (jobExecution == null) {
             ModelPage<JobExecution> jobExecutionsOfJob = jobManager.getJobExecutionsOfJob(job.getId(), 0, 1);
             if (jobExecutionsOfJob != null && !jobExecutionsOfJob.getItems().isEmpty()) {

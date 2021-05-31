@@ -13,7 +13,7 @@
     <packaging>jar</packaging>
 
     <name>application</name>
-    <description>Contains the application logik of igor.</description>
+    <description>Contains the application logic of igor.</description>
 
     <dependencies>
 

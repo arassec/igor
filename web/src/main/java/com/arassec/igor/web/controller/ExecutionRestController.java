@@ -1,7 +1,6 @@
 package com.arassec.igor.web.controller;
 
 import com.arassec.igor.application.manager.JobManager;
-import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.util.ModelPage;
@@ -52,7 +51,7 @@ public class ExecutionRestController extends BaseRestController {
     public SseEmitter getExecutionStream(HttpServletResponse response) {
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
 
-        SseEmitter emitter = new SseEmitter(-1L);
+        var emitter = new SseEmitter(-1L);
         emitter.onCompletion(() -> executionStreamEmitters.remove(emitter));
         emitter.onTimeout(() -> executionStreamEmitters.remove(emitter));
 
@@ -80,7 +79,7 @@ public class ExecutionRestController extends BaseRestController {
         ModelPage<JobExecution> jobExecutions = jobManager.getJobExecutionsOfJob(jobId, pageNumber, pageSize);
 
         if (jobExecutions != null) {
-            Job job = jobManager.load(jobId);
+            var job = jobManager.load(jobId);
 
             ModelPage<JobExecutionListEntry> result = new ModelPage<>(pageNumber, pageSize, jobExecutions.getTotalPages(), null);
             result.setItems(jobExecutions.getItems().stream().map(jobExecution -> convert(jobExecution, job.getName()))
@@ -121,7 +120,7 @@ public class ExecutionRestController extends BaseRestController {
      */
     @GetMapping("details/{id}")
     public JobExecution getDetailedExecution(@PathVariable("id") Long id) {
-        JobExecution jobExecution = jobManager.getJobExecution(id);
+        var jobExecution = jobManager.getJobExecution(id);
         if (jobExecution != null) {
             return jobExecution;
         }
@@ -176,7 +175,7 @@ public class ExecutionRestController extends BaseRestController {
 
         if ((JobEventType.STATE_CHANGE.equals(jobEvent.getType())
                 || JobEventType.STATE_REFRESH.equals(jobEvent.getType()))) {
-            JobExecution jobExecution = determineJobExecution(jobManager, jobEvent.getJob());
+            var jobExecution = determineJobExecution(jobManager, jobEvent.getJob());
             for (SseEmitter emitter : executionStreamEmitters) {
                 try {
                     emitter.send(jobExecution);
