@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.model.TransferData;
 import com.arassec.igor.web.test.TestConnector;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,7 +59,8 @@ class TransferControllerTest extends RestControllerBaseTest {
 
         assertEquals(1, transferData.getJobJsons().size());
         assertEquals("{\"id\":\"job-id\",\"active\":false,\"historyLimit\":5,\"simulationLimit\":25,\"numThreads\":1,"
-            + "\"actions\":[],\"running\":false,\"faultTolerant\":true}", transferData.getJobJsons().get(0));
+            + "\"actions\":[],\"running\":false,\"faultTolerant\":true}",
+            objectMapper.writeValueAsString(transferData.getJobJsons().get(0)));
 
         assertEquals(1, transferData.getConnectorJsons().size());
         assertNotNull(transferData.getConnectorJsons().get(0));
@@ -74,8 +77,10 @@ class TransferControllerTest extends RestControllerBaseTest {
         testConnector.setId("connector-id");
 
         TransferData transferData = new TransferData();
-        transferData.getJobJsons().add(objectMapper.writeValueAsString(Job.builder().id("job-id").build()));
-        transferData.getConnectorJsons().add(objectMapper.writeValueAsString(testConnector));
+        transferData.getJobJsons().add(objectMapper.convertValue(Job.builder().id("job-id").build(), new TypeReference<>() {
+        }));
+        transferData.getConnectorJsons().add(objectMapper.convertValue(testConnector, new TypeReference<>() {
+        }));
 
         String content = objectMapper.writeValueAsString(transferData);
 
@@ -119,7 +124,7 @@ class TransferControllerTest extends RestControllerBaseTest {
         assertEquals(1, transferData.getConnectorJsons().size());
 
         when(igorComponentRegistry.createConnectorInstance(eq("connector-type-id"), anyMap())).thenReturn(new TestConnector());
-        Connector exportedConnector = objectMapper.readValue(transferData.getConnectorJsons().get(0), Connector.class);
+        Connector exportedConnector = objectMapper.convertValue(transferData.getConnectorJsons().get(0), Connector.class);
 
         assertEquals("connector-id", exportedConnector.getId());
     }
@@ -134,7 +139,8 @@ class TransferControllerTest extends RestControllerBaseTest {
         TestConnector testConnector = new TestConnector();
         testConnector.setId("connector-id");
 
-        String connectorJson = objectMapper.writeValueAsString(testConnector);
+        Map<String, Object> connectorJson = objectMapper.convertValue(testConnector, new TypeReference<>() {
+        });
 
         TransferData transferData = new TransferData();
         transferData.getConnectorJsons().add(connectorJson);

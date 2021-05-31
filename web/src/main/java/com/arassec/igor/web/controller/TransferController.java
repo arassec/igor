@@ -6,7 +6,7 @@ import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.web.model.TransferData;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,24 +52,20 @@ public class TransferController {
      */
     @GetMapping(value = "job/{id}")
     public void exportJob(@PathVariable("id") String id, HttpServletResponse response) {
-        Job job = jobManager.load(id);
+        var job = jobManager.load(id);
         if (job == null) {
             throw new IllegalArgumentException("No job with ID '" + id + "' found!");
         }
         try {
-            TransferData transferData = new TransferData();
+            var transferData = new TransferData();
 
-            transferData.getJobJsons().add(objectMapper.writeValueAsString(job));
+            transferData.getJobJsons().add(objectMapper.convertValue(job, new TypeReference<>() {
+            }));
 
             Set<Pair<String, String>> referencedConnectors = jobManager.getReferencedConnectors(id);
-            referencedConnectors.forEach(referencedConnector -> {
-                try {
-                    transferData.getConnectorJsons().add(
-                            objectMapper.writeValueAsString(connectorManager.load(referencedConnector.getKey())));
-                } catch (JsonProcessingException e) {
-                    throw new IllegalStateException("Could not convert connector to JSON!", e);
-                }
-            });
+            referencedConnectors.forEach(referencedConnector -> transferData.getConnectorJsons().add(
+                objectMapper.convertValue(connectorManager.load(referencedConnector.getKey()), new TypeReference<>() {
+                })));
 
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + job.getId() + ".igor.json");
@@ -89,15 +85,16 @@ public class TransferController {
      */
     @GetMapping(value = "connector/{id}")
     public void exportConnector(@PathVariable("id") String id, HttpServletResponse response) {
-        Connector connector = connectorManager.load(id);
+        var connector = connectorManager.load(id);
         if (connector == null) {
             throw new IllegalArgumentException("No connector with ID '" + id + "' found!");
         }
 
         try {
-            TransferData transferData = new TransferData();
+            var transferData = new TransferData();
 
-            transferData.getConnectorJsons().add(objectMapper.writeValueAsString(connector));
+            transferData.getConnectorJsons().add(objectMapper.convertValue(connector, new TypeReference<>() {
+            }));
 
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + connector.getId() + ".igor.json");
@@ -119,21 +116,10 @@ public class TransferController {
     @PostMapping
     public ResponseEntity<String> importTransferData(@RequestBody TransferData transferData) {
 
-        transferData.getConnectorJsons().forEach(connectorJson -> {
-            try {
-                connectorManager.save(objectMapper.readValue(connectorJson, Connector.class));
-            } catch (JsonProcessingException e) {
-                throw new IllegalStateException("Could not import connector data!", e);
-            }
-        });
+        transferData.getConnectorJsons().forEach(connectorJson ->
+            connectorManager.save(objectMapper.convertValue(connectorJson, Connector.class)));
 
-        transferData.getJobJsons().forEach(jobJson -> {
-            try {
-                jobManager.save(objectMapper.readValue(jobJson, Job.class));
-            } catch (JsonProcessingException e) {
-                throw new IllegalStateException("Could not import job data!", e);
-            }
-        });
+        transferData.getJobJsons().forEach(jobJson -> jobManager.save(objectMapper.convertValue(jobJson, Job.class)));
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

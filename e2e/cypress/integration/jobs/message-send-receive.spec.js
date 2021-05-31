@@ -6,7 +6,7 @@ import {
 } from "../../support/before";
 
 describe('Tests message sending and receiving.', () => {
-    it.only('Tests sending and receiving messages with RabbitMQ.', function () {
+    it('Tests sending and receiving messages with RabbitMQ.', function () {
             cy.openJobEditor(jobRabbitMqReceiverKebap);
 
             let checked;

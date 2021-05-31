@@ -1,5 +1,10 @@
 # Changelog
 
+::: danger Breaking Changes in Minor Versions
+During development there will be breaking changes in minor versions until a stable version 1.0.0 is released.
+After that, semantic versioning will be used and breaking changes will only occur in major version updates.
+:::
+
 ## Version {{ $themeConfig.igorVersion }}
 - Refactored application module into igor-standalone module.
 - Removed json-path, jmustache and byte-buddy dependencies from core module.
@@ -10,6 +15,7 @@
 - Removed 'data' and 'meta' parameters from all triggers. Use the new 'Add data' action instead!
 - Refactored message sending and retrieval: separate trigger and actions per message protocol (RabbitMQ).
 - 'Number of threads' per action is now a job configuration parameter and configured once for all actions.
+- Changed import/export format of jobs and connectors. Now plain JSON-Objects are exported instead of JSON-Objects encoded as strings.
 :::
 
 ## Version 0.3.0
