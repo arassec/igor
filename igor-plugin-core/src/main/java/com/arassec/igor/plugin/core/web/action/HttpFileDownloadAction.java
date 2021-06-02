@@ -54,47 +54,47 @@ public class HttpFileDownloadAction extends BaseHttpAction {
      * The destination for the copied file.
      */
     @NotNull
-    @IgorParam(4)
+    @IgorParam(sortIndex = 4)
     private FileConnector target;
 
     /**
      * The target directory to copy/move the file to.
      */
     @NotBlank
-    @IgorParam(5)
+    @IgorParam(sortIndex = 5)
     private String targetDirectory;
 
     /**
      * The target file name.
      */
     @NotBlank
-    @IgorParam(6)
+    @IgorParam(sortIndex = 6)
     private String targetFilename;
 
     /**
      * The request's headers.
      */
-    @IgorParam(value = 7, advanced = true, subtype = ParameterSubtype.MULTI_LINE)
+    @IgorParam(sortIndex = 7, advanced = true, subtype = ParameterSubtype.MULTI_LINE)
     private String headers;
 
     /**
      * Enables a ".igor" file suffix during file transfer. The suffix will be removed after the file has been downloaded
      * completely.
      */
-    @IgorParam(value = 8, advanced = true)
+    @IgorParam(sortIndex = 8, advanced = true)
     private boolean appendTransferSuffix = true;
 
     /**
      * If set to {@code true}, igor appends a filetype suffix if avaliable (e.g. '.html' or '.jpeg').
      */
-    @IgorParam(value = 9, advanced = true)
+    @IgorParam(sortIndex = 9, advanced = true)
     private boolean appendFiletypeSuffix;
 
     /**
      * The target key to put the web response in the data item.
      */
     @NotBlank
-    @IgorParam(value = Integer.MAX_VALUE - 1, advanced = true)
+    @IgorParam(sortIndex = Integer.MAX_VALUE - 1, advanced = true)
     private String targetKey = DEFAULT_KEY_WEB_RESPONSE;
 
     /**

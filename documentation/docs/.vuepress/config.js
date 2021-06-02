@@ -18,6 +18,7 @@ module.exports = {
             "/user/": [
                 {
                     title: "Getting Started",
+                    sidebarDepth: 0,
                     children: [
                         "",
                         "configuration",
@@ -26,6 +27,7 @@ module.exports = {
                 },
                 {
                     title: "Core Elements",
+                    sidebarDepth: 0,
                     children: [
                         "core/job",
                         "core/action",
@@ -34,6 +36,7 @@ module.exports = {
                 },
                 {
                     title: "User Interface",
+                    sidebarDepth: 0,
                     children: [
                         "job-overview",
                         "job-editor",
@@ -103,6 +106,7 @@ module.exports = {
             "/developer/": [
                 {
                     title: "Getting Started",
+                    sidebarDepth: 0,
                     children: [
                         "",
                         "developing"
@@ -121,6 +125,7 @@ module.exports = {
             "/examples/": [
                 {
                     title: "Overview",
+                    sidebarDepth: 0,
                     children: [
                         ""
                     ]

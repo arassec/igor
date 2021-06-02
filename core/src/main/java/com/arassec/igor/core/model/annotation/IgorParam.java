@@ -20,7 +20,7 @@ public @interface IgorParam {
      *
      * @return The sort index of this parameter.
      */
-    int value() default 0;
+    int sortIndex() default 0;
 
     /**
      * Indicates whether this parameter has to be encrypted before saving it to a repository. If set to {@code true}, the

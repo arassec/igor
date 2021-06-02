@@ -44,7 +44,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
      * The service's port.
      */
     @Positive
-    @IgorParam(value = 2)
+    @IgorParam(sortIndex = 2)
     private int port = 993;
 
     /**

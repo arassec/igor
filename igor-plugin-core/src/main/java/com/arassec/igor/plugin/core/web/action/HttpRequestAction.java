@@ -53,19 +53,19 @@ public class HttpRequestAction extends BaseHttpAction {
      */
     @NotBlank
     @Pattern(regexp = "GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH")
-    @IgorParam(value = 3)
+    @IgorParam(sortIndex = 3)
     private String method = "GET";
 
     /**
      * The request's headers.
      */
-    @IgorParam(value = 4, advanced = true, subtype = ParameterSubtype.MULTI_LINE)
+    @IgorParam(sortIndex = 4, advanced = true, subtype = ParameterSubtype.MULTI_LINE)
     private String headers;
 
     /**
      * The request's body.
      */
-    @IgorParam(value = 5, advanced = true, subtype = ParameterSubtype.MULTI_LINE)
+    @IgorParam(sortIndex = 5, advanced = true, subtype = ParameterSubtype.MULTI_LINE)
     private String body;
 
     /**
@@ -84,7 +84,7 @@ public class HttpRequestAction extends BaseHttpAction {
      * The target key to put the web response in the data item.
      */
     @NotBlank
-    @IgorParam(value = Integer.MAX_VALUE - 1, advanced = true)
+    @IgorParam(sortIndex = Integer.MAX_VALUE - 1, advanced = true)
     private String targetKey = DEFAULT_KEY_WEB_RESPONSE;
 
     /**

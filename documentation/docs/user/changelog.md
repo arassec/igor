@@ -6,6 +6,12 @@ After that, semantic versioning will be used and breaking changes will only occu
 :::
 
 ## Version {{ $themeConfig.igorVersion }}
+::: danger Breaking Changes
+- Removed 'defaultValue' property of the @IgorParam annotation. Directly assign default values instead.
+- Renamed 'value' property of the @IgorParam annotation into 'sortIndex'.
+::: 
+
+## Version 0.4.1
 - Refactored application module into igor-standalone module.
 - Removed json-path, jmustache and byte-buddy dependencies from core module.
 - Added 'Add Data' action. 

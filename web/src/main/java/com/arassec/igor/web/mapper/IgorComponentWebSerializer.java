@@ -151,15 +151,15 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
             IgorParam annotation = field.getAnnotation(IgorParam.class);
             return annotation.advanced();
         }).sorted((o1, o2) -> {
-            Integer first = o1.getAnnotation(IgorParam.class).value();
-            Integer second = o2.getAnnotation(IgorParam.class).value();
+            Integer first = o1.getAnnotation(IgorParam.class).sortIndex();
+            Integer second = o2.getAnnotation(IgorParam.class).sortIndex();
             return first.compareTo(second);
         }).collect(Collectors.toList());
 
         parameters.removeAll(advancedParameters);
         parameters.sort((o1, o2) -> {
-            Integer first = o1.getAnnotation(IgorParam.class).value();
-            Integer second = o2.getAnnotation(IgorParam.class).value();
+            Integer first = o1.getAnnotation(IgorParam.class).sortIndex();
+            Integer second = o2.getAnnotation(IgorParam.class).sortIndex();
             return first.compareTo(second);
         });
         parameters.addAll(advancedParameters);

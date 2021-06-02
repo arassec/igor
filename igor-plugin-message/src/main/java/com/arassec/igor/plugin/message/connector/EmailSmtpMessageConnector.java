@@ -29,7 +29,7 @@ public class EmailSmtpMessageConnector extends EmailBaseConnector {
      * The port of the SMTP service.
      */
     @Positive
-    @IgorParam(value = 2)
+    @IgorParam(sortIndex = 2)
     private int port = 25;
 
     /**

@@ -37,8 +37,8 @@ public class CustomAction extends BaseAction {
     /**
      * A parameter switching the message on or off.
      */
-    @IgorParam(defaultValue = "true")
-    private boolean addMessage;
+    @IgorParam
+    private boolean addMessage = true;
 
     /**
      * Creates a new component instance.

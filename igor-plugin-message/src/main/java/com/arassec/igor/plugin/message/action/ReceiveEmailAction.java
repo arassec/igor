@@ -43,25 +43,25 @@ public class ReceiveEmailAction extends BaseMessageAction {
     /**
      * Set to {@code true} if only new mails should be processed.
      */
-    @IgorParam(advanced = true, value = 9)
+    @IgorParam(advanced = true, sortIndex = 9)
     private boolean onlyNew = true;
 
     /**
      * Set to {@code true} if mails should be deleted after processing.
      */
-    @IgorParam(advanced = true, value = 10)
+    @IgorParam(advanced = true, sortIndex = 10)
     private boolean deleteProcessed = false;
 
     /**
      * Set to {@code true} if mail attachments should be saved.
      */
-    @IgorParam(advanced = true, value = 11)
+    @IgorParam(advanced = true, sortIndex = 11)
     private boolean saveAttachments = false;
 
     /**
      * The directory in the local filesystem to store mails in.
      */
-    @IgorParam(advanced = true, value = 12)
+    @IgorParam(advanced = true, sortIndex = 12)
     private String attachmentDirectory;
 
     /**

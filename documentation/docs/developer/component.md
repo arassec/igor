@@ -76,7 +76,7 @@ In order to control the appearance, the annotation has the following parameters 
 
 |Parameter|Default Value|Description|
 |---|---|---|
-|value|0|The standard annotation parameter, indicates the sort order of the parameter in the editor. Properties will be ordered ascending according to this value.|
+|sortIndex|0|Indicates the position of the parameter in the editor in relation to the other properties. Properties will be ordered ascending according to this value.|
 |secured|false|If set to `true`, the parameter editor will create a password input field and the contents of the property will be hidden by default. Additionally, if a security provider is active, the properties contents will be secured before persisting them.
 |advanced|false|If set to 'true', the parameter will be hidden by default and only visible, if the user opens the advanced parameter configuration.
 |subtype|NONE|Can be used to further specify the type of the parameter. The parameter editor will adopt the input accordingly. Possible values are 'MULTI_LINE' for parameters that can contain multiple lines of input and 'CRON', if the parameter represents a cron expression.

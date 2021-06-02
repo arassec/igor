@@ -27,26 +27,26 @@ public abstract class BaseHttpAction extends BaseAction {
      * The connector to use for requests.
      */
     @NotNull
-    @IgorParam(1)
+    @IgorParam(sortIndex = 1)
     protected HttpConnector httpConnector;
 
     /**
      * The URL to request.
      */
     @NotBlank
-    @IgorParam(2)
+    @IgorParam(sortIndex = 2)
     protected String url;
 
     /**
      * A username for authentication.
      */
-    @IgorParam(value = Integer.MAX_VALUE - 3, advanced = true)
+    @IgorParam(sortIndex = Integer.MAX_VALUE - 3, advanced = true)
     protected String username;
 
     /**
      * The password for authentication.
      */
-    @IgorParam(value = Integer.MAX_VALUE - 2, advanced = true, secured = true)
+    @IgorParam(sortIndex = Integer.MAX_VALUE - 2, advanced = true, secured = true)
     protected String password;
 
     /**
