@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -99,7 +98,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
 
         Map<String, Map<String, String>> result = new HashMap<>();
 
-        BindingResult bindingResult = methodArgumentNotValidException.getBindingResult();
+        var bindingResult = methodArgumentNotValidException.getBindingResult();
 
         Object target = bindingResult.getTarget(); // Job or Connector
 
@@ -191,7 +190,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
             .replace(".", "/")
             .replace("[", "/")
             .replace("]", "") + "id";
-        JsonNode jsonNode = objectMapper.convertValue(target, JsonNode.class);
+        var jsonNode = objectMapper.convertValue(target, JsonNode.class);
         String result = jsonNode.at(jsonPointer).asText();
         if (!StringUtils.hasText(result)) {
             result = validationPath.replace(".", "_").substring(0, validationPath.length());

@@ -4,7 +4,6 @@ import com.arassec.igor.application.manager.ConnectorManager;
 import com.arassec.igor.application.manager.JobManager;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.connector.MissingComponentConnector;
-import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.core.util.StacktraceFormatter;
@@ -101,7 +100,7 @@ public class ConnectorRestController {
      */
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Connector getConnector(@PathVariable("id") String id) {
-        Connector connector = connectorManager.load(id);
+        var connector = connectorManager.load(id);
         if (connector != null) {
             return connector;
         }
@@ -124,7 +123,7 @@ public class ConnectorRestController {
             referencingJobs.getItems().forEach(jobReference -> jobManager.delete(jobReference.getKey()));
         } else if (referencingJobs.getItems() != null) {
             referencingJobs.getItems().forEach(jobReference -> {
-                Job job = jobManager.load(jobReference.getKey());
+                var job = jobManager.load(jobReference.getKey());
                 job.setActive(false);
                 jobManager.save(job);
             });
@@ -174,8 +173,8 @@ public class ConnectorRestController {
      */
     @GetMapping("check/{name}/{id}")
     public Boolean checkConnectorName(@PathVariable("name") String encodedName, @PathVariable("id") String id) {
-        String name = new String(Base64.getDecoder().decode(encodedName));
-        Connector existingConnector = connectorManager.loadByName(name);
+        var name = new String(Base64.getDecoder().decode(encodedName));
+        var existingConnector = connectorManager.loadByName(name);
         return (existingConnector != null && !(existingConnector.getId().equals(id)));
     }
 

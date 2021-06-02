@@ -146,7 +146,7 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
      * @return {@code true}, if the property is secured, {@code false} otherwise.
      */
     private boolean isSecured(Field field) {
-        IgorParam igorParam = field.getAnnotation(IgorParam.class);
+        var igorParam = field.getAnnotation(IgorParam.class);
         return igorParam.secured() && field.getType().isAssignableFrom(String.class);
     }
 
