@@ -29,8 +29,8 @@ public class EmailSmtpMessageConnector extends EmailBaseConnector {
      * The port of the SMTP service.
      */
     @Positive
-    @IgorParam(defaultValue = "25", value = 2)
-    private int port;
+    @IgorParam(value = 2)
+    private int port = 25;
 
     /**
      * Creates a new component instance.

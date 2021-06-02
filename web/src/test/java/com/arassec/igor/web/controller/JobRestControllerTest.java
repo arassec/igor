@@ -434,11 +434,11 @@ class JobRestControllerTest extends RestControllerBaseTest {
     @SuppressWarnings("unchecked")
     void testCreateJobBeanValidation() {
 
-        when(igorComponentRegistry.createTriggerInstance(eq(TestTrigger.TYPE_ID), any(Map.class))).thenReturn(new TestTrigger());
-
         TestTrigger trigger = new TestTrigger();
         trigger.setId("trigger-id");
-        trigger.setTestParam(null);
+        trigger.setTestParam(null); // Notnull parameter must be validated!
+
+        when(igorComponentRegistry.createTriggerInstance(eq(TestTrigger.TYPE_ID), any(Map.class))).thenReturn(trigger);
 
         Job job = Job.builder().id("job-id").name("job-name").trigger(trigger).build();
 

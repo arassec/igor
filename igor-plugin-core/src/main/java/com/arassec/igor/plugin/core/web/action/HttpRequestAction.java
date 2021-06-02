@@ -53,8 +53,8 @@ public class HttpRequestAction extends BaseHttpAction {
      */
     @NotBlank
     @Pattern(regexp = "GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH")
-    @IgorParam(value = 3, defaultValue = "GET")
-    private String method;
+    @IgorParam(value = 3)
+    private String method = "GET";
 
     /**
      * The request's headers.
@@ -77,15 +77,15 @@ public class HttpRequestAction extends BaseHttpAction {
     /**
      * Only executes idempotent web requests if {@code true}.
      */
-    @IgorParam(advanced = true, defaultValue = "true")
-    private boolean simulationSafe;
+    @IgorParam(advanced = true)
+    private boolean simulationSafe = true;
 
     /**
      * The target key to put the web response in the data item.
      */
     @NotBlank
-    @IgorParam(value = Integer.MAX_VALUE - 1, advanced = true, defaultValue = DEFAULT_KEY_WEB_RESPONSE)
-    private String targetKey;
+    @IgorParam(value = Integer.MAX_VALUE - 1, advanced = true)
+    private String targetKey = DEFAULT_KEY_WEB_RESPONSE;
 
     /**
      * Creates a new HTTP connector instance.

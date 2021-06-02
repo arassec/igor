@@ -35,15 +35,15 @@ public class DeleteFileAction extends BaseFileAction {
      * The directory the file is in.
      */
     @NotBlank
-    @IgorParam(defaultValue = DIRECTORY_TEMPLATE)
-    private String directory;
+    @IgorParam
+    private String directory = DIRECTORY_TEMPLATE;
 
     /**
      * The name of the file.
      */
     @NotBlank
-    @IgorParam(defaultValue = FILENAME_TEMPLATE)
-    private String filename;
+    @IgorParam
+    private String filename = FILENAME_TEMPLATE;
 
     /**
      * Creates a new component instance.

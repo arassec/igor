@@ -56,7 +56,7 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
         Map<String, Object> parameters =
                 deserializeParameters((List<Map<String, Object>>) map.get(WebMapperKey.PARAMETERS.getKey()));
 
-        T instance = createInstance(typeId, parameters);
+        var instance = createInstance(typeId, parameters);
 
         if (instance == null) {
             throw new IllegalStateException("Could not create instance for type-id: " + typeId);
@@ -92,7 +92,7 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
         }
         Map<String, Object> result = new HashMap<>();
         parameters.forEach(jsonParameter -> {
-            String parameterName = String.valueOf(jsonParameter.get(WebMapperKey.NAME.getKey()));
+            var parameterName = String.valueOf(jsonParameter.get(WebMapperKey.NAME.getKey()));
             if (jsonParameter.containsKey(WebMapperKey.CONNECTOR.getKey()) && (boolean) jsonParameter.get(WebMapperKey.CONNECTOR.getKey()) && connectorRepository != null) {
                 result.put(parameterName, deserializeConnectorParameter(jsonParameter));
             } else {

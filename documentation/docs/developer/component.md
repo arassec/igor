@@ -70,15 +70,15 @@ public class CustomConnector implements Connector {
 ### @IgorParam
 This annotation marks a property of a component as configurable by the user.
 All properties of a component annotated with @IgorParam will be shown in the application's parameter editor.
+A default value can be assigned directly to the property.
 
 In order to control the appearance, the annotation has the following parameters itself:
 
 |Parameter|Default Value|Description|
 |---|---|---|
-|value|0|The standard annotation parameter, indicates the sort order of the parameter in the editor. Properties will be ordered descending according to this value.|
+|value|0|The standard annotation parameter, indicates the sort order of the parameter in the editor. Properties will be ordered ascending according to this value.|
 |secured|false|If set to `true`, the parameter editor will create a password input field and the contents of the property will be hidden by default. Additionally, if a security provider is active, the properties contents will be secured before persisting them.
 |advanced|false|If set to 'true', the parameter will be hidden by default and only visible, if the user opens the advanced parameter configuration.
-|defaultValue|""|An optional default value that will be used in the UI.
 |subtype|NONE|Can be used to further specify the type of the parameter. The parameter editor will adopt the input accordingly. Possible values are 'MULTI_LINE' for parameters that can contain multiple lines of input and 'CRON', if the parameter represents a cron expression.
 
 ::: tip
@@ -89,8 +89,8 @@ You should use it to validate the input made by the user.
 An example use of this annotation might look like this:
 ``` java
 @Positive
-@IgorParam(advanced = true, defaultValue = "42")
-private int port;
+@IgorParam(advanced = true)
+private int port = 42;
 ```
 
 ### @IgorSimulationSafe

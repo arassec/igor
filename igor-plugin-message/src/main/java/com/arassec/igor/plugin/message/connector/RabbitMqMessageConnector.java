@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
@@ -66,8 +65,8 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
      * The RabbitMQ port.
      */
     @Positive
-    @IgorParam(defaultValue = "5672")
-    private int port;
+    @IgorParam
+    private int port = 5672;
 
     /**
      * The RabbitMQ username.
@@ -93,29 +92,29 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
      * The virtual host.
      */
     @NotBlank
-    @IgorParam(advanced = true, defaultValue = "/")
-    private String virtualHost;
+    @IgorParam(advanced = true)
+    private String virtualHost = "/";
 
     /**
      * Optional heartbeat for connections to the RabbitMQ server.
      */
     @Positive
-    @IgorParam(advanced = true, defaultValue = "30")
-    private int heartBeat;
+    @IgorParam(advanced = true)
+    private int heartBeat = 30;
 
     /**
      * Optional connection timeout.
      */
     @Positive
-    @IgorParam(advanced = true, defaultValue = "60000")
-    private int connectionTimeout;
+    @IgorParam(advanced = true)
+    private int connectionTimeout = 60000;
 
     /**
      * Number of messages that are fetched at once without waiting for acknowledgements of the previous messages.
      */
     @Positive
-    @IgorParam(advanced = true, defaultValue = "10")
-    private int prefetchCount;
+    @IgorParam(advanced = true)
+    private int prefetchCount = 10;
 
     /**
      * The job's ID.
@@ -179,13 +178,13 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
             throw new IgorException("Empty content provided for message sending!");
         }
 
-        MessageProperties messageProperties = new MessageProperties();
+        var messageProperties = new MessageProperties();
         messageProperties.setContentEncoding(message.getContentEncoding());
         messageProperties.setContentType(message.getContentType());
 
         message.getHeaders().forEach((key, value) -> messageProperties.getHeaders().put(key, value));
 
-        org.springframework.amqp.core.Message rabbitMessage = new org.springframework.amqp.core.Message(message.getContent().getBytes(), messageProperties);
+        var rabbitMessage = new org.springframework.amqp.core.Message(message.getContent().getBytes(), messageProperties);
         rabbitTemplate.send(exchange, routingKey, rabbitMessage);
     }
 
@@ -233,7 +232,7 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
     @Override
     public void testConfiguration() {
         CachingConnectionFactory testConnectionFactory = createConnectionFactory();
-        Connection connection = testConnectionFactory.createConnection();
+        var connection = testConnectionFactory.createConnection();
         connection.close();
         testConnectionFactory.destroy();
     }
@@ -253,7 +252,7 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
             throw new IgorException("Received invalid message from RabbitMQ: message properties missing!");
         }
 
-        String messageContent = new String(message.getBody());
+        var messageContent = new String(message.getBody());
         log.debug("Received message from RabbitMQ:\n{}", messageContent);
 
         Map<String, Object> metaData = new HashMap<>();
@@ -262,7 +261,7 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
 
         Map<String, Object> dataItem = new HashMap<>();
         try {
-            JsonNode jsonNode = objectMapper.readTree(messageContent);
+            var jsonNode = objectMapper.readTree(messageContent);
             dataItem.put("message", objectMapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>() {
             }));
         } catch (JsonProcessingException e) {
@@ -284,8 +283,8 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
     @IgorSimulationSafe
     public void processingFinished(Map<String, Object> dataItem) {
         try {
-            JsonNode jsonNode = objectMapper.convertValue(dataItem, JsonNode.class);
-            JsonNode deliveryTagNode = jsonNode.at("/messageMeta/deliveryTag");
+            var jsonNode = objectMapper.convertValue(dataItem, JsonNode.class);
+            var deliveryTagNode = jsonNode.at("/messageMeta/deliveryTag");
             Long deliveryTag = deliveryTagNode.asLong();
             if (channels.containsKey(deliveryTag)) {
                 channels.get(deliveryTag).basicAck(deliveryTag, false);
@@ -305,7 +304,7 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
         if (!StringUtils.hasText(host) || !StringUtils.hasText(username) || !StringUtils.hasText(password)) {
             throw new IgorException("Connector configuration missing required values!");
         }
-        CachingConnectionFactory result = new CachingConnectionFactory(host, port);
+        var result = new CachingConnectionFactory(host, port);
         result.setUsername(username);
         result.setPassword(password);
         result.setRequestedHeartBeat(heartBeat);

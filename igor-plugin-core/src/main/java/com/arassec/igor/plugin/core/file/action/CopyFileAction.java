@@ -10,7 +10,6 @@ import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
-import com.arassec.igor.plugin.core.file.connector.FileStreamData;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -42,15 +41,15 @@ public class CopyFileAction extends BaseFileAction {
      * Source directory to copy the file from.
      */
     @NotBlank
-    @IgorParam(defaultValue = DIRECTORY_TEMPLATE)
-    private String sourceDirectory;
+    @IgorParam
+    private String sourceDirectory = DIRECTORY_TEMPLATE;
 
     /**
      * Source file to copy.
      */
     @NotBlank
-    @IgorParam(defaultValue = FILENAME_TEMPLATE)
-    private String sourceFilename;
+    @IgorParam
+    private String sourceFilename = FILENAME_TEMPLATE;
 
     /**
      * The destination for the copied file.
@@ -106,18 +105,18 @@ public class CopyFileAction extends BaseFileAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        ResolvedData resolvedData = resolveData(data, sourceFilename, sourceDirectory, targetFilename, targetDirectory);
+        var resolvedData = resolveData(data, sourceFilename, sourceDirectory, targetFilename, targetDirectory);
         if (resolvedData == null) {
             return List.of(data);
         }
 
-        WorkInProgressMonitor workInProgressMonitor = new WorkInProgressMonitor(resolvedData.getSourceFilename(), 0);
+        var workInProgressMonitor = new WorkInProgressMonitor(resolvedData.getSourceFilename(), 0);
         jobExecution.addWorkInProgress(workInProgressMonitor);
 
         try {
             String sourceFileWithPath = CorePluginUtils.combineFilePath(resolvedData.getSourceDirectory(), resolvedData.getSourceFilename());
 
-            FileStreamData fileStreamData = source.readStream(sourceFileWithPath);
+            var fileStreamData = source.readStream(sourceFileWithPath);
 
             if (fileStreamData == null || fileStreamData.getData() == null) {
                 throw new IgorException("Not valid or not a file!");

@@ -38,8 +38,8 @@ public class PersistValueAction extends BasePersistenceAction {
      */
     @Getter
     @Setter
-    @IgorParam(defaultValue = "0")
-    private int numValuesToKeep;
+    @IgorParam
+    private int numValuesToKeep = 0;
 
     /**
      * Creates a new instance.
@@ -61,15 +61,15 @@ public class PersistValueAction extends BasePersistenceAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String jobId = getJobId(data);
+        var jobId = getJobId(data);
 
-        String resolvedInput = CorePluginUtils.getString(data, input);
+        var resolvedInput = CorePluginUtils.getString(data, input);
         if (resolvedInput == null) {
             log.debug("Not enough data to persist: {}", input);
             return List.of();
         }
 
-        PersistentValue value = new PersistentValue(CorePluginUtils.getString(data, resolvedInput));
+        var value = new PersistentValue(CorePluginUtils.getString(data, resolvedInput));
         if (!persistentValueRepository.isPersisted(jobId, value)) {
             if (isSimulation(data)) {
                 data.put(DataKey.SIMULATION_LOG.getKey(), "Would have persisted: " + value.getContent());

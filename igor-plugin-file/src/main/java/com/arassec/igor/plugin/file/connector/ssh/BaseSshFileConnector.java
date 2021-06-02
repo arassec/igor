@@ -31,8 +31,8 @@ public abstract class BaseSshFileConnector extends BaseFileConnector {
      * The port of the remote server.
      */
     @Positive
-    @IgorParam(defaultValue = "22")
-    private int port;
+    @IgorParam
+    private int port = 25;
 
     /**
      * The username to login with.
@@ -51,21 +51,21 @@ public abstract class BaseSshFileConnector extends BaseFileConnector {
     /**
      * Enables or disables strict host-key checking.
      */
-    @IgorParam(advanced = true, defaultValue = "false")
-    private boolean strictHostkeyChecking;
+    @IgorParam(advanced = true)
+    private boolean strictHostkeyChecking = false;
 
     /**
      * Preferred authentications.
      */
-    @IgorParam(advanced = true, defaultValue = "publickey,keyboard-interactive,password")
-    private String preferredAuthentications;
+    @IgorParam(advanced = true)
+    private String preferredAuthentications = "publickey,keyboard-interactive,password";
 
     /**
      * Connection timeout in milliseconds.
      */
     @Positive
-    @IgorParam(advanced = true, defaultValue = "30000")
-    private int timeout;
+    @IgorParam(advanced = true)
+    private int timeout = 30000;
 
     /**
      * Creates a new component instance.
@@ -83,8 +83,8 @@ public abstract class BaseSshFileConnector extends BaseFileConnector {
      */
     Session connect(String host, int port, String username, String password) {
         try {
-            JSch jsch = new JSch();
-            Session session = jsch.getSession(username, host, port);
+            var jsch = new JSch();
+            var session = jsch.getSession(username, host, port);
             session.setPassword(password);
             session.setConfig("StrictHostKeyChecking", strictHostkeyChecking ? "yes" : "no");
             if (StringUtils.hasText(preferredAuthentications)) {

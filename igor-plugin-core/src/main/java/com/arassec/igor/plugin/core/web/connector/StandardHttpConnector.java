@@ -61,8 +61,8 @@ public class StandardHttpConnector extends BaseHttpConnector {
     @Getter
     @Setter
     @Positive
-    @IgorParam(advanced = true, defaultValue = "80")
-    private Integer proxyPort;
+    @IgorParam(advanced = true)
+    private Integer proxyPort = 80;
 
     /**
      * Path to a keystore file for the SSL {@link KeyManager}.
@@ -86,8 +86,8 @@ public class StandardHttpConnector extends BaseHttpConnector {
     @Getter
     @Setter
     @NotBlank
-    @IgorParam(advanced = true, defaultValue = "pkcs12")
-    private String keymanagerType;
+    @IgorParam(advanced = true)
+    private String keymanagerType = "pkcs12";
 
     /**
      * Path to a keystore file for the SSL {@link TrustManager}.
@@ -111,24 +111,24 @@ public class StandardHttpConnector extends BaseHttpConnector {
     @Getter
     @Setter
     @NotBlank
-    @IgorParam(advanced = true, defaultValue = "pkcs12")
-    private String trustmanagerType;
+    @IgorParam(advanced = true)
+    private String trustmanagerType = "pkcs12";
 
     /**
      * Enables or disables SSL certificate verification.
      */
     @Getter
     @Setter
-    @IgorParam(advanced = true, defaultValue = "true")
-    private boolean certificateVerification;
+    @IgorParam(advanced = true)
+    private boolean certificateVerification = true;
 
     /**
      * Enables or disables following redirects.
      */
     @Getter
     @Setter
-    @IgorParam(advanced = true, defaultValue = "true")
-    private boolean followRedirects;
+    @IgorParam(advanced = true)
+    private boolean followRedirects = true;
 
     /**
      * The HTTP-Client for web requests.
@@ -149,7 +149,7 @@ public class StandardHttpConnector extends BaseHttpConnector {
     public void initialize(JobExecution jobExecution) {
         super.initialize(jobExecution);
 
-        HttpClient.Builder httpClientBuilder = HttpClient.newBuilder();
+        var httpClientBuilder = HttpClient.newBuilder();
 
         if (followRedirects) {
             httpClientBuilder.followRedirects(HttpClient.Redirect.NORMAL);
@@ -167,10 +167,10 @@ public class StandardHttpConnector extends BaseHttpConnector {
         if (StringUtils.hasText(keymanagerKeystore)) {
             String password = Optional.ofNullable(keymanagerPassword).orElse("");
             try (InputStream keystoreInputStream = new FileInputStream(keymanagerKeystore)) {
-                KeyStore keyStore = KeyStore.getInstance(keymanagerType);
+                var keyStore = KeyStore.getInstance(keymanagerType);
                 keyStore.load(keystoreInputStream, password.toCharArray());
 
-                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                var keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
                 keyManagerFactory.init(keyStore, password.toCharArray());
 
                 keyManagers = keyManagerFactory.getKeyManagers();
@@ -206,10 +206,10 @@ public class StandardHttpConnector extends BaseHttpConnector {
         } else if (StringUtils.hasText(trustmanagerKeystore)) {
             String password = Optional.ofNullable(trustmanagerPassword).orElse("");
             try (InputStream keystoreInputStream = new FileInputStream(trustmanagerKeystore)) {
-                KeyStore keyStore = KeyStore.getInstance(trustmanagerType);
+                var keyStore = KeyStore.getInstance(trustmanagerType);
                 keyStore.load(keystoreInputStream, password.toCharArray());
 
-                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                var trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(keyStore);
 
                 trustManagers = trustManagerFactory.getTrustManagers();
@@ -220,7 +220,7 @@ public class StandardHttpConnector extends BaseHttpConnector {
 
         if (keyManagers != null || trustManagers != null) {
             try {
-                SSLContext sslContext = SSLContext.getInstance(SSL_CONTEXT_PROTOCOL);
+                var sslContext = SSLContext.getInstance(SSL_CONTEXT_PROTOCOL);
                 sslContext.init(keyManagers, trustManagers, null);
                 httpClientBuilder.sslContext(sslContext);
                 httpClientBuilder.sslParameters(sslContext.getDefaultSSLParameters());

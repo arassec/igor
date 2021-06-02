@@ -47,6 +47,7 @@ class EmailImapMessageConnectorTest {
         connector.setPort(ServerSetupTest.IMAP.getPort());
         connector.setUsername("igor");
         connector.setPassword("igor");
+        connector.setEnableTls(false);
 
         connector.testConfiguration();
 
@@ -66,6 +67,7 @@ class EmailImapMessageConnectorTest {
         connector.setPort(ServerSetupTest.IMAP.getPort());
         connector.setUsername("igor");
         connector.setPassword("igor");
+        connector.setEnableTls(false);
 
         MimeMessage message = new MimeMessage((Session) null);
         message.setFrom(new InternetAddress("igor-test@arassec.com"));

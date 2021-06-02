@@ -25,8 +25,8 @@ public class LimitAction extends BaseUtilAction {
      * The configured number of items to skip.
      */
     @Positive
-    @IgorParam(defaultValue = "1")
-    private int number;
+    @IgorParam
+    private int number = 1;
 
     /**
      * Counts the processed data items.

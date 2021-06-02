@@ -35,15 +35,15 @@ public class MoveFileAction extends BaseFileAction {
      * Source directory to copy the file from.
      */
     @NotBlank
-    @IgorParam(defaultValue = DIRECTORY_TEMPLATE)
-    private String sourceDirectory;
+    @IgorParam
+    private String sourceDirectory = DIRECTORY_TEMPLATE;
 
     /**
      * Source file to copy.
      */
     @NotBlank
-    @IgorParam(defaultValue = FILENAME_TEMPLATE)
-    private String sourceFilename;
+    @IgorParam
+    private String sourceFilename = FILENAME_TEMPLATE;
 
     /**
      * The target directory to copy/move the file to.
@@ -73,7 +73,7 @@ public class MoveFileAction extends BaseFileAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        ResolvedData resolvedData = resolveData(data, sourceFilename, sourceDirectory, targetFilename, targetDirectory);
+        var resolvedData = resolveData(data, sourceFilename, sourceDirectory, targetFilename, targetDirectory);
         if (resolvedData == null) {
             return List.of(data);
         }

@@ -36,8 +36,8 @@ public class TestTrigger extends BaseTrigger implements ScheduledTrigger {
     @Getter
     @Setter
     @NotNull
-    @IgorParam(defaultValue = "666")
-    private Integer testParam;
+    @IgorParam
+    private Integer testParam = 666;
 
     /**
      * {@inheritDoc}
@@ -46,4 +46,5 @@ public class TestTrigger extends BaseTrigger implements ScheduledTrigger {
     public String getCronExpression() {
         return "* 1 * * * *";
     }
+
 }

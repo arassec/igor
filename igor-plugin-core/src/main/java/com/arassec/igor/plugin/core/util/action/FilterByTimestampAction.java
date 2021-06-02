@@ -49,29 +49,29 @@ public class FilterByTimestampAction extends BaseUtilAction {
      * If set to {@code true}, timestamps older than the configured one are filtered. If set to {@code false}, timestamps younger
      * than the configured one are filtered.
      */
-    @IgorParam(defaultValue = "true")
-    private boolean olderThan;
+    @IgorParam
+    private boolean olderThan = true;
 
     /**
      * The amount of time (configured by {@link #timeUnit}) to use for filtering.
      */
     @Positive
-    @IgorParam(defaultValue = "1")
-    private long amount;
+    @IgorParam
+    private long amount = 1;
 
     /**
      * The time unit to use for filtering.
      */
     @NotBlank
-    @IgorParam(defaultValue = DEFAULT_TIME_UNIT)
-    private String timeUnit;
+    @IgorParam
+    private String timeUnit = DEFAULT_TIME_UNIT;
 
     /**
      * The format of the timestamp.
      */
     @NotBlank
-    @IgorParam(defaultValue = DEFAULT_TIMESTAMP_FORMAT)
-    private String timestampFormat;
+    @IgorParam
+    private String timestampFormat = DEFAULT_TIMESTAMP_FORMAT;
 
     /**
      * Creates a new component instance.
@@ -92,24 +92,24 @@ public class FilterByTimestampAction extends BaseUtilAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String resolvedInput = CorePluginUtils.getString(data, input);
-        String resolvedTimeUnit = CorePluginUtils.getString(data, timeUnit);
-        String resolvedTimestampFormat = CorePluginUtils.getString(data, timestampFormat);
+        var resolvedInput = CorePluginUtils.getString(data, input);
+        var resolvedTimeUnit = CorePluginUtils.getString(data, timeUnit);
+        var resolvedTimestampFormat = CorePluginUtils.getString(data, timestampFormat);
 
         if (resolvedInput == null || resolvedTimeUnit == null || resolvedTimestampFormat == null) {
             log.debug("Missing required data for filtering: {} / {} / {}", resolvedInput, resolvedTimeUnit, resolvedTimestampFormat);
             return List.of();
         }
 
-        LocalDateTime target = LocalDateTime.now();
+        var target = LocalDateTime.now();
         target = target.minus(amount, ChronoUnit.valueOf(resolvedTimeUnit));
 
         LocalDateTime actual;
         if (FORMAT_EPOCH_MILLIS.equals(resolvedTimestampFormat)) {
-            Instant instant = Instant.ofEpochMilli(Long.parseLong(resolvedInput));
+            var instant = Instant.ofEpochMilli(Long.parseLong(resolvedInput));
             actual = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
         } else if (FORMAT_EPOCH_SECONDS.equals(resolvedTimestampFormat)) {
-            Instant instant = Instant.ofEpochSecond(Long.parseLong(resolvedInput));
+            var instant = Instant.ofEpochSecond(Long.parseLong(resolvedInput));
             actual = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
         } else {
             actual = LocalDateTime.parse(resolvedInput, DateTimeFormatter.ofPattern(resolvedTimestampFormat));

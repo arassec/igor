@@ -22,7 +22,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -35,6 +34,12 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 public class IgorComponentRegistry implements InitializingBean, ApplicationContextAware {
+
+    /**
+     * Set of builtin java object types.
+     */
+    private static final Set<Class<?>> javaObjectTypes = Set.of(Boolean.class, Byte.class, Short.class, Integer.class,
+        Long.class, Float.class, Double.class, Character.class, String.class);
 
     /**
      * The Spring application context.
@@ -165,17 +170,17 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      */
     public Job createJobPrototype() {
         var trigger = createTriggerInstance(triggers.stream()
-                .filter(triggerCandidate -> triggerCandidate.getTypeId().equals(igorApplicationProperties.getDefaultTrigger()))
-                .findFirst()
-                .orElse(triggers.get(0)).getTypeId(), null);
+            .filter(triggerCandidate -> triggerCandidate.getTypeId().equals(igorApplicationProperties.getDefaultTrigger()))
+            .findFirst()
+            .orElse(triggers.get(0)).getTypeId(), null);
         trigger.setId(UUID.randomUUID().toString());
 
         return Job.builder()
-                .id(UUID.randomUUID().toString())
-                .name("New Job")
-                .active(true)
-                .trigger(trigger)
-                .build();
+            .id(UUID.randomUUID().toString())
+            .name("New Job")
+            .active(true)
+            .trigger(trigger)
+            .build();
     }
 
     /**
@@ -185,9 +190,9 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      */
     public Action createActionPrototype() {
         var action = createActionInstance(actions.stream()
-                .filter(actionCandidate -> actionCandidate.getTypeId().equals(igorApplicationProperties.getDefaultAction()))
-                .findFirst()
-                .orElse(actions.get(0)).getTypeId(), null);
+            .filter(actionCandidate -> actionCandidate.getTypeId().equals(igorApplicationProperties.getDefaultAction()))
+            .findFirst()
+            .orElse(actions.get(0)).getTypeId(), null);
         action.setId(UUID.randomUUID().toString());
         return action;
     }
@@ -258,13 +263,13 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
         Map<String, Set<String>> result = new HashMap<>();
         if (parameterClass != null) {
             connectors.stream()
-                    .filter(connector -> parameterClass.isAssignableFrom(connector.getClass()))
-                    .forEach(connector -> {
-                        if (!result.containsKey(connector.getCategoryId())) {
-                            result.put(connector.getCategoryId(), new HashSet<>());
-                        }
-                        result.get(connector.getCategoryId()).add(connector.getTypeId());
-                    });
+                .filter(connector -> parameterClass.isAssignableFrom(connector.getClass()))
+                .forEach(connector -> {
+                    if (!result.containsKey(connector.getCategoryId())) {
+                        result.put(connector.getCategoryId(), new HashSet<>());
+                    }
+                    result.get(connector.getCategoryId()).add(connector.getTypeId());
+                });
         }
         return result;
     }
@@ -308,9 +313,10 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
                         parameterValue = handleMissingConnector(field);
                     }
                     ReflectionUtils.setField(field, instance, parameterValue);
-                } else if (field.isAnnotationPresent(IgorParam.class) && parameters == null) {
-                    convertToObject(field.getType(), field.getAnnotation(IgorParam.class).defaultValue())
-                            .ifPresent(o -> ReflectionUtils.setField(field, instance, o));
+                } else if (field.isAnnotationPresent(IgorParam.class) && parameters != null && !parameters.containsKey(field.getName())) {
+                    // In this case the user didn't configure the property. If it is a primitive type, the default value is used.
+                    // If it is an object type, the value is set to null.
+                    clearFieldValue(instance, field);
                 }
             });
         }
@@ -332,65 +338,42 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
                 implementations.add(Connector.class);
             }
             return new ByteBuddy()
-                    .subclass(field.getType())
-                    .implement(implementations)
-                    .method(ElementMatchers.any())
-                    .intercept(InvocationHandlerAdapter.of((proxy, method, args) -> {
-                        switch (method.getName()) {
-                            case "getName":
-                            case "toString":
-                                return "Missing Connector!";
-                            case "equals":
-                                return false;
-                            case "hashCode":
-                                return 1;
-                            default:
-                                return null;
-                        }
-                    }))
-                    .make()
-                    .load(this.getClass().getClassLoader())
-                    .getLoaded()
-                    .getDeclaredConstructor()
-                    .newInstance();
+                .subclass(field.getType())
+                .implement(implementations)
+                .method(ElementMatchers.any())
+                .intercept(InvocationHandlerAdapter.of((proxy, method, args) -> {
+                    switch (method.getName()) {
+                        case "getName":
+                        case "toString":
+                            return "Missing Connector!";
+                        case "equals":
+                            return false;
+                        case "hashCode":
+                            return 1;
+                        default:
+                            return null;
+                    }
+                }))
+                .make()
+                .load(this.getClass().getClassLoader())
+                .getLoaded()
+                .getDeclaredConstructor()
+                .newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new IgorException("Could not process missing connector component!", e);
         }
     }
 
     /**
-     * Converts the supplied String value to a corresponding java type.
+     * Clears the field's default value if it is a java object type.
      *
-     * @param clazz The target class to convert the input to.
-     * @param value The input to convert.
-     *
-     * @return An object with the supplied value.
+     * @param instance The target object to clear the field value on.
+     * @param field    The property to set to {@code null}.
      */
-    @SuppressWarnings("java:S3776") // Splitting up this method would increase complexity and decrease readability...
-    private Optional<Object> convertToObject(Class<?> clazz, String value) {
-        Optional<Object> result;
-        if (!StringUtils.hasText(value)) {
-            result = Optional.empty();
-        } else if (Boolean.class == clazz || boolean.class == clazz) {
-            result = Optional.of(Boolean.parseBoolean(value));
-        } else if (Byte.class == clazz || byte.class == clazz) {
-            result = Optional.of(Byte.parseByte(value));
-        } else if (Short.class == clazz || short.class == clazz) {
-            result = Optional.of(Short.parseShort(value));
-        } else if (Integer.class == clazz || int.class == clazz) {
-            result = Optional.of(Integer.parseInt(value));
-        } else if (Long.class == clazz || long.class == clazz) {
-            result = Optional.of(Long.parseLong(value));
-        } else if (Float.class == clazz || float.class == clazz) {
-            result = Optional.of(Float.parseFloat(value));
-        } else if (Double.class == clazz || double.class == clazz) {
-            result = Optional.of(Double.parseDouble(value));
-        } else if (Character.class == clazz || char.class == clazz) {
-            result = Optional.of(value.charAt(0));
-        } else {
-            result = Optional.of(value);
+    private void clearFieldValue(Object instance, Field field) {
+        if (javaObjectTypes.contains(field.getType())) {
+            ReflectionUtils.setField(field, instance, null);
         }
-        return result;
     }
 
 }

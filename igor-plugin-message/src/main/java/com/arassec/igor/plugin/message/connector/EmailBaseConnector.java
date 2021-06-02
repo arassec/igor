@@ -39,8 +39,8 @@ public abstract class EmailBaseConnector extends BaseMessageConnector {
     /**
      * Set to {@code true} to enable TLS.
      */
-    @IgorParam(value = 5, defaultValue = "true", advanced = true)
-    protected boolean enableTls;
+    @IgorParam(value = 5, advanced = true)
+    protected boolean enableTls = true;
 
     /**
      * If {@code true}, always accepts the provided SSL/TLS certificate from the server.
@@ -52,15 +52,15 @@ public abstract class EmailBaseConnector extends BaseMessageConnector {
      * Connection timeout in milliseconds.
      */
     @Positive
-    @IgorParam(value = 7, advanced = true, defaultValue = "5000")
-    protected int connectionTimeout;
+    @IgorParam(value = 7, advanced = true)
+    protected int connectionTimeout = 5000;
 
     /**
      * Read timeout in milliseconds.
      */
     @Positive
-    @IgorParam(value = 8, advanced = true, defaultValue = "15000")
-    protected int readTimeout;
+    @IgorParam(value = 8, advanced = true)
+    protected int readTimeout = 15000;
 
     /**
      * Creates a new component instance.

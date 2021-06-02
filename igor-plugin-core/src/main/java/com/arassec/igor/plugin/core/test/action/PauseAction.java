@@ -29,15 +29,15 @@ public class PauseAction extends BaseTestAction {
      * Amount of milliseconds the action should pause data processing.
      */
     @Positive
-    @IgorParam(defaultValue = "1000")
-    private int milliseconds;
+    @IgorParam
+    private int milliseconds = 1000;
 
     /**
      * Causes the pause to vary for each data item.
      */
     @PositiveOrZero
-    @IgorParam(advanced = true, defaultValue = "0")
-    private int variance;
+    @IgorParam(advanced = true)
+    private int variance = 0;
 
     /**
      * Random number generator for including variance in the pause.

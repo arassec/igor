@@ -11,6 +11,7 @@ import java.util.Map;
  * Desrializer for {@link Action}s.
  */
 public class ActionWebDeserializer extends IgorComponentWebDeserializer<Action> {
+
     /**
      * Creates a new deserializer instance.
      *

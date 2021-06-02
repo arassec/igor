@@ -81,8 +81,8 @@ public class HttpFileDownloadAction extends BaseHttpAction {
      * Enables a ".igor" file suffix during file transfer. The suffix will be removed after the file has been downloaded
      * completely.
      */
-    @IgorParam(value = 8, advanced = true, defaultValue = "true")
-    private boolean appendTransferSuffix;
+    @IgorParam(value = 8, advanced = true)
+    private boolean appendTransferSuffix = true;
 
     /**
      * If set to {@code true}, igor appends a filetype suffix if avaliable (e.g. '.html' or '.jpeg').
@@ -94,8 +94,8 @@ public class HttpFileDownloadAction extends BaseHttpAction {
      * The target key to put the web response in the data item.
      */
     @NotBlank
-    @IgorParam(value = Integer.MAX_VALUE - 1, advanced = true, defaultValue = DEFAULT_KEY_WEB_RESPONSE)
-    private String targetKey;
+    @IgorParam(value = Integer.MAX_VALUE - 1, advanced = true)
+    private String targetKey = DEFAULT_KEY_WEB_RESPONSE;
 
     /**
      * Creates a new component instance.

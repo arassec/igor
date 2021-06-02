@@ -72,8 +72,8 @@ public class SendRabbitMqMessageAction extends BaseMessageAction {
     /**
      * Only sends messages during simulated job executions if set to {@code false}.
      */
-    @IgorParam(advanced = true, defaultValue = "true")
-    private boolean simulationSafe;
+    @IgorParam(advanced = true)
+    private boolean simulationSafe = true;
 
     /**
      * Creates a new component instance.
@@ -96,9 +96,9 @@ public class SendRabbitMqMessageAction extends BaseMessageAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        String content = CorePluginUtils.getString(data, messageTemplate);
+        var content = CorePluginUtils.getString(data, messageTemplate);
 
-        RabbitMqMessage message = new RabbitMqMessage();
+        var message = new RabbitMqMessage();
         message.setContentType(contentType);
         message.setContentEncoding(contentEncoding);
         message.setContent(content);

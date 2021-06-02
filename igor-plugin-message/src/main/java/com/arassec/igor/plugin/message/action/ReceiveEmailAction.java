@@ -37,26 +37,26 @@ public class ReceiveEmailAction extends BaseMessageAction {
      * The E-Mail folder to read mails from.
      */
     @NotEmpty
-    @IgorParam(defaultValue = "INBOX")
-    private String folderName;
+    @IgorParam
+    private String folderName = "INBOX";
 
     /**
      * Set to {@code true} if only new mails should be processed.
      */
-    @IgorParam(defaultValue = "true", advanced = true, value = 9)
-    private boolean onlyNew;
+    @IgorParam(advanced = true, value = 9)
+    private boolean onlyNew = true;
 
     /**
      * Set to {@code true} if mails should be deleted after processing.
      */
-    @IgorParam(defaultValue = "false", advanced = true, value = 10)
-    private boolean deleteProcessed;
+    @IgorParam(advanced = true, value = 10)
+    private boolean deleteProcessed = false;
 
     /**
      * Set to {@code true} if mail attachments should be saved.
      */
-    @IgorParam(defaultValue = "false", advanced = true, value = 11)
-    private boolean saveAttachments;
+    @IgorParam(advanced = true, value = 11)
+    private boolean saveAttachments = false;
 
     /**
      * The directory in the local filesystem to store mails in.

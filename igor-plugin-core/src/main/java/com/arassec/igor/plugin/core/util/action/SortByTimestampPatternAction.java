@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -49,14 +48,14 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * The timestamp format.
      */
     @NotBlank
-    @IgorParam(defaultValue = DEFAULT_TIMESTAMP_FORMAT)
-    private String timestampFormat;
+    @IgorParam
+    private String timestampFormat = DEFAULT_TIMESTAMP_FORMAT;
 
     /**
      * Defines the sort order
      */
-    @IgorParam(defaultValue = "true")
-    private boolean sortAscending;
+    @IgorParam
+    private boolean sortAscending = true;
 
     /**
      * Contains all data that should have been processed by the action.
@@ -151,17 +150,17 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     private ZonedDateTime extractDateTime(Map<String, Object> data, Pattern p, DateTimeFormatter formatter,
                                           boolean applyDefaultTimezone) {
 
-        String resolvedInput = CorePluginUtils.getString(data, input);
+        var resolvedInput = CorePluginUtils.getString(data, input);
         if (resolvedInput == null) {
             log.debug("Missing data to extract date-time: {}", input);
             return null;
         }
 
-        String rawValue = CorePluginUtils.getString(data, resolvedInput);
+        var rawValue = CorePluginUtils.getString(data, resolvedInput);
 
         Pattern pn = p;
         if (pn == null) {
-            String resolvedPattern = CorePluginUtils.getString(data, pattern);
+            var resolvedPattern = CorePluginUtils.getString(data, pattern);
             if (resolvedPattern == null) {
                 log.debug("Missing pattern to extract date-time: {}", pattern);
                 return null;
@@ -171,7 +170,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
 
         DateTimeFormatter df = formatter;
         if (df == null) {
-            String resolvedTimestampFormat = CorePluginUtils.getString(data, timestampFormat);
+            var resolvedTimestampFormat = CorePluginUtils.getString(data, timestampFormat);
             if (resolvedTimestampFormat == null) {
                 log.debug("Missing timestamp format to extract date-time: {}", timestampFormat);
                 return null;
@@ -182,7 +181,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
             df = DateTimeFormatter.ofPattern(resolvedTimestampFormat);
         }
 
-        Matcher m = pn.matcher(rawValue);
+        var m = pn.matcher(rawValue);
 
         if (m.find()) {
             if (applyDefaultTimezone) {

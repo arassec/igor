@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -106,7 +107,7 @@ class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
         FileStreamData fileStreamData = connector.readStream("alpha.txt");
 
         StringWriter stringWriter = new StringWriter();
-        IOUtils.copy(fileStreamData.getData(), stringWriter);
+        IOUtils.copy(fileStreamData.getData(), stringWriter, Charset.defaultCharset());
         assertEquals("ALPHA-igor-ftp-connector-tests", stringWriter.toString());
         assertEquals(30, fileStreamData.getFileSize());
     }

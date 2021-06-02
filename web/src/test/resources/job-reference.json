@@ -23,7 +23,7 @@
                 "name": "testParam",
                 "required": true,
                 "type": "java.lang.Integer",
-                "value": null,
+                "value": 666,
                 "connector": false
             }
         ]

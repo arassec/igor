@@ -60,8 +60,8 @@ public class SendEmailAction extends BaseMessageAction {
      * The body's content type.
      */
     @NotEmpty
-    @IgorParam(defaultValue = "text/plain")
-    private String contentType;
+    @IgorParam
+    private String contentType = "text/plain";
 
     /**
      * The mail's body.

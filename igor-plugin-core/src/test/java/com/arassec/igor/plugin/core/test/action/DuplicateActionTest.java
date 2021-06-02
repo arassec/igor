@@ -39,7 +39,7 @@ class DuplicateActionTest extends CoreActionBaseTest {
         Map<String, Object> data = createData();
 
         List<Map<String, Object>> result = action.process(data, new JobExecution());
-        assertEquals(0, result.size());
+        assertEquals(2, result.size()); // Default = 2
 
         action.setAmount(3);
 

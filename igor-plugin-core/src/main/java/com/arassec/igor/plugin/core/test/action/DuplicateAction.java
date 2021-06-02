@@ -25,8 +25,8 @@ public class DuplicateAction extends BaseTestAction {
      * The number of duplications to create.
      */
     @Positive
-    @IgorParam(defaultValue = "2")
-    private int amount;
+    @IgorParam
+    private int amount = 2;
 
     /**
      * Creates a new component instance.
@@ -41,7 +41,7 @@ public class DuplicateAction extends BaseTestAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         List<Map<String, Object>> result = new LinkedList<>();
-        for (int i = 0; i < amount; i++) {
+        for (var i = 0; i < amount; i++) {
             Map<String, Object> clone = CorePluginUtils.clone(data);
             clone.put("index", i);
             result.add(clone);

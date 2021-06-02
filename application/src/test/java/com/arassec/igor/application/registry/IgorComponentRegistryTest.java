@@ -314,104 +314,104 @@ class IgorComponentRegistryTest {
         /**
          * boolean test parameter.
          */
-        @IgorParam(defaultValue = "true")
-        private boolean booleanParam;
+        @IgorParam
+        private boolean booleanParam = true;
 
         /**
          * Boolean test parameter.
          */
-        @IgorParam(defaultValue = "true")
-        private Boolean booleanObjectParam;
+        @IgorParam
+        private Boolean booleanObjectParam = true;
 
         /**
          * byte test parameter.
          */
-        @IgorParam(defaultValue = "-128")
-        private byte byteParam;
+        @IgorParam
+        private byte byteParam = -128;
 
         /**
          * Byte test parameter.
          */
-        @IgorParam(defaultValue = "127")
-        private Byte byteObjectParam;
+        @IgorParam
+        private Byte byteObjectParam = 127;
 
         /**
          * short test parameter.
          */
-        @IgorParam(defaultValue = "123")
-        private short shortParam;
+        @IgorParam
+        private short shortParam = 123;
 
         /**
          * Short test parameter.
          */
-        @IgorParam(defaultValue = "456")
-        private Short shortObjectParam;
+        @IgorParam
+        private Short shortObjectParam = 456;
 
         /**
          * int test parameter.
          */
-        @IgorParam(defaultValue = "23")
-        private int intParam;
+        @IgorParam
+        private int intParam = 23;
 
         /**
          * Integer test parameter.
          */
-        @IgorParam(defaultValue = "42")
-        private Integer integerParam;
+        @IgorParam
+        private Integer integerParam = 42;
 
         /**
          * long test parameter.
          */
-        @IgorParam(defaultValue = "123456789")
-        private long longParam;
+        @IgorParam
+        private long longParam = 123456789;
 
         /**
          * Long test parameter.
          */
-        @IgorParam(defaultValue = "987654321")
-        private Long longObjectParam;
+        @IgorParam
+        private Long longObjectParam = 987654321L;
 
         /**
          * float test parameter.
          */
-        @IgorParam(defaultValue = "1.23")
-        private float floatParam;
+        @IgorParam
+        private float floatParam = 1.23f;
 
         /**
          * Float test parameter.
          */
-        @IgorParam(defaultValue = "4.56")
-        private Float floatObjectParam;
+        @IgorParam
+        private Float floatObjectParam = 4.56F;
 
         /**
          * double test parameter.
          */
-        @IgorParam(defaultValue = "1.23456789")
-        private double doubleParam;
+        @IgorParam
+        private double doubleParam = 1.23456789;
 
         /**
          * Double test parameter.
          */
-        @IgorParam(defaultValue = "9.87654321")
-        private Double doubleObjectParam;
+        @IgorParam
+        private Double doubleObjectParam = 9.87654321D;
 
         /**
          * char test parameter.
          */
-        @IgorParam(defaultValue = "A")
-        private char charParam;
+        @IgorParam
+        private char charParam = 'A';
 
         /**
          * Character test parameter.
          */
-        @IgorParam(defaultValue = "B")
-        private Character characterParam;
+        @IgorParam
+        private Character characterParam = 'B';
 
         /**
          * String test parameter.
          */
-        @IgorParam(defaultValue = "igor")
-        private String stringParam;
+        @IgorParam
+        private String stringParam = "igor";
 
         /**
          * Creates a new component instance.

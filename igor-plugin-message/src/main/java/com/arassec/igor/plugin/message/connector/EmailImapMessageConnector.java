@@ -44,8 +44,8 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
      * The service's port.
      */
     @Positive
-    @IgorParam(defaultValue = "993", value = 2)
-    private int port;
+    @IgorParam(value = 2)
+    private int port = 993;
 
     /**
      * Creates a new component instance.
