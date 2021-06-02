@@ -34,7 +34,7 @@ public class JdbcPersistentValueRepository implements PersistentValueRepository 
      */
     @Override
     public PersistentValue upsert(String jobId, PersistentValue value) {
-        PersistentValueEntity entity = new PersistentValueEntity();
+        var entity = new PersistentValueEntity();
         if (value.getId() != null) {
             entity = persistentValueDao.findById(value.getId()).orElseThrow(
                     () -> new IllegalStateException("No persistent value for ID " + value.getId() + " available!"));

@@ -25,7 +25,7 @@ public class FtpFileConnector extends BaseFtpFileConnector {
      */
     protected FTPClient connect() {
         try {
-            FTPClient ftpClient = new FTPClient();
+            var ftpClient = new FTPClient();
             configureAndConnect(ftpClient);
             return ftpClient;
         } catch (IOException e) {

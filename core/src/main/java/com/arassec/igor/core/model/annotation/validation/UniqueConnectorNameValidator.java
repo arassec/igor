@@ -44,7 +44,7 @@ public class UniqueConnectorNameValidator implements ConstraintValidator<UniqueC
             return true;
         }
 
-        Connector existingConnectorWithSameName = connectorRepository.findByName(connector.getName());
+        var existingConnectorWithSameName = connectorRepository.findByName(connector.getName());
 
         if (existingConnectorWithSameName != null) {
             return existingConnectorWithSameName.getId().equals(connector.getId());

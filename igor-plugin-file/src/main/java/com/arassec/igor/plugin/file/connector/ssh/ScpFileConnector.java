@@ -56,13 +56,13 @@ public class ScpFileConnector extends BaseSshFileConnector {
         }
 
         if (b == 1 || b == 2) {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             int c;
             do {
                 c = in.read();
                 sb.append((char) c);
             } while (c != '\n');
-            log.append(sb.toString());
+            log.append(sb);
         }
 
         return b;
@@ -74,7 +74,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
     @Override
     public List<FileInfo> listFiles(String directory, String fileEnding) {
         final String dir = directory.endsWith("/") ? directory : directory + "/";
-        int numResultsToSkip = 1; // Without filter the total number of files is the first line of the result
+        var numResultsToSkip = 1; // Without filter the total number of files is the first line of the result
         String command = "cd " + dir + " && ls -Alp --time-style=full-iso | grep -v /";
         if (StringUtils.hasText(fileEnding)) {
             numResultsToSkip = 0;
@@ -99,8 +99,8 @@ public class ScpFileConnector extends BaseSshFileConnector {
      */
     @Override
     public String read(String file) {
-        FileStreamData fileStreamData = readStream(file);
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+        var fileStreamData = readStream(file);
+        try (var outputStream = new ByteArrayOutputStream()) {
             copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), new WorkInProgressMonitor(),
                     JobExecution.builder().executionState(JobExecutionState.RUNNING).build());
             outputStream.flush();
@@ -118,29 +118,29 @@ public class ScpFileConnector extends BaseSshFileConnector {
     @Override
     public FileStreamData readStream(String file) {
         try {
-            FileStreamData result = new FileStreamData();
+            var result = new FileStreamData();
 
             // exec 'scp -f rfile' remotely
             String command = "scp -f " + file;
-            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+            var session = connect(getHost(), getPort(), getUsername(), getPassword());
 
             ChannelExec channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
 
             // get I/O streams for remote scp
-            OutputStream sshOutputStream = channel.getOutputStream();
-            InputStream sshInputStream = channel.getInputStream();
+            var sshOutputStream = channel.getOutputStream();
+            var sshInputStream = channel.getInputStream();
 
             channel.connect();
 
-            byte[] buf = new byte[1024];
+            var buf = new byte[1024];
 
             // send '\0'
             buf[0] = 0;
             sshOutputStream.write(buf, 0, 1);
             sshOutputStream.flush();
 
-            StringBuilder log = new StringBuilder();
+            var log = new StringBuilder();
             int c = checkAck(sshInputStream, log);
             if (c != 'C') {
                 throw new IgorException("Could not read remote SSH file " + file + ": " + log);
@@ -150,7 +150,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
             //noinspection ResultOfMethodCallIgnored
             sshInputStream.read(buf, 0, 5);
 
-            long fileSize = 0L;
+            var fileSize = 0L;
             while (true) {
                 if (sshInputStream.read(buf, 0, 1) < 0) {
                     // error
@@ -163,7 +163,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
             }
 
             // Consume the file name from the stream...
-            for (int i = 0; ; i++) {
+            for (var i = 0; ; i++) {
                 //noinspection ResultOfMethodCallIgnored
                 sshInputStream.read(buf, i, 1);
                 if (buf[i] == (byte) 0x0a) {
@@ -176,12 +176,12 @@ public class ScpFileConnector extends BaseSshFileConnector {
             sshOutputStream.write(buf, 0, 1);
             sshOutputStream.flush();
 
-            SshInputStreamWrapper sshInputStreamWrapper = new SshInputStreamWrapper(sshInputStream, fileSize);
+            var sshInputStreamWrapper = new SshInputStreamWrapper(sshInputStream, fileSize);
 
             result.setData(sshInputStreamWrapper);
             result.setFileSize(fileSize);
 
-            SshConnectionData sshConnectionData = new SshConnectionData();
+            var sshConnectionData = new SshConnectionData();
             sshConnectionData.setSession(session);
             sshConnectionData.setChannel(channel);
             sshConnectionData.setSshOutputStream(sshOutputStream);
@@ -203,16 +203,16 @@ public class ScpFileConnector extends BaseSshFileConnector {
                             JobExecution jobExecution) {
         try {
             String command = "scp -t " + file;
-            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+            var session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelExec channel = (ChannelExec) session.openChannel("exec");
             channel.setCommand(command);
 
-            OutputStream sshOutputStream = channel.getOutputStream();
-            InputStream sshInputStream = channel.getInputStream();
+            var sshOutputStream = channel.getOutputStream();
+            var sshInputStream = channel.getInputStream();
 
             channel.connect();
 
-            StringBuilder log = new StringBuilder();
+            var log = new StringBuilder();
             int sshReturnCode = checkAck(sshInputStream, log);
             if (sshReturnCode != 0) {
                 throw new IgorException("Error during SCP file transfer (" + sshReturnCode + "): " + log);
@@ -248,7 +248,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
         if (fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
-            SshConnectionData sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
+            var sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
             finalizeStreams(sshConnectionData.getSession(), sshConnectionData.getChannel(), sshConnectionData.getSshOutputStream(),
                     sshConnectionData.getSshInputStream());
         }
@@ -275,7 +275,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
      */
     @Override
     public void testConfiguration() {
-        Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+        var session = connect(getHost(), getPort(), getUsername(), getPassword());
         session.disconnect();
     }
 
@@ -342,10 +342,10 @@ public class ScpFileConnector extends BaseSshFileConnector {
     private void finalizeStreams(Session session, Channel channel, OutputStream sshOutputStream, InputStream sshInputStream) {
         try {
             // send '\0'
-            byte[] buf = {0};
+            byte[] buf = {0}; //NOSONAR - var is not applicable here...
             sshOutputStream.write(buf, 0, 1);
             sshOutputStream.flush();
-            StringBuilder log = new StringBuilder();
+            var log = new StringBuilder();
             int sshReturnCode = checkAck(sshInputStream, log);
             if (sshReturnCode != 0) {
                 throw new IgorException("SSH command not successful (" + sshReturnCode + "): " + log);
@@ -367,9 +367,9 @@ public class ScpFileConnector extends BaseSshFileConnector {
      * @return The command's output.
      */
     private StringBuilder execute(String command) {
-        StringBuilder result = new StringBuilder();
+        var result = new StringBuilder();
 
-        Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+        var session = connect(getHost(), getPort(), getUsername(), getPassword());
         ChannelExec channel;
         try {
             channel = (ChannelExec) session.openChannel("exec");
@@ -378,13 +378,13 @@ public class ScpFileConnector extends BaseSshFileConnector {
         }
         channel.setCommand(command);
         channel.setInputStream(null);
-        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+        var errorStream = new ByteArrayOutputStream();
         channel.setErrStream(errorStream);
 
-        try (InputStream in = channel.getInputStream()) {
+        try (var in = channel.getInputStream()) {
             channel.connect();
 
-            byte[] tmp = new byte[1024];
+            var tmp = new byte[1024];
             while (true) {
                 while (in.available() > 0) {
                     int i = in.read(tmp, 0, 1024);

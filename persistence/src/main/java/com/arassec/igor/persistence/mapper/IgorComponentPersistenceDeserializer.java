@@ -68,7 +68,7 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
 
         Map<String, Object> parameters = deserializeParameters(rawParameters, typeId);
 
-        T instance = createInstance(typeId, parameters);
+        var instance = createInstance(typeId, parameters);
 
         setComponentSpecifica(instance, map);
 
@@ -101,7 +101,7 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
         }
         Map<String, Object> result = new HashMap<>();
         parameters.forEach(jsonParameter -> {
-            String parameterName = String.valueOf(jsonParameter.get(PersistenceMapperKey.NAME.getKey()));
+            var parameterName = String.valueOf(jsonParameter.get(PersistenceMapperKey.NAME.getKey()));
             if (jsonParameter.containsKey(PersistenceMapperKey.CONNECTOR.getKey()) && (boolean) jsonParameter.get(PersistenceMapperKey.CONNECTOR.getKey()) && connectorRepository != null) {
                 result.put(parameterName,
                         connectorRepository.findById(String.valueOf(jsonParameter.get(PersistenceMapperKey.VALUE.getKey()))));

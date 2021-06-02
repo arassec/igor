@@ -77,7 +77,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      */
     @Override
     public JobExecution findById(Long id) {
-        JobExecutionEntity jobExecutionEntity = jobExecutionDao.findById(id).orElse(null);
+        var jobExecutionEntity = jobExecutionDao.findById(id).orElse(null);
         if (jobExecutionEntity != null) {
             return convert(jobExecutionEntity);
         }
@@ -133,7 +133,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
         Page<JobExecutionEntity> page = jobExecutionDao.findByJobId(jobId, pageable);
         if (page != null && page.hasContent() && page.getTotalElements() > numToKeep) {
 
-            int i = 0;
+            var i = 0;
             for (JobExecutionEntity entity : page.getContent()) {
                 if (!JobExecutionState.FAILED.name().equals(entity.getState())) {
                     i++;

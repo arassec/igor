@@ -50,7 +50,7 @@ public class AddDataAction extends BaseUtilAction {
 
         Map<String, Object> jsonData = CorePluginUtils.getData(CorePluginUtils.getString(data, json));
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        var objectMapper = new ObjectMapper();
 
         JsonNode updateNode = objectMapper.convertValue(jsonData, JsonNode.class);
         JsonNode mainNode = objectMapper.convertValue(data, JsonNode.class);
@@ -78,7 +78,7 @@ public class AddDataAction extends BaseUtilAction {
         while (fieldNames.hasNext()) {
 
             String fieldName = fieldNames.next();
-            JsonNode jsonNode = mainNode.get(fieldName);
+            var jsonNode = mainNode.get(fieldName);
             // if field exists and is an embedded object
             if (jsonNode != null && jsonNode.isObject()) {
                 merge(jsonNode, updateNode.get(fieldName));

@@ -83,14 +83,14 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
             @Override
             @SuppressWarnings("NullableProblems")
             public Thread newThread(Runnable r) {
-                Thread t = new Thread(r, String.format(THREAD_NAME_PATTERN, concurrencyGroupId, counter.incrementAndGet()));
+                var t = new Thread(r, String.format(THREAD_NAME_PATTERN, concurrencyGroupId, counter.incrementAndGet()));
                 t.setUncaughtExceptionHandler(ConcurrencyGroup.this);
                 return t;
             }
         });
 
-        for (int i = 0; i < threads; i++) {
-            ActionsExecutingRunnable runnable = new ActionsExecutingRunnable(actions, inputQueue, outputQueue, jobExecution);
+        for (var i = 0; i < threads; i++) {
+            var runnable = new ActionsExecutingRunnable(actions, inputQueue, outputQueue, jobExecution);
             runnables.add(runnable);
             threadPoolExecutor.execute(runnable);
         }
@@ -178,7 +178,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
             return;
         }
 
-        Object waitLock = new Object();
+        var waitLock = new Object();
         ScheduledExecutorService waitCheckExecutor = Executors.newSingleThreadScheduledExecutor();
 
         waitCheckExecutor.scheduleAtFixedRate(() -> {

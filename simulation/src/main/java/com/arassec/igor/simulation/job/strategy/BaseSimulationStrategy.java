@@ -39,22 +39,22 @@ public abstract class BaseSimulationStrategy implements SimulationStrategy {
     protected Map<String, SimulationResult> extractSimulationResult(Job job, JobExecution jobExecution) {
         Map<String, SimulationResult> result = new HashMap<>();
 
-        SimulationResult jobResult = new SimulationResult();
+        var jobResult = new SimulationResult();
 
         if (jobExecution.getErrorCause() != null) {
             jobResult.setErrorCause(jobExecution.getErrorCause());
         }
 
         if (job.getTrigger() instanceof TriggerProxy) {
-            TriggerProxy triggerProxy = (TriggerProxy) job.getTrigger();
+            var triggerProxy = (TriggerProxy) job.getTrigger();
             final List<Map<String, Object>> simulationTriggerData = triggerProxy.getCollectedData();
             simulationTriggerData.forEach(dataItem -> jobResult.getResults().add(dataItem));
         }
 
         job.getActions().forEach(action -> {
             if (action instanceof ActionProxy) {
-                ActionProxy actionProxy = (ActionProxy) action;
-                SimulationResult actionResult = new SimulationResult();
+                var actionProxy = (ActionProxy) action;
+                var actionResult = new SimulationResult();
                 actionResult.setErrorCause(actionProxy.getErrorCause());
                 actionProxy.getCollectedData().stream().filter(Objects::nonNull).forEach(jsonObject -> actionResult.getResults().add(jsonObject));
                 if (action.getId() != null) {

@@ -9,7 +9,6 @@ import com.arassec.igor.plugin.core.file.connector.FileStreamData;
 import com.arassec.igor.plugin.file.FilePluginType;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -42,7 +41,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
     @Override
     public List<FileInfo> listFiles(String directory, String fileEnding) {
         try {
-            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+            var session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
             List<ChannelSftp.LsEntry> files = new LinkedList<>();
@@ -66,8 +65,8 @@ public class SftpFileConnector extends BaseSshFileConnector {
      */
     @Override
     public String read(String file) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+        try (var outputStream = new ByteArrayOutputStream()) {
+            var session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
             channel.get(file, outputStream);
@@ -85,7 +84,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
     @Override
     public FileStreamData readStream(String file) {
         try {
-            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+            var session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
 
@@ -95,11 +94,11 @@ public class SftpFileConnector extends BaseSshFileConnector {
             Vector lsEntries = channel.ls(file);
 
             if (lsEntries != null && !lsEntries.isEmpty() && lsEntries.firstElement() instanceof ChannelSftp.LsEntry) {
-                FileStreamData result = new FileStreamData();
+                var result = new FileStreamData();
                 result.setFileSize(((ChannelSftp.LsEntry) lsEntries.firstElement()).getAttrs().getSize());
                 result.setData(channel.get(file));
 
-                SshConnectionData sshConnectionData = new SshConnectionData();
+                var sshConnectionData = new SshConnectionData();
                 sshConnectionData.setSession(session);
                 sshConnectionData.setChannel(channel);
                 result.setSourceConnectionData(sshConnectionData);
@@ -122,7 +121,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
     public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor,
                             JobExecution jobExecution) {
         try {
-            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+            var session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
             channel.put(fileStreamData.getData(), file,
@@ -143,7 +142,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
         if (fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
-            SshConnectionData sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
+            var sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
             sshConnectionData.getChannel().disconnect();
             sshConnectionData.getSession().disconnect();
         }
@@ -155,7 +154,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
     @Override
     public void delete(String file) {
         try {
-            Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+            var session = connect(getHost(), getPort(), getUsername(), getPassword());
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
             channel.rm(file);
@@ -193,7 +192,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
      */
     @Override
     public void testConfiguration() {
-        Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+        var session = connect(getHost(), getPort(), getUsername(), getPassword());
         session.disconnect();
     }
 
@@ -207,7 +206,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
      * @throws SftpException In case of SFTP errors.
      */
     private void moveInternal(String source, String target) throws JSchException, SftpException {
-        Session session = connect(getHost(), getPort(), getUsername(), getPassword());
+        var session = connect(getHost(), getPort(), getUsername(), getPassword());
         ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
         channel.connect();
         channel.rename(source, target);

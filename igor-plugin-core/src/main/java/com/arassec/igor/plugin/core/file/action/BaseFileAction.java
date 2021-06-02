@@ -59,7 +59,7 @@ public abstract class BaseFileAction extends BaseAction {
      * @return The resolved parameter values as {@link ResolvedData}.
      */
     ResolvedData resolveData(Map<String, Object> data, String sourceFilename, String sourceDirectory, String targetFilename, String targetDirectory) {
-        ResolvedData result = new ResolvedData();
+        var result = new ResolvedData();
 
         result.setSourceFilename(CorePluginUtils.getString(data, sourceFilename));
         result.setSourceDirectory(resolveDirectory(data, sourceDirectory));
@@ -87,7 +87,7 @@ public abstract class BaseFileAction extends BaseAction {
      * @return The resolved file path.
      */
     String resolveFilePath(Map<String, Object> data, String filename, String directory) {
-        String resolvedFilename = CorePluginUtils.getString(data, filename);
+        var resolvedFilename = CorePluginUtils.getString(data, filename);
         String resolvedDirectory = resolveDirectory(data, directory);
 
         if (resolvedFilename == null) {
@@ -137,7 +137,7 @@ public abstract class BaseFileAction extends BaseAction {
      * @return A directory (or path) as String.
      */
     private String resolveDirectory(Map<String, Object> data, String query) {
-        String resolvedDirectory = CorePluginUtils.getString(data, query);
+        var resolvedDirectory = CorePluginUtils.getString(data, query);
 
         if (resolvedDirectory == null) {
             resolvedDirectory = "/";

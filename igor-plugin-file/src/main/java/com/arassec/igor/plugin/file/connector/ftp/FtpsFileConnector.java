@@ -27,7 +27,7 @@ public class FtpsFileConnector extends BaseFtpFileConnector {
     @Override
     protected FTPClient connect() {
         try {
-            FTPSClient ftpsClient = new FTPSClient();
+            var ftpsClient = new FTPSClient();
             configureAndConnect(ftpsClient);
 
             ftpsClient.execPBSZ(0);

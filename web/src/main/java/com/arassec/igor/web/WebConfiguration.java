@@ -42,9 +42,9 @@ public class WebConfiguration {
      */
     @Bean
     public MessageSource messageSource(final List<MessageSource> messageSources) {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        var messageSource = new ResourceBundleMessageSource();
         if (messageSources != null && !messageSources.isEmpty()) {
-            for (int i = 1; i < messageSources.size(); i++) {
+            for (var i = 1; i < messageSources.size(); i++) {
                 ((HierarchicalMessageSource) messageSources.get(i)).setParentMessageSource(messageSources.get(i - 1));
             }
             messageSource.setParentMessageSource(messageSources.get(messageSources.size() - 1));
@@ -65,7 +65,7 @@ public class WebConfiguration {
     @Bean
     public ObjectMapper objectMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository,
                                      MessageSource messageSource) {
-        SimpleModule mapperModule = new SimpleModule();
+        var mapperModule = new SimpleModule();
 
         mapperModule.addSerializer(new IgorComponentWebSerializer(messageSource, igorComponentRegistry));
         mapperModule.addDeserializer(Connector.class, new ConnectorWebDeserializer(igorComponentRegistry));

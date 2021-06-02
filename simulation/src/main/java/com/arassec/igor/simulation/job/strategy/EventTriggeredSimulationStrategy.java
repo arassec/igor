@@ -38,7 +38,7 @@ public class EventTriggeredSimulationStrategy extends BaseSimulationStrategy {
         ExecutorService jobExecutor = Executors.newSingleThreadExecutor();
         jobExecutor.submit(() -> job.start(jobExecution));
 
-        Object processedEventsLock = new Object();
+        var processedEventsLock = new Object();
 
         ScheduledExecutorService jobFinishedCheckExecutor = Executors.newSingleThreadScheduledExecutor();
         jobFinishedCheckExecutor.scheduleAtFixedRate(() -> {

@@ -53,14 +53,14 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
         String jobId = getJobId(data);
-        String resolvedInput = CorePluginUtils.getString(data, input);
+        var resolvedInput = CorePluginUtils.getString(data, input);
 
         if (resolvedInput == null) {
             log.debug("Not enough data to filter: {}", input);
             return List.of();
         }
 
-        PersistentValue value = new PersistentValue(resolvedInput);
+        var value = new PersistentValue(resolvedInput);
         if (persistentValueRepository.isPersisted(jobId, value)) {
             log.debug("Filtered persisted value: '{}'", resolvedInput);
             return List.of();

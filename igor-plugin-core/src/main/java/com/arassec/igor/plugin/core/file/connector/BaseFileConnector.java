@@ -58,7 +58,7 @@ public abstract class BaseFileConnector extends BaseConnector implements FileCon
                               JobExecution jobExecution) {
         try {
             long totalSize = fileSize;
-            byte[] buf = new byte[streamCopyBufferSize];
+            var buf = new byte[streamCopyBufferSize];
             int foo;
             while (jobExecution.isRunningOrActive()) {
                 if (buf.length < fileSize) {

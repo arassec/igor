@@ -63,15 +63,15 @@ public class SplitArrayAction extends BaseUtilAction {
         // e.g. {{data.content.array}} -> /data/content/array
         String arrayPointer = arraySelector.replace("{{", "/").replace(".", "/").replace("}}", "");
         // e.g. /data/content/array -> /data/content
-        String parentPointer = arrayPointer.substring(0, arrayPointer.lastIndexOf("/"));
+        var parentPointer = arrayPointer.substring(0, arrayPointer.lastIndexOf("/"));
         // e.g. /data/content/array -> array
-        String leafName = arrayPointer.substring(arrayPointer.lastIndexOf("/") + 1);
+        var leafName = arrayPointer.substring(arrayPointer.lastIndexOf("/") + 1);
 
-        JsonNode jsonNode = objectMapper.convertValue(data, JsonNode.class);
-        JsonNode array = jsonNode.at(arrayPointer);
+        var jsonNode = objectMapper.convertValue(data, JsonNode.class);
+        var array = jsonNode.at(arrayPointer);
 
         for (JsonNode element : array) {
-            JsonNode clonedJsonNode = objectMapper.convertValue(data, JsonNode.class);
+            var clonedJsonNode = objectMapper.convertValue(data, JsonNode.class);
             ((ObjectNode) clonedJsonNode.at(parentPointer)).set(leafName, element);
             result.add(objectMapper.convertValue(clonedJsonNode, new TypeReference<>() {
             }));

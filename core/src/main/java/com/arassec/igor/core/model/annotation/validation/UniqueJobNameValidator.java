@@ -43,7 +43,7 @@ public class UniqueJobNameValidator implements ConstraintValidator<UniqueJobName
             return true;
         }
 
-        Job existingJobWithSameName = jobRepository.findByName(job.getName());
+        var existingJobWithSameName = jobRepository.findByName(job.getName());
 
         if (existingJobWithSameName != null) {
             return existingJobWithSameName.getId().equals(job.getId());

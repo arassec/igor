@@ -25,8 +25,8 @@ public class StacktraceFormatter {
         if (throwable == null) {
             return null;
         }
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
+        var sw = new StringWriter();
+        var pw = new PrintWriter(sw);
         throwable.printStackTrace(pw);
         return sw.toString();
     }

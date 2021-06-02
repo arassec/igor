@@ -82,7 +82,7 @@ public class LocalFilesystemFileConnector extends BaseFileConnector {
     @Override
     public FileStreamData readStream(String file) {
         try {
-            FileStreamData result = new FileStreamData();
+            var result = new FileStreamData();
             result.setFileSize(Files.size(Paths.get(file)));
             result.setData(new FileInputStream(file));
             return result;
@@ -97,7 +97,7 @@ public class LocalFilesystemFileConnector extends BaseFileConnector {
     @Override
     public void writeStream(String file, FileStreamData fileStreamData, WorkInProgressMonitor workInProgressMonitor,
                             JobExecution jobExecution) {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+        try (var fileOutputStream = new FileOutputStream(file)) {
             copyStream(fileStreamData.getData(), fileOutputStream, fileStreamData.getFileSize(), workInProgressMonitor, jobExecution);
         } catch (IOException e) {
             throw new IgorException("Could not write file (stream): " + file, e);

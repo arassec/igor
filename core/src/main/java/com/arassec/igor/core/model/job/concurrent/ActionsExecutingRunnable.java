@@ -88,8 +88,8 @@ public class ActionsExecutingRunnable implements Runnable {
      * Completes all actions and processes final data, if any.
      */
     public void complete() {
-        for (int i = 0; i < actions.size(); i++) {
-            Action action = actions.get(i);
+        for (var i = 0; i < actions.size(); i++) {
+            var action = actions.get(i);
             List<Map<String, Object>> items = action.complete();
             if (items != null && !items.isEmpty()) {
                 if ((i + 1) < actions.size()) {

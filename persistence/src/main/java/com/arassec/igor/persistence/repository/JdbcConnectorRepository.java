@@ -100,7 +100,7 @@ public class JdbcConnectorRepository implements ConnectorRepository {
         Optional<ConnectorEntity> connectorEntityOptional = connectorDao.findById(id);
         if (connectorEntityOptional.isPresent()) {
             try {
-                ConnectorEntity connectorEntity = connectorEntityOptional.get();
+                var connectorEntity = connectorEntityOptional.get();
                 return persistenceConnectorMapper.readValue(connectorEntity.getContent(), Connector.class);
             } catch (IOException e) {
                 throw new IllegalStateException(READ_CONNECTOR_ERROR, e);
@@ -118,7 +118,7 @@ public class JdbcConnectorRepository implements ConnectorRepository {
      */
     @Override
     public Connector findByName(String name) {
-        ConnectorEntity connectorEntity = connectorDao.findByName(name);
+        var connectorEntity = connectorDao.findByName(name);
         if (connectorEntity != null) {
             try {
                 return persistenceConnectorMapper.readValue(connectorEntity.getContent(), Connector.class);
@@ -137,7 +137,7 @@ public class JdbcConnectorRepository implements ConnectorRepository {
     @Override
     public List<Connector> findAll() {
         List<Connector> result = new LinkedList<>();
-        for (ConnectorEntity connectorEntity : connectorDao.findAll()) {
+        for (var connectorEntity : connectorDao.findAll()) {
             try {
                 result.add(persistenceConnectorMapper.readValue(connectorEntity.getContent(), Connector.class));
             } catch (IOException e) {

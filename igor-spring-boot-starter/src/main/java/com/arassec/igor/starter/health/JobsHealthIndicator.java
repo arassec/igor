@@ -1,7 +1,6 @@
 package com.arassec.igor.starter.health;
 
 import com.arassec.igor.application.manager.JobManager;
-import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.util.ModelPage;
@@ -42,7 +41,7 @@ public class JobsHealthIndicator implements HealthIndicator {
                 .map(JobExecution::getJobId)
                 .distinct()
                 .forEach(jobId -> {
-                    Job job = jobManager.load(jobId);
+                    var job = jobManager.load(jobId);
                     if (job.isActive()) {
                         details.add(Map.of(
                             "jobId", jobId,
@@ -53,7 +52,7 @@ public class JobsHealthIndicator implements HealthIndicator {
                 });
 
             if (!details.isEmpty()) {
-                Health.Builder healthBuilder = Health.down();
+                var healthBuilder = Health.down();
                 healthBuilder.withDetail("jobs", details);
                 return healthBuilder.build();
             }

@@ -45,7 +45,7 @@ public class PersistenceConfiguration {
     public ObjectMapper persistenceJobMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository,
                                              SecurityProvider securityProvider) {
 
-        SimpleModule mapperModule = new SimpleModule();
+        var mapperModule = new SimpleModule();
 
         mapperModule.addSerializer(new IgorComponentPersistenceSerializer(securityProvider));
 
@@ -72,7 +72,7 @@ public class PersistenceConfiguration {
     @Bean(name = "persistenceConnectorMapper")
     public ObjectMapper persistenceConnectorMapper(IgorComponentRegistry igorComponentRegistry, SecurityProvider securityProvider) {
 
-        SimpleModule mapperModule = new SimpleModule();
+        var mapperModule = new SimpleModule();
 
         mapperModule.addSerializer(new IgorComponentPersistenceSerializer(securityProvider));
         mapperModule.addDeserializer(Connector.class, new ConnectorPersistenceDeserializer(igorComponentRegistry, securityProvider));
