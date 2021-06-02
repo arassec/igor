@@ -72,8 +72,8 @@ public class ProxyProvider implements ApplicationContextAware {
         ReflectionUtils.doWithFields(igorComponent.getClass(), field -> {
             if (field.isAnnotationPresent(IgorParam.class) && Connector.class.isAssignableFrom(field.getType())) {
                 ReflectionUtils.makeAccessible(field);
-                Connector connector = (Connector) ReflectionUtils.getField(field, igorComponent);
-                Connector connectorProxy = createConnectorProxy(connector);
+                var connector = (Connector) ReflectionUtils.getField(field, igorComponent);
+                var connectorProxy = createConnectorProxy(connector);
                 ReflectionUtils.setField(field, igorComponent, connectorProxy);
             }
         });
@@ -98,10 +98,10 @@ public class ProxyProvider implements ApplicationContextAware {
             // Get constructor parameters from the spring context if possible:
             Parameter[] parameters = constructor.getParameters();
 
-            Class<?>[] parameterTypes = new Class<?>[parameters.length];
-            Object[] parameterValues = new Object[parameters.length];
+            var parameterTypes = new Class<?>[parameters.length];
+            var parameterValues = new Object[parameters.length];
 
-            for (int i = 0; i < parameters.length; i++) {
+            for (var i = 0; i < parameters.length; i++) {
                 parameterTypes[i] = parameters[i].getType();
                 parameterValues[i] = getSpringBean(parameters[i].getType());
             }

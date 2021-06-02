@@ -1,14 +1,14 @@
 package com.arassec.igor.core.model.job;
 
-import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
+import lombok.Getter;
+import lombok.Setter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,7 @@ class IgorComponentUtilTest {
     /**
      * IgorComponent for testing the util.
      */
-    private Action testAction;
+    private TestAction testAction;
 
     /**
      * A connector for testing.
@@ -32,18 +32,27 @@ class IgorComponentUtilTest {
     private Connector testConnector;
 
     /**
+     * An inherited connector for testing.
+     */
+    private Connector inheritedTestConnector;
+
+    /**
      * A {@link JobExecution} for testing.
      */
-    private JobExecution jobExecution = JobExecution.builder().jobId("job-id").build();
+    private final JobExecution jobExecution = JobExecution.builder().jobId("job-id").build();
 
     /**
      * Initializes the test environment.
      */
     @BeforeEach
     void initialize() {
-        testConnector = mock(Connector.class);
         testAction = new TestAction();
-        ReflectionTestUtils.setField(testAction, "testConnector", testConnector);
+
+        inheritedTestConnector = mock(Connector.class);
+        testAction.setInheritedTestConnector(inheritedTestConnector);
+
+        testConnector = mock(Connector.class);
+        testAction.setTestConnector(testConnector);
     }
 
     /**
@@ -56,6 +65,7 @@ class IgorComponentUtilTest {
         IgorComponentUtil.initializeConnectors(null, jobExecution);
 
         IgorComponentUtil.initializeConnectors(testAction, jobExecution);
+        verify(inheritedTestConnector, times(1)).initialize(jobExecution);
         verify(testConnector, times(1)).initialize(jobExecution);
     }
 
@@ -69,17 +79,20 @@ class IgorComponentUtilTest {
         IgorComponentUtil.shutdownConnectors(null, jobExecution);
 
         IgorComponentUtil.shutdownConnectors(testAction, jobExecution);
+        verify(inheritedTestConnector, times(1)).shutdown(jobExecution);
         verify(testConnector, times(1)).shutdown(jobExecution);
     }
 
     /**
      * Action for testing.
      */
-    private static class TestAction extends BaseAction {
+    private static class TestAction extends TestBaseAction {
 
         /**
          * Test connector.
          */
+        @Getter
+        @Setter
         @IgorParam
         private Connector testConnector;
 
@@ -87,7 +100,7 @@ class IgorComponentUtilTest {
          * Creates a new component instance.
          */
         TestAction() {
-            super("action-category-id", "action-type-id");
+            super("action-type-id");
         }
 
         /**
@@ -98,6 +111,27 @@ class IgorComponentUtilTest {
             return List.of();
         }
 
+    }
+
+    /**
+     * Base class to test connector processing on inherited fields.
+     */
+    private static abstract class TestBaseAction extends BaseAction {
+
+        /**
+         * Base test connector. Inherited connectors must be initialized and shut down, too.
+         */
+        @Getter
+        @Setter
+        @IgorParam
+        private Connector inheritedTestConnector;
+
+        /**
+         * Creates a new component instance.
+         */
+        public TestBaseAction(String typeId) {
+            super("action-category-id", typeId);
+        }
     }
 
 }

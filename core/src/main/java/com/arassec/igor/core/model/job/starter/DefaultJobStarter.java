@@ -132,7 +132,7 @@ public class DefaultJobStarter implements JobStarter {
      */
     protected void dispatchInitialDataItem(BlockingQueue<Map<String, Object>> inputQueue, Map<String,
         Object> initialDataItem, boolean processingFinishedCallbackSet) {
-        boolean added = false;
+        var added = false;
         while (!added) {
             try {
                 added = inputQueue.offer(initialDataItem, 100, TimeUnit.MILLISECONDS);
@@ -197,9 +197,9 @@ public class DefaultJobStarter implements JobStarter {
         BlockingQueue<Map<String, Object>> inputQueueHolder = inputQueue;
 
         for (List<Action> concurrencyList : concurrencyLists) {
-            String concurrencyGroupId = String
+            var concurrencyGroupId = String
                 .format(CONCURRENCY_GROUP_ID_PATTERN, jobExecution.getJobId(), concurrencyLists.indexOf(concurrencyList));
-            ConcurrencyGroup concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueueHolder, concurrencyGroupId,
+            var concurrencyGroup = new ConcurrencyGroup(concurrencyList, inputQueueHolder, concurrencyGroupId,
                 jobExecution, numThreads);
             inputQueueHolder = concurrencyGroup.getOutputQueue();
             result.add(concurrencyGroup);

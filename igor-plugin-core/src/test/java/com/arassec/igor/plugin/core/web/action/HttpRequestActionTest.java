@@ -43,6 +43,40 @@ class HttpRequestActionTest {
     }
 
     /**
+     * Tests sending an HTTP GET request.
+     */
+    @Test
+    @DisplayName("Tests sending an HTTP GET request.")
+    void testHttpGet() {
+        WireMockServer httpServer = new WireMockServer(new WireMockConfiguration().dynamicPort());
+        httpServer.start();
+        httpServer.stubFor(
+            get("/test")
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withBody("{\"a\": \"b\", \"c\": 123}".getBytes())
+                )
+        );
+
+        JobExecution jobExecution = new JobExecution();
+
+        StandardHttpConnector httpConnector = new StandardHttpConnector();
+        httpConnector.initialize(jobExecution);
+
+        HttpRequestAction action = new HttpRequestAction();
+        action.setHttpConnector(httpConnector);
+        action.setUrl("http://localhost:" + httpServer.port() + "/test");
+        action.setMethod("GET");
+        action.setTargetKey("webResponse");
+
+        Map<String, Object> data = new HashMap<>();
+        List<Map<String, Object>> result = action.process(data, jobExecution);
+
+        assertEquals(1, result.size());
+    }
+
+    /**
      * Tests sending an HTTP POST request with custom headers and body.
      */
     @Test

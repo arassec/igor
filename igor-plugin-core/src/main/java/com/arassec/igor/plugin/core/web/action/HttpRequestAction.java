@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Action to issue an HTTP(S) request using a
@@ -92,7 +89,6 @@ public class HttpRequestAction extends BaseHttpAction {
      */
     public HttpRequestAction() {
         super(CorePluginType.HTTP_REQUEST_ACTION.getId());
-        body = "";
     }
 
     /**
@@ -112,7 +108,7 @@ public class HttpRequestAction extends BaseHttpAction {
 
         var requestMethod = CorePluginUtils.getString(data, method);
         var requestUrl = CorePluginUtils.getString(data, url);
-        var content = CorePluginUtils.getString(data, body);
+        var content = Optional.ofNullable(CorePluginUtils.getString(data, body)).orElse("");
 
         var httpRequestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(requestUrl))

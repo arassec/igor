@@ -6,6 +6,8 @@ After that, semantic versioning will be used and breaking changes will only occu
 :::
 
 ## Version {{ $themeConfig.igorVersion }}
+- Fixed broken 'HTTP Request' action.
+
 ::: danger Breaking Changes
 - Removed 'defaultValue' property of the @IgorParam annotation. Directly assign default values instead.
 - Renamed 'value' property of the @IgorParam annotation into 'sortIndex'.

@@ -30,8 +30,12 @@ public class IgorComponentUtil {
         if (igorComponent == null) {
             return;
         }
-        Arrays.stream(igorComponent.getClass().getDeclaredFields()).forEach(field -> processField(igorComponent, jobExecution, field,
-            true));
+        Class<?> current = igorComponent.getClass();
+        do {
+            Arrays.stream(current.getDeclaredFields()).forEach(field -> processField(igorComponent, jobExecution, field,
+                    true));
+            current = current.getSuperclass();
+        } while (current != null && !current.equals(Object.class));
     }
 
     /**
@@ -44,8 +48,12 @@ public class IgorComponentUtil {
         if (igorComponent == null) {
             return;
         }
-        Arrays.stream(igorComponent.getClass().getDeclaredFields()).forEach(field -> processField(igorComponent, jobExecution, field,
-            false));
+        Class<?> current = igorComponent.getClass();
+        do {
+            Arrays.stream(current.getDeclaredFields()).forEach(field -> processField(igorComponent, jobExecution, field,
+                    false));
+            current = current.getSuperclass();
+        } while (current != null && !current.equals(Object.class));
     }
 
     /**
@@ -61,8 +69,8 @@ public class IgorComponentUtil {
         if (field.isAnnotationPresent(IgorParam.class)) {
             try {
                 if ((!Modifier.isPublic(field.getModifiers()) ||
-                    !Modifier.isPublic(field.getDeclaringClass().getModifiers()) ||
-                    Modifier.isFinal(field.getModifiers())) && !field.canAccess(igorComponent)) {
+                        !Modifier.isPublic(field.getDeclaringClass().getModifiers()) ||
+                        Modifier.isFinal(field.getModifiers())) && !field.canAccess(igorComponent)) {
                     field.setAccessible(true); //NOSONAR - @IgorParam-fields must not necessarily be accessible!
                 }
                 Object value = field.get(igorComponent);

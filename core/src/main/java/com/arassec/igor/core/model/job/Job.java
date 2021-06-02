@@ -183,7 +183,7 @@ public class Job {
                 currentJobExecution.setExecutionState(JobExecutionState.FINISHED);
             }
 
-            Object cancelLock = new Object();
+            var cancelLock = new Object();
 
             ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
             executor.scheduleAtFixedRate(() -> {
@@ -215,7 +215,7 @@ public class Job {
      * @param concurrencyGroups List of concurrency group to wait for.
      */
     private void awaitThreadTermination(List<ConcurrencyGroup> concurrencyGroups) {
-        boolean allThreadsTerminated = false;
+        var allThreadsTerminated = false;
         while (!allThreadsTerminated) {
             allThreadsTerminated = true;
             for (ConcurrencyGroup concurrencyGroup : concurrencyGroups) {

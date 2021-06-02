@@ -59,11 +59,11 @@ public class StandardJobSimulator implements JobSimulator {
     @Override
     public Future<Map<String, SimulationResult>> simulateJob(Job job) {
 
-        JobExecution jobExecution = new JobExecution();
+        var jobExecution = new JobExecution();
 
         runningSimulations.add(job);
 
-        SimulationStrategy simulationStrategy = simulationStrategyFactory.determineSimulationStrategy(job);
+        var simulationStrategy = simulationStrategyFactory.determineSimulationStrategy(job);
 
         Map<String, SimulationResult> simulationResults = simulationStrategy.simulate(job, jobExecution);
 
@@ -107,8 +107,8 @@ public class StandardJobSimulator implements JobSimulator {
                 return true;
             }
             Instant started = job.getCurrentJobExecution().getStarted();
-            Instant now = Instant.now();
-            Duration time = Duration.between(started, now);
+            var now = Instant.now();
+            var time = Duration.between(started, now);
             return time.toSeconds() >= simulationProperties.getTimeout();
         };
         List<Job> staleSimulations = runningSimulations.stream()
