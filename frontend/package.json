@@ -19,7 +19,7 @@
     "animate.css": "^4.1.1",
     "axios": "^0.21.1",
     "markdown-it": "^10.0.0",
-    "vue": "^2.6.12",
+    "vue": "^2.6.13",
     "vue-json-pretty": "^1.8.0",
     "vue-router": "^3.5.1",
     "vuedraggable": "^2.24.3"
@@ -31,6 +31,6 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^5.12.1",
     "eslint-plugin-vue": "^5.1.0",
-    "vue-template-compiler": "^2.6.12"
+    "vue-template-compiler": "^2.6.13"
   }
 }
