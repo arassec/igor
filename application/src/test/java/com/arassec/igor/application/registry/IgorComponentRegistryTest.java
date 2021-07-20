@@ -1,6 +1,7 @@
 package com.arassec.igor.application.registry;
 
 import com.arassec.igor.application.IgorApplicationProperties;
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.action.MissingComponentAction;
@@ -73,23 +74,37 @@ class IgorComponentRegistryTest {
     private IgorApplicationProperties igorApplicationProperties;
 
     /**
+     * Utility for igor components.
+     */
+    @Mock
+    private IgorComponentUtil igorComponentUtil;
+
+    /**
      * Initializes the test environment.
      */
     @BeforeEach
     void initialize() {
-        when(actionMock.getTypeId()).thenReturn("action-type-id");
-        when(actionMock.getCategoryId()).thenReturn("action-category-id");
+        lenient().doReturn("action-type-id").when(igorComponentUtil).getTypeId(actionMock);
+        lenient().doReturn("action-category-id").when(igorComponentUtil).getCategoryId(actionMock);
 
-        when(triggerMock.getTypeId()).thenReturn("trigger-type-id");
-        when(triggerMock.getCategoryId()).thenReturn("trigger-category-id");
+        lenient().doReturn("trigger-type-id").when(igorComponentUtil).getTypeId(triggerMock);
+        lenient().doReturn("trigger-category-id").when(igorComponentUtil).getCategoryId(triggerMock);
 
-        when(connectorMock.getTypeId()).thenReturn("connector-type-id");
-        when(connectorMock.getCategoryId()).thenReturn("connector-category-id");
+        lenient().doReturn("connector-type-id").when(igorComponentUtil).getTypeId(connectorMock);
+        lenient().doReturn("connector-category-id").when(igorComponentUtil).getCategoryId(connectorMock);
 
         applicationContextMock = mock(ApplicationContext.class);
 
-        igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock, new TestAction()), List.of(triggerMock),
-                List.of(new TestConnectorImpl(), connectorMock), igorApplicationProperties);
+        TestAction testAction = new TestAction();
+        lenient().doReturn("testaction-type-id").when(igorComponentUtil).getTypeId(testAction);
+        lenient().doReturn("testaction-category-id").when(igorComponentUtil).getCategoryId(testAction);
+
+        TestConnectorImpl testConnector = new TestConnectorImpl();
+        lenient().doReturn("testconnector-type-id").when(igorComponentUtil).getTypeId(testConnector);
+        lenient().doReturn("testconnector-category-id").when(igorComponentUtil).getCategoryId(testConnector);
+
+        igorComponentRegistry = new IgorComponentRegistry(List.of(actionMock, testAction), List.of(triggerMock),
+                List.of(testConnector, connectorMock), igorApplicationProperties, igorComponentUtil);
         igorComponentRegistry.afterPropertiesSet();
         igorComponentRegistry.setApplicationContext(applicationContextMock);
     }
@@ -100,7 +115,7 @@ class IgorComponentRegistryTest {
     @Test
     @DisplayName("Tests getting all categories of a component type")
     void testGetCategoriesOfComponentType() {
-        assertNotNull(new IgorComponentRegistry(List.of(), List.of(), List.of(), null).getCategoriesOfComponentType(Action.class));
+        assertNotNull(new IgorComponentRegistry(List.of(), List.of(), List.of(), null, null).getCategoriesOfComponentType(Action.class));
 
         Set<String> categoriesOfComponentType = igorComponentRegistry.getCategoriesOfComponentType(Action.class);
         assertEquals("action-category-id", categoriesOfComponentType.iterator().next());
@@ -190,7 +205,7 @@ class IgorComponentRegistryTest {
         Connector connectorInstance = igorComponentRegistry.createConnectorInstance("unknown-type-id", null);
         assertTrue(connectorInstance instanceof MissingComponentConnector);
 
-        igorComponentRegistry.createConnectorInstance("connector-type-id", null);
+        igorComponentRegistry.createConnectorInstance("testconnector-type-id", null);
         verify(applicationContextMock, times(1)).getBean(TestConnectorImpl.class);
     }
 
@@ -203,7 +218,8 @@ class IgorComponentRegistryTest {
         Map<String, Object> params = new HashMap<>();
         params.put("intParam", 666);
         when(applicationContextMock.getBean(TestConnectorImpl.class)).thenReturn(new TestConnectorImpl());
-        TestConnectorImpl connectorInstance = (TestConnectorImpl) igorComponentRegistry.createConnectorInstance("connector-type-id", params);
+        TestConnectorImpl connectorInstance = (TestConnectorImpl) igorComponentRegistry
+            .createConnectorInstance("testconnector-type-id", params);
         assertEquals(666, connectorInstance.getIntParam());
     }
 
@@ -228,19 +244,20 @@ class IgorComponentRegistryTest {
     void testGetParameterCategoryAndType() {
         assertTrue(igorComponentRegistry.getConnectorParameterCategoryAndType(String.class).isEmpty());
 
-        TestConnectorImpl expected = new TestConnectorImpl();
+        String typeId = "testconnector-type-id";
+        String categoryId = "testconnector-category-id";
 
         // The interface works...
         Map<String, Set<String>> candidates = igorComponentRegistry.getConnectorParameterCategoryAndType(TestConnector.class);
         assertEquals(1, candidates.size());
-        assertEquals(1, candidates.get(expected.getCategoryId()).size());
-        assertEquals(expected.getTypeId(), candidates.get(expected.getCategoryId()).iterator().next());
+        assertEquals(1, candidates.get(categoryId).size());
+        assertEquals(typeId, candidates.get(categoryId).iterator().next());
 
-        // ...as well as the concrete implementation.
+        // ...as well as its implementation.
         candidates = igorComponentRegistry.getConnectorParameterCategoryAndType(TestConnectorImpl.class);
         assertEquals(1, candidates.size());
-        assertEquals(1, candidates.get(expected.getCategoryId()).size());
-        assertEquals(expected.getTypeId(), candidates.get(expected.getCategoryId()).iterator().next());
+        assertEquals(1, candidates.get(categoryId).size());
+        assertEquals(typeId, candidates.get(categoryId).iterator().next());
     }
 
     /**
@@ -253,7 +270,7 @@ class IgorComponentRegistryTest {
 
         Map<String, Object> parameters = Map.of("missingConnector", new MissingComponentConnector("component-registry-test"));
 
-        TestAction action = (TestAction) igorComponentRegistry.createActionInstance("missing-connector-action-type", parameters);
+        TestAction action = (TestAction) igorComponentRegistry.createActionInstance("testaction-type-id", parameters);
 
         Connector missingConnector = action.getMissingConnector();
 
@@ -269,7 +286,7 @@ class IgorComponentRegistryTest {
     void testDefaultValueHandling() {
         when(applicationContextMock.getBean(TestConnectorImpl.class)).thenReturn(new TestConnectorImpl());
 
-        TestConnectorImpl connector = (TestConnectorImpl) igorComponentRegistry.createConnectorInstance("connector-type-id",
+        TestConnectorImpl connector = (TestConnectorImpl) igorComponentRegistry.createConnectorInstance("testconnector-type-id",
                 null);
 
         assertNull(connector.getEmptyDefaultValueParam());
@@ -417,7 +434,7 @@ class IgorComponentRegistryTest {
          * Creates a new component instance.
          */
         TestConnectorImpl() {
-            super("connector-category-id", "connector-type-id");
+            super();
         }
 
         /**
@@ -441,13 +458,6 @@ class IgorComponentRegistryTest {
          */
         @IgorParam
         private Connector missingConnector;
-
-        /**
-         * Creates a new component instance.
-         */
-        protected TestAction() {
-            super("missing-connector-action-category", "missing-connector-action-type");
-        }
 
         /**
          * {@inheritDoc}

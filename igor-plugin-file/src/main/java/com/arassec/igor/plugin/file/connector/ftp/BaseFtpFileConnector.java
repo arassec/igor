@@ -35,78 +35,65 @@ import java.util.stream.Stream;
 public abstract class BaseFtpFileConnector extends BaseFileConnector {
 
     /**
-     * The host of the FTP server.
+     * The host running the server.
      */
     @NotBlank
     @IgorParam
     private String host;
 
     /**
-     * The port of the FTP server.
+     * The port, the server is listening on.
      */
     @Positive
     @IgorParam
     private int port = 21;
 
     /**
-     * The username to login with.
+     * An optional username for authentication/authorization.
      */
     @IgorParam(advanced = true)
     private String username;
 
     /**
-     * The password used for authentication.
+     * An optional password for authentication/authorization.
      */
     @IgorParam(advanced = true, secured = true)
     private String password;
 
     /**
-     * Activates active or passive FTP mode.
+     * If checked, the connector will use FTP passive mode to connect to the FTP(S) server.
      */
     @IgorParam(advanced = true)
     private boolean passiveMode = true;
 
     /**
-     * Buffer size for copying data.
-     *
-     * Default value: 1024 * 1024 = 1.048.576‬
+     * The size of the buffer <strong>in bytes</strong> that is used by the connector to e.g. copy files.
      */
     @Positive
     @IgorParam(advanced = true)
     private int bufferSize = 1048576;
 
     /**
-     * Timeout for the data connection.
-     *
-     * Default value = 60 * 5 * 1000 = 300.000‬
+     * A timeout <strong>in milliseconds</strong> after which a data connection will be aborted if no new data is received from
+     * the FTP(S) server.
      */
     @Positive
     @IgorParam(advanced = true)
     private int dataTimeout = 300000;
 
     /**
-     * Keepalive timeout for the control connection.
-     *
-     * Default value = 60 * 15 = 900
+     * A timeout <strong>in minutes</strong> after which the connection to the FTP(S) server will be aborted if no new data is
+     * received.
      */
     @Positive
     @IgorParam(advanced = true)
     private int keepAliveTimeout = 900;
 
     /**
-     * Set to {@code true}, if it's a Windows FTP server.
+     * If checked, the connector expects the FTP(S) server to be running on a Microsoft Windows operating system.
      */
     @IgorParam(advanced = true)
     private boolean windowsFtp = false;
-
-    /**
-     * Creates a new component instance.
-     *
-     * @param typeId The type ID.
-     */
-    protected BaseFtpFileConnector(String typeId) {
-        super(typeId);
-    }
 
     /**
      * {@inheritDoc}
@@ -119,7 +106,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
             List<FileInfo> result;
 
             FTPFile[] ftpFiles = ftpClient.listFiles(directory,
-                    ftpFile -> !StringUtils.hasText(fileEnding) || ftpFile.getName().endsWith(fileEnding));
+                ftpFile -> !StringUtils.hasText(fileEnding) || ftpFile.getName().endsWith(fileEnding));
             if (ftpFiles != null && ftpFiles.length > 0) {
                 result = Stream.of(ftpFiles).filter(Objects::nonNull).filter(FTPFile::isFile).map(ftpFile -> {
                     var mTime = Instant.ofEpochMilli(ftpFile.getTimestamp().getTime().getTime());

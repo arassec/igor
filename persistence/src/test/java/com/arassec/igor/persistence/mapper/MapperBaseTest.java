@@ -1,6 +1,7 @@
 package com.arassec.igor.persistence.mapper;
 
 import com.arassec.igor.application.registry.IgorComponentRegistry;
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.persistence.PersistenceConfiguration;
@@ -44,19 +45,23 @@ public abstract class MapperBaseTest {
         when(applicationContextMock.getBean(TestTrigger.class)).thenReturn(new TestTrigger());
         when(applicationContextMock.getBean(TestAction.class)).thenReturn(new TestAction());
 
+        IgorComponentUtil igorComponentUtil = new IgorComponentUtil();
+
         IgorComponentRegistry igorComponentRegistry = new IgorComponentRegistry(List.of(new TestAction()),
-                List.of(new TestTrigger()), List.of(new TestConnector()), null);
+            List.of(new TestTrigger()), List.of(new TestConnector()), null, igorComponentUtil);
         igorComponentRegistry.setApplicationContext(applicationContextMock);
         igorComponentRegistry.afterPropertiesSet();
 
         PersistenceConfiguration persistenceConfiguration = new PersistenceConfiguration();
 
-        connectorObjectMapper = persistenceConfiguration.persistenceConnectorMapper(igorComponentRegistry, new TestSecurityProvider());
+        connectorObjectMapper = persistenceConfiguration.persistenceConnectorMapper(igorComponentRegistry,
+            new TestSecurityProvider(), igorComponentUtil);
 
         ConnectorRepository connectorRepositoryMock = mock(ConnectorRepository.class);
         when(connectorRepositoryMock.findById(TestConnector.CONNECTOR_ID)).thenReturn(new TestConnector());
 
-        jobObjectMapper = persistenceConfiguration.persistenceJobMapper(igorComponentRegistry, connectorRepositoryMock, new TestSecurityProvider());
+        jobObjectMapper = persistenceConfiguration.persistenceJobMapper(igorComponentRegistry, connectorRepositoryMock,
+            new TestSecurityProvider(), igorComponentUtil);
     }
 
     /**

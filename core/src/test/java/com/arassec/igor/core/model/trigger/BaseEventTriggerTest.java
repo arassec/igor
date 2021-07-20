@@ -21,17 +21,7 @@ class BaseEventTriggerTest {
      * The base class under test.
      */
     private final BaseEventTrigger baseEventTrigger = mock(BaseEventTrigger.class,
-            withSettings().useConstructor("category-id", "type-id").defaultAnswer(CALLS_REAL_METHODS));
-
-    /**
-     * Tests the {@link BaseEventTrigger}'s constructor.
-     */
-    @Test
-    @DisplayName("Tests the base-event-trigger's constructor.")
-    void testBaseEventTrigger() {
-        assertEquals("category-id", baseEventTrigger.getCategoryId());
-        assertEquals("type-id", baseEventTrigger.getTypeId());
-    }
+        withSettings().defaultAnswer(CALLS_REAL_METHODS));
 
     /**
      * Tests setting the event queue.

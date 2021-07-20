@@ -4,9 +4,9 @@ import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.file.connector.FileInfo;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
-import com.arassec.igor.plugin.file.FilePluginType;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
@@ -22,18 +22,14 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 /**
- * File-Connector for SFTP file handling.
+ * <h1>SFTP Connector</h1>
+ *
+ * <h2>Description</h2>
+ * A file-connector that connects to an SFTP server.
  */
 @Slf4j
-@IgorComponent
+@IgorComponent(typeId = "sftp-file-connector", categoryId = CoreCategory.FILE)
 public class SftpFileConnector extends BaseSshFileConnector {
-
-    /**
-     * Creates a new component instance.
-     */
-    public SftpFileConnector() {
-        super(FilePluginType.SFTP_FILE_CONNECTOR.getId());
-    }
 
     /**
      * {@inheritDoc}

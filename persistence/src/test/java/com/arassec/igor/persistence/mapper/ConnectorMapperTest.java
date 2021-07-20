@@ -64,8 +64,6 @@ class ConnectorMapperTest extends MapperBaseTest {
         TestConnector testConnector = (TestConnector) connectorObjectMapper.readValue(connectorJson, Connector.class);
 
         assertEquals(TestConnector.CONNECTOR_ID, testConnector.getId());
-        assertEquals(TestConnector.CATEGORY_ID, testConnector.getCategoryId());
-        assertEquals(TestConnector.TYPE_ID, testConnector.getTypeId());
         assertEquals("connector-name", testConnector.getName());
         assertEquals(1, testConnector.getIntParam());
         assertEquals(2, testConnector.getIntegerParam());

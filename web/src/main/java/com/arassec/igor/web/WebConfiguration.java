@@ -1,6 +1,7 @@
 package com.arassec.igor.web;
 
 import com.arassec.igor.application.registry.IgorComponentRegistry;
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.trigger.Trigger;
@@ -64,10 +65,10 @@ public class WebConfiguration {
      */
     @Bean
     public ObjectMapper objectMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository,
-                                     MessageSource messageSource) {
+                                     IgorComponentUtil igorComponentUtil, MessageSource messageSource) {
         var mapperModule = new SimpleModule();
 
-        mapperModule.addSerializer(new IgorComponentWebSerializer(messageSource, igorComponentRegistry));
+        mapperModule.addSerializer(new IgorComponentWebSerializer(messageSource, igorComponentRegistry, igorComponentUtil));
         mapperModule.addDeserializer(Connector.class, new ConnectorWebDeserializer(igorComponentRegistry));
         mapperModule.addDeserializer(Action.class, new ActionWebDeserializer(igorComponentRegistry, connectorRepository));
         mapperModule.addDeserializer(Trigger.class, new TriggerWebDeserializer(igorComponentRegistry, connectorRepository));

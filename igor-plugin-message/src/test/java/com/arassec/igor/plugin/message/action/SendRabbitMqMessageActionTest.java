@@ -40,7 +40,7 @@ class SendRabbitMqMessageActionTest extends MessageActionBaseTest {
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
-        verify(messageConnectorMock, times(1)).sendMessage(eq("test-exchange"), argCap.capture());
+        verify(messageConnectorMock, times(1)).sendMessage(eq("test-exchange"), isNull(), argCap.capture());
 
         assertEquals(1, result.size());
         assertEquals("{'key': '" + PARAM_VALUE + "'}", argCap.getValue().getContent());
@@ -64,7 +64,7 @@ class SendRabbitMqMessageActionTest extends MessageActionBaseTest {
 
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
-        verify(messageConnectorMock, times(1)).sendMessage(eq("test-exchange"), argCap.capture());
+        verify(messageConnectorMock, times(1)).sendMessage(eq("test-exchange"), isNull(), argCap.capture());
         assertEquals(1, result.size());
 
         RabbitMqMessage sentMessage = argCap.getValue();

@@ -73,11 +73,9 @@ class RabbitMqMessageConnectorTest {
         RabbitMqMessageConnector rabbitMqMessageConnector = new RabbitMqMessageConnector(applicationEventPublisher);
 
         RabbitMqMessage emptyMessage = new RabbitMqMessage();
-        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage(null, emptyMessage));
-        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage("",null));
-        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage("", emptyMessage));
-
-        rabbitMqMessageConnector.setRoutingKey("test-routing-key");
+        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage(null, null, emptyMessage));
+        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage("", null,null));
+        assertThrows(IgorException.class, () -> rabbitMqMessageConnector.sendMessage("", null, emptyMessage));
 
         RabbitTemplate rabbitTemplateMock = mock(RabbitTemplate.class);
         rabbitMqMessageConnector.setRabbitTemplate(rabbitTemplateMock);
@@ -89,7 +87,7 @@ class RabbitMqMessageConnectorTest {
         message.getHeaders().put("c", "d");
         message.setContent("test-message");
 
-        rabbitMqMessageConnector.sendMessage("test-exchange", message);
+        rabbitMqMessageConnector.sendMessage("test-exchange", "test-routing-key", message);
 
         ArgumentCaptor<org.springframework.amqp.core.Message> argCap =
                 ArgumentCaptor.forClass(org.springframework.amqp.core.Message.class);

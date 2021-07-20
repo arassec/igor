@@ -3,7 +3,7 @@ package com.arassec.igor.plugin.message.connector;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.message.MessagePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,11 +18,14 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Mail-Connector for sending mails via SMTP.
+ * <h1>'E-Mail Sender (SMTP)' Connector</h1>
+ *
+ * <h2>Description</h2>
+ * A connector that uses the SMTP protocol to send E-Mails.
  */
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "email-smtp-message-connector", categoryId = CoreCategory.MESSAGE)
 public class EmailSmtpMessageConnector extends EmailBaseConnector {
 
     /**
@@ -31,13 +34,6 @@ public class EmailSmtpMessageConnector extends EmailBaseConnector {
     @Positive
     @IgorParam(sortIndex = 2)
     private int port = 25;
-
-    /**
-     * Creates a new component instance.
-     */
-    public EmailSmtpMessageConnector() {
-        super(MessagePluginType.EMAIL_SMTP_MESSAGE_CONNECTOR.getId());
-    }
 
     /**
      * Tests the connector configuration.

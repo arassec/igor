@@ -2,7 +2,6 @@ package com.arassec.igor.plugin.core.file.action;
 
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.BaseAction;
-import com.arassec.igor.plugin.core.CorePluginCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import lombok.Data;
 
@@ -37,15 +36,6 @@ public abstract class BaseFileAction extends BaseAction {
      * Default-Template for the filename.
      */
     protected static final String FILENAME_TEMPLATE = "{{data." + FILENAME_KEY + "}}";
-
-    /**
-     * Creates a new component instance.
-     *
-     * @param typeId The type ID.
-     */
-    protected BaseFileAction(String typeId) {
-        super(CorePluginCategory.FILE.getId(), typeId);
-    }
 
     /**
      * Resolves the supplied variables and returns the result.

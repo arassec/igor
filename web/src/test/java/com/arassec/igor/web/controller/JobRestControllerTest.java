@@ -107,6 +107,9 @@ class JobRestControllerTest extends RestControllerBaseTest {
         TestAction testAction = new TestAction();
         testAction.setId("action-id");
 
+        when(igorComponentUtil.getTypeId(any(TestAction.class))).thenReturn("type-id");
+        when(igorComponentUtil.getCategoryId(any(TestAction.class))).thenReturn("category-id");
+
         when(igorComponentRegistry.createActionPrototype()).thenReturn(testAction);
 
         mockMvc.perform(get("/api/job/action/prototype"))
@@ -438,7 +441,10 @@ class JobRestControllerTest extends RestControllerBaseTest {
         trigger.setId("trigger-id");
         trigger.setTestParam(null); // Notnull parameter must be validated!
 
-        when(igorComponentRegistry.createTriggerInstance(eq(TestTrigger.TYPE_ID), any(Map.class))).thenReturn(trigger);
+        when(igorComponentUtil.getTypeId(trigger)).thenReturn("trigger-type-id");
+        when(igorComponentUtil.getCategoryId(trigger)).thenReturn("trigger-category-id");
+
+        when(igorComponentRegistry.createTriggerInstance(eq("trigger-type-id"), any(Map.class))).thenReturn(trigger);
 
         Job job = Job.builder().id("job-id").name("job-name").trigger(trigger).build();
 

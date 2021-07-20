@@ -5,7 +5,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
 import com.arassec.igor.core.repository.PersistentValueRepository;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,16 +16,22 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Filters data of which a value has already been persisted before.
+ * <h1>'Filter Persisted Value' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action filters data items based on values from igor's datastore.<br>
+ *
+ * Filtered data items are not passed to the following action.
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "filter-persisted-value-action", categoryId = CoreCategory.PERSISTENCE)
 public class FilterPersistedValueAction extends BasePersistenceAction {
 
     /**
-     * The input (query) to persist.
+     * A mustache expression selecting a property from the data item. The property's value is checked against all persisted values
+     * from igor's datastore. If the value is already persisted, the data item is filtered.
      */
     @NotBlank
     @IgorParam
@@ -37,7 +43,7 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
      * @param persistentValueRepository The repository for persisted values.
      */
     public FilterPersistedValueAction(PersistentValueRepository persistentValueRepository) {
-        super(CorePluginType.FILTER_PERSISTENT_VALUE_ACTION.getId(), persistentValueRepository);
+        super(persistentValueRepository);
     }
 
     /**

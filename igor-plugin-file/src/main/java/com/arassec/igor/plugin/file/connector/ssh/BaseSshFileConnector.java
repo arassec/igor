@@ -21,60 +21,51 @@ import javax.validation.constraints.Positive;
 public abstract class BaseSshFileConnector extends BaseFileConnector {
 
     /**
-     * The host of the remote server.
+     * The host running the SSH server.
      */
     @NotBlank
     @IgorParam
     private String host;
 
     /**
-     * The port of the remote server.
+     * The port, the SSH server is listening on.
      */
     @Positive
     @IgorParam
     private int port = 25;
 
     /**
-     * The username to login with.
+     * A username for authentication/authorization.
      */
     @NotBlank
     @IgorParam
     private String username;
 
     /**
-     * The password used for authentication.
+     * A password for authentication/authorization.
      */
     @NotBlank
     @IgorParam(secured = true)
     private String password;
 
     /**
-     * Enables or disables strict host-key checking.
+     * If checked, the host key of the server will be verified. If unchecked, the host key is ignored.
      */
     @IgorParam(advanced = true)
     private boolean strictHostkeyChecking = false;
 
     /**
-     * Preferred authentications.
+     * List of preferred SSH authentication methods for this connector.
      */
     @IgorParam(advanced = true)
     private String preferredAuthentications = "publickey,keyboard-interactive,password";
 
     /**
-     * Connection timeout in milliseconds.
+     * A timeout <strong>in milliseconds</strong> after which requests to the SSH server will be aborted.
      */
     @Positive
     @IgorParam(advanced = true)
     private int timeout = 30000;
-
-    /**
-     * Creates a new component instance.
-     *
-     * @param typeId The type ID.
-     */
-    protected BaseSshFileConnector(String typeId) {
-        super(typeId);
-    }
 
     /**
      * Initializes the SSH session.

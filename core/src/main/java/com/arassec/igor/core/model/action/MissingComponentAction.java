@@ -1,7 +1,5 @@
 package com.arassec.igor.core.model.action;
 
-import com.arassec.igor.core.model.CoreCategory;
-import com.arassec.igor.core.model.CoreType;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.annotation.validation.MissingComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
@@ -31,7 +29,6 @@ public class MissingComponentAction extends BaseAction {
      * @param errorCause Description of the original error cause.
      */
     public MissingComponentAction(String errorCause) {
-        super(CoreCategory.CORE.getId(), CoreType.MISSING_COMPONENT_ACTION.getId());
         setActive(true);
         this.errorCause = errorCause;
     }

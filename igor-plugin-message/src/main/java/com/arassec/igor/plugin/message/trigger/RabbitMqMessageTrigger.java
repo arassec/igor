@@ -5,8 +5,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.BaseEventTrigger;
 import com.arassec.igor.core.model.trigger.EventType;
-import com.arassec.igor.plugin.core.CorePluginCategory;
-import com.arassec.igor.plugin.message.MessagePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.message.connector.RabbitMqMessageConnector;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,22 +15,35 @@ import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
- * Trigger for incoming messages that should be processed by a job.
+ * <h1>RabbitMQ Message Trigger</h1>
+ *
+ * <h2>Description</h2>
+ * A trigger that fires on incoming messages on a RabbitMQ server.<br>
+ * <p>
+ * This message trigger is an event based trigger that processes an incoming message as data item as soon as it is received.
+ *
+ * <h2>Limitations and Caveats</h2>
+ * Not all actions are available for event-triggered jobs. E.g. sorting by timestamp requires all data items, that should be
+ * sorted, to be known to the action. Since event-triggered jobs process a continuous stream of incoming events, there is no fixed
+ * number of data items to sort.
+ * <p>
+ * During simulated job executions the trigger will receive (and probably consume) messages provided by the message connector.
+ * This means, that e.g. RabbitMQ messages will be retrieved <strong>and acknowledged</strong> during simulated job executions!
  */
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "rabbitmq-message-trigger", categoryId = CoreCategory.MESSAGE)
 public class RabbitMqMessageTrigger extends BaseEventTrigger {
 
     /**
-     * The connector that is used to receive messages.
+     * A RabbitMQ message connector that provides the incoming messages.
      */
     @NotNull
     @IgorParam
     private RabbitMqMessageConnector rabbitMqConnector;
 
     /**
-     * The RabbitMQ queue to retrieve messages from.
+     * The RabbitMQ queue containing the messages.
      */
     @NotEmpty
     @IgorParam
@@ -41,7 +53,6 @@ public class RabbitMqMessageTrigger extends BaseEventTrigger {
      * Creates a new component instance.
      */
     protected RabbitMqMessageTrigger() {
-        super(CorePluginCategory.MESSAGE.getId(), MessagePluginType.RABBITMQ_MESSAGE_TRIGGER.getId());
         rabbitMqConnector = new RabbitMqMessageConnector(null);
     }
 

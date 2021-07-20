@@ -1,5 +1,6 @@
 package com.arassec.igor.application.manager;
 
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.core.util.ModelPage;
@@ -41,11 +42,17 @@ class ConnectorManagerTest {
     private Connector connectorMock;
 
     /**
+     * Mock-Utility for igor components.
+     */
+    @Mock
+    private IgorComponentUtil igorComponentUtil;
+
+    /**
      * Initializes the test environment.
      */
     @BeforeEach
     void initialize() {
-        connectorManager = new ConnectorManager(connectorRepository);
+        connectorManager = new ConnectorManager(connectorRepository, igorComponentUtil);
     }
 
     /**
@@ -99,12 +106,12 @@ class ConnectorManagerTest {
     @DisplayName("Tests loading connectors of a type.")
     void testLoadAllOfType() {
         Connector first = mock(Connector.class);
-        when(first.getTypeId()).thenReturn("a");
+        when(igorComponentUtil.getTypeId(first)).thenReturn("a");
         Connector second = mock(Connector.class);
-        when(second.getTypeId()).thenReturn("b");
+        when(igorComponentUtil.getTypeId(second)).thenReturn("b");
         when(second.getName()).thenReturn("z");
         Connector third = mock(Connector.class);
-        when(third.getTypeId()).thenReturn("b");
+        when(igorComponentUtil.getTypeId(third)).thenReturn("b");
         when(third.getName()).thenReturn("y");
 
         when(connectorRepository.findAll()).thenReturn(List.of(first, second, third));

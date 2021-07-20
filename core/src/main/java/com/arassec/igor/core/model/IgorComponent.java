@@ -9,22 +9,6 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 public interface IgorComponent {
 
     /**
-     * Returns the ID of the category of this component.
-     *
-     * @return The unique category ID.
-     */
-    @IgorSimulationSafe
-    String getCategoryId();
-
-    /**
-     * Returns the ID of the type of this component.
-     *
-     * @return The unique type ID.
-     */
-    @IgorSimulationSafe
-    String getTypeId();
-
-    /**
      * Returns the ID of the instantiated component.
      *
      * @return The unique ID.

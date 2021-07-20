@@ -1,5 +1,6 @@
 package com.arassec.igor.web.test;
 
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
@@ -14,30 +15,14 @@ import java.util.Map;
  */
 @Getter
 @Setter
+@IgorComponent(typeId = "action-type-id", categoryId = "action-category-id")
 public class TestAction extends BaseAction {
-
-    /**
-     * The category ID.
-     */
-    public static final String CATEGORY_ID = "action-category-id";
-
-    /**
-     * The type ID.
-     */
-    public static final String TYPE_ID = "action-type-id";
 
     /**
      * A connector as parameter.
      */
     @IgorParam
     private TestConnectorInterface testConnector;
-
-    /**
-     * Creates a new component instance.
-     */
-    public TestAction() {
-        super(CATEGORY_ID, TYPE_ID);
-    }
 
     /**
      * {@inheritDoc}

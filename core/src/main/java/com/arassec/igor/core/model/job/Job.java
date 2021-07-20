@@ -233,12 +233,12 @@ public class Job {
     private void shutdown(JobExecution jobExecution) {
         if (!actions.isEmpty()) {
             actions.stream().filter(Action::isActive).forEach(action -> {
-                IgorComponentUtil.shutdownConnectors(action, jobExecution);
+                IgorConnectorUtil.shutdownConnectors(action, jobExecution);
                 action.shutdown(jobExecution);
             });
         }
         if (trigger != null) {
-            IgorComponentUtil.shutdownConnectors(trigger, jobExecution);
+            IgorConnectorUtil.shutdownConnectors(trigger, jobExecution);
             trigger.shutdown(jobExecution);
         }
     }

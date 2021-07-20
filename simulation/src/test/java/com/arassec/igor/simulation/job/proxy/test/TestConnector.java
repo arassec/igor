@@ -1,12 +1,14 @@
 package com.arassec.igor.simulation.job.proxy.test;
 
 
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.model.connector.BaseConnector;
 
 /**
  * A connector for testing.
  */
+@IgorComponent(typeId = "test-connector-type", categoryId = "test-connector-category")
 public class TestConnector extends BaseConnector {
 
     /**
@@ -24,13 +26,6 @@ public class TestConnector extends BaseConnector {
     @IgorSimulationSafe
     public boolean simulationSafe() {
         return true;
-    }
-
-    /**
-     * Creates a new component instance.
-     */
-    public TestConnector() {
-        super("test-connector-category", "test-connector-type");
     }
 
     /**

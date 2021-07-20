@@ -23,6 +23,11 @@ public class DocumentationUtil {
     private static final String BASE_DIR = "doc";
 
     /**
+     * The fallback base directory that may contain generated documentation of a module.
+     */
+    private static final String GEN_DIR = "doc-gen";
+
+    /**
      * The file suffix for documentation.
      */
     private static final String DOC_SUFFIX = ".md";
@@ -77,12 +82,30 @@ public class DocumentationUtil {
      * @return A {@link ClassPathResource} to the documentation.
      */
     private static ClassPathResource getClassPathResource(String key, Locale locale) {
+        var classPathResource = getClassPathResource(key, locale, BASE_DIR);
+        if (!classPathResource.exists()) {
+            classPathResource = getClassPathResource(key, locale, GEN_DIR);
+        }
+        return classPathResource;
+    }
+
+    /**
+     * Returns a {@link ClassPathResource} to the documentation, whether it exists or not in the specified directory.
+     *
+     * @param key       The documentation key.
+     * @param locale    The locale of the documentation.
+     * @param directory The directory to look for the resource.
+     *
+     * @return A {@link ClassPathResource} to the documentation.
+     */
+    private static ClassPathResource getClassPathResource(String key, Locale locale, String directory) {
         ClassPathResource classPathResource = null;
         if (locale != null) {
-            classPathResource = new ClassPathResource(BASE_DIR + File.separator + locale.getLanguage() + File.separator + key + DOC_SUFFIX);
+            classPathResource =
+                new ClassPathResource(directory + File.separator + locale.getLanguage() + File.separator + key + DOC_SUFFIX);
         }
         if (classPathResource == null || !classPathResource.exists()) {
-            classPathResource = new ClassPathResource(BASE_DIR + File.separator + key + DOC_SUFFIX);
+            classPathResource = new ClassPathResource(directory + File.separator + key + DOC_SUFFIX);
         }
         return classPathResource;
     }

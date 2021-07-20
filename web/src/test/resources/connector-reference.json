@@ -14,6 +14,7 @@
     "parameters": [
         {
             "name": "intParam",
+            "displayName": "Int Param",
             "required": true,
             "type": "int",
             "value": 0,
@@ -21,12 +22,14 @@
         },
         {
             "name": "integerParam",
+            "displayName": "Integer Param",
             "type": "java.lang.Integer",
             "value": null,
             "connector": false
         },
         {
             "name": "longParam",
+            "displayName": "Long Param",
             "required": true,
             "type": "long",
             "value": 0,
@@ -34,12 +37,14 @@
         },
         {
             "name": "longObjectParam",
+            "displayName": "Long Object Param",
             "type": "java.lang.Long",
             "value": null,
             "connector": false
         },
         {
             "name": "booleanParam",
+            "displayName": "Boolean Param",
             "required": true,
             "type": "boolean",
             "value": false,
@@ -47,18 +52,21 @@
         },
         {
             "name": "booleanObjectParam",
+            "displayName": "Boolean Object Param",
             "type": "java.lang.Boolean",
             "value": null,
             "connector": false
         },
         {
             "name": "stringParam",
+            "displayName": "String Param",
             "type": "java.lang.String",
             "value": null,
             "connector": false
         },
         {
             "name": "securedStringParam",
+            "displayName": "Secured String Param",
             "secured": true,
             "type": "java.lang.String",
             "value": null,

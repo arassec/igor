@@ -4,7 +4,7 @@ import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import com.arassec.igor.plugin.core.validation.ValidJsonObject;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -20,27 +20,54 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Adds data to the data item at the configured position.
+ * <h1>'Add Data' Action</h1>
+ *
+ * <h2>Description</h2>
+ * The action adds JSON data to the processed data item.
+ *
+ * <h2>Example</h2>
+ * The following configuration of the 'Json' parameter:
+ * <pre><code>
+ * {
+ *   "data": {
+ *     "alpha": "beta",
+ *     "delta": [
+ *       42,
+ *       23
+ *     ]
+ *   }
+ * }
+ * </code></pre>
+ * <p>
+ * will result in the following data item:
+ * <pre><code>
+ * {
+ *   "data": {
+ *     "alpha": "beta",
+ *     "delta": [
+ *       42,
+ *       23
+ *     ]
+ *   },
+ *   "meta": {
+ *     "jobId": "01d11f89-1b89-4fa0-8da4-cdd75229f8b5",
+ *     "timestamp": 1599580925108
+ *   }
+ * }
+ * </code></pre>
  */
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "add-data-action", categoryId = CoreCategory.UTIL)
 public class AddDataAction extends BaseUtilAction {
 
     /**
-     * The JSON to add.
+     * The JSON to add to the data item. The configured JSON must not be an array!
      */
     @NotEmpty
     @ValidJsonObject
     @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
     private String json;
-
-    /**
-     * Creates a new instance.
-     */
-    public AddDataAction() {
-        super(CorePluginType.ADD_DATA_ACTION.getId());
-    }
 
     /**
      * {@inheritDoc}

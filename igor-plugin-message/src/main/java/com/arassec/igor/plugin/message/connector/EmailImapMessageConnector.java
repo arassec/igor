@@ -4,7 +4,7 @@ import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.message.MessagePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,12 +22,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * E-Mail connector for incoming messages via an IMAP service.
+ * <h1>'E-Mail Receiver (IMAP)' Connector</h1>
+ *
+ * <h2>Description</h2>
+ * A connector that uses the IMAP protocol to receive mails.
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "email-imap-message-connector", categoryId = CoreCategory.MESSAGE)
 public class EmailImapMessageConnector extends EmailBaseConnector {
 
     /**
@@ -41,18 +44,11 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * The service's port.
+     * The port, the IMAP service is listening on.
      */
     @Positive
     @IgorParam(sortIndex = 2)
     private int port = 993;
-
-    /**
-     * Creates a new component instance.
-     */
-    protected EmailImapMessageConnector() {
-        super(MessagePluginType.EMAIL_IMAP_MESSAGE_CONNECTOR.getId());
-    }
 
     /**
      * Tests the connector's configuration.

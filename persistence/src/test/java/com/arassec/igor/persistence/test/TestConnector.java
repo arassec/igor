@@ -1,5 +1,6 @@
 package com.arassec.igor.persistence.test;
 
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.connector.Connector;
@@ -13,17 +14,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
+@IgorComponent(typeId = "connector-type-id", categoryId = "connector-category-id")
 public class TestConnector extends BaseConnector implements Connector {
-
-    /**
-     * The connector's category ID.
-     */
-    public static final String CATEGORY_ID = "connector-category-id";
-
-    /**
-     * The connector's type ID.
-     */
-    public static final String TYPE_ID = "connector-type-id";
 
     /**
      * An example ID for the test connector.
@@ -77,13 +69,6 @@ public class TestConnector extends BaseConnector implements Connector {
      */
     @IgorParam(secured = true)
     private String securedStringParam;
-
-    /**
-     * Creates a new component instance.
-     */
-    public TestConnector() {
-        super(CATEGORY_ID, TYPE_ID);
-    }
 
     /**
      * {@inheritDoc}

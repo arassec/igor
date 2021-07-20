@@ -23,8 +23,6 @@ class MissingComponentActionTest {
     @DisplayName("Tests creation of the component.")
     void testCreation() {
         MissingComponentAction component = new MissingComponentAction("unit-test-error-cause");
-        assertEquals("core", component.getCategoryId());
-        assertEquals("missing-component-action", component.getTypeId());
         assertEquals("unit-test-error-cause", component.getErrorCause());
         assertTrue(component.isActive());
     }

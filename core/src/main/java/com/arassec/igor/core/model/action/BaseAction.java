@@ -32,16 +32,6 @@ public abstract class BaseAction extends BaseIgorComponent implements Action {
     private ProcessingFinishedCallback processingFinishedCallback;
 
     /**
-     * Creates a new component instance.
-     *
-     * @param categoryId The category ID.
-     * @param typeId     The type ID.
-     */
-    protected BaseAction(String categoryId, String typeId) {
-        super(categoryId, typeId);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

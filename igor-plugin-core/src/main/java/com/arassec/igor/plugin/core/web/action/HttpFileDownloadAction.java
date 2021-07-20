@@ -6,8 +6,8 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CoreDataKey;
-import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
@@ -27,12 +27,33 @@ import java.net.http.HttpResponse;
 import java.util.*;
 
 /**
- * Action to download a file and store it using a {@link FileConnector}.
+ * <h1>'HTTP File Download' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action Downloads a file from an HTTP(S) server and stores it in the target's filesystem.<br>
+ *
+ * The action adds data about the downloaded file to the data item under the 'downloadedFile' key.<br>
+ *
+ * A data item processed by this action could look like this:
+ * <pre><code>
+ * {
+ *   "data": {},
+ *   "meta": {
+ *     "jobId": "69c52202-4bc6-4753-acfe-b24870a75e90",
+ *     "simulation": true,
+ *     "timestamp": 1601302794228
+ *   },
+ *   "downloadedFile": {
+ *     "targetFilename": "downloaded-file.txt",
+ *     "targetDirectory": "/tmp"
+ *   }
+ * }
+ * </code></pre>
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "http-file-download-action", categoryId = CoreCategory.WEB)
 public class HttpFileDownloadAction extends BaseHttpAction {
 
     /**
@@ -51,47 +72,46 @@ public class HttpFileDownloadAction extends BaseHttpAction {
     public static final String HTTP_HEADER_CONTENT_LENGTH = "Content-Length";
 
     /**
-     * The destination for the copied file.
+     * The file connector for the target filesystem.
      */
     @NotNull
     @IgorParam(sortIndex = 4)
     private FileConnector target;
 
     /**
-     * The target directory to copy/move the file to.
+     * The directory to store the downloaded file in.
      */
     @NotBlank
     @IgorParam(sortIndex = 5)
     private String targetDirectory;
 
     /**
-     * The target file name.
+     * The filename of the downloaded file.
      */
     @NotBlank
     @IgorParam(sortIndex = 6)
     private String targetFilename;
 
     /**
-     * The request's headers.
+     * The HTTP headers to use for the request. Headers must be entered as 'key: value'-pairs, with each header in a separate line.
      */
     @IgorParam(sortIndex = 7, advanced = true, subtype = ParameterSubtype.MULTI_LINE)
     private String headers;
 
     /**
-     * Enables a ".igor" file suffix during file transfer. The suffix will be removed after the file has been downloaded
-     * completely.
+     * If checked, the filename on the target connector will be appended with '.igor' during transfer. This is useful to indicate that the file is currently downloaded.
      */
     @IgorParam(sortIndex = 8, advanced = true)
     private boolean appendTransferSuffix = true;
 
     /**
-     * If set to {@code true}, igor appends a filetype suffix if avaliable (e.g. '.html' or '.jpeg').
+     * If checked, igor will try to determine the file type and append it to the target filename (e.g. '.html' or '.jpeg').
      */
     @IgorParam(sortIndex = 9, advanced = true)
     private boolean appendFiletypeSuffix;
 
     /**
-     * The target key to put the web response in the data item.
+     * The name of the key the action's results will be stored in.
      */
     @NotBlank
     @IgorParam(sortIndex = Integer.MAX_VALUE - 1, advanced = true)
@@ -101,7 +121,6 @@ public class HttpFileDownloadAction extends BaseHttpAction {
      * Creates a new component instance.
      */
     public HttpFileDownloadAction() {
-        super(CorePluginType.HTTP_FILE_DOWNLOAD_ACTION.getId());
         target = new FallbackFileConnector();
     }
 

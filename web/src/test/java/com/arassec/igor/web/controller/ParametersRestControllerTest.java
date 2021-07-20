@@ -17,8 +17,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,6 +36,9 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests retrieval of connector parameters.")
     @SneakyThrows(Exception.class)
     void testGetConnectorParameters() {
+        when(igorComponentUtil.getTypeId(any(TestConnector.class))).thenReturn("connector-type-id");
+        when(igorComponentUtil.getCategoryId(any(TestConnector.class))).thenReturn("connector-category-id");
+
         when(igorComponentRegistry.createConnectorInstance(eq("type-id"), isNull())).thenReturn(new TestConnector());
 
         MvcResult mvcResult = mockMvc.perform(get("/api/parameters/connector/type-id")).andExpect(status().isOk()).andReturn();
@@ -67,6 +69,9 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests retrieval of action parameters.")
     @SneakyThrows(Exception.class)
     void testGetActionParameters() {
+        when(igorComponentUtil.getTypeId(any(TestAction.class))).thenReturn("action-type-id");
+        when(igorComponentUtil.getCategoryId(any(TestAction.class))).thenReturn("action-category-id");
+
         when(igorComponentRegistry.createActionInstance(eq("type-id"), isNull())).thenReturn(new TestAction());
         when(igorComponentRegistry.getConnectorParameterCategoryAndType(TestConnectorInterface.class)).thenReturn(
                 Map.of("two", Set.of("three", "b"), "one", Set.of("four")));
@@ -113,6 +118,9 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests retrieval of trigger parameters.")
     @SneakyThrows(Exception.class)
     void testGetTriggerParameters() {
+        when(igorComponentUtil.getTypeId(any(TestTrigger.class))).thenReturn("trigger-type-id");
+        when(igorComponentUtil.getCategoryId(any(TestTrigger.class))).thenReturn("trigger-category-id");
+
         when(igorComponentRegistry.createTriggerInstance(eq("type-id"), isNull())).thenReturn(new TestTrigger());
 
         mockMvc.perform(get("/api/parameters/trigger/type-id"))

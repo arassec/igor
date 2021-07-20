@@ -3,7 +3,7 @@ package com.arassec.igor.plugin.core.util.action;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,12 +20,36 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Filters the supplied data by a timestamp.
+ * <h1>'Filter by Timestamp' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action filters data items by comparing a timestamp from the input against a configured time span.<br>
+ *
+ * Filtered data items are not passed to following actions.
+ *
+ * <h2>Filtering Epoch Timestamps</h2>
+ * If the timestamp is given as Epoch timestamp, you can use the following special values as 'Timestamp format' parameter:<br>
+ *
+ * <table>
+ *     <caption>Timestamp formats</caption>
+ *     <tr>
+ *         <th>Timestamp format value</th>
+ *         <th>Description</th>
+ *     </tr>
+ *     <tr>
+ *         <td>epoch-millis</td>
+ *         <td>Assumes the timestamp value is given as Epoch timestamp in milliseconds.</td>
+ *     </tr>
+ *     <tr>
+ *         <td>epoch-seconds</td>
+ *         <td>Assumes the timestamp value is given as Epoch timestamp in seconds.</td>
+ *     </tr>
+ * </table>
  */
 @Slf4j
 @Setter
 @Getter
-@IgorComponent
+@IgorComponent(typeId = "filter-by-timestamp-action", categoryId = CoreCategory.UTIL)
 public class FilterByTimestampAction extends BaseUtilAction {
 
     /**
@@ -39,46 +63,45 @@ public class FilterByTimestampAction extends BaseUtilAction {
     public static final String FORMAT_EPOCH_SECONDS = "epoch-seconds";
 
     /**
-     * The input to use as Timestamp.
+     * A mustache expression selecting a property from the data item. The property's value is converted into a timestamp and
+     * afterwards used for filtering.
      */
     @NotBlank
     @IgorParam
     private String input;
 
     /**
-     * If set to {@code true}, timestamps older than the configured one are filtered. If set to {@code false}, timestamps younger
-     * than the configured one are filtered.
+     * If checked, data items with timestamps older than the configured time span are filtered. If unchecked, data items with
+     * timestamps younger than the configured time span are filtered.
      */
     @IgorParam
     private boolean olderThan = true;
 
     /**
-     * The amount of time (configured by {@link #timeUnit}) to use for filtering.
+     * The amount of the time span.
      */
     @Positive
     @IgorParam
     private long amount = 1;
 
     /**
-     * The time unit to use for filtering.
+     * The unit of the time span. Allowed values are e.g. 'MINUTES', DAYS', 'WEEKS'. See
+     * <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/temporal/ChronoUnit.html">Java
+     * ChronoUnit</a> for all allowed values.
      */
     @NotBlank
     @IgorParam
     private String timeUnit = DEFAULT_TIME_UNIT;
 
     /**
-     * The format of the timestamp.
+     * The format of the property's value containing the timestamp. See
+     * <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/format/DateTimeFormatter.html">Java
+     * DateTimeFormat</a> (section 'Patterns for Formatting and Parsing') for allowed values. The special values 'millis' and
+     * 'seconds' are additionally supported (see below).
      */
     @NotBlank
     @IgorParam
     private String timestampFormat = DEFAULT_TIMESTAMP_FORMAT;
-
-    /**
-     * Creates a new component instance.
-     */
-    public FilterByTimestampAction() {
-        super(CorePluginType.FILTER_BY_TIMESTAMP_ACTION.getId());
-    }
 
     /**
      * Filters data according to the configured timestamp settings.

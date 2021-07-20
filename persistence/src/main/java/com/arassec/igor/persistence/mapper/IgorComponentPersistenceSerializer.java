@@ -1,5 +1,6 @@
 package com.arassec.igor.persistence.mapper;
 
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.annotation.IgorParam;
@@ -25,13 +26,20 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
     private final transient SecurityProvider securityProvider;
 
     /**
+     * Utility for handling igor components.
+     */
+    private final transient IgorComponentUtil igorComponentUtil;
+
+    /**
      * Creates a new serializer instance.
      *
-     * @param securityProvider The security provider to handle secured parameter values.
+     * @param securityProvider  The security provider to handle secured parameter values.
+     * @param igorComponentUtil Igor's component util.
      */
-    public IgorComponentPersistenceSerializer(SecurityProvider securityProvider) {
+    public IgorComponentPersistenceSerializer(SecurityProvider securityProvider, IgorComponentUtil igorComponentUtil) {
         super(IgorComponent.class);
         this.securityProvider = securityProvider;
+        this.igorComponentUtil = igorComponentUtil;
     }
 
     /**
@@ -41,7 +49,7 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
     public void serialize(IgorComponent instance, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField(PersistenceMapperKey.ID.getKey(), instance.getId());
-        jsonGenerator.writeStringField(PersistenceMapperKey.TYPE_ID.getKey(), instance.getTypeId());
+        jsonGenerator.writeStringField(PersistenceMapperKey.TYPE_ID.getKey(), igorComponentUtil.getTypeId(instance));
         if (instance instanceof Connector) {
             jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), ((Connector) instance).getName());
         }

@@ -1,7 +1,7 @@
 package com.arassec.igor.core.model.job.starter;
 
 import com.arassec.igor.core.model.action.Action;
-import com.arassec.igor.core.model.job.IgorComponentUtil;
+import com.arassec.igor.core.model.job.IgorConnectorUtil;
 import com.arassec.igor.core.model.job.concurrent.ConcurrencyGroup;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ProcessingFinishedCallback;
@@ -113,12 +113,12 @@ public class DefaultJobStarter implements JobStarter {
     protected void initialize(JobExecution jobExecution) {
         if (trigger != null) {
             trigger.initialize(jobExecution);
-            IgorComponentUtil.initializeConnectors(trigger, jobExecution);
+            IgorConnectorUtil.initializeConnectors(trigger, jobExecution);
         }
         if (!actions.isEmpty()) {
             actions.stream().filter(Action::isActive).forEach(action -> {
                 action.initialize(jobExecution);
-                IgorComponentUtil.initializeConnectors(action, jobExecution);
+                IgorConnectorUtil.initializeConnectors(action, jobExecution);
             });
         }
     }

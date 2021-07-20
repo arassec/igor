@@ -1,7 +1,7 @@
 package com.arassec.igor.simulation.job.proxy;
 
 import com.arassec.igor.core.model.IgorComponent;
-import com.arassec.igor.core.model.job.IgorComponentUtil;
+import com.arassec.igor.core.model.job.IgorConnectorUtil;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.StacktraceFormatter;
 import lombok.Getter;
@@ -54,7 +54,7 @@ public abstract class BaseProxy<T extends IgorComponent> implements IgorComponen
     public void initialize(JobExecution jobExecution) {
         try {
             delegate.initialize(jobExecution);
-            IgorComponentUtil.initializeConnectors(delegate, jobExecution);
+            IgorConnectorUtil.initializeConnectors(delegate, jobExecution);
         } catch (Exception e) {
             setErrorCause(StacktraceFormatter.format(e));
         }
@@ -67,26 +67,10 @@ public abstract class BaseProxy<T extends IgorComponent> implements IgorComponen
     public void shutdown(JobExecution jobExecution) {
         try {
             delegate.shutdown(jobExecution);
-            IgorComponentUtil.shutdownConnectors(delegate, jobExecution);
+            IgorConnectorUtil.shutdownConnectors(delegate, jobExecution);
         } catch (Exception e) {
             errorCause = StacktraceFormatter.format(e);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getCategoryId() {
-        return delegate.getCategoryId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTypeId() {
-        return delegate.getTypeId();
     }
 
     /**

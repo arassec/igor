@@ -6,7 +6,7 @@
                 <div class="tr" v-bind:key="param.name"
                      v-bind:style="(!showAdvancedParameters && param.advanced) ? 'visibility: collapse' : ''">
                     <div class="text-top td">
-                        <label>{{ formatParameterName(param) }}</label>
+                        <label>{{ param.displayName }}</label>
                     </div>
                     <div class="td" :class="isBoolean(param.type) ? 'align-left' : ''">
 
@@ -164,16 +164,6 @@ export default {
             } else {
                 return true;
             }
-        },
-        formatParameterName: function (parameter) {
-            let string = parameter.name.replace(/\.?([A-Z])/g, function (x, y) {
-                return ' ' + y.toLowerCase()
-            }).replace(/^_/, '')
-            let star = "";
-            if (parameter.required) {
-                star = "*";
-            }
-            return string.charAt(0).toUpperCase() + string.slice(1) + star
         },
         toggleCleartext: function (index) {
             if (this.parameterInputTypes[index] === 'password') {

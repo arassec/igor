@@ -19,16 +19,6 @@ public abstract class BaseTrigger extends BaseIgorComponent implements Trigger {
     private JobExecution jobExecution;
 
     /**
-     * Creates a new component instance.
-     *
-     * @param categoryId The category ID.
-     * @param typeId     The type ID.
-     */
-    protected BaseTrigger(String categoryId, String typeId) {
-        super(categoryId, typeId);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

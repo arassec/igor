@@ -3,7 +3,7 @@ package com.arassec.igor.plugin.core.file.action;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import lombok.Getter;
@@ -16,44 +16,51 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Moves a file.
+ * <h1>'Move file' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action moves/renames a file.
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "move-file-action", categoryId = CoreCategory.FILE)
 public class MoveFileAction extends BaseFileAction {
 
     /**
-     * Connector where the file can be found.
+     * A file-connector providing access to the file.
      */
     @NotNull
     @IgorParam
     private FileConnector source;
 
     /**
-     * Source directory to copy the file from.
+     * The directory containing the file to move. Either a fixed value or a mustache expression selecting a property from the data
+     * item. If a mustache expression is used, the property's value will be used as directory name.
      */
     @NotBlank
     @IgorParam
     private String sourceDirectory = DIRECTORY_TEMPLATE;
 
     /**
-     * Source file to copy.
+     * The name of the file to move. Either a fixed value or a mustache expression selecting a property from the data item. If a
+     * mustache expression is used, the property's value will be used as filename.
      */
     @NotBlank
     @IgorParam
     private String sourceFilename = FILENAME_TEMPLATE;
 
     /**
-     * The target directory to copy/move the file to.
+     * The target directory of the moved file. Either a fixed value or a mustache expression selecting a property from the data
+     * item. If a mustache expression is used, the property's value will be used as directory name.
      */
     @NotBlank
     @IgorParam
     private String targetDirectory;
 
     /**
-     * The target file name.
+     * The target name of the moved file. Either a fixed value or a mustache expression selecting a property from the data item.
+     * If a mustache expression is used, the property's value will be used as filename.
      */
     @NotBlank
     @IgorParam
@@ -63,7 +70,6 @@ public class MoveFileAction extends BaseFileAction {
      * Creates a new component instance.
      */
     public MoveFileAction() {
-        super(CorePluginType.MOVE_FILE_ACTION.getId());
         source = new FallbackFileConnector();
     }
 

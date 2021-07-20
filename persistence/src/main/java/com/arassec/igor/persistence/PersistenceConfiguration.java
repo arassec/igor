@@ -1,6 +1,7 @@
 package com.arassec.igor.persistence;
 
 import com.arassec.igor.application.registry.IgorComponentRegistry;
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
@@ -38,16 +39,17 @@ public class PersistenceConfiguration {
      * @param igorComponentRegistry The igor component registry.
      * @param connectorRepository   The repository for connectors.
      * @param securityProvider      The security provider for en- and decrypting secured parameter values.
+     * @param igorComponentUtil     Utility for handling igor components.
      *
      * @return A newly created {@link ObjectMapper} instance.
      */
     @Bean(name = "persistenceJobMapper")
     public ObjectMapper persistenceJobMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository,
-                                             SecurityProvider securityProvider) {
+                                             SecurityProvider securityProvider, IgorComponentUtil igorComponentUtil) {
 
         var mapperModule = new SimpleModule();
 
-        mapperModule.addSerializer(new IgorComponentPersistenceSerializer(securityProvider));
+        mapperModule.addSerializer(new IgorComponentPersistenceSerializer(securityProvider, igorComponentUtil));
 
         mapperModule.addDeserializer(Connector.class, new ConnectorPersistenceDeserializer(igorComponentRegistry, securityProvider));
         mapperModule.addDeserializer(Action.class, new ActionPersistenceDeserializer(igorComponentRegistry, connectorRepository, securityProvider));
@@ -66,15 +68,16 @@ public class PersistenceConfiguration {
      *
      * @param igorComponentRegistry The igor component registry.
      * @param securityProvider      The security provider for en- and decrypting secured parameter values.
+     * @param igorComponentUtil     Utility for handling igor components.
      *
      * @return A newly created {@link ObjectMapper} instance.
      */
     @Bean(name = "persistenceConnectorMapper")
-    public ObjectMapper persistenceConnectorMapper(IgorComponentRegistry igorComponentRegistry, SecurityProvider securityProvider) {
+    public ObjectMapper persistenceConnectorMapper(IgorComponentRegistry igorComponentRegistry, SecurityProvider securityProvider, IgorComponentUtil igorComponentUtil) {
 
         var mapperModule = new SimpleModule();
 
-        mapperModule.addSerializer(new IgorComponentPersistenceSerializer(securityProvider));
+        mapperModule.addSerializer(new IgorComponentPersistenceSerializer(securityProvider, igorComponentUtil));
         mapperModule.addDeserializer(Connector.class, new ConnectorPersistenceDeserializer(igorComponentRegistry, securityProvider));
 
         return applyDefaultConfiguration(new ObjectMapper()).registerModule(mapperModule);

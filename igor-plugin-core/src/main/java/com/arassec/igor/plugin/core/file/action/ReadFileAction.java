@@ -3,7 +3,7 @@ package com.arassec.igor.plugin.core.file.action;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import lombok.Getter;
@@ -16,12 +16,30 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Reads the content of a file.
+ * <h1>'Read file' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action reads a file from a file-connector and adds its contents to the processed data item.<br>
+ * <p>
+ * The file's contents will be available in the data item under the key 'fileContents'.<br>
+ * <p>
+ * A data item processed by this action could look like this:
+ * <pre><code>
+ * {
+ *   "data": {
+ *     ...
+ *   },
+ *   "meta": {
+ *     ...
+ *   }
+ *   "fileContents": "THIS IS THE CONTENT READ FROM THE FILE!"
+ * }
+ * </code></pre>
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "read-file-action", categoryId = CoreCategory.FILE)
 public class ReadFileAction extends BaseFileAction {
 
     /**
@@ -30,21 +48,23 @@ public class ReadFileAction extends BaseFileAction {
     public static final String KEY_FILE_CONTENTS = "fileContents";
 
     /**
-     * The connector providing the file to read.
+     * A connector providing access to the file to read.
      */
     @NotNull
     @IgorParam
     private FileConnector source;
 
     /**
-     * The directory the file is in.
+     * The directory containing the file to delete. Either a fixed value or a mustache expression selecting a property from the
+     * data item. If a mustache expression is used, the property's value will be used as directory name.
      */
     @NotBlank
     @IgorParam
     private String directory = DIRECTORY_TEMPLATE;
 
     /**
-     * The name of the file.
+     * The name of the file to delete. Either a fixed value or a mustache expression selecting a property from the data item. If a
+     * mustache expression is used, the property's value will be used as filename.
      */
     @NotBlank
     @IgorParam
@@ -54,7 +74,6 @@ public class ReadFileAction extends BaseFileAction {
      * Creates a new component instance.
      */
     public ReadFileAction() {
-        super(CorePluginType.READ_FILE_ACTION.getId());
         source = new FallbackFileConnector();
     }
 
