@@ -20,18 +20,7 @@ class BaseTriggerTest {
     /**
      * The base class under test.
      */
-    private final BaseTrigger baseTrigger = mock(BaseTrigger.class,
-            withSettings().useConstructor("category-id", "type-id").defaultAnswer(CALLS_REAL_METHODS));
-
-    /**
-     * Tests the {@link BaseTrigger}'s constructor.
-     */
-    @Test
-    @DisplayName("Tests the base-trigger's constructor.")
-    void testBaseTrigger() {
-        assertEquals("category-id", baseTrigger.getCategoryId());
-        assertEquals("type-id", baseTrigger.getTypeId());
-    }
+    private final BaseTrigger baseTrigger = mock(BaseTrigger.class, withSettings().defaultAnswer(CALLS_REAL_METHODS));
 
     /**
      * Tests initialization of the base trigger.

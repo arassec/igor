@@ -5,9 +5,9 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.file.connector.FileInfo;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
-import com.arassec.igor.plugin.file.FilePluginType;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
@@ -25,18 +25,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * File-Connector for SCP file handling.
+ * <h1>SCP Connector</h1>
+ *
+ * <h2>Description</h2>
+ * A file-connector that connects to an SCP server.
  */
 @Slf4j
-@IgorComponent
+@IgorComponent(typeId = "scp-file-connector", categoryId = CoreCategory.FILE)
 public class ScpFileConnector extends BaseSshFileConnector {
-
-    /**
-     * Creates a new component instance.
-     */
-    public ScpFileConnector() {
-        super(FilePluginType.SCP_FILE_CONNECTOR.getId());
-    }
 
     /**
      * Reads from the provided InputStream to check the return value of the last SSH command sent to the server.
@@ -159,7 +155,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
                 if (buf[0] == ' ') {
                     break;
                 }
-                fileSize = fileSize * 10L + (long) (buf[0] - '0');
+                fileSize = fileSize * 10L + (buf[0] - '0');
             }
 
             // Consume the file name from the stream...

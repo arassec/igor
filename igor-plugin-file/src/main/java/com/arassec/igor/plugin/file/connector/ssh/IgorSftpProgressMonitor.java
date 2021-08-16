@@ -71,7 +71,7 @@ public class IgorSftpProgressMonitor implements SftpProgressMonitor {
             workInProgressMonitor.setProgressInPercent(100);
             return false;
         }
-        workInProgressMonitor.setProgressInPercent((double) count * 100 / (double) fileSize);
+        workInProgressMonitor.setProgressInPercent((double) count * 100 / fileSize);
         return true;
     }
 

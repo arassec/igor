@@ -2,20 +2,14 @@ package com.arassec.igor.plugin.core.util.trigger;
 
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.trigger.BaseTrigger;
-import com.arassec.igor.plugin.core.CorePluginCategory;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 
 /**
- * Trigger for manual job executions.
+ * <h1>Manual Trigger</h1>
+ *
+ * <h2>Description</h2>
+ * This trigger doesn't start a job automatically. The user has to start the job manually each time.
  */
-@IgorComponent
+@IgorComponent(typeId = "manual-trigger", categoryId = CoreCategory.UTIL)
 public class ManualTrigger extends BaseTrigger {
-
-    /**
-     * Creates a new component instance.
-     */
-    public ManualTrigger() {
-        super(CorePluginCategory.UTIL.getId(), CorePluginType.MANUAL_TRIGGER.getId());
-    }
-
 }

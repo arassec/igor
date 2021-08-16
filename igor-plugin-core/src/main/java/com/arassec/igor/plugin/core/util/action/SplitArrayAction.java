@@ -3,7 +3,7 @@ package com.arassec.igor.plugin.core.util.action;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,13 +18,70 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Action that converts a JSON-Array into multiple data items with a single JSON-Object containing one of the old values from the
- * array.
+ * <h1>'Split Array' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action splits a JSON-Array into multiple data items. Each data item contains one element from the original array at the
+ * same position the array had before.<br>
+ * <p>
+ * If there is no JSON-Array at the configured position, the data item will be **filtered** by this action.
+ *
+ * <h2>Example</h2>
+ * <p>
+ * An example data item processed by this action might look like this:
+ * <pre><code>
+ * {
+ *   "data": {
+ *     "input": [
+ *       "a",
+ *       "b",
+ *       "c"
+ *     ]
+ *   }
+ * }
+ * </code></pre>
+ * <p>
+ * With the following configuration:<br>
+ *
+ * <table>
+ *     <caption>Example configuration</caption>
+ *     <tr>
+ *         <th>Parameter</th>
+ *         <th>Configuration value</th>
+ *     </tr>
+ *     <tr>
+ *         <td>Array Selector</td>
+ *         <td>{ { data.input } }</td>
+ *     </tr>
+ * </table>
+ * <p>
+ * these three data items are created by the action:
+ * <pre><code>
+ * {
+ *   "data": {
+ *     "input": "a"
+ *   }
+ * }
+ * </code></pre>
+ * <pre><code>
+ * {
+ *   "data": {
+ *     "input": "b"
+ *   }
+ * }
+ * </code></pre>
+ * <pre><code>
+ * {
+ *   "data": {
+ *     "input": "c"
+ *   }
+ * }
+ * </code></pre>
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "split-array-action", categoryId = CoreCategory.UTIL)
 public class SplitArrayAction extends BaseUtilAction {
 
     /**
@@ -33,18 +90,12 @@ public class SplitArrayAction extends BaseUtilAction {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * The JSON-Path query to the array element.
+     * A Mustache expression selecting a JSON-Array from the data item. The array is split and its content separated into
+     * individual data items.
      */
     @NotEmpty
     @IgorParam
     private String arraySelector;
-
-    /**
-     * Creates a new component instance.
-     */
-    public SplitArrayAction() {
-        super(CorePluginType.SPLIT_ARRAY_ACTION.getId());
-    }
 
     /**
      * Converts a JSON-Array at the configured position and returns multiple data items from it. Each data item contains only a

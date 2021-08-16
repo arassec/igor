@@ -1,7 +1,5 @@
 package com.arassec.igor.core.model.trigger;
 
-import com.arassec.igor.core.model.CoreCategory;
-import com.arassec.igor.core.model.CoreType;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.annotation.validation.MissingComponent;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
@@ -26,7 +24,6 @@ public class MissingComponentTrigger extends BaseTrigger {
      * @param errorCause Description of the original error cause.
      */
     public MissingComponentTrigger(String errorCause) {
-        super(CoreCategory.CORE.getId(), CoreType.MISSING_COMPONENT_TRIGGER.getId());
         this.errorCause = errorCause;
     }
 

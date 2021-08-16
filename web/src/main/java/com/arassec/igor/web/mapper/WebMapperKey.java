@@ -28,6 +28,11 @@ public enum WebMapperKey {
     NAME("name"),
 
     /**
+     * The 'displayName' key.
+     */
+    DISPLAY_NAME("displayName"),
+
+    /**
      * The description key.
      */
     DESCRIPTION("description"),

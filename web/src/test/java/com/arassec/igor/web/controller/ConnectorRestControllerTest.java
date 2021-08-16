@@ -79,6 +79,9 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests getting all connectors of a certain category.")
     @SneakyThrows(Exception.class)
     void testGetConnectorsInCategory() {
+        when(igorComponentUtil.getTypeId(any(TestConnector.class))).thenReturn("type-id");
+        when(igorComponentUtil.getCategoryId(any(TestConnector.class))).thenReturn("category-id");
+
         TestConnector testConnector = new TestConnector();
         when(connectorManager.loadAllOfType(Set.of("category-id"), 666, 1)).thenReturn(
                 new ModelPage<>(666, 1, 1, List.of(testConnector))
@@ -106,6 +109,9 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
     @DisplayName("Test getting a specific connector.")
     @SneakyThrows(Exception.class)
     void testGetConnector() {
+        when(igorComponentUtil.getTypeId(any(TestConnector.class))).thenReturn("type-id");
+        when(igorComponentUtil.getCategoryId(any(TestConnector.class))).thenReturn("category-id");
+
         mockMvc.perform(get("/api/connector/connector-id")).andExpect(status().isNotFound());
 
         TestConnector testConnector = new TestConnector();
@@ -160,6 +166,9 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
     void testCreateConnector() {
         when(igorComponentRegistry.createConnectorInstance(anyString(), anyMap())).thenReturn(new TestConnector());
 
+        when(igorComponentUtil.getTypeId(any(TestConnector.class))).thenReturn("type-id");
+        when(igorComponentUtil.getCategoryId(any(TestConnector.class))).thenReturn("category-id");
+
         TestConnector testConnector = new TestConnector();
         testConnector.setId("connector-id");
         testConnector.setName("connector-name");
@@ -198,6 +207,9 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
         testConnector.setId("connector-id");
         testConnector.setName("update-test");
 
+        when(igorComponentUtil.getTypeId(any(TestConnector.class))).thenReturn("type-id");
+        when(igorComponentUtil.getCategoryId(any(TestConnector.class))).thenReturn("category-id");
+
         when(igorComponentRegistry.createConnectorInstance(anyString(), anyMap())).thenReturn(new TestConnector());
         when(connectorManager.save(any(Connector.class))).thenReturn(testConnector);
 
@@ -229,6 +241,9 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
     @SneakyThrows(Exception.class)
     void testTestConnector() {
         when(igorComponentRegistry.createConnectorInstance(anyString(), anyMap())).thenReturn(new TestConnector());
+
+        when(igorComponentUtil.getTypeId(any(TestConnector.class))).thenReturn("type-id");
+        when(igorComponentUtil.getCategoryId(any(TestConnector.class))).thenReturn("category-id");
 
         mockMvc.perform(post("/api/connector/test")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

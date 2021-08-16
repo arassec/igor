@@ -6,7 +6,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.PersistentValue;
 import com.arassec.igor.core.repository.PersistentValueRepository;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,14 +17,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Persists a value from the supplied data to the persistence store.
+ * <h1>'Persist Value' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action persists values in igor's datastore.
  */
 @Slf4j
-@IgorComponent
+@IgorComponent(typeId = "persist-value-action", categoryId = CoreCategory.PERSISTENCE)
 public class PersistValueAction extends BasePersistenceAction {
 
     /**
-     * The input to persist.
+     * A mustache expression selecting a property from the data item. The property's value is persisted in igor's datastore.
      */
     @Getter
     @Setter
@@ -33,8 +36,7 @@ public class PersistValueAction extends BasePersistenceAction {
     private String input;
 
     /**
-     * The number of values to keep in the persistence store. The cleanup is only triggered if a value greater zero is
-     * configured.
+     * The number of persisted values to keep. If the number is exceeded, old values are removed from the datastore.
      */
     @Getter
     @Setter
@@ -47,7 +49,7 @@ public class PersistValueAction extends BasePersistenceAction {
      * @param persistentValueRepository The repository for persisted values.
      */
     public PersistValueAction(PersistentValueRepository persistentValueRepository) {
-        super(CorePluginType.PERSIST_VALUE_ACTION.getId(), persistentValueRepository);
+        super(persistentValueRepository);
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.arassec.igor.simulation.job.proxy;
 
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.connector.Connector;
@@ -85,19 +86,13 @@ class ConnectorProxyTest {
 
     @Getter
     @Setter
+    @IgorComponent(typeId = "simulation-test-type", categoryId = "simulation-test-category")
     private static class TestConnector extends BaseConnector implements Connector {
 
         /**
          * Property to support testing if the testConfiguration method has been invoked.
          */
         private boolean testConfigurationInvoked = false;
-
-        /**
-         * Creates a new component instance.
-         */
-        protected TestConnector() {
-            super("simulation-test-category", "simulateion-test-type");
-        }
 
         /**
          * Throws an {@link IllegalStateException} to test proxying this connector.

@@ -4,7 +4,7 @@ import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.file.connector.BaseFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileInfo;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
@@ -22,18 +22,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * File-Connector to access files in the local file system.
+ * <h1>Filesystem Connector</h1>
+ *
+ * <h2>Description</h2>
+ * A file-connector providing access to the filesystem the igor server is running on.
+ *
+ * <h3>Parameters</h3>
+ * There are no parameters to configure the connector. Access rights to files and directories are those of the user running the
+ * igor server.
  */
 @Slf4j
-@IgorComponent
+@IgorComponent(typeId = "localfs-file-connector", categoryId = CoreCategory.FILE)
 public class LocalFilesystemFileConnector extends BaseFileConnector {
-
-    /**
-     * Creates a new component instance.
-     */
-    public LocalFilesystemFileConnector() {
-        super(CorePluginType.LOCAL_FILESYSTEM_CONNECTOR.getId());
-    }
 
     /**
      * {@inheritDoc}
@@ -56,7 +56,7 @@ public class LocalFilesystemFileConnector extends BaseFileConnector {
                         log.warn("Could not get last modified time from path: {},", path);
                     }
                     return new FileInfo(path.getFileName().toString(), lastModifiedTime != null ? formatInstant(
-                            lastModifiedTime.toInstant().truncatedTo(ChronoUnit.SECONDS)) : null);
+                        lastModifiedTime.toInstant().truncatedTo(ChronoUnit.SECONDS)) : null);
                 }).collect(Collectors.toList());
             }
         } catch (IOException e) {

@@ -18,16 +18,6 @@ public abstract class BaseEventTrigger extends BaseTrigger implements EventTrigg
     protected BlockingQueue<Map<String, Object>> eventQueue;
 
     /**
-     * Creates a new component instance.
-     *
-     * @param categoryId The category ID.
-     * @param typeId     The type ID.
-     */
-    protected BaseEventTrigger(String categoryId, String typeId) {
-        super(categoryId, typeId);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

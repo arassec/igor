@@ -3,7 +3,7 @@ package com.arassec.igor.plugin.core.util.action;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,16 +13,29 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Limits the data stream to the first 'n' data items.
+ * <h1>Limit Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action limits the data stream to the first 'n' data items.
+ *
+ * <h2>Event-Triggered Jobs</h2>
+ * <strong>This action is not available in event-triggered jobs!</strong><br>
+ * <p>
+ * The limit counter is set on job start and applies to the complete job execution. Each processed data item increases the
+ * counter, which is never reset until the next job execution. Since event triggered jobs don't stop their execution, the counter
+ * would never be reset.<br>
+ * <p>
+ * Thus, this action would let the first 'n' data items of an event-triggered job pass, and block **all** following data items
+ * until the job were restarted!
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "limit-action", categoryId = CoreCategory.UTIL)
 public class LimitAction extends BaseUtilAction {
 
     /**
-     * The configured number of items to skip.
+     * The number of data items to limit the stream to.
      */
     @Positive
     @IgorParam
@@ -32,13 +45,6 @@ public class LimitAction extends BaseUtilAction {
      * Counts the processed data items.
      */
     private int processed;
-
-    /**
-     * Creates a new component instance.
-     */
-    public LimitAction() {
-        super(CorePluginType.LIMIT_ACTION.getId());
-    }
 
     /**
      * Limits processing to the configured amount of data items.

@@ -31,7 +31,7 @@ The code of our custom action looks like this:
 /**
  * A custom action that adds a message to the data items.
  */
-@IgorComponent
+@IgorComponent(categoryId = "Demo-Actions", typeId = "Custom-Action")
 public class CustomAction extends BaseAction {
 
     /**
@@ -41,17 +41,10 @@ public class CustomAction extends BaseAction {
     private boolean addMessage = true;
 
     /**
-     * Creates a new component instance.
-     */
-    public CustomAction() {
-        super("Demo-Actions", "Custom-Action");
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    public List<Map<String, Object>> process(Map<String, Object> data, 
+    public List<Map<String, Object>> process(Map<String, Object> data,
                                              JobExecution jobExecution) {
         if (addMessage) {
             data.put("message", "A custom action's message");

@@ -8,7 +8,7 @@ public enum EventType {
     /**
      * This event has an unknown type.
      */
-    NONE,
+    UNKNOWN,
 
     /**
      * An incoming message is the source of the event.

@@ -3,7 +3,7 @@ package com.arassec.igor.plugin.core.file.action;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import lombok.Getter;
@@ -16,30 +16,35 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Deletes a file.
+ * <h1>'Delete file' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action deletes a file.
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "delete-file-action", categoryId = CoreCategory.FILE)
 public class DeleteFileAction extends BaseFileAction {
 
     /**
-     * The connector providing the file to delete.
+     * A file-connector to delete the file from.
      */
     @NotNull
     @IgorParam
     private FileConnector source;
 
     /**
-     * The directory the file is in.
+     * The directory containing the file to delete. Either a fixed value or a mustache expression selecting a property from the
+     * data item. If a mustache expression is used, the property's value will be used as directory name.
      */
     @NotBlank
     @IgorParam
     private String directory = DIRECTORY_TEMPLATE;
 
     /**
-     * The name of the file.
+     * The name of the file to delete. Either a fixed value or a mustache expression selecting a property from the data item. If a
+     * mustache expression is used, the property's value will be used as filename.
      */
     @NotBlank
     @IgorParam
@@ -49,7 +54,6 @@ public class DeleteFileAction extends BaseFileAction {
      * Creates a new component instance.
      */
     public DeleteFileAction() {
-        super(CorePluginType.DELETE_FILE_ACTION.getId());
         source = new FallbackFileConnector();
     }
 

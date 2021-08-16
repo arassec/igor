@@ -2,39 +2,34 @@
 
 ## Category- and Type-ID
 All igor components are organized in categories and have a unique type.
-To support this concept, an igor component must implement the following two methods:
-``` java
-String getCategoryId();
+To support this concept, an igor component must provide a category and type ID within the component annotation (see <router-link to="/developer/component.html#igorcomponent">@IgorComponent</router-link>).
 
-String getTypeId();
-```
-Both properties are strings and can be freely assigned. 
 The category and type of a component are selected in the user interface with dropdown-boxes.
 
-If you want to add your custom component to an existing category, you should set the corresponding category ID or better yet, inherit from the appropriate base class.
+If you want to add your custom component to an existing category, you should set it accordingly:
 
-|Component Type|Category|Category-ID|Base Class to Extend|
-|---|---|---|---|
-|Trigger|Util|"util"|BaseUtilTrigger.class|
-|Trigger|Web|"web"|-|
-|Action|Util|"util"|BaseUtilAction.class|
-|Action|File|"file"|BaseFileAction.class|
-|Action|Message|"message"|BaseMessageAction.class|
-|Action|Persistence|"persistence"|BasePersistenceAction.class|
-|Connector|File|"file"|BaseFileConnector.class|
-|Connector|Message|"message"|BaseMessageConnector.class|
+|Category|Category-ID Definition|String representation|
+|---|---|---|
+|Util|CoreCategory.UTIL|"util"|
+|Web|CoreCategory.WEB|"web"|
+|File|CoreCategory.FILE|"file|
+|Message|CoreCategory.MESSAGE|"message"|
+|File|CoreCategory.TEST|"test"|
+|Persistence|CoreCategory.PERSISTENCE|"persistence"|
 
 If you give your component a type ID that is already taken, igor will throw an exception during startup.
 
 ## Interfaces
 In order to write your own igor component, you have to implement the following interfaces with your class.
-Base classes exist that ease development of custom components of the given type.
+Base classes exist to ease the development of custom components of the given type.
+
+The interfaces and base classes are all found in the package (or sub-packages of): `com.arassec.igor.core.model`
 
 |Component Type|Interface to Implement|Base Class to Extend|
 |---|---|---|
-|Trigger|Trigger.class|BaseTrigger.class|
-|Action|Action.class|BaseAction.class|
-|Connector|Connector.class|BaseConnector.class|
+|Trigger|Trigger|BaseTrigger|
+|Action|Action|BaseAction|
+|Connector|Connector|BaseConnector|
 
 Additionally, you have to use the following annotations in your class.
 
@@ -48,22 +43,23 @@ Igor provides the following annotations that must be used in components.
 |@IgorSimulationSafe|Method Annotation|Marks a method of a Connector as safe for simulated job executions.
 
 ### @IgorComponent
-This annotation is basically a "wrapper" for Spring's `@Scope` annotation. 
-Igor components are Spring beans. 
-This annotation makes sure, they are in scope `prototype`.
+This annotation marks a class as igor component.
 
-::: warning
-The **prototype** scope is important, since many instances of the same component can be created simultaneously, and will be configured in different ways.
-:::
-
-A singleton component might be useful in some cases and is possible in general.
-Be aware though, that properties annotated with @IgorParam will be overwritten any time the singleton instance is used during a job, and thus might have side effects on running jobs.
+Within the annotation the component's category and type ID must be specified.
 
 An example use of this annotation might look like this:
 ``` java
-@IgorComponent
-public class CustomConnector implements Connector {
+@IgorComponent(categoryId = "custom-category", typeId = "custom-type")
+public class CustomConnector extends BaseConnector {
    ...
+}
+```
+
+Only classes annotated with `@IgorComponent` will be considered as components, thus enabling inheritance.
+
+E.g. the following class will **not** be considered by igor, although implementing a component interface, and can thus be used as base class for multiple custom components:
+``` java
+public abstract class CustomBaseConnector implements Connector {
 }
 ```
 
@@ -99,7 +95,7 @@ This annotation marks connector methods as safe for execution during simulated j
 Only methods marked with `@IgorSimulationSafe` will be executed during simulated job runs. 
 For all other methods of a connector, a proxy will be generated which uses default values.
 
-::: warning
+::: tip
 Only idempotent operations should be annotated with this annotation.
 :::
 
@@ -108,4 +104,25 @@ An example use of this annotation might look like this:
 @IgorSimulationSafe
 List<Entry> listEntries(String parameter);
 ```
- 
+
+## Method Hooks
+All igor components implement the following methods.
+They are each called once during job execution and can be extended by custom components to perform initialization or shutdown tasks:
+
+``` java
+/**
+ * Initializes the component before job executions.
+ *
+ * @param jobExecution Contains the state of the job execution.
+ */
+default void initialize(JobExecution jobExecution) {
+}
+
+/**
+ * Shuts the component down at the end of the job execution.
+ *
+ * @param jobExecution Contains the state of the job execution.
+ */
+default void shutdown(JobExecution jobExecution) {
+}
+```

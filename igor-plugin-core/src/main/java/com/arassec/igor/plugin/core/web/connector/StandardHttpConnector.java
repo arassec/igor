@@ -3,9 +3,10 @@ package com.arassec.igor.plugin.core.web.connector;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
+import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +29,17 @@ import java.security.cert.CertificateException;
 import java.util.Optional;
 
 /**
- * A connector to HTTP(S) servers.
+ * <h1>HTTP Connector</h1>
+ *
+ * <h2>Description</h2>
+ * The HTTP connector can be used to query web servers via HTTP/HTTPS.<br>
+ * <p>
+ * The java.net.http.HttpClient is used internally to connect to servers. All configuration options available, e.g. with JVM
+ * parameters, will automatically be used by the connector.
  */
 @Slf4j
-@IgorComponent
-public class StandardHttpConnector extends BaseHttpConnector {
+@IgorComponent(typeId = "http-web-connector", categoryId = CoreCategory.WEB)
+public class StandardHttpConnector extends BaseConnector implements HttpConnector {
 
     /**
      * Protocol for the SSL-Context.
@@ -40,7 +47,7 @@ public class StandardHttpConnector extends BaseHttpConnector {
     private static final String SSL_CONTEXT_PROTOCOL = "TLSv1.2";
 
     /**
-     * An URL for testing the configuration.
+     * An HTTP(S) URL that is queried via HTTP-GET when the connector's configuration is tested by the user.
      */
     @Getter
     @Setter
@@ -65,7 +72,7 @@ public class StandardHttpConnector extends BaseHttpConnector {
     private Integer proxyPort = 80;
 
     /**
-     * Path to a keystore file for the SSL {@link KeyManager}.
+     * Path to a keystore file containing the HTTP client's keys.
      */
     @Getter
     @Setter
@@ -73,7 +80,7 @@ public class StandardHttpConnector extends BaseHttpConnector {
     private String keymanagerKeystore;
 
     /**
-     * The password for the {@link KeyManager}'s keystore file.
+     * Password for the keymanager's keystore file.
      */
     @Getter
     @Setter
@@ -81,7 +88,7 @@ public class StandardHttpConnector extends BaseHttpConnector {
     private String keymanagerPassword;
 
     /**
-     * The type of the {@link KeyManager}'s keystore file.
+     * Type of the keymanager's keystore.
      */
     @Getter
     @Setter
@@ -90,7 +97,7 @@ public class StandardHttpConnector extends BaseHttpConnector {
     private String keymanagerType = "pkcs12";
 
     /**
-     * Path to a keystore file for the SSL {@link TrustManager}.
+     * Path to a keystore file containing trusted server certificates.
      */
     @Getter
     @Setter
@@ -98,7 +105,7 @@ public class StandardHttpConnector extends BaseHttpConnector {
     private String trustmanagerKeystore;
 
     /**
-     * The password for the {@link TrustManager}'s keystore file.
+     * Password for the trustmanager's keystore file.
      */
     @Getter
     @Setter
@@ -106,7 +113,7 @@ public class StandardHttpConnector extends BaseHttpConnector {
     private String trustmanagerPassword;
 
     /**
-     * The type of the {@link TrustManager}'s keystore file.
+     * Type of the trustmanager's keystore.
      */
     @Getter
     @Setter
@@ -115,7 +122,8 @@ public class StandardHttpConnector extends BaseHttpConnector {
     private String trustmanagerType = "pkcs12";
 
     /**
-     * Enables or disables SSL certificate verification.
+     * If checked, server SSL certificates will be validated by the connector. If unchecked, all provided certificates will be
+     * accepted, <strong>THUS DISABLING SECURITY!</strong>
      */
     @Getter
     @Setter
@@ -123,7 +131,8 @@ public class StandardHttpConnector extends BaseHttpConnector {
     private boolean certificateVerification = true;
 
     /**
-     * Enables or disables following redirects.
+     * If checked, the connector will follow redirects in a secure way (e.g. not leaving SSL connections). If unchecked, HTTP
+     * redirects will be treated as errors.
      */
     @Getter
     @Setter
@@ -134,13 +143,6 @@ public class StandardHttpConnector extends BaseHttpConnector {
      * The HTTP-Client for web requests.
      */
     private HttpClient httpClient;
-
-    /**
-     * Creates a new connector instance.
-     */
-    public StandardHttpConnector() {
-        super(CorePluginType.HTTP_WEB_CONNECTOR.getId());
-    }
 
     /**
      * {@inheritDoc}
@@ -181,27 +183,27 @@ public class StandardHttpConnector extends BaseHttpConnector {
 
         if (!certificateVerification) {
             trustManagers = new TrustManager[]{
-                    new X509TrustManager() {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return new java.security.cert.X509Certificate[0];
-                        }
-
-                        // For now, all certificates are accepted if the user wishes to do so. In the future, igor will provide
-                        // the ability to accept specific, invalid certificates.
-                        @SuppressWarnings({"java:S4830", "squid:S4424"})
-                        public void checkClientTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
-                            // Accept all certificates...
-                        }
-
-                        // For now, all certificates are accepted if the user wishes to do so. In the future, igor will provide
-                        // the ability to accept specific, invalid certificates.
-                        @SuppressWarnings({"java:S4830", "squid:S4424"})
-                        public void checkServerTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
-                            // Accept all certificates...
-                        }
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new java.security.cert.X509Certificate[0];
                     }
+
+                    // For now, all certificates are accepted if the user wishes to do so. In the future, igor will provide
+                    // the ability to accept specific, invalid certificates.
+                    @SuppressWarnings({"java:S4830", "squid:S4424"})
+                    public void checkClientTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                        // Accept all certificates...
+                    }
+
+                    // For now, all certificates are accepted if the user wishes to do so. In the future, igor will provide
+                    // the ability to accept specific, invalid certificates.
+                    @SuppressWarnings({"java:S4830", "squid:S4424"})
+                    public void checkServerTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                        // Accept all certificates...
+                    }
+                }
             };
         } else if (StringUtils.hasText(trustmanagerKeystore)) {
             String password = Optional.ofNullable(trustmanagerPassword).orElse("");

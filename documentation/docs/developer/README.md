@@ -4,7 +4,7 @@
 Igor is highly extensible and can be customized very easily. 
 It is based on the popular Spring framework and uses many of its tools and concepts.
 
-Custom types for the following components can easily be added to igor:
+Custom components of the following types can easily be added to igor:
 - Trigger
 - Action
 - Connector 
@@ -25,3 +25,6 @@ Then add the following dependency to your project's `pom.xml` file:
 &lt;/dependency&gt;</code></pre></div>
 
 Now your application should start and igor's web frontend should be available with the standard features of the respective version.
+
+### Optional: Component Documentation Generation
+If you want to generate component documentation for igor's online help from JavaDoc comments of the respective component, you can use the `igor-maven-plugin` as described here (TODO).

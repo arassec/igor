@@ -61,12 +61,6 @@ class BaseProxyTest {
     @Test
     @DisplayName("Tests getters and setters of the proxy.")
     void testGetGettersAndSetters() {
-        actionProxy.getCategoryId();
-        verify(actionMock, times(1)).getCategoryId();
-
-        actionProxy.getTypeId();
-        verify(actionMock, times(1)).getTypeId();
-
         actionProxy.getId();
         verify(actionMock, times(1)).getId();
 

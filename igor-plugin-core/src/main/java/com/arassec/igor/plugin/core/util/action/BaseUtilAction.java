@@ -1,7 +1,6 @@
 package com.arassec.igor.plugin.core.util.action;
 
 import com.arassec.igor.core.model.action.BaseAction;
-import com.arassec.igor.plugin.core.CorePluginCategory;
 
 /**
  * Base class for actions that don't really fit into any other category.
@@ -17,14 +16,5 @@ public abstract class BaseUtilAction extends BaseAction {
      * The default time format to use for parsing data timestamps.
      */
     protected static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
-
-    /**
-     * Creates a new component instance.
-     *
-     * @param typeId The type ID.
-     */
-    protected BaseUtilAction(String typeId) {
-        super(CorePluginCategory.UTIL.getId(), typeId);
-    }
 
 }

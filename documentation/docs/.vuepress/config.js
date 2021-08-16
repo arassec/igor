@@ -113,12 +113,13 @@ module.exports = {
                     ]
                 },
                 {
-                    title: "Adding Components",
+                    title: "Custom Components",
                     children: [
                         "component",
                         "trigger",
                         "action",
-                        "connector"
+                        "connector",
+                        "documentation"
                     ]
                 }
             ],

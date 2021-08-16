@@ -18,4 +18,29 @@ import java.lang.annotation.Target;
 @Component
 @Scope("prototype")
 public @interface IgorComponent {
+
+    /**
+     * Name of the Type-ID member of this annotation. Used e.g. during documentation generation.
+     */
+    String TYPE_ID = "typeId";
+
+    /**
+     * The default category of any component. Used if no other can be determined.
+     */
+    String DEFAULT_CATEGORY = "miscellaneous";
+
+    /**
+     * The component's type ID.
+     *
+     * @return The type ID.
+     */
+    String typeId();
+
+    /**
+     * The component's category ID.
+     *
+     * @return The type ID.
+     */
+    String categoryId() default DEFAULT_CATEGORY;
+
 }

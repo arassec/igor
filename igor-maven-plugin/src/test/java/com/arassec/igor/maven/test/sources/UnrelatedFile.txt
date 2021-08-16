@@ -1,0 +1,1 @@
+This text file must be ignored during documentation generation and must not cause the generation to fail!

@@ -1,12 +1,12 @@
 package com.arassec.igor.plugin.message.action;
 
 import com.arassec.igor.application.annotation.IgorComponent;
+import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
-import com.arassec.igor.plugin.core.message.action.BaseMessageAction;
-import com.arassec.igor.plugin.message.MessagePluginType;
 import com.arassec.igor.plugin.message.connector.RabbitMqMessage;
 import com.arassec.igor.plugin.message.connector.RabbitMqMessageConnector;
 import lombok.Getter;
@@ -20,57 +20,99 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Sends a message to the specified messaging connector.
+ * <h1>'Send RabbitMQ Message' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action sends a message to a RabbitMQ exchange.
+ *
+ * <h2>Mustache Template Parameters</h2>
+ * The message template can contain mustache expressions to fill the message with dynamic values from the processed data
+ * item.<br>
+ * <p>
+ * As example, let's assume the action operates on the following data item:
+ * <pre><code>
+ * {
+ *   "data": {
+ *     "filename": "README.TXT",
+ *     "lastModified": "2020-04-18T00:00:00+02:00",
+ *     "directory": "/"
+ *   },
+ *   "meta": {
+ *     "jobId": "1e91a654-ba8c-4c3a-afd0-932bd27d2888",
+ *     "timestamp": 1587203554775
+ *   }
+ * }
+ * </code></pre>
+ * <p>
+ * The action should send a message containing the filename with the key 'file':
+ * <pre><code>
+ * {
+ *   "file": "README.TXT"
+ * }
+ * </code></pre>
+ * <p>
+ * This can be done by configuring the following message template:
+ * <pre><code>
+ * {
+ *   "file": "{{data.filename}}"
+ * }
+ * </code></pre>
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
-public class SendRabbitMqMessageAction extends BaseMessageAction {
+@IgorComponent(typeId = "send-rabbitmq-message-action", categoryId = CoreCategory.MESSAGE)
+public class SendRabbitMqMessageAction extends BaseAction {
 
     /**
-     * The connector to use for message sending.
+     * The RabbitMQ connector to use for sending the message.
      */
     @NotNull
     @IgorParam
     private RabbitMqMessageConnector messageConnector;
 
     /**
-     * The exchange to send messages to.
+     * The RabbitMQ exchange to send the messages to.
      */
     @NotEmpty
     @IgorParam
     private String exchange;
 
     /**
-     * The message template to use.
+     * A template message that is used as message body. Parameters can be filled by using the template syntax explained below.
      */
     @NotEmpty
     @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
     private String messageTemplate;
 
     /**
-     * The message encoding.
+     * Sets the encoding for messages sent by this connector.
      */
     @NotEmpty
     @IgorParam(advanced = true)
     private String contentEncoding = "UTF-8";
 
     /**
-     * The message's content type.
+     * Specifies the content type of the message's content.
      */
     @NotEmpty
     @IgorParam(advanced = true)
     private String contentType = "text/plain";
 
     /**
-     * Optional message headers.
+     * An optional routing key that will be used in messages of this connector.
+     */
+    @IgorParam(advanced = true)
+    private String routingKey;
+
+    /**
+     * Each line can contain a 'Header:Value'-pair which is used in messages sent by this action.
      */
     @IgorParam(advanced = true, subtype = ParameterSubtype.MULTI_LINE)
     private String headers;
 
     /**
-     * Only sends messages during simulated job executions if set to {@code false}.
+     * Only sends messages during simulated job executions if unchecked.
      */
     @IgorParam(advanced = true)
     private boolean simulationSafe = true;
@@ -79,7 +121,6 @@ public class SendRabbitMqMessageAction extends BaseMessageAction {
      * Creates a new component instance.
      */
     public SendRabbitMqMessageAction() {
-        super(MessagePluginType.SEND_RABBITMQ_MESSAGE_ACTION.getId());
         messageConnector = new RabbitMqMessageConnector(null);
         messageTemplate = "";
     }
@@ -114,7 +155,7 @@ public class SendRabbitMqMessageAction extends BaseMessageAction {
         }
 
         if (!isSimulation(data) || !simulationSafe) {
-            messageConnector.sendMessage(exchange, message);
+            messageConnector.sendMessage(exchange, routingKey, message);
         }
 
         log.trace("RabbitMqMessage sent:\n{}", content);

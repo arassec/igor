@@ -1,6 +1,7 @@
 package com.arassec.igor.simulation.job.proxy.test;
 
 
+import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
@@ -13,6 +14,7 @@ import java.util.Map;
 /**
  * An action for testing.
  */
+@IgorComponent(typeId = "test-action-type", categoryId = "test-action-category")
 public class TestAction extends BaseAction {
 
     /**
@@ -22,13 +24,6 @@ public class TestAction extends BaseAction {
     @Setter
     @IgorParam
     private TestConnector testConnector;
-
-    /**
-     * Creates a new component instance.
-     */
-    public TestAction() {
-        super("test-action-category", "test-action-type");
-    }
 
     /**
      * {@inheritDoc}

@@ -79,6 +79,7 @@
         <module>persistence</module>
         <module>frontend</module>
         <module>simulation</module>
+        <module>igor-maven-plugin</module>
         <module>igor-plugin-core</module>
         <module>igor-plugin-file</module>
         <module>igor-plugin-message</module>

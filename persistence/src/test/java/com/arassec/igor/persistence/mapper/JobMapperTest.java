@@ -85,8 +85,6 @@ class JobMapperTest extends MapperBaseTest {
         TestTrigger testTrigger = (TestTrigger) testJob.getTrigger();
 
         assertEquals("trigger-id", testTrigger.getId());
-        assertEquals(TestTrigger.CATEGORY_ID, testTrigger.getCategoryId());
-        assertEquals(TestTrigger.TYPE_ID, testTrigger.getTypeId());
 
         assertEquals(1, testJob.getActions().size());
         TestAction testAction = (TestAction) testJob.getActions().get(0);
@@ -94,8 +92,6 @@ class JobMapperTest extends MapperBaseTest {
         assertEquals("action-id", testAction.getId());
         assertEquals("action-name", testAction.getName());
         assertEquals("action-description", testAction.getDescription());
-        assertEquals(TestAction.CATEGORY_ID, testAction.getCategoryId());
-        assertEquals(TestAction.TYPE_ID, testAction.getTypeId());
         assertTrue(testAction.getTestConnector() instanceof TestConnector);
     }
 

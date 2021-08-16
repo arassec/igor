@@ -1,5 +1,6 @@
 package com.arassec.igor.web.controller;
 
+import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.util.Pair;
@@ -38,6 +39,9 @@ class TransferControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests exporting a job.")
     @SneakyThrows
     void testExportJob() {
+        when(igorComponentUtil.getTypeId(any(IgorComponent.class))).thenReturn("type-id");
+        when(igorComponentUtil.getCategoryId(any(IgorComponent.class))).thenReturn("category-id");
+
         mockMvc.perform(get("/api/transfer/job/job-id").contentType(MediaType.APPLICATION_OCTET_STREAM))
             .andExpect(status().isBadRequest()).andReturn();
 
@@ -73,6 +77,9 @@ class TransferControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests importing a job.")
     @SneakyThrows
     void testImportJob() {
+        when(igorComponentUtil.getTypeId(any(IgorComponent.class))).thenReturn("type-id");
+        when(igorComponentUtil.getCategoryId(any(IgorComponent.class))).thenReturn("category-id");
+
         TestConnector testConnector = new TestConnector();
         testConnector.setId("connector-id");
 
@@ -84,7 +91,7 @@ class TransferControllerTest extends RestControllerBaseTest {
 
         String content = objectMapper.writeValueAsString(transferData);
 
-        when(igorComponentRegistry.createConnectorInstance(eq(testConnector.getTypeId()), anyMap())).thenReturn(new TestConnector());
+        when(igorComponentRegistry.createConnectorInstance(eq("type-id"), anyMap())).thenReturn(new TestConnector());
 
         mockMvc.perform(post("/api/transfer").content(content).contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().is(200)).andReturn();
@@ -105,6 +112,9 @@ class TransferControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests exporting a connector.")
     @SneakyThrows
     void testExportConnector() {
+        when(igorComponentUtil.getTypeId(any(IgorComponent.class))).thenReturn("type-id");
+        when(igorComponentUtil.getCategoryId(any(IgorComponent.class))).thenReturn("category-id");
+
         mockMvc.perform(get("/api/transfer/connector/connector-id").contentType(MediaType.APPLICATION_OCTET_STREAM))
             .andExpect(status().isBadRequest()).andReturn();
 
@@ -123,7 +133,7 @@ class TransferControllerTest extends RestControllerBaseTest {
         TransferData transferData = convert(mvcResult, TransferData.class);
         assertEquals(1, transferData.getConnectorJsons().size());
 
-        when(igorComponentRegistry.createConnectorInstance(eq("connector-type-id"), anyMap())).thenReturn(new TestConnector());
+        when(igorComponentRegistry.createConnectorInstance(eq("type-id"), anyMap())).thenReturn(new TestConnector());
         Connector exportedConnector = objectMapper.convertValue(transferData.getConnectorJsons().get(0), Connector.class);
 
         assertEquals("connector-id", exportedConnector.getId());
@@ -136,6 +146,9 @@ class TransferControllerTest extends RestControllerBaseTest {
     @DisplayName("Tests importing a connector.")
     @SneakyThrows
     void testImportConnector() {
+        when(igorComponentUtil.getTypeId(any(IgorComponent.class))).thenReturn("type-id");
+        when(igorComponentUtil.getCategoryId(any(IgorComponent.class))).thenReturn("category-id");
+
         TestConnector testConnector = new TestConnector();
         testConnector.setId("connector-id");
 
@@ -147,7 +160,7 @@ class TransferControllerTest extends RestControllerBaseTest {
 
         String content = objectMapper.writeValueAsString(transferData);
 
-        when(igorComponentRegistry.createConnectorInstance(eq(testConnector.getTypeId()), anyMap())).thenReturn(new TestConnector());
+        when(igorComponentRegistry.createConnectorInstance(eq("type-id"), anyMap())).thenReturn(new TestConnector());
 
         mockMvc.perform(post("/api/transfer").content(content).contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().is(200)).andReturn();

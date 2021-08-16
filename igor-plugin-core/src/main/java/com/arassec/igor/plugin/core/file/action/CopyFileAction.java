@@ -5,8 +5,8 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CoreDataKey;
-import com.arassec.igor.plugin.core.CorePluginType;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
@@ -20,66 +20,96 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 /**
- * Copies a file from one connector to another.
+ * <h1>'Copy file' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action copies a file.<br>
+ *
+ * Details about the action's parameters are added to processed data items under the 'copiedFile' key.<br>
+ *
+ * A data item processed by this action could look like this:
+ * <pre><code>
+ * {
+ *   "data": {
+ *     "filename": "KeyGenerator.png",
+ *     "lastModified": "2007-03-19T20:52:58+01:00",
+ *     "directory": "/pub/example/"
+ *   },
+ *   "meta": {
+ *     "jobId": "e0b925ed-104f-45b1-81b7-5d79ea46a633",
+ *     "simulation": true,
+ *     "timestamp": 1601302694149
+ *   },
+ *   "copiedFile": {
+ *     "sourceDirectory": "/pub/example/",
+ *     "targetFilename": "KeyGenerator.png",
+ *     "targetDirectory": "/volume1/data/test/",
+ *     "sourceFilename": "KeyGenerator.png"
+ *   }
+ * }
+ * </code></pre>
  */
 @Slf4j
 @Setter
 @Getter
-@IgorComponent
+@IgorComponent(typeId = "copy-file-action", categoryId = CoreCategory.FILE)
 public class CopyFileAction extends BaseFileAction {
 
     /**
-     * The connector providing the file to copy.
+     * A file-connector providing access to the file to copy.
      */
     @NotNull
     @IgorParam
     private FileConnector source;
 
     /**
-     * Source directory to copy the file from.
+     * The directory containing the file to copy. Either a fixed value or a mustache expression selecting a property from the data
+     * item. If a mustache expression is used, the property's value will be used as directory name.
      */
     @NotBlank
     @IgorParam
     private String sourceDirectory = DIRECTORY_TEMPLATE;
 
     /**
-     * Source file to copy.
+     * The name of the file to copy. Either a fixed value or a mustache expression selecting a property from the data item. If a
+     * mustache expression is used, the property's value will be used as filename.
      */
     @NotBlank
     @IgorParam
     private String sourceFilename = FILENAME_TEMPLATE;
 
     /**
-     * The destination for the copied file.
+     * A file-connector providing access to the filesystem the file should be copied to.
      */
     @NotNull
     @IgorParam
     private FileConnector target;
 
     /**
-     * The target directory to copy/move the file to.
+     * The target directory for the copied file. Either a fixed value or a mustache expression selecting a property from the data
+     * item. If a mustache expression is used, the property's value will be used as directory name.
      */
     @NotBlank
     @IgorParam
     private String targetDirectory;
 
     /**
-     * The target file name.
+     * The target name of the copied file. Either a fixed value or a mustache expression selecting a property from the data item.
+     * If a mustache expression is used, the property's value will be used as filename.
      */
     @NotBlank
     @IgorParam
     private String targetFilename;
 
     /**
-     * Enables a ".igor" file suffix during file transfer. The suffix will be removed after the file has been copied completely.
+     * Enables an ".igor" file suffix during file transfer. The suffix will be removed after the file has been copied completely.
      */
     @IgorParam(advanced = true)
     private boolean appendTransferSuffix = true;
 
     /**
-     * If set to {@code true}, igor appends a filetype suffix if avaliable (e.g. '.html' or '.jpeg').
+     * If checked, igor will try to determine the file type and append it to the target filename (e.g. '.html' or '.jpeg').
      */
     @IgorParam(advanced = true)
     private boolean appendFiletypeSuffix = false;
@@ -88,7 +118,6 @@ public class CopyFileAction extends BaseFileAction {
      * Creates a new component instance.
      */
     public CopyFileAction() {
-        super(CorePluginType.COPY_FILE_ACTION.getId());
         source = new FallbackFileConnector();
         target = new FallbackFileConnector();
     }
@@ -123,7 +152,7 @@ public class CopyFileAction extends BaseFileAction {
             }
 
             String targetFileWithSuffix = CorePluginUtils.appendSuffixIfRequired(resolvedData.getTargetFilename(),
-                    fileStreamData.getFilenameSuffix(), appendFiletypeSuffix);
+                fileStreamData.getFilenameSuffix(), appendFiletypeSuffix);
 
             String targetFileWithPath = CorePluginUtils.combineFilePath(resolvedData.getTargetDirectory(), targetFileWithSuffix);
 

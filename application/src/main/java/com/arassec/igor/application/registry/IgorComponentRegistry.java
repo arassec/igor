@@ -1,6 +1,7 @@
 package com.arassec.igor.application.registry;
 
 import com.arassec.igor.application.IgorApplicationProperties;
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.action.MissingComponentAction;
@@ -65,6 +66,11 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * Igor's application configuration properties.
      */
     private final IgorApplicationProperties igorApplicationProperties;
+
+    /**
+     * Utility for igor components.
+     */
+    private final IgorComponentUtil igorComponentUtil;
 
     /**
      * Contains the categories of a certain component type (e.g. Action.class -> Action-Categories or Connector.class ->
@@ -169,10 +175,10 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * @return A new job instance.
      */
     public Job createJobPrototype() {
-        var trigger = createTriggerInstance(triggers.stream()
-            .filter(triggerCandidate -> triggerCandidate.getTypeId().equals(igorApplicationProperties.getDefaultTrigger()))
+        var trigger = createTriggerInstance(igorComponentUtil.getTypeId(triggers.stream()
+            .filter(triggerCandidate -> igorComponentUtil.getTypeId(triggerCandidate).equals(igorApplicationProperties.getDefaultTrigger()))
             .findFirst()
-            .orElse(triggers.get(0)).getTypeId(), null);
+            .orElse(triggers.get(0))), null);
         trigger.setId(UUID.randomUUID().toString());
 
         return Job.builder()
@@ -189,10 +195,10 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * @return A new action instance.
      */
     public Action createActionPrototype() {
-        var action = createActionInstance(actions.stream()
-            .filter(actionCandidate -> actionCandidate.getTypeId().equals(igorApplicationProperties.getDefaultAction()))
+        var action = createActionInstance(igorComponentUtil.getTypeId(actions.stream()
+            .filter(actionCandidate -> igorComponentUtil.getTypeId(actionCandidate).equals(igorApplicationProperties.getDefaultAction()))
             .findFirst()
-            .orElse(actions.get(0)).getTypeId(), null);
+            .orElse(actions.get(0))), null);
         action.setId(UUID.randomUUID().toString());
         return action;
     }
@@ -206,7 +212,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * @return The new {@link Action} instance.
      */
     public Action createActionInstance(String typeId, Map<String, Object> parameters) {
-        Optional<Action> optional = actions.stream().filter(action -> action.getTypeId().equals(typeId)).findFirst();
+        Optional<Action> optional = actions.stream().filter(action -> igorComponentUtil.getTypeId(action).equals(typeId)).findFirst();
         if (optional.isPresent()) {
             var action = applicationContext.getBean(optional.get().getClass());
             applyParameters(action, parameters);
@@ -224,7 +230,8 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * @return The new {@link Connector} instance.
      */
     public Connector createConnectorInstance(String typeId, Map<String, Object> parameters) {
-        Optional<Connector> optional = connectors.stream().filter(connector -> connector.getTypeId().equals(typeId)).findFirst();
+        Optional<Connector> optional =
+            connectors.stream().filter(connector -> igorComponentUtil.getTypeId(connector).equals(typeId)).findFirst();
         if (optional.isPresent()) {
             Connector connector = applicationContext.getBean(optional.get().getClass());
             applyParameters(connector, parameters);
@@ -242,7 +249,8 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      * @return The new {@link Trigger} instance.
      */
     public Trigger createTriggerInstance(String typeId, Map<String, Object> parameters) {
-        Optional<Trigger> optional = triggers.stream().filter(trigger -> trigger.getTypeId().equals(typeId)).findFirst();
+        Optional<Trigger> optional =
+            triggers.stream().filter(trigger -> igorComponentUtil.getTypeId(trigger).equals(typeId)).findFirst();
         if (optional.isPresent()) {
             Trigger trigger = applicationContext.getBean(optional.get().getClass());
             applyParameters(trigger, parameters);
@@ -265,10 +273,11 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
             connectors.stream()
                 .filter(connector -> parameterClass.isAssignableFrom(connector.getClass()))
                 .forEach(connector -> {
-                    if (!result.containsKey(connector.getCategoryId())) {
-                        result.put(connector.getCategoryId(), new HashSet<>());
+                    String categoryId = igorComponentUtil.getCategoryId(connector);
+                    if (!result.containsKey(categoryId)) {
+                        result.put(categoryId, new HashSet<>());
                     }
-                    result.get(connector.getCategoryId()).add(connector.getTypeId());
+                    result.get(categoryId).add(igorComponentUtil.getTypeId(connector));
                 });
         }
         return result;
@@ -284,16 +293,11 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
     private void initializeComponent(Class<? extends IgorComponent> componentType, List<? extends IgorComponent> components,
                                      Map<String, Set<String>> typeByCategoryStore) {
         categoriesByComponentType.put(componentType, new HashSet<>());
-
         for (IgorComponent component : components) {
-
-            categoriesByComponentType.get(componentType).add(component.getCategoryId());
-
-            if (!typeByCategoryStore.containsKey(component.getCategoryId())) {
-                typeByCategoryStore.put(component.getCategoryId(), new HashSet<>());
-            }
-
-            typeByCategoryStore.get(component.getCategoryId()).add(component.getTypeId());
+            String categoryId = igorComponentUtil.getCategoryId(component);
+            categoriesByComponentType.get(componentType).add(categoryId);
+            typeByCategoryStore.computeIfAbsent(categoryId, s -> new HashSet<>());
+            typeByCategoryStore.get(categoryId).add(igorComponentUtil.getTypeId(component));
         }
     }
 

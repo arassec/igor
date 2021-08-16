@@ -104,6 +104,21 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>copy-resources-plugin-common-gen</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>docs/user/igor-plugin-core</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../igor-plugin-core/src/main/resources/doc-gen</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-resources-plugin-file</id>
                         <phase>initialize</phase>
                         <goals>
@@ -119,6 +134,21 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>copy-resources-plugin-file-gen</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>docs/user/igor-plugin-file</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../igor-plugin-file/src/main/resources/doc-gen</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-resources-plugin-message</id>
                         <phase>initialize</phase>
                         <goals>
@@ -129,6 +159,21 @@
                             <resources>
                                 <resource>
                                     <directory>${project.basedir}/../igor-plugin-message/src/main/resources/doc</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-plugin-message-gen</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>docs/user/igor-plugin-message</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../igor-plugin-message/src/main/resources/doc-gen</directory>
                                 </resource>
                             </resources>
                         </configuration>

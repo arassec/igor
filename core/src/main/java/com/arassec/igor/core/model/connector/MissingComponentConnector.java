@@ -1,7 +1,5 @@
 package com.arassec.igor.core.model.connector;
 
-import com.arassec.igor.core.model.CoreCategory;
-import com.arassec.igor.core.model.CoreType;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.annotation.validation.MissingComponent;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
@@ -27,7 +25,6 @@ public class MissingComponentConnector extends BaseConnector {
      * @param errorCause Description of the original error cause.
      */
     public MissingComponentConnector(String errorCause) {
-        super(CoreCategory.CORE.getId(), CoreType.MISSING_COMPONENT_CONNECTOR.getId());
         this.errorCause = errorCause;
     }
 

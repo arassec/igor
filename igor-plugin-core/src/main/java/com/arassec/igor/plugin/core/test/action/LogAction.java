@@ -2,8 +2,9 @@ package com.arassec.igor.plugin.core.test.action;
 
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.DataKey;
+import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -12,25 +13,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Logs the processed data item to igor's log.
+ * <h1>Log Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action logs every processed data item to igor's log with DEBUG level.
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
-public class LogAction extends BaseTestAction {
+@IgorComponent(typeId = "log-action", categoryId = CoreCategory.TEST)
+public class LogAction extends BaseAction {
 
     /**
      * The job's ID.
      */
     private String jobId;
-
-    /**
-     * Creates a new component instance.
-     */
-    public LogAction() {
-        super(CorePluginType.LOG_ACTION.getId());
-    }
 
     /**
      * {@inheritDoc}

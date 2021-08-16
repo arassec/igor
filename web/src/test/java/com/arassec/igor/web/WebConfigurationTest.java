@@ -1,6 +1,7 @@
 package com.arassec.igor.web;
 
 import com.arassec.igor.application.registry.IgorComponentRegistry;
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.application.util.IgorConfigHelper;
 import com.arassec.igor.core.repository.ConnectorRepository;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -57,11 +58,13 @@ class WebConfigurationTest {
     @Test
     @DisplayName("Tests getting the web layer's object-mappers.")
     void testObjectMapperCreation() {
+        IgorComponentUtil igorComponentUtil = mock(IgorComponentUtil.class);
         IgorComponentRegistry igorComponentRegistryMock = mock(IgorComponentRegistry.class);
         ConnectorRepository connectorRepositoryMock = mock(ConnectorRepository.class);
         MessageSource messageSourceMock = mock(MessageSource.class);
 
-        ObjectMapper objectMapper = webConfiguration.objectMapper(igorComponentRegistryMock, connectorRepositoryMock, messageSourceMock);
+        ObjectMapper objectMapper = webConfiguration.objectMapper(igorComponentRegistryMock, connectorRepositoryMock,
+            igorComponentUtil, messageSourceMock);
 
         assertFalse(objectMapper.isEnabled(MapperFeature.DEFAULT_VIEW_INCLUSION));
         assertFalse(objectMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));

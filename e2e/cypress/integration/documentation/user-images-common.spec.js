@@ -4,15 +4,15 @@ describe('Creates user doc common images.', () => {
     it('Create delete-button.png, export-button.png and duplicate-button.png', function () {
         cy.openConnectorOverview();
 
-        cy.get('[data-e2e=delete-local-filesystem]')
+        cy.get('[data-e2e=delete-rabbit-mq-server]')
             .should('be.visible')
             .screenshot(targetDir + 'delete-button')
 
-        cy.get('[data-e2e=export-local-filesystem]')
+        cy.get('[data-e2e=export-rabbit-mq-server]')
             .should('be.visible')
             .screenshot(targetDir + 'export-button')
 
-        cy.get('[data-e2e=duplicate-local-filesystem]')
+        cy.get('[data-e2e=duplicate-rabbit-mq-server]')
             .should('be.visible')
             .screenshot(targetDir + 'duplicate-button')
     });

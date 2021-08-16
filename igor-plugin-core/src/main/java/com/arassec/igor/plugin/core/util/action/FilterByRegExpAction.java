@@ -3,7 +3,7 @@ package com.arassec.igor.plugin.core.util.action;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,16 +14,28 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Filters the supplied data by a regular expression.
+ * <h1>'Filter by Regular Expression' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action filters data items by evaluating a regular expression against a property value of the data item.<br>
+ *
+ * If the regular expression matches, the data item is passed to the following action. Otherwise the data item is filtered and not
+ * passed to the following action.
+ *
+ * <h2>Regular Expressions</h2>
+ * This action uses Java's 'String.matches(String regExp)' method for regular expression matching. The regular expressions
+ * supported by this method are described in
+ * <a href="https://docs.oracle.com/javase/tutorial/essential/regex/">The Java Tutorials</a>.
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "filter-by-regexp-action", categoryId = CoreCategory.UTIL)
 public class FilterByRegExpAction extends BaseUtilAction {
 
     /**
-     * The input to test against the regular expression.
+     * A mustache expression selecting a property from the data item. The property's value is used for matching against the
+     * regular expression.
      */
     @NotBlank
     @IgorParam
@@ -37,18 +49,11 @@ public class FilterByRegExpAction extends BaseUtilAction {
     private String expression;
 
     /**
-     * If set to {@code true}, the filter will drop all matching data items. If set to {@code false}, all non-matching data items
-     * will be dropped.
+     * If checked, data items that <strong>match</strong> the regular expression will be removed from the stream. If unchecked,
+     * data items that <strong>do not</strong> match are removed from further processing.
      */
     @IgorParam(advanced = true)
     private boolean dropMatching;
-
-    /**
-     * Creates a new component instance.
-     */
-    public FilterByRegExpAction() {
-        super(CorePluginType.FILTER_BY_REGEXP_ACTION.getId());
-    }
 
     /**
      * Matches the provided data against the configured regular expression and filters it, if it doesn't match.
@@ -71,7 +76,7 @@ public class FilterByRegExpAction extends BaseUtilAction {
         }
 
         if ((dropMatching && resolvedInput.matches(resolvedExpression))
-                || (!dropMatching && !resolvedInput.matches(resolvedExpression))) {
+            || (!dropMatching && !resolvedInput.matches(resolvedExpression))) {
             log.debug("Filtered '{}' against RegExp '{}'", resolvedInput, resolvedExpression);
             return List.of();
         }

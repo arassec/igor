@@ -1,6 +1,7 @@
 package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.application.registry.IgorComponentRegistry;
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.application.util.IgorConfigHelper;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.job.Job;
@@ -46,13 +47,15 @@ class ObjectMapperTest {
      */
     @BeforeEach
     void initialize() {
+        IgorComponentUtil igorComponentUtil = new IgorComponentUtil();
+
         ApplicationContext applicationContextMock = mock(ApplicationContext.class);
         when(applicationContextMock.getBean(TestConnector.class)).thenReturn(new TestConnector());
         when(applicationContextMock.getBean(TestTrigger.class)).thenReturn(new TestTrigger());
         when(applicationContextMock.getBean(TestAction.class)).thenReturn(new TestAction());
 
         IgorComponentRegistry igorComponentRegistry = new IgorComponentRegistry(List.of(new TestAction()),
-                List.of(new TestTrigger()), List.of(new TestConnector()), null);
+                List.of(new TestTrigger()), List.of(new TestConnector()), null, igorComponentUtil);
         igorComponentRegistry.setApplicationContext(applicationContextMock);
         igorComponentRegistry.afterPropertiesSet();
 
@@ -61,7 +64,7 @@ class ObjectMapperTest {
 
         WebConfiguration webConfiguration = new WebConfiguration();
 
-        objectMapper = webConfiguration.objectMapper(igorComponentRegistry, connectorRepositoryMock,
+        objectMapper = webConfiguration.objectMapper(igorComponentRegistry, connectorRepositoryMock,  igorComponentUtil,
                 webConfiguration.messageSource(List.of(IgorConfigHelper.createMessageSource("i18n/mapper"))));
     }
 
@@ -127,8 +130,6 @@ class ObjectMapperTest {
         TestTrigger testTrigger = (TestTrigger) testJob.getTrigger();
 
         assertEquals("trigger-id", testTrigger.getId());
-        assertEquals(TestTrigger.CATEGORY_ID, testTrigger.getCategoryId());
-        assertEquals(TestTrigger.TYPE_ID, testTrigger.getTypeId());
 
         assertEquals(1, testJob.getActions().size());
         TestAction testAction = (TestAction) testJob.getActions().get(0);
@@ -136,8 +137,6 @@ class ObjectMapperTest {
         assertEquals("action-id", testAction.getId());
         assertEquals("action-name", testAction.getName());
         assertEquals("action-description", testAction.getDescription());
-        assertEquals(TestAction.CATEGORY_ID, testAction.getCategoryId());
-        assertEquals(TestAction.TYPE_ID, testAction.getTypeId());
         assertTrue(testAction.getTestConnector() instanceof TestConnector);
     }
 

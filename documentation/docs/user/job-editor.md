@@ -20,9 +20,9 @@ The top element contains buttons for the following actions:
 
 ![switch navigator button](./images/job/switch-navigator-button.png) Toggles the view of the job configuration and the list of job executions.
 
-![test button](./images/common/test-button.png) Runs the job in **simulation** mode. The results are displayed in the simulation results element.
-
 ![save button](./images/common/save-button.png) Saves the job.
+
+![test button](./images/common/test-button.png) Runs the job in **simulation** mode. The results are displayed in the simulation results element.
 
 ![run job button](./images/job/run-job-button.png) Runs the job.
 
@@ -89,5 +89,4 @@ Clicking on a data item's arrow opens the item's JSON in a tree view.
 
 By clicking on keys in the result JSON, a mustache template for the respective key is entered into the input above the simulation results.
 
-The template is automatically copied to the clipboard.
-After manual modifications, a click on ![copy to clipboard button](./images/job/copy-to-clipboard-button.png) copies the mustache template again to the clipboard.
+A click on ![copy to clipboard button](./images/job/copy-to-clipboard-button.png) copies the mustache template to the clipboard.

@@ -2,23 +2,19 @@ package com.arassec.igor.plugin.file.connector.ftp;
 
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.file.FilePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.IOException;
 
 /**
- * File-Connector that uses FTP as protocol.
+ * <h1>FTP Connector</h1>
+ *
+ * <h2>Description</h2>
+ * A file-connector providing access to an FTP server.
  */
-@IgorComponent
+@IgorComponent(typeId = "ftp-file-connector", categoryId = CoreCategory.FILE)
 public class FtpFileConnector extends BaseFtpFileConnector {
-
-    /**
-     * Creates a new component instance.
-     */
-    public FtpFileConnector() {
-        super(FilePluginType.FTP_FILE_CONNECTOR.getId());
-    }
 
     /**
      * Initializes the FTP client.

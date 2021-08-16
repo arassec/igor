@@ -7,10 +7,12 @@ After that, semantic versioning will be used and breaking changes will only occu
 
 ## Version {{ $themeConfig.igorVersion }}
 - Fixed broken 'HTTP Request' action.
+- Added "igor-maven-plugin" to support component documentation generation from JavaDoc comments.
 
 ::: danger Breaking Changes
 - Removed 'defaultValue' property of the @IgorParam annotation. Directly assign default values instead.
 - Renamed 'value' property of the @IgorParam annotation into 'sortIndex'.
+- Type-ID and Category-ID of Igor components are now configured in the `@IgorComponent` annotation.
 ::: 
 
 ## Version 0.4.1

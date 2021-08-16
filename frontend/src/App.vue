@@ -228,4 +228,8 @@ export default {
         border-top: .1em solid var(--color-font);
     }
 
+    .router-link-exact-active div {
+        background-color: var(--color-foreground);
+    }
+
 </style>

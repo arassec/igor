@@ -2,7 +2,6 @@ package com.arassec.igor.plugin.core.web.action;
 
 import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
-import com.arassec.igor.plugin.core.CorePluginCategory;
 import com.arassec.igor.plugin.core.web.connector.FallbackHttpConnector;
 import com.arassec.igor.plugin.core.web.connector.HttpConnector;
 import lombok.Getter;
@@ -24,27 +23,27 @@ import java.util.List;
 public abstract class BaseHttpAction extends BaseAction {
 
     /**
-     * The connector to use for requests.
+     * An 'HTTP Connector' that is configured to execute the request.
      */
     @NotNull
     @IgorParam(sortIndex = 1)
     protected HttpConnector httpConnector;
 
     /**
-     * The URL to request.
+     * The HTTP(S) URL for the request.
      */
     @NotBlank
     @IgorParam(sortIndex = 2)
     protected String url;
 
     /**
-     * A username for authentication.
+     * A username for HTTP Basic Authentication. If set together with a password, a HTTP Authorization header with the encoded password will be added to every request.
      */
     @IgorParam(sortIndex = Integer.MAX_VALUE - 3, advanced = true)
     protected String username;
 
     /**
-     * The password for authentication.
+     * A password for HTTP Basic Authentication.
      */
     @IgorParam(sortIndex = Integer.MAX_VALUE - 2, advanced = true, secured = true)
     protected String password;
@@ -56,11 +55,8 @@ public abstract class BaseHttpAction extends BaseAction {
 
     /**
      * Creates a new component instance.
-     *
-     * @param typeId The type ID.
      */
-    protected BaseHttpAction(String typeId) {
-        super(CorePluginCategory.WEB.getId(), typeId);
+    protected BaseHttpAction() {
         httpConnector = new FallbackHttpConnector();
     }
 

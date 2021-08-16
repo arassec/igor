@@ -3,13 +3,13 @@ package com.arassec.igor.plugin.message.connector;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
+import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.util.event.JobTriggerEvent;
-import com.arassec.igor.plugin.core.message.connector.BaseMessageConnector;
-import com.arassec.igor.plugin.message.MessagePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,13 +36,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * RabbitMqMessage connector to process messages via RabbitMQ.
+ * <h1>RabbitMQ Connector</h1>
+ *
+ * <h2>Description</h2>
+ * A message-connector that uses RabbitMQ to send messages.
  */
 @Getter
 @Setter
 @Slf4j
-@IgorComponent
-public class RabbitMqMessageConnector extends BaseMessageConnector implements ChannelAwareMessageListener {
+@IgorComponent(typeId = "rabbitmq-message-connector", categoryId = CoreCategory.MESSAGE)
+public class RabbitMqMessageConnector extends BaseConnector implements ChannelAwareMessageListener {
 
     /**
      * Publisher for events based on job changes.
@@ -55,55 +58,49 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * The RabbitMQ host.
+     * The host running RabbitMQ.
      */
     @NotBlank
     @IgorParam
     private String host;
 
     /**
-     * The RabbitMQ port.
+     * The port, RabbitMQ is listening on.
      */
     @Positive
     @IgorParam
     private int port = 5672;
 
     /**
-     * The RabbitMQ username.
+     * The RabbitMQ user's name.
      */
     @NotBlank
     @IgorParam
     private String username;
 
     /**
-     * The RabbitMQ password.
+     * The password of the RabbitMQ user.
      */
     @NotBlank
     @IgorParam(secured = true)
     private String password;
 
     /**
-     * The optional routing key for messages.
-     */
-    @IgorParam(advanced = true)
-    private String routingKey;
-
-    /**
-     * The virtual host.
+     * The virtual host to use on the RabbitMQ server.
      */
     @NotBlank
     @IgorParam(advanced = true)
     private String virtualHost = "/";
 
     /**
-     * Optional heartbeat for connections to the RabbitMQ server.
+     * RabbitMQ heart beat <strong>in seconds</strong> to use to check the connection to the server.
      */
     @Positive
     @IgorParam(advanced = true)
     private int heartBeat = 30;
 
     /**
-     * Optional connection timeout.
+     * A timeout <strong>in milliseconds</strong> after which a connection to the server will be aborted.
      */
     @Positive
     @IgorParam(advanced = true)
@@ -147,7 +144,6 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
      * @param applicationEventPublisher Spring's event publisher.
      */
     public RabbitMqMessageConnector(ApplicationEventPublisher applicationEventPublisher) {
-        super(MessagePluginType.RABBITMQ_MESSAGE_CONNECTOR.getId());
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
@@ -169,7 +165,7 @@ public class RabbitMqMessageConnector extends BaseMessageConnector implements Ch
     /**
      * {@inheritDoc}
      */
-    public void sendMessage(String exchange, RabbitMqMessage message) {
+    public void sendMessage(String exchange, String routingKey, RabbitMqMessage message) {
         if (!StringUtils.hasText(exchange)) {
             throw new IgorException("No RabbitMQ exchange configured to send messages to!");
         }

@@ -3,7 +3,7 @@ package com.arassec.igor.plugin.core.util.action;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,37 +22,92 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Sorts data by using a configurable pattern on a data value.
+ * <h1>'Sort by Timestamp Pattern' Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action sorts data items based on a timestamp inside a value of the input data.<br>
+ * <p>
+ * This might e.g. be used to sort files by a timestamp that is part of their filename, if the timestamp of the last modification
+ * is not available.
+ *
+ * <h2>Example</h2>
+ * <p>
+ * An example data item processed by this action might look like this:
+ * <pre><code>
+ * {
+ *   "data": {
+ *     "filename": "alpha_20200113185100_beta.jpeg",
+ *     "directory": "/"
+ *   },
+ *   "meta": {
+ *     "jobId": "1e91a654-ba8c-4c3a-afd0-932bd27d2888",
+ *     "timestamp": 1587203554775
+ *   }
+ * }
+ * </code></pre>
+ * <p>
+ * With the following configuration, all data items of a job execution could be sorted by the timestamp encoded in the
+ * filename:<br>
+ * <table>
+ *     <caption>Example configuration</caption>
+ *     <tr>
+ *         <th>Parameter</th>
+ *         <th>Configuration value</th>
+ *     </tr>
+ *     <tr>
+ *         <td>Input</td>
+ *         <td>$.data.filename</td>
+ *     </tr>
+ *     <tr>
+ *         <td>Pattern</td>
+ *         <td>[0-9]{14}</td>
+ *     </tr>
+ *     <tr>
+ *         <td>Timestamp format</td>
+ *         <td>yyyyMMddHHmmss</td>
+ *     </tr>
+ * </table>
+ *
+ * <h2>Event-Triggered Jobs</h2>
+ * <strong>This action is not available in event-triggered jobs!</strong>
+ * <p>
+ * Sorting is done by collecting all data items of one job execution and by sorting the resulting list.
+ * Since event triggered jobs don't stop their execution, the action would collect data items forever, and never forwarding them
+ * to following actions.
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
+@IgorComponent(typeId = "sort-by-timestamp-pattern-action", categoryId = CoreCategory.UTIL)
 public class SortByTimestampPatternAction extends BaseUtilAction {
 
     /**
-     * The input containing the timestamp to sort by.
+     * A mustache expression selecting a property from the data item. The property's value is converted into a timestamp and used
+     * for sorting.
      */
     @NotBlank
     @IgorParam
     private String input;
 
     /**
-     * The pattern to use to extract the date from the target value.
+     * A regular expression matching the timestamp part of the input value.
      */
     @NotBlank
     @IgorParam
     private String pattern;
 
     /**
-     * The timestamp format.
+     * The format of the timtestamp part of the property's value. See
+     * <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/format/DateTimeFormatter.html">Java
+     * DateTimeFormat</a> (section 'Patterns for Formatting and Parsing') for allowed values.
      */
     @NotBlank
     @IgorParam
     private String timestampFormat = DEFAULT_TIMESTAMP_FORMAT;
 
     /**
-     * Defines the sort order
+     * If checked, data items are sorted from older to newer timestamps. If unchecked, data items are sorted from newer to older
+     * timestamps.
      */
     @IgorParam
     private boolean sortAscending = true;
@@ -61,13 +116,6 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * Contains all data that should have been processed by the action.
      */
     private List<Map<String, Object>> collectedData = new LinkedList<>();
-
-    /**
-     * Creates a new instance.
-     */
-    public SortByTimestampPatternAction() {
-        super(CorePluginType.SORT_BY_TIMESTAMP_PATTERN_ACTION.getId());
-    }
 
     /**
      * Collects all data in memory for later sorting.
@@ -106,20 +154,20 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
         }
 
         final boolean applyDefaultTimezone = (!pattern.contains("V") && !pattern.contains("z") && !pattern
-                .contains("O") && !pattern.contains("X") && !pattern.contains("x") && !pattern.contains("Z"));
+            .contains("O") && !pattern.contains("X") && !pattern.contains("x") && !pattern.contains("Z"));
 
         if (!collectedData.isEmpty()) {
             return collectedData.stream()
-                    .filter(data -> extractDateTime(data, p, formatter, applyDefaultTimezone) != null)
-                    .sorted((o1, o2) -> {
-                        ZonedDateTime firstDateTime = extractDateTime(o1, p, formatter, applyDefaultTimezone);
-                        ZonedDateTime secondDateTime = extractDateTime(o2, p, formatter, applyDefaultTimezone);
-                        if (sortAscending) {
-                            return Objects.requireNonNull(firstDateTime).compareTo(Objects.requireNonNull(secondDateTime));
-                        } else {
-                            return Objects.requireNonNull(secondDateTime).compareTo(Objects.requireNonNull(firstDateTime));
-                        }
-                    }).collect(Collectors.toList());
+                .filter(data -> extractDateTime(data, p, formatter, applyDefaultTimezone) != null)
+                .sorted((o1, o2) -> {
+                    ZonedDateTime firstDateTime = extractDateTime(o1, p, formatter, applyDefaultTimezone);
+                    ZonedDateTime secondDateTime = extractDateTime(o2, p, formatter, applyDefaultTimezone);
+                    if (sortAscending) {
+                        return Objects.requireNonNull(firstDateTime).compareTo(Objects.requireNonNull(secondDateTime));
+                    } else {
+                        return Objects.requireNonNull(secondDateTime).compareTo(Objects.requireNonNull(firstDateTime));
+                    }
+                }).collect(Collectors.toList());
         }
 
         return List.of();
@@ -142,8 +190,8 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * @param data                 The raw input data.
      * @param p                    The pattern to use to find the date-time-String.
      * @param formatter            The {@link ZonedDateTime} for the supplied String.
-     * @param applyDefaultTimezone Set to {@code true}, if the format is in {@link LocalDateTime} and the system's
-     *                             default time zone must be applied to the result.
+     * @param applyDefaultTimezone Set to {@code true}, if the format is in {@link LocalDateTime} and the system's default time
+     *                             zone must be applied to the result.
      *
      * @return The {@link ZonedDateTime} or {@code null}, if none could be extracted.
      */
@@ -176,8 +224,8 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
                 return null;
             }
             applyDefaultTimezone = (!resolvedTimestampFormat.contains("V") && !resolvedTimestampFormat.contains("z")
-                    && !resolvedTimestampFormat.contains("O") && !resolvedTimestampFormat.contains("X")
-                    && !resolvedTimestampFormat.contains("x") && !resolvedTimestampFormat.contains("Z"));
+                && !resolvedTimestampFormat.contains("O") && !resolvedTimestampFormat.contains("X")
+                && !resolvedTimestampFormat.contains("x") && !resolvedTimestampFormat.contains("Z"));
             df = DateTimeFormatter.ofPattern(resolvedTimestampFormat);
         }
 
@@ -196,8 +244,8 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     }
 
     /**
-     * Sorting works on all data items in the stream. With events, the stream is unlimited and thus this action would wait
-     * forever for the job to finish.
+     * Sorting works on all data items in the stream. With events, the stream is unlimited and thus this action would wait forever
+     * for the job to finish.
      *
      * @return Always {@code false}.
      */

@@ -1,5 +1,6 @@
 package com.arassec.igor.application.manager;
 
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.core.util.ModelPage;
@@ -26,6 +27,11 @@ public class ConnectorManager {
      * Repository for connectors.
      */
     private final ConnectorRepository connectorRepository;
+
+    /**
+     * Utility for igor components.
+     */
+    private final IgorComponentUtil igorComponentUtil;
 
     /**
      * Saves the provided connector.
@@ -88,7 +94,7 @@ public class ConnectorManager {
         }
         List<Connector> connectors = connectorRepository.findAll();
         List<Connector> allOfType = connectors.stream()
-                .filter(connector -> typeIds.contains(connector.getTypeId()))
+                .filter(connector -> typeIds.contains(igorComponentUtil.getTypeId(connector)))
                 .sorted(Comparator.comparing(Connector::getName)).collect(Collectors.toList());
         return ModelPageHelper.getModelPage(allOfType, pageNumber, pageSize);
     }

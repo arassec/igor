@@ -4,6 +4,7 @@ import com.arassec.igor.application.manager.ConnectorManager;
 import com.arassec.igor.application.manager.JobManager;
 import com.arassec.igor.application.registry.IgorComponentRegistry;
 import com.arassec.igor.application.simulation.JobSimulator;
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.application.util.IgorConfigHelper;
 import com.arassec.igor.core.repository.ConnectorRepository;
 import com.arassec.igor.core.repository.JobRepository;
@@ -108,6 +109,12 @@ public abstract class RestControllerBaseTest {
      */
     @MockBean
     protected JobSimulator jobSimulator;
+
+    /**
+     * Mock for igor's component util.
+     */
+    @MockBean
+    protected IgorComponentUtil igorComponentUtil;
 
     /**
      * Converts the web response into the desired object.

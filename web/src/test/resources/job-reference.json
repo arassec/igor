@@ -21,6 +21,7 @@
         "parameters": [
             {
                 "name": "testParam",
+                "displayName": "Test Param",
                 "required": true,
                 "type": "java.lang.Integer",
                 "value": 666,
@@ -47,6 +48,7 @@
             "parameters": [
                 {
                     "name": "testConnector",
+                    "displayName": "Test Connector",
                     "categoryCandidates": [
                         {
                             "key": "connector-category-id",

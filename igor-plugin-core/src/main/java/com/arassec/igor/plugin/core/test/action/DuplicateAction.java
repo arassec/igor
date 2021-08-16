@@ -1,9 +1,10 @@
 package com.arassec.igor.plugin.core.test.action;
 
 import com.arassec.igor.application.annotation.IgorComponent;
+import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,26 +15,30 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Duplicates data items to the configured amount.
+ * <h1>Duplicate Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action duplicates each processed data item by the configured amount.<br>
+ *
+ * The index of the duplicated data item is added to the result under the key 'index'.
+ *
+ * <h2>Examples</h2>
+ * The configured amount will be the result size of the data items created by the action.<br>
+ *
+ * E.g. a configuration of 1 will result in the data item being passed through, a configuration of 2 will result in a duplication
+ * of the processed data item, and so on...
  */
 @Getter
 @Setter
-@IgorComponent
-public class DuplicateAction extends BaseTestAction {
+@IgorComponent(typeId = "duplicate-action", categoryId = CoreCategory.TEST)
+public class DuplicateAction extends BaseAction {
 
     /**
-     * The number of duplications to create.
+     * The amount of duplicate data items that should be created by this action.
      */
     @Positive
     @IgorParam
     private int amount = 2;
-
-    /**
-     * Creates a new component instance.
-     */
-    protected DuplicateAction() {
-        super(CorePluginType.DUPLICATE_ACTION.getId());
-    }
 
     /**
      * {@inheritDoc}

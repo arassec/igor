@@ -18,16 +18,6 @@ public abstract class BaseConnector extends BaseIgorComponent implements Connect
     private String name;
 
     /**
-     * Creates a new component instance.
-     *
-     * @param categoryId The category ID.
-     * @param typeId     The type ID.
-     */
-    protected BaseConnector(String categoryId, String typeId) {
-        super(categoryId, typeId);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

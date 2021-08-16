@@ -2,9 +2,10 @@ package com.arassec.igor.plugin.core.test.action;
 
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.DataKey;
+import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.core.CorePluginType;
+import com.arassec.igor.plugin.core.CoreCategory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,23 +18,28 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Pauses the processing for a configurable amount of time.
+ * <h1>Pause Action</h1>
+ *
+ * <h2>Description</h2>
+ * This action pauses execution by the configured amount of time. Execution pauses <strong>for every data item</strong> which is
+ * processed by the action.
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent
-public class PauseAction extends BaseTestAction {
+@IgorComponent(typeId = "pause-action", categoryId = CoreCategory.TEST)
+public class PauseAction extends BaseAction {
 
     /**
-     * Amount of milliseconds the action should pause data processing.
+     * The number of milliseconds to pause for each data item.
      */
     @Positive
     @IgorParam
     private int milliseconds = 1000;
 
     /**
-     * Causes the pause to vary for each data item.
+     * A number smaller than 'Milliseconds'. If set, the actual pause time will be random and between 'Milliseconds - Variance'
+     * and 'Milliseconds + Variance'. Set to 0 to disable variable pause times.
      */
     @PositiveOrZero
     @IgorParam(advanced = true)
@@ -48,7 +54,6 @@ public class PauseAction extends BaseTestAction {
      * Creates a new component instance.
      */
     public PauseAction() {
-        super(CorePluginType.PAUSE_ACTION.getId());
         random = new SecureRandom();
     }
 

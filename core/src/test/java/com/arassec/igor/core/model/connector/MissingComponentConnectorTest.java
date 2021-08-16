@@ -20,8 +20,6 @@ class MissingComponentConnectorTest {
     @DisplayName("Tests creation of the component.")
     void testCreation() {
         MissingComponentConnector component = new MissingComponentConnector("unit-test-error-cause");
-        assertEquals("core", component.getCategoryId());
-        assertEquals("missing-component-connector", component.getTypeId());
         assertEquals("unit-test-error-cause", component.getErrorCause());
     }
 

@@ -1,6 +1,7 @@
 package com.arassec.igor.web.mapper;
 
 import com.arassec.igor.application.registry.IgorComponentRegistry;
+import com.arassec.igor.application.util.IgorComponentUtil;
 import com.arassec.igor.core.model.IgorComponent;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.annotation.IgorParam;
@@ -44,15 +45,22 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
     private final transient IgorComponentRegistry igorComponentRegistry;
 
     /**
+     * Util for handling igor components.
+     */
+    private final transient IgorComponentUtil igorComponentUtil;
+
+    /**
      * Creates a new serializer instance.
      *
      * @param messageSource         The message source for I18N.
      * @param igorComponentRegistry The registry for igor components.
      */
-    public IgorComponentWebSerializer(MessageSource messageSource, IgorComponentRegistry igorComponentRegistry) {
+    public IgorComponentWebSerializer(MessageSource messageSource, IgorComponentRegistry igorComponentRegistry,
+                                      IgorComponentUtil igorComponentUtil) {
         super(IgorComponent.class);
         this.messageSource = messageSource;
         this.igorComponentRegistry = igorComponentRegistry;
+        this.igorComponentUtil = igorComponentUtil;
     }
 
     /**
@@ -77,9 +85,9 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
             }
             jsonGenerator.writeBooleanField(WebMapperKey.ACTIVE.getKey(), ((Action) instance).isActive());
         }
+        String categoryId = igorComponentUtil.getCategoryId(instance);
         writeKeyLabelStore(jsonGenerator, WebMapperKey.CATEGORY.getKey(),
-                new KeyLabelStore(instance.getCategoryId(), messageSource.getMessage(instance.getCategoryId(), null,
-                        LocaleContextHolder.getLocale())));
+                new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, LocaleContextHolder.getLocale())));
         writeTypeData(jsonGenerator, instance);
         writeParameters(jsonGenerator, instance);
         jsonGenerator.writeEndObject();
@@ -110,12 +118,13 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      * @throws IOException In case of serialization problems.
      */
     private void writeTypeData(JsonGenerator jsonGenerator, IgorComponent instance) throws IOException {
+        String typeId = igorComponentUtil.getTypeId(instance);
         jsonGenerator.writeObjectFieldStart(WebMapperKey.TYPE.getKey());
-        jsonGenerator.writeStringField(WebMapperKey.KEY.getKey(), instance.getTypeId());
-        jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), messageSource.getMessage(instance.getTypeId(), null,
+        jsonGenerator.writeStringField(WebMapperKey.KEY.getKey(), typeId);
+        jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), messageSource.getMessage(typeId, null,
                 LocaleContextHolder.getLocale()));
         jsonGenerator.writeBooleanField(WebMapperKey.DOCUMENTATION_AVAILABLE.getKey(),
-                DocumentationUtil.isDocumentationAvailable(instance.getTypeId(), LocaleContextHolder.getLocale()));
+                DocumentationUtil.isDocumentationAvailable(typeId, LocaleContextHolder.getLocale()));
         if (instance instanceof Action) {
             jsonGenerator.writeBooleanField(WebMapperKey.SUPPORTS_EVENTS.getKey(), ((Action) instance).supportsEvents());
         } else if (instance instanceof EventTrigger) {
@@ -138,6 +147,8 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      */
     private void writeParameters(JsonGenerator jsonGenerator, IgorComponent instance) throws IOException {
         jsonGenerator.writeArrayFieldStart(WebMapperKey.PARAMETERS.getKey());
+
+        String typeId = igorComponentUtil.getTypeId(instance);
 
         List<Field> parameters = new LinkedList<>();
         ReflectionUtils.doWithFields(instance.getClass(), field -> {
@@ -171,6 +182,13 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
 
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), field.getName());
+
+                String key = typeId + "." + field.getName();
+                String displayName = messageSource.getMessage(key, null, LocaleContextHolder.getLocale());
+                if (key.equals(displayName)) {
+                    displayName = igorComponentUtil.formatIgorParamName(field.getName());
+                }
+                jsonGenerator.writeStringField(WebMapperKey.DISPLAY_NAME.getKey(), displayName);
 
                 writeMetaData(jsonGenerator, annotation, field);
 

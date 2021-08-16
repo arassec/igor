@@ -30,7 +30,7 @@ public interface EventTrigger extends Trigger, ProcessingFinishedCallback {
      * @return The supported event type.
      */
     default EventType getSupportedEventType() {
-        return EventType.NONE;
+        return EventType.UNKNOWN;
     }
 
 }

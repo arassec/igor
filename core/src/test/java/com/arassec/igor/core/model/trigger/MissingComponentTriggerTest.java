@@ -19,8 +19,6 @@ class MissingComponentTriggerTest {
     @DisplayName("Tests creation of the component.")
     void testCreation() {
         MissingComponentTrigger component = new MissingComponentTrigger("unit-test-error-cause");
-        assertEquals("core", component.getCategoryId());
-        assertEquals("missing-component-trigger", component.getTypeId());
         assertEquals("unit-test-error-cause", component.getErrorCause());
     }
 
