@@ -9,6 +9,7 @@ After that, semantic versioning will be used and breaking changes will only occu
 - Fixed broken 'HTTP Request' action.
 - Added 'igor-maven-plugin' to support component documentation generation from JavaDoc comments.
 - Moved 'Duplicate', 'Log' and 'Pause' actions to 'Util' category.
+- Added 'Execute Command' action.
 
 ::: danger Breaking Changes
 - Removed 'defaultValue' property of the @IgorParam annotation. Directly assign default values instead.
