@@ -1,4 +1,4 @@
-package com.arassec.igor.plugin.core.test.action;
+package com.arassec.igor.plugin.core.util.action;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreActionBaseTest;

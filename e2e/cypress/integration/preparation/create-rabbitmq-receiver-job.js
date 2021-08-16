@@ -27,7 +27,7 @@ describe('Initializes the test environment\'s \'RabbitMQ Receiver\' job.', () =>
                         'queueName': 'igor-queue'
                     }, null);
 
-                cy.addAction('Pause', 'Test', 'Pause',
+                cy.addAction('Pause', 'Util', 'Pause',
                     {
                         'milliseconds': 1000
                     },
@@ -35,7 +35,7 @@ describe('Initializes the test environment\'s \'RabbitMQ Receiver\' job.', () =>
                         'variance': 500
                     });
 
-                cy.addAction('Log Messages', 'Test', 'Log', null, null);
+                cy.addAction('Log Messages', 'Util', 'Log', null, null);
 
                 cy.get('[data-e2e=save-job-button]')
                     .should('be.visible')

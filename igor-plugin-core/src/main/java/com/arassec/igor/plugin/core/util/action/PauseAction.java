@@ -1,4 +1,4 @@
-package com.arassec.igor.plugin.core.test.action;
+package com.arassec.igor.plugin.core.util.action;
 
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.DataKey;
@@ -27,7 +27,7 @@ import java.util.Random;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "pause-action", categoryId = CoreCategory.TEST)
+@IgorComponent(typeId = "pause-action", categoryId = CoreCategory.UTIL)
 public class PauseAction extends BaseAction {
 
     /**

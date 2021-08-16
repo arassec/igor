@@ -1,4 +1,4 @@
-package com.arassec.igor.plugin.core.test.action;
+package com.arassec.igor.plugin.core.util.action;
 
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.DataKey;
@@ -21,7 +21,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "log-action", categoryId = CoreCategory.TEST)
+@IgorComponent(typeId = "log-action", categoryId = CoreCategory.UTIL)
 public class LogAction extends BaseAction {
 
     /**

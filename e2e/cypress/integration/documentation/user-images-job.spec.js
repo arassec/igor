@@ -277,7 +277,7 @@ describe('Creates user doc job images.', () => {
 
             cy.chooseType('trigger', 'Manual');
 
-            cy.addAction('Pause', 'Test', 'Pause');
+            cy.addAction('Pause', 'Util', 'Pause');
 
             cy.get('[data-e2e=job-configuration]')
                 .should('be.visible')
@@ -360,7 +360,7 @@ describe('Creates user doc job images.', () => {
 
             cy.chooseType('trigger', 'Manual');
 
-            cy.addAction('Pause', 'Test', 'Pause',
+            cy.addAction('Pause', 'Util', 'Pause',
                 {
                     'milliseconds': 60000
                 });

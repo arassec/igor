@@ -26,7 +26,7 @@ describe('Initializes the test environment\'s \'E-Mail Receiver\' job.', () => {
                         'emailConnector': emailReceiverKebap
                     });
 
-                cy.addAction('Log Messages', 'Test', 'Log', null, null);
+                cy.addAction('Log Messages', 'Util', 'Log', null, null);
 
                 cy.get('[data-e2e=save-job-button]')
                     .should('be.visible')

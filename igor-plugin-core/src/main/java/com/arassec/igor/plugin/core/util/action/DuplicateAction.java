@@ -1,4 +1,4 @@
-package com.arassec.igor.plugin.core.test.action;
+package com.arassec.igor.plugin.core.util.action;
 
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.action.BaseAction;
@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
-@IgorComponent(typeId = "duplicate-action", categoryId = CoreCategory.TEST)
+@IgorComponent(typeId = "duplicate-action", categoryId = CoreCategory.UTIL)
 public class DuplicateAction extends BaseAction {
 
     /**

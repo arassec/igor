@@ -26,11 +26,6 @@ public class CoreCategory {
     public static final String MESSAGE = "message";
 
     /**
-     * The "Test" category.
-     */
-    public static final String TEST = "test";
-
-    /**
      * The "Persistence" category.
      */
     public static final String PERSISTENCE = "persistence";

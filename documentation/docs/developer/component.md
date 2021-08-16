@@ -14,7 +14,6 @@ If you want to add your custom component to an existing category, you should set
 |Web|CoreCategory.WEB|"web"|
 |File|CoreCategory.FILE|"file|
 |Message|CoreCategory.MESSAGE|"message"|
-|File|CoreCategory.TEST|"test"|
 |Persistence|CoreCategory.PERSISTENCE|"persistence"|
 
 If you give your component a type ID that is already taken, igor will throw an exception during startup.

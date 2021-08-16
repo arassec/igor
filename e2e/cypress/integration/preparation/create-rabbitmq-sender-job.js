@@ -21,7 +21,7 @@ describe('Initializes the test environment\'s \'RabbitMQ Sender\' job.', () => {
                 cy.get('[data-e2e=job-title]')
                     .contains(jobRabbitMqSenderName);
 
-                cy.addAction('Create Test Data', 'Test', 'Duplicate',
+                cy.addAction('Create Test Data', 'Util', 'Duplicate',
                     {
                         'amount': 1000
                     }, null);
