@@ -13,36 +13,19 @@ At the moment, there are three kinds of triggers available in igor:
 
 ## Methods
 There should usually be no need to create a custom trigger.
-However, the following methods might be useful and can be implemented by custom triggers:
+However, the following method might be useful and can be implemented by custom triggers:
 
 ``` java
 /**
- * Returns meta-data from the trigger that is added to each data item.
+ * Creates the initial data item that is used as input for following actions.
  *
- * @return The trigger's meta-data.
+ * @return The initial data item.
  */
-Map<String, Object> getMetaData();
-
-/**
- * Returns data from the trigger that is added to each data item.
- *
- * @return Trigger-data.
- */
-Map<String, Object> getData();
+Map<String, Object> createDataItem();
 ```
 
-Additionally, custom event based triggers might be usefull to support event sources that igor doesn't support natively.
-In this case the custom trigger can contain the code to listen for events.
-If such an event arrives, the custom trigger must call the following method in order for the job to process the event:
-
-``` java
-/**
- * Processes the supplied event data and hands it over to the job.
- *
- * @param eventData The event's data.
- */
-void processEvent(Map<String, Object> eventData);
-```
+Additionally, custom event based triggers might be useful to support event sources that igor doesn't support natively.
+In this case the custom trigger can contain a (custom) connector that is used to retrieve the events.
 
 ## Custom Manual Trigger
 A custom trigger for manual execution should extend `BaseTrigger` to get sensible defaults for the methods to override.
@@ -53,7 +36,7 @@ The code of our custom manual trigger looks like this:
 /**
  * A custom trigger for manual job execution.
  */
-@IgorComponent
+@IgorComponent(categoryId = "Demo-Triggers", typeId = "Custom-Manual-Trigger")
 public class CustomManualTrigger extends BaseTrigger {
 
     /**
@@ -63,37 +46,32 @@ public class CustomManualTrigger extends BaseTrigger {
     private String demoParam;
 
     /**
-     * Creates a new component instance.
-     */
-    public CustomManualTrigger() {
-        super("Demo-Triggers", "Custom-Manual-Trigger");
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> getMetaData() {
-        return Map.of("demoParam", demoParam);
+    public Map<String, Object> createDataItem() {
+        Map<String, Object> dataItem = super.createDataItem();
+        dataItem.put("demoParam", demoParam);
+        return dataItem;
     }
 
 }
 ```
 
-This trigger will be available in igor under the Category- and Type-ID we set in the constructor.
+This trigger will be available in igor under the Category- and Type-ID we set in the `@IgorComponent` annotation.
 
 Category|Type
 ---|---
 Demo-Triggers|Custom-Manual-Trigger
 
-The demo parameter will be added to each data item in the `metaData` segment.
+The demo parameter will be added to the initial data item:
 
 ``` json
 {
+  "demoParam": "user input",
   "data": {},
   "meta": {
     "jobId": "2400f526-b5b2-4d7e-b1f7-12e8cb886944",
-    "demoParam": "user input",
     "simulation": true,
     "simulationLimit": 25,
     "timestamp": 1599587099204
@@ -102,7 +80,7 @@ The demo parameter will be added to each data item in the `metaData` segment.
 ```
 
 ## Custom Scheduled Trigger
-A custom scheduled trigger should extend `BaseScheduledTrigger` to get sensible defaults for the methods to override.
+A custom scheduled trigger must implement the `ScheduledTrigger` interface.
 
 The code of our custom scheduled trigger looks like this:
 
@@ -110,8 +88,15 @@ The code of our custom scheduled trigger looks like this:
 /**
  * A custom trigger for scheduled job execution.
  */
-@IgorComponent
-public class CustomScheduledTrigger extends BaseScheduledTrigger {
+@IgorComponent(categoryId = "Demo-Triggers", typeId = "Custom-Scheduled-Trigger")
+public class CustomScheduledTrigger extends BaseTrigger implements ScheduledTrigger {
+
+    /**
+     * The CRON expression that is used to trigger the job.
+     */
+    @NotEmpty
+    @IgorParam(subtype = ParameterSubtype.CRON)
+    protected String cronExpression;
 
     /**
      * A sample parameter.
@@ -120,18 +105,21 @@ public class CustomScheduledTrigger extends BaseScheduledTrigger {
     private String demoParam;
 
     /**
-     * Creates a new component instance.
+     * {@inheritDoc}
      */
-    public CustomScheduledTrigger() {
-        super("Demo-Triggers", "Custom-Scheduled-Trigger");
+    @Override
+    public Map<String, Object> createDataItem() {
+        Map<String, Object> dataItem = super.createDataItem();
+        dataItem.put("demoParam", demoParam);
+        return dataItem;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> getData() {
-        return Map.of("demoParam", demoParam);
+    public String getCronExpression() {
+        return cronExpression;
     }
 
 }
@@ -143,13 +131,12 @@ Category|Type
 ---|---
 Demo-Triggers|Custom-Scheduled-Trigger
 
-According to our code, the configured parameter will be added to each data item in the `data` segment.
+According to our code, the configured parameter will be added to the initial data item created by the trigger:
 
 ``` json
 {
-  "data": {
-    "demoParam": "user input"
-  },
+  "demoParam": "user input"
+  "data": {},
   "meta": {
     "jobId": "2400f526-b5b2-4d7e-b1f7-12e8cb886944",
     "simulation": true,
@@ -166,10 +153,16 @@ The code of our custom event trigger looks like this:
 
 ``` java
 /**
- * A custom trigger for jobs that are scheduled by events.
+ * A custom trigger for jobs that are triggered by events.
  */
-@IgorComponent
+@IgorComponent(categoryId = "Demo-Triggers", typeId = "Custom-Event-Trigger")
 public class CustomEventTrigger extends BaseEventTrigger {
+
+    /**
+     * Spring's publisher for events. This is used to start processing the
+     * event's data.
+     */
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * A sample parameter.
@@ -178,26 +171,66 @@ public class CustomEventTrigger extends BaseEventTrigger {
     private String demoParam;
 
     /**
-     * Creates a new component instance.
+     * The job's ID.
      */
-    public CustomEventTrigger() {
-        super("Demo-Triggers", "Custom-Event-Trigger");
+    private String jobId;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param applicationEventPublisher The event published injected by Spring.
+     */
+    public CustomEventTrigger(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> getMetaData() {
-        return Map.of("demoParam", demoParam);
+    public void initialize(JobExecution jobExecution) {
+        super.initialize(jobExecution);
+        this.jobId = jobExecution.getJobId();
+
+        // Simulates an event, fifteen seconds after the trigger is initialized...
+        var timer = new Timer();
+        TimerTask fakeEvent = new TimerTask() {
+            @Override
+            public void run() {
+                fakeEvent();
+            }
+        };
+        timer.schedule(fakeEvent, 15000);
+    }
+
+    /**
+     * Usually, an event would be e.g. a message that is received, and the code to
+     * start processing the event's data could be integrated in a custom connector.
+     */
+    public void fakeEvent() {
+        Map<String, Object> dataItem = new HashMap<>();
+        dataItem.put("currentTimeMillis", System.currentTimeMillis());
+        // The EventType must match the result provided by getSupportedEventType()!
+        applicationEventPublisher.publishEvent(
+                new JobTriggerEvent(jobId, dataItem, EventType.UNKNOWN));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> getData() {
-        return Map.of("demoParam", demoParam);
+    public Map<String, Object> createDataItem() {
+        Map<String, Object> dataItem = super.createDataItem();
+        dataItem.put("demoParam", demoParam);
+        return dataItem;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public EventType getSupportedEventType() {
+        return EventType.UNKNOWN;
     }
 
 }
@@ -209,21 +242,18 @@ Category|Type
 ---|---
 Demo-Triggers|Custom-Event-Trigger
 
-Since scheduled triggers add the configured simulation input to the data items, the processed data item in a
-simulated job execution will contain both configurations in the `data` segment: 
+According to our code, the data items processed will contain the current time in milliseconds since 1970 as "event data".
+Additionally, the configured parameter value of our trigger will be added to the initial data item, too:
 
 ``` json
 {
-  "data": {
-    "demoParam": "user input",
-    "sample": "parameter"
-  },
+  "demoParam": "user input",
+  "currentTimeMillis": 1629041492762,
+  "data": {},
   "meta": {
-    "jobId": "a1f005d2-7ffc-4e0d-a2c9-9ea7e51e16c8",
-    "demoParam": "user input",
-    "simulation": true,
-    "simulationLimit": 25,
-    "timestamp": 1599838823466
+    "jobId": "2400f526-b5b2-4d7e-b1f7-12e8cb886944",
+    "simulation": false,
+    "timestamp": 1629041492762
   }
 }
 ```

@@ -9,7 +9,7 @@ This message trigger is an event based trigger that processes an incoming messag
 ## Limitations and Caveats
 Not all actions are available for event-triggered jobs. E.g. sorting by timestamp requires all data items, that should be sorted, to be known to the action. Since event-triggered jobs process a continuous stream of incoming events, there is no fixed number of data items to sort. 
 
-During simulated job executions the trigger will receive (and probably consume) messages provided by the message connector. This means, that e.g. RabbitMQ messages will be retrieved **and acknowledged** during simulated job executions!
+During simulated job executions the trigger will receive (and probably consume) messages provided by the message connector. Thus RabbitMQ messages will be retrieved **and acknowledged** during simulated job executions!
 
 ## Parameters
 The component can be configured by the following parameters:

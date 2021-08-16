@@ -36,7 +36,8 @@ class DocGenMojoTest {
 
         docGenMojo.execute();
 
-        verify(documentationGenerator, times(1)).generateDoc(Path.of("unit-test"), "src-test", "target-test");
+        verify(documentationGenerator, times(1)).generateDoc(Path.of("unit-test"), "/src/main/java",
+            "/src/main/resources/doc-gen/");
     }
 
     /**

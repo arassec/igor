@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "cypress:local": "cypress open --config baseUrl=http://localhost:8081 --env nginx_host=localhost,rabbitmq_host=localhost,vsftpd_host=localhost,sshd_host=localhost,sshd_port=2222,mail_host=localhost",
-    "cypress:e2e": "cypress run",
+    "cypress:e2e": "cross-env NO_COLOR=1 cypress run",
     "env:up": "docker-compose up -d",
     "env:down": "docker-compose down",
     "env:restart": "docker-compose down && docker-compose up -d",
@@ -16,5 +16,8 @@
   "devDependencies": {
     "cypress": "^7.4.0",
     "cypress-file-upload": "^4.1.1"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3"
   }
 }

@@ -28,7 +28,7 @@ import java.util.Map;
  * number of data items to sort.
  * <p>
  * During simulated job executions the trigger will receive (and probably consume) messages provided by the message connector.
- * This means, that e.g. RabbitMQ messages will be retrieved <strong>and acknowledged</strong> during simulated job executions!
+ * Thus RabbitMQ messages will be retrieved <strong>and acknowledged</strong> during simulated job executions!
  */
 @Getter
 @Setter
@@ -57,7 +57,7 @@ public class RabbitMqMessageTrigger extends BaseEventTrigger {
     }
 
     /**
-     * Initializes the trigger by registering it as message processor.
+     * Initializes the trigger by enabling message retrieval of the connector.
      *
      * @param jobExecution The current {@link JobExecution}.
      */

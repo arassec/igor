@@ -1,5 +1,8 @@
 package com.arassec.igor.plugin.core;
 
+/**
+ * Defines core category IDs.
+ */
 public class CoreCategory {
 
     /**
@@ -31,5 +34,12 @@ public class CoreCategory {
      * The "Persistence" category.
      */
     public static final String PERSISTENCE = "persistence";
+
+    /**
+     * Creates a new instance.
+     */
+    private CoreCategory() {
+        // prevent instantiation.
+    }
 
 }

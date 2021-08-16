@@ -25,18 +25,10 @@ The code of our custom connector looks like this:
 
 ``` java
 /**
- * A basic example connector querying google, to demonstrate the usage 
- * of igor connectors.
+ * A basic example connector querying google, to demonstrate the usage of igor connectors.
  */
-@IgorComponent
+@IgorComponent(categoryId = "Demo-Connectors", typeId = "Custom-Connector")
 public class CustomConnector extends BaseConnector {
-
-    /**
-     * Creates a new component instance.
-     */
-    public CustomConnector() {
-        super("Demo-Connectors", "Custom-Connector");
-    }
 
     /**
      * {@inheritDoc}
@@ -88,7 +80,7 @@ In order to use the new connector we set it as parameter in a new action:
 /**
  * A custom action adding a google search result to the data items.
  */
-@IgorComponent
+@IgorComponent(categoryId = "Demo-Actions", typeId = "Search-Action")
 public class SearchAction extends BaseAction {
 
     /**
@@ -97,13 +89,6 @@ public class SearchAction extends BaseAction {
     @NotNull
     @IgorParam
     private CustomConnector connector;
-
-    /**
-     * Creates a new component instance.
-     */
-    public SearchAction() {
-        super("Demo-Actions", "Search-Action");
-    }
 
     /**
      * {@inheritDoc}
