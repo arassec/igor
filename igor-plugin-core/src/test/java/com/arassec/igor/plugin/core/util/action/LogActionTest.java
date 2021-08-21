@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests the {@link LogAction}.
@@ -59,6 +58,37 @@ class LogActionTest extends CoreActionBaseTest {
 
         assertEquals(1, result.size());
         assertNotNull(result.get(0).get(DataKey.SIMULATION_LOG.getKey()));
+    }
+
+    /**
+     * Tests logging messages in different log levels.
+     */
+    @Test
+    @DisplayName("Tests logging messages in different log levels.")
+    void testLogLevels() {
+        LogAction logAction = new LogAction();
+        Map<String, Object> data = createData();
+        data.put("logTest", "loggable value");
+
+        logAction.setLevel("error");
+        logAction.setMessage("Test error logging: '{{logTest}}'");
+        assertDoesNotThrow(() -> logAction.process(data, new JobExecution()));
+
+        logAction.setLevel("warn");
+        logAction.setMessage("Test warn logging: '{{logTest}}'");
+        assertDoesNotThrow(() -> logAction.process(data, new JobExecution()));
+
+        logAction.setLevel("info");
+        logAction.setMessage("Test info logging: '{{logTest}}'");
+        assertDoesNotThrow(() -> logAction.process(data, new JobExecution()));
+
+        logAction.setLevel("debug");
+        logAction.setMessage("Test debug logging: '{{logTest}}'");
+        assertDoesNotThrow(() -> logAction.process(data, new JobExecution()));
+
+        logAction.setLevel("trace");
+        logAction.setMessage("Test trace logging: '{{logTest}}'");
+        assertDoesNotThrow(() -> logAction.process(data, new JobExecution()));
     }
 
 }

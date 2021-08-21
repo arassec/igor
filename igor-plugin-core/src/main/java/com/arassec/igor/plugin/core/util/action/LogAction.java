@@ -3,12 +3,19 @@ package com.arassec.igor.plugin.core.util.action;
 import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.DataKey;
 import com.arassec.igor.core.model.action.BaseAction;
+import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.samskivert.mustache.Mustache;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +37,21 @@ public class LogAction extends BaseAction {
     private String jobId;
 
     /**
+     * The loglevel to use for logging the message. Must be one of 'error', 'warn', 'info', 'debug' or 'trace'.
+     */
+    @NotBlank
+    @Pattern(regexp = "error|warn|info|debug|trace")
+    @IgorParam
+    private String level = "debug";
+
+    /**
+     * The message to log. Supports mustache templates to log parts of or the complete data item being processed.
+     */
+    @NotBlank
+    @IgorParam
+    private String message = "{{.}}";
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -48,10 +70,42 @@ public class LogAction extends BaseAction {
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
+
+        var resolvedMessage = Mustache.compiler().escapeHTML(false).withFormatter(o -> {
+            if (o instanceof HashMap) {
+                try {
+                    return new ObjectMapper().writeValueAsString(o);
+                } catch (JsonProcessingException e) {
+                    // Debug level is OK here, because the user will get  the unformatted toString()-value and
+                    // processing can go on...
+                    log.debug("Logging message appeared to be a JSON-Object but could not be formatted!", e);
+                }
+            }
+            return o.toString();
+        }).compile(message).execute(data);
+
         if (isSimulation(data)) {
-            data.put(DataKey.SIMULATION_LOG.getKey(), "Logged data item in loglevel DEBUG!");
+            data.put(DataKey.SIMULATION_LOG.getKey(), "Would have Logged message in loglevel '" + level.toUpperCase() + "'.");
         }
-        log.debug("{} - Processed data item:\n{}", jobId, data);
+
+        switch (level) {
+            case "error":
+                log.error(resolvedMessage);
+                break;
+            case "warn":
+                log.warn(resolvedMessage);
+                break;
+            case "info":
+                log.info(resolvedMessage);
+                break;
+            case "debug":
+                log.debug(resolvedMessage);
+                break;
+            default:
+                log.trace(resolvedMessage);
+                break;
+        }
+
         return List.of(data);
     }
 
