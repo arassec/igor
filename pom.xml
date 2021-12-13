@@ -278,7 +278,7 @@
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-ui</artifactId>
-                <version>1.5.12</version>
+                <version>1.6.0</version>
             </dependency>
 
             <!-- plugin-file -->
