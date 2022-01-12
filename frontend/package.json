@@ -18,7 +18,7 @@
     "ajv-keywords": "^3.5.2",
     "animate.css": "^4.1.1",
     "axios": "^0.21.2",
-    "markdown-it": "^10.0.0",
+    "markdown-it": "^12.3.2",
     "vue": "^2.6.14",
     "vue-json-pretty": "^1.8.1",
     "vue-router": "^3.5.2",
