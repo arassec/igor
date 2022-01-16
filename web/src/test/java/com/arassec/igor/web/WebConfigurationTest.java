@@ -70,7 +70,7 @@ class WebConfigurationTest {
         assertFalse(objectMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
         assertFalse(objectMapper.isEnabled(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS));
         assertFalse(objectMapper.isEnabled(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS));
-        assertTrue(objectMapper.getRegisteredModuleIds().contains("com.fasterxml.jackson.datatype.jsr310.JavaTimeModule"));
+        assertTrue(objectMapper.getRegisteredModuleIds().contains("jackson-datatype-jsr310"));
     }
 
 }

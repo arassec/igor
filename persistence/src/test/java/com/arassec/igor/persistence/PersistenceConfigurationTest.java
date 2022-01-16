@@ -60,7 +60,7 @@ class PersistenceConfigurationTest {
         assertFalse(jobMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
         assertFalse(jobMapper.isEnabled(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS));
         assertFalse(jobMapper.isEnabled(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS));
-        assertTrue(jobMapper.getRegisteredModuleIds().contains("com.fasterxml.jackson.datatype.jsr310.JavaTimeModule"));
+        assertTrue(jobMapper.getRegisteredModuleIds().contains("jackson-datatype-jsr310"));
     }
 
     /**
@@ -73,7 +73,7 @@ class PersistenceConfigurationTest {
         ObjectMapper connectorMapper = persistenceConfiguration.persistenceConnectorMapper(igorComponentRegistry,
             securityProvider, igorComponentUtil);
         assertFalse(connectorMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
-        assertTrue(connectorMapper.getRegisteredModuleIds().contains("com.fasterxml.jackson.datatype.jsr310.JavaTimeModule"));
+        assertTrue(connectorMapper.getRegisteredModuleIds().contains("jackson-datatype-jsr310"));
     }
 
 }
