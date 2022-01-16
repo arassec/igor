@@ -75,7 +75,10 @@ public class IgorParamsMdDocGenerator {
     /**
      * Initializes the converter.
      *
-     * @param projectRoot The project's root path.
+     * @param projectRoot       The project's root path.
+     * @param sourceDir         The path to the project's sources.
+     * @param i18nSourceDir     The path to the project's I18N sources.
+     * @param igorComponentUtil Igor's component utility.
      *
      * @throws IOException In case the I18N files could not be read.
      */
