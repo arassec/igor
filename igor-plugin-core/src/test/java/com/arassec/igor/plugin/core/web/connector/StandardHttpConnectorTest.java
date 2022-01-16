@@ -147,7 +147,7 @@ class StandardHttpConnectorTest {
         httpProxy.start();
         httpProxy.stubFor(
                 get("/proxied").willReturn(
-                        aResponse().proxiedFrom("http://localhost:" + proxiedServer.port() + "/ok/")
+                        aResponse().proxiedFrom("http://localhost:" + proxiedServer.port() + "/ok")
                 )
         );
 
@@ -209,7 +209,7 @@ class StandardHttpConnectorTest {
             fail("Should have thrown an IgorException due to missing client certificate!");
         } catch (IgorException e) {
             // Extra check here, to make sure the request really failed because of the missing certificate!
-            assertTrue(e.getMessage().contains("handshake_failure"));
+            assertTrue(e.getMessage().contains("bad_certificate"));
         }
 
         // Use the test keystore as client certificate repository:
