@@ -10,6 +10,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
@@ -159,7 +160,8 @@ public class IgorParamsMdDocGenerator {
             ParseResult<CompilationUnit> parseResult;
             try {
                 parseResult = javaParser.parse(Path.of(sourcesRoot.toString(),
-                    extendedClass.resolve().getQualifiedName().replace(".", "/") + ".java"));
+                    ((ResolvedReferenceType) extendedClass.resolve()).getQualifiedName().replace(".", "/") + ".java"
+                ));
                 var compilationUnit = parseResult.getResult().orElseThrow();
                 var collector = new ClassOrInterfaceDeclarationCollector();
                 collector.visit(compilationUnit, null);
