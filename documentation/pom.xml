@@ -72,7 +72,7 @@
             <plugin>
                 <groupId>se.bjurr.gitchangelog</groupId>
                 <artifactId>git-changelog-maven-plugin</artifactId>
-                <version>1.78</version>
+                <version>1.86</version>
                 <executions>
                     <execution>
                         <id>GenerateGitChangelog</id>
@@ -82,7 +82,7 @@
                         </goals>
                         <configuration>
                             <file>docs/user/changelog.md</file>
-                            <fromCommit>f794ddf22c1dddd3c15d121c984d52ebbaabcf45</fromCommit>
+                            <fromCommit>67ede76b1551b48</fromCommit>
                             <templateContent>
                                 <![CDATA[
 # Changelog
@@ -123,6 +123,17 @@ After that, semantic versioning will be used and breaking changes will only occu
 
     {{#commits}}
       {{#ifCommitType . type='fix'}}
+- {{#eachCommitScope .}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+
+
+  {{#ifContainsType commits type='chore'}}
+### Chores
+
+    {{#commits}}
+      {{#ifCommitType . type='chore'}}
 - {{#eachCommitScope .}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
       {{/ifCommitType}}
     {{/commits}}
@@ -254,6 +265,13 @@ After that, semantic versioning will be used and breaking changes will only occu
                 <version>3.1.0</version>
                 <configuration>
                     <filesets>
+                        <fileset>
+                            <directory>docs/user/</directory>
+                            <followSymlinks>false</followSymlinks>
+                            <includes>
+                                <include>changelog.md</include>
+                            </includes>
+                        </fileset>
                         <fileset>
                             <directory>docs/user/core</directory>
                             <followSymlinks>false</followSymlinks>
