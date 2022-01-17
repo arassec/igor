@@ -82,7 +82,6 @@
                         </goals>
                         <configuration>
                             <file>docs/user/changelog.md</file>
-                            <fromCommit>67ede76b1551b48</fromCommit>
                             <templateContent>
                                 <![CDATA[
 # Changelog
