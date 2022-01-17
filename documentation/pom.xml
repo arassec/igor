@@ -72,7 +72,7 @@
             <plugin>
                 <groupId>se.bjurr.gitchangelog</groupId>
                 <artifactId>git-changelog-maven-plugin</artifactId>
-                <version>1.78</version>
+                <version>1.86</version>
                 <executions>
                     <execution>
                         <id>GenerateGitChangelog</id>
