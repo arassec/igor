@@ -70,84 +70,6 @@
             </plugin>
 
             <plugin>
-                <groupId>se.bjurr.gitchangelog</groupId>
-                <artifactId>git-changelog-maven-plugin</artifactId>
-                <version>1.86</version>
-                <executions>
-                    <execution>
-                        <id>GenerateGitChangelog</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>git-changelog</goal>
-                        </goals>
-                        <configuration>
-                            <file>docs/user/changelog.md</file>
-                            <templateContent>
-                                <![CDATA[
-# Changelog
-
-::: danger Breaking Changes in Minor Versions
-During development there will be breaking changes in minor versions until a stable version 1.0.0 is released.
-After that, semantic versioning will be used and breaking changes will only occur in major version updates.
-:::
-
-{{#tags}}
-{{#ifReleaseTag .}}
-## [{{name}}](https://github.com/arassec/igor/releases/tag/{{name}}) ({{tagDate .}})
-
-  {{#ifContainsBreaking commits}}
-### Breaking changes
-
-    {{#commits}}
-      {{#ifCommitBreaking .}}
-- {{#eachCommitScope .}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
-      {{/ifCommitBreaking}}
-    {{/commits}}
-  {{/ifContainsBreaking}}
-
-
-  {{#ifContainsType commits type='feat'}}
-### Features
-
-    {{#commits}}
-      {{#ifCommitType . type='feat'}}
-- {{#eachCommitScope .}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
-      {{/ifCommitType}}
-    {{/commits}}
-  {{/ifContainsType}}
-
-
-  {{#ifContainsType commits type='fix'}}
-### Bug Fixes
-
-    {{#commits}}
-      {{#ifCommitType . type='fix'}}
-- {{#eachCommitScope .}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
-      {{/ifCommitType}}
-    {{/commits}}
-  {{/ifContainsType}}
-
-
-  {{#ifContainsType commits type='chore'}}
-### Chores
-
-    {{#commits}}
-      {{#ifCommitType . type='chore'}}
-- {{#eachCommitScope .}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
-      {{/ifCommitType}}
-    {{/commits}}
-  {{/ifContainsType}}
-
-{{/ifReleaseTag}}
-{{/tags}}
-]]>
-                            </templateContent>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.2.0</version>
                 <executions>
@@ -191,7 +113,8 @@ After that, semantic versioning will be used and breaking changes will only occu
                             <outputDirectory>docs/user/igor-plugin-core</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}/../igor-plugin-core/src/main/resources/doc-gen</directory>
+                                    <directory>${project.basedir}/../igor-plugin-core/src/main/resources/doc-gen
+                                    </directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -221,7 +144,8 @@ After that, semantic versioning will be used and breaking changes will only occu
                             <outputDirectory>docs/user/igor-plugin-file</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}/../igor-plugin-file/src/main/resources/doc-gen</directory>
+                                    <directory>${project.basedir}/../igor-plugin-file/src/main/resources/doc-gen
+                                    </directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -236,7 +160,8 @@ After that, semantic versioning will be used and breaking changes will only occu
                             <outputDirectory>docs/user/igor-plugin-message</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}/../igor-plugin-message/src/main/resources/doc</directory>
+                                    <directory>${project.basedir}/../igor-plugin-message/src/main/resources/doc
+                                    </directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -251,7 +176,8 @@ After that, semantic versioning will be used and breaking changes will only occu
                             <outputDirectory>docs/user/igor-plugin-message</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}/../igor-plugin-message/src/main/resources/doc-gen</directory>
+                                    <directory>${project.basedir}/../igor-plugin-message/src/main/resources/doc-gen
+                                    </directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -293,5 +219,96 @@ After that, semantic versioning will be used and breaking changes will only occu
 
         </plugins>
     </build>
+
+
+    <profiles>
+
+        <!-- During release: generate the changelog -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>se.bjurr.gitchangelog</groupId>
+                        <artifactId>git-changelog-maven-plugin</artifactId>
+                        <version>1.86</version>
+                        <executions>
+                            <execution>
+                                <id>GenerateGitChangelog</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>git-changelog</goal>
+                                </goals>
+                                <configuration>
+                                    <file>docs/user/changelog.md</file>
+                                    <templateContent>
+                                        <![CDATA[
+        # Changelog
+
+        ::: danger Breaking Changes in Minor Versions
+        During development there will be breaking changes in minor versions until a stable version 1.0.0 is released.
+        After that, semantic versioning will be used and breaking changes will only occur in major version updates.
+        :::
+
+        {{#tags}}
+{{#ifReleaseTag.}}
+## [{{name}}](https://github.com/arassec/igor/releases/tag/{{name}}) ({{tagDate.}})
+
+  {{#ifContainsBreaking commits}}
+### Breaking changes
+
+    {{#commits}}
+      {{#ifCommitBreaking.}}
+- {{#eachCommitScope.}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitBreaking}}
+    {{/commits}}
+  {{/ifContainsBreaking}}
+
+
+  {{#ifContainsType commits type = 'feat'}}
+### Features
+
+    {{#commits}}
+      {{#ifCommitType.type = 'feat'}}
+- {{#eachCommitScope.}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+
+
+  {{#ifContainsType commits type = 'fix'}}
+### Bug Fixes
+
+    {{#commits}}
+      {{#ifCommitType.type = 'fix'}}
+- {{#eachCommitScope.}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+
+
+  {{#ifContainsType commits type = 'chore'}}
+### Chores
+
+    {{#commits}}
+      {{#ifCommitType.type = 'chore'}}
+- {{#eachCommitScope.}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{/ifCommitType}}
+    {{/commits}}
+  {{/ifContainsType}}
+
+{{/ifReleaseTag}}
+{{/tags}}
+]]>
+                                    </templateContent>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
