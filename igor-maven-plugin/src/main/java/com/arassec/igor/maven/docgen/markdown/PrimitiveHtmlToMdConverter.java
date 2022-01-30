@@ -56,22 +56,12 @@ public class PrimitiveHtmlToMdConverter {
             var element = ((Element) node);
             switch (element.tagName()) {
                 case "h1":
-                    convertHeader(element, result, 1);
-                    break;
                 case "h2":
-                    convertHeader(element, result, 2);
-                    break;
                 case "h3":
-                    convertHeader(element, result, 3);
-                    break;
                 case "h4":
-                    convertHeader(element, result, 4);
-                    break;
                 case "h5":
-                    convertHeader(element, result, 5);
-                    break;
                 case "h6":
-                    convertHeader(element, result, 6);
+                    convertHeader(element, result, Integer.parseInt(element.tagName().replace("h", "")));
                     break;
                 case "br":
                     convertBreak(result);
@@ -205,7 +195,7 @@ public class PrimitiveHtmlToMdConverter {
      */
     private void convertPreformatted(Element element, StringBuilder target) {
         var codeElement = element.getElementsByTag("code");
-        if (codeElement != null && StringUtils.hasText(codeElement.text())) {
+        if (StringUtils.hasText(codeElement.text())) {
             target.append("\n```\n").append(codeElement.text()).append("\n```\n\n");
         } else {
             target.append("`");

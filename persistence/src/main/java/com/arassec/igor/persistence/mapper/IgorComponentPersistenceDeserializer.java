@@ -97,7 +97,7 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
      */
     private Map<String, Object> deserializeParameters(List<Map<String, Object>> parameters, String typeId) {
         if (parameters == null || parameters.isEmpty()) {
-            return null;
+            return Map.of();
         }
         Map<String, Object> result = new HashMap<>();
         parameters.forEach(jsonParameter -> {

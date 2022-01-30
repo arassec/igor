@@ -88,7 +88,7 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
      */
     private Map<String, Object> deserializeParameters(List<Map<String, Object>> parameters) {
         if (parameters == null || parameters.isEmpty()) {
-            return null;
+            return Map.of();
         }
         Map<String, Object> result = new HashMap<>();
         parameters.forEach(jsonParameter -> {

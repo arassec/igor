@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.HierarchicalMessageSource;
@@ -29,6 +30,7 @@ import java.util.List;
 /**
  * Configures the web layer of igor.
  */
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Configuration
 @ComponentScan
 public class WebConfiguration {
@@ -65,7 +67,7 @@ public class WebConfiguration {
      */
     @Bean
     public ObjectMapper objectMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository,
-                                     IgorComponentUtil igorComponentUtil, MessageSource messageSource) {
+                                 IgorComponentUtil igorComponentUtil, MessageSource messageSource) {
         var mapperModule = new SimpleModule();
 
         mapperModule.addSerializer(new IgorComponentWebSerializer(messageSource, igorComponentRegistry, igorComponentUtil));
@@ -73,14 +75,15 @@ public class WebConfiguration {
         mapperModule.addDeserializer(Action.class, new ActionWebDeserializer(igorComponentRegistry, connectorRepository));
         mapperModule.addDeserializer(Trigger.class, new TriggerWebDeserializer(igorComponentRegistry, connectorRepository));
 
-        return new ObjectMapper()
-                .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
-                .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .registerModule(new JavaTimeModule())
-                .registerModule(mapperModule);
+        return JsonMapper.builder()
+            .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+            .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+            .serializationInclusion(JsonInclude.Include.NON_NULL)
+            .addModule(new JavaTimeModule())
+            .addModule(mapperModule)
+            .build();
     }
 
 }

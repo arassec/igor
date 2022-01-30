@@ -69,20 +69,23 @@ public class LogAction extends BaseAction {
      * @return Always the supplied data item.
      */
     @Override
+    @SuppressWarnings("java:S5247") // We need un-escaped JSON in the logs!
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        var resolvedMessage = Mustache.compiler().escapeHTML(false).withFormatter(o -> {
-            if (o instanceof HashMap) {
-                try {
-                    return new ObjectMapper().writeValueAsString(o);
-                } catch (JsonProcessingException e) {
-                    // Debug level is OK here, because the user will get  the unformatted toString()-value and
-                    // processing can go on...
-                    log.debug("Logging message appeared to be a JSON-Object but could not be formatted!", e);
+        var resolvedMessage = Mustache.compiler()
+            .escapeHTML(false) // This is required to prevent escaping '"' into '&quot;'
+            .withFormatter(o -> {
+                if (o instanceof HashMap) {
+                    try {
+                        return new ObjectMapper().writeValueAsString(o);
+                    } catch (JsonProcessingException e) {
+                        // Debug level is OK here, because the user will get  the unformatted toString()-value and
+                        // processing can go on...
+                        log.debug("Logging message appeared to be a JSON-Object but could not be formatted!", e);
+                    }
                 }
-            }
-            return o.toString();
-        }).compile(message).execute(data);
+                return o.toString();
+            }).compile(message).execute(data);
 
         if (isSimulation(data)) {
             data.put(DataKey.SIMULATION_LOG.getKey(), "Would have Logged message in loglevel '" + level.toUpperCase() + "'.");
