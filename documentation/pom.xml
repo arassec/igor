@@ -191,13 +191,6 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>docs/user/</directory>
-                            <followSymlinks>false</followSymlinks>
-                            <includes>
-                                <include>changelog.md</include>
-                            </includes>
-                        </fileset>
-                        <fileset>
                             <directory>docs/user/core</directory>
                             <followSymlinks>false</followSymlinks>
                         </fileset>

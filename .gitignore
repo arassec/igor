@@ -59,7 +59,6 @@ web/src/main/resources/static
 application.properties
 documentation/docs/.vuepress/components
 documentation/docs/user/core
-documentation/docs/user/changelog.md
 documentation/docs/user/igor-plugin-core
 documentation/docs/user/igor-plugin-file
 documentation/docs/user/igor-plugin-message

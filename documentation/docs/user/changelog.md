@@ -1,0 +1,3 @@
+# Changelog
+
+Placeholder changelog. Will be replaced by a generated one during release builds...
