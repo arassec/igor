@@ -27,9 +27,9 @@ import java.net.http.HttpResponse;
 import java.util.*;
 
 /**
- * <h1>'HTTP File Download' Action</h1>
+ * <h2>'HTTP File Download' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action Downloads a file from an HTTP(S) server and stores it in the target's filesystem.<br>
  *
  * The action adds data about the downloaded file to the data item under the 'downloadedFile' key.<br>

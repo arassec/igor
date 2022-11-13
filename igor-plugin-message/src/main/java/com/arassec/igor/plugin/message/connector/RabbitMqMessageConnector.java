@@ -36,9 +36,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <h1>RabbitMQ Connector</h1>
+ * <h2>RabbitMQ Connector</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * A message-connector that uses RabbitMQ to send messages.
  */
 @Getter

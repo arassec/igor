@@ -13,18 +13,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>Skip Action</h1>
+ * <h2>Skip Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action skips the first 'n' data items.
  *
- * <h2>Event-Triggered Jobs</h2>
+ * <h3>Event-Triggered Jobs</h3>
  * <strong>This action is not available in event-triggered jobs!</strong>
  *
  * The counter that skips the first 'n' data items is set on job start and applies to the complete job execution. Each skipped
  * data item increases the counter, which is never reset until the next job execution. Since event triggered jobs don't stop their
  * execution, the counter will never be reset.
- * 
+ *
  * Thus, this action would skip the first 'n' data items of an event-triggered job, and forward <strong>all</strong> following
  * data items afterwards until the job were restarted!
  */

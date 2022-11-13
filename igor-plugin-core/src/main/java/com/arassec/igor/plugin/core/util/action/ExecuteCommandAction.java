@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Execute Command' Action</h1>
+ * <h2>'Execute Command' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * Executes a command on the command line. The command is executed with the same rights the igor server is running with.<br>
  * <p>
  * The standard output and error stream of the command execution will be available in the following data items under the

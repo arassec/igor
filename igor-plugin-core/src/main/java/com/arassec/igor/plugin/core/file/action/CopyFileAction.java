@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Copy file' Action</h1>
+ * <h2>'Copy file' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action copies a file.<br>
  *
  * Details about the action's parameters are added to processed data items under the 'copiedFile' key.<br>

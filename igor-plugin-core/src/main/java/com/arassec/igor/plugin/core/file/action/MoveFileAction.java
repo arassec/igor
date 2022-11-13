@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Move file' Action</h1>
+ * <h2>'Move file' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action moves/renames a file.
  */
 @Slf4j

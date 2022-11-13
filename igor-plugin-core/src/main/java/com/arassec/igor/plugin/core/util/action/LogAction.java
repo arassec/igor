@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>Log Action</h1>
+ * <h2>Log Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action logs every processed data item to igor's log with DEBUG level.
  */
 @Slf4j

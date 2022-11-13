@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Add Data' Action</h1>
+ * <h2>'Add Data' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * The action adds JSON data to the processed data item.
  *
- * <h2>Example</h2>
+ * <h3>Example</h3>
  * The following configuration of the 'Json' parameter:
  * <pre><code>
  * {

@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Send RabbitMQ Message' Action</h1>
+ * <h2>'Send RabbitMQ Message' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action sends a message to a RabbitMQ exchange.
  *
- * <h2>Mustache Template Parameters</h2>
+ * <h3>Mustache Template Parameters</h3>
  * The message template can contain mustache expressions to fill the message with dynamic values from the processed data
  * item.<br>
  * <p>

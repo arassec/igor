@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>Limit Action</h1>
+ * <h2>Limit Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action limits the data stream to the first 'n' data items.
  *
- * <h2>Event-Triggered Jobs</h2>
+ * <h3>Event-Triggered Jobs</h3>
  * <strong>This action is not available in event-triggered jobs!</strong><br>
  * <p>
  * The limit counter is set on job start and applies to the complete job execution. Each processed data item increases the

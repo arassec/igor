@@ -23,9 +23,9 @@ import java.net.http.HttpResponse;
 import java.util.*;
 
 /**
- * <h1>'HTTP Request' Action</h1>
+ * <h2>'HTTP Request' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action issues HTTP requests against web servers.<br>
  *
  * The action adds the results of the request to the data item under the 'webResponse' key.<br>

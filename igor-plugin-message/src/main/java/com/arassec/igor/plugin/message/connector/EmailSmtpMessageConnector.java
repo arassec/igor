@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * <h1>'E-Mail Sender (SMTP)' Connector</h1>
+ * <h2>'E-Mail Sender (SMTP)' Connector</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * A connector that uses the SMTP protocol to send E-Mails.
  */
 @Getter

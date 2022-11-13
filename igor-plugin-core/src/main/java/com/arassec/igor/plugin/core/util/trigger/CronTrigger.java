@@ -13,9 +13,9 @@ import javax.validation.constraints.NotEmpty;
 
 
 /**
- * <h1>CRON Trigger</h1>
+ * <h2>CRON Trigger</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * The CRON trigger runs a job periodically according to its cron expression. Just like the UNIX cron daemon does.<br>
  *
  * A CRON expression consists of six fields: <pre>second, minute, hour, day, month, weekday</pre><br>
@@ -63,7 +63,7 @@ import javax.validation.constraints.NotEmpty;
  *     </tr>
  * </table>
  *
- * <h2>Examples</h2>
+ * <h3>Examples</h3>
  * <table>
  *     <caption>CRON examples</caption>
  *     <tr>

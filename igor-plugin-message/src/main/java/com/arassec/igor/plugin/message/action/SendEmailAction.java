@@ -19,12 +19,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * <h1>'Send E-Mail' Action</h1>
+ * <h2>'Send E-Mail' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action sends an E-Mail.
  *
- * <h2>Mustache Template Parameters</h2>
+ * <h3>Mustache Template Parameters</h3>
  * All of the action's parameters support mustache templates as input.
  * <p>
  * As example, let's assume the action operates on the following data item:

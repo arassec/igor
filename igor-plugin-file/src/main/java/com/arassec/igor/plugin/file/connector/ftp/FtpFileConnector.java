@@ -8,9 +8,9 @@ import org.apache.commons.net.ftp.FTPClient;
 import java.io.IOException;
 
 /**
- * <h1>FTP Connector</h1>
+ * <h2>FTP Connector</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * A file-connector providing access to an FTP server.
  */
 @IgorComponent(typeId = "ftp-file-connector", categoryId = CoreCategory.FILE)

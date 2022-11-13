@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * <h1>Pause Action</h1>
+ * <h2>Pause Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action pauses execution by the configured amount of time. Execution pauses <strong>for every data item</strong> which is
  * processed by the action.
  */

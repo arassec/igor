@@ -7,9 +7,9 @@ import com.arassec.igor.plugin.core.CoreCategory;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>Web-Hook Trigger</h1>
+ * <h2>Web-Hook Trigger</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * The web-hook trigger is an event based trigger that runs a job after an HTTP request has been made to igor's web-hook
  * interface.<br>
  * <p>
@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
  * http(s)://[HOST:PORT]/webhook/[JOB-ID]
  * </code></pre>
  *
- * <h2>Examples</h2>
+ * <h3>Examples</h3>
  * Let's assume igor is running on localhost and reachable under port 8080.
  * <p>
  * A job with ID `01d11f89-1b89-4fa0-8da4-cdd75229f8b5`, and the web-hook trigger attached to it, can be triggered by calling:
@@ -51,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
  * }
  * </code></pre>
  *
- * <h2>Limitations and Caveats</h2>
+ * <h3>Limitations and Caveats</h3>
  * Not all actions are available for event-triggered jobs. E.g. sorting by timestamp requires all data items, that should be
  * sorted, to be known to the action. Since event-triggered jobs process a continuous stream of incoming events, there is no fixed
  * number of data items to sort.

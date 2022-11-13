@@ -22,9 +22,9 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 /**
- * <h1>SFTP Connector</h1>
+ * <h2>SFTP Connector</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * A file-connector that connects to an SFTP server.
  */
 @Slf4j

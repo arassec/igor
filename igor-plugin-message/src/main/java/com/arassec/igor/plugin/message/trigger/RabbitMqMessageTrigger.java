@@ -15,14 +15,14 @@ import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
- * <h1>RabbitMQ Message Trigger</h1>
+ * <h2>RabbitMQ Message Trigger</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * A trigger that fires on incoming messages on a RabbitMQ server.<br>
  * <p>
  * This message trigger is an event based trigger that processes an incoming message as data item as soon as it is received.
  *
- * <h2>Limitations and Caveats</h2>
+ * <h3>Limitations and Caveats</h3>
  * Not all actions are available for event-triggered jobs. E.g. sorting by timestamp requires all data items, that should be
  * sorted, to be known to the action. Since event-triggered jobs process a continuous stream of incoming events, there is no fixed
  * number of data items to sort.

@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Receive E-Mail' Action</h1>
+ * <h2>'Receive E-Mail' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action receives E-Mails and creates a new data item for every received E-Mail.
  *
- * <h2>Example</h2>
+ * <h3>Example</h3>
  * For every data item processed by the action, E-Mails are retrieved from the configured server.<br>
  * <p>
  * The created new data items contain the E-Mails data, e.g.:

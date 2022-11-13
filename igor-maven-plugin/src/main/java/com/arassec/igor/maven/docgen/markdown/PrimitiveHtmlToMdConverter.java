@@ -22,7 +22,6 @@ public class PrimitiveHtmlToMdConverter {
      * Converts the supplied JavaDoc into markdown format.
      *
      * @param javadoc The component's JavaDoc as String.
-     *
      * @return The created markdown as String.
      */
     public String convert(String javadoc) {
@@ -38,7 +37,6 @@ public class PrimitiveHtmlToMdConverter {
      * Only HTML nodes relevant for igor's documentation are supported!
      *
      * @param node The HTML node to convert.
-     *
      * @return The corresponding markdown as String.
      */
     private String processNode(Node node) {
@@ -102,7 +100,8 @@ public class PrimitiveHtmlToMdConverter {
      */
     private void convertHeader(Element element, StringBuilder target, int order) {
         target.append("\n\n");
-        target.append(Stream.generate(() -> "#").limit(order).collect(Collectors.joining()))
+        // JavaDoc DocLint prohibits h1 elements with recent versions, so those are ignored during markdown generation:
+        target.append(Stream.generate(() -> "#").limit(order - 1).collect(Collectors.joining()))
             .append(" ");
         element.childNodes().forEach(childNode -> target.append(processNode(childNode)));
         target.append("\n");
@@ -111,7 +110,7 @@ public class PrimitiveHtmlToMdConverter {
     /**
      * Converts an HTML "break" element into markdown.
      *
-     * @param target  The {@link StringBuilder} containing the target markdown.
+     * @param target The {@link StringBuilder} containing the target markdown.
      */
     private void convertBreak(StringBuilder target) {
         target.append("\n\n");

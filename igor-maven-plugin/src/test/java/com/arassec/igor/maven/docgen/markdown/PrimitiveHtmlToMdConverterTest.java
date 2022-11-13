@@ -17,16 +17,18 @@ class PrimitiveHtmlToMdConverterTest {
 
     /**
      * Tests converting HTML header elements.
+     * <p>
+     * Since JavaDoc prohibits h1-elements in recent versions, markdown header generation starts with h2-elements.
      */
     @Test
     @DisplayName("Tests converting HTML header elements.")
     void testConvertHeaders() {
-        assertEquals("# header-test", converter.convert("<h1>header-test</h1>"));
-        assertEquals("## header-test", converter.convert("<h2>header-test</h2>"));
-        assertEquals("### header-test", converter.convert("<h3>header-test</h3>"));
-        assertEquals("#### header-test", converter.convert("<h4>header-test</h4>"));
-        assertEquals("##### header-test", converter.convert("<h5>header-test</h5>"));
-        assertEquals("###### header-test", converter.convert("<h6>header-test</h6>"));
+        assertEquals("header-test", converter.convert("<h1>header-test</h1>"));
+        assertEquals("# header-test", converter.convert("<h2>header-test</h2>"));
+        assertEquals("## header-test", converter.convert("<h3>header-test</h3>"));
+        assertEquals("### header-test", converter.convert("<h4>header-test</h4>"));
+        assertEquals("#### header-test", converter.convert("<h5>header-test</h5>"));
+        assertEquals("##### header-test", converter.convert("<h6>header-test</h6>"));
     }
 
     /**

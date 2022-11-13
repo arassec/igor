@@ -14,15 +14,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Filter by Regular Expression' Action</h1>
+ * <h2>'Filter by Regular Expression' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action filters data items by evaluating a regular expression against a property value of the data item.<br>
  *
  * If the regular expression matches, the data item is passed to the following action. Otherwise the data item is filtered and not
  * passed to the following action.
  *
- * <h2>Regular Expressions</h2>
+ * <h3>Regular Expressions</h3>
  * This action uses Java's 'String.matches(String regExp)' method for regular expression matching. The regular expressions
  * supported by this method are described in
  * <a href="https://docs.oracle.com/javase/tutorial/essential/regex/">The Java Tutorials</a>.

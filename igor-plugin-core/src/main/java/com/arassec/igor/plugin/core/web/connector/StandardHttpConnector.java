@@ -29,9 +29,9 @@ import java.security.cert.CertificateException;
 import java.util.Optional;
 
 /**
- * <h1>HTTP Connector</h1>
+ * <h2>HTTP Connector</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * The HTTP connector can be used to query web servers via HTTP/HTTPS.<br>
  * <p>
  * The java.net.http.HttpClient is used internally to connect to servers. All configuration options available, e.g. with JVM

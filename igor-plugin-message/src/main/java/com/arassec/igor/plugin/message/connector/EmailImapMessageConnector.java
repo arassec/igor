@@ -22,9 +22,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * <h1>'E-Mail Receiver (IMAP)' Connector</h1>
+ * <h2>'E-Mail Receiver (IMAP)' Connector</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * A connector that uses the IMAP protocol to receive mails.
  */
 @Slf4j

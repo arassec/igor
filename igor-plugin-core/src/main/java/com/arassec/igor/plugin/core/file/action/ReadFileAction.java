@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Read file' Action</h1>
+ * <h2>'Read file' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action reads a file from a file-connector and adds its contents to the processed data item.<br>
  * <p>
  * The file's contents will be available in the data item under the key 'fileContents'.<br>

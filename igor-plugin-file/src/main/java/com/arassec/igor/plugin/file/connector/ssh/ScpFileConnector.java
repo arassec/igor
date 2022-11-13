@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * <h1>SCP Connector</h1>
+ * <h2>SCP Connector</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * A file-connector that connects to an SCP server.
  */
 @Slf4j

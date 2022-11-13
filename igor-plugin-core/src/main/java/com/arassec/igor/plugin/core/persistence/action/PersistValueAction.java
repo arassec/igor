@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Persist Value' Action</h1>
+ * <h2>'Persist Value' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action persists values in igor's datastore.
  */
 @Slf4j

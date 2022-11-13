@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Filter Persisted Value' Action</h1>
+ * <h2>'Filter Persisted Value' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action filters data items based on values from igor's datastore.<br>
  *
  * Filtered data items are not passed to the following action.

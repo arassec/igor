@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * <h1>Filesystem Connector</h1>
+ * <h2>Filesystem Connector</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * A file-connector providing access to the filesystem the igor server is running on.
  *
  * <h3>Parameters</h3>

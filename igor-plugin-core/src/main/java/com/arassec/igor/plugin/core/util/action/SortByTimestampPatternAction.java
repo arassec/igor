@@ -22,15 +22,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * <h1>'Sort by Timestamp Pattern' Action</h1>
+ * <h2>'Sort by Timestamp Pattern' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action sorts data items based on a timestamp inside a value of the input data.<br>
  * <p>
  * This might e.g. be used to sort files by a timestamp that is part of their filename, if the timestamp of the last modification
  * is not available.
  *
- * <h2>Example</h2>
+ * <h3>Example</h3>
  * <p>
  * An example data item processed by this action might look like this:
  * <pre><code>
@@ -68,7 +68,7 @@ import java.util.stream.Collectors;
  *     </tr>
  * </table>
  *
- * <h2>Event-Triggered Jobs</h2>
+ * <h3>Event-Triggered Jobs</h3>
  * <strong>This action is not available in event-triggered jobs!</strong>
  * <p>
  * Sorting is done by collecting all data items of one job execution and by sorting the resulting list.

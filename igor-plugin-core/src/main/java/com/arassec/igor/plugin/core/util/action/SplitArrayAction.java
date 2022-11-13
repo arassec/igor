@@ -18,15 +18,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Split Array' Action</h1>
+ * <h2>'Split Array' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action splits a JSON-Array into multiple data items. Each data item contains one element from the original array at the
  * same position the array had before.<br>
  * <p>
  * If there is no JSON-Array at the configured position, the data item will be **filtered** by this action.
  *
- * <h2>Example</h2>
+ * <h3>Example</h3>
  * <p>
  * An example data item processed by this action might look like this:
  * <pre><code>

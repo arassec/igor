@@ -20,14 +20,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'Filter by Timestamp' Action</h1>
+ * <h2>'Filter by Timestamp' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action filters data items by comparing a timestamp from the input against a configured time span.<br>
  *
  * Filtered data items are not passed to following actions.
  *
- * <h2>Filtering Epoch Timestamps</h2>
+ * <h3>Filtering Epoch Timestamps</h3>
  * If the timestamp is given as Epoch timestamp, you can use the following special values as 'Timestamp format' parameter:<br>
  *
  * <table>

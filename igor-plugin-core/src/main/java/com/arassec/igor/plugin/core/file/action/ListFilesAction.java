@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <h1>'List files' Action</h1>
+ * <h2>'List files' Action</h2>
  *
- * <h2>Description</h2>
+ * <h3>Description</h3>
  * This action lists all files contained in a directory.
  * <p>
  * The action creates new data items for every file listed. A data item created by this action could look like this:
