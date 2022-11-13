@@ -4,6 +4,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.IgorException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests the {@link StandardHttpConnector}.
  */
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 @DisplayName("'HTTP' connector tests.")
 class StandardHttpConnectorTest {
@@ -209,6 +211,7 @@ class StandardHttpConnectorTest {
             fail("Should have thrown an IgorException due to missing client certificate!");
         } catch (IgorException e) {
             // Extra check here, to make sure the request really failed because of the missing certificate!
+            log.info("Expected test exception!", e);
             assertTrue(e.getMessage().contains("bad_certificate"));
         }
 
