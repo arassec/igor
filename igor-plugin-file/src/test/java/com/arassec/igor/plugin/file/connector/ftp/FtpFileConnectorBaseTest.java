@@ -71,6 +71,7 @@ public abstract class FtpFileConnectorBaseTest {
         ftpRoot = ftpRootDir;
         FileSystemUtils.copyRecursively(Paths.get("src/test/resources/ftp/igor"), Paths.get(ftpRoot));
 
+        // Replace with: int port = TestSocketUtils.findAvailableTcpPort();
         int port = SocketUtils.findAvailableTcpPort();
 
         PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
@@ -108,7 +109,7 @@ public abstract class FtpFileConnectorBaseTest {
 
         connector = baseFtpFileConnector;
         connector.setHost(FTP_HOST);
-        connector.setPort(port);
+        connector.setPort(listenerFactory.getPort());
         connector.setUsername(FTP_USER);
         connector.setPassword(FTP_PASS);
     }

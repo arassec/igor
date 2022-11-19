@@ -1,5 +1,6 @@
 package com.arassec.igor.maven.docgen.markdown;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,15 +12,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Converts HTML JavaDoc comments in {@link com.arassec.igor.application.annotation.IgorComponent}s into markdown format.
+ * Converts HTML JavaDoc comments in {@link com.arassec.igor.application.annotation.IgorComponent}s into Markdown format.
  * <p>
  * Uses a simple mechanism to convert key HTML elements into their markdown equivalents. Not all JavaDoc HTML features are
  * supported for conversion, only what's necessary to crete the basic igor documentation markdown files is implemented.
  */
+@Slf4j
 public class PrimitiveHtmlToMdConverter {
 
     /**
-     * Converts the supplied JavaDoc into markdown format.
+     * Converts the supplied JavaDoc into Markdown format.
      *
      * @param javadoc The component's JavaDoc as String.
      * @return The created markdown as String.
@@ -40,8 +42,8 @@ public class PrimitiveHtmlToMdConverter {
      * @return The corresponding markdown as String.
      */
     private String processNode(Node node) {
-        if (node instanceof TextNode) {
-            String text = ((TextNode) node).text();
+        if (node instanceof TextNode textNode) {
+            String text = textNode.text();
             if (!" ".equals(text)) {
                 if (text.startsWith(" ")) {
                     return text.substring(1);
@@ -49,42 +51,20 @@ public class PrimitiveHtmlToMdConverter {
                     return text;
                 }
             }
-        } else if (node instanceof Element) {
+        } else if (node instanceof Element element) {
             var result = new StringBuilder();
-            var element = ((Element) node);
             switch (element.tagName()) {
-                case "h1":
-                case "h2":
-                case "h3":
-                case "h4":
-                case "h5":
-                case "h6":
+                case "h1", "h2", "h3", "h4", "h5", "h6" ->
                     convertHeader(element, result, Integer.parseInt(element.tagName().replace("h", "")));
-                    break;
-                case "br":
-                    convertBreak(result);
-                    break;
-                case "strong":
-                case "b":
-                    convertStrong(element, result);
-                    break;
-                case "i":
-                    convertItalic(element, result);
-                    break;
-                case "a":
-                    convertAnchor(element, result);
-                    break;
-                case "table":
-                    convertTable(element, result);
-                    break;
-                case "pre":
-                    convertPreformatted(element, result);
-                    break;
-                case "p":
-                    convertParagraph(element, result);
-                    break;
-                default:
-                    break;
+                case "br" -> convertBreak(result);
+                case "strong", "b" -> convertStrong(element, result);
+                case "i" -> convertItalic(element, result);
+                case "a" -> convertAnchor(element, result);
+                case "table" -> convertTable(element, result);
+                case "pre" -> convertPreformatted(element, result);
+                case "p" -> convertParagraph(element, result);
+                default -> log.info("Element {} not supported for markdown conversion!", element.tagName());
+
             }
             return result.toString();
         }
@@ -101,7 +81,7 @@ public class PrimitiveHtmlToMdConverter {
     private void convertHeader(Element element, StringBuilder target, int order) {
         target.append("\n\n");
         // JavaDoc DocLint prohibits h1 elements with recent versions, so those are ignored during markdown generation:
-        target.append(Stream.generate(() -> "#").limit(order - 1).collect(Collectors.joining()))
+        target.append(Stream.generate(() -> "#").limit(order - 1L).collect(Collectors.joining()))
             .append(" ");
         element.childNodes().forEach(childNode -> target.append(processNode(childNode)));
         target.append("\n");

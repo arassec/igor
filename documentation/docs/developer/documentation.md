@@ -126,7 +126,7 @@ The precedence to determine which documentation file to use, if multiple for the
 The following HTML elements are converted to their Markdown equivalents during generation:
 |HTML Element|Generation Result|
 |---|---|
-|&lt;h1&gt;heading1&lt;/h1&gt; ... &lt;h6&gt;heading6&lt;/h6&gt;|# heading1 ... ###### heading6|
+|&lt;h2&gt;heading2&lt;/h2&gt; ... &lt;h6&gt;heading6&lt;/h6&gt;|# heading2 ... ###### heading6|
 |&lt;br&gt;|\n\n|
 |&lt;strong&gt;text&lt;/strong&gt;|&#42;&#42;text&#42;&#42;|
 |&lt;b&gt;text&lt;/b&gt;|&#42;&#42;text&#42;&#42;|
@@ -136,6 +136,8 @@ The following HTML elements are converted to their Markdown equivalents during g
 |&lt;pre&gt;text&lt;/pre&gt;|&#96;text&#96;|
 |&lt;pre&gt;&lt;code&gt;text&lt;/code&gt;&lt;/pre&gt;|\n&#96;&#96;&#96;text&#96;&#96;&#96;\n|
 |&lt;p&gt;text&lt;/p&gt;|\n\ntext\n|
+
+Due to changes in JavaDoc-Linting HTML &lt;h1&gt; headings are not supported anymore!
 
 ### Code-Gen Example
 E.g. for the following component...

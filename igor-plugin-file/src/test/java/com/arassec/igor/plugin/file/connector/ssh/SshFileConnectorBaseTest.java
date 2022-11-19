@@ -70,10 +70,7 @@ abstract class SshFileConnectorBaseTest {
      * @throws IOException In case of SSHD errors.
      */
     protected static void initializeTestEnvironment(BaseSshFileConnector baseSshFileConnector) throws IOException {
-        int port = SocketUtils.findAvailableTcpPort();
-
         sshd = SshServer.setUpDefaultServer();
-        sshd.setPort(port);
         sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
         sshd.setPasswordAuthenticator((user, pass, serverSession) -> SSHD_USER.equals(user) && SSHD_PASS.equals(pass));
         sshd.setCommandFactory(new ScpCommandFactoryMock()); // SCP support
@@ -82,7 +79,7 @@ abstract class SshFileConnectorBaseTest {
 
         connector = baseSshFileConnector;
         connector.setHost(SSHD_HOST);
-        connector.setPort(port);
+        connector.setPort(sshd.getPort());
         connector.setUsername(SSHD_USER);
         connector.setPassword(SSHD_PASS);
     }

@@ -167,7 +167,7 @@ class RabbitMqMessageConnectorTest {
     void testTestConfiguration() {
         RabbitMqMessageConnector rabbitMqMessageConnector = new RabbitMqMessageConnector(applicationEventPublisher);
         rabbitMqMessageConnector.setHost("localhost");
-        rabbitMqMessageConnector.setPort(SocketUtils.findAvailableTcpPort());
+        rabbitMqMessageConnector.setPort(1);
         rabbitMqMessageConnector.setUsername("igor-test");
         rabbitMqMessageConnector.setPassword("invalid");
         rabbitMqMessageConnector.setConnectionTimeout(1);
