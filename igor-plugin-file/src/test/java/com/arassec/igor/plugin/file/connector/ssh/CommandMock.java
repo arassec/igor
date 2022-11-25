@@ -21,19 +21,9 @@ import java.nio.file.StandardOpenOption;
 public class CommandMock implements Command {
 
     /**
-     * SSH input stream.
-     */
-    private InputStream inputStream;
-
-    /**
      * SSH output stream.
      */
     private OutputStream outputStream;
-
-    /**
-     * SSH error stream.
-     */
-    private OutputStream errorStream;
 
     /**
      * An exit callback.
@@ -43,7 +33,7 @@ public class CommandMock implements Command {
     /**
      * Used to return different results based on the configured variant.
      */
-    private int testVariant;
+    private final int testVariant;
 
     /**
      * Creates a new instance.
@@ -59,7 +49,6 @@ public class CommandMock implements Command {
      */
     @Override
     public void setInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
     }
 
     /**
@@ -75,7 +64,6 @@ public class CommandMock implements Command {
      */
     @Override
     public void setErrorStream(OutputStream errorStream) {
-        this.errorStream = errorStream;
     }
 
     /**
@@ -94,10 +82,11 @@ public class CommandMock implements Command {
         log.debug("Start called with test variant: {}", testVariant);
 
         if (testVariant == 1) { // list files without filter
-            outputStream.write((
-                    "total 2\n" +
-                            "-rw-r--r--  1 root   root 129997 2020-02-22 17:43:13.410083727 +0100 alpha.txt\n" +
-                            "-rw-r--r--  1 root   root   1634 2020-02-22 17:43:18.633492983 +0100 beta.test\n"
+            outputStream.write(("""
+                    total 2
+                    -rw-r--r--  1 root   root 129997 2020-02-22 17:43:13.410083727 +0100 alpha.txt
+                    -rw-r--r--  1 root   root   1634 2020-02-22 17:43:18.633492983 +0100 beta.test
+                    """
             ).getBytes());
         } else if (testVariant == 2) { // list files with file-ending filter
             outputStream.write((

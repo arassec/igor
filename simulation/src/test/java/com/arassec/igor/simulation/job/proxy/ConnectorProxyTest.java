@@ -43,7 +43,7 @@ class ConnectorProxyTest {
         // The proxy should NOT call the real method due to the missing @IgorSimulationSafe annotation:
         connectorProxy.testConfiguration();
         Assertions.assertFalse(testConnector.isTestConfigurationInvoked());
-        // Check, that the invokation does change the property:
+        // Check, that the invocation does change the property:
         testConnector.testConfiguration();
         Assertions.assertTrue(testConnector.isTestConfigurationInvoked());
     }
@@ -53,7 +53,7 @@ class ConnectorProxyTest {
      */
     @Test
     @DisplayName("Tests that the proxied connector's initialize method is called.")
-    void testInvokeInitilize() {
+    void testInvokeInitialize() {
         TestConnector connectorMock = mock(TestConnector.class);
 
         Connector connectorProxy = (Connector) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Connector.class},

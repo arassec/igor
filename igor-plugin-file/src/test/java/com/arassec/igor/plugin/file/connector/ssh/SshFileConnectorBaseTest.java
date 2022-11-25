@@ -13,13 +13,13 @@ import org.apache.sshd.sftp.server.SftpSubsystemFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.FileSystemUtils;
-import org.springframework.util.SocketUtils;
 import org.springframework.util.StreamUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
@@ -158,7 +158,7 @@ abstract class SshFileConnectorBaseTest {
         String fileName = "target/ssh-write-stream-test.txt";
         String fileContent = "igor-ssh-write-test";
 
-        assertFalse(Files.exists(Paths.get(fileName)));
+        Path fileNamePath = Paths.get(fileName); assertFalse(Files.exists(fileNamePath));
 
         FileStreamData fileStreamData = new FileStreamData();
         fileStreamData.setData(new ByteArrayInputStream(fileContent.getBytes()));
@@ -167,9 +167,9 @@ abstract class SshFileConnectorBaseTest {
         connector.writeStream(fileName, fileStreamData,
                 new WorkInProgressMonitor(), JobExecution.builder().executionState(JobExecutionState.RUNNING).build());
 
-        assertEquals(fileContent, Files.readString(Paths.get(fileName)));
+        assertEquals(fileContent, Files.readString(fileNamePath));
 
-        Files.deleteIfExists(Paths.get(fileName));
+        Files.deleteIfExists(fileNamePath);
     }
 
     /**
@@ -180,11 +180,13 @@ abstract class SshFileConnectorBaseTest {
     @SneakyThrows
     void testDelete() {
         String fileName = "target/ssh-delete-test.txt";
-        Files.writeString(Paths.get(fileName), "ssh-delete-test", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        Path fileNamePath = Paths.get(fileName);
+
+        Files.writeString(fileNamePath, "ssh-delete-test", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
         connector.delete(fileName);
 
-        assertFalse(Files.exists(Paths.get(fileName)));
+        assertFalse(Files.exists(fileNamePath));
     }
 
     /**
@@ -197,17 +199,20 @@ abstract class SshFileConnectorBaseTest {
         String fileName = "target/ssh-move-test.txt";
         String targetFilename = fileName + ".moved";
 
-        Files.writeString(Paths.get(fileName), "ssh-move-test", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        Path fileNamePath = Paths.get(fileName);
+        Path targetFilenamePath = Paths.get(targetFilename);
 
-        assertTrue(Files.exists(Paths.get(fileName)));
-        assertFalse(Files.exists(Paths.get(targetFilename)));
+        Files.writeString(fileNamePath, "ssh-move-test", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+        assertTrue(Files.exists(fileNamePath));
+        assertFalse(Files.exists(targetFilenamePath));
 
         connector.move(fileName, fileName + ".moved");
 
-        assertFalse(Files.exists(Paths.get(fileName)));
-        assertTrue(Files.exists(Paths.get(targetFilename)));
+        assertFalse(Files.exists(fileNamePath));
+        assertTrue(Files.exists(targetFilenamePath));
 
-        Files.deleteIfExists(Paths.get(targetFilename));
+        Files.deleteIfExists(targetFilenamePath);
     }
 
     /**

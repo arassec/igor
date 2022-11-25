@@ -21,14 +21,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -107,10 +105,11 @@ public class DocumentationGenerator {
     private void createDocFile(Path projectRoot, String docTargetDir, String typeId, String content) {
         try {
             var targetDir = projectRoot + docTargetDir;
-            if (!Files.exists(Path.of(targetDir))) {
-                Files.createDirectories(Path.of(targetDir));
+            Path targetDirPath = Path.of(targetDir);
+            if (!Files.exists(targetDirPath)) {
+                Files.createDirectories(targetDirPath);
             }
-            Files.write(Paths.get(targetDir, typeId + ".md"), content.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(Paths.get(targetDir, typeId + ".md"), content);
         } catch (IOException e) {
             throw new IgorException("Could not write target file with igor documentation!", e);
         }
@@ -127,7 +126,7 @@ public class DocumentationGenerator {
         try (Stream<Path> walk = Files.walk(sourcesRoot)) {
             return walk.filter(Files::isRegularFile)
                 .filter(path -> path.toString().endsWith(".java"))
-                .collect(Collectors.toList());
+                .toList();
         } catch (IOException e) {
             throw new IgorException("Could not determine source files!", e);
         }

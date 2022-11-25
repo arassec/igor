@@ -5,7 +5,7 @@ import com.arassec.igor.core.model.connector.Connector;
 
 /**
  * A connector interface for testing. The {@link TestConnector} cannot use {@link Connector} directly, since that is filtered
- * during category extraction in the {@link com.arassec.igor.core.application.IgorComponentRegistry}.
+ * during category extraction in the {@link com.arassec.igor.application.registry.IgorComponentRegistry}.
  */
 public interface TestConnectorInterface {
 
@@ -25,7 +25,7 @@ public interface TestConnectorInterface {
     String simulationUnsafeMethod();
 
     /**
-     * Method that is annotated as {@link IgorSimulationSafe} in a sub-class.
+     * Method that is annotated as {@link IgorSimulationSafe} in a subclass.
      *
      * @return A string.
      */

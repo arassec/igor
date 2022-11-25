@@ -124,8 +124,8 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
      */
     private String getTypeId(Map<String, Object> map) {
         Object type = map.get(PersistenceMapperKey.TYPE_ID.getKey());
-        if (type instanceof String) {
-            return (String) type;
+        if (type instanceof String typeId) {
+            return typeId;
         }
         return null;
     }

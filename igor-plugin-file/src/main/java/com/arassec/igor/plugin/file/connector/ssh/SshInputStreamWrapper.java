@@ -24,7 +24,7 @@ public class SshInputStreamWrapper extends InputStream {
     /**
      * The original input stream provided by a JSch channel.
      */
-    private InputStream inputStream;
+    private final InputStream inputStream;
 
     /**
      * The size of the file that is being transferred.
