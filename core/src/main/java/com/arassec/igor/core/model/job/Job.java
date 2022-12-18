@@ -10,16 +10,16 @@ import com.arassec.igor.core.model.job.starter.EventTriggeredJobStarter;
 import com.arassec.igor.core.model.job.starter.JobStarter;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.model.trigger.Trigger;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
@@ -221,7 +221,7 @@ public class Job {
             for (ConcurrencyGroup concurrencyGroup : concurrencyGroups) {
                 allThreadsTerminated = (allThreadsTerminated && concurrencyGroup.awaitTermination());
             }
-            log.debug("Threads terminated over all concurrency-groups: {}", allThreadsTerminated);
+            log.trace("Threads terminated over all concurrency-groups: {}", allThreadsTerminated);
         }
     }
 

@@ -2,7 +2,7 @@
     <div>
 
         <div class="table">
-            <template v-for="(param, index) in parameters" v-bind:id="param.name" v-bind:index="index">
+            <template v-for="(param, index) in parameters">
                 <div class="tr" v-bind:key="param.name"
                      v-bind:style="(!showAdvancedParameters && param.advanced) ? 'visibility: collapse' : ''">
                     <div class="text-top td">
@@ -189,8 +189,7 @@ export default {
                 '&pageSize=' + this.connectorPage.size)
         },
         setSelectedConnector: function (connector) {
-            this.parameters[this.connectorParameterIndex].connectorName = connector.name
-            this.parameters[this.connectorParameterIndex].value = connector.id
+            this.$emit('connector-selected', connector, this.connectorParameterIndex);
             this.showConnectorPicker = false
         },
         createConnector: function () {
@@ -201,12 +200,12 @@ export default {
             this.showCronPicker = true
         },
         setCronExpression: function (value) {
-            this.parameters[this.cronParameterIndex].value = value
+            this.$emit('set-cron-expression', value, this.cronParameterIndex)
             this.showCronPicker = false
         },
         advancedParametersExist: function () {
-            for (let index = 0; index < this.parameters.length; index++) {
-                if (this.parameters[index].advanced) {
+            for (const element of this.parameters) {
+                if (element.advanced) {
                     return true
                 }
             }
@@ -215,7 +214,7 @@ export default {
         updateParameterInputTypes: function () {
             let component = this
             for (let i in this.parameters) {
-                if (this.parameters.hasOwnProperty(i)) {
+                if (Object.prototype.hasOwnProperty.call(this.parameters, i)) {
                     let param = this.parameters[i]
                     if (!component.isNumber(param.type) && !component.isBoolean(param.type)) {
                         if (param.secured) {
@@ -231,8 +230,8 @@ export default {
         },
         arrowColor: function () {
             if (this.validationErrors && this.parentId in this.validationErrors) {
-                for (let index = 0; index < this.parameters.length; index++) {
-                    if (this.parameters[index].advanced && this.parameters[index].name in this.validationErrors[this.parentId]) {
+                for (const element of this.parameters) {
+                    if (element.advanced && element.name in this.validationErrors[this.parentId]) {
                         return 'arrow-alert';
                     }
                 }

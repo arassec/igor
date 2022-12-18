@@ -2,9 +2,8 @@ package com.arassec.igor.core.model.annotation.validation;
 
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.repository.JobRepository;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * Validates a job's name and checks, that it is unique.

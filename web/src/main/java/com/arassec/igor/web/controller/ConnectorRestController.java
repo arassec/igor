@@ -9,6 +9,7 @@ import com.arassec.igor.core.util.Pair;
 import com.arassec.igor.core.util.StacktraceFormatter;
 import com.arassec.igor.web.mapper.WebMapperKey;
 import com.arassec.igor.web.model.ConnectorListEntry;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,14 +45,13 @@ public class ConnectorRestController {
      * @param pageNumber The number of the page to return.
      * @param pageSize   The size of the page to return.
      * @param nameFilter An optional filter for connector names.
-     *
      * @return List of available connectors.
      */
     @GetMapping
     public ModelPage<ConnectorListEntry> getConnectors(
-            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-            @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize,
-            @RequestParam(value = "nameFilter", required = false) String nameFilter) {
+        @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+        @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize,
+        @RequestParam(value = "nameFilter", required = false) String nameFilter) {
         ModelPage<Connector> connectorsPage = connectorManager.loadPage(pageNumber, pageSize, nameFilter);
         if (connectorsPage != null && !connectorsPage.getItems().isEmpty()) {
             ModelPage<ConnectorListEntry> result = new ModelPage<>(pageNumber, pageSize, connectorsPage.getTotalPages(), null);
@@ -64,7 +63,7 @@ public class ConnectorRestController {
                     connectorName = "missing.connector " + connectorName;
                 }
                 return new ConnectorListEntry(connector.getId(), connectorName,
-                        (referencingJobs != null && !referencingJobs.getItems().isEmpty()));
+                    (referencingJobs != null && !referencingJobs.getItems().isEmpty()));
             }).collect(Collectors.toList()));
 
             return result;
@@ -78,7 +77,6 @@ public class ConnectorRestController {
      * @param types      The required connector types.
      * @param pageNumber The number of the page to return.
      * @param pageSize   The size of the page to return.
-     *
      * @return List of available connectors of the given types.
      */
     @GetMapping(value = "candidate/{types}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,7 +93,6 @@ public class ConnectorRestController {
      * Returns the connector with the given ID.
      *
      * @param id The connector's ID.
-     *
      * @return The connector.
      */
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -117,7 +114,7 @@ public class ConnectorRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteConnector(@PathVariable("id") String id,
                                 @RequestParam(value = "deleteAffectedJobs", required = false, defaultValue = "false")
-                                        Boolean deleteAffectedJobs) {
+                                Boolean deleteAffectedJobs) {
         ModelPage<Pair<String, String>> referencingJobs = getReferencingJobs(id, 0, Integer.MAX_VALUE);
         if (referencingJobs.getItems() != null && Boolean.TRUE.equals(deleteAffectedJobs)) {
             referencingJobs.getItems().forEach(jobReference -> jobManager.delete(jobReference.getKey()));
@@ -135,7 +132,6 @@ public class ConnectorRestController {
      * Saves a connector.
      *
      * @param connector The new connector configuration.
-     *
      * @return The saved connector.
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -147,7 +143,6 @@ public class ConnectorRestController {
      * Tests the supplied connector configuration.
      *
      * @param connector The connector configuration.
-     *
      * @return The string 'OK' on success, an error message if the test was not successful.
      */
     @PostMapping("test")
@@ -168,7 +163,6 @@ public class ConnectorRestController {
      *
      * @param encodedName The connector's Base64 encoded name.
      * @param id          The connector's ID.
-     *
      * @return {@code true} if a connector with the provided name already exists, {@code false} otherwise.
      */
     @GetMapping("check/{name}/{id}")
@@ -181,18 +175,17 @@ public class ConnectorRestController {
     /**
      * Returns the jobs that reference this connector.
      *
-     * @param id The connector's ID.
+     * @param id         The connector's ID.
      * @param pageNumber The number of the page to return.
      * @param pageSize   The size of the page to return.
-     *
      * @return The jobs.
      */
     @GetMapping(value = "{id}/job-references", produces = MediaType.APPLICATION_JSON_VALUE)
     public ModelPage<Pair<String, String>> getReferencingJobs(@PathVariable("id") String id,
                                                               @RequestParam(value = "pageNumber", required = false, defaultValue
-                                                                      = "0") int pageNumber,
+                                                                  = "0") int pageNumber,
                                                               @RequestParam(value = "pageSize", required = false, defaultValue =
-                                                                      "2147483647") int pageSize) {
+                                                                  "2147483647") int pageSize) {
         ModelPage<Pair<String, String>> referencingJobs = connectorManager.getReferencingJobs(id, pageNumber, pageSize);
         if (referencingJobs != null) {
             return referencingJobs;

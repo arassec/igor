@@ -14,16 +14,17 @@
                     <div class="td"><label>Active</label></div>
                     <div class="td align-left">
                         <font-awesome-icon :icon="jobConfiguration.active ? 'check-square' : 'square'"
-                                           v-on:click="jobConfiguration.active = !jobConfiguration.active"
+                                           v-on:click="$emit('toggle-job-active')"
                                            data-e2e="job-active-button"/>
                     </div>
                 </div>
                 <div class="tr">
                     <div class="td"><label for="name">Name*</label></div>
                     <div class="td">
-                        <input-validated id="name" type="text" v-model="jobConfiguration.name"
+                        <input-validated id="name" type="text" @input="$emit('change-job-name', $event)"
                                          :parent-id="jobConfiguration.id" :property-id="'name'"
                                          :validation-errors="validationErrors"
+                                         :text="jobConfiguration.name"
                                          data-e2e="job-name-input"/>
                     </div>
                 </div>
@@ -31,7 +32,8 @@
                     <div class="text-top td"><label for="description-input">Description</label></div>
                     <div class="td">
                         <textarea rows="8" cols="35" id="description-input" autocomplete="off"
-                                  v-model="jobConfiguration.description" class="textarea"/>
+                                  :value="jobConfiguration.description"
+                                  @input="$emit('change-job-description', $event.target.value)" class="textarea"/>
                     </div>
                 </div>
                 <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
@@ -40,7 +42,8 @@
                         <input-validated id="numexechistory-input" type="text"
                                          :parent-id="jobConfiguration.id" :property-id="'historyLimit'"
                                          :validation-errors="validationErrors"
-                                         v-model.number="jobConfiguration.historyLimit"
+                                         :text="jobConfiguration.historyLimit"
+                                         @input="$emit('change-job-history-limit', $event)"
                                          :is-number="true"/>
                     </div>
                 </div>
@@ -50,7 +53,8 @@
                         <input-validated id="numsimlimit-input" type="text"
                                          :parent-id="jobConfiguration.id" :property-id="'simulationLimit'"
                                          :validation-errors="validationErrors"
-                                         v-model.number="jobConfiguration.simulationLimit"
+                                         :text="jobConfiguration.simulationLimit"
+                                         @input="$emit('change-job-simulation-limit', $event)"
                                          :is-number="true"/>
                     </div>
                 </div>
@@ -59,7 +63,7 @@
                     <div class="td align-left">
                         <font-awesome-icon id="faulttolerant-input"
                                            :icon="jobConfiguration.faultTolerant ? 'check-square' : 'square'"
-                                           v-on:click="jobConfiguration.faultTolerant = !jobConfiguration.faultTolerant"
+                                           v-on:click="$emit('toggle-job-fault-tolerant')"
                                            data-e2e="job-faulttolerant-button"/>
                     </div>
                 </div>
@@ -69,7 +73,8 @@
                         <input-validated id="numthreads-input" type="text"
                                          :parent-id="jobConfiguration.id" :property-id="'numThreads'"
                                          :validation-errors="validationErrors"
-                                         v-model.number="jobConfiguration.numThreads"
+                                         :text="jobConfiguration.numThreads"
+                                         @input="$emit('change-job-num-threads', $event)"
                                          :is-number="true"/>
                     </div>
                 </div>
@@ -96,12 +101,9 @@
                     <div class="tr">
                         <div class="td"><label for="category">Category</label></div>
                         <div class="td">
-                            <select id="category" v-model="jobConfiguration.trigger.category"
-                                    data-e2e="trigger-category-selector"
-                                    v-on:change="loadTriggerTypesOfCategory(jobConfiguration.trigger.category.key, true).then(() => {
-                                        loadTriggerParametersOfType(jobConfiguration.trigger.type.key)})">
-                                <option v-for="triggerCategory in triggerCategories" v-bind:value="triggerCategory"
-                                        v-bind:key="triggerCategory.key">
+                            <select id="category" :value="jobConfiguration.trigger.category.key" @change="changeTriggerCategory($event)"
+                                    data-e2e="trigger-category-selector">
+                                <option v-for="triggerCategory in triggerCategories" :value="triggerCategory.key" :key="triggerCategory.key">
                                     {{ triggerCategory.value }}
                                 </option>
                             </select>
@@ -110,11 +112,9 @@
                     <div class="tr">
                         <div class="td"><label for="type">Type</label></div>
                         <div class="td">
-                            <select id="type" v-model="jobConfiguration.trigger.type"
-                                    data-e2e="trigger-type-selector"
-                                    v-on:change="loadTriggerParametersOfType(jobConfiguration.trigger.type.key)">
-                                <option v-for="triggerType in triggerTypes" v-bind:value="triggerType"
-                                        v-bind:key="triggerType.key">
+                            <select id="type" :value="jobConfiguration.trigger.type.key" @change="changeTriggerParameters"
+                                    data-e2e="trigger-type-selector">
+                                <option v-for="triggerType in triggerTypes" :value="triggerType.key" :key="triggerType.key">
                                     {{ triggerType.value }}
                                 </option>
                             </select>
@@ -138,7 +138,9 @@
                         :parent-id="jobConfiguration.trigger.id"
                         :validation-errors="validationErrors"
                         :parameters="jobConfiguration.trigger.parameters"
-                        v-on:create-connector="createConnector"/>
+                        v-on:create-connector="createConnector"
+                        v-on:connector-selected="connectorSelected"
+                        v-on:set-cron-expression="setCronExpression"/>
                 </div>
                 <p v-else>
                     This trigger has no parameters to configure.
@@ -179,7 +181,7 @@ export default {
                     component.triggerCategories.push(item)
                 });
                 if (this.jobConfiguration.trigger.category == null) {
-                    this.jobConfiguration.trigger.category = this.triggerCategories[0]
+                    this.$emit('change-job-trigger-category', this.triggerCategories[0]);
                 }
             })
         },
@@ -193,7 +195,7 @@ export default {
                     component.triggerTypes.push(item)
                 });
                 if (selectFirst) {
-                    this.jobConfiguration.trigger.type = this.triggerTypes[0]
+                    this.$emit('change-job-trigger-type', this.triggerTypes[0]);
                 }
             })
         },
@@ -204,19 +206,25 @@ export default {
                 this.$emit('close-documentation');
             }
             await IgorBackend.getData('/api/parameters/trigger/' + typeKey).then((parameters) => {
-                this.jobConfiguration.trigger.parameters = parameters
+                this.$emit('change-job-trigger-parameters', parameters);
             })
         },
         createConnector: function (componentId, parameterIndex, connectorCategoryCandidates) {
             this.$emit('create-connector', componentId, parameterIndex, connectorCategoryCandidates)
         },
+        connectorSelected: function (connector, connectorParameterIndex) {
+            this.$emit('connector-selected', connector, connectorParameterIndex)
+        },
+        setCronExpression: function (cronExpression, cronParameterIndex) {
+            this.$emit('set-cron-expression', cronExpression, cronParameterIndex)
+        },
         hasTriggerDocumentation: function (typeKey) {
             if (!typeKey) {
                 return false;
             }
-            for (let i = 0; i < this.triggerTypes.length; i++) {
-                if (this.triggerTypes[i].key === typeKey) {
-                    return this.triggerTypes[i].documentationAvailable;
+            for (const element of this.triggerTypes) {
+                if (element.key === typeKey) {
+                    return element.documentationAvailable;
                 }
             }
             return typeKey === 'missing-component-trigger';
@@ -227,6 +235,27 @@ export default {
                 return 'arrow-alert';
             }
             return '';
+        },
+        changeTriggerCategory: function (event) {
+            const chosenCategoryKey = event.target.value;
+            this.loadTriggerTypesOfCategory(chosenCategoryKey, true).then(() => {
+                for (const element of this.triggerCategories) {
+                    if (element.key === chosenCategoryKey) {
+                        this.$emit('change-job-trigger-category', element);
+                    }
+                }
+                this.loadTriggerParametersOfType(this.jobConfiguration.trigger.type.key)
+            });
+        },
+        changeTriggerParameters: function (event) {
+            const chosenTypeKey = event.target.value;
+            this.loadTriggerParametersOfType(chosenTypeKey).then(() => {
+                for (const element of this.triggerTypes) {
+                    if (element.key === chosenTypeKey) {
+                        this.$emit('change-job-trigger-type', element);
+                    }
+                }
+            })
         }
     },
     async mounted() {

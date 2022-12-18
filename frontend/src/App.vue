@@ -53,7 +53,7 @@ export default {
 
     @font-face {
         font-family: 'Roboto';
-        src: url('/fonts/Roboto-Light-webfont.woff') format('woff');
+        src: url('./fonts/Roboto-Light-webfont.woff') format('woff');
         font-weight: normal;
         font-style: normal;
     }

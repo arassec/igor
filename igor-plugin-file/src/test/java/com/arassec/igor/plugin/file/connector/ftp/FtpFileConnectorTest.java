@@ -7,7 +7,6 @@ import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.file.connector.FileInfo;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
 import lombok.SneakyThrows;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.ftpserver.ftplet.FtpException;
 import org.junit.jupiter.api.AfterAll;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -106,9 +104,7 @@ class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
     void testReadStream() {
         FileStreamData fileStreamData = connector.readStream("alpha.txt");
 
-        StringWriter stringWriter = new StringWriter();
-        IOUtils.copy(fileStreamData.getData(), stringWriter, Charset.defaultCharset());
-        assertEquals("ALPHA-igor-ftp-connector-tests", stringWriter.toString());
+        assertEquals("ALPHA-igor-ftp-connector-tests", new String(fileStreamData.getData().readAllBytes(), Charset.defaultCharset()));
         assertEquals(30, fileStreamData.getFileSize());
     }
 

@@ -7,9 +7,8 @@ import com.arassec.igor.core.model.trigger.BaseTrigger;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.validation.ValidCronExpression;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Setter;
-
-import javax.validation.constraints.NotEmpty;
 
 
 /**

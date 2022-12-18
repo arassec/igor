@@ -7,11 +7,11 @@ import com.arassec.igor.core.model.trigger.BaseEventTrigger;
 import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.message.connector.RabbitMqMessageConnector;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**

@@ -1,8 +1,8 @@
 package com.arassec.igor.persistence.entity;
 
+import jakarta.persistence.*;
 import lombok.Data;
 
-import javax.persistence.*;
 import java.time.Instant;
 
 /**

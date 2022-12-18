@@ -6,7 +6,7 @@ import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import java.util.List;
 
 /**
- * This is used as default assignment for {@link javax.validation.constraints.NotNull} connector parameters.
+ * This is used as default assignment for {@link jakarta.validation.constraints.NotNull} connector parameters.
  */
 public class FallbackFileConnector extends BaseFileConnector {
 

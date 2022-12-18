@@ -14,7 +14,7 @@
                              v-on:run-job="$emit('run-job')"
                              data-e2e="job-configuration"/>
 
-        <draggable v-model="jobConfiguration.actions" :group="'actions'" @start="drag=true" @end="drag=false"
+        <draggable v-model="jobConfigActions" :group="'actions'" @start="drag=true" @end="drag=false"
                    handle=".move-icon">
             <action-navigation-item v-for="action of jobConfiguration.actions" :key="action.id" :action="action"
                                     :selected-action-id="selectedActionId"
@@ -46,9 +46,14 @@ export default {
     name: "job-navigation",
     components: {ActionNavigationItem, LayoutRow, AddItemButton, JobNavigationItem, draggable},
     props: ['jobConfiguration', 'validationErrors', 'selectedActionId', 'jobRunningOrWaiting', 'jobExecutionsPage', 'simulationResults'],
+    data() {
+        return {
+            jobConfigActions: this.jobConfiguration.actions
+        }
+    },
     methods: {
         getActionSimulationResults: function(actionId) {
-            if (this.simulationResults && this.simulationResults.hasOwnProperty(actionId)) {
+            if (this.simulationResults && Object.prototype.hasOwnProperty.call(this.simulationResults, actionId)) {
                 return this.simulationResults[actionId];
             }
             return null;

@@ -6,28 +6,31 @@
                     <font-awesome-icon icon="wrench" class="margin-right"/>
                     {{ action.name.length > 0 ? action.name : action.type.value }}
                 </h1>
-                <icon-button slot="right" icon="question" v-on:clicked="$emit('open-documentation', 'action')"/>
+                <template v-slot:right>
+                    <icon-button icon="question" v-on:clicked="$emit('open-documentation', 'action')"/>
+                </template>
             </layout-row>
             <div class="table full-width">
                 <div class="tr">
                     <div class="td"><label>Active</label></div>
                     <div class="td align-left">
                         <font-awesome-icon :icon="action.active ? 'check-square' : 'square'"
-                                           v-on:click="action.active = !action.active"/>
+                                           v-on:click="$emit('toggle-action-active')"/>
                     </div>
                 </div>
                 <div class="tr">
                     <div class="td"><label>Name</label></div>
                     <div class="td">
-                        <input type="text" autocomplete="off" v-model="action.name" class="full-width"
-                               data-e2e="name-input"/>
+                        <input type="text" autocomplete="off" :value="action.name" class="full-width"
+                               data-e2e="name-input" @input="changeActionName"/>
                     </div>
                 </div>
                 <div class="tr" v-bind:style="!showAdvancedParameters ? 'visibility: collapse' : ''">
                     <div class="td"><label for="description-input">Description</label></div>
                     <div class="text-top td">
                         <textarea rows="8" cols="35" id="description-input" autocomplete="off"
-                                  v-model="action.description" class="textarea"/>
+                                  :value="action.description" @change="changeActionDescription"
+                                  class="textarea"/>
                     </div>
                 </div>
                 <div class="tr">
@@ -44,30 +47,29 @@
             <core-panel class="spacer-top">
                 <layout-row>
                     <h2 slot="left">Action</h2>
-                    <icon-button slot="right" icon="question" v-show="hasDocumentation(action.type.key)"
-                                 v-on:clicked="$emit('open-documentation', action.type.key)"/>
+                    <template v-slot:right>
+                        <icon-button icon="question" v-show="hasDocumentation(action.type.key)"
+                                     v-on:clicked="$emit('open-documentation', action.type.key)"/>
+                    </template>
                 </layout-row>
                 <div class="table margin-bottom">
-                    <div class="tr">
+                    <div class="tr" v-if="actionCategories.length > 0">
                         <div class="td"><label>Category</label></div>
                         <div class="td">
-                            <select v-model="action.category" v-on:change="loadTypesOfCategory(action.category.key, true).then(() => {
-                                        loadParametersOfType(action.type.key)})"
+                            <select :value="action.category.key" @change="changeActionCategory($event)"
                                     data-e2e="action-category-selector">
-                                <option v-for="category in actionCategories" v-bind:value="category"
-                                        v-bind:key="category.key">
+                                <option v-for="category in actionCategories" :value="category.key" :key="category.key">
                                     {{ category.value }}
                                 </option>
                             </select>
                         </div>
                     </div>
-                    <div class="tr">
+                    <div class="tr" v-if="actionTypes.length > 0">
                         <div class="td">Type</div>
                         <div class="td">
-                            <select v-model="action.type" v-on:change="loadParametersOfType(action.type.key)"
+                            <select :value="action.type.key" @change="changeActionParameters"
                                     data-e2e="action-type-selector">
-                                <option v-for="type in actionTypes" v-bind:value="type"
-                                        v-bind:key="type.key">
+                                <option v-for="type in actionTypes" :value="type.key" :key="type.key">
                                     {{ type.value }}
                                 </option>
                             </select>
@@ -83,7 +85,9 @@
                         :parent-id="action.id"
                         :validation-errors="validationErrors"
                         :parameters="action.parameters"
-                        v-on:create-connector="createConnector"/>
+                        v-on:create-connector="createConnector"
+                        v-on:connector-selected="connectorSelected"
+                        v-on:set-cron-expression="setCronExpression"/>
                 </div>
                 <p v-else>
                     This Action has no parameters to configure.
@@ -137,27 +141,33 @@ export default {
                     }
                 })
                 if (selectFirst) {
-                    this.action.type = this.actionTypes[0]
+                    this.$emit('change-action-type', this.actionTypes[0]);
                 }
             })
         },
-        loadParametersOfType: function (typeKey) {
+        loadParametersOfType: async function (typeKey) {
             if (this.hasDocumentation(typeKey)) {
                 this.$emit('switch-documentation', typeKey);
             } else {
                 this.$emit('close-documentation');
             }
             IgorBackend.getData('/api/parameters/action/' + typeKey).then((parameters) => {
-                this.action.parameters = parameters
+                this.$emit('change-action-parameters', parameters);
             })
         },
         createConnector: function (componentId, parameterIndex, connectorCategoryCandidates) {
             this.$emit('create-connector', componentId, parameterIndex, connectorCategoryCandidates)
         },
+        connectorSelected: function (connector, connectorParameterIndex) {
+            this.$emit('connector-selected', connector, connectorParameterIndex)
+        },
+        setCronExpression: function (cronExpression, cronParameterIndex) {
+            this.$emit('set-cron-expression', cronExpression, cronParameterIndex)
+        },
         hasDocumentation: function (typeId) {
-            for (let i = 0; i < this.actionTypes.length; i++) {
-                if (this.actionTypes[i].key === typeId) {
-                    return this.actionTypes[i].documentationAvailable;
+            for (const element of this.actionTypes) {
+                if (element.key === typeId) {
+                    return element.documentationAvailable;
                 }
             }
             return typeId === 'missing-component-action';
@@ -168,6 +178,33 @@ export default {
             } else {
                 return 'action-configurator-' + Utils.toKebabCase(this.action.type.value);
             }
+        },
+        changeActionName: function (event) {
+            this.$emit('change-action-name', event.target.value);
+        },
+        changeActionDescription: function (event) {
+            this.$emit('change-action-description', event.target.value);
+        },
+        changeActionCategory: function (event) {
+            const chosenCategoryKey = event.target.value;
+            this.loadTypesOfCategory(chosenCategoryKey, true).then(() => {
+                for (const element of this.actionCategories) {
+                    if (element.key === chosenCategoryKey) {
+                        this.$emit('change-action-category', element);
+                    }
+                }
+                this.loadParametersOfType(this.action.type.key)
+            });
+        },
+        changeActionParameters: function (event) {
+            const chosenTypeKey = event.target.value;
+            this.loadParametersOfType(chosenTypeKey).then(() => {
+                for (const element of this.actionTypes) {
+                    if (element.key === chosenTypeKey) {
+                        this.$emit('change-action-type', element);
+                    }
+                }
+            })
         }
     },
     watch: {

@@ -18,7 +18,6 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.MimeTypeUtils;
-import org.springframework.util.SocketUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;

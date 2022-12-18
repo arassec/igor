@@ -90,11 +90,11 @@ describe('Initializes the test environment\'s connectors', () => {
                     {
                         'host': Cypress.env('mail_host'),
                         'port': Cypress.env('mail_smtp_port'),
-                        'username': 'igor',
+                        'username': 'igor@igor-test.dev',
                         'password': 'igor'
                     },
                     {
-                        'alwaysTrustSsl': true
+                        'enableTls': false
                     });
             }
         });
@@ -112,7 +112,7 @@ describe('Initializes the test environment\'s connectors', () => {
                         'password': 'igor'
                     },
                     {
-                        'alwaysTrustSsl': true
+                        'enableTls': false
                     });
             }
         });

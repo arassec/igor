@@ -1,7 +1,8 @@
 package com.arassec.igor.core.model.annotation.validation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * Validator that always fails. Used on igor components that indicate a missing component after it has been removed from the

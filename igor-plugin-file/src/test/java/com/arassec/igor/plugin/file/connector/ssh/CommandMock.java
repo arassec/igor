@@ -1,7 +1,6 @@
 package com.arassec.igor.plugin.file.connector.ssh;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.channel.ChannelSession;
@@ -13,6 +12,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 
 /**
  * Mock {@link Command} to test {@link ScpFileConnector}.
@@ -83,20 +83,20 @@ public class CommandMock implements Command {
 
         if (testVariant == 1) { // list files without filter
             outputStream.write(("""
-                    total 2
-                    -rw-r--r--  1 root   root 129997 2020-02-22 17:43:13.410083727 +0100 alpha.txt
-                    -rw-r--r--  1 root   root   1634 2020-02-22 17:43:18.633492983 +0100 beta.test
-                    """
+                total 2
+                -rw-r--r--  1 root   root 129997 2020-02-22 17:43:13.410083727 +0100 alpha.txt
+                -rw-r--r--  1 root   root   1634 2020-02-22 17:43:18.633492983 +0100 beta.test
+                """
             ).getBytes());
         } else if (testVariant == 2) { // list files with file-ending filter
             outputStream.write((
-                    "-rw-r--r--  1 root   root   1634 2020-02-22 17:43:18.633492983 +0100 beta.test\n"
+                "-rw-r--r--  1 root   root   1634 2020-02-22 17:43:18.633492983 +0100 beta.test\n"
             ).getBytes());
         } else if (testVariant == 3) { // read file alpha.txt
             byte[] result = "C0644 30 alpha.txt".getBytes();
-            result = ArrayUtils.add(result, (byte) 0x0a);
-            result = ArrayUtils.addAll(result, "ALPHA-igor-ssh-connector-tests".getBytes());
-            result = ArrayUtils.add(result, (byte) 0x00);
+            result = append(result, (byte) 0x0a);
+            result = appendAll(result, "ALPHA-igor-ssh-connector-tests".getBytes());
+            result = append(result, (byte) 0x00);
             outputStream.write(result);
         } else if (testVariant == 4) { // read invalid file
             outputStream.write("-1".getBytes());
@@ -121,6 +121,34 @@ public class CommandMock implements Command {
     @Override
     public void destroy(ChannelSession channelSession) {
         // nothing to do here...
+    }
+
+    /**
+     * Appends all elements of the second array to the first.
+     *
+     * @param array    The target array.
+     * @param addition The new elements to add.
+     * @return A new array containing all previous elements and the newly added ones.
+     */
+    private byte[] appendAll(byte[] array, byte[] addition) {
+        byte[] result = array;
+        for (byte b : addition) {
+            result = append(result, b);
+        }
+        return result;
+    }
+
+    /**
+     * Appends the new element to the array.
+     *
+     * @param array   The target array.
+     * @param element The new element to add.
+     * @return A new array containing all previous elements and the newly added one.
+     */
+    private byte[] append(byte[] array, byte element) {
+        byte[] result = Arrays.copyOf(array, array.length + 1);
+        result[result.length - 1] = element;
+        return result;
     }
 
 }

@@ -16,7 +16,7 @@
         "sshd_port": 22,
         "mail_host": "igor-mail",
         "mail_smtp_port": 25,
-        "mail_imap_port": 993
+        "mail_imap_port": 143
     },
     "watchForFileChanges": false,
     "testFiles": [

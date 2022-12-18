@@ -2,6 +2,7 @@ package com.arassec.igor.persistence.dao;
 
 import com.arassec.igor.persistence.entity.PersistentValueEntity;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,14 +13,14 @@ import java.util.List;
  * Defines access to {@link PersistentValueEntity}s in the database.
  */
 @Repository
-public interface PersistentValueDao extends PagingAndSortingRepository<PersistentValueEntity, Long> {
+public interface PersistentValueDao extends PagingAndSortingRepository<PersistentValueEntity, Long>,
+    CrudRepository<PersistentValueEntity, Long> {
 
     /**
      * Returns a persisted value if it exists.
      *
      * @param jobId   The job's ID.
      * @param content The content of the value.
-     *
      * @return The {@link PersistentValueEntity} if it exists or {@code null} otherwise.
      */
     PersistentValueEntity findByJobIdAndContent(String jobId, String content);
@@ -29,7 +30,6 @@ public interface PersistentValueDao extends PagingAndSortingRepository<Persisten
      *
      * @param jobId The job's ID.
      * @param limit The limit.
-     *
      * @return List of IDs.
      */
     @Query(value = "SELECT id FROM persistent_value WHERE job_id = :jobId ORDER BY id DESC LIMIT :limit", nativeQuery = true)

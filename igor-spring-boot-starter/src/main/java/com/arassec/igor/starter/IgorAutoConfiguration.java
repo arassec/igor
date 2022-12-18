@@ -19,6 +19,6 @@ import org.springframework.context.annotation.PropertySource;
 @ComponentScan
 @Import({ApplicationConfiguration.class, PersistenceConfiguration.class, WebConfiguration.class, SimulationConfiguration.class,
     IgorCorePluginConfiguration.class, IgorMessagePluginConfiguration.class, IgorFilePluginConfiguration.class})
-@PropertySource("classpath:igor.properties")
+@PropertySource("classpath:/igor.properties")
 public class IgorAutoConfiguration {
 }

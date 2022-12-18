@@ -51,7 +51,7 @@ services:
     networks:
       - igor-e2e
   sshd:
-    image: "panubo/sshd:1.3.0"
+    image: "panubo/sshd:1.5.0"
     container_name: "igor-sshd"
     ports:
       - "2222:22"
@@ -63,16 +63,16 @@ services:
     networks:
       - igor-e2e
   mail:
-    image: "antespi/docker-imap-devel:latest"
+    image: "docker.io/mailserver/docker-mailserver:11.2.0"
     container_name: "igor-mail"
+    hostname: "igor-test.dev"
     ports:
       - "25:25"
       - "143:143"
-      - "993:993"
+    volumes:
+        - ./environment/mail/postfix-accounts.cf:/tmp/docker-mailserver/postfix-accounts.cf:ro
     environment:
-      - MAILNAME=igor
-      - MAIL_ADDRESS=igor@igor-test.dev
-      - MAIL_PASS=igor
+        - SSL_TYPE=
     networks:
       - igor-e2e
 

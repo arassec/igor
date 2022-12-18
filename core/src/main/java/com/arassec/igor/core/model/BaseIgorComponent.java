@@ -1,6 +1,6 @@
 package com.arassec.igor.core.model;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * Base class for {@link IgorComponent}s.

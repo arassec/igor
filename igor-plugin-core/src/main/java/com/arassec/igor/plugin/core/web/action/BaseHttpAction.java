@@ -4,12 +4,12 @@ import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.plugin.core.web.connector.FallbackHttpConnector;
 import com.arassec.igor.plugin.core.web.connector.HttpConnector;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.net.http.HttpRequest;
 import java.util.Base64;
 import java.util.LinkedList;

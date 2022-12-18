@@ -2,11 +2,10 @@ package com.arassec.igor.plugin.message.connector;
 
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.connector.BaseConnector;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Positive;
 
 /**
  * Base connector for E-Mail related messages.

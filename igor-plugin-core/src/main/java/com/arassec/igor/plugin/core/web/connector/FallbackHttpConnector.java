@@ -6,7 +6,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import java.net.http.HttpClient;
 
 /**
- * Fallback {@link StandardHttpConnector} to support {@link javax.validation.constraints.NotNull} annotations on connector params.
+ * Fallback {@link StandardHttpConnector} to support {@link jakarta.validation.constraints.NotNull} annotations on connector params.
  */
 public class FallbackHttpConnector extends BaseConnector implements HttpConnector {
 

@@ -7,6 +7,7 @@ import com.arassec.igor.core.util.ModelPage;
 import com.arassec.igor.core.util.event.JobEvent;
 import com.arassec.igor.core.util.event.JobEventType;
 import com.arassec.igor.web.model.JobExecutionListEntry;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
@@ -14,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.LinkedList;

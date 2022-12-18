@@ -7,10 +7,10 @@
 </template>
 
 <script>
-    import FeedbackSnackbar from './feedback-snackbar'
-    import WipWindow from './wip-window'
+import FeedbackSnackbar from './feedback-snackbar'
+import WipWindow from './wip-window'
 
-    export default {
+export default {
         name: 'core-container',
         components: {WipWindow, FeedbackSnackbar}
     }

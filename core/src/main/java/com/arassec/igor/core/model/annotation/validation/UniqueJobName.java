@@ -1,7 +1,8 @@
 package com.arassec.igor.core.model.annotation.validation;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -35,7 +36,7 @@ public @interface UniqueJobName {
      *
      * @return The groups this validation is put in.
      */
-    Class<?>[] groups() default { };
+    Class<?>[] groups() default {};
 
     /**
      * Can be used to assign custom payload objects to a constraint.
@@ -43,6 +44,6 @@ public @interface UniqueJobName {
      * @return The payload.
      */
     @SuppressWarnings("unused")
-    Class<? extends Payload>[] payload() default { };
+    Class<? extends Payload>[] payload() default {};
 
 }

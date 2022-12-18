@@ -13,9 +13,9 @@
 </template>
 
 <script>
-    import InputButton from "./input-button";
+import InputButton from "./input-button";
 
-    export default {
+export default {
     name: "list-pager",
     components: {InputButton},
     props: ['page', 'dark']

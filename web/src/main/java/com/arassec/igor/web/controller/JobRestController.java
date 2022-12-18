@@ -18,6 +18,8 @@ import com.arassec.igor.core.util.event.JobEventType;
 import com.arassec.igor.web.model.JobExecutionOverview;
 import com.arassec.igor.web.model.JobListEntry;
 import com.arassec.igor.web.model.ScheduleEntry;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -29,15 +31,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 /**
  * REST-Controller for {@link Job}s.
@@ -93,9 +92,8 @@ public class JobRestController extends BaseRestController {
      *
      * @param pageNumber  The number of the page to retrieve.
      * @param pageSize    The size of the page to retrieve.
-     * @param nameFilter  Optinoal String to use as filter for job names.
+     * @param nameFilter  Optional String to use as filter for job names.
      * @param stateFilter Optional {@link JobExecutionState} to use for filtering jobs.
-     *
      * @return List of Job-IDs.
      */
     @GetMapping
@@ -114,12 +112,15 @@ public class JobRestController extends BaseRestController {
         if (jobsPage != null && !jobsPage.getItems().isEmpty()) {
             ModelPage<JobListEntry> result = new ModelPage<>(pageNumber, pageSize, jobsPage.getTotalPages(), null);
 
-            result.setItems(jobsPage.getItems().stream().map(job -> {
-                var jobExecution = determineJobExecution(jobManager, job);
-                return new JobListEntry(job.getId(), job.getName(), job.isActive(),
-                    (jobManager.countExecutionsOfJobInState(job.getId(), JobExecutionState.FAILED) > 0), job.isFaultTolerant(),
-                    convert(jobExecution, null));
-            }).collect(Collectors.toList()));
+            result.setItems(jobsPage.getItems().stream()
+                .map(job -> {
+                    var jobExecution = determineJobExecution(jobManager, job);
+                    return new JobListEntry(job.getId(), job.getName(), job.isActive(),
+                        (jobManager.countExecutionsOfJobInState(job.getId(), JobExecutionState.FAILED) > 0), job.isFaultTolerant(),
+                        convert(jobExecution, null));
+                })
+                .toList()
+            );
 
             return result;
         }
@@ -151,12 +152,13 @@ public class JobRestController extends BaseRestController {
      * Returns an {@link SseEmitter} that will be used to send SSE job messages to the client.
      *
      * @param response The {@link HttpServletResponse} of the request.
-     *
      * @return SSE emitter for job messages.
      */
     @GetMapping("stream")
     public SseEmitter getJobStream(HttpServletResponse response) {
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
+        response.setHeader(HttpHeaders.CONNECTION, "keep-alive");
+        response.setHeader(HttpHeaders.CONTENT_TYPE, "text/event-stream");
 
         var emitter = new SseEmitter(-1L);
         emitter.onCompletion(() -> jobStreamEmitters.remove(emitter));
@@ -176,7 +178,6 @@ public class JobRestController extends BaseRestController {
      * Returns the JSON-representation of the Job with the given ID.
      *
      * @param id The job's ID.
-     *
      * @return The job in JSON form.
      */
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -192,7 +193,6 @@ public class JobRestController extends BaseRestController {
      * Saves a job.
      *
      * @param job The job configuration.
-     *
      * @return The saved job.
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -204,7 +204,6 @@ public class JobRestController extends BaseRestController {
      * Runs a simulation of the supplied job.
      *
      * @param job The job configuration.
-     *
      * @return Test results of the simulated job execution.
      */
     @PostMapping("simulate")
@@ -235,7 +234,6 @@ public class JobRestController extends BaseRestController {
      *
      * @param encodedName The job's Base64 encoded name.
      * @param id          The job's ID.
-     *
      * @return {@code true} if a job with the provided name already exists, {@code false} otherwise.
      */
     @GetMapping("check/{name}/{id}")
@@ -267,7 +265,6 @@ public class JobRestController extends BaseRestController {
      * Runs the supplied job.
      *
      * @param job The job configuration.
-     *
      * @return 'OK' on success.
      */
     @PostMapping(value = "run", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -302,7 +299,6 @@ public class JobRestController extends BaseRestController {
      *
      * @param pageNumber The number of the page to return.
      * @param pageSize   The size of the page to return.
-     *
      * @return List of schedules.
      */
     @GetMapping("schedule")
@@ -326,7 +322,6 @@ public class JobRestController extends BaseRestController {
      * Returns the connectors that are ONLY referenced by this job.
      *
      * @param id The job's ID.
-     *
      * @return The connectors.
      */
     @GetMapping(value = "{id}/exclusive-connector-references", produces = MediaType.APPLICATION_JSON_VALUE)

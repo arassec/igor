@@ -1,9 +1,8 @@
 package com.arassec.igor.plugin.core.validation;
 
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.scheduling.support.CronTrigger;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 /**
  * Validates a CRON expression against Spring's scheduler requirements.

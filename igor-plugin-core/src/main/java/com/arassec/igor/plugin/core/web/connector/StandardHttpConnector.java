@@ -7,14 +7,14 @@ import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import javax.net.ssl.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;

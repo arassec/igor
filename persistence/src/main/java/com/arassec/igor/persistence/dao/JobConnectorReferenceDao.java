@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -18,22 +19,21 @@ import java.util.List;
  */
 @Repository
 public interface JobConnectorReferenceDao extends PagingAndSortingRepository<JobConnectorReferenceEntity,
-        JobConnectorReferenceIdentity> {
+    JobConnectorReferenceIdentity>, CrudRepository<JobConnectorReferenceEntity, JobConnectorReferenceIdentity> {
 
     /**
      * Finds all job-connector-references for the given job ID.
      *
      * @param jobId The job's ID.
-     *
      * @return List of job-connector-references.
      */
     @Query(value = "SELECT jcr.job_id AS jobId, j.name AS jobName, jcr.connector_id AS connectorId, c.name AS connectorName " +
-            "FROM job_connector_reference jcr " +
-            "LEFT JOIN job j ON jcr.job_id = j.id " +
-            "LEFT JOIN connector c ON jcr.connector_id = c.id " +
-            "WHERE job_id = :jobId",
-            countQuery = "select count(*) FROM job_connector_reference WHERE job_id = :jobId",
-            nativeQuery = true)
+        "FROM job_connector_reference jcr " +
+        "LEFT JOIN job j ON jcr.job_id = j.id " +
+        "LEFT JOIN connector c ON jcr.connector_id = c.id " +
+        "WHERE job_id = :jobId",
+        countQuery = "select count(*) FROM job_connector_reference WHERE job_id = :jobId",
+        nativeQuery = true)
     List<JobConnectorReferenceView> findByJobId(@Param("jobId") String jobId);
 
     /**
@@ -50,16 +50,15 @@ public interface JobConnectorReferenceDao extends PagingAndSortingRepository<Job
      *
      * @param connectorId The connector's ID.
      * @param pageable    Spring's {@link Pageable} object to support paging.
-     *
      * @return List of job-connector-references.
      */
     @Query(value = "SELECT jcr.job_id AS jobId, j.name AS jobName, jcr.connector_id AS connectorId, c.name AS connectorName " +
-            "FROM job_connector_reference jcr " +
-            "LEFT JOIN job j ON jcr.job_id = j.id " +
-            "LEFT JOIN connector c ON jcr.connector_id = c.id " +
-            "WHERE connector_id = :connectorId",
-            countQuery = "select count(*) FROM job_connector_reference WHERE connector_id = :connectorId",
-            nativeQuery = true)
+        "FROM job_connector_reference jcr " +
+        "LEFT JOIN job j ON jcr.job_id = j.id " +
+        "LEFT JOIN connector c ON jcr.connector_id = c.id " +
+        "WHERE connector_id = :connectorId",
+        countQuery = "select count(*) FROM job_connector_reference WHERE connector_id = :connectorId",
+        nativeQuery = true)
     Page<JobConnectorReferenceView> findByConnectorId(@Param("connectorId") String connectorId, Pageable pageable);
 
     /**

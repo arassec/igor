@@ -62,10 +62,10 @@
                                     {{ formatJobExecution(jobExecution) }}
                                 </div>
                                 <div slot="right">
-                                    <input-button slot="right" icon="times"
+                                    <input-button icon="times"
                                                   v-on:clicked="openCancelJobDialog(jobExecution)"
                                                   v-if="jobExecution.state === 'WAITING' || jobExecution.state === 'RUNNING' || jobExecution.state === 'ACTIVE'"/>
-                                    <input-button slot="right" icon="check"
+                                    <input-button icon="check"
                                                   v-on:clicked="openMarkJobExecutionResolvedDialog(jobExecution)"
                                                   v-if="jobExecution.state === 'FAILED'"
                                                   :data-e2e="'job-execution-' + index + '-mark-resolved-button'"/>
@@ -88,9 +88,21 @@
                 :job-configuration="jobConfiguration"
                 :validation-errors="validationErrors"
                 v-on:create-connector="createConnector"
+                v-on:connector-selected="connectorSelectedForTrigger"
+                v-on:set-cron-expression="setCronExpressionForTrigger"
                 v-on:open-documentation="openDocumentation"
                 v-on:switch-documentation="switchDocumentation"
                 v-on:close-documentation="closeDocumentation"
+                v-on:toggle-job-active="toggleJobActive"
+                v-on:change-job-name="changeJobName"
+                v-on:change-job-description="changeJobDescription"
+                v-on:change-job-history-limit="changeJobHistoryLimit"
+                v-on:change-job-simulation-limit="changeJobSimulationLimit"
+                v-on:toggle-job-fault-tolerant="toggleJobFaultTolerant"
+                v-on:change-job-num-threads="changeJobNumThreads"
+                v-on:change-job-trigger-category="changeJobTriggerCategory"
+                v-on:change-job-trigger-type="changeJobTriggerType"
+                v-on:change-job-trigger-parameters="changeJobTriggerParameters"
                 ref="jobConfigurator"/>
 
             <action-configurator v-for="action in jobConfiguration.actions"
@@ -100,9 +112,17 @@
                                  :validation-errors="validationErrors"
                                  :event-trigger="jobConfiguration.trigger.type.supportsEvents"
                                  v-on:create-connector="createConnector"
+                                 v-on:connector-selected="connectorSelectedForAction"
+                                 v-on:set-cron-expression="setCronExpressionForAction"
                                  v-on:open-documentation="openDocumentation"
                                  v-on:switch-documentation="switchDocumentation"
                                  v-on:close-documentation="closeDocumentation"
+                                 v-on:toggle-action-active="toggleActionActive"
+                                 v-on:change-action-name="changeActionName"
+                                 v-on:change-action-description="changeActionDescription"
+                                 v-on:change-action-category="changeActionCategory"
+                                 v-on:change-action-type="changeActionType"
+                                 v-on:change-action-parameters="changeActionParameters"
                                  ref="actionConfigurators"/>
         </core-content>
 
@@ -111,8 +131,8 @@
                     enter-active-class="animated slideInRight"
                     leave-active-class="animated slideOutRight">
             <simulation-result-container v-show="showSimulationResults && simulationResults != null"
-                                   v-on:close="closeSimulationResults"
-                                   v-bind:selected-simulation-results="selectedSimulationResults"/>
+                                         v-on:close="closeSimulationResults"
+                                         v-bind:selected-simulation-results="selectedSimulationResults"/>
         </transition>
 
         <transition v-on:after-leave="blendInSimulationResults"
@@ -223,6 +243,7 @@ import CorePanel from "../components/common/core-panel";
 import FormatUtils from "../utils/utils";
 import DocumentationContainer from "../components/common/documentation-container";
 import BackgroundIcon from "@/components/common/background-icon";
+import Vue from "vue";
 
 export default {
     name: 'job-editor',
@@ -285,10 +306,10 @@ export default {
     computed: {
         jobRunningOrWaiting: function () {
             if (this.jobExecutionsPage) {
-                for (let i = 0; i < this.jobExecutionsPage.items.length; i++) {
-                    if ('RUNNING' === this.jobExecutionsPage.items[i].state
-                        || 'WAITING' === this.jobExecutionsPage.items[i].state
-                        || 'ACTIVE' === this.jobExecutionsPage.items[i].state) {
+                for (const element of this.jobExecutionsPage.items) {
+                    if ('RUNNING' === element.state
+                        || 'WAITING' === element.state
+                        || 'ACTIVE' === element.state) {
                         return true
                     }
                 }
@@ -485,6 +506,28 @@ export default {
             this.$root.$data.store.setJobData(this.jobConfiguration, selectionKey, parameterIndex, connectorCategoryCandidates);
             this.$router.push({name: 'connector-editor'})
         },
+        getSelectedActionIndex: function () {
+            for (let i = 0; i < this.jobConfiguration.actions.length; i++) {
+                if (this.jobConfiguration.actions[i].id === this.selectedActionId) {
+                    return i;
+                }
+            }
+            return -1;
+        },
+        connectorSelectedForAction: function (connector, connectorParameterIndex) {
+            this.jobConfiguration.actions[this.getSelectedActionIndex()].parameters[connectorParameterIndex].connectorName = connector.name;
+            this.jobConfiguration.actions[this.getSelectedActionIndex()].parameters[connectorParameterIndex].value = connector.id;
+        },
+        setCronExpressionForAction: function (cronExpression, cronParameterIndex) {
+            this.jobConfiguration.actions[this.getSelectedActionIndex()].parameters[cronParameterIndex].value = cronExpression
+        },
+        connectorSelectedForTrigger: function (connector, connectorParameterIndex) {
+            this.jobConfiguration.trigger.parameters[connectorParameterIndex].connectorName = connector.name;
+            this.jobConfiguration.trigger.parameters[connectorParameterIndex].value = connector.id;
+        },
+        setCronExpressionForTrigger: function (cronExpression, cronParameterIndex) {
+            this.jobConfiguration.trigger.parameters[cronParameterIndex].value = cronExpression
+        },
         openMarkJobExecutionResolvedDialog: async function (selectedJobExecutionListEntry) {
             this.selectedJobExecutionListEntry = selectedJobExecutionListEntry;
             this.$root.$data.store.setWip('Loading job execution details...');
@@ -532,11 +575,25 @@ export default {
             }
         },
         initJobListEventSource: function () {
+            console.log("AAAAAAAAAAAAAAAAA: " + JSON.stringify(this.jobListEventSource))
             if (this.jobListEventSource) {
+                console.log("BBBBBBBBBBBBBB")
                 this.jobListEventSource.close();
             }
             this.jobListEventSource = new EventSource('api/job/stream');
+
+            this.jobListEventSource.onmessage = function (event) {
+                console.log("EVENT: " + JSON.stringify(event));
+            };
+
             let component = this;
+            this.jobListEventSource.onopen = function () {
+                console.log('connection is established');
+            };
+
+            this.jobListEventSource.addEventListener('error', (event) => {
+                console.log("BAAAAD: " + JSON.stringify(event));
+            })
             this.jobListEventSource.addEventListener('state-update', function (event) {
                 let jobListEntry = JSON.parse(event.data);
                 if (jobListEntry.id === component.jobConfiguration.id) {
@@ -562,10 +619,12 @@ export default {
                 }
             }, false);
             this.jobListEventSource.onerror = () => {
+                console.log("BBBBBBBBBBBBBBAAAAAA")
                 setTimeout(this.initJobListEventSource, 5000);
             }
         },
         initJobExecutionEventSource: function () {
+            console.log("CCCCCCCCCCCCCCCCCCCCCCc")
             this.jobExecutionEventSource = new EventSource('api/execution/stream');
             let component = this;
             this.jobExecutionEventSource.onmessage = event => {
@@ -577,6 +636,55 @@ export default {
             this.jobExecutionEventSource.onerror = () => {
                 setTimeout(this.initJobListEventSource, 5000);
             }
+        },
+        toggleActionActive: function () {
+            this.jobConfiguration.actions[this.getSelectedActionIndex()].active =
+                !this.jobConfiguration.actions[this.getSelectedActionIndex()].active;
+        },
+        changeActionName: function (name) {
+            this.jobConfiguration.actions[this.getSelectedActionIndex()].name = name;
+        },
+        changeActionDescription: function (description) {
+            this.jobConfiguration.actions[this.getSelectedActionIndex()].description = description;
+        },
+        changeActionCategory: function (category) {
+            this.jobConfiguration.actions[this.getSelectedActionIndex()].category = category;
+        },
+        changeActionType: function (type) {
+            this.jobConfiguration.actions[this.getSelectedActionIndex()].type = type;
+        },
+        changeActionParameters: function (parameters) {
+            this.jobConfiguration.actions[this.getSelectedActionIndex()].parameters = parameters;
+        },
+        toggleJobActive: function () {
+            this.jobConfiguration.active = !this.jobConfiguration.active;
+        },
+        changeJobName: function (name) {
+            this.jobConfiguration.name = name;
+        },
+        changeJobDescription: function (description) {
+            this.jobConfiguration.description = description;
+        },
+        changeJobHistoryLimit: function (limit) {
+            this.jobConfiguration.historyLimit = limit;
+        },
+        changeJobSimulationLimit: function (limit) {
+            this.jobConfiguration.simulationLimit = limit;
+        },
+        toggleJobFaultTolerant: function () {
+            this.jobConfiguration.faultTolerant = !this.jobConfiguration.faultTolerant;
+        },
+        changeJobNumThreads: function (numThreads) {
+            this.jobConfiguration.numThreads = numThreads;
+        },
+        changeJobTriggerCategory: function (category) {
+            this.jobConfiguration.trigger.category = category;
+        },
+        changeJobTriggerType: function (type) {
+            this.jobConfiguration.trigger.type = type;
+        },
+        changeJobTriggerParameters: function (parameters) {
+            this.jobConfiguration.trigger.parameters = parameters;
         }
     },
     async mounted() {

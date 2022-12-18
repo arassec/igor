@@ -6,12 +6,11 @@ import com.arassec.igor.plugin.core.file.connector.BaseFileConnector;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
 
 /**
  * Base for SSH based file-connectors (like SFTP and SCP).

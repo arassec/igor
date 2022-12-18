@@ -1,9 +1,8 @@
 package com.arassec.igor.core.model.connector;
 
 import com.arassec.igor.core.model.BaseIgorComponent;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 /**
  * Base class for connectors that provides a common set of functionality.

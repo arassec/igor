@@ -15,14 +15,14 @@ import com.arassec.igor.web.util.DocumentationUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -87,7 +87,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
         }
         String categoryId = igorComponentUtil.getCategoryId(instance);
         writeKeyLabelStore(jsonGenerator, WebMapperKey.CATEGORY.getKey(),
-                new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, LocaleContextHolder.getLocale())));
+            new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, LocaleContextHolder.getLocale())));
         writeTypeData(jsonGenerator, instance);
         writeParameters(jsonGenerator, instance);
         jsonGenerator.writeEndObject();
@@ -99,7 +99,6 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      * @param jsonGenerator The json generator.
      * @param name          The name of the key-label-store.
      * @param keyLabelStore The actual store to write.
-     *
      * @throws IOException In case of serialization problems.
      */
     private void writeKeyLabelStore(JsonGenerator jsonGenerator, String name, KeyLabelStore keyLabelStore) throws IOException {
@@ -114,7 +113,6 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      *
      * @param jsonGenerator The json generator.
      * @param instance      The component instance.
-     *
      * @throws IOException In case of serialization problems.
      */
     private void writeTypeData(JsonGenerator jsonGenerator, IgorComponent instance) throws IOException {
@@ -122,9 +120,9 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
         jsonGenerator.writeObjectFieldStart(WebMapperKey.TYPE.getKey());
         jsonGenerator.writeStringField(WebMapperKey.KEY.getKey(), typeId);
         jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), messageSource.getMessage(typeId, null,
-                LocaleContextHolder.getLocale()));
+            LocaleContextHolder.getLocale()));
         jsonGenerator.writeBooleanField(WebMapperKey.DOCUMENTATION_AVAILABLE.getKey(),
-                DocumentationUtil.isDocumentationAvailable(typeId, LocaleContextHolder.getLocale()));
+            DocumentationUtil.isDocumentationAvailable(typeId, LocaleContextHolder.getLocale()));
         if (instance instanceof Action) {
             jsonGenerator.writeBooleanField(WebMapperKey.SUPPORTS_EVENTS.getKey(), ((Action) instance).supportsEvents());
         } else if (instance instanceof EventTrigger) {
@@ -142,7 +140,6 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      *
      * @param jsonGenerator The json generator.
      * @param instance      The component instance.
-     *
      * @throws IOException If parameters could not be written.
      */
     private void writeParameters(JsonGenerator jsonGenerator, IgorComponent instance) throws IOException {
@@ -220,7 +217,6 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      * @param jsonGenerator The JSON generator.
      * @param annotation    The {@link IgorParam} annotation.
      * @param field         The field annotated by the annotation.
-     *
      * @throws IOException If the JSON could not be written out.
      */
     private void writeMetaData(JsonGenerator jsonGenerator, IgorParam annotation, Field field) throws IOException {
@@ -234,7 +230,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
             jsonGenerator.writeStringField(WebMapperKey.SUBTYPE.getKey(), annotation.subtype().name());
         }
         boolean required = (field.isAnnotationPresent(NotNull.class)
-                || field.isAnnotationPresent(NotBlank.class) || field.getType().isPrimitive());
+            || field.isAnnotationPresent(NotBlank.class) || field.getType().isPrimitive());
         if (required) {
             jsonGenerator.writeBooleanField(WebMapperKey.REQUIRED.getKey(), true);
         }
@@ -246,13 +242,12 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      * @param jsonGenerator The json generator to create the JSON.
      * @param value         The value of the parameter.
      * @param candidates    The possible connector implementations that can be used as parameter values.
-     *
      * @throws IOException If the parameter could not be written.
      */
     private void writeConnectorParameter(JsonGenerator jsonGenerator, Object value, Map<String, Set<String>> candidates) throws IOException {
         List<KeyLabelStore> categories = new LinkedList<>();
         candidates.keySet().forEach(candidate -> categories.add(new KeyLabelStore(candidate, messageSource.getMessage(candidate,
-                null, LocaleContextHolder.getLocale()))));
+            null, LocaleContextHolder.getLocale()))));
         categories.sort(Comparator.comparing(KeyLabelStore::getValue)); // sort by label
 
         jsonGenerator.writeArrayFieldStart(WebMapperKey.CATEGORY_CANDIDATES.getKey());
@@ -261,7 +256,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
             Set<String> typeCandidates = candidates.get(category.getKey());
             List<KeyLabelStore> types = new LinkedList<>();
             typeCandidates.forEach(typeCandidate -> types.add(new KeyLabelStore(typeCandidate, messageSource.getMessage(typeCandidate, null,
-                    LocaleContextHolder.getLocale()))));
+                LocaleContextHolder.getLocale()))));
             types.sort(Comparator.comparing(KeyLabelStore::getValue));
 
             try {
@@ -279,7 +274,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                         jsonGenerator.writeEndObject();
                     } catch (IOException e) {
                         log.error("Could not serialize type of connector parameter (" + type.getKey() + " / "
-                                + type.getValue() + ")", e);
+                            + type.getValue() + ")", e);
                     }
                 });
                 jsonGenerator.writeEndArray();

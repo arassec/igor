@@ -10,8 +10,8 @@ import org.apache.ftpserver.ssl.SslConfigurationFactory;
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 import org.apache.ftpserver.usermanager.impl.BaseUser;
 import org.apache.ftpserver.usermanager.impl.WritePermission;
+import org.springframework.test.util.TestSocketUtils;
 import org.springframework.util.FileSystemUtils;
-import org.springframework.util.SocketUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +60,6 @@ public abstract class FtpFileConnectorBaseTest {
      * @param baseFtpFileConnector The FTP(S) file-connector instance to configure and use for testing.
      * @param ftpRootDir           Root directory for files of the test.
      * @param enableFtps           Set to {@code true} to enable FTPS.
-     *
      * @throws IOException  In case of filesystem problems.
      * @throws FtpException In case of Apache Mina FTP-Server problems.
      */
@@ -71,8 +70,7 @@ public abstract class FtpFileConnectorBaseTest {
         ftpRoot = ftpRootDir;
         FileSystemUtils.copyRecursively(Paths.get("src/test/resources/ftp/igor"), Paths.get(ftpRoot));
 
-        // Replace with: int port = TestSocketUtils.findAvailableTcpPort();
-        int port = SocketUtils.findAvailableTcpPort();
+        int port = TestSocketUtils.findAvailableTcpPort();
 
         PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
         UserManager userManager = userManagerFactory.createUserManager();

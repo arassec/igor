@@ -1,12 +1,11 @@
 package com.arassec.igor.persistence.entity;
 
 import com.arassec.igor.core.model.connector.Connector;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.Data;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Version;
 
 /**
  * JPA entity for {@link Connector}s.

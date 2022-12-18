@@ -1,8 +1,7 @@
 package com.arassec.igor.persistence.entity;
 
+import jakarta.persistence.*;
 import lombok.Data;
-
-import javax.persistence.*;
 
 /**
  * JPA Entity for {@link com.arassec.igor.core.model.job.execution.JobExecution}s.
