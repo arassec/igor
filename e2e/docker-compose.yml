@@ -63,7 +63,7 @@ services:
     networks:
       - igor-e2e
   mail:
-    image: "greenmail/standalone:1.6.11"
+    image: "greenmail/standalone:1.6.12"
     container_name: "igor-mail"
     hostname: "igor-test.dev"
     ports:
