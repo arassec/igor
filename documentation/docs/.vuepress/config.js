@@ -132,6 +132,7 @@ module.exports = {
         igorVersion: process.env.REVISION,
         igorJavaVersion: "Java 17",
         igorNodeVersion: "Node.js 18.12.1 LTS",
+        igorSpringBootVersion: "Spring-Boot 3",
     },
     dest: "./target/doc/",
     base: "/igor/",

@@ -14,6 +14,8 @@ At the moment, the best way to extend igor is by creating your own Spring-Boot p
 
 Igor requires at least **{{ $themeConfig.igorJavaVersion }}** to be installed.
 
+The Spring-Boot starter is based on **{{ $themeConfig.igorSpringBootVersion }}**.
+
 Visit [start.spring.io](https://start.spring.io) and create a new Spring-Boot project.
 
 Then add the following dependency to your project's `pom.xml` file:
