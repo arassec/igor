@@ -62,7 +62,7 @@
 
         <java.version>17</java.version>
         <maven.compiler.release>17</maven.compiler.release>
-        <nodejs.version>v18.12.1</nodejs.version>
+        <nodejs.version>v14.3.0</nodejs.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -103,18 +103,6 @@
 
     <build>
         <plugins>
-            <!-- Avoid warning during startup:
-            https://stackoverflow.com/questions/74600681/warning-printed-after-migrating-to-spring-boot-3-0-spring-integration-6-0 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-                <configuration>
-                    <compilerArgs>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
@@ -216,13 +204,6 @@
     <dependencyManagement>
         <dependencies>
 
-            <!-- core -->
-            <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
-                <version>2.0.1.Final</version>
-            </dependency>
-
             <!-- templating -->
             <dependency>
                 <groupId>com.samskivert</groupId>
@@ -245,10 +226,9 @@
                 <scope>test</scope>
             </dependency>
 
-            <!-- wiremock-jre8-standalone as a workaround until fix: https://github.com/wiremock/wiremock/issues/1760 -->
             <dependency>
                 <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock-jre8-standalone</artifactId>
+                <artifactId>wiremock-jre8</artifactId>
                 <version>2.35.0</version>
                 <scope>test</scope>
                 <exclusions>
@@ -308,6 +288,12 @@
             </dependency>
 
             <!-- plugin message -->
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>1.4.7</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.icegreen</groupId>
                 <artifactId>greenmail-junit5</artifactId>
