@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.1</version>
         <relativePath/>
     </parent>
 
@@ -308,12 +308,6 @@
             </dependency>
 
             <!-- plugin message -->
-            <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
-                <version>1.4.7</version>
-            </dependency>
-
             <dependency>
                 <groupId>com.icegreen</groupId>
                 <artifactId>greenmail-junit5</artifactId>

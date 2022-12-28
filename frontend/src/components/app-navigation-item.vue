@@ -2,7 +2,7 @@
     <router-link :to="target" :data-e2e="dataEToE">
         <div class="nav-item-container">
             <div class="icon">
-                <font-awesome-icon :icon="icon"/>
+                <font-awesome-icon :icon="icon" />
             </div>
             <div class="label">
                 {{ label }}
@@ -11,11 +11,10 @@
     </router-link>
 </template>
 
-<script>
-export default {
-    name: "app-navigation-item",
-    props: ['target', 'dataEToE', 'icon', 'label']
-}
+<script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
+defineProps(["target", "dataEToE", "icon", "label"]);
 </script>
 
 <style scoped>
@@ -24,7 +23,7 @@ export default {
     flex-direction: column;
     min-width: 6em;
     border-right: 1px solid var(--color-font);
-    padding: .5em;
+    padding: 0.5em;
 }
 
 .nav-item-container:hover {

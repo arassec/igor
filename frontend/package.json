@@ -1,36 +1,35 @@
 {
-  "name": "frontend",
-  "version": "1.0.0-SNAPSHOT",
-  "description": "Vue.js frontend for igor",
-  "author": "Andreas Sensen <andreas.sensen@arassec.com>",
-  "private": true,
-  "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --modern",
-    "lint": "vue-cli-service lint"
-  },
-  "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.36",
-    "@fortawesome/free-regular-svg-icons": "^5.15.4",
-    "@fortawesome/free-solid-svg-icons": "^5.15.4",
-    "@fortawesome/vue-fontawesome": "^0.1.10",
-    "ajv": "^6.12.6",
-    "ajv-keywords": "^3.5.2",
-    "animate.css": "^4.1.1",
-    "axios": "^0.21.4",
-    "markdown-it": "^12.3.2",
-    "vue": "^2.7.10",
-    "vue-json-pretty": "^1.8.2",
-    "vue-router": "^3.5.3",
-    "vuedraggable": "^2.24.3"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "^5.0.8",
-    "@vue/cli-plugin-eslint": "^5.0.8",
-    "@vue/cli-service": "^5.0.8",
-    "eslint": "^8.28.0",
-    "eslint-plugin-vue": "^9.8.0",
-    "vue-eslint-parser": "^9.1.0",
-    "vue-template-compiler": "^2.6.14"
-  }
+    "name": "frontend",
+    "version": "1.0.0-SNAPSHOT",
+    "description": "Vue.js frontend for igor",
+    "author": "Andreas Sensen <andreas.sensen@arassec.com>",
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^6.2.1",
+        "@fortawesome/free-solid-svg-icons": "^6.2.1",
+        "@fortawesome/vue-fontawesome": "^3.0.2",
+        "animate.css": "^4.1.1",
+        "axios": "^1.2.1",
+        "markdown-it": "^13.0.1",
+        "pinia": "^2.0.28",
+        "vue": "^3.2.45",
+        "vue-json-pretty": "^2.2.3",
+        "vue-router": "^4.1.6",
+        "vuedraggable": "^4.1.0"
+    },
+    "devDependencies": {
+        "@rushstack/eslint-patch": "^1.1.4",
+        "@vitejs/plugin-vue": "^4.0.0",
+        "@vue/eslint-config-prettier": "^7.0.0",
+        "eslint": "^8.22.0",
+        "eslint-plugin-vue": "^9.3.0",
+        "prettier": "^2.7.1",
+        "vite": "^4.0.0"
+    }
 }

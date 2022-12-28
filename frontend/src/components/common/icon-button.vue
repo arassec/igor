@@ -1,44 +1,42 @@
 <template>
     <button v-on:click.stop="fire()" :disabled="disabled">
-        <font-awesome-icon :icon="icon" class="fa-fw"/>
+        <font-awesome-icon :icon="icon" class="fa-fw" />
     </button>
 </template>
 
 <script>
-    export default {
-        name: "icon-button",
-        props: ['icon', 'disabled'],
-        methods: {
-            fire: function () {
-                if (!this.disabled) {
-                    this.$emit('clicked')
-                }
+export default {
+    name: "icon-button",
+    props: ["icon", "disabled"],
+    methods: {
+        fire: function () {
+            if (!this.disabled) {
+                this.$emit("clicked");
             }
-        }
-    }
+        },
+    },
+};
 </script>
 
 <style scoped>
+button {
+    background-color: transparent;
+    color: var(--color-font);
+    border: none;
+    padding: 0.2em;
+}
 
-    button {
-        background-color: transparent;
-        color: var(--color-font);
-        border: none;
-        padding: .2em;
-    }
+button:hover:enabled {
+    background-color: var(--color-font);
+    color: var(--color-background);
+    cursor: pointer;
+}
 
-    button:hover:enabled {
-        background-color: var(--color-font);
-        color: var(--color-background);
-        cursor: pointer;
-    }
+button:disabled {
+    opacity: 0.5;
+}
 
-    button:disabled {
-        opacity: 0.5;
-    }
-
-    button::-moz-focus-inner {
-        border: 0;
-    }
-
+button::-moz-focus-inner {
+    border: 0;
+}
 </style>

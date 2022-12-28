@@ -1,23 +1,36 @@
 <template>
-    <navigation-item class="spacer-top" v-on:clicked="$emit('action-is-selected', action.id)" :class="style"
-                     :data-e2e="dataE2eName">
-        <font-awesome-icon slot="left" icon="grip-vertical" class="margin-right fa-fw move-icon"/>
-        <label slot="center" class="action-label">{{ action.name.length > 0 ? action.name : action.type.value }}</label>
-        <font-awesome-icon v-if="simulationResults && (simulationResults.errorCause || simulationResults.stale)"
-                           slot="right" icon="plug" class="simulation-error"></font-awesome-icon>
-        <icon-button slot="right" icon="trash" v-on:clicked="$emit('delete-action', action.id)"/>
+    <navigation-item
+        class="spacer-top"
+        v-on:clicked="$emit('action-is-selected', action.id)"
+        :class="style"
+        :data-e2e="dataE2eName"
+    >
+        <template v-slot:left>
+            <font-awesome-icon icon="grip-vertical" class="margin-right fa-fw move-icon" />
+        </template>
+        <template v-slot:center>
+            <label class="action-label">{{ action.name.length > 0 ? action.name : action.type.value }}</label>
+        </template>
+        <template v-slot:right>
+            <font-awesome-icon
+                v-if="simulationResults && (simulationResults.errorCause || simulationResults.stale)"
+                icon="plug"
+                class="simulation-error"
+            ></font-awesome-icon>
+            <icon-button icon="trash" v-on:clicked="$emit('delete-action', action.id)" />
+        </template>
     </navigation-item>
 </template>
 
 <script>
-import NavigationItem from "./navigation-item";
-import IconButton from "../common/icon-button";
-import Utils from "../../utils/utils";
+import NavigationItem from "./navigation-item.vue";
+import IconButton from "../common/icon-button.vue";
+import Utils from "../../utils/utils.js";
 
 export default {
     name: "action-navigation-item",
-    components: {IconButton, NavigationItem},
-    props: ['action', 'selectedActionId', 'validationErrors', 'simulationResults'],
+    components: { IconButton, NavigationItem },
+    props: ["action", "selectedActionId", "validationErrors", "simulationResults"],
     computed: {
         actionSelected: function () {
             return this.selectedActionId === this.action.id;
@@ -36,20 +49,19 @@ export default {
         },
         dataE2eName: function () {
             if (this.action.name) {
-                return 'action-' + Utils.toKebabCase(this.action.name);
+                return "action-" + Utils.toKebabCase(this.action.name);
             } else {
-                return 'action-' + Utils.toKebabCase(this.action.type.value);
+                return "action-" + Utils.toKebabCase(this.action.type.value);
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 
 <style scoped>
-
 .action-label {
     display: inline-block;
-    padding: .2em 0 .2em 0;
+    padding: 0.2em 0 0.2em 0;
 }
 
 .move-icon {
@@ -68,7 +80,6 @@ export default {
 
 .simulation-error {
     color: var(--color-alert);
-    margin-right: .25em;
+    margin-right: 0.25em;
 }
-
 </style>

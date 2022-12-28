@@ -245,7 +245,7 @@ describe('Creates user doc job images.', () => {
             cy.openJobOverview();
 
             cy.get(`[data-e2e=run-${activeJobKebap}1] svg`)
-                .should('have.class', 'fa-sign-in-alt');
+                .should('have.class', 'fa-right-to-bracket');
 
             cy.get(`[data-e2e=run-${activeJobKebap}1]`)
                 .should('be.visible')

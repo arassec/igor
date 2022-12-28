@@ -13,7 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;

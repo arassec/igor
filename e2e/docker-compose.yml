@@ -63,16 +63,18 @@ services:
     networks:
       - igor-e2e
   mail:
-    image: "docker.io/mailserver/docker-mailserver:11.2.0"
+    image: "greenmail/standalone:1.6.11"
     container_name: "igor-mail"
     hostname: "igor-test.dev"
     ports:
-      - "25:25"
-      - "143:143"
-    volumes:
-        - ./environment/mail/postfix-accounts.cf:/tmp/docker-mailserver/postfix-accounts.cf:ro
+      - "3025:3025" # SMTP
+      - "3143:3143" # IMAP
     environment:
-        - SSL_TYPE=
+        - GREENMAIL_OPTS=-Dgreenmail.setup.test.smtp
+                         -Dgreenmail.setup.test.imap
+                         -Dgreenmail.users=igor:igor@igor-test.dev
+                         -Dgreenmail.verbose
+                         -Dgreenmail.hostname=0.0.0.0
     networks:
       - igor-e2e
 

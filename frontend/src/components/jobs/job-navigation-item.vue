@@ -1,37 +1,51 @@
 <template>
     <div :class="style" v-on:click="$emit('job-is-selected')">
         <h1>
-            <font-awesome-icon icon="toolbox" class="margin-right fa-fw"/>
-            {{ job.name.length > 0 ? job.name : 'Job' }}
+            <font-awesome-icon icon="toolbox" class="margin-right fa-fw" />
+            {{ job.name.length > 0 ? job.name : "Job" }}
         </h1>
         <layout-row>
-            <input-button slot="left" icon="chevron-left" v-on:clicked="$emit('show-executions')"
-                          :class="jobExecutionFailed ? 'alert' : ''"
-                          data-e2e="show-job-executions-button"/>
-            <input-button slot="left" icon="save" v-on:clicked="$emit('save-configuration')" class="margin-left"
-                          data-e2e="save-job-button"/>
-            <input-button slot="right" icon="plug" v-on:clicked="$emit('test-configuration')"
-                          data-e2e="test-job-button"/>
-            <input-button slot="right" :icon="playIcon" v-on:clicked="$emit('run-job')" class="margin-left"
-                          :disabled="jobRunningOrWaiting || job.id == null || !job.active || disableDueToFaultIntolerance"
-                          data-e2e="run-job-button"/>
+            <template v-slot:left>
+                <input-button
+                    icon="chevron-left"
+                    v-on:clicked="$emit('show-executions')"
+                    :class="jobExecutionFailed ? 'alert' : ''"
+                    data-e2e="show-job-executions-button"
+                />
+                <input-button
+                    icon="save"
+                    v-on:clicked="$emit('save-configuration')"
+                    class="margin-left"
+                    data-e2e="save-job-button"
+                />
+            </template>
+            <template v-slot:right>
+                <input-button icon="plug" v-on:clicked="$emit('test-configuration')" data-e2e="test-job-button" />
+                <input-button
+                    :icon="playIcon"
+                    v-on:clicked="$emit('run-job')"
+                    class="margin-left"
+                    :disabled="jobRunningOrWaiting || job.id == null || !job.active || disableDueToFaultIntolerance"
+                    data-e2e="run-job-button"
+                />
+            </template>
         </layout-row>
     </div>
 </template>
 
 <script>
-import InputButton from "../common/input-button";
-import LayoutRow from "../common/layout-row";
+import InputButton from "../common/input-button.vue";
+import LayoutRow from "../common/layout-row.vue";
 
 export default {
     name: "job-navigation-item",
-    components: {LayoutRow, InputButton},
-    props: ['job', 'selected', 'validationErrors', 'jobRunningOrWaiting', 'jobExecutionsPage'],
+    components: { LayoutRow, InputButton },
+    props: ["job", "selected", "validationErrors", "jobRunningOrWaiting", "jobExecutionsPage"],
     computed: {
         disableDueToFaultIntolerance: function () {
             if (this.jobExecutionsPage.items.length > 0) {
                 let state = this.jobExecutionsPage.items[0].state;
-                if (state === 'FAILED' && !this.job.faultTolerant) {
+                if (state === "FAILED" && !this.job.faultTolerant) {
                     return true;
                 }
             }
@@ -54,35 +68,34 @@ export default {
         },
         jobExecutionFailed: function () {
             if (this.jobExecutionsPage) {
-                for (let i = 0; i < this.jobExecutionsPage.items.length; i++) {
-                    if ('FAILED' === this.jobExecutionsPage.items[i].state) {
-                        return true
+                for (const element of this.jobExecutionsPage.items) {
+                    if ("FAILED" === element.state) {
+                        return true;
                     }
                 }
             }
-            return false
+            return false;
         },
         playIcon: function () {
             if (this.disableDueToFaultIntolerance) {
-                return 'bolt';
+                return "bolt";
             } else if (this.jobExecutionsPage.items.length > 0) {
                 let state = this.jobExecutionsPage.items[0].state;
-                if (state === 'WAITING') {
-                    return 'hourglass';
-                } else if (state === 'RUNNING') {
-                    return 'circle-notch';
-                } else if (state === 'ACTIVE') {
-                    return 'sign-in-alt';
+                if (state === "WAITING") {
+                    return "hourglass";
+                } else if (state === "RUNNING") {
+                    return "circle-notch";
+                } else if (state === "ACTIVE") {
+                    return "sign-in-alt";
                 }
             }
-            return 'play';
-        }
-    }
-}
+            return "play";
+        },
+    },
+};
 </script>
 
 <style scoped>
-
 div:hover {
     cursor: pointer;
 }

@@ -1,21 +1,18 @@
 <template>
-    <transition name="animate-css-modal"
-                enter-active-class="animated fadeIn"
-                leave-active-class="animated fadeOut">
+    <transition name="animate-css-modal" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
         <div class="modal-mask" @click="close">
             <div class="modal-wrapper">
                 <div class="modal-container center" @click.stop>
-
                     <div class="modal-header" v-if="hasHeader">
-                        <slot name="header"/>
+                        <slot name="header" />
                     </div>
 
                     <div class="modal-body" v-if="hasBody">
-                        <slot name="body"/>
+                        <slot name="body" />
                     </div>
 
                     <div class="modal-footer" v-if="hasFooter">
-                        <slot name="footer"/>
+                        <slot name="footer" />
                     </div>
                 </div>
             </div>
@@ -25,24 +22,24 @@
 
 <script>
 export default {
-    name: 'modal-dialog',
+    name: "modal-dialog",
     methods: {
         close: function () {
-            this.$emit('close')
-        }
+            this.$emit("close");
+        },
     },
     computed: {
         hasHeader() {
-            return this.$slots.header
+            return this.$slots.header;
         },
         hasBody() {
-            return this.$slots.body
+            return this.$slots.body;
         },
         hasFooter() {
-            return this.$slots.footer
-        }
-    }
-}
+            return this.$slots.footer;
+        },
+    },
+};
 </script>
 
 <style scoped>
@@ -53,9 +50,9 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, .5);
+    background-color: rgba(0, 0, 0, 0.5);
     display: table;
-    transition: opacity .3s ease;
+    transition: opacity 0.3s ease;
 }
 
 .modal-wrapper {
@@ -68,10 +65,10 @@ export default {
     max-width: 75%;
     padding: 15px;
     background-color: var(--color-background);
-    transition: all .3s ease;
+    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
-    align-items: flex-start
+    align-items: flex-start;
 }
 
 .modal-header {
@@ -111,5 +108,4 @@ export default {
     -webkit-animation-fill-mode: both;
     animation-fill-mode: both;
 }
-
 </style>

@@ -13,7 +13,7 @@ describe('Tests message sending and receiving.', () => {
 
             // Deactivate the listener:
             cy.get('[data-e2e=job-active-button]').then(elem => {
-                checked = elem.hasClass('fa-check-square')
+                checked = elem.hasClass('fa-square-check')
                 if (checked) {
                     cy.get('[data-e2e=job-active-button]')
                         .click();

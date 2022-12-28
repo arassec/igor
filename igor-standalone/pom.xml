@@ -76,7 +76,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>adoptopenjdk:11-jre-openj9@sha256:686ef31677ea8189abe062e5ee08f5c625d823beba298170bd7a479a051efc8a</image>
+                                <image>eclipse-temurin:17.0.5_8-jre@sha256:402c656f078bc116a6db1e2e23b08c6f4a78920a2c804ea4c2d3e197f1d6b47c</image>
                             </from>
                             <to>
                                 <image>docker.io/arassec/igor</image>

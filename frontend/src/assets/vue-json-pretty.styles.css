@@ -1,8 +1,8 @@
-.vjs-tree__brackets {
+.vjs-tree-brackets {
     cursor: pointer
 }
 
-.vjs-tree__brackets:hover {
+.vjs-tree-brackets:hover {
     background-color: var(--color-background) /* customized for igor */
 }
 
@@ -11,20 +11,20 @@
     left: 0
 }
 
-.vjs-check-controller.is-checked .vjs-check-controller__inner {
+.vjs-check-controller.is-checked .vjs-check-controller-inner {
     background-color: #1890ff;
     border-color: #0076e4
 }
 
-.vjs-check-controller.is-checked .vjs-check-controller__inner.is-checkbox:after {
+.vjs-check-controller.is-checked .vjs-check-controller-inner.is-checkbox:after {
     transform: rotate(45deg) scaleY(1)
 }
 
-.vjs-check-controller.is-checked .vjs-check-controller__inner.is-radio:after {
+.vjs-check-controller.is-checked .vjs-check-controller-inner.is-radio:after {
     transform: translate(-50%, -50%) scale(1)
 }
 
-.vjs-check-controller .vjs-check-controller__inner {
+.vjs-check-controller .vjs-check-controller-inner {
     display: inline-block;
     position: relative;
     border: 1px solid #bfcbd9;
@@ -39,7 +39,7 @@
     transition: border-color .25s cubic-bezier(.71, -.46, .29, 1.46), background-color .25s cubic-bezier(.71, -.46, .29, 1.46)
 }
 
-.vjs-check-controller .vjs-check-controller__inner:after {
+.vjs-check-controller .vjs-check-controller-inner:after {
     box-sizing: content-box;
     content: "";
     border: 2px solid #fff;
@@ -55,11 +55,11 @@
     transform-origin: center
 }
 
-.vjs-check-controller .vjs-check-controller__inner.is-radio {
+.vjs-check-controller .vjs-check-controller-inner.is-radio {
     border-radius: 100%
 }
 
-.vjs-check-controller .vjs-check-controller__inner.is-radio:after {
+.vjs-check-controller .vjs-check-controller-inner.is-radio:after {
     border-radius: 100%;
     height: 4px;
     background-color: #fff;
@@ -67,7 +67,7 @@
     top: 50%
 }
 
-.vjs-check-controller .vjs-check-controller__original {
+.vjs-check-controller .vjs-check-controller-original {
     opacity: 0;
     outline: none;
     position: absolute;
@@ -79,61 +79,93 @@
     margin: 0
 }
 
-.vjs-tree__node {
+.vjs-carets {
+    position: absolute;
+    right: 0;
+    cursor: pointer
+}
+
+.vjs-carets svg {
+    transition: transform .3s
+}
+
+.vjs-carets:hover {
+    color: #1890ff
+}
+
+.vjs-carets-close {
+    transform: rotate(-90deg)
+}
+
+.vjs-tree-node {
+    display: flex;
+    position: relative;
+    line-height: 20px
+}
+
+.vjs-tree-node.has-carets {
+    padding-left: 15px
+}
+
+.vjs-tree-node.has-carets.has-selector, .vjs-tree-node.has-selector {
+    padding-left: 30px
+}
+
+.vjs-tree-node.is-highlight, .vjs-tree-node:hover {
+    background-color: var(--color-background); /* customized for igor */
+    cursor: copy;
+}
+
+.vjs-tree-node .vjs-indent {
     display: flex;
     position: relative
 }
 
-.vjs-tree__node.has-selector {
-    padding-left: 30px
+.vjs-tree-node .vjs-indent-unit {
+    width: 1em
 }
 
-/* disabled for igor */
-/*
-.vjs-tree__node.is-highlight, .vjs-tree__node:hover {
-    background-color: #e6f7ff
-}
-*/
-
-.vjs-tree__node .vjs-tree__indent {
-    flex: 0 0 1em
-}
-
-.vjs-tree__node .vjs-tree__indent.has-line {
+.vjs-tree-node .vjs-indent-unit.has-line {
     border-left: 1px dashed #bfcbd9
+}
+
+.vjs-node-index {
+    position: absolute;
+    right: 100%;
+    margin-right: 4px
 }
 
 .vjs-comment {
     color: var(--color-font) /* customized for igor */
 }
 
-.vjs-value__null {
+.vjs-value {
+    word-break: break-word
+}
+
+.vjs-value-null, .vjs-value-undefined {
     color: var(--color-font) /* customized for igor */
 }
 
-.vjs-value__boolean, .vjs-value__number {
+.vjs-value-boolean, .vjs-value-number {
     color: var(--color-font) /* customized for igor */
 }
 
-.vjs-value__string {
+.vjs-value-string {
     color: var(--color-font) /* customized for igor */
 }
 
 .vjs-tree {
     font-family: 'Roboto', sans-serif; /* customized for igor */
-    color: var(--color-font) /* customized for igor */
+    color: var(--color-font); /* customized for igor */
+    font-size: 14px;
+    text-align: left
 }
 
 .vjs-tree.is-virtual {
     overflow: auto
 }
 
-.vjs-tree.is-virtual .vjs-tree__node {
+.vjs-tree.is-virtual .vjs-tree-node {
     white-space: nowrap
-}
-
-/* added for igor */
-.vjs-tree .vjs-key:hover {
-    cursor: crosshair;
-    background-color: var(--color-background)
 }

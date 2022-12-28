@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.mail.*;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
 
-import javax.mail.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -72,9 +72,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
      * @param markReadAfterProcessing Set to {@code true} to mark processed mails as read.
      * @param saveAttachments         Set to {@code true} to save mail attachments to the local filesystem.
      * @param attachmentDirectory     The directory to store mail attachments in.
-     *
      * @return List of E-Mails including body and header data as JSON.
-     *
      * @throws MessagingException In case of exceptions during mail handling.
      */
     @IgorSimulationSafe
@@ -174,7 +172,6 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
      * @param targetJson          The JSON object to store processed data in (e.g. headers, bodies, ...).
      * @param saveAttachments     Set to {@code true} to save mail attachments.
      * @param attachmentDirectory The directory to save attachments in.
-     *
      * @throws MessagingException In case of errors during message processing.
      * @throws IOException        In case of errors during attachment processing.
      */
@@ -209,7 +206,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
                 processMessageParts(multipart.getBodyPart(i), targetJson, saveAttachments, attachmentDirectory);
             }
         } else if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && saveAttachments && StringUtils.hasText(attachmentDirectory)
-                        && Files.isWritable(Paths.get(attachmentDirectory, part.getFileName()))) {
+            && Files.isWritable(Paths.get(attachmentDirectory, part.getFileName()))) {
             // It is the job admin's responsibility to configure the job in a way, that path
             // traversal attacks are prevented, e.g. by configuring a fixed 'attachamentDirectory' as apposed to a template.
             // Hence the suppressed warning ("javasecurity:S2083")...

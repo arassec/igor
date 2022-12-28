@@ -1,65 +1,82 @@
 <template>
     <modal-dialog>
+        <template v-slot:header>
+            <layout-row>
+                <template v-slot:left>
+                    <h1>Select Connector</h1>
+                </template>
+                <template v-slot:right>
+                    <input-button icon="times" v-on:clicked="$emit('cancel')" />
+                </template>
+            </layout-row>
+        </template>
 
-        <layout-row slot="header">
-            <h1 slot="left">Select Connector</h1>
-            <input-button slot="right" icon="times" v-on:clicked="$emit('cancel')"/>
-        </layout-row>
+        <template v-slot:body>
+            <div class="max-width">
+                <label v-if="connectors == null || connectors.length === 0">
+                    No suitable connector found. Please create a new connector with the button on the right below.
+                </label>
 
-        <div slot="body" class="max-width">
-            <label v-if="connectors == null || connectors.length === 0">
-                No suitable connector found. Please create a new connector with the button on the right below.
-            </label>
-
-            <div class="connectors-container max-width">
-                <feedback-box v-for="connector in connectors" :key="connector.id" :clickable="true"
-                              v-on:feedback-clicked="$emit('selected', connector)"
-                              :data-e2e="dataE2EName('picker-', connector.name)">
-                    <div slot="left" class="truncate">{{ connector.name }}</div>
-                </feedback-box>
-                <layout-row slot="footer">
-                    <input-button slot="right" icon="plus" v-on:clicked="$emit('create')"/>
-                </layout-row>
+                <div class="connectors-container max-width">
+                    <feedback-box
+                        v-for="connector in connectors"
+                        :key="connector.id"
+                        :clickable="true"
+                        v-on:feedback-clicked="$emit('selected', connector)"
+                        :data-e2e="dataE2EName('picker-', connector.name)"
+                    >
+                        <template v-slot:left>
+                            <div class="truncate">{{ connector.name }}</div>
+                        </template>
+                    </feedback-box>
+                    <layout-row>
+                        <template v-slot:right>
+                            <input-button icon="plus" v-on:clicked="$emit('create')" />
+                        </template>
+                    </layout-row>
+                </div>
             </div>
-        </div>
+        </template>
 
-        <list-pager slot="footer" :page="page"
-                    v-on:first="$emit('first-page')"
-                    v-on:previous="$emit('previous-page')"
-                    v-on:next="$emit('next-page')"
-                    v-on:last="$emit('last-page')"/>
-
+        <template v-slot:footer>
+            <list-pager
+                :page="page"
+                v-on:first="$emit('first-page')"
+                v-on:previous="$emit('previous-page')"
+                v-on:next="$emit('next-page')"
+                v-on:last="$emit('last-page')"
+            />
+        </template>
     </modal-dialog>
 </template>
 
 <script>
-import ModalDialog from '../common/modal-dialog'
-import LayoutRow from '../common/layout-row'
-import InputButton from '../common/input-button'
-import ListPager from "../common/list-pager";
-import FeedbackBox from "../common/feedback-box";
-import Utils from "@/utils/utils";
+import ModalDialog from "../common/modal-dialog.vue";
+import LayoutRow from "../common/layout-row.vue";
+import InputButton from "../common/input-button.vue";
+import ListPager from "../common/list-pager.vue";
+import FeedbackBox from "../common/feedback-box.vue";
+import Utils from "@/utils/utils.js";
 
 export default {
-    name: 'connector-picker',
-    components: {FeedbackBox, ListPager, InputButton, LayoutRow, ModalDialog},
-    props: ['connectors', 'page'],
+    name: "connector-picker",
+    components: { FeedbackBox, ListPager, InputButton, LayoutRow, ModalDialog },
+    props: ["connectors", "page"],
     data: function () {
         return {
-            feedback: '',
-            feedbackOk: true
-        }
+            feedback: "",
+            feedbackOk: true,
+        };
     },
     methods: {
         dataE2EName: function (prefix, suffix) {
             return prefix + Utils.toKebabCase(suffix);
-        }
-    }
-}
+        },
+    },
+};
 </script>
 
 <style scoped>
-
 table {
     width: 100%;
 }
@@ -75,5 +92,4 @@ table {
 .connectors-container {
     min-height: 425px;
 }
-
 </style>

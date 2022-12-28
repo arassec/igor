@@ -1,28 +1,31 @@
 <template>
-    <layout-row :class="{info: !alert,  alert: alert}" class="margin-bottom"
-                v-on:clicked="clickable ? $emit('feedback-clicked') : false"
-                :clickable="clickable" :align-left="alignLeft">
+    <layout-row
+        :class="{ info: !alert, alert: alert }"
+        class="margin-bottom"
+        v-on:clicked="clickable ? $emit('feedback-clicked') : false"
+        :clickable="clickable"
+        :align-left="alignLeft"
+    >
         <template v-slot:left>
-            <slot name="left"/>
+            <slot name="left" />
         </template>
         <template v-slot:right>
-            <slot name="right"/>
+            <slot name="right" />
         </template>
     </layout-row>
 </template>
 
 <script>
-import LayoutRow from './layout-row'
+import LayoutRow from "./layout-row.vue";
 
 export default {
-    name: 'feedback-box',
-    components: {LayoutRow},
-    props: ['alert', 'clickable', 'alignLeft']
-}
+    name: "feedback-box",
+    components: { LayoutRow },
+    props: ["alert", "clickable", "alignLeft"],
+};
 </script>
 
 <style scoped>
-
 div {
     color: var(--color-font);
     line-height: 25px;
@@ -40,5 +43,4 @@ div {
 .alert {
     background-color: var(--color-alert);
 }
-
 </style>

@@ -4,70 +4,77 @@
             <div class="main-menu">
                 <ul>
                     <li>
-                        <app-navigation-item target="/" data-e-to-e="navigation-job-overview"
-                                             icon="toolbox" label="Jobs"/>
+                        <app-navigation-item
+                            target="/"
+                            data-e-to-e="navigation-job-overview"
+                            icon="toolbox"
+                            label="Jobs"
+                        />
                     </li>
                     <li>
-                        <app-navigation-item target="/connector-overview" data-e-to-e="navigation-connector-overview"
-                                             icon="link" label="Connectors"/>
+                        <app-navigation-item
+                            target="/connector-overview"
+                            data-e-to-e="navigation-connector-overview"
+                            icon="link"
+                            label="Connectors"
+                        />
                     </li>
                 </ul>
-
             </div>
             <div class="title">
-                <h1 class="heading" data-e2e="navigation-heading">{{ heading }}</h1>
+                <h1 class="heading" data-e2e="navigation-heading">
+                    {{ heading }}
+                </h1>
                 <a class="documentation-link" target="_blank" rel="noopener noreferrer" href="/igor/index.html">
                     <div class="top-logo-container">
-                        <img alt="igor-logo" src="@/assets/igor-logo-top.png" class="top-logo"/>
+                        <img alt="igor-logo" src="@/assets/igor-logo-top.png" class="top-logo" />
                         <label class="version">v{{ version }}</label>
                     </div>
                 </a>
             </div>
         </nav>
 
-        <router-view/>
-
+        <router-view />
     </div>
 </template>
 
 <script>
-import {version} from '../../package.json';
-import AppNavigationItem from "@/components/app-navigation-item";
+import AppNavigationItem from "@/components/app-navigation-item.vue";
+import { version } from "@/../package.json";
 
 export default {
-    name: 'app-navigation',
-    components: {AppNavigationItem},
+    name: "app-navigation",
+    components: { AppNavigationItem },
     data: function () {
         return {
             importFile: null,
-            showImportDialog: false
-        }
+            showImportDialog: false,
+        };
     },
     computed: {
         heading: function () {
-            if (this.$route.name === 'app-status') {
-                return 'Dashboard'
-            } else if (this.$route.name === 'job-overview') {
-                return 'Job Overview'
-            } else if (this.$route.name === 'job-editor') {
-                return 'Job-Editor'
-            } else if (this.$route.name === 'connector-overview') {
-                return 'Connector Overview'
-            } else if (this.$route.name === 'connector-editor') {
-                return 'Connector-Editor'
+            if (this.$route.name === "app-status") {
+                return "Dashboard";
+            } else if (this.$route.name === "job-overview") {
+                return "Job Overview";
+            } else if (this.$route.name === "job-editor") {
+                return "Job-Editor";
+            } else if (this.$route.name === "connector-overview") {
+                return "Connector Overview";
+            } else if (this.$route.name === "connector-editor") {
+                return "Connector-Editor";
             } else {
-                return 'Undefined'
+                return "Undefined";
             }
         },
         version: function () {
-            return version.replace('-SNAPSHOT', '');
-        }
-    }
-}
+            return version;
+        },
+    },
+};
 </script>
 
 <style scoped>
-
 .main-menu {
     flex-basis: 50%;
     display: flex;
@@ -117,11 +124,11 @@ nav h1 {
 .top-logo {
     height: 4em;
     float: right;
-    padding: .25em;
+    padding: 0.25em;
 }
 
 .version {
-    margin: -.75em 0 0 1em;
+    margin: -0.75em 0 0 1em;
     font-size: 75%;
 }
 
@@ -136,5 +143,4 @@ nav h1 {
 .documentation-link:hover {
     background-color: var(--color-foreground);
 }
-
 </style>
