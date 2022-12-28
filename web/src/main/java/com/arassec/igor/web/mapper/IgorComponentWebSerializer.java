@@ -26,7 +26,6 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Serializer for igor components in the web layer.
@@ -70,20 +69,20 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
     public void serialize(IgorComponent instance, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField(WebMapperKey.ID.getKey(), instance.getId());
-        if (instance instanceof Connector && ((Connector) instance).getName() != null) {
+        if (instance instanceof Connector connector && connector.getName() != null) {
             jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), ((Connector) instance).getName());
-        } else if (instance instanceof Action) {
-            if (((Action) instance).getName() != null) {
-                jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), ((Action) instance).getName());
+        } else if (instance instanceof Action action) {
+            if (action.getName() != null) {
+                jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), action.getName());
             } else {
                 jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), "");
             }
             if (((Action) instance).getDescription() != null) {
-                jsonGenerator.writeStringField(WebMapperKey.DESCRIPTION.getKey(), ((Action) instance).getDescription());
+                jsonGenerator.writeStringField(WebMapperKey.DESCRIPTION.getKey(), action.getDescription());
             } else {
                 jsonGenerator.writeStringField(WebMapperKey.DESCRIPTION.getKey(), "");
             }
-            jsonGenerator.writeBooleanField(WebMapperKey.ACTIVE.getKey(), ((Action) instance).isActive());
+            jsonGenerator.writeBooleanField(WebMapperKey.ACTIVE.getKey(), action.isActive());
         }
         String categoryId = igorComponentUtil.getCategoryId(instance);
         writeKeyLabelStore(jsonGenerator, WebMapperKey.CATEGORY.getKey(),
@@ -123,8 +122,8 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
             LocaleContextHolder.getLocale()));
         jsonGenerator.writeBooleanField(WebMapperKey.DOCUMENTATION_AVAILABLE.getKey(),
             DocumentationUtil.isDocumentationAvailable(typeId, LocaleContextHolder.getLocale()));
-        if (instance instanceof Action) {
-            jsonGenerator.writeBooleanField(WebMapperKey.SUPPORTS_EVENTS.getKey(), ((Action) instance).supportsEvents());
+        if (instance instanceof Action action) {
+            jsonGenerator.writeBooleanField(WebMapperKey.SUPPORTS_EVENTS.getKey(), action.supportsEvents());
         } else if (instance instanceof EventTrigger) {
             jsonGenerator.writeBooleanField(WebMapperKey.SUPPORTS_EVENTS.getKey(), true);
         } else if (instance instanceof Trigger) {
@@ -162,7 +161,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
             Integer first = o1.getAnnotation(IgorParam.class).sortIndex();
             Integer second = o2.getAnnotation(IgorParam.class).sortIndex();
             return first.compareTo(second);
-        }).collect(Collectors.toList());
+        }).toList();
 
         parameters.removeAll(advancedParameters);
         parameters.sort((o1, o2) -> {
@@ -195,7 +194,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                     writeConnectorParameter(jsonGenerator, value, candidates);
                 } else {
                     jsonGenerator.writeStringField(WebMapperKey.TYPE.getKey(), field.getType().getName());
-                    if (value instanceof String && !StringUtils.hasText((String) value)) {
+                    if (value instanceof String stringValue && !StringUtils.hasText(stringValue)) {
                         jsonGenerator.writeObjectField(WebMapperKey.VALUE.getKey(), null);
                     } else {
                         jsonGenerator.writeObjectField(WebMapperKey.VALUE.getKey(), value);
@@ -221,10 +220,10 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      */
     private void writeMetaData(JsonGenerator jsonGenerator, IgorParam annotation, Field field) throws IOException {
         if (annotation.secured()) {
-            jsonGenerator.writeBooleanField(WebMapperKey.SECURED.getKey(), annotation.secured());
+            jsonGenerator.writeBooleanField(WebMapperKey.SECURED.getKey(), true);
         }
         if (annotation.advanced()) {
-            jsonGenerator.writeBooleanField(WebMapperKey.ADVANCED.getKey(), annotation.advanced());
+            jsonGenerator.writeBooleanField(WebMapperKey.ADVANCED.getKey(), true);
         }
         if (!ParameterSubtype.NONE.equals(annotation.subtype())) {
             jsonGenerator.writeStringField(WebMapperKey.SUBTYPE.getKey(), annotation.subtype().name());

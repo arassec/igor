@@ -1,38 +1,36 @@
 module.exports = {
     title: "Igor Reference Documentation (v" + process.env.REVISION + ")",
     head: [
-        ['meta', {name: "Cache-Control", content: "no-cache, no-store, must-revalidate"}],
-        ['meta', {name: "Pragma", content: "no-cache"}],
-        ['meta', {name: "Expires", content: "0"}]
+        [
+            "meta",
+            {
+                name: "Cache-Control",
+                content: "no-cache, no-store, must-revalidate",
+            },
+        ],
+        ["meta", { name: "Pragma", content: "no-cache" }],
+        ["meta", { name: "Expires", content: "0" }],
     ],
     themeConfig: {
         searchMaxSuggestions: 25,
         nav: [
-            {text: "Home", link: "/"},
-            {text: "User Guide", link: "/user/"},
-            {text: "Developer Guide", link: "/developer/"},
-            {text: "Examples", link: "/examples/"},
-            {text: "GitHub", link: "https://www.github.com/arassec/igor"}
+            { text: "Home", link: "/" },
+            { text: "User Guide", link: "/user/" },
+            { text: "Developer Guide", link: "/developer/" },
+            { text: "Examples", link: "/examples/" },
+            { text: "GitHub", link: "https://www.github.com/arassec/igor" },
         ],
         sidebar: {
             "/user/": [
                 {
                     title: "Getting Started",
                     sidebarDepth: 0,
-                    children: [
-                        "",
-                        "configuration",
-                        "changelog"
-                    ]
+                    children: ["", "configuration", "changelog"],
                 },
                 {
                     title: "Core Elements",
                     sidebarDepth: 0,
-                    children: [
-                        "core/job",
-                        "core/action",
-                        "core/connector"
-                    ]
+                    children: ["core/job", "core/action", "core/connector"],
                 },
                 {
                     title: "User Interface",
@@ -41,8 +39,8 @@ module.exports = {
                         "job-overview",
                         "job-editor",
                         "connector-overview",
-                        "connector-editor"
-                    ]
+                        "connector-editor",
+                    ],
                 },
                 {
                     title: "Components",
@@ -55,8 +53,8 @@ module.exports = {
                                 "igor-plugin-core/cron-trigger",
                                 "igor-plugin-core/manual-trigger",
                                 "igor-plugin-core/web-hook-trigger",
-                                "igor-plugin-message/rabbitmq-message-trigger"
-                            ]
+                                "igor-plugin-message/rabbitmq-message-trigger",
+                            ],
                         },
                         {
                             title: "Actions",
@@ -81,8 +79,8 @@ module.exports = {
                                 "igor-plugin-core/add-data-action",
                                 "igor-plugin-message/send-rabbitmq-message-action",
                                 "igor-plugin-message/send-email-message-action",
-                                "igor-plugin-message/receive-email-message-action"
-                            ]
+                                "igor-plugin-message/receive-email-message-action",
+                            ],
                         },
                         {
                             title: "Connectors",
@@ -96,21 +94,17 @@ module.exports = {
                                 "igor-plugin-file/sftp-file-connector",
                                 "igor-plugin-message/rabbitmq-message-connector",
                                 "igor-plugin-message/email-imap-message-connector",
-                                "igor-plugin-message/email-smtp-message-connector"
-
-                            ]
-                        }
-                    ]
-                }
+                                "igor-plugin-message/email-smtp-message-connector",
+                            ],
+                        },
+                    ],
+                },
             ],
             "/developer/": [
                 {
                     title: "Getting Started",
                     sidebarDepth: 0,
-                    children: [
-                        "",
-                        "developing"
-                    ]
+                    children: ["", "developing"],
                 },
                 {
                     title: "Custom Components",
@@ -119,30 +113,26 @@ module.exports = {
                         "trigger",
                         "action",
                         "connector",
-                        "documentation"
-                    ]
-                }
+                        "documentation",
+                    ],
+                },
             ],
             "/examples/": [
                 {
                     title: "Overview",
                     sidebarDepth: 0,
-                    children: [
-                        ""
-                    ]
+                    children: [""],
                 },
                 {
                     title: "File Handling",
-                    children: [
-                        "copynewfiles"
-                    ]
-                }
-            ]
+                    children: ["copynewfiles"],
+                },
+            ],
         },
         igorVersion: process.env.REVISION,
         igorJavaVersion: "Java 17",
-        igorNodeVersion: "Node.js 14.17.0 LTS"
+        igorNodeVersion: "Node.js 18.12.1 LTS",
     },
     dest: "./target/doc/",
-    base: "/igor/"
+    base: "/igor/",
 };

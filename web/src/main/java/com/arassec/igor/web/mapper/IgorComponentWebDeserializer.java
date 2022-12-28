@@ -116,7 +116,7 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
         if (value == null) {
             return false;
         }
-        return !(value instanceof String) || StringUtils.hasText((String) value);
+        return !(value instanceof String stringValue) || StringUtils.hasText(stringValue);
     }
 
     /**
@@ -139,8 +139,8 @@ public abstract class IgorComponentWebDeserializer<T extends IgorComponent> exte
      */
     private String getTypeId(Map<String, Object> map) {
         Object type = map.get(WebMapperKey.KEY.getKey());
-        if (type instanceof String) {
-            return (String) type;
+        if (type instanceof String value) {
+            return value;
         }
         return null;
     }

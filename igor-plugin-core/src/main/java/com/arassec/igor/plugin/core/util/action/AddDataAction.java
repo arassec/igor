@@ -92,8 +92,7 @@ public class AddDataAction extends BaseUtilAction {
     /**
      * Merges two JSON nodes.
      * <p>
-     * Thanks to StackOverflow: https://stackoverflow.com/a/11459962
-     *
+     * Thanks to <a href="ttps://stackoverflow.com/a/11459962>StackOverflow</a>!
      * @param mainNode   The main {@link JsonNode} to add the data to.
      * @param updateNode The data to add to the main node.
      *
@@ -110,10 +109,10 @@ public class AddDataAction extends BaseUtilAction {
             if (jsonNode != null && jsonNode.isObject()) {
                 merge(jsonNode, updateNode.get(fieldName));
             } else {
-                if (mainNode instanceof ObjectNode) {
+                if (mainNode instanceof ObjectNode node) {
                     // Overwrite field
                     JsonNode value = updateNode.get(fieldName);
-                    ((ObjectNode) mainNode).replace(fieldName, value);
+                    node.replace(fieldName, value);
                 }
             }
 

@@ -132,7 +132,7 @@ public class IgorParamsMdDocGenerator {
             Integer firstSortIndex = extractSortIndex(o1);
             Integer secondSortIndex = extractSortIndex(o2);
             return firstSortIndex.compareTo(secondSortIndex);
-        }).collect(Collectors.toList());
+        }).toList();
 
         if (!igorParams.isEmpty()) {
             writeHeader(result);

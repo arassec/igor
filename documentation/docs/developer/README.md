@@ -27,4 +27,4 @@ Then add the following dependency to your project's `pom.xml` file:
 Now your application should start and igor's web frontend should be available with the standard features of the respective version.
 
 ### Optional: Component Documentation Generation
-If you want to generate component documentation for igor's online help from JavaDoc comments of the respective component, you can use the `igor-maven-plugin` as described here (TODO).
+If you want to generate component documentation for igor's online help from JavaDoc comments of the respective component, you can use the `ìgor-maven-plugin` as documented [here](./documentation.md).

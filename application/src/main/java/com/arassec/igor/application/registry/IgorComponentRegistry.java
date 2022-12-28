@@ -265,7 +265,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      *
      * @param parameterClass The class of the parameter.
      *
-     * @return List of components that can be assigned to the parameter.
+     * @return Map of components that can be assigned to the parameter.
      */
     public Map<String, Set<String>> getConnectorParameterCategoryAndType(Class<?> parameterClass) {
         Map<String, Set<String>> result = new HashMap<>();
@@ -345,18 +345,11 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
                 .subclass(field.getType())
                 .implement(implementations)
                 .method(ElementMatchers.any())
-                .intercept(InvocationHandlerAdapter.of((proxy, method, args) -> {
-                    switch (method.getName()) {
-                        case "getName":
-                        case "toString":
-                            return "Missing Connector!";
-                        case "equals":
-                            return false;
-                        case "hashCode":
-                            return 1;
-                        default:
-                            return null;
-                    }
+                .intercept(InvocationHandlerAdapter.of((proxy, method, args) -> switch (method.getName()) {
+                    case "getName", "toString" -> "Missing Connector!";
+                    case "equals" -> false;
+                    case "hashCode" -> 1;
+                    default -> null;
                 }))
                 .make()
                 .load(this.getClass().getClassLoader())

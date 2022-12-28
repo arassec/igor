@@ -50,13 +50,13 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField(PersistenceMapperKey.ID.getKey(), instance.getId());
         jsonGenerator.writeStringField(PersistenceMapperKey.TYPE_ID.getKey(), igorComponentUtil.getTypeId(instance));
-        if (instance instanceof Connector) {
-            jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), ((Connector) instance).getName());
+        if (instance instanceof Connector connector) {
+            jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), connector.getName());
         }
-        if (instance instanceof Action) {
-            jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), ((Action) instance).getName());
-            jsonGenerator.writeStringField(PersistenceMapperKey.DESCRIPTION.getKey(), ((Action) instance).getDescription());
-            jsonGenerator.writeBooleanField(PersistenceMapperKey.ACTIVE.getKey(), ((Action) instance).isActive());
+        if (instance instanceof Action action) {
+            jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), action.getName());
+            jsonGenerator.writeStringField(PersistenceMapperKey.DESCRIPTION.getKey(), action.getDescription());
+            jsonGenerator.writeBooleanField(PersistenceMapperKey.ACTIVE.getKey(), action.isActive());
         }
         serializeParameters(instance, jsonGenerator);
         jsonGenerator.writeEndObject();
@@ -102,13 +102,13 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
         if (value == null) {
             return;
         }
-        if (value instanceof String && !StringUtils.hasText((String) value)) {
+        if (value instanceof String stringValue && !StringUtils.hasText(stringValue)) {
             return;
         }
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField(PersistenceMapperKey.NAME.getKey(), field.getName());
-        if (value instanceof Connector) {
-            jsonGenerator.writeStringField(PersistenceMapperKey.VALUE.getKey(), ((Connector) value).getId());
+        if (value instanceof Connector connector) {
+            jsonGenerator.writeStringField(PersistenceMapperKey.VALUE.getKey(), connector.getId());
             jsonGenerator.writeBooleanField(PersistenceMapperKey.CONNECTOR.getKey(), true);
         } else {
             jsonGenerator.writeObjectField(PersistenceMapperKey.VALUE.getKey(), value);

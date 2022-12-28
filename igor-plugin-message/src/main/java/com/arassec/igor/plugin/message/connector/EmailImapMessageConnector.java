@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * <h2>'E-Mail Receiver (IMAP)' Connector</h2>
@@ -178,15 +177,14 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
     @SuppressWarnings({"unchecked", "javasecurity:S2083"})
     private void processMessageParts(Part part, Map<String, Object> targetJson, boolean saveAttachments, String attachmentDirectory)
         throws MessagingException, IOException {
-        if (part instanceof Message) {
-            var message = ((Message) part);
+        if (part instanceof Message message) {
             if (message.getReplyTo().length >= 1) {
                 targetJson.put("from", message.getReplyTo()[0].toString());
             } else if (message.getFrom().length >= 1) {
                 targetJson.put("from", message.getFrom()[0].toString());
             }
             targetJson.put("recipients",
-                Arrays.stream(message.getAllRecipients()).map(Address::toString).collect(Collectors.toList()));
+                Arrays.stream(message.getAllRecipients()).map(Address::toString).toList());
             Map<String, Object> headers = new HashMap<>();
             Enumeration<Header> allHeaders = message.getAllHeaders();
             while (allHeaders.hasMoreElements()) {
@@ -199,8 +197,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
 
         Object content = part.getContent();
 
-        if (content instanceof Multipart) {
-            var multipart = (Multipart) content;
+        if (content instanceof Multipart multipart) {
             int count = multipart.getCount();
             for (var i = 0; i < count; i++) {
                 processMessageParts(multipart.getBodyPart(i), targetJson, saveAttachments, attachmentDirectory);
@@ -209,7 +206,7 @@ public class EmailImapMessageConnector extends EmailBaseConnector {
             && Files.isWritable(Paths.get(attachmentDirectory, part.getFileName()))) {
             // It is the job admin's responsibility to configure the job in a way, that path
             // traversal attacks are prevented, e.g. by configuring a fixed 'attachamentDirectory' as apposed to a template.
-            // Hence the suppressed warning ("javasecurity:S2083")...
+            // Hence, the suppressed warning ("javasecurity:S2083")...
             try (var fos = new FileOutputStream(attachmentDirectory + part.getFileName())) {
                 FileCopyUtils.copy(part.getInputStream(), fos);
             }

@@ -91,7 +91,6 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
      *
      * @return A {@link ResponseEntity} with a JSON object containing validation errors.
      */
-    @NonNull
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException methodArgumentNotValidException,
                                                                   @NonNull HttpHeaders headers, @NonNull HttpStatusCode status,
@@ -110,8 +109,8 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
 
         allErrors.forEach(objectError -> {
 
-            if (objectError instanceof FieldError) {
-                appendFieldError(validatedJson, (FieldError) objectError, result);
+            if (objectError instanceof FieldError fieldError) {
+                appendFieldError(validatedJson, fieldError, result);
             } else {
                 // Special case: the custom "UniqueXyzName"-validators pass their validation result as ObjectError (because
                 // bean validation doesn't support field validation with references to other fields, e.g. a job's ID).

@@ -19,7 +19,6 @@ import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
 /**
  * <h2>SFTP Connector</h2>
@@ -50,7 +49,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
             channel.disconnect();
             session.disconnect();
             return files.stream().map(lsEntry -> new FileInfo(lsEntry.getFilename(),
-                    formatInstant(Instant.ofEpochMilli(lsEntry.getAttrs().getMTime() * 1000L)))).collect(Collectors.toList());
+                    formatInstant(Instant.ofEpochMilli(lsEntry.getAttrs().getMTime() * 1000L)))).toList();
         } catch (JSchException | SftpException e) {
             throw new IgorException("Could not list files via SFTP!", e);
         }
@@ -89,9 +88,9 @@ public class SftpFileConnector extends BaseSshFileConnector {
             @SuppressWarnings({"squid:S1149", "java:S3740"})
             Vector lsEntries = channel.ls(file);
 
-            if (lsEntries != null && !lsEntries.isEmpty() && lsEntries.firstElement() instanceof ChannelSftp.LsEntry) {
+            if (lsEntries != null && !lsEntries.isEmpty() && lsEntries.firstElement() instanceof ChannelSftp.LsEntry lsEntry) {
                 var result = new FileStreamData();
-                result.setFileSize(((ChannelSftp.LsEntry) lsEntries.firstElement()).getAttrs().getSize());
+                result.setFileSize(lsEntry.getAttrs().getSize());
                 result.setData(channel.get(file));
 
                 var sshConnectionData = new SshConnectionData();
@@ -137,8 +136,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
      */
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
-        if (fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
-            var sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
+        if (fileStreamData.getSourceConnectionData() instanceof SshConnectionData sshConnectionData) {
             sshConnectionData.getChannel().disconnect();
             sshConnectionData.getSession().disconnect();
         }

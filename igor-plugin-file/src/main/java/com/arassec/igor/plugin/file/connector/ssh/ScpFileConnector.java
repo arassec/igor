@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * <h2>SCP Connector</h2>
@@ -80,7 +79,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
             StringBuilder result = execute(command);
             return Arrays.stream(result.toString().split("\n")).skip(numResultsToSkip)
                     .map(lsResult -> new FileInfo(extractFilename(lsResult), extractLastModified(lsResult)))
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (IgorException e) {
             if (StringUtils.hasText(fileEnding) && e.getMessage().contains("No such file or directory")) {
                 return new LinkedList<>();
@@ -243,8 +242,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
      */
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
-        if (fileStreamData.getSourceConnectionData() instanceof SshConnectionData) {
-            var sshConnectionData = (SshConnectionData) fileStreamData.getSourceConnectionData();
+        if (fileStreamData.getSourceConnectionData() instanceof SshConnectionData sshConnectionData) {
             finalizeStreams(sshConnectionData.getSession(), sshConnectionData.getChannel(), sshConnectionData.getSshOutputStream(),
                     sshConnectionData.getSshInputStream());
         }
@@ -310,11 +308,11 @@ public class ScpFileConnector extends BaseSshFileConnector {
 
         String[] split = input.split("\\s");
         for (String part : split) {
-            if (part.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) { // 2019-06-04
+            if (part.matches("\\d{4}-\\d{2}-\\d{2}")) { // 2019-06-04
                 yearPart = part;
-            } else if (part.matches("[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{9}")) { // 13:14:23
+            } else if (part.matches("\\d{2}:\\d{2}:\\d{2}\\.\\d{9}")) { // 13:14:23
                 timePart = part;
-            } else if (part.matches("\\+[0-9]{4}")) { // +0200
+            } else if (part.matches("\\+\\d{4}")) { // +0200
                 timezonePart = part;
             }
         }

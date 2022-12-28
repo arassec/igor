@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * <h2>'Sort by Timestamp Pattern' Action</h2>
@@ -167,7 +166,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
                     } else {
                         return Objects.requireNonNull(secondDateTime).compareTo(Objects.requireNonNull(firstDateTime));
                     }
-                }).collect(Collectors.toList());
+                }).toList();
         }
 
         return List.of();

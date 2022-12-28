@@ -48,6 +48,15 @@ export default {
     color: var(--color-font);
 }
 
+.panel :deep(select) {
+    border: none;
+    background-color: var(--color-foreground);
+    height: 2em;
+    min-width: 20em;
+    width: 100%;
+    color: var(--color-font);
+}
+
 .panel :deep(textarea) {
     background-color: var(--color-foreground);
     color: var(--color-font);
@@ -64,13 +73,6 @@ export default {
 
 .panel :deep(textarea.alert) {
     background-color: var(--color-alert);
-}
-
-.panel :deep(select option) {
-    border: none;
-    outline: none;
-    background-color: var(--color-foreground);
-    height: 2em;
 }
 
 .panel :deep(select:focus),

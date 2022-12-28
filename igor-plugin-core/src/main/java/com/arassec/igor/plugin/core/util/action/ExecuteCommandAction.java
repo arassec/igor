@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,8 +50,8 @@ public class ExecuteCommandAction extends BaseAction {
         try {
             var process = Runtime.getRuntime().exec(resolvedCommand);
 
-            commandExecution.put("stdout", new String(process.getInputStream().readAllBytes()));
-            commandExecution.put("stderr", new String(process.getErrorStream().readAllBytes()));
+            commandExecution.put("stdout", new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8));
+            commandExecution.put("stderr", new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8));
 
             data.put("commandExecution", commandExecution);
 
