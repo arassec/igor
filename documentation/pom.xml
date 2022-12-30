@@ -210,41 +210,29 @@
                 </configuration>
             </plugin>
 
-        </plugins>
-    </build>
+            <plugin>
+                <groupId>se.bjurr.gitchangelog</groupId>
+                <artifactId>git-changelog-maven-plugin</artifactId>
+                <version>1.95.4</version>
+                <executions>
+                    <execution>
+                        <id>GenerateGitChangelog</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>git-changelog</goal>
+                        </goals>
+                        <configuration>
+                            <file>docs/user/changelog.md</file>
+                            <templateContent>
+                                <![CDATA[
+# Changelog
 
+::: danger Breaking Changes in Minor Versions
+During development there will be breaking changes in minor versions until a stable version 1.0.0 is released.
+After that, semantic versioning will be used and breaking changes will only occur in major version updates.
+:::
 
-    <profiles>
-
-        <!-- During release: generate the changelog -->
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-
-                    <plugin>
-                        <groupId>se.bjurr.gitchangelog</groupId>
-                        <artifactId>git-changelog-maven-plugin</artifactId>
-                        <version>1.95.4</version>
-                        <executions>
-                            <execution>
-                                <id>GenerateGitChangelog</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>git-changelog</goal>
-                                </goals>
-                                <configuration>
-                                    <file>docs/user/changelog.md</file>
-                                    <templateContent>
-                                        <![CDATA[
-        # Changelog
-
-        ::: danger Breaking Changes in Minor Versions
-        During development there will be breaking changes in minor versions until a stable version 1.0.0 is released.
-        After that, semantic versioning will be used and breaking changes will only occur in major version updates.
-        :::
-
-        {{#tags}}
+{{#tags}}
 {{#ifReleaseTag .}}
 ## [{{name}}](https://github.com/arassec/igor/releases/tag/{{name}}) ({{tagDate .}})
 
@@ -294,14 +282,12 @@
 {{/ifReleaseTag}}
 {{/tags}}
 ]]>
-                                    </templateContent>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+                            </templateContent>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
+        </plugins>
+    </build>
 </project>
