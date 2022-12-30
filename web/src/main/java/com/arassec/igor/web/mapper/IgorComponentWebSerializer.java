@@ -53,6 +53,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
      *
      * @param messageSource         The message source for I18N.
      * @param igorComponentRegistry The registry for igor components.
+     * @param igorComponentUtil     Igor's component util.
      */
     public IgorComponentWebSerializer(MessageSource messageSource, IgorComponentRegistry igorComponentRegistry,
                                       IgorComponentUtil igorComponentUtil) {

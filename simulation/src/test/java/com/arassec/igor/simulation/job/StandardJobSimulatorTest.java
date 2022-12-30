@@ -1,5 +1,6 @@
 package com.arassec.igor.simulation.job;
 
+import com.arassec.igor.application.simulation.SimulationResult;
 import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.EventTrigger;
@@ -8,6 +9,7 @@ import com.arassec.igor.core.util.event.JobTriggerEvent;
 import com.arassec.igor.simulation.IgorSimulationProperties;
 import com.arassec.igor.simulation.job.strategy.SimulationStrategy;
 import com.arassec.igor.simulation.job.strategy.SimulationStrategyFactory;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
@@ -52,6 +55,7 @@ class StandardJobSimulatorTest {
      * Tests simulating a job.
      */
     @Test
+    @SneakyThrows
     @DisplayName("Tests simulating a job.")
     void testSimulateJob() {
         Job job = Job.builder().build();
@@ -60,7 +64,9 @@ class StandardJobSimulatorTest {
 
         when(simulationStrategyFactory.determineSimulationStrategy(job)).thenReturn(simulationStrategyMock);
 
-        standardJobSimulator.simulateJob(job);
+        Future<Map<String, SimulationResult>> simulateJobFuture = standardJobSimulator.simulateJob(job);
+        // Wait for the future to complete, we are not interested in the result:
+        simulateJobFuture.get();
 
         verify(simulationStrategyMock, times(1)).simulate(eq(job), any(JobExecution.class));
 

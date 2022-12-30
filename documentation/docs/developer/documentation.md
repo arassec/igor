@@ -6,17 +6,17 @@ pageClass: docpage
 
 ## Documenting Components
 Igor provides an online help for every component that is documented.
-The help is openend by clicking the ![help button](../user/images/common/help-button.png) button in the parameter editor.
+The help is opened by clicking the ![help button](../user/images/common/help-button.png) button in the parameter editor.
 
 Component documentation must be in **Markdown** format and placed in the following directory in the classpath:
 ```
 doc/
 ```
-The file containing a component's documentation must be name like the component's **type ID**.
-E.g. a custom component with type ID "custom-component" must place its documentation in the classpath in the file:
+The file containing a component's documentation must be name like the component's **type ID**, e.g.
 ```
 doc/custom-component.md
 ```
+where `custom-component` ist the component's type ID.
 
 I18N of component documentation is supported by placing translated documentation files in subdirectories that are named like the respective locale.
 
@@ -25,10 +25,10 @@ E.g. a translated documentation in german for the custom component must be place
 doc/de_DE/custom-component.md
 ```
 
-If no translated documentation for the current user's locale is found, igor will fallback to the standard documentation (if it exists).
+If no translated documentation for the current user's locale is found, igor will fall back to the standard documentation (if it exists).
 
 ## I18N
-Igor supports translation of categories and types and parameters of components.
+Igor supports translation of categories, types and parameters of components.
 In order to use the translation you have to place properties files in the following directory in the classpath:
 ```
 i18n/
@@ -96,6 +96,21 @@ The labels defined will be used in igor's UI and in generated component document
 
 ## Generating Documentation
 Since keeping code and documentation in sync is difficult, you can use the **igor-maven-plugin** to generate documentation of your custom components.
+
+::: danger Java 17 Features
+Igor uses [JavaParser](https://javaparser.org/) to parse component source files and generate documentation from them.
+
+The parser supports Java only up to language level **15** at the moment.
+Since igor requires Java **17**, you might use langueage features in components that lead to parser errors during documentation generation, e.g.:
+
+```
+[ERROR] Could not parse file AddDataAction.java (generated documentation 
+might be incomplete): (line 112,col 21) Use of patterns with instanceof is not 
+supported.
+```
+
+In these cases you should provide manual documentation for the respective component as described above.
+:::
 
 In order to use the plugin you have to enable it your project's `pom.xml` file:
 <div class="language-text"><pre>

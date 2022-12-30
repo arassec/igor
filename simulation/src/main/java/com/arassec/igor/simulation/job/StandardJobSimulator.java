@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +23,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * A {@link JobSimulator} that runs the jobs in simulation mode.
@@ -58,18 +57,19 @@ public class StandardJobSimulator implements JobSimulator {
     @Async
     @Override
     public Future<Map<String, SimulationResult>> simulateJob(Job job) {
+        return CompletableFuture.supplyAsync(() -> {
+            var jobExecution = new JobExecution();
 
-        var jobExecution = new JobExecution();
+            runningSimulations.add(job);
 
-        runningSimulations.add(job);
+            var simulationStrategy = simulationStrategyFactory.determineSimulationStrategy(job);
 
-        var simulationStrategy = simulationStrategyFactory.determineSimulationStrategy(job);
+            Map<String, SimulationResult> simulationResults = simulationStrategy.simulate(job, jobExecution);
 
-        Map<String, SimulationResult> simulationResults = simulationStrategy.simulate(job, jobExecution);
+            runningSimulations.remove(job);
 
-        runningSimulations.remove(job);
-
-        return new AsyncResult<>(simulationResults);
+            return simulationResults;
+        });
     }
 
     /**
@@ -78,8 +78,8 @@ public class StandardJobSimulator implements JobSimulator {
     @Override
     public void cancelAllSimulations(String jobId) {
         List<Job> jobsToCancel = runningSimulations.stream()
-                .filter(simulatedJob -> simulatedJob.getId().equals(jobId))
-                .collect(Collectors.toList());
+            .filter(simulatedJob -> simulatedJob.getId().equals(jobId))
+            .toList();
         jobsToCancel.forEach(Job::cancel);
     }
 
@@ -91,10 +91,10 @@ public class StandardJobSimulator implements JobSimulator {
     @EventListener
     public void onJobTriggerEvent(JobTriggerEvent jobTriggerEvent) {
         runningSimulations.stream()
-                .filter(job -> job.getId().equals(jobTriggerEvent.getJobId()))
-                .filter(job -> job.getTrigger() instanceof EventTrigger)
-                .filter(job -> ((EventTrigger) job.getTrigger()).getSupportedEventType().equals(jobTriggerEvent.getEventType()))
-                .forEach(job -> ((EventTrigger) job.getTrigger()).processEvent(jobTriggerEvent.getEventData()));
+            .filter(job -> job.getId().equals(jobTriggerEvent.getJobId()))
+            .filter(job -> job.getTrigger() instanceof EventTrigger)
+            .filter(job -> ((EventTrigger) job.getTrigger()).getSupportedEventType().equals(jobTriggerEvent.getEventType()))
+            .forEach(job -> ((EventTrigger) job.getTrigger()).processEvent(jobTriggerEvent.getEventData()));
     }
 
     /**
@@ -112,8 +112,8 @@ public class StandardJobSimulator implements JobSimulator {
             return time.toSeconds() >= simulationProperties.getTimeout();
         };
         List<Job> staleSimulations = runningSimulations.stream()
-                .filter(isStale)
-                .collect(Collectors.toList());
+            .filter(isStale)
+            .toList();
         staleSimulations.forEach(job -> {
             log.debug("Cancelling simulation of job '" + job.getId() + "' due to timeout!");
             job.cancel();

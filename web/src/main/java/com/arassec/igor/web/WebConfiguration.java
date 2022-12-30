@@ -30,17 +30,15 @@ import java.util.List;
 /**
  * Configures the web layer of igor.
  */
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Configuration
 @ComponentScan
 public class WebConfiguration {
 
     /**
-     * Creates a {@link MessageSource} to support I18N. All configured message sources from igor sub-modules are configured as
+     * Creates a {@link MessageSource} to support I18N. All configured message sources from igor submodules are configured as
      * hierarchy of parent message sources, to allow individual message sources per module.
      *
      * @param messageSources All available message sources.
-     *
      * @return The primary message source.
      */
     @Bean
@@ -62,12 +60,12 @@ public class WebConfiguration {
      * @param igorComponentRegistry Igor's component registry.
      * @param connectorRepository   Repository for connectors.
      * @param messageSource         Spring's message source for i18n.
-     *
+     * @param igorComponentUtil     Igor's component util.
      * @return The default {@link ObjectMapper}.
      */
     @Bean
     public ObjectMapper objectMapper(IgorComponentRegistry igorComponentRegistry, ConnectorRepository connectorRepository,
-                                 IgorComponentUtil igorComponentUtil, MessageSource messageSource) {
+                                     IgorComponentUtil igorComponentUtil, MessageSource messageSource) {
         var mapperModule = new SimpleModule();
 
         mapperModule.addSerializer(new IgorComponentWebSerializer(messageSource, igorComponentRegistry, igorComponentUtil));

@@ -133,6 +133,7 @@ module.exports = {
         igorJavaVersion: "Java 17",
         igorNodeVersion: "Node.js 18.12.1 LTS",
         igorSpringBootVersion: "Spring-Boot 3",
+        igorVueVersion: "Vue.js 3",
     },
     dest: "./target/doc/",
     base: "/igor/",

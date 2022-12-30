@@ -37,7 +37,7 @@ class DocGenMojoTest {
         docGenMojo.execute();
 
         verify(documentationGenerator, times(1)).generateDoc(Path.of("unit-test"), "/src/main/java",
-            "/src/main/resources/doc-gen/");
+            "/src/main/resources/doc-gen/", "/src/main/resources/doc/");
     }
 
     /**
@@ -51,7 +51,7 @@ class DocGenMojoTest {
         mavenProject.setBasedir(new File("unit-test"));
 
         DocumentationGenerator documentationGenerator = mock(DocumentationGenerator.class);
-        doThrow(new IOException("test-exception")).when(documentationGenerator).generateDoc(any(Path.class), any(String.class), any(String.class));
+        doThrow(new IOException("test-exception")).when(documentationGenerator).generateDoc(any(Path.class), any(String.class), any(String.class), any(String.class));
 
         DocGenMojo docGenMojo = new DocGenMojo();
         docGenMojo.setProject(mavenProject);

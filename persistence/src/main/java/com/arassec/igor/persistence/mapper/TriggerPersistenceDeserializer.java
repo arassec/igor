@@ -7,6 +7,9 @@ import com.arassec.igor.persistence.security.SecurityProvider;
 
 import java.util.Map;
 
+/**
+ * Deserializer for persisted {@link Trigger} instances.
+ */
 public class TriggerPersistenceDeserializer extends IgorComponentPersistenceDeserializer<Trigger> {
 
     /**

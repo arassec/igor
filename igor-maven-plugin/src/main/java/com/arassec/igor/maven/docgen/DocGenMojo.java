@@ -41,7 +41,7 @@ public class DocGenMojo extends AbstractMojo {
         getLog().info("Generating documentation of igor components.");
         try {
             documentationGenerator.generateDoc(Path.of(project.getBasedir().getPath()),
-                PluginConstants.JAVA_SOURCES, PluginConstants.DOC_GEN_TARGET_DIR);
+                PluginConstants.JAVA_SOURCES, PluginConstants.DOC_GEN_TARGET_DIR, PluginConstants.DOC_TARGET_DIR);
         } catch (IOException e) {
             throw new IgorException("Could not generate documentation!", e);
         }

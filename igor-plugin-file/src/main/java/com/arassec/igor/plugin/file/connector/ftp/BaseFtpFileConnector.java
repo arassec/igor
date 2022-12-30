@@ -20,11 +20,11 @@ import org.springframework.util.StringUtils;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -111,7 +111,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
                 result = Stream.of(ftpFiles).filter(Objects::nonNull).filter(FTPFile::isFile).map(ftpFile -> {
                     var mTime = Instant.ofEpochMilli(ftpFile.getTimestamp().getTime().getTime());
                     return new FileInfo(ftpFile.getName(), formatInstant(mTime));
-                }).collect(Collectors.toList());
+                }).toList();
             } else {
                 result = new LinkedList<>();
             }
@@ -182,8 +182,7 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
      */
     @Override
     public void finalizeStream(FileStreamData fileStreamData) {
-        if (fileStreamData.getSourceConnectionData() instanceof FTPClient) {
-            var ftpClient = (FTPClient) fileStreamData.getSourceConnectionData();
+        if (fileStreamData.getSourceConnectionData() instanceof FTPClient ftpClient) {
             try {
                 if (!ftpClient.completePendingCommand()) {
                     ftpClient.logout();
@@ -281,9 +280,9 @@ public abstract class BaseFtpFileConnector extends BaseFileConnector {
             throw new IgorException("Login to FTP server " + host + ":" + port + " failed for user: " + user);
         }
 
-        ftpClient.setDataTimeout(dataTimeout);
-        ftpClient.setControlKeepAliveTimeout(keepAliveTimeout);
-        ftpClient.setControlKeepAliveReplyTimeout(keepAliveTimeout);
+        ftpClient.setDataTimeout(Duration.ofMillis(dataTimeout));
+        ftpClient.setControlKeepAliveTimeout(Duration.ofMinutes(keepAliveTimeout));
+        ftpClient.setControlKeepAliveReplyTimeout(Duration.ofMinutes(keepAliveTimeout));
         ftpClient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
     }

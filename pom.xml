@@ -297,7 +297,6 @@
             </dependency>
 
             <!-- igor-maven-plugin -->
-
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-plugin-api</artifactId>
@@ -340,7 +339,6 @@
                 <artifactId>maven-core</artifactId>
                 <version>3.8.6</version>
             </dependency>
-
 
         </dependencies>
     </dependencyManagement>

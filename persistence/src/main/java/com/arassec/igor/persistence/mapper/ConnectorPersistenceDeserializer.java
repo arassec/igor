@@ -7,6 +7,9 @@ import com.arassec.igor.persistence.security.SecurityProvider;
 
 import java.util.Map;
 
+/**
+ * Deserializer for persisted {@link Connector} instances.
+ */
 public class ConnectorPersistenceDeserializer extends IgorComponentPersistenceDeserializer<Connector> {
 
     /**

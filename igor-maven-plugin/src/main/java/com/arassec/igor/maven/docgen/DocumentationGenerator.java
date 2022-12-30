@@ -9,6 +9,7 @@ import com.arassec.igor.maven.docgen.markdown.PrimitiveHtmlToMdConverter;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
@@ -16,6 +17,8 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -35,6 +39,7 @@ import java.util.stream.Stream;
  * If found, converts the class' JavaDoc to Markdown and saves the file under src/main/resources/doc-gen. Documentation for the
  * component's parameters are appended to the file.
  */
+@Slf4j
 @Named
 @Singleton
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
@@ -55,13 +60,13 @@ public class DocumentationGenerator {
     /**
      * Generates documentation of all igor components found in the module.
      *
-     * @param projectRoot  The module's root path.
-     * @param sourcesDir   The directory containing the java source files.
-     * @param docTargetDir The directory to put the generated documentation in.
-     *
+     * @param projectRoot     The module's root path.
+     * @param sourcesDir      The directory containing the java source files.
+     * @param docGenTargetDir The directory to put the generated documentation in.
+     * @param docTargetDir    The directory where manually created documentation lies in.
      * @throws IOException In case of generation errors.
      */
-    public void generateDoc(Path projectRoot, String sourcesDir, String docTargetDir) throws IOException {
+    public void generateDoc(Path projectRoot, String sourcesDir, String docGenTargetDir, String docTargetDir) throws IOException {
 
         igorParamsMdDocGenerator.initialize(projectRoot, sourcesDir, PluginConstants.I18N_SOURCES, new IgorComponentUtil());
 
@@ -69,13 +74,16 @@ public class DocumentationGenerator {
             .forEach(file -> {
                 var parserConfiguration = new ParserConfiguration();
                 parserConfiguration.setSymbolResolver(new JavaSymbolSolver(new JavaParserTypeSolver(Paths.get(projectRoot.toString(), sourcesDir))));
-                var javaParser = new JavaParser(parserConfiguration);
                 try {
+                    var javaParser = new JavaParser(parserConfiguration);
                     ParseResult<CompilationUnit> result = javaParser.parse(file);
+
                     var compilationUnit = result.getResult().orElseThrow();
-                    var igorComponentCollector = new IgorComponentCollector();
+                    var igorComponentCollector = new IgorComponentCollector(file, result);
                     igorComponentCollector.visit(compilationUnit, null);
                     igorComponentCollector.getIgorComponents().forEach((classDeclaration, typeId) -> {
+
+                        checkErrors(file, result, projectRoot, docTargetDir, typeId);
 
                         StringBuilder documentation = new StringBuilder();
 
@@ -84,7 +92,7 @@ public class DocumentationGenerator {
 
                         documentation.append(igorParamsMdDocGenerator.generateDocumentation(classDeclaration, typeId));
 
-                        createDocFile(projectRoot, docTargetDir, typeId, documentation.toString());
+                        createDocFile(projectRoot, docGenTargetDir, typeId, documentation.toString());
                     });
                 } catch (IOException e) {
                     throw new IgorException("Could not parse java file!", e);
@@ -119,7 +127,6 @@ public class DocumentationGenerator {
      * Returns all source files found under the provided path.
      *
      * @param sourcesRoot The path to search sources in.
-     *
      * @return List of Java source files found in the directory tree.
      */
     private List<Path> getSourceFiles(Path sourcesRoot) {
@@ -133,10 +140,46 @@ public class DocumentationGenerator {
     }
 
     /**
+     * Checks for errors during parsing and logs an error message if required.
+     * <p>
+     * Logging is suppressed when manually created documentation for the component exists.
+     *
+     * @param file         The parsed file.
+     * @param parseResult  The parser's results.
+     * @param projectRoot  The module's root path.
+     * @param docTargetDir The directory where manually crated documentation lies in.
+     * @param typeId       The igor component's Type-ID.
+     */
+    private void checkErrors(Path file, ParseResult<CompilationUnit> parseResult, Path projectRoot, String docTargetDir, String typeId) {
+        var targetDir = projectRoot + docTargetDir;
+        if (!parseResult.getProblems().isEmpty() &&
+            !Files.exists(Paths.get(targetDir, typeId + ".md"))) {
+            log.error("Could not parse file {} (generated documentation might be incomplete): {}", file,
+                parseResult.getProblems().stream()
+                    .map(Problem::toString)
+                    .collect(Collectors.joining())
+            );
+        }
+    }
+
+    /**
      * Visitor that checks parsed classes for an {@link IgorComponent} annotation.
      */
     @SuppressWarnings("java:S3985") // The class is used but Sonar doesn't recognize it...
+    @RequiredArgsConstructor
     private static class IgorComponentCollector extends VoidVisitorAdapter<ClassOrInterfaceDeclaration> {
+
+        /**
+         * The source file containing the original javadoc comments.
+         */
+        @Getter
+        private final Path sourceFile;
+
+        /**
+         * The result of the java parser for the source file.
+         */
+        @Getter
+        private final ParseResult<CompilationUnit> parseResult;
 
         /**
          * Contains all found igor components together with their respective Type-ID.
