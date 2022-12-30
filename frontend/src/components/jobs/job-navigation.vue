@@ -16,14 +16,7 @@
             data-e2e="job-configuration"
         />
 
-        <draggable
-            v-model="jobConfigActions"
-            item-key="id"
-            @start="drag = true"
-            @end="drag = false"
-            handle=".move-icon"
-            :group="'actions'"
-        >
+        <draggable :list="jobConfiguration.actions" item-key="id" handle=".move-icon" :group="'actions'">
             <template #item="{ element }">
                 <action-navigation-item
                     :action="element"
@@ -76,11 +69,6 @@ export default {
         "jobExecutionsPage",
         "simulationResults",
     ],
-    data() {
-        return {
-            jobConfigActions: this.jobConfiguration.actions,
-        };
-    },
     methods: {
         getActionSimulationResults: function (actionId) {
             if (this.simulationResults && Object.prototype.hasOwnProperty.call(this.simulationResults, actionId)) {
