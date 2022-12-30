@@ -210,71 +210,82 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>se.bjurr.gitchangelog</groupId>
-                <artifactId>git-changelog-maven-plugin</artifactId>
-                <version>1.95.4</version>
-                <executions>
-                    <execution>
-                        <id>GenerateGitChangelog</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>git-changelog</goal>
-                        </goals>
-                        <configuration>
-                            <file>docs/user/changelog.md</file>
-                            <templateContent>
-                                <![CDATA[
-# Changelog
+        </plugins>
+    </build>
+
+    <profiles>
+
+        <!-- During release: generate the changelog -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>se.bjurr.gitchangelog</groupId>
+                        <artifactId>git-changelog-maven-plugin</artifactId>
+                        <version>1.95.4</version>
+                        <executions>
+                            <execution>
+                                <id>GenerateGitChangelog</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>git-changelog</goal>
+                                </goals>
+                                <configuration>
+                                    <file>docs/user/changelog.md</file>
+                                    <templateContent>
+                                        <![CDATA[
+        # Changelog
 
 ::: danger Breaking Changes in Minor Versions
 During development there will be breaking changes in minor versions until a stable version 1.0.0 is released.
 After that, semantic versioning will be used and breaking changes will only occur in major version updates.
 :::
 
-{{#tags}}
-{{#ifReleaseTag .}}
-## [{{name}}](https://github.com/arassec/igor/releases/tag/{{name}}) ({{tagDate .}})
+        {{#tags}}
+{{#ifReleaseTag.}}
+## [{{name}}](https://github.com/arassec/igor/releases/tag/{{name}}) ({{tagDate.}})
 
   {{#ifContainsBreaking commits}}
 ### Breaking changes
 
     {{#commits}}
-      {{#ifCommitBreaking .}}
-- {{#eachCommitScope .}} **{{.}}**:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{#ifCommitBreaking.}}
+- {{#eachCommitScope.}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
       {{/ifCommitBreaking}}
     {{/commits}}
   {{/ifContainsBreaking}}
 
 
-  {{#ifContainsType commits type='feat'}}
+  {{#ifContainsType commits type = 'feat'}}
 ### Features
 
     {{#commits}}
-      {{#ifCommitType . type = 'feat'}}
-- {{#eachCommitScope .}} **{{.}}**:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{#ifCommitType.type = 'feat'}}
+- {{#eachCommitScope.}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
       {{/ifCommitType}}
     {{/commits}}
   {{/ifContainsType}}
 
 
-  {{#ifContainsType commits type='fix'}}
+  {{#ifContainsType commits type = 'fix'}}
 ### Bug Fixes
 
     {{#commits}}
-      {{#ifCommitType . type='fix'}}
-- {{#eachCommitScope .}} **{{.}}**:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{#ifCommitType.type = 'fix'}}
+- {{#eachCommitScope.}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
       {{/ifCommitType}}
     {{/commits}}
   {{/ifContainsType}}
 
 
-  {{#ifContainsType commits type='chore'}}
+  {{#ifContainsType commits type = 'chore'}}
 ### Chores
 
     {{#commits}}
-      {{#ifCommitType . type='chore'}}
-- {{#eachCommitScope .}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
+      {{#ifCommitType.type = 'chore'}}
+- {{#eachCommitScope.}} {{.}}:{{/eachCommitScope}} {{{commitDescription .}}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}))
       {{/ifCommitType}}
     {{/commits}}
   {{/ifContainsType}}
@@ -282,12 +293,14 @@ After that, semantic versioning will be used and breaking changes will only occu
 {{/ifReleaseTag}}
 {{/tags}}
 ]]>
-                            </templateContent>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+                                    </templateContent>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
-        </plugins>
-    </build>
 </project>
