@@ -561,9 +561,9 @@ export default {
         },
         deleteAction: function () {
             this.validationErrors = {};
-            this.$delete(
-                this.jobConfiguration.actions,
-                Utils.findActionIndex(this.jobConfiguration, this.selectedActionId)
+            this.jobConfiguration.actions.splice(
+                Utils.findActionIndex(this.jobConfiguration, this.selectedActionId),
+                1
             );
             this.showDeleteActionDialog = false;
             this.selectedActionId = null;
