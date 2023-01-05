@@ -224,7 +224,7 @@
                     <plugin>
                         <groupId>se.bjurr.gitchangelog</groupId>
                         <artifactId>git-changelog-maven-plugin</artifactId>
-                        <version>1.95.4</version>
+                        <version>1.95.5</version>
                         <executions>
                             <execution>
                                 <id>GenerateGitChangelog</id>
