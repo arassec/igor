@@ -2,13 +2,10 @@ package com.arassec.igor.application;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-
-import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,18 +36,6 @@ class ApplicationConfigurationTest {
     void testAnnotations() {
         assertTrue(ApplicationConfiguration.class.isAnnotationPresent(Configuration.class));
         assertTrue(ApplicationConfiguration.class.isAnnotationPresent(EnableScheduling.class));
-    }
-
-    /**
-     * Tests I18N of core messages.
-     */
-    @Test
-    @DisplayName("Tests I18N of core messages.")
-    void testI18n() {
-        ApplicationConfiguration configuration = new ApplicationConfiguration();
-        MessageSource messageSource = configuration.coreMessageSource();
-        assertEquals("a job with the same name already exists",
-                messageSource.getMessage("com.arassec.igor.core.validation.unique-job-name", null, Locale.getDefault()));
     }
 
 }

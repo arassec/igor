@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ResourceBundleMessageSource;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -64,8 +65,12 @@ class ObjectMapperTest {
 
         WebConfiguration webConfiguration = new WebConfiguration();
 
+        var messageSource = new ResourceBundleMessageSource();
+        messageSource.setParentMessageSource(IgorConfigHelper.createMessageSource("i18n/mapper"));
+        messageSource.setUseCodeAsDefaultMessage(true);
+
         objectMapper = webConfiguration.objectMapper(igorComponentRegistry, connectorRepositoryMock,  igorComponentUtil,
-                webConfiguration.messageSource(List.of(IgorConfigHelper.createMessageSource("i18n/mapper"))));
+            messageSource);
     }
 
     /**

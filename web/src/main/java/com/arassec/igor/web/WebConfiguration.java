@@ -2,6 +2,7 @@ package com.arassec.igor.web;
 
 import com.arassec.igor.application.registry.IgorComponentRegistry;
 import com.arassec.igor.application.util.IgorComponentUtil;
+import com.arassec.igor.application.util.IgorConfigHelper;
 import com.arassec.igor.core.model.action.Action;
 import com.arassec.igor.core.model.connector.Connector;
 import com.arassec.igor.core.model.trigger.Trigger;
@@ -24,7 +25,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -38,13 +44,27 @@ public class WebConfiguration {
      * Creates a {@link MessageSource} to support I18N. All configured message sources from igor submodules are configured as
      * hierarchy of parent message sources, to allow individual message sources per module.
      *
-     * @param messageSources All available message sources.
+     * @param resourcePatternResolver Helper to find all I18N properties in the classpath.
      * @return The primary message source.
      */
     @Bean
-    public MessageSource messageSource(final List<MessageSource> messageSources) {
+    public MessageSource messageSource(ResourcePatternResolver resourcePatternResolver) {
+        final List<MessageSource> messageSources = new LinkedList<>();
+
+        try {
+            Resource[] resources = resourcePatternResolver.getResources("classpath*:i18n/*.properties");
+            Arrays.stream(resources).forEach(resource -> {
+                if (resource.getFilename() != null) {
+                    messageSources.add(IgorConfigHelper.createMessageSource(
+                        "i18n/" + resource.getFilename().replace(".properties", "")));
+                }
+            });
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not create MessageSource from properties files!", e);
+        }
+
         var messageSource = new ResourceBundleMessageSource();
-        if (messageSources != null && !messageSources.isEmpty()) {
+        if (!messageSources.isEmpty()) {
             for (var i = 1; i < messageSources.size(); i++) {
                 ((HierarchicalMessageSource) messageSources.get(i)).setParentMessageSource(messageSources.get(i - 1));
             }

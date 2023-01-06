@@ -34,8 +34,6 @@ In order to use the translation you have to place properties files in the follow
 i18n/
 ```
 
-The properties file containing the translations must end with `-labels.properties`.
-
 E.g. the translation for your custom components could be placed in the file:
 ```
 i18n/custom-labels.properties
@@ -47,19 +45,7 @@ E.g. a german translation for your custom components must be placed in:
 ```
 i18n/de_DE/custom-labels.properties
 ```
-
-A Spring Bean must be configured as follows for igor to use the created properties files:
-``` java
-/**
- * Creates a new {@link MessageSource} for i18n.
- *
- * @return The newly created instance.
- */
-@Bean
-public MessageSource customMessageSource() {
-    return IgorConfigHelper.createMessageSource("i18n/custom-labels");
-}
-```
+All properties files from the classpath residing in an `i18n/` directory will be used as message source for translations.
 
 ### I18N Example
 For a custom component...

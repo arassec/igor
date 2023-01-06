@@ -193,7 +193,7 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(testConnector)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.connector-id.name").value("com.arassec.igor.core.validation.unique-connector-name"));
+                .andExpect(jsonPath("$.connector-id.name").value("a connector with the same name already exists"));
     }
 
     /**
