@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests the {@link AddDataAction}.
  */
+@DisplayName("'Add data' action tests.")
 class AddDataActionTest {
 
     /**

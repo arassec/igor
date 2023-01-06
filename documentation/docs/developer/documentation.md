@@ -151,6 +151,7 @@ The following HTML elements are converted to their Markdown equivalents during g
 |&lt;pre&gt;text&lt;/pre&gt;|&#96;text&#96;|
 |&lt;pre&gt;&lt;code&gt;text&lt;/code&gt;&lt;/pre&gt;|\n&#96;&#96;&#96;text&#96;&#96;&#96;\n|
 |&lt;p&gt;text&lt;/p&gt;|\n\ntext\n|
+|&lt;ul&gt;&lt;li&gt;first&lt;/li&gt;&lt;li&gt;second&lt;/li&gt;&lt;/ul&gt;|* first\n* second\n\n
 
 Due to changes in JavaDoc-Linting HTML &lt;h1&gt; headings are not supported anymore!
 

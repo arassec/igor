@@ -59,7 +59,7 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
         String jobId = getJobId(data);
-        var resolvedInput = CorePluginUtils.getString(data, input);
+        var resolvedInput = CorePluginUtils.evaluateTemplate(data, input);
 
         if (resolvedInput == null) {
             log.debug("Not enough data to filter: {}", input);

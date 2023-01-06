@@ -36,7 +36,8 @@ public class PersistValueAction extends BasePersistenceAction {
     private String input;
 
     /**
-     * The number of persisted values to keep. If the number is exceeded, old values are removed from the datastore.
+     * The number of persisted values to keep. If the number is exceeded, old values are removed from the datastore. A
+     * value of '0' will never delete old values.
      */
     @Getter
     @Setter
@@ -65,13 +66,13 @@ public class PersistValueAction extends BasePersistenceAction {
 
         var jobId = getJobId(data);
 
-        var resolvedInput = CorePluginUtils.getString(data, input);
+        var resolvedInput = CorePluginUtils.evaluateTemplate(data, input);
         if (resolvedInput == null) {
             log.debug("Not enough data to persist: {}", input);
             return List.of();
         }
 
-        var value = new PersistentValue(CorePluginUtils.getString(data, resolvedInput));
+        var value = new PersistentValue(CorePluginUtils.evaluateTemplate(data, resolvedInput));
         if (!persistentValueRepository.isPersisted(jobId, value)) {
             if (isSimulation(data)) {
                 data.put(DataKey.SIMULATION_LOG.getKey(), "Would have persisted: " + value.getContent());

@@ -140,14 +140,14 @@ public class HttpFileDownloadAction extends BaseHttpAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        var requestUrl = CorePluginUtils.getString(data, url);
-        var destination = CorePluginUtils.getString(data, targetDirectory);
-        var filename = CorePluginUtils.getString(data, targetFilename);
-        var resolvedTargetKey = CorePluginUtils.getString(data, targetKey);
+        var requestUrl = CorePluginUtils.evaluateTemplate(data, url);
+        var destination = CorePluginUtils.evaluateTemplate(data, targetDirectory);
+        var filename = CorePluginUtils.evaluateTemplate(data, targetFilename);
+        var resolvedTargetKey = CorePluginUtils.evaluateTemplate(data, targetKey);
 
         var httpRequestBuilder = HttpRequest.newBuilder().GET().uri(URI.create(requestUrl));
-        parsedHeaders.forEach(header -> httpRequestBuilder.header(CorePluginUtils.getString(data, header.split(":")[0]),
-            CorePluginUtils.getString(data, header.split(":")[1])));
+        parsedHeaders.forEach(header -> httpRequestBuilder.header(CorePluginUtils.evaluateTemplate(data, header.split(":")[0]),
+            CorePluginUtils.evaluateTemplate(data, header.split(":")[1])));
         addBasicAuthHeaderIfConfigured(httpRequestBuilder);
 
         try {

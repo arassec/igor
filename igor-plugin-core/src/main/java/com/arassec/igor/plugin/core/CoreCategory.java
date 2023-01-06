@@ -31,6 +31,11 @@ public class CoreCategory {
     public static final String PERSISTENCE = "persistence";
 
     /**
+     * The "Data" category.
+     */
+    public static final String DATA = "data";
+
+    /**
      * Creates a new instance.
      */
     private CoreCategory() {

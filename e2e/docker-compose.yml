@@ -6,6 +6,11 @@ services:
     container_name: "igor"
     ports:
       - "9090:8080"
+    environment:
+        - spring.datasource.url=jdbc:postgresql://igor-postgres-db:5432/igor
+        - spring.datasource.username=igor
+        - spring.datasource.password=igor
+        - spring.datasource.driver-class-name=org.postgresql.Driver
     networks:
       - igor-e2e
   rabbitmq:
@@ -75,6 +80,28 @@ services:
                          -Dgreenmail.users=igor:igor@igor-test.dev
                          -Dgreenmail.verbose
                          -Dgreenmail.hostname=0.0.0.0
+    networks:
+      - igor-e2e
+  postgres-db:
+    image: "postgres:15-alpine"
+    container_name: "igor-postgres-db"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=igor
+      - POSTGRES_PASSWORD=igor
+    networks:
+        - igor-e2e
+  mysql-db:
+    image: "mysql:8-debian"
+    container_name: "igor-mysql-db"
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=igor-playground
+      - MYSQL_USER=igor
+      - MYSQL_PASSWORD=igor
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
     networks:
       - igor-e2e
 

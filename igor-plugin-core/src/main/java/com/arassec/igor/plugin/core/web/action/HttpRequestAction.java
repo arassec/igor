@@ -149,15 +149,15 @@ public class HttpRequestAction extends BaseHttpAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        var requestMethod = CorePluginUtils.getString(data, method);
-        var requestUrl = CorePluginUtils.getString(data, url);
-        var content = Optional.ofNullable(CorePluginUtils.getString(data, body)).orElse("");
+        var requestMethod = CorePluginUtils.evaluateTemplate(data, method);
+        var requestUrl = CorePluginUtils.evaluateTemplate(data, url);
+        var content = Optional.ofNullable(CorePluginUtils.evaluateTemplate(data, body)).orElse("");
 
         var httpRequestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(requestUrl))
             .method(requestMethod, HttpRequest.BodyPublishers.ofString(content));
-        parsedHeaders.forEach(header -> httpRequestBuilder.header(CorePluginUtils.getString(data, header.split(":")[0]),
-            CorePluginUtils.getString(data, header.split(":")[1])));
+        parsedHeaders.forEach(header -> httpRequestBuilder.header(CorePluginUtils.evaluateTemplate(data, header.split(":")[0]),
+            CorePluginUtils.evaluateTemplate(data, header.split(":")[1])));
         addBasicAuthHeaderIfConfigured(httpRequestBuilder);
 
         if (isSimulation(data) && simulationSafe && SIMULATION_UNSAFE_METHODS.contains(requestMethod)) {
@@ -176,7 +176,7 @@ public class HttpRequestAction extends BaseHttpAction {
                 responseData.put("headers", httpResponse.headers().map());
                 responseData.put("body", parseResponseBody(httpResponse));
 
-                data.put(CorePluginUtils.getString(data, targetKey), responseData);
+                data.put(CorePluginUtils.evaluateTemplate(data, targetKey), responseData);
             } catch (IOException e) {
                 throw new IgorException("Could not request URL: " + url, e);
             } catch (InterruptedException e) {

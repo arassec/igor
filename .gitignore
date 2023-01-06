@@ -62,6 +62,7 @@ documentation/docs/user/core
 documentation/docs/user/igor-plugin-core
 documentation/docs/user/igor-plugin-file
 documentation/docs/user/igor-plugin-message
+documentation/docs/user/igor-plugin-data
 e2e/cypress/screenshots
 e2e/cypress/videos
 e2e/debug.log

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests the {@link DuplicateAction}.
  */
-@DisplayName("'Duplicate action' tests.")
+@DisplayName("'Duplicate' action tests.")
 class DuplicateActionTest extends CoreActionBaseTest {
 
     /**

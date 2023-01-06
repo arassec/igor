@@ -83,6 +83,7 @@
         <module>igor-plugin-core</module>
         <module>igor-plugin-file</module>
         <module>igor-plugin-message</module>
+        <module>igor-plugin-data</module>
         <module>documentation</module>
         <module>web</module>
         <module>igor-spring-boot-starter</module>

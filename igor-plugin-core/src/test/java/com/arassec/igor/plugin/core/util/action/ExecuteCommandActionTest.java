@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests the {@link ExecuteCommandAction}.
  */
+@DisplayName("'Execute Command' action tests.")
 class ExecuteCommandActionTest {
 
     /**

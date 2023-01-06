@@ -67,8 +67,8 @@ public class FilterByRegExpAction extends BaseUtilAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        var resolvedInput = CorePluginUtils.getString(data, input);
-        var resolvedExpression = CorePluginUtils.getString(data, expression);
+        var resolvedInput = CorePluginUtils.evaluateTemplate(data, input);
+        var resolvedExpression = CorePluginUtils.evaluateTemplate(data, expression);
 
         if (resolvedInput == null || resolvedExpression == null) {
             log.debug("Missing required data for filtering: {} / {}", resolvedInput, resolvedExpression);

@@ -182,6 +182,38 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-resources-plugin-data</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>docs/user/igor-plugin-data</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../igor-plugin-data/src/main/resources/doc
+                                    </directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-plugin-data-gen</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>docs/user/igor-plugin-data</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../igor-plugin-data/src/main/resources/doc-gen
+                                    </directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 

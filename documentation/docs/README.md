@@ -50,13 +50,23 @@ Igor's web interface should now be available at: [http://localhost:8080](http://
 
 There are currently connectors for the following protocols and services:
 
-File Handling | Message Handling | Web
----|---|---
-FTP | RabbitMQ | HTTP(S)
-FTPS | E-Mail |
-Local Filesystem | | 
-SCP |  |
-SFTP | |
+* **File Handling**
+  * FTP
+  * FTPS
+  * Local
+  * SCP
+  * SFTP
+* **Messaging**
+  * RabbitMQ
+  * E-Mail
+* **Web**
+  * HTTP(S)
+* **Data**
+  * H2
+  * PostgreSQL
+  * Oracle
+  * IBM DB2
+  * Microsoft SQL Server
 
 # Contact
 You can contact me via e-mail under andreas.sensen@arassec.com
