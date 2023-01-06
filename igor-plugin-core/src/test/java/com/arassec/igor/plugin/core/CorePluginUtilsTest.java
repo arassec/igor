@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,17 +63,18 @@ class CorePluginUtilsTest {
     }
 
     /**
-     * Tests retrieving Strings from the supplied action data.
+     * Tests evaluating mustache templates against the supplied data.
      */
     @Test
-    @DisplayName("Tests retrieving Strings from the data.")
-    void testGetString() {
-        assertNull(CorePluginUtils.getString(null, "{{test}}"));
-        assertNull(CorePluginUtils.getString(testData, null));
-        assertEquals("original-input", CorePluginUtils.getString(testData, "original-input"));
-        assertEquals("job-id", CorePluginUtils.getString(testData, "{{" + DataKey.META.getKey() + "."
+    @DisplayName("Tests evaluating mustache templates against the supplied data.")
+    void testEvaluateTemplate() {
+        assertNull(CorePluginUtils.evaluateTemplate(null, "{{test}}"));
+        assertNull(CorePluginUtils.evaluateTemplate(testData, null));
+        assertEquals("original-input", CorePluginUtils.evaluateTemplate(testData, "original-input"));
+        assertEquals("job-id", CorePluginUtils.evaluateTemplate(testData, "{{" + DataKey.META.getKey() + "."
             + DataKey.JOB_ID.getKey() + "}}"));
-        assertEquals("1122334455", CorePluginUtils.getString(testData, "{{" + DataKey.TIMESTAMP.getKey() + "}}"));
+        assertEquals("1122334455", CorePluginUtils.evaluateTemplate(testData, "{{" + DataKey.TIMESTAMP.getKey() + "}}"));
+        assertEquals("path.to.key", CorePluginUtils.evaluateTemplate(testData, "path.to.key"));
     }
 
     /**
@@ -96,11 +98,77 @@ class CorePluginUtilsTest {
      */
     @Test
     @DisplayName("Tests converting a JSON string into a map.")
-    void testGetData() {
+    void testJsonToMap() {
         String json = "{\"a\": \"b\", \"c\": 23}";
-        Map<String, Object> data = CorePluginUtils.getData(json);
+        Map<String, Object> data = CorePluginUtils.jsonToMap(json);
         assertEquals("b", data.get("a"));
         assertEquals(23, data.get("c"));
+    }
+
+    /**
+     * Tests fault tolerance of adding a value to the supplied JSON object.
+     */
+    @Test
+    @DisplayName("Tests fault tolerance of adding a value to the supplied JSON object.")
+    void testPutValueFailsafe() {
+        CorePluginUtils.putValue(null, "data.key", "value");
+
+        Map<String, Object> data = new HashMap<>();
+        CorePluginUtils.putValue(data, null, "value");
+        assertTrue(data.isEmpty());
+        CorePluginUtils.putValue(data, "", "value");
+        assertTrue(data.isEmpty());
+
+        CorePluginUtils.putValue(data, "data.key", null);
+        assertTrue(data.isEmpty());
+    }
+
+    /**
+     * Tests adding a nested value to the supplied JSON object.
+     */
+    @Test
+    @DisplayName("Tests adding a nested value to the supplied JSON object.")
+    @SuppressWarnings("unchecked")
+    void testPutValue() {
+        Map<String, Object> data = new HashMap<>();
+
+        CorePluginUtils.putValue(data, "data.example.key", "value");
+
+        assertEquals("value",
+            ((Map<String, Object>) ((Map<String, Object>) data.get("data")).get("example")).get("key"));
+    }
+
+    /**
+     * Tests getting a value from the supplied JSON.
+     */
+    @Test
+    @DisplayName("Tests getting a value from the supplied JSON.")
+    void testGetValueFailsafe() {
+        assertTrue(CorePluginUtils.getValue(null, "data.key", String.class).isEmpty());
+        assertTrue(CorePluginUtils.getValue(Map.of(), "", String.class).isEmpty());
+        assertTrue(CorePluginUtils.getValue(Map.of(), null, String.class).isEmpty());
+        assertTrue(CorePluginUtils.getValue(Map.of(), "data.key", null).isEmpty());
+    }
+
+    /**
+     * "Tests getting a value from the supplied JSON."
+     */
+    @Test
+    @DisplayName("Tests getting a value from the supplied JSON.")
+    void testGetValue() {
+        Map<String, Object> example = new HashMap<>();
+        example.put("key", "value");
+
+        Map<String, Object> path = new HashMap<>();
+        path.put("example", example);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("path", path);
+
+        assertEquals("value",
+            CorePluginUtils.getValue(data, "path.example.key", String.class).orElseThrow());
+
+        assertTrue(CorePluginUtils.getValue(data, "path.example.key", Integer.class).isEmpty());
     }
 
 }

@@ -80,6 +80,10 @@ module.exports = {
                                 "igor-plugin-message/send-rabbitmq-message-action",
                                 "igor-plugin-message/send-email-message-action",
                                 "igor-plugin-message/receive-email-message-action",
+                                "igor-plugin-data/start-transaction-action",
+                                "igor-plugin-data/commit-transaction-action",
+                                "igor-plugin-data/query-data-action",
+                                "igor-plugin-data/execute-statement-action",
                             ],
                         },
                         {
@@ -95,6 +99,7 @@ module.exports = {
                                 "igor-plugin-message/rabbitmq-message-connector",
                                 "igor-plugin-message/email-imap-message-connector",
                                 "igor-plugin-message/email-smtp-message-connector",
+                                "igor-plugin-data/jdbc-datasource-connector",
                             ],
                         },
                     ],

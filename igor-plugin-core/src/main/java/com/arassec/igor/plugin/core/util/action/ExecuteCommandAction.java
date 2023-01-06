@@ -43,7 +43,7 @@ public class ExecuteCommandAction extends BaseAction {
      */
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
-        var resolvedCommand = CorePluginUtils.getString(data, command);
+        var resolvedCommand = CorePluginUtils.evaluateTemplate(data, command);
 
         Map<String, Object> commandExecution = new HashMap<>();
 

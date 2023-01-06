@@ -110,8 +110,8 @@ public class ReceiveEmailAction extends BaseAction {
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
         List<Map<String, Object>> result = new LinkedList<>();
 
-        var folder = CorePluginUtils.getString(data, folderName);
-        var attachmentTargetDirectory = CorePluginUtils.getString(data, attachmentDirectory);
+        var folder = CorePluginUtils.evaluateTemplate(data, folderName);
+        var attachmentTargetDirectory = CorePluginUtils.evaluateTemplate(data, attachmentDirectory);
 
         boolean markReadAfterProcessing = !deleteProcessed;
         if (isSimulation(data)) {

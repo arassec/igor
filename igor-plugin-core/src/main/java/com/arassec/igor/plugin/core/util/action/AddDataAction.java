@@ -75,7 +75,7 @@ public class AddDataAction extends BaseUtilAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        Map<String, Object> jsonData = CorePluginUtils.getData(CorePluginUtils.getString(data, json));
+        Map<String, Object> jsonData = CorePluginUtils.jsonToMap(CorePluginUtils.evaluateTemplate(data, json));
 
         var objectMapper = new ObjectMapper();
 

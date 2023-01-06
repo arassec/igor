@@ -105,4 +105,12 @@ class PrimitiveHtmlToMdConverterTest {
         assertEquals("previous \n\nparagraph-test\nfollowing", converter.convert("previous <p>paragraph-test</p>\n following"));
     }
 
+    /**
+     * Tests converting HTML lists.
+     */
+    @Test
+    @DisplayName("Tests converting HTML lists.")
+    void testConvertList() {
+        assertEquals("* first\n* second", converter.convert("<ul><li>first</li><li>second</li></ul>"));
+    }
 }

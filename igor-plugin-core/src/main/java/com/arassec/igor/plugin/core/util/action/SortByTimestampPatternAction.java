@@ -197,17 +197,17 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
     private ZonedDateTime extractDateTime(Map<String, Object> data, Pattern p, DateTimeFormatter formatter,
                                           boolean applyDefaultTimezone) {
 
-        var resolvedInput = CorePluginUtils.getString(data, input);
+        var resolvedInput = CorePluginUtils.evaluateTemplate(data, input);
         if (resolvedInput == null) {
             log.debug("Missing data to extract date-time: {}", input);
             return null;
         }
 
-        var rawValue = CorePluginUtils.getString(data, resolvedInput);
+        var rawValue = CorePluginUtils.evaluateTemplate(data, resolvedInput);
 
         Pattern pn = p;
         if (pn == null) {
-            var resolvedPattern = CorePluginUtils.getString(data, pattern);
+            var resolvedPattern = CorePluginUtils.evaluateTemplate(data, pattern);
             if (resolvedPattern == null) {
                 log.debug("Missing pattern to extract date-time: {}", pattern);
                 return null;
@@ -217,7 +217,7 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
 
         DateTimeFormatter df = formatter;
         if (df == null) {
-            var resolvedTimestampFormat = CorePluginUtils.getString(data, timestampFormat);
+            var resolvedTimestampFormat = CorePluginUtils.evaluateTemplate(data, timestampFormat);
             if (resolvedTimestampFormat == null) {
                 log.debug("Missing timestamp format to extract date-time: {}", timestampFormat);
                 return null;

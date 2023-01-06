@@ -115,9 +115,9 @@ public class FilterByTimestampAction extends BaseUtilAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        var resolvedInput = CorePluginUtils.getString(data, input);
-        var resolvedTimeUnit = CorePluginUtils.getString(data, timeUnit);
-        var resolvedTimestampFormat = CorePluginUtils.getString(data, timestampFormat);
+        var resolvedInput = CorePluginUtils.evaluateTemplate(data, input);
+        var resolvedTimeUnit = CorePluginUtils.evaluateTemplate(data, timeUnit);
+        var resolvedTimestampFormat = CorePluginUtils.evaluateTemplate(data, timestampFormat);
 
         if (resolvedInput == null || resolvedTimeUnit == null || resolvedTimestampFormat == null) {
             log.debug("Missing required data for filtering: {} / {} / {}", resolvedInput, resolvedTimeUnit, resolvedTimestampFormat);

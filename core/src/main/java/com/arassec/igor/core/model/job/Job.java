@@ -231,15 +231,21 @@ public class Job {
      * @param jobExecution Container for execution information.
      */
     private void shutdown(JobExecution jobExecution) {
-        if (!actions.isEmpty()) {
-            actions.stream().filter(Action::isActive).forEach(action -> {
-                IgorConnectorUtil.shutdownConnectors(action, jobExecution);
-                action.shutdown(jobExecution);
-            });
-        }
-        if (trigger != null) {
-            IgorConnectorUtil.shutdownConnectors(trigger, jobExecution);
-            trigger.shutdown(jobExecution);
+        try {
+            if (!actions.isEmpty()) {
+                actions.stream().filter(Action::isActive).forEach(action -> {
+                    IgorConnectorUtil.shutdownConnectors(action, jobExecution);
+                    action.shutdown(jobExecution);
+                });
+            }
+            if (trigger != null) {
+                IgorConnectorUtil.shutdownConnectors(trigger, jobExecution);
+                trigger.shutdown(jobExecution);
+            }
+        } catch (Exception e) {
+            log.error("Exception during job shutdown!", e);
+            currentJobExecution.fail(e);
+
         }
     }
 

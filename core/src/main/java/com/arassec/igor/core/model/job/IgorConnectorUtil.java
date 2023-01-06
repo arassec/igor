@@ -74,11 +74,11 @@ public class IgorConnectorUtil {
                     field.setAccessible(true); //NOSONAR - @IgorParam-fields must not necessarily be accessible!
                 }
                 Object value = field.get(igorComponent);
-                if (value instanceof Connector) {
+                if (value instanceof Connector connector) {
                     if (initialize) {
-                        ((Connector) value).initialize(jobExecution);
+                        connector.initialize(jobExecution);
                     } else {
-                        ((Connector) value).shutdown(jobExecution);
+                        connector.shutdown(jobExecution);
                     }
                 }
             } catch (IllegalAccessException e) {

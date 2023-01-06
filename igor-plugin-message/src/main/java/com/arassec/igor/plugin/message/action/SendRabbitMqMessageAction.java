@@ -137,7 +137,7 @@ public class SendRabbitMqMessageAction extends BaseAction {
     @Override
     public List<Map<String, Object>> process(Map<String, Object> data, JobExecution jobExecution) {
 
-        var content = CorePluginUtils.getString(data, messageTemplate);
+        var content = CorePluginUtils.evaluateTemplate(data, messageTemplate);
 
         var message = new RabbitMqMessage();
         message.setContentType(contentType);

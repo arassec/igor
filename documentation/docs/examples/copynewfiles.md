@@ -125,7 +125,7 @@ During the next job run, those filenames will then be filtered and the files won
 ::: v-pre
 The **'Persist Value' action** stores a value from the data item in igor's datastore.
 As input parameter we set the data item's filename by configuring `{{data.filename}}`.
-Since we don't want to store an unbounded number of values in igor's datastore, we limit the number of filenames to keep to `5000`.
+Since we don't want to store an unbounded number of values in igor's datastore, we limit the number of filenames to keep in this example to `1`.
 This value has to be adopted according to the number of files on the server and how often filenames might e.g. get recycled.
 The action configuration looks like this:
 :::

@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
+import org.jsoup.select.Elements;
 import org.springframework.util.StringUtils;
 
 import java.util.stream.Collectors;
@@ -63,6 +64,7 @@ public class PrimitiveHtmlToMdConverter {
                 case "table" -> convertTable(element, result);
                 case "pre" -> convertPreformatted(element, result);
                 case "p" -> convertParagraph(element, result);
+                case "ul" -> convertList(element, result);
                 default -> log.info("Element {} not supported for markdown conversion!", element.tagName());
 
             }
@@ -192,6 +194,22 @@ public class PrimitiveHtmlToMdConverter {
     private void convertParagraph(Element element, StringBuilder target) {
         target.append("\n\n");
         element.childNodes().forEach(childNode -> target.append(processNode(childNode)));
+        target.append("\n");
+    }
+
+    /**
+     * Converts a HTML list into a markdown list.
+     *
+     * @param element The "ul" element from the HTML list.
+     * @param target The {@link StringBuilder} containing the target markdown.
+     */
+    private void convertList(Element element, StringBuilder target) {
+        Elements listElements = element.getElementsByTag("li");
+        listElements.eachText().forEach(text -> {
+            target.append("* ");
+            target.append(text);
+            target.append("\n");
+        });
         target.append("\n");
     }
 
