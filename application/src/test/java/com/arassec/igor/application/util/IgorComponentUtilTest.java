@@ -62,7 +62,7 @@ class IgorComponentUtilTest {
     /**
      * A component for testing.
      */
-    @IgorComponent(typeId = "test-type-id", categoryId = "test-category-id")
+    @IgorComponent(categoryId = "test-category-id", typeId = "test-type-id")
     private static class TestComponent extends BaseTrigger {
     }
 

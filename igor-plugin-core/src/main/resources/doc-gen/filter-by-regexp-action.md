@@ -3,6 +3,7 @@
 ## Description
 This action filters data items by evaluating a regular expression against a property value of the data item.
 
+
 If the regular expression matches, the data item is passed to the following action. Otherwise the data item is filtered and not passed to the following action. 
 
 ## Regular Expressions

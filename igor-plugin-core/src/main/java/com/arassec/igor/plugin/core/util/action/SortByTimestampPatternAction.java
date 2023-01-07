@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -77,7 +78,7 @@ import java.util.regex.Pattern;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "sort-by-timestamp-pattern-action", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.SORT_BY_TIMESTAMP_PATTERN_ACTION)
 public class SortByTimestampPatternAction extends BaseUtilAction {
 
     /**
@@ -121,7 +122,6 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      *
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
-     *
      * @return Always an empty list.
      */
     @Override
@@ -176,7 +176,6 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * Checks if a configured value is a mustache template or not.
      *
      * @param input The input to check.
-     *
      * @return {@code true} if the input is a mustache template, {@code false} otherwise.
      */
     private boolean isTemplate(String input) {
@@ -191,7 +190,6 @@ public class SortByTimestampPatternAction extends BaseUtilAction {
      * @param formatter            The {@link ZonedDateTime} for the supplied String.
      * @param applyDefaultTimezone Set to {@code true}, if the format is in {@link LocalDateTime} and the system's default time
      *                             zone must be applied to the result.
-     *
      * @return The {@link ZonedDateTime} or {@code null}, if none could be extracted.
      */
     private ZonedDateTime extractDateTime(Map<String, Object> data, Pattern p, DateTimeFormatter formatter,

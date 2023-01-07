@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.data.DataType;
 import com.arassec.igor.plugin.data.connector.JdbcDatasourceConnector;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +25,7 @@ import java.util.UUID;
  */
 @Getter
 @Setter
-@IgorComponent(categoryId = CoreCategory.DATA, typeId = "execute-statement-action")
+@IgorComponent(categoryId = CoreCategory.DATA, typeId = DataType.EXECUTE_STATEMENT_ACTION)
 public class ExecuteStatementAction extends BaseDataAction {
 
     /**

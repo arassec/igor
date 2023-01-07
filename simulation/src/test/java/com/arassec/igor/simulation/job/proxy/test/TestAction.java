@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * An action for testing.
  */
-@IgorComponent(typeId = "test-action-type", categoryId = "test-action-category")
+@IgorComponent(categoryId = "test-action-category", typeId = "test-action-type")
 public class TestAction extends BaseAction {
 
     /**

@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.WorkInProgressMonitor;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CoreType;
 import com.arassec.igor.plugin.core.file.connector.BaseFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileInfo;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
@@ -32,7 +33,7 @@ import java.util.stream.Stream;
  * igor server.
  */
 @Slf4j
-@IgorComponent(typeId = "localfs-file-connector", categoryId = CoreCategory.FILE)
+@IgorComponent(categoryId = CoreCategory.FILE, typeId = CoreType.LOCAL_FS_CONNECTOR)
 public class LocalFilesystemFileConnector extends BaseFileConnector {
 
     /**

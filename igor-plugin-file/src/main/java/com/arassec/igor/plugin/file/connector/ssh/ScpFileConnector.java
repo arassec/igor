@@ -8,6 +8,7 @@ import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.file.connector.FileInfo;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
+import com.arassec.igor.plugin.file.FileType;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
@@ -30,7 +31,7 @@ import java.util.List;
  * A file-connector that connects to an SCP server.
  */
 @Slf4j
-@IgorComponent(typeId = "scp-file-connector", categoryId = CoreCategory.FILE)
+@IgorComponent(categoryId = CoreCategory.FILE, typeId = FileType.SCP_CONNECTOR)
 public class ScpFileConnector extends BaseSshFileConnector {
 
     /**
@@ -38,9 +39,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
      *
      * @param in  The InputStream to read.
      * @param log Will be filled with an error message from the server if the command was not successful.
-     *
      * @return The result of the last SSH command.
-     *
      * @throws IOException In case of errors.
      */
     private static int checkAck(InputStream in, StringBuilder log) throws IOException {
@@ -78,8 +77,8 @@ public class ScpFileConnector extends BaseSshFileConnector {
         try {
             StringBuilder result = execute(command);
             return Arrays.stream(result.toString().split("\n")).skip(numResultsToSkip)
-                    .map(lsResult -> new FileInfo(extractFilename(lsResult), extractLastModified(lsResult)))
-                    .toList();
+                .map(lsResult -> new FileInfo(extractFilename(lsResult), extractLastModified(lsResult)))
+                .toList();
         } catch (IgorException e) {
             if (StringUtils.hasText(fileEnding) && e.getMessage().contains("No such file or directory")) {
                 return new LinkedList<>();
@@ -97,7 +96,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
         var fileStreamData = readStream(file);
         try (var outputStream = new ByteArrayOutputStream()) {
             copyStream(fileStreamData.getData(), outputStream, fileStreamData.getFileSize(), new WorkInProgressMonitor(),
-                    JobExecution.builder().executionState(JobExecutionState.RUNNING).build());
+                JobExecution.builder().executionState(JobExecutionState.RUNNING).build());
             outputStream.flush();
             return outputStream.toString();
         } catch (IOException e) {
@@ -244,7 +243,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
     public void finalizeStream(FileStreamData fileStreamData) {
         if (fileStreamData.getSourceConnectionData() instanceof SshConnectionData sshConnectionData) {
             finalizeStreams(sshConnectionData.getSession(), sshConnectionData.getChannel(), sshConnectionData.getSshOutputStream(),
-                    sshConnectionData.getSshInputStream());
+                sshConnectionData.getSshInputStream());
         }
     }
 
@@ -278,7 +277,6 @@ public class ScpFileConnector extends BaseSshFileConnector {
      * is not desired for igor.
      *
      * @param input The file name from the 'ls' command.
-     *
      * @return The sanitized file name.
      */
     private String extractFilename(String input) {
@@ -297,7 +295,6 @@ public class ScpFileConnector extends BaseSshFileConnector {
      * This method extracts the timestamp relevant fields from the string and returns the formatted result.
      *
      * @param input One output line from the 'ls' command.
-     *
      * @return The extracted timestamp or {@code null}, if none could be extracted.
      */
     @SuppressWarnings("squid:S4784") // Using RegExps is OK...
@@ -319,7 +316,7 @@ public class ScpFileConnector extends BaseSshFileConnector {
 
         if (yearPart != null && timePart != null && timezonePart != null) {
             return yearPart + "T" + timePart.substring(0, 8) + "+" + timezonePart.substring(1, 3) + ":" + timezonePart
-                    .substring(3, 5);
+                .substring(3, 5);
         }
 
         return null;
@@ -357,7 +354,6 @@ public class ScpFileConnector extends BaseSshFileConnector {
      * Executes the supplied shell command on the remote SSH server and returns the output as StringBuffer.
      *
      * @param command The shell command to execute.
-     *
      * @return The command's output.
      */
     private StringBuilder execute(String command) {
@@ -408,7 +404,6 @@ public class ScpFileConnector extends BaseSshFileConnector {
      * @param channel     The execution channel.
      * @param in          The SSH input stream from the server.
      * @param errorStream The SSH error stream.
-     *
      * @return {@code true}, if the exeuction should be stopped, {@code false} otherwise.
      */
     private boolean shouldExecutionStop(ChannelExec channel, InputStream in, ByteArrayOutputStream errorStream) throws IOException {
@@ -418,8 +413,8 @@ public class ScpFileConnector extends BaseSshFileConnector {
             }
             if (channel.getExitStatus() != 0) {
                 throw new IgorException(
-                        "Exit status != 0 received: " + channel.getExitStatus() + "\n(" + errorStream.toString()
-                                .replace("\n", "") + ")");
+                    "Exit status != 0 received: " + channel.getExitStatus() + "\n(" + errorStream.toString()
+                        .replace("\n", "") + ")");
             }
             return true;
         }

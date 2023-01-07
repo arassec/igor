@@ -3,11 +3,17 @@
 ## Description
 The CRON trigger runs a job periodically according to its cron expression. Just like the UNIX cron daemon does.
 
-A CRON expression consists of six fields: `second, minute, hour, day, month, weekday`
+
+A CRON expression consists of six fields: 
+`second, minute, hour, day, month, weekday`
+
 
 Month and weekday names can be given as the first three letters of the English names.
 
+
+
 The following special characters can be used in a CRON expression:
+
 
 character | means | explanation | example | 
 :---|:---|:---|:---

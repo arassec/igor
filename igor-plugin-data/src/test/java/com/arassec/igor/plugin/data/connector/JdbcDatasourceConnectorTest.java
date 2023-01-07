@@ -4,7 +4,7 @@ package com.arassec.igor.plugin.data.connector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.util.IgorException;
-import com.arassec.igor.plugin.data.util.JdbcDatasourceUtil;
+import com.arassec.igor.plugin.data.connector.util.JdbcDatasourceUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

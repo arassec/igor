@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileInfo;
@@ -42,7 +43,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
-@IgorComponent(typeId = "list-files-action", categoryId = CoreCategory.FILE)
+@IgorComponent(categoryId = CoreCategory.FILE, typeId = CoreType.LIST_FILES_ACTION)
 public class ListFilesAction extends BaseFileAction {
 
     /**

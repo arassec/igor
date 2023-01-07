@@ -8,6 +8,7 @@ import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,14 +23,15 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
 
+
 /**
  * <h2>'HTTP Request' Action</h2>
  *
  * <h3>Description</h3>
  * This action issues HTTP requests against web servers.<br>
- *
+ * <p>
  * The action adds the results of the request to the data item under the 'webResponse' key.<br>
- *
+ * <p>
  * A data item processed by this action could look like this:
  * <pre><code>
  * {
@@ -76,7 +78,8 @@ import java.util.*;
  */
 @Getter
 @Setter
-@IgorComponent(typeId = "http-request-action", categoryId = CoreCategory.WEB)
+@SuppressWarnings("JavadocLinkAsPlainText") // The link in the example JSON above should be in plain text...
+@IgorComponent(categoryId = CoreCategory.WEB, typeId = CoreType.HTTP_REQUEST_ACTION)
 public class HttpRequestAction extends BaseHttpAction {
 
     /**
@@ -192,7 +195,6 @@ public class HttpRequestAction extends BaseHttpAction {
      * Tries to parse the response body as JSON and returns it if possible.
      *
      * @param httpResponse The received HTTP response.
-     *
      * @return The
      */
     private Object parseResponseBody(HttpResponse<String> httpResponse) {

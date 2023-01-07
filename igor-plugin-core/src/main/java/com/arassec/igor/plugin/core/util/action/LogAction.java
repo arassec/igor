@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CoreType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.samskivert.mustache.Mustache;
@@ -28,7 +29,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "log-action", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.LOG_ACTION)
 public class LogAction extends BaseAction {
 
     /**
@@ -65,7 +66,6 @@ public class LogAction extends BaseAction {
      *
      * @param data         The data the action will work with.
      * @param jobExecution The job's execution log.
-     *
      * @return Always the supplied data item.
      */
     @Override
@@ -92,21 +92,11 @@ public class LogAction extends BaseAction {
         }
 
         switch (level) {
-            case "error":
-                log.error(resolvedMessage);
-                break;
-            case "warn":
-                log.warn(resolvedMessage);
-                break;
-            case "info":
-                log.info(resolvedMessage);
-                break;
-            case "debug":
-                log.debug(resolvedMessage);
-                break;
-            default:
-                log.trace(resolvedMessage);
-                break;
+            case "error" -> log.error(resolvedMessage);
+            case "warn" -> log.warn(resolvedMessage);
+            case "info" -> log.info(resolvedMessage);
+            case "debug" -> log.debug(resolvedMessage);
+            default -> log.trace(resolvedMessage);
         }
 
         return List.of(data);

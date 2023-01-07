@@ -3,9 +3,13 @@
 ## Description
 This action issues HTTP requests against web servers.
 
+
 The action adds the results of the request to the data item under the 'webResponse' key.
 
+
+
 A data item processed by this action could look like this: 
+
 ```
 {
   "data": {},

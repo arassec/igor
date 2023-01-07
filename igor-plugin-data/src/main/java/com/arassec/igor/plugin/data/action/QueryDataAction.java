@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.data.DataType;
 import com.arassec.igor.plugin.data.connector.JdbcDatasourceConnector;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -46,7 +47,7 @@ import java.util.UUID;
  */
 @Getter
 @Setter
-@IgorComponent(categoryId = CoreCategory.DATA, typeId = "query-data-action")
+@IgorComponent(categoryId = CoreCategory.DATA, typeId = DataType.QUERY_DATA_ACTION)
 public class QueryDataAction extends BaseDataAction {
 
     /**

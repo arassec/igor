@@ -7,13 +7,14 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.message.MessageType;
 import com.arassec.igor.plugin.message.connector.EmailImapMessageConnector;
+import jakarta.mail.MessagingException;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.mail.MessagingException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
-@IgorComponent(typeId = "receive-email-message-action", categoryId = CoreCategory.MESSAGE)
+@IgorComponent(categoryId = CoreCategory.MESSAGE, typeId = MessageType.RECEIVE_EMAIL_ACTION)
 public class ReceiveEmailAction extends BaseAction {
 
     /**

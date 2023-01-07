@@ -7,6 +7,7 @@ import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.file.connector.FileInfo;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
+import com.arassec.igor.plugin.file.FileType;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
@@ -27,7 +28,7 @@ import java.util.Vector;
  * A file-connector that connects to an SFTP server.
  */
 @Slf4j
-@IgorComponent(typeId = "sftp-file-connector", categoryId = CoreCategory.FILE)
+@IgorComponent(categoryId = CoreCategory.FILE, typeId = FileType.SFTP_CONNECTOR)
 public class SftpFileConnector extends BaseSshFileConnector {
 
     /**
@@ -49,7 +50,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
             channel.disconnect();
             session.disconnect();
             return files.stream().map(lsEntry -> new FileInfo(lsEntry.getFilename(),
-                    formatInstant(Instant.ofEpochMilli(lsEntry.getAttrs().getMTime() * 1000L)))).toList();
+                formatInstant(Instant.ofEpochMilli(lsEntry.getAttrs().getMTime() * 1000L)))).toList();
         } catch (JSchException | SftpException e) {
             throw new IgorException("Could not list files via SFTP!", e);
         }
@@ -120,7 +121,7 @@ public class SftpFileConnector extends BaseSshFileConnector {
             ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
             channel.put(fileStreamData.getData(), file,
-                    new IgorSftpProgressMonitor(fileStreamData.getFileSize(), workInProgressMonitor, jobExecution), ChannelSftp.OVERWRITE);
+                new IgorSftpProgressMonitor(fileStreamData.getFileSize(), workInProgressMonitor, jobExecution), ChannelSftp.OVERWRITE);
             channel.disconnect();
             session.disconnect();
         } catch (JobCancelledException e) {
@@ -195,7 +196,6 @@ public class SftpFileConnector extends BaseSshFileConnector {
      *
      * @param source The source file to move.
      * @param target The target file name.
-     *
      * @throws JSchException In case of SSH protocol errors.
      * @throws SftpException In case of SFTP errors.
      */

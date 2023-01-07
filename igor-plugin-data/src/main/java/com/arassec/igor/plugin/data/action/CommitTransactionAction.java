@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.data.DataType;
 import com.arassec.igor.plugin.data.connector.JdbcDatasourceConnector;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +24,7 @@ import java.util.UUID;
  */
 @Getter
 @Setter
-@IgorComponent(categoryId = CoreCategory.DATA, typeId = "commit-transaction-action")
+@IgorComponent(categoryId = CoreCategory.DATA, typeId = DataType.COMMIT_TRANSACTION_ACTION)
 public class CommitTransactionAction extends BaseDataAction {
 
     /**

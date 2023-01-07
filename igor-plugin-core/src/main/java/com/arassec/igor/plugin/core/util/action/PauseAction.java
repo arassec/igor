@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.action.BaseAction;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CoreType;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
@@ -27,7 +28,7 @@ import java.util.Random;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "pause-action", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.PAUSE_ACTION)
 public class PauseAction extends BaseAction {
 
     /**
@@ -62,7 +63,6 @@ public class PauseAction extends BaseAction {
      *
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
-     *
      * @return The supplied data item.
      */
     @Override

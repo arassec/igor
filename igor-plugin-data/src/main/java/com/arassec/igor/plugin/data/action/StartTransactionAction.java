@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.data.DataType;
 import com.arassec.igor.plugin.data.connector.JdbcDatasourceConnector;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +16,6 @@ import lombok.Setter;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * <h2>'Start Transaction' Action</h2>
@@ -29,7 +29,7 @@ import java.util.function.Consumer;
  */
 @Getter
 @Setter
-@IgorComponent(categoryId = CoreCategory.DATA, typeId = "start-transaction-action")
+@IgorComponent(categoryId = CoreCategory.DATA, typeId = DataType.START_TRANSACTION_ACTION)
 public class StartTransactionAction extends BaseDataAction {
 
     /**

@@ -4,6 +4,7 @@ import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.trigger.BaseEventTrigger;
 import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CoreType;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -57,7 +58,8 @@ import lombok.extern.slf4j.Slf4j;
  * number of data items to sort.
  */
 @Slf4j
-@IgorComponent(typeId = "web-hook-trigger", categoryId = CoreCategory.WEB)
+@SuppressWarnings("JavadocLinkAsPlainText") // The link in the example JSON above should be in plain text...
+@IgorComponent(categoryId = CoreCategory.WEB, typeId = CoreType.WEB_HOOK_TRIGGER)
 public class WebHookTrigger extends BaseEventTrigger {
 
     /**

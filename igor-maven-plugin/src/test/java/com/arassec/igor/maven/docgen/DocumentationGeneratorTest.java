@@ -58,7 +58,7 @@ class DocumentationGeneratorTest {
         when(igorParamsMdDocGenerator.generateDocumentation(any(ClassOrInterfaceDeclaration.class),
             eq("maven-plugin-test-type-id"))).thenReturn("generated-parameter-doc");
 
-        documentationGenerator.generateDoc(Path.of("."), "src/test/java/com/arassec/igor/maven/test/sources", "/target/gen-docs", "/target/docs");
+        documentationGenerator.generateDoc(Path.of("."), "src/test/java", "/target/gen-docs", "/target/docs");
 
         String result = Files.readString(targetFile);
         assertEquals("generated-component-doc\ngenerated-parameter-doc", result);

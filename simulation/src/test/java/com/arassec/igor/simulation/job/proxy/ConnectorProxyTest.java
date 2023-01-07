@@ -86,7 +86,7 @@ class ConnectorProxyTest {
 
     @Getter
     @Setter
-    @IgorComponent(typeId = "simulation-test-type", categoryId = "simulation-test-category")
+    @IgorComponent(categoryId = "simulation-test-category", typeId = "simulation-test-type")
     private static class TestConnector extends BaseConnector implements Connector {
 
         /**

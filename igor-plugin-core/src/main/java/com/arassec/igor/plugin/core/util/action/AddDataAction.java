@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import com.arassec.igor.plugin.core.validation.ValidJsonObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -58,7 +59,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
-@IgorComponent(typeId = "add-data-action", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.ADD_DATA_ACTION)
 public class AddDataAction extends BaseUtilAction {
 
     /**

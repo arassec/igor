@@ -12,10 +12,17 @@ import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,34 +77,41 @@ public class DocumentationGenerator {
 
         igorParamsMdDocGenerator.initialize(projectRoot, sourcesDir, PluginConstants.I18N_SOURCES, new IgorComponentUtil());
 
-        getSourceFiles(Paths.get(projectRoot.toString(), sourcesDir))
-            .forEach(file -> {
-                var parserConfiguration = new ParserConfiguration();
-                parserConfiguration.setSymbolResolver(new JavaSymbolSolver(new JavaParserTypeSolver(Paths.get(projectRoot.toString(), sourcesDir))));
-                try {
-                    var javaParser = new JavaParser(parserConfiguration);
-                    ParseResult<CompilationUnit> result = javaParser.parse(file);
+        var srcDir = Paths.get(projectRoot.toString(), sourcesDir);
 
-                    var compilationUnit = result.getResult().orElseThrow();
-                    var igorComponentCollector = new IgorComponentCollector(file, result);
-                    igorComponentCollector.visit(compilationUnit, null);
-                    igorComponentCollector.getIgorComponents().forEach((classDeclaration, typeId) -> {
+        CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
+        combinedTypeSolver.add(new ReflectionTypeSolver());
+        combinedTypeSolver.add(new JavaParserTypeSolver(srcDir));
+        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(combinedTypeSolver);
 
-                        checkErrors(file, result, projectRoot, docTargetDir, typeId);
+        var parserConfiguration = new ParserConfiguration();
+        parserConfiguration.setSymbolResolver(symbolSolver);
+        var javaParser = new JavaParser(parserConfiguration);
 
-                        StringBuilder documentation = new StringBuilder();
+        getSourceFiles(srcDir).forEach(file -> {
+            try {
+                ParseResult<CompilationUnit> result = javaParser.parse(file);
 
-                        classDeclaration.getJavadoc()
-                            .ifPresent(javadoc -> documentation.append(primitiveHtmlToMdConverter.convert(javadoc.toText())));
+                var compilationUnit = result.getResult().orElseThrow();
+                var igorComponentCollector = new IgorComponentCollector(file, result, combinedTypeSolver);
+                igorComponentCollector.visit(compilationUnit, null);
+                igorComponentCollector.getIgorComponents().forEach((classDeclaration, typeId) -> {
 
-                        documentation.append(igorParamsMdDocGenerator.generateDocumentation(classDeclaration, typeId));
+                    checkErrors(file, result, projectRoot, docTargetDir, typeId);
 
-                        createDocFile(projectRoot, docGenTargetDir, typeId, documentation.toString());
-                    });
-                } catch (IOException e) {
-                    throw new IgorException("Could not parse java file!", e);
-                }
-            });
+                    StringBuilder documentation = new StringBuilder();
+
+                    classDeclaration.getJavadoc()
+                        .ifPresent(javadoc -> documentation.append(primitiveHtmlToMdConverter.convert(javadoc.toText())));
+
+                    documentation.append(igorParamsMdDocGenerator.generateDocumentation(classDeclaration, typeId));
+
+                    createDocFile(projectRoot, docGenTargetDir, typeId, documentation.toString());
+                });
+            } catch (IOException e) {
+                throw new IgorException("Could not parse java file!", e);
+            }
+        });
 
         igorParamsMdDocGenerator.teardown();
     }
@@ -182,6 +196,12 @@ public class DocumentationGenerator {
         private final ParseResult<CompilationUnit> parseResult;
 
         /**
+         * Type solver for analyzing parsed source files.
+         */
+        @Getter
+        private final CombinedTypeSolver combinedTypeSolver;
+
+        /**
          * Contains all found igor components together with their respective Type-ID.
          */
         @Getter
@@ -199,7 +219,23 @@ public class DocumentationGenerator {
                 .flatMap(normalExpression -> ((NormalAnnotationExpr) normalExpression).getPairs().stream())
                 .filter(memberValuePair -> memberValuePair.getName().asString().equals(IgorComponent.TYPE_ID))
                 .findFirst()
-                .ifPresent(memberValuePair -> igorComponents.put(n, memberValuePair.getValue().asStringLiteralExpr().asString()));
+                .ifPresent(memberValuePair -> {
+                    if (memberValuePair.getValue() instanceof FieldAccessExpr fieldAccessExpr) {
+                        String typeClassName = fieldAccessExpr.getScope().asNameExpr().getNameAsString();
+                        parseResult.ifSuccessful(cu -> {
+                            String qualifiedTypeClassName = cu.getImports().stream()
+                                .map(NodeWithName::getNameAsString)
+                                .filter(importStatement -> importStatement.endsWith(typeClassName))
+                                .findFirst().orElseThrow(() -> new IgorException("Could not find Import for type ID resolution. Please avoid asterisks in class imports when generating igor component documentation."));
+                            ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = combinedTypeSolver.solveType(qualifiedTypeClassName);
+                            JavaParserFieldDeclaration javaParserFieldDeclaration = (JavaParserFieldDeclaration) resolvedReferenceTypeDeclaration.getField(fieldAccessExpr.getNameAsString());
+                            StringLiteralExpr expression = javaParserFieldDeclaration.getVariableDeclarator().getInitializer().orElseThrow().asStringLiteralExpr();
+                            igorComponents.put(n, expression.getValue());
+                        });
+                    } else {
+                        igorComponents.put(n, memberValuePair.getValue().asStringLiteralExpr().asString());
+                    }
+                });
         }
     }
 

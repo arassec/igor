@@ -3,9 +3,13 @@
 ## Description
 This action Downloads a file from an HTTP(S) server and stores it in the target's filesystem.
 
+
 The action adds data about the downloaded file to the data item under the 'downloadedFile' key.
 
+
+
 A data item processed by this action could look like this: 
+
 ```
 {
   "data": {},

@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
@@ -24,7 +25,7 @@ import java.util.Map;
  *
  * <h3>Description</h3>
  * This action filters data items by comparing a timestamp from the input against a configured time span.<br>
- *
+ * <p>
  * Filtered data items are not passed to following actions.
  *
  * <h3>Filtering Epoch Timestamps</h3>
@@ -49,7 +50,7 @@ import java.util.Map;
 @Slf4j
 @Setter
 @Getter
-@IgorComponent(typeId = "filter-by-timestamp-action", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.FILTER_BY_TIMESTAMP_ACTION)
 public class FilterByTimestampAction extends BaseUtilAction {
 
     /**
@@ -108,7 +109,6 @@ public class FilterByTimestampAction extends BaseUtilAction {
      *
      * @param data         The data the action will work with.
      * @param jobExecution The job's execution log.
-     *
      * @return The supplied data, if the timestamp under the configured {@link #input} matches the configured criteria. {@code
      * null} otherwise.
      */

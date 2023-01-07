@@ -8,6 +8,7 @@ import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CoreDataKey;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import jakarta.validation.constraints.NotBlank;
@@ -53,7 +54,7 @@ import java.util.Map;
 @Slf4j
 @Setter
 @Getter
-@IgorComponent(typeId = "copy-file-action", categoryId = CoreCategory.FILE)
+@IgorComponent(categoryId = CoreCategory.FILE, typeId = CoreType.COPY_FILE_ACTION)
 public class CopyFileAction extends BaseFileAction {
 
     /**

@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,7 @@ import java.util.Map;
  *
  * <h3>Description</h3>
  * This action filters data items by evaluating a regular expression against a property value of the data item.<br>
- *
+ * <p>
  * If the regular expression matches, the data item is passed to the following action. Otherwise the data item is filtered and not
  * passed to the following action.
  *
@@ -30,7 +31,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "filter-by-regexp-action", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.FILTER_BY_REGEXP_ACTION)
 public class FilterByRegExpAction extends BaseUtilAction {
 
     /**
@@ -60,7 +61,6 @@ public class FilterByRegExpAction extends BaseUtilAction {
      *
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
-     *
      * @return The supplied data, if the value under the configured {@link #input} matches the regular expresion. {@code null}
      * otherwise.
      */

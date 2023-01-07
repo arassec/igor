@@ -4,6 +4,7 @@ import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CoreType;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import jakarta.validation.constraints.NotBlank;
@@ -39,7 +40,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "read-file-action", categoryId = CoreCategory.FILE)
+@IgorComponent(categoryId = CoreCategory.FILE, typeId = CoreType.READ_FILE_ACTION)
 public class ReadFileAction extends BaseFileAction {
 
     /**

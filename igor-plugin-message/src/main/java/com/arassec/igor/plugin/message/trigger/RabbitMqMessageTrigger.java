@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.trigger.BaseEventTrigger;
 import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.message.MessageType;
 import com.arassec.igor.plugin.message.connector.RabbitMqMessageConnector;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -32,7 +33,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
-@IgorComponent(typeId = "rabbitmq-message-trigger", categoryId = CoreCategory.MESSAGE)
+@IgorComponent(categoryId = CoreCategory.MESSAGE, typeId = MessageType.RABBITMQ_TRIGGER)
 public class RabbitMqMessageTrigger extends BaseEventTrigger {
 
     /**

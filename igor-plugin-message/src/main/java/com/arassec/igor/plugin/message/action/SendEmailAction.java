@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.message.MessageType;
 import com.arassec.igor.plugin.message.connector.EmailSmtpMessageConnector;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -59,7 +60,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @Setter
-@IgorComponent(typeId = "send-email-message-action", categoryId = CoreCategory.MESSAGE)
+@IgorComponent(categoryId = CoreCategory.MESSAGE, typeId = MessageType.SEND_EMAIL_ACTION)
 public class SendEmailAction extends BaseAction {
 
     /**

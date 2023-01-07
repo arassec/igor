@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,18 +20,18 @@ import java.util.Map;
  *
  * <h3>Description</h3>
  * This action duplicates each processed data item by the configured amount.<br>
- *
+ * <p>
  * The index of the duplicated data item is added to the result under the key 'index'.
  *
  * <h3>Examples</h3>
  * The configured amount will be the result size of the data items created by the action.<br>
- *
+ * <p>
  * E.g. a configuration of 1 will result in the data item being passed through, a configuration of 2 will result in a duplication
  * of the processed data item, and so on...
  */
 @Getter
 @Setter
-@IgorComponent(typeId = "duplicate-action", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.DUPLICATE_ACTION)
 public class DuplicateAction extends BaseAction {
 
     /**

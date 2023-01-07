@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.job.misc.PersistentValue;
 import com.arassec.igor.core.repository.PersistentValueRepository;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,13 +21,13 @@ import java.util.Map;
  *
  * <h3>Description</h3>
  * This action filters data items based on values from igor's datastore.<br>
- *
+ * <p>
  * Filtered data items are not passed to the following action.
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "filter-persisted-value-action", categoryId = CoreCategory.PERSISTENCE)
+@IgorComponent(categoryId = CoreCategory.PERSISTENCE, typeId = CoreType.FILTER_PERSISTED_VALUE_ACTION)
 public class FilterPersistedValueAction extends BasePersistenceAction {
 
     /**
@@ -52,7 +53,6 @@ public class FilterPersistedValueAction extends BasePersistenceAction {
      *
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
-     *
      * @return The manipulated data.
      */
     @Override

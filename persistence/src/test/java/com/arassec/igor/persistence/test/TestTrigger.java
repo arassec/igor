@@ -6,7 +6,7 @@ import com.arassec.igor.core.model.trigger.BaseTrigger;
 /**
  * A trigger to test object mapping. This trigger has no parameters, which must be handled safely during object mapping.
  */
-@IgorComponent(typeId = "trigger-type-id", categoryId = "trigger-category-id")
+@IgorComponent(categoryId = "trigger-category-id", typeId = "trigger-type-id")
 public class TestTrigger extends BaseTrigger {
 
 }

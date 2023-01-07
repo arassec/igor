@@ -4,6 +4,8 @@ import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.message.MessageType;
+import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
@@ -11,8 +13,6 @@ import jakarta.mail.internet.MimeMultipart;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
-
-import jakarta.mail.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.Properties;
  */
 @Getter
 @Setter
-@IgorComponent(typeId = "email-smtp-message-connector", categoryId = CoreCategory.MESSAGE)
+@IgorComponent(categoryId = CoreCategory.MESSAGE, typeId = MessageType.EMAIL_SMTP_CONNECTOR)
 public class EmailSmtpMessageConnector extends EmailBaseConnector {
 
     /**

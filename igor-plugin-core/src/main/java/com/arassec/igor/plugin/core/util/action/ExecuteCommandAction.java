@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +29,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
-@IgorComponent(typeId = "execute-command", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.EXECUTE_COMMAND_ACTION)
 public class ExecuteCommandAction extends BaseAction {
 
     /**

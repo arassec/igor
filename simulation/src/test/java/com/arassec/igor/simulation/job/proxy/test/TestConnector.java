@@ -8,7 +8,7 @@ import com.arassec.igor.core.model.connector.BaseConnector;
 /**
  * A connector for testing.
  */
-@IgorComponent(typeId = "test-connector-type", categoryId = "test-connector-category")
+@IgorComponent(categoryId = "test-connector-category", typeId = "test-connector-type")
 public class TestConnector extends BaseConnector {
 
     /**

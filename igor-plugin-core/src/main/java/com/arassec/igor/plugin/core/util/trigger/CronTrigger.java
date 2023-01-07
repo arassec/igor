@@ -6,6 +6,7 @@ import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.core.model.trigger.BaseTrigger;
 import com.arassec.igor.core.model.trigger.ScheduledTrigger;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CoreType;
 import com.arassec.igor.plugin.core.validation.ValidCronExpression;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Setter;
@@ -16,11 +17,11 @@ import lombok.Setter;
  *
  * <h3>Description</h3>
  * The CRON trigger runs a job periodically according to its cron expression. Just like the UNIX cron daemon does.<br>
- *
+ * <p>
  * A CRON expression consists of six fields: <pre>second, minute, hour, day, month, weekday</pre><br>
- *
+ * <p>
  * Month and weekday names can be given as the first three letters of the English names.<br>
- *
+ * <p>
  * The following special characters can be used in a CRON expression:<br>
  * <table>
  *     <caption>CRON special characters</caption>
@@ -99,7 +100,7 @@ import lombok.Setter;
  *     </tr>
  * </table>
  */
-@IgorComponent(typeId = "cron-trigger", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.CRON_TRIGGER)
 public class CronTrigger extends BaseTrigger implements ScheduledTrigger {
 
     /**

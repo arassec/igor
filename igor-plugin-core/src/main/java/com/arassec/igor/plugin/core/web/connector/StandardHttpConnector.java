@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.connector.BaseConnector;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CoreType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
@@ -38,7 +39,7 @@ import java.util.Optional;
  * parameters, will automatically be used by the connector.
  */
 @Slf4j
-@IgorComponent(typeId = "http-web-connector", categoryId = CoreCategory.WEB)
+@IgorComponent(categoryId = CoreCategory.WEB, typeId = CoreType.HTTP_WEB_CONNECTOR)
 public class StandardHttpConnector extends BaseConnector implements HttpConnector {
 
     /**
@@ -176,7 +177,8 @@ public class StandardHttpConnector extends BaseConnector implements HttpConnecto
                 keyManagerFactory.init(keyStore, password.toCharArray());
 
                 keyManagers = keyManagerFactory.getKeyManagers();
-            } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException e) {
+            } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException |
+                     UnrecoverableKeyException e) {
                 throw new IgorException("Could not create KeyManager!", e);
             }
         }

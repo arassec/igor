@@ -45,7 +45,7 @@ class IgorParamsMdDocGeneratorTest {
         var javaParser = new JavaParser();
 
         ParseResult<CompilationUnit> result = javaParser.parse(Path.of("src/test/java/com/arassec/igor/maven/test/sources" +
-            "/TestComponent.java"));
+            "/component/TestComponent.java"));
         var compilationUnit = result.getResult().orElseThrow();
 
 

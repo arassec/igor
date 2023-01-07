@@ -4,6 +4,7 @@ import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CoreType;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +32,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "limit-action", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.LIMIT_ACTION)
 public class LimitAction extends BaseUtilAction {
 
     /**
@@ -51,7 +52,6 @@ public class LimitAction extends BaseUtilAction {
      *
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
-     *
      * @return Every data item until the first 'n' have been processed.
      */
     @Override

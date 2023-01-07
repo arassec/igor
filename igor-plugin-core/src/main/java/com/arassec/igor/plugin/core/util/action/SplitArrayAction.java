@@ -4,6 +4,7 @@ import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CoreType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,7 +82,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "split-array-action", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.SPLIT_ARRAY_ACTION)
 public class SplitArrayAction extends BaseUtilAction {
 
     /**
@@ -103,7 +104,6 @@ public class SplitArrayAction extends BaseUtilAction {
      *
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
-     *
      * @return Data items for each array element.
      */
     @Override

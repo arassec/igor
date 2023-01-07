@@ -4,6 +4,7 @@ import com.arassec.igor.application.annotation.IgorComponent;
 import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.core.CoreType;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,18 +21,18 @@ import java.util.Map;
  *
  * <h3>Event-Triggered Jobs</h3>
  * <strong>This action is not available in event-triggered jobs!</strong>
- *
+ * <p>
  * The counter that skips the first 'n' data items is set on job start and applies to the complete job execution. Each skipped
  * data item increases the counter, which is never reset until the next job execution. Since event triggered jobs don't stop their
  * execution, the counter will never be reset.
- *
+ * <p>
  * Thus, this action would skip the first 'n' data items of an event-triggered job, and forward <strong>all</strong> following
  * data items afterwards until the job were restarted!
  */
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "skip-action", categoryId = CoreCategory.UTIL)
+@IgorComponent(categoryId = CoreCategory.UTIL, typeId = CoreType.SKIP_ACTION)
 public class SkipAction extends BaseUtilAction {
 
     /**
@@ -51,7 +52,6 @@ public class SkipAction extends BaseUtilAction {
      *
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
-     *
      * @return Every data item after the first 'n' have been skipped.
      */
     @Override

@@ -8,6 +8,7 @@ import com.arassec.igor.core.model.job.misc.PersistentValue;
 import com.arassec.igor.core.repository.PersistentValueRepository;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +24,7 @@ import java.util.Map;
  * This action persists values in igor's datastore.
  */
 @Slf4j
-@IgorComponent(typeId = "persist-value-action", categoryId = CoreCategory.PERSISTENCE)
+@IgorComponent(categoryId = CoreCategory.PERSISTENCE, typeId = CoreType.PERSIST_VALUE_ACTION)
 public class PersistValueAction extends BasePersistenceAction {
 
     /**

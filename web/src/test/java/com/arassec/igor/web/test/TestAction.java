@@ -15,7 +15,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
-@IgorComponent(typeId = "action-type-id", categoryId = "action-category-id")
+@IgorComponent(categoryId = "action-category-id", typeId = "action-type-id")
 public class TestAction extends BaseAction {
 
     /**

@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.misc.ParameterSubtype;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.message.MessageType;
 import com.arassec.igor.plugin.message.connector.RabbitMqMessage;
 import com.arassec.igor.plugin.message.connector.RabbitMqMessageConnector;
 import jakarta.validation.constraints.NotEmpty;
@@ -61,7 +62,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "send-rabbitmq-message-action", categoryId = CoreCategory.MESSAGE)
+@IgorComponent(categoryId = CoreCategory.MESSAGE, typeId = MessageType.SEND_RABBITMQ_ACTION)
 public class SendRabbitMqMessageAction extends BaseAction {
 
     /**
@@ -131,7 +132,6 @@ public class SendRabbitMqMessageAction extends BaseAction {
      *
      * @param data         The data the action will work with.
      * @param jobExecution The job execution log.
-     *
      * @return The manipulated data.
      */
     @Override

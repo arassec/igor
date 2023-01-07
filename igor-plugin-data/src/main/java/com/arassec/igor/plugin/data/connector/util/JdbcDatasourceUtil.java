@@ -1,4 +1,4 @@
-package com.arassec.igor.plugin.data.util;
+package com.arassec.igor.plugin.data.connector.util;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.util.IgorException;

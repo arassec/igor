@@ -5,6 +5,7 @@ import com.arassec.igor.core.model.annotation.IgorParam;
 import com.arassec.igor.core.model.annotation.IgorSimulationSafe;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.message.MessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.*;
 import jakarta.validation.constraints.Positive;
@@ -29,7 +30,7 @@ import java.util.*;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "email-imap-message-connector", categoryId = CoreCategory.MESSAGE)
+@IgorComponent(categoryId = CoreCategory.MESSAGE, typeId = MessageType.EMAIL_IMAP_CONNECTOR)
 public class EmailImapMessageConnector extends EmailBaseConnector {
 
     /**

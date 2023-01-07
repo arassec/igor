@@ -10,6 +10,7 @@ import com.arassec.igor.core.model.trigger.EventType;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.core.util.event.JobTriggerEvent;
 import com.arassec.igor.plugin.core.CoreCategory;
+import com.arassec.igor.plugin.message.MessageType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 /**
  * <h2>RabbitMQ Connector</h2>
@@ -44,7 +46,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Slf4j
-@IgorComponent(typeId = "rabbitmq-message-connector", categoryId = CoreCategory.MESSAGE)
+@IgorComponent(categoryId = CoreCategory.MESSAGE, typeId = MessageType.RABBITMQ_CONNECTOR)
 public class RabbitMqMessageConnector extends BaseConnector implements ChannelAwareMessageListener {
 
     /**
@@ -253,7 +255,7 @@ public class RabbitMqMessageConnector extends BaseConnector implements ChannelAw
 
         Map<String, Object> metaData = new HashMap<>();
         metaData.put("deliveryTag", message.getMessageProperties().getDeliveryTag());
-        message.getMessageProperties().getHeaders().forEach(metaData::put);
+        metaData.putAll(message.getMessageProperties().getHeaders());
 
         Map<String, Object> dataItem = new HashMap<>();
         try {
@@ -284,10 +286,24 @@ public class RabbitMqMessageConnector extends BaseConnector implements ChannelAw
             Long deliveryTag = deliveryTagNode.asLong();
             if (channels.containsKey(deliveryTag)) {
                 channels.get(deliveryTag).basicAck(deliveryTag, false);
-                channels.remove(deliveryTag);
+                removeChannel(deliveryTag);
             }
         } catch (IllegalArgumentException | IOException e) {
             throw new IgorException("Could not ACK message from RabbitMQ: " + dataItem);
+        }
+    }
+
+    /**
+     * Removes and closes the channel for the supplied delivery tag.
+     *
+     * @param deliveryTag The tag of the message to close the channel for.
+     */
+    private void removeChannel(Long deliveryTag) {
+        try (Channel ignored = channels.remove(deliveryTag)) {
+            // Just for closing the channel with try-with-resources...
+            log.trace("Closing channel after message ack!");
+        } catch (TimeoutException | IOException e) {
+            throw new IgorException("Error while acknowledging message!", e);
         }
     }
 

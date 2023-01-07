@@ -9,6 +9,7 @@ import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
 import com.arassec.igor.plugin.core.CoreDataKey;
 import com.arassec.igor.plugin.core.CorePluginUtils;
+import com.arassec.igor.plugin.core.CoreType;
 import com.arassec.igor.plugin.core.file.connector.FallbackFileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileConnector;
 import com.arassec.igor.plugin.core.file.connector.FileStreamData;
@@ -31,9 +32,9 @@ import java.util.*;
  *
  * <h3>Description</h3>
  * This action Downloads a file from an HTTP(S) server and stores it in the target's filesystem.<br>
- *
+ * <p>
  * The action adds data about the downloaded file to the data item under the 'downloadedFile' key.<br>
- *
+ * <p>
  * A data item processed by this action could look like this:
  * <pre><code>
  * {
@@ -53,7 +54,7 @@ import java.util.*;
 @Slf4j
 @Getter
 @Setter
-@IgorComponent(typeId = "http-file-download-action", categoryId = CoreCategory.WEB)
+@IgorComponent(categoryId = CoreCategory.WEB, typeId = CoreType.HTTP_FILE_DOWNLOAD_ACTION)
 public class HttpFileDownloadAction extends BaseHttpAction {
 
     /**
@@ -207,7 +208,6 @@ public class HttpFileDownloadAction extends BaseHttpAction {
      * Determines the filetype suffix if possible.
      *
      * @param httpResponse The HTTP response containing headers.
-     *
      * @return The filetype suffix or {code null}, if none could be determined.
      */
     private String determineFilenameSuffix(HttpResponse<InputStream> httpResponse) {

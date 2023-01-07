@@ -8,7 +8,8 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.core.model.job.execution.JobExecutionState;
 import com.arassec.igor.core.util.IgorException;
 import com.arassec.igor.plugin.core.CoreCategory;
-import com.arassec.igor.plugin.data.util.JdbcDatasourceUtil;
+import com.arassec.igor.plugin.data.DataType;
+import com.arassec.igor.plugin.data.connector.util.JdbcDatasourceUtil;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ import java.util.UUID;
  */
 @Slf4j
 @RequiredArgsConstructor
-@IgorComponent(categoryId = CoreCategory.DATA, typeId = "jdbc-datasource-connector")
+@IgorComponent(categoryId = CoreCategory.DATA, typeId = DataType.JDBC_DATASOURCE_CONNECTOR)
 public class JdbcDatasourceConnector extends BaseConnector {
 
     /**

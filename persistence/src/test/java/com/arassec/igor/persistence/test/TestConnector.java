@@ -14,7 +14,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-@IgorComponent(typeId = "connector-type-id", categoryId = "connector-category-id")
+@IgorComponent(categoryId = "connector-category-id", typeId = "connector-type-id")
 public class TestConnector extends BaseConnector implements Connector {
 
     /**
