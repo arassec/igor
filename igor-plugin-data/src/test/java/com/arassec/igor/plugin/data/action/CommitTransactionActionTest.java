@@ -4,12 +4,12 @@ import com.arassec.igor.core.model.job.execution.JobExecution;
 import com.arassec.igor.plugin.data.connector.JdbcDatasourceConnector;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.Commit;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.*;
 
@@ -32,7 +32,7 @@ class CommitTransactionActionTest {
         action.setTransactionKey("transactionId");
 
         // Must not throw any exception:
-        action.process(new HashMap<>(), JobExecution.builder().build());
+        assertDoesNotThrow(() -> action.process(new HashMap<>(), JobExecution.builder().build()));
     }
 
     /**

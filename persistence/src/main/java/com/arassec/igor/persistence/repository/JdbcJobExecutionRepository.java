@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * {@link com.arassec.igor.core.repository.JobExecutionRepository} implementation that uses JDBC to persist {@link
@@ -101,7 +100,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     public List<JobExecution> findAllOfJobInState(String jobId, JobExecutionState state) {
         List<JobExecutionEntity> jobExecutionEntities = jobExecutionDao.findByJobIdAndStateOrderByIdDesc(jobId, state.name());
         if (jobExecutionEntities != null) {
-            return jobExecutionEntities.stream().map(this::convert).collect(Collectors.toList());
+            return jobExecutionEntities.stream().map(this::convert).toList();
         }
         return List.of();
     }
@@ -196,7 +195,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
     private ModelPage<JobExecution> convertpage(Page<JobExecutionEntity> page, int pageNumber) {
         if (page != null && page.hasContent()) {
             ModelPage<JobExecution> result = new ModelPage<>(page.getNumber(), page.getSize(), page.getTotalPages(), null);
-            result.setItems(page.getContent().stream().map(this::convert).collect(Collectors.toList()));
+            result.setItems(page.getContent().stream().map(this::convert).toList());
             return result;
         }
         return new ModelPage<>(pageNumber, 0, 0, List.of());
