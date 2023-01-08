@@ -81,6 +81,7 @@ module.exports = {
                                 "igor-plugin-core/duplicate-action",
                                 "igor-plugin-core/xml-to-json-action",
                                 "igor-plugin-core/execute-command-action",
+                                "igor-plugin-core/split-string-action",
                                 "igor-plugin-message/send-rabbitmq-message-action",
                                 "igor-plugin-message/send-email-message-action",
                                 "igor-plugin-message/receive-email-message-action",

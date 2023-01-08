@@ -136,6 +136,11 @@ public class CoreType {
     public static final String XML_TO_JSON_ACTION = "xml-to-json-action";
 
     /**
+     * The "Split String" action type.
+     */
+    public static final String SPLIT_STRING_ACTION = "split-string-action";
+
+    /**
      * Creates a new instance.
      */
     private CoreType() {
