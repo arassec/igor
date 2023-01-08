@@ -77,6 +77,7 @@ module.exports = {
                                 "igor-plugin-core/read-file-action",
                                 "igor-plugin-core/http-request-action",
                                 "igor-plugin-core/add-data-action",
+                                "igor-plugin-core/xml-to-json-action",
                                 "igor-plugin-message/send-rabbitmq-message-action",
                                 "igor-plugin-message/send-email-message-action",
                                 "igor-plugin-message/receive-email-message-action",

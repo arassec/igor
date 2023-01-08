@@ -131,6 +131,11 @@ public class CoreType {
     public static final String WEB_HOOK_TRIGGER = "web-hook-trigger";
 
     /**
+     * The "XML2JSON" action type.
+     */
+    public static final String XML_TO_JSON_ACTION = "xml-to-json-action";
+
+    /**
      * Creates a new instance.
      */
     private CoreType() {
