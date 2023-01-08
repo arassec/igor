@@ -58,7 +58,7 @@ public class CoreType {
     /**
      * The "Execute Command" action type.
      */
-    public static final String EXECUTE_COMMAND_ACTION = "execute-command";
+    public static final String EXECUTE_COMMAND_ACTION = "execute-command-action";
 
     /**
      * The "Filter by Regular Expression" action type.

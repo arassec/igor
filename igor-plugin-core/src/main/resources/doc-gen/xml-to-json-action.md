@@ -8,11 +8,11 @@ The following XML string:
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <element>
-  <status>400</status>
-  <message>This is an example.</message>
-  <error>A</error>
-  <error>B</error>
-  <error>C</error>
+    <status>400</status>
+    <message>This is an example.</message>
+    <error>A</error>
+    <error>B</error>
+    <error>C</error>
 </element>
 ```
 
@@ -42,5 +42,5 @@ The component can be configured by the following parameters:
 
 Parameter | Description
 :---|:---
-Xml | The XML string to convert. Can be mustache template to read the value from an attribute of the processed data item.
+Xml | The XML string to convert. Can be a mustache template to read the value from an attribute of the processed data item.
 Target Key | Key into the data item where the converted JSON is put. Can be a dot-separated path.

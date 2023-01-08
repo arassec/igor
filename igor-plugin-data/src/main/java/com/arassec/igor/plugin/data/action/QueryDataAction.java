@@ -9,7 +9,6 @@ import com.arassec.igor.plugin.core.CorePluginUtils;
 import com.arassec.igor.plugin.data.DataType;
 import com.arassec.igor.plugin.data.connector.JdbcDatasourceConnector;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,7 +59,7 @@ public class QueryDataAction extends BaseDataAction {
     /**
      * The SQL statement to use.
      */
-    @NotEmpty
+    @NotBlank
     @IgorParam(subtype = ParameterSubtype.MULTI_LINE)
     private String sqlStatement;
 
