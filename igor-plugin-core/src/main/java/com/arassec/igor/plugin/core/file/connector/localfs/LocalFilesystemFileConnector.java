@@ -19,7 +19,6 @@ import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -58,7 +57,7 @@ public class LocalFilesystemFileConnector extends BaseFileConnector {
                     }
                     return new FileInfo(path.getFileName().toString(), lastModifiedTime != null ? formatInstant(
                         lastModifiedTime.toInstant().truncatedTo(ChronoUnit.SECONDS)) : null);
-                }).collect(Collectors.toList());
+                }).toList();
             }
         } catch (IOException e) {
             throw new IgorException("Could not list files in local directory: " + directory, e);

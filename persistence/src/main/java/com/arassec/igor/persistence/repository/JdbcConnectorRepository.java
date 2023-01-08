@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * {@link ConnectorRepository} implementation that uses JDBC to persist {@link Connector}s.
@@ -176,7 +175,7 @@ public class JdbcConnectorRepository implements ConnectorRepository {
                 } catch (IOException e) {
                     throw new IllegalStateException(READ_CONNECTOR_ERROR, e);
                 }
-            }).collect(Collectors.toList()));
+            }).toList());
             return result;
         }
 
@@ -205,7 +204,7 @@ public class JdbcConnectorRepository implements ConnectorRepository {
             ModelPage<Pair<String, String>> result = new ModelPage<>(pageNumber, pageSize, connectorReferences.getTotalPages(), null);
             result.setItems(connectorReferences.get()
                     .map(reference -> new Pair<>(reference.getJobId(), reference.getJobName()))
-                    .collect(Collectors.toList()));
+                    .toList());
             return result;
         }
         return new ModelPage<>(pageNumber, pageSize, 0, List.of());

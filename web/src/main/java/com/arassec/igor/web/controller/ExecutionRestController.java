@@ -44,7 +44,6 @@ public class ExecutionRestController extends BaseRestController {
      * Returns an {@link SseEmitter} that will be used to send SSE job execution messages to the client.
      *
      * @param response the {@link HttpServletResponse} of the request.
-     *
      * @return SSE emitter for job execution messages.
      */
     @GetMapping("stream")
@@ -66,16 +65,16 @@ public class ExecutionRestController extends BaseRestController {
      * @param jobId      The job's ID.
      * @param pageNumber The number of the page to load.
      * @param pageSize   The number of elements in one page.
-     *
      * @return The saved {@link JobExecution}s with information about their state or {@code null}, if the job has never been
      * executed.
      */
+    @SuppressWarnings("java:S6204") // Stream.toList() result cannot be sorted....
     @GetMapping("job/{jobId}")
     public ModelPage<JobExecutionListEntry> getExecutionsOfJob(@PathVariable("jobId") String jobId,
                                                                @RequestParam(value = "pageNumber", required = false,
-                                                                       defaultValue = "0") int pageNumber,
+                                                                   defaultValue = "0") int pageNumber,
                                                                @RequestParam(value = "pageSize", required = false,
-                                                                       defaultValue = "2147483647") int pageSize) {
+                                                                   defaultValue = "2147483647") int pageSize) {
         ModelPage<JobExecution> jobExecutions = jobManager.getJobExecutionsOfJob(jobId, pageNumber, pageSize);
 
         if (jobExecutions != null) {
@@ -83,7 +82,7 @@ public class ExecutionRestController extends BaseRestController {
 
             ModelPage<JobExecutionListEntry> result = new ModelPage<>(pageNumber, pageSize, jobExecutions.getTotalPages(), null);
             result.setItems(jobExecutions.getItems().stream().map(jobExecution -> convert(jobExecution, job.getName()))
-                    .collect(Collectors.toList()));
+                .collect(Collectors.toList()));
             result.getItems().sort(Comparator.comparing(JobExecutionListEntry::getId).reversed());
 
             return result;
@@ -97,7 +96,6 @@ public class ExecutionRestController extends BaseRestController {
      *
      * @param jobId The job's ID.
      * @param state The execution's state.
-     *
      * @return The saved {@link JobExecution}s with information about their state or {@code null}, if the job has never been
      * executed.
      */
@@ -106,7 +104,7 @@ public class ExecutionRestController extends BaseRestController {
         ModelPage<JobExecution> jobExecutions = jobManager.getJobExecutionsOfJob(jobId, 0, Integer.MAX_VALUE);
         if (jobExecutions != null && jobExecutions.getItems() != null) {
             return jobExecutions.getItems().stream().filter(jobExecution -> jobExecution.getExecutionState().equals(state))
-                    .count();
+                .count();
         }
         return 0L;
     }
@@ -115,7 +113,6 @@ public class ExecutionRestController extends BaseRestController {
      * Returns the execution details with the given ID.
      *
      * @param id The execution details' ID.
-     *
      * @return The details.
      */
     @GetMapping("details/{id}")
@@ -174,7 +171,7 @@ public class ExecutionRestController extends BaseRestController {
         List<SseEmitter> deadJobStreamEmitters = new LinkedList<>();
 
         if ((JobEventType.STATE_CHANGE.equals(jobEvent.getType())
-                || JobEventType.STATE_REFRESH.equals(jobEvent.getType()))) {
+            || JobEventType.STATE_REFRESH.equals(jobEvent.getType()))) {
             var jobExecution = determineJobExecution(jobManager, jobEvent.getJob());
             for (SseEmitter emitter : executionStreamEmitters) {
                 try {

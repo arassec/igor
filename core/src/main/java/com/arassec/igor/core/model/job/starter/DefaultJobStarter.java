@@ -142,8 +142,8 @@ public class DefaultJobStarter implements JobStarter {
         }
         // This means we have to notify the trigger that the processing finished immediately, because there are no (active)
         // actions...
-        if (trigger instanceof ProcessingFinishedCallback && !processingFinishedCallbackSet) {
-            ((ProcessingFinishedCallback) trigger).processingFinished(initialDataItem);
+        if (trigger instanceof ProcessingFinishedCallback processingFinishedCallback && !processingFinishedCallbackSet) {
+            processingFinishedCallback.processingFinished(initialDataItem);
         }
     }
 
@@ -153,7 +153,7 @@ public class DefaultJobStarter implements JobStarter {
      * <p>
      * Keeps the order of the actions.
      *
-     * @param numThreads The number of threads the job' actions should execute with.
+     * @param numThreads The number of threads the job's actions should execute with.
      *
      * @return {@link Action}s grouped by the number of threads they should execute with.
      */
@@ -187,7 +187,7 @@ public class DefaultJobStarter implements JobStarter {
      * @param concurrencyLists The ordered list of actions that should be executed with the same number of threads.
      * @param inputQueue       The initial input queue in which the first data item will be put.
      * @param jobExecution     The container for job execution data.
-     * @param numThreads       The number of threads the job' actions should execute with.
+     * @param numThreads       The number of threads the job's actions should execute with.
      *
      * @return List of {@link ConcurrencyGroup}s.
      */
@@ -215,10 +215,10 @@ public class DefaultJobStarter implements JobStarter {
      * @return {@code true} if the callback has been set, {@code false} otherwise.
      */
     private boolean setProcessingFinishedCallbackIfApplicable() {
-        if (trigger instanceof ProcessingFinishedCallback && !actions.isEmpty()) {
+        if (trigger instanceof ProcessingFinishedCallback processingFinishedCallback && !actions.isEmpty()) {
             for (int i = (actions.size() - 1); i >= 0; i--) {
                 if (actions.get(i).isActive()) {
-                    actions.get(i).setProcessingFinishedCallback((ProcessingFinishedCallback) trigger);
+                    actions.get(i).setProcessingFinishedCallback(processingFinishedCallback);
                     return true;
                 }
             }

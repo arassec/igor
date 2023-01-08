@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -64,7 +63,7 @@ public class ConnectorRestController {
                 }
                 return new ConnectorListEntry(connector.getId(), connectorName,
                     (referencingJobs != null && !referencingJobs.getItems().isEmpty()));
-            }).collect(Collectors.toList()));
+            }).toList());
 
             return result;
         }

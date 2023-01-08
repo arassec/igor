@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
-import java.util.stream.Collectors;
 
 /**
  * Manages {@link Job}s. Entry point from outside the core package to create and maintain jobs.
@@ -264,7 +263,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             }
             return stateFilters.stream().filter(stateFilter -> (jobExecutionRepository.countAllOfJobInState(job.getId(),
                 stateFilter) > 0)).map(result -> true).findFirst().orElse(false);
-        }).collect(Collectors.toList());
+        }).toList();
         return ModelPageHelper.getModelPage(filteredList, pageNumber, pageSize);
     }
 
@@ -287,7 +286,7 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
                 } else {
                     return 0;
                 }
-            }).collect(Collectors.toList());
+            }).toList();
     }
 
     /**
@@ -420,8 +419,8 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
             return;
         }
 
-        if (job.getTrigger() instanceof ScheduledTrigger) {
-            String cronExpression = ((ScheduledTrigger) job.getTrigger()).getCronExpression();
+        if (job.getTrigger() instanceof ScheduledTrigger scheduledTrigger) {
+            String cronExpression = scheduledTrigger.getCronExpression();
             try {
                 scheduledJobs.put(job.getId(), taskScheduler.schedule(() -> {
                     log.info("Job triggered for execution: {} ({})", job.getName(), job.getId());

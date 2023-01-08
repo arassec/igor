@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Manages {@link Connector}s. Entry point from outside the core package to create and maintain connectors.
@@ -95,7 +94,7 @@ public class ConnectorManager {
         List<Connector> connectors = connectorRepository.findAll();
         List<Connector> allOfType = connectors.stream()
                 .filter(connector -> typeIds.contains(igorComponentUtil.getTypeId(connector)))
-                .sorted(Comparator.comparing(Connector::getName)).collect(Collectors.toList());
+                .sorted(Comparator.comparing(Connector::getName)).toList();
         return ModelPageHelper.getModelPage(allOfType, pageNumber, pageSize);
     }
 

@@ -17,7 +17,6 @@ import lombok.Setter;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * <h2>'Send E-Mail' Action</h2>
@@ -129,7 +128,7 @@ public class SendEmailAction extends BaseAction {
         if (StringUtils.hasText(attachmentsResolved)) {
             attachmentsPrepared = Arrays.stream(attachmentsResolved.split("\n"))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
         }
 
         emailConnector.sendMessage(fromResolved, toResolved, subjectResolved, bodyResolved, contentTypeResolved, attachmentsPrepared);

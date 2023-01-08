@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 /**
  * REST-Controller for types.
@@ -41,21 +40,20 @@ public class TypeRestController extends BaseRestController {
      *
      * @param locale   The user's locale for i18n.
      * @param category The category to use.
-     *
-     * @return Set of types.
+     * @return List of types.
      */
     @GetMapping("action/{category}")
     public List<TypeData> getActionTypes(Locale locale, @PathVariable("category") String category) {
         // IntelliJ suggests to use peek() instead of map(), but SonarLint doesn't like peek()...
         //noinspection SimplifyStreamApiCallChains
         return igorComponentRegistry.getActionTypesOfCategory(category).stream()
-                .map(typeId -> createTypeData(locale, typeId))
-                .map(typeData -> {
-                    typeData.setSupportsEvents(igorComponentRegistry.createActionInstance(typeData.getKey(), null).supportsEvents());
-                    return typeData;
-                })
-                .sorted(Comparator.comparing(TypeData::getValue))
-                .collect(Collectors.toList());
+            .map(typeId -> createTypeData(locale, typeId))
+            .map(typeData -> {
+                typeData.setSupportsEvents(igorComponentRegistry.createActionInstance(typeData.getKey(), null).supportsEvents());
+                return typeData;
+            })
+            .sorted(Comparator.comparing(TypeData::getValue))
+            .toList();
     }
 
     /**
@@ -63,21 +61,20 @@ public class TypeRestController extends BaseRestController {
      *
      * @param locale   The user's locale for i18n.
      * @param category The category to use.
-     *
-     * @return Set of types.
+     * @return List of types.
      */
     @GetMapping("trigger/{category}")
     public List<TypeData> getTriggerTypes(Locale locale, @PathVariable("category") String category) {
         // IntelliJ suggests to use peek() instead of map(), but SonarLint doesn't like peek()...
         //noinspection SimplifyStreamApiCallChains
         return igorComponentRegistry.getTriggerTypesOfCategory(category).stream()
-                .map(typeId -> createTypeData(locale, typeId))
-                .map(typeData -> {
-                    typeData.setSupportsEvents(igorComponentRegistry.createTriggerInstance(typeData.getKey(), null) instanceof EventTrigger);
-                    return typeData;
-                })
-                .sorted(Comparator.comparing(TypeData::getValue))
-                .collect(Collectors.toList());
+            .map(typeId -> createTypeData(locale, typeId))
+            .map(typeData -> {
+                typeData.setSupportsEvents(igorComponentRegistry.createTriggerInstance(typeData.getKey(), null) instanceof EventTrigger);
+                return typeData;
+            })
+            .sorted(Comparator.comparing(TypeData::getValue))
+            .toList();
     }
 
     /**
@@ -85,15 +82,14 @@ public class TypeRestController extends BaseRestController {
      *
      * @param locale   The user's locale for i18n.
      * @param category The category to use.
-     *
-     * @return Set of types.
+     * @return List of types.
      */
     @GetMapping("connector/{category}")
     public List<TypeData> getConnectorTypes(Locale locale, @PathVariable("category") String category) {
         return igorComponentRegistry.getConnectorTypesOfCategory(category).stream()
-                .map(typeId -> createTypeData(locale, typeId))
-                .sorted(Comparator.comparing(TypeData::getValue))
-                .collect(Collectors.toList());
+            .map(typeId -> createTypeData(locale, typeId))
+            .sorted(Comparator.comparing(TypeData::getValue))
+            .toList();
     }
 
     /**
@@ -101,12 +97,11 @@ public class TypeRestController extends BaseRestController {
      *
      * @param locale The user's locale for I18N.
      * @param typeId The type's ID.
-     *
      * @return a newly created {@link TypeData}.
      */
     private TypeData createTypeData(Locale locale, String typeId) {
         return new TypeData(typeId, messageSource.getMessage(typeId, null, locale),
-                DocumentationUtil.isDocumentationAvailable(typeId, LocaleContextHolder.getLocale()), false);
+            DocumentationUtil.isDocumentationAvailable(typeId, LocaleContextHolder.getLocale()), false);
     }
 
 }

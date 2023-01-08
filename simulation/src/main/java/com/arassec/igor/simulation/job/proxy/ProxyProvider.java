@@ -7,6 +7,7 @@ import com.arassec.igor.core.model.job.Job;
 import com.arassec.igor.core.model.trigger.EventTrigger;
 import com.arassec.igor.core.util.IgorException;
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.implementation.InvocationHandlerAdapter;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.springframework.context.ApplicationContext;
@@ -16,6 +17,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -47,6 +49,7 @@ public class ProxyProvider implements ApplicationContextAware {
      *
      * @param job The job to apply proxies to.
      */
+    @SuppressWarnings("java:S6204") // Stream.toList() returns ActionProxy which can't be assigned to List<Action>
     public void applyProxies(Job job) {
         if (job.getTrigger() instanceof EventTrigger) {
             job.setTrigger(new EventTriggerProxy((EventTrigger) proxyConnectors(job.getTrigger()), job.getSimulationLimit()));
@@ -55,9 +58,9 @@ public class ProxyProvider implements ApplicationContextAware {
         }
 
         job.setActions(job.getActions()
-                .stream()
-                .map(action -> new ActionProxy(proxyConnectors(action), job.getSimulationLimit()))
-                .collect(Collectors.toList()));
+            .stream()
+            .map(action -> new ActionProxy(proxyConnectors(action), job.getSimulationLimit()))
+            .collect(Collectors.toList()));
     }
 
     /**
@@ -65,7 +68,6 @@ public class ProxyProvider implements ApplicationContextAware {
      *
      * @param igorComponent The component to apply connector proxies to.
      * @param <T>           The component's type.
-     *
      * @return The component with applied connector proxies.
      */
     private <T extends IgorComponent> T proxyConnectors(T igorComponent) {
@@ -84,38 +86,37 @@ public class ProxyProvider implements ApplicationContextAware {
      * Wraps a {@link ConnectorProxy} around the supplied {@link Connector} and returns it.
      *
      * @param connector The Connector to wrap the proxy around.
-     *
      * @return The newly created Proxy wrapping the original connector.
      */
     private Connector createConnectorProxy(Connector connector) {
         if (connector == null) {
             throw new IllegalArgumentException("No connector supplied for proxy creation!");
         }
-        try {
-            Constructor<?>[] declaredConstructors = connector.getClass().getDeclaredConstructors();
-            Constructor<?> constructor = declaredConstructors[0];
+        Constructor<?>[] declaredConstructors = connector.getClass().getDeclaredConstructors();
+        Constructor<?> constructor = declaredConstructors[0];
 
-            // Get constructor parameters from the spring context if possible:
-            Parameter[] parameters = constructor.getParameters();
+        // Get constructor parameters from the spring context if possible:
+        Parameter[] parameters = constructor.getParameters();
 
-            var parameterTypes = new Class<?>[parameters.length];
-            var parameterValues = new Object[parameters.length];
+        var parameterTypes = new Class<?>[parameters.length];
+        var parameterValues = new Object[parameters.length];
 
-            for (var i = 0; i < parameters.length; i++) {
-                parameterTypes[i] = parameters[i].getType();
-                parameterValues[i] = getSpringBean(parameters[i].getType());
-            }
+        for (var i = 0; i < parameters.length; i++) {
+            parameterTypes[i] = parameters[i].getType();
+            parameterValues[i] = getSpringBean(parameters[i].getType());
+        }
 
-            return new ByteBuddy()
-                    .subclass(connector.getClass())
-                    .method(ElementMatchers.any())
-                    .intercept(InvocationHandlerAdapter.of(new ConnectorProxy(connector)))
-                    .make()
-                    .load(connector.getClass().getClassLoader())
-                    .getLoaded()
-                    .getDeclaredConstructor(parameterTypes)
-                    .newInstance(parameterValues);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        try (DynamicType.Unloaded<? extends Connector> unloaded = new ByteBuddy()
+            .subclass(connector.getClass())
+            .method(ElementMatchers.any())
+            .intercept(InvocationHandlerAdapter.of(new ConnectorProxy(connector)))
+            .make()) {
+            return unloaded.load(connector.getClass().getClassLoader())
+                .getLoaded()
+                .getDeclaredConstructor(parameterTypes)
+                .newInstance(parameterValues);
+        } catch (IOException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
             throw new IgorException("Could not create connector proxy!", e);
         }
     }
@@ -124,7 +125,6 @@ public class ProxyProvider implements ApplicationContextAware {
      * Retrieves a spring bean from the context.
      *
      * @param clazz The class to get the bean of.
-     *
      * @return The bean from the spring application context.
      */
     private Object getSpringBean(Class<?> clazz) {

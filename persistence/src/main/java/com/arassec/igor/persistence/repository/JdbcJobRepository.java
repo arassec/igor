@@ -25,7 +25,6 @@ import org.springframework.util.ReflectionUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * {@link JobRepository} implementation that uses JDBC to persist {@link Job}s.
@@ -195,7 +194,7 @@ public class JdbcJobRepository implements JobRepository {
                 } catch (IOException e) {
                     throw new IllegalStateException(READ_JOB_ERROR, e);
                 }
-            }).collect(Collectors.toList()));
+            }).toList());
             return result;
         }
 
@@ -248,8 +247,8 @@ public class JdbcJobRepository implements JobRepository {
                 try {
                     ReflectionUtils.makeAccessible(field);
                     Object value = field.get(instance);
-                    if (value instanceof Connector) {
-                        result.add(((Connector) value).getId());
+                    if (value instanceof Connector connector) {
+                        result.add(connector.getId());
                     }
                 } catch (IllegalAccessException e) {
                     throw new IllegalStateException("Could not read connector ID!", e);

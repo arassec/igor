@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 /**
  * REST-Controller for category requests.
@@ -38,45 +37,42 @@ public class CategoryRestController extends BaseRestController {
      * Returns all connector categories as {@link KeyLabelStore}s.
      *
      * @param locale The user's locale for i18n.
-     *
-     * @return Set of all available connector categories.
+     * @return List of all available connector categories.
      */
     @GetMapping("connector")
     public List<KeyLabelStore> getConnectorCategories(Locale locale) {
         return igorComponentRegistry.getCategoriesOfComponentType(Connector.class).stream()
-                .map(categoryId -> new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, locale)))
-                .sorted(Comparator.comparing(KeyLabelStore::getValue))
-                .collect(Collectors.toList());
+            .map(categoryId -> new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, locale)))
+            .sorted(Comparator.comparing(KeyLabelStore::getValue))
+            .toList();
     }
 
     /**
      * Returns all action categories as {@link KeyLabelStore}s.
      *
      * @param locale The user's locale for i18n.
-     *
-     * @return Set of all available action categories.
+     * @return List of all available action categories.
      */
     @GetMapping("action")
     public List<KeyLabelStore> getActionCategories(Locale locale) {
         return igorComponentRegistry.getCategoriesOfComponentType(Action.class).stream()
-                .map(categoryId -> new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, locale)))
-                .sorted(Comparator.comparing(KeyLabelStore::getValue))
-                .collect(Collectors.toList());
+            .map(categoryId -> new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, locale)))
+            .sorted(Comparator.comparing(KeyLabelStore::getValue))
+            .toList();
     }
 
     /**
      * Returns all trigger categories as {@link KeyLabelStore}s.
      *
      * @param locale The user's locale for i18n.
-     *
-     * @return Set of all available trigger categories.
+     * @return List of all available trigger categories.
      */
     @GetMapping("trigger")
     public List<KeyLabelStore> getTriggerCategories(Locale locale) {
         return igorComponentRegistry.getCategoriesOfComponentType(Trigger.class).stream()
-                .map(categoryId -> new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, locale)))
-                .sorted(Comparator.comparing(KeyLabelStore::getValue))
-                .collect(Collectors.toList());
+            .map(categoryId -> new KeyLabelStore(categoryId, messageSource.getMessage(categoryId, null, locale)))
+            .sorted(Comparator.comparing(KeyLabelStore::getValue))
+            .toList();
     }
 
 }

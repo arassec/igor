@@ -28,12 +28,11 @@ public abstract class BaseSimulationStrategy implements SimulationStrategy {
 
     /**
      * Extracts the simulation results from the supplied job. The job must have been enhanced with proxies around igor components
-     * (by using {@link ProxyProvider#applyProxies(Job)}, and simulated using a {@link SimulationStrategy}, prior to using this
+     * (by using {@link ProxyProvider#applyProxies(Job)}), and simulated using a {@link SimulationStrategy}, prior to using this
      * method!
      *
      * @param job          The job to extract the simulation data from.
      * @param jobExecution The simulated job's execution information.
-     *
      * @return Extracted {@link SimulationResult}s, indexed by the job's, trigger's and action's IDs.
      */
     protected Map<String, SimulationResult> extractSimulationResult(Job job, JobExecution jobExecution) {
@@ -45,15 +44,13 @@ public abstract class BaseSimulationStrategy implements SimulationStrategy {
             jobResult.setErrorCause(jobExecution.getErrorCause());
         }
 
-        if (job.getTrigger() instanceof TriggerProxy) {
-            var triggerProxy = (TriggerProxy) job.getTrigger();
+        if (job.getTrigger() instanceof TriggerProxy triggerProxy) {
             final List<Map<String, Object>> simulationTriggerData = triggerProxy.getCollectedData();
             simulationTriggerData.forEach(dataItem -> jobResult.getResults().add(dataItem));
         }
 
         job.getActions().forEach(action -> {
-            if (action instanceof ActionProxy) {
-                var actionProxy = (ActionProxy) action;
+            if (action instanceof ActionProxy actionProxy) {
                 var actionResult = new SimulationResult();
                 actionResult.setErrorCause(actionProxy.getErrorCause());
                 actionProxy.getCollectedData().stream().filter(Objects::nonNull).forEach(jsonObject -> actionResult.getResults().add(jsonObject));
