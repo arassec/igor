@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 import ConnectorEditor from "../views/connector-editor.vue";
 import ConnectorOverview from "../views/connector-overview.vue";
@@ -7,7 +7,7 @@ import JobEditor from "../views/job-editor.vue";
 import JobOverview from "../views/job-overview.vue";
 
 const router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
+    history: createWebHashHistory(import.meta.env.BASE_URL),
     routes: [
         {
             path: "/",

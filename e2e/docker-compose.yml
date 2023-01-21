@@ -6,11 +6,6 @@ services:
     container_name: "igor"
     ports:
       - "9090:8080"
-    environment:
-        - spring.datasource.url=jdbc:postgresql://igor-postgres-db:5432/igor
-        - spring.datasource.username=igor
-        - spring.datasource.password=igor
-        - spring.datasource.driver-class-name=org.postgresql.Driver
     networks:
       - igor-e2e
   rabbitmq:
