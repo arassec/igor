@@ -139,7 +139,8 @@ public class IgorParamsMdDocGenerator {
             igorParams.forEach(igorParam -> appendParameter(result, igorParam, typeId));
         }
 
-        return result.toString();
+        // Normalize EOL into the expected (UNIX) format:
+        return result.toString().replaceAll("(\r\n|\r|\n)", "\r\n");
     }
 
     /**

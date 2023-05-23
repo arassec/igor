@@ -31,7 +31,8 @@ public class PrimitiveHtmlToMdConverter {
         Document parsedJavaDoc = Jsoup.parse(javadoc);
         var result = new StringBuilder();
         parsedJavaDoc.body().childNodes().forEach(node -> result.append(processNode(node)));
-        return result.toString().trim().replace("\n\n\n", "\n\n");
+        // Normalize EOL into the expected (UNIX) format:
+        return result.toString().trim().replace("\n\n\n", "\n\n").replaceAll("(\r\n|\r|\n)", "\r\n");
     }
 
     /**
