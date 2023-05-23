@@ -48,7 +48,6 @@ class IgorParamsMdDocGeneratorTest {
             "/component/TestComponent.java"));
         var compilationUnit = result.getResult().orElseThrow();
 
-
         String generatedDoc = converter.generateDocumentation(compilationUnit.getClassByName("TestComponent").orElseThrow(),
             "maven-plugin-test-type-id");
 

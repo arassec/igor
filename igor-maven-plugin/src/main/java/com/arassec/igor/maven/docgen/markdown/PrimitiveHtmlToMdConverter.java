@@ -32,7 +32,7 @@ public class PrimitiveHtmlToMdConverter {
         var result = new StringBuilder();
         parsedJavaDoc.body().childNodes().forEach(node -> result.append(processNode(node)));
         // Normalize EOL into the expected (UNIX) format:
-        return result.toString().trim().replace("\n\n\n", "\n\n").replaceAll("(\r\n|\r|\n)", "\r\n");
+        return result.toString().trim().replaceAll("(\r\n|\r)", "\n").replace("\n\n\n", "\n\n");
     }
 
     /**
@@ -146,16 +146,16 @@ public class PrimitiveHtmlToMdConverter {
      */
     private void convertTable(Element element, StringBuilder target) {
         // Column headers:
-        target.append("\n");
+        target.append("\n|");
         element.getElementsByTag("th").forEach(headerColumn -> {
-            headerColumn.childNodes().forEach(childNode -> target.append(processNode(childNode)));
-            target.append(" | ");
+            headerColumn.childNodes().forEach(childNode -> target.append(" ").append(processNode(childNode)));
+            target.append(" |");
         });
-        target.append("\n");
+        target.append("\n|");
         // Header separator: ':---|:---|:---'
         target.append(element.getElementsByTag("th").stream()
-            .map(columnHeaderElement -> ":---")
-            .collect(Collectors.joining("|"))).append("\n");
+            .map(columnHeaderElement -> " :--- ")
+            .collect(Collectors.joining("|"))).append("|\n| ");
         // Rows:
         element.getElementsByTag("tr").stream()
             .skip(1) // skip the header!

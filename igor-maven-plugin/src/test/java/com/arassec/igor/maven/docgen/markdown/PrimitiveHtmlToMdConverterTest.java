@@ -80,7 +80,7 @@ class PrimitiveHtmlToMdConverterTest {
     @DisplayName("Tests converting HTML tables.")
     void testConvertTable() {
         String tableHtml = "<table><tr><th>h1</th><th>h2</th></tr><tr><td>c1</td><td>c2</td></tr></table>";
-        String tableMarkdown = "h1 | h2 | \n:---|:---\nc1 | c2 |";
+        String tableMarkdown = "| h1 | h2 |\n| :--- | :--- |\n| c1 | c2 |";
         assertEquals(tableMarkdown, converter.convert(tableHtml));
     }
 

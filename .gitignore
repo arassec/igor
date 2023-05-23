@@ -66,3 +66,4 @@ documentation/docs/user/igor-plugin-data
 e2e/cypress/screenshots
 e2e/cypress/videos
 e2e/debug.log
+/igor-plugin-*/src/main/resources/doc-gen/

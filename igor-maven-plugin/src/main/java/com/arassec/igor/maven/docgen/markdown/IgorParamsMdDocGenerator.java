@@ -140,7 +140,7 @@ public class IgorParamsMdDocGenerator {
         }
 
         // Normalize EOL into the expected (UNIX) format:
-        return result.toString().replaceAll("(\r\n|\r|\n)", "\r\n");
+        return result.toString().replaceAll("(\r\n|\r)", "\n");
     }
 
     /**
@@ -204,8 +204,8 @@ public class IgorParamsMdDocGenerator {
      */
     private void writeHeader(StringBuilder target) {
         target.append("\n\n## Parameters\nThe component can be configured by the following parameters:\n\n");
-        target.append("Parameter | Description\n");
-        target.append(":---|:---\n");
+        target.append("| Parameter | Description |\n");
+        target.append("| :--- | :--- |\n");
     }
 
     /**
@@ -232,10 +232,11 @@ public class IgorParamsMdDocGenerator {
                     paramName = igorComponentUtil.formatIgorParamName(paramName);
                 }
 
-                target.append(paramName)
+                target.append("| ")
+                    .append(paramName)
                     .append(" | ")
                     .append(primitiveHtmlToMdConverter.convert(javadoc.toText().replaceAll("(\r\n|\n)", " ")))
-                    .append("\n");
+                    .append(" |\n");
             });
     }
 
