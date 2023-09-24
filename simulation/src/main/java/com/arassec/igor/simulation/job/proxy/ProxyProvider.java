@@ -17,7 +17,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -115,7 +114,7 @@ public class ProxyProvider implements ApplicationContextAware {
                 .getLoaded()
                 .getDeclaredConstructor(parameterTypes)
                 .newInstance(parameterValues);
-        } catch (IOException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException e) {
             throw new IgorException("Could not create connector proxy!", e);
         }
