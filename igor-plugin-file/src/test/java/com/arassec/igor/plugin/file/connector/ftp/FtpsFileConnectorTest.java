@@ -56,6 +56,7 @@ class FtpsFileConnectorTest extends FtpFileConnectorBaseTest {
     @DisplayName("Tests an alternative configuration.")
     void testAlternativeConfiguration() {
         FtpsFileConnector ftpsFileConnector = new FtpsFileConnector();
+        ftpsFileConnector.setHost("localhost");
         ftpsFileConnector.setPassiveMode(true);
         ftpsFileConnector.setWindowsFtp(true);
 
