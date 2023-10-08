@@ -88,7 +88,7 @@ described in the documentation.
 The reference documentation is distributed within the igor application.
 The documentation of the latest, **stable** release is also available online at:
 
-[Igor Reference Documentation](https://arassec.com/igor/)
+[Igor Reference Documentation](https://arassec.github.io/igor/)
 
 # License
 
