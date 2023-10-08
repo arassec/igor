@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Custom Triggers | Igor Reference Documentation (v0.6.8)</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    
+    <meta name="description" content="">
+    <meta name="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="Pragma" content="no-cache">
+    <meta name="Expires" content="0">
+    
+    <link rel="preload" href="/igor/assets/css/0.styles.77c2bd1e.css" as="style"><link rel="preload" href="/igor/assets/js/app.8bb422b5.js" as="script"><link rel="preload" href="/igor/assets/js/2.bedb1b07.js" as="script"><link rel="preload" href="/igor/assets/js/19.a54bf307.js" as="script"><link rel="prefetch" href="/igor/assets/js/10.c7789626.js"><link rel="prefetch" href="/igor/assets/js/11.b667481f.js"><link rel="prefetch" href="/igor/assets/js/12.33f60069.js"><link rel="prefetch" href="/igor/assets/js/13.12c6c6f9.js"><link rel="prefetch" href="/igor/assets/js/14.d5ccebd2.js"><link rel="prefetch" href="/igor/assets/js/15.9eec2f91.js"><link rel="prefetch" href="/igor/assets/js/16.dcbe7dd9.js"><link rel="prefetch" href="/igor/assets/js/17.120761cb.js"><link rel="prefetch" href="/igor/assets/js/18.b5b9cc58.js"><link rel="prefetch" href="/igor/assets/js/20.937e9197.js"><link rel="prefetch" href="/igor/assets/js/21.c5b7ecd6.js"><link rel="prefetch" href="/igor/assets/js/22.e22a768f.js"><link rel="prefetch" href="/igor/assets/js/23.552e8fbf.js"><link rel="prefetch" href="/igor/assets/js/24.01d1f799.js"><link rel="prefetch" href="/igor/assets/js/25.5311b6b0.js"><link rel="prefetch" href="/igor/assets/js/26.dcc4120b.js"><link rel="prefetch" href="/igor/assets/js/27.8deb29dc.js"><link rel="prefetch" href="/igor/assets/js/28.56059f70.js"><link rel="prefetch" href="/igor/assets/js/29.b5858d92.js"><link rel="prefetch" href="/igor/assets/js/3.5c8709c2.js"><link rel="prefetch" href="/igor/assets/js/30.d1c7f9d7.js"><link rel="prefetch" href="/igor/assets/js/31.682c7109.js"><link rel="prefetch" href="/igor/assets/js/32.a857f7dd.js"><link rel="prefetch" href="/igor/assets/js/33.b2a88f1e.js"><link rel="prefetch" href="/igor/assets/js/34.9b1bc25d.js"><link rel="prefetch" href="/igor/assets/js/35.f7e4a690.js"><link rel="prefetch" href="/igor/assets/js/36.0495d0d3.js"><link rel="prefetch" href="/igor/assets/js/37.18da8c01.js"><link rel="prefetch" href="/igor/assets/js/38.5d260abe.js"><link rel="prefetch" href="/igor/assets/js/39.cbcae287.js"><link rel="prefetch" href="/igor/assets/js/4.8ed385da.js"><link rel="prefetch" href="/igor/assets/js/40.af1d2983.js"><link rel="prefetch" href="/igor/assets/js/41.5989fe16.js"><link rel="prefetch" href="/igor/assets/js/42.ac4865d2.js"><link rel="prefetch" href="/igor/assets/js/43.e33f8350.js"><link rel="prefetch" href="/igor/assets/js/44.d289688f.js"><link rel="prefetch" href="/igor/assets/js/45.ab7ee4c1.js"><link rel="prefetch" href="/igor/assets/js/46.3b695529.js"><link rel="prefetch" href="/igor/assets/js/47.5124d1f9.js"><link rel="prefetch" href="/igor/assets/js/48.3d2d285f.js"><link rel="prefetch" href="/igor/assets/js/49.0539584e.js"><link rel="prefetch" href="/igor/assets/js/5.1670c084.js"><link rel="prefetch" href="/igor/assets/js/50.3c6e5332.js"><link rel="prefetch" href="/igor/assets/js/51.7a97479c.js"><link rel="prefetch" href="/igor/assets/js/52.ec50c50d.js"><link rel="prefetch" href="/igor/assets/js/53.4cd54949.js"><link rel="prefetch" href="/igor/assets/js/54.6611d6cc.js"><link rel="prefetch" href="/igor/assets/js/55.8cb4b6b0.js"><link rel="prefetch" href="/igor/assets/js/56.b5025b6b.js"><link rel="prefetch" href="/igor/assets/js/57.9316211e.js"><link rel="prefetch" href="/igor/assets/js/58.060aa898.js"><link rel="prefetch" href="/igor/assets/js/59.91245302.js"><link rel="prefetch" href="/igor/assets/js/6.44d856c4.js"><link rel="prefetch" href="/igor/assets/js/60.40467131.js"><link rel="prefetch" href="/igor/assets/js/61.194a3570.js"><link rel="prefetch" href="/igor/assets/js/62.03501bae.js"><link rel="prefetch" href="/igor/assets/js/63.55be4abc.js"><link rel="prefetch" href="/igor/assets/js/64.e21b782a.js"><link rel="prefetch" href="/igor/assets/js/65.14b5681d.js"><link rel="prefetch" href="/igor/assets/js/66.f2b4d567.js"><link rel="prefetch" href="/igor/assets/js/67.40c82714.js"><link rel="prefetch" href="/igor/assets/js/68.582f642c.js"><link rel="prefetch" href="/igor/assets/js/69.8a4e453a.js"><link rel="prefetch" href="/igor/assets/js/7.689a71a1.js"><link rel="prefetch" href="/igor/assets/js/70.df59ee71.js"><link rel="prefetch" href="/igor/assets/js/71.7c8cbba5.js"><link rel="prefetch" href="/igor/assets/js/72.37ac92c6.js"><link rel="prefetch" href="/igor/assets/js/8.81cf1544.js"><link rel="prefetch" href="/igor/assets/js/9.a7b576f3.js">
+    <link rel="stylesheet" href="/igor/assets/css/0.styles.77c2bd1e.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container docpage"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/igor/" class="home-link router-link-active"><!----> <span class="site-name">Igor Reference Documentation (v0.6.8)</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/igor/" class="nav-link">
+  Home
+</a></div><div class="nav-item"><a href="/igor/user/" class="nav-link">
+  User Guide
+</a></div><div class="nav-item"><a href="/igor/developer/" class="nav-link router-link-active">
+  Developer Guide
+</a></div><div class="nav-item"><a href="/igor/examples/" class="nav-link">
+  Examples
+</a></div><div class="nav-item"><a href="https://www.github.com/arassec/igor" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  GitHub
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/igor/" class="nav-link">
+  Home
+</a></div><div class="nav-item"><a href="/igor/user/" class="nav-link">
+  User Guide
+</a></div><div class="nav-item"><a href="/igor/developer/" class="nav-link router-link-active">
+  Developer Guide
+</a></div><div class="nav-item"><a href="/igor/examples/" class="nav-link">
+  Examples
+</a></div><div class="nav-item"><a href="https://www.github.com/arassec/igor" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  GitHub
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>Getting Started</span> <span class="arrow right"></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>Custom Components</span> <span class="arrow down"></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/igor/developer/component.html" class="sidebar-link">General Concepts</a></li><li><a href="/igor/developer/trigger.html" aria-current="page" class="active sidebar-link">Custom Triggers</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/igor/developer/trigger.html#introduction" class="sidebar-link">Introduction</a></li><li class="sidebar-sub-header"><a href="/igor/developer/trigger.html#methods" class="sidebar-link">Methods</a></li><li class="sidebar-sub-header"><a href="/igor/developer/trigger.html#custom-manual-trigger" class="sidebar-link">Custom Manual Trigger</a></li><li class="sidebar-sub-header"><a href="/igor/developer/trigger.html#custom-scheduled-trigger" class="sidebar-link">Custom Scheduled Trigger</a></li><li class="sidebar-sub-header"><a href="/igor/developer/trigger.html#custom-event-trigger" class="sidebar-link">Custom Event Trigger</a></li></ul></li><li><a href="/igor/developer/action.html" class="sidebar-link">Custom Actions</a></li><li><a href="/igor/developer/connector.html" class="sidebar-link">Custom Connectors</a></li><li><a href="/igor/developer/documentation.html" class="sidebar-link">Documentation and I18N</a></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="custom-triggers"><a href="#custom-triggers" class="header-anchor">#</a> Custom Triggers</h1> <h2 id="introduction"><a href="#introduction" class="header-anchor">#</a> Introduction</h2> <p>Triggers start an igor job.
+At the moment, there are three kinds of triggers available in igor:</p> <ul><li>Triggers for manual execution</li> <li>Triggers that schedule a job based on a CRON expression</li> <li>Event based triggers</li></ul> <h2 id="methods"><a href="#methods" class="header-anchor">#</a> Methods</h2> <p>There should usually be no need to create a custom trigger.
+However, the following method might be useful and can be implemented by custom triggers:</p> <div class="language-java extra-class"><pre class="language-java"><code><span class="token comment">/**
+ * Creates the initial data item that is used as input for following actions.
+ *
+ * @return The initial data item.
+ */</span>
+<span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> <span class="token function">createDataItem</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><p>Additionally, custom event based triggers might be useful to support event sources that igor doesn't support natively.
+In this case the custom trigger can contain a (custom) connector that is used to retrieve the events.</p> <h2 id="custom-manual-trigger"><a href="#custom-manual-trigger" class="header-anchor">#</a> Custom Manual Trigger</h2> <p>A custom trigger for manual execution should extend <code>BaseTrigger</code> to get sensible defaults for the methods to override.</p> <p>The code of our custom manual trigger looks like this:</p> <div class="language-java extra-class"><pre class="language-java"><code><span class="token comment">/**
+ * A custom trigger for manual job execution.
+ */</span>
+<span class="token annotation punctuation">@IgorComponent</span><span class="token punctuation">(</span>categoryId <span class="token operator">=</span> <span class="token string">&quot;Demo-Triggers&quot;</span><span class="token punctuation">,</span> typeId <span class="token operator">=</span> <span class="token string">&quot;Custom-Manual-Trigger&quot;</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">CustomManualTrigger</span> <span class="token keyword">extends</span> <span class="token class-name">BaseTrigger</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">/**
+     * A sample parameter.
+     */</span>
+    <span class="token annotation punctuation">@IgorParam</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> demoParam<span class="token punctuation">;</span>
+
+    <span class="token comment">/**
+     * {@inheritDoc}
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> <span class="token function">createDataItem</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> dataItem <span class="token operator">=</span> <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">createDataItem</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        dataItem<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">&quot;demoParam&quot;</span><span class="token punctuation">,</span> demoParam<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> dataItem<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+</code></pre></div><p>This trigger will be available in igor under the Category- and Type-ID we set in the <code>@IgorComponent</code> annotation.</p> <table><thead><tr><th>Category</th> <th>Type</th></tr></thead> <tbody><tr><td>Demo-Triggers</td> <td>Custom-Manual-Trigger</td></tr></tbody></table> <p>The demo parameter will be added to the initial data item:</p> <div class="language-json extra-class"><pre class="language-json"><code><span class="token punctuation">{</span>
+  <span class="token property">&quot;demoParam&quot;</span><span class="token operator">:</span> <span class="token string">&quot;user input&quot;</span><span class="token punctuation">,</span>
+  <span class="token property">&quot;data&quot;</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">&quot;meta&quot;</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">&quot;jobId&quot;</span><span class="token operator">:</span> <span class="token string">&quot;2400f526-b5b2-4d7e-b1f7-12e8cb886944&quot;</span><span class="token punctuation">,</span>
+    <span class="token property">&quot;simulation&quot;</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">&quot;simulationLimit&quot;</span><span class="token operator">:</span> <span class="token number">25</span><span class="token punctuation">,</span>
+    <span class="token property">&quot;timestamp&quot;</span><span class="token operator">:</span> <span class="token number">1599587099204</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h2 id="custom-scheduled-trigger"><a href="#custom-scheduled-trigger" class="header-anchor">#</a> Custom Scheduled Trigger</h2> <p>A custom scheduled trigger must implement the <code>ScheduledTrigger</code> interface.</p> <p>The code of our custom scheduled trigger looks like this:</p> <div class="language-java extra-class"><pre class="language-java"><code><span class="token comment">/**
+ * A custom trigger for scheduled job execution.
+ */</span>
+<span class="token annotation punctuation">@IgorComponent</span><span class="token punctuation">(</span>categoryId <span class="token operator">=</span> <span class="token string">&quot;Demo-Triggers&quot;</span><span class="token punctuation">,</span> typeId <span class="token operator">=</span> <span class="token string">&quot;Custom-Scheduled-Trigger&quot;</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">CustomScheduledTrigger</span> <span class="token keyword">extends</span> <span class="token class-name">BaseTrigger</span> <span class="token keyword">implements</span> <span class="token class-name">ScheduledTrigger</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">/**
+     * The CRON expression that is used to trigger the job.
+     */</span>
+    <span class="token annotation punctuation">@NotEmpty</span>
+    <span class="token annotation punctuation">@IgorParam</span><span class="token punctuation">(</span>subtype <span class="token operator">=</span> <span class="token class-name">ParameterSubtype</span><span class="token punctuation">.</span><span class="token constant">CRON</span><span class="token punctuation">)</span>
+    <span class="token keyword">protected</span> <span class="token class-name">String</span> cronExpression<span class="token punctuation">;</span>
+
+    <span class="token comment">/**
+     * A sample parameter.
+     */</span>
+    <span class="token annotation punctuation">@IgorParam</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> demoParam<span class="token punctuation">;</span>
+
+    <span class="token comment">/**
+     * {@inheritDoc}
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> <span class="token function">createDataItem</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> dataItem <span class="token operator">=</span> <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">createDataItem</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        dataItem<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">&quot;demoParam&quot;</span><span class="token punctuation">,</span> demoParam<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> dataItem<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * {@inheritDoc}
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getCronExpression</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> cronExpression<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+</code></pre></div><p>This trigger will be available under the same category as the previous one:</p> <table><thead><tr><th>Category</th> <th>Type</th></tr></thead> <tbody><tr><td>Demo-Triggers</td> <td>Custom-Scheduled-Trigger</td></tr></tbody></table> <p>According to our code, the configured parameter will be added to the initial data item created by the trigger:</p> <div class="language-json extra-class"><pre class="language-json"><code><span class="token punctuation">{</span>
+  <span class="token property">&quot;demoParam&quot;</span><span class="token operator">:</span> <span class="token string">&quot;user input&quot;</span>
+  <span class="token property">&quot;data&quot;</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">&quot;meta&quot;</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">&quot;jobId&quot;</span><span class="token operator">:</span> <span class="token string">&quot;2400f526-b5b2-4d7e-b1f7-12e8cb886944&quot;</span><span class="token punctuation">,</span>
+    <span class="token property">&quot;simulation&quot;</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">&quot;simulationLimit&quot;</span><span class="token operator">:</span> <span class="token number">25</span><span class="token punctuation">,</span>
+    <span class="token property">&quot;timestamp&quot;</span><span class="token operator">:</span> <span class="token number">1599837870589</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h2 id="custom-event-trigger"><a href="#custom-event-trigger" class="header-anchor">#</a> Custom Event Trigger</h2> <p>A custom event trigger should extend <code>BaseEventTrigger</code> to get sensible defaults for the methods to override.</p> <p>The code of our custom event trigger looks like this:</p> <div class="language-java extra-class"><pre class="language-java"><code><span class="token comment">/**
+ * A custom trigger for jobs that are triggered by events.
+ */</span>
+<span class="token annotation punctuation">@IgorComponent</span><span class="token punctuation">(</span>categoryId <span class="token operator">=</span> <span class="token string">&quot;Demo-Triggers&quot;</span><span class="token punctuation">,</span> typeId <span class="token operator">=</span> <span class="token string">&quot;Custom-Event-Trigger&quot;</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">CustomEventTrigger</span> <span class="token keyword">extends</span> <span class="token class-name">BaseEventTrigger</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">/**
+     * Spring's publisher for events. This is used to start processing the
+     * event's data.
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">ApplicationEventPublisher</span> applicationEventPublisher<span class="token punctuation">;</span>
+
+    <span class="token comment">/**
+     * A sample parameter.
+     */</span>
+    <span class="token annotation punctuation">@IgorParam</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> demoParam<span class="token punctuation">;</span>
+
+    <span class="token comment">/**
+     * The job's ID.
+     */</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> jobId<span class="token punctuation">;</span>
+
+    <span class="token comment">/**
+     * Creates a new instance.
+     *
+     * @param applicationEventPublisher The event published injected by Spring.
+     */</span>
+    <span class="token keyword">public</span> <span class="token class-name">CustomEventTrigger</span><span class="token punctuation">(</span><span class="token class-name">ApplicationEventPublisher</span> applicationEventPublisher<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>applicationEventPublisher <span class="token operator">=</span> applicationEventPublisher<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * {@inheritDoc}
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">initialize</span><span class="token punctuation">(</span><span class="token class-name">JobExecution</span> jobExecution<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">initialize</span><span class="token punctuation">(</span>jobExecution<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>jobId <span class="token operator">=</span> jobExecution<span class="token punctuation">.</span><span class="token function">getJobId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// Simulates an event, fifteen seconds after the trigger is initialized...</span>
+        <span class="token keyword">var</span> timer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Timer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">TimerTask</span> fakeEvent <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TimerTask</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">fakeEvent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">;</span>
+        timer<span class="token punctuation">.</span><span class="token function">schedule</span><span class="token punctuation">(</span>fakeEvent<span class="token punctuation">,</span> <span class="token number">15000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * Usually, an event would be e.g. a message that is received, and the code to
+     * start processing the event's data could be integrated in a custom connector.
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">fakeEvent</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> dataItem <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        dataItem<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">&quot;currentTimeMillis&quot;</span><span class="token punctuation">,</span> <span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// The EventType must match the result provided by getSupportedEventType()!</span>
+        applicationEventPublisher<span class="token punctuation">.</span><span class="token function">publishEvent</span><span class="token punctuation">(</span>
+                <span class="token keyword">new</span> <span class="token class-name">JobTriggerEvent</span><span class="token punctuation">(</span>jobId<span class="token punctuation">,</span> dataItem<span class="token punctuation">,</span> <span class="token class-name">EventType</span><span class="token punctuation">.</span><span class="token constant">UNKNOWN</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * {@inheritDoc}
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> <span class="token function">createDataItem</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> dataItem <span class="token operator">=</span> <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">createDataItem</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        dataItem<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">&quot;demoParam&quot;</span><span class="token punctuation">,</span> demoParam<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> dataItem<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * {@inheritDoc}
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token class-name">EventType</span> <span class="token function">getSupportedEventType</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">EventType</span><span class="token punctuation">.</span><span class="token constant">UNKNOWN</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+</code></pre></div><p>Again, the trigger will be available under the category as the previous two.</p> <table><thead><tr><th>Category</th> <th>Type</th></tr></thead> <tbody><tr><td>Demo-Triggers</td> <td>Custom-Event-Trigger</td></tr></tbody></table> <p>According to our code, the data items processed will contain the current time in milliseconds since 1970 as &quot;event data&quot;.
+Additionally, the configured parameter value of our trigger will be added to the initial data item, too:</p> <div class="language-json extra-class"><pre class="language-json"><code><span class="token punctuation">{</span>
+  <span class="token property">&quot;demoParam&quot;</span><span class="token operator">:</span> <span class="token string">&quot;user input&quot;</span><span class="token punctuation">,</span>
+  <span class="token property">&quot;currentTimeMillis&quot;</span><span class="token operator">:</span> <span class="token number">1629041492762</span><span class="token punctuation">,</span>
+  <span class="token property">&quot;data&quot;</span><span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">&quot;meta&quot;</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">&quot;jobId&quot;</span><span class="token operator">:</span> <span class="token string">&quot;2400f526-b5b2-4d7e-b1f7-12e8cb886944&quot;</span><span class="token punctuation">,</span>
+    <span class="token property">&quot;simulation&quot;</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+    <span class="token property">&quot;timestamp&quot;</span><span class="token operator">:</span> <span class="token number">1629041492762</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/igor/developer/component.html" class="prev">
+        General Concepts
+      </a></span> <span class="next"><a href="/igor/developer/action.html">
+        Custom Actions
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/igor/assets/js/app.8bb422b5.js" defer></script><script src="/igor/assets/js/2.bedb1b07.js" defer></script><script src="/igor/assets/js/19.a54bf307.js" defer></script>
+  </body>
+</html>
