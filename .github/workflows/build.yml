@@ -27,11 +27,7 @@ jobs:
       run: ./mvnw org.jacoco:jacoco-maven-plugin:prepare-agent install --no-transfer-progress
 
     - name: Analyze with SonarCloud
-      uses: sonarsource/sonarcloud-github-action@master
-      with:
-        args: >
-          -Dsonar.organziation=arassec
-          -Dsonar.projectKey=arassec_igor
+      run: ./mvnw sonar:sonar -Dsonar.projectKey=arassec_igor -Dsonar.organization=arassec -Dsonar.host.url=https://sonarcloud.io --no-transfer-progress
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
