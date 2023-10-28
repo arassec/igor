@@ -67,10 +67,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <!-- Ignore sonar false positives: https://jira.sonarsource.com/browse/SONARJAVA-3157 -->
-        <sonar.issue.ignore.multicriteria>fp1</sonar.issue.ignore.multicriteria>
-        <sonar.issue.ignore.multicriteria.fp1.ruleKey>squid:S2637</sonar.issue.ignore.multicriteria.fp1.ruleKey>
-        <sonar.issue.ignore.multicriteria.fp1.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.fp1.resourceKey>
+        <!-- Sonar configuration -->
+        <sonar.organization>arassec</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <modules>
