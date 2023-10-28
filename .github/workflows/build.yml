@@ -38,6 +38,7 @@ jobs:
     - name: Build with Maven
       run: ./mvnw org.jacoco:jacoco-maven-plugin:prepare-agent install --no-transfer-progress
     - name: Analyze with SonarCloud
+      if: ${{ github.actor != 'dependabot[bot]' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
