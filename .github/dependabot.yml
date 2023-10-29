@@ -5,20 +5,3 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: com.google.cloud.tools:jib-maven-plugin
-    versions:
-    - 2.7.1
-    - 2.8.0
-  - dependency-name: com.github.eirslett:frontend-maven-plugin
-    versions:
-    - 1.11.2
-  - dependency-name: org.springframework.boot:spring-boot-starter-parent
-    versions:
-    - 2.4.2
-  - dependency-name: org.apache.sshd:sshd-scp
-    versions:
-    - 2.6.0
-  - dependency-name: org.apache.sshd:sshd-sftp
-    versions:
-    - 2.6.0

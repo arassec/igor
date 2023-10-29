@@ -1,23 +1,6 @@
-<p align="center">
-  <img width="256" src="https://raw.githubusercontent.com/arassec/igor/main/documentation/docs/.vuepress/public/logo.png" alt="igor-logo"/>
-</p>
+# <img src="https://raw.githubusercontent.com/arassec/igor/main/documentation/docs/.vuepress/public/logo.png" width="256"> [![Build Status](https://github.com/arassec/igor/workflows/Build/badge.svg?branch=main)](https://github.com/arassec/igor/actions?query=workflow%3ABuild")  [![Quality Gate](https://img.shields.io/sonar/quality_gate/arassec_igor?server=http%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/dashboard?id=arassec_igor") [![Code Coverage](https://img.shields.io/sonar/coverage/arassec_igor?server=http%3A%2F%2Fsonarcloud.io&color=success)](https://sonarcloud.io/component_measures?id=arassec_igor&metric=coverage&view=treemap") [![Maven Build Status](https://maven-badges.herokuapp.com/maven-central/com.arassec.igor/application/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.arassec.igor/application")
 
-<p align="center">
-  <a href="https://github.com/arassec/igor/actions?query=workflow%3ABuild">
-    <img src="https://github.com/arassec/igor/workflows/Build/badge.svg?branch=main" alt="build-state"/>
-  </a>
-  <a href="https://sonarcloud.io/dashboard?id=arassec_igor">
-    <img src="https://img.shields.io/sonar/quality_gate/arassec_igor?server=http%3A%2F%2Fsonarcloud.io" alt="quality-state"/>
-  </a>
-  <a href="https://sonarcloud.io/component_measures?id=arassec_igor&metric=coverage&view=treemap">
-    <img src="https://img.shields.io/sonar/coverage/arassec_igor?server=http%3A%2F%2Fsonarcloud.io&color=success" alt="coverage-state"/>
-  </a>
-  <a href="https://maven-badges.herokuapp.com/maven-central/com.arassec.igor/application">
-    <img src="https://maven-badges.herokuapp.com/maven-central/com.arassec.igor/application/badge.svg" alt="maven-central-version"/>
-  </a>
-</p> 
-
-# What is Igor?
+## About
 
 Igor is a tool for managing 'continuous workarounds'.
 
@@ -31,7 +14,7 @@ i.e. it provides a "low-code" environment for developers.
 It's written in Java using [Spring Boot](https://spring.io/projects/spring-boot) and provides an easy-to-use
 web-frontend written in [vue.js](https://vuejs.org/).
 
-# What can it do?
+## What can it do?
 
 Continuous workarounds are configured in igor using **jobs**.
 
@@ -47,7 +30,7 @@ these services..
 
 ![igor overview image](https://raw.githubusercontent.com/arassec/igor/main/documentation/docs/overview.png)
 
-# Quick Start
+## Quick Start
 
 Install igor using docker:
 
@@ -58,7 +41,7 @@ docker run --name igor -p8080:8080 arassec/igor
 
 Igor's web interface should now be available at: [http://localhost:8080](http://localhost:8080)
 
-# Connectors
+## Connectors
 
 There are currently builtin connectors for the following protocols and services:
 
@@ -83,13 +66,13 @@ There are currently builtin connectors for the following protocols and services:
 You can easily add new connectors by creating a Spring-Boot application and using the `igor-spring-boot-starter` as
 described in the documentation.
 
-# Reference Documentation
+## Reference Documentation
 
 The reference documentation is distributed within the igor application.
 The documentation of the latest, **stable** release is also available online at:
 
 [Igor Reference Documentation](https://arassec.github.io/igor/)
 
-# License
+## License
 
 This project is licensed under the [MIT License](https://github.com/arassec/igor/blob/main/LICENSE)
