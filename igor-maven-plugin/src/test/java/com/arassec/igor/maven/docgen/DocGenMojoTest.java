@@ -30,9 +30,8 @@ class DocGenMojoTest {
 
         DocumentationGenerator documentationGenerator = mock(DocumentationGenerator.class);
 
-        DocGenMojo docGenMojo = new DocGenMojo();
+        DocGenMojo docGenMojo = new DocGenMojo(documentationGenerator);
         docGenMojo.setProject(mavenProject);
-        docGenMojo.setDocumentationGenerator(documentationGenerator);
 
         docGenMojo.execute();
 
@@ -53,9 +52,8 @@ class DocGenMojoTest {
         DocumentationGenerator documentationGenerator = mock(DocumentationGenerator.class);
         doThrow(new IOException("test-exception")).when(documentationGenerator).generateDoc(any(Path.class), any(String.class), any(String.class), any(String.class));
 
-        DocGenMojo docGenMojo = new DocGenMojo();
+        DocGenMojo docGenMojo = new DocGenMojo(documentationGenerator);
         docGenMojo.setProject(mavenProject);
-        docGenMojo.setDocumentationGenerator(documentationGenerator);
 
         assertThrows(IgorException.class, docGenMojo::execute);
     }

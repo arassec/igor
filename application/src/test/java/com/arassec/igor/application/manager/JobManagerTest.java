@@ -470,14 +470,14 @@ class JobManagerTest {
 
         // This job should be put to the end of the list:
         ScheduledTrigger laterTriggerMock = mock(ScheduledTrigger.class);
-        when(laterTriggerMock.getCronExpression()).thenReturn("0 0 3 * * *");
+        when(laterTriggerMock.getCronExpression()).thenReturn("0 0 3 25 12 ?");
         Job laterJob = new Job();
         laterJob.setActive(true);
         laterJob.setTrigger(laterTriggerMock);
 
         // This job should be the first entry of the result list:
         ScheduledTrigger earlierTriggerMock = mock(ScheduledTrigger.class);
-        when(earlierTriggerMock.getCronExpression()).thenReturn("0 0 1 * * *");
+        when(earlierTriggerMock.getCronExpression()).thenReturn("0 0 1 24 12 ?");
         Job earlierJob = new Job();
         earlierJob.setActive(true);
         earlierJob.setTrigger(earlierTriggerMock);

@@ -75,6 +75,7 @@ public class JdbcJobExecutionRepository implements JobExecutionRepository {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("java:S3516") // "not always return the same value" sonar false positive
     public JobExecution findById(Long id) {
         var jobExecutionEntity = jobExecutionDao.findById(id).orElse(null);
         if (jobExecutionEntity != null) {

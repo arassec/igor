@@ -274,7 +274,8 @@ public class JobManager implements ApplicationListener<ContextRefreshedEvent>, D
      */
     public List<Job> loadScheduled() {
         return jobRepository.findAll().stream().filter(Job::isActive)
-            .filter(job -> job.getTrigger() instanceof ScheduledTrigger).sorted((jobOne, jobTwo) -> {
+            .filter(job -> job.getTrigger() instanceof ScheduledTrigger)
+            .sorted((jobOne, jobTwo) -> {
                 String firstCron = ((ScheduledTrigger) jobOne.getTrigger()).getCronExpression();
                 String secondCron = ((ScheduledTrigger) jobTwo.getTrigger()).getCronExpression();
                 var cronTriggerOne = CronExpression.parse(firstCron);

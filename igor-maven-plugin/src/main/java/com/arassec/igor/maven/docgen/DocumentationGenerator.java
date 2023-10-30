@@ -49,20 +49,29 @@ import java.util.stream.Stream;
 @Slf4j
 @Named
 @Singleton
-@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 public class DocumentationGenerator {
 
     /**
      * A primitive converter for HTML to Markdown.
      */
-    @Inject
-    private PrimitiveHtmlToMdConverter primitiveHtmlToMdConverter;
+    private final PrimitiveHtmlToMdConverter primitiveHtmlToMdConverter;
 
     /**
      * A converter for igor parameter properties to Markdown documentation.
      */
+    private final IgorParamsMdDocGenerator igorParamsMdDocGenerator;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param primitiveHtmlToMdConverter A primitive converter for HTML to Markdown.
+     * @param igorParamsMdDocGenerator   A converter for igor parameter properties to Markdown documentation.
+     */
     @Inject
-    private IgorParamsMdDocGenerator igorParamsMdDocGenerator;
+    public DocumentationGenerator(PrimitiveHtmlToMdConverter primitiveHtmlToMdConverter, IgorParamsMdDocGenerator igorParamsMdDocGenerator) {
+        this.primitiveHtmlToMdConverter = primitiveHtmlToMdConverter;
+        this.igorParamsMdDocGenerator = igorParamsMdDocGenerator;
+    }
 
     /**
      * Generates documentation of all igor components found in the module.
@@ -179,6 +188,7 @@ public class DocumentationGenerator {
     /**
      * Visitor that checks parsed classes for an {@link IgorComponent} annotation.
      */
+    @Getter
     @SuppressWarnings("java:S3985") // The class is used but Sonar doesn't recognize it...
     @RequiredArgsConstructor
     private static class IgorComponentCollector extends VoidVisitorAdapter<ClassOrInterfaceDeclaration> {
@@ -186,25 +196,21 @@ public class DocumentationGenerator {
         /**
          * The source file containing the original javadoc comments.
          */
-        @Getter
         private final Path sourceFile;
 
         /**
          * The result of the java parser for the source file.
          */
-        @Getter
         private final ParseResult<CompilationUnit> parseResult;
 
         /**
          * Type solver for analyzing parsed source files.
          */
-        @Getter
         private final CombinedTypeSolver combinedTypeSolver;
 
         /**
          * Contains all found igor components together with their respective Type-ID.
          */
-        @Getter
         Map<ClassOrInterfaceDeclaration, String> igorComponents = new HashMap<>();
 
         /**

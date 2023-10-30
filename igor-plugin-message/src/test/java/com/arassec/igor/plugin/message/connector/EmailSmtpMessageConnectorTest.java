@@ -8,7 +8,6 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import jakarta.mail.Message;
 import jakarta.mail.internet.MimeMessage;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -20,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests the {@link EmailSmtpMessageConnector}.
  */
-@Disabled("Disabled until GreenMail 2 is released to support jakarta.mail.")
 class EmailSmtpMessageConnectorTest {
 
     /**
@@ -66,9 +64,7 @@ class EmailSmtpMessageConnectorTest {
 
         connector.sendMessage("igor@arassec.com", "a@b.com", "smtp-test", "smtp junit test", "text/plain", List.of());
 
-        // TODO: Requires GreenMail 2:
-        //  MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
-        MimeMessage[] receivedMessages = {};
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
         assertEquals(1, receivedMessages.length);
 
         MimeMessage msg = receivedMessages[0];

@@ -8,7 +8,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,15 +22,14 @@ class IgorParamsMdDocGeneratorTest {
     /**
      * The converter under test.
      */
-    private final IgorParamsMdDocGenerator converter = new IgorParamsMdDocGenerator();
+    private final IgorParamsMdDocGenerator converter = new IgorParamsMdDocGenerator(new PrimitiveHtmlToMdConverter());
 
     /**
      * Initializes the test environment.
      */
     @BeforeEach
     @SneakyThrows
-    void inititialize() {
-        ReflectionTestUtils.setField(converter, "primitiveHtmlToMdConverter", new PrimitiveHtmlToMdConverter());
+    void initialize() {
         converter.initialize(Path.of("."), "", "/src/test/resources", new IgorComponentUtil());
     }
 

@@ -31,8 +31,17 @@ public class DocGenMojo extends AbstractMojo {
     /**
      * The generator for igor component documentation.
      */
-    @Inject
     private DocumentationGenerator documentationGenerator;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param documentationGenerator The generator for igor component documentation.
+     */
+    @Inject
+    public DocGenMojo(DocumentationGenerator documentationGenerator) {
+        this.documentationGenerator = documentationGenerator;
+    }
 
     /**
      * Creates the generated documentation of igor components.

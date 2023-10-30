@@ -45,8 +45,7 @@ public class IgorParamsMdDocGenerator {
     /**
      * The primitive "JavaDoc to markdown" converter of this plugin.
      */
-    @Inject
-    private PrimitiveHtmlToMdConverter primitiveHtmlToMdConverter;
+    private final PrimitiveHtmlToMdConverter primitiveHtmlToMdConverter;
 
     /**
      * The Classloader.
@@ -74,13 +73,22 @@ public class IgorParamsMdDocGenerator {
     private JavaParser javaParser;
 
     /**
+     * Creates a new instance.
+     *
+     * @param primitiveHtmlToMdConverter The primitive "JavaDoc to markdown" converter of this plugin.
+     */
+    @Inject
+    public IgorParamsMdDocGenerator(PrimitiveHtmlToMdConverter primitiveHtmlToMdConverter) {
+        this.primitiveHtmlToMdConverter = primitiveHtmlToMdConverter;
+    }
+
+    /**
      * Initializes the converter.
      *
      * @param projectRoot       The project's root path.
      * @param sourceDir         The path to the project's sources.
      * @param i18nSourceDir     The path to the project's I18N sources.
      * @param igorComponentUtil Igor's component utility.
-     *
      * @throws IOException In case the I18N files could not be read.
      */
     public void initialize(Path projectRoot, String sourceDir, String i18nSourceDir, IgorComponentUtil igorComponentUtil) throws IOException {
@@ -120,7 +128,6 @@ public class IgorParamsMdDocGenerator {
      *
      * @param igorComponent The component to create the paremeter's markdown from.
      * @param typeId        The component's typeId, required for I18N.
-     *
      * @return Documentation of all parameters of the component in markdown format.
      */
     public String generateDocumentation(ClassOrInterfaceDeclaration igorComponent, String typeId) {
@@ -147,7 +154,6 @@ public class IgorParamsMdDocGenerator {
      * Collects {@link FieldDeclaration}s of all fields annotated as igor parameters.
      *
      * @param igorComponent The component to get the fields from.
-     *
      * @return List of igor parameters, including fields from (available) super-classes.
      */
     private List<FieldDeclaration> collectIgorParams(ClassOrInterfaceDeclaration igorComponent) {
@@ -179,7 +185,6 @@ public class IgorParamsMdDocGenerator {
      * Extracts the sort index from the igor parameter annotation of a field.
      *
      * @param fieldDeclaration The field to get the sort index for.
-     *
      * @return The sort index.
      */
     private int extractSortIndex(FieldDeclaration fieldDeclaration) {
@@ -244,7 +249,6 @@ public class IgorParamsMdDocGenerator {
      * Tries to determine igor's default I18N properties file for translating the parameter names.
      *
      * @param directory The directory containing properties files for I18N.
-     *
      * @return Path to the default I18N file or an empty string, if none exists.
      */
     private String determineResourceBundleBasename(String directory) {
@@ -267,9 +271,9 @@ public class IgorParamsMdDocGenerator {
     /**
      * Collects the class or interface declaration of a parsed Java source file.
      */
+    @Getter
     private static class ClassOrInterfaceDeclarationCollector extends VoidVisitorAdapter<ClassOrInterfaceDeclaration> {
 
-        @Getter
         private ClassOrInterfaceDeclaration classOrInterfaceDeclaration;
 
         @Override
