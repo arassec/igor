@@ -226,18 +226,11 @@
                 <scope>test</scope>
             </dependency>
 
-            <!-- wiremock-jre8-standalone as a workaround until fix: https://github.com/wiremock/wiremock/issues/1760 -->
             <dependency>
-                <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock-jre8-standalone</artifactId>
-                <version>2.35.1</version>
+                <groupId>org.wiremock</groupId>
+                <artifactId>wiremock</artifactId>
+                <version>3.3.1</version>
                 <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.opentest4j</groupId>
-                        <artifactId>opentest4j</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
