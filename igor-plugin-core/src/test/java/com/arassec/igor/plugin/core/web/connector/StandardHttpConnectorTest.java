@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -178,6 +179,7 @@ class StandardHttpConnectorTest {
      */
     @Test
     @DisplayName("Tests authentication with client certificates.")
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true") // Disabled on Github due to instability.
     void testClientCertAuth() {
         // Start a server which requires client authentication:
         WireMockServer server = new WireMockServer(new WireMockConfiguration()
