@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @DisplayName("'HTTP' connector tests.")
-@DisabledIfEnvironmentVariable(named = "CI", matches = "true") // Disabled on Github due to instability.
 class StandardHttpConnectorTest {
 
     /**
@@ -180,6 +179,7 @@ class StandardHttpConnectorTest {
      */
     @Test
     @DisplayName("Tests authentication with client certificates.")
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true") // Disabled on Github due to instability.
     void testClientCertAuth() {
         // Start a server which requires client authentication:
         WireMockServer server = new WireMockServer(new WireMockConfiguration()
