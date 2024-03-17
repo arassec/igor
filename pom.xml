@@ -60,9 +60,9 @@
     <properties>
         <revision>1.0.0-SNAPSHOT</revision>
 
-        <java.version>17</java.version>
-        <maven.compiler.release>17</maven.compiler.release>
-        <nodejs.version>v18.12.1</nodejs.version>
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <nodejs.version>v20.11.1</nodejs.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -105,7 +105,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.3</version>
+                <version>3.2.5</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -129,7 +129,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.4.1</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -229,7 +229,7 @@
             <dependency>
                 <groupId>org.wiremock</groupId>
                 <artifactId>wiremock</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
                 <scope>test</scope>
             </dependency>
 
@@ -250,14 +250,14 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers</artifactId>
-                <version>1.19.6</version>
+                <version>1.19.7</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>junit-jupiter</artifactId>
-                <version>1.19.5</version>
+                <version>1.19.7</version>
                 <scope>test</scope>
             </dependency>
 
@@ -265,7 +265,7 @@
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-ui</artifactId>
-                <version>1.7.0</version>
+                <version>1.8.0</version>
             </dependency>
 
             <!-- plugin-file -->
@@ -293,7 +293,7 @@
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-plugin-api</artifactId>
-                <version>3.9.5</version>
+                <version>3.9.6</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -312,7 +312,7 @@
             <dependency>
                 <groupId>com.github.javaparser</groupId>
                 <artifactId>javaparser-symbol-solver-core</artifactId>
-                <version>3.25.8</version>
+                <version>3.25.9</version>
             </dependency>
 
             <dependency>
@@ -330,7 +330,7 @@
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-core</artifactId>
-                <version>3.9.5</version>
+                <version>3.9.6</version>
             </dependency>
 
         </dependencies>
@@ -377,7 +377,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.1.0</version>
+                        <version>3.2.0</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
