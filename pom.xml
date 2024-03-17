@@ -250,7 +250,7 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers</artifactId>
-                <version>1.19.6</version>
+                <version>1.19.7</version>
                 <scope>test</scope>
             </dependency>
 
@@ -265,7 +265,7 @@
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-ui</artifactId>
-                <version>1.7.0</version>
+                <version>1.8.0</version>
             </dependency>
 
             <!-- plugin-file -->
