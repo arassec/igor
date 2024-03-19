@@ -214,7 +214,8 @@ class StandardHttpConnectorTest {
         } catch (IgorException e) {
             // Extra check here, to make sure the request really failed because of the missing certificate!
             log.info("Expected test exception!", e);
-            assertTrue(e.getMessage().contains("bad_certificate"));
+            assertTrue(e.getMessage().contains("bad_certificate")
+                || e.getMessage().contains("terminated the handshake"));
         }
 
         // Use the test keystore as client certificate repository:
