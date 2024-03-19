@@ -25,19 +25,17 @@ export const jobEmailReceiverName='E-Mail Receiver'
 export const jobEmailReceiverKebap='e-mail-receiver'
 
 beforeEach(() => {
-    cy.server();
-
-    cy.route('GET', '/api/connector**').as('getConnectors')
-    cy.route('GET', '/api/connector/**').as('getConnectorData')
-    cy.route('GET', '/api/type/**').as('getTypes')
-    cy.route('GET', '/api/parameters/**').as('getParameters')
-    cy.route('POST', '/api/connector/test').as('testConnector')
-    cy.route('POST', '/api/connector').as('saveConnector')
-    cy.route('GET', '/api/job**').as('getJobs')
-    cy.route('POST', '/api/job').as('saveJob')
-    cy.route('GET', '/api/job/action/prototype').as('getActionPrototype')
-    cy.route('POST', '/api/job/simulate').as('simulateJob')
-    cy.route('POST', '/api/job/run').as('runJob')
-    cy.route('GET', '/api/execution/job/**').as('getJobExecutions')
-    cy.route('DELETE', '/api/job/**').as('deleteJob')
+    cy.intercept('GET', '/api/connector**').as('getConnectors')
+    cy.intercept('GET', '/api/connector/**').as('getConnectorData')
+    cy.intercept('GET', '/api/type/**').as('getTypes')
+    cy.intercept('GET', '/api/parameters/**').as('getParameters')
+    cy.intercept('POST', '/api/connector/test').as('testConnector')
+    cy.intercept('POST', '/api/connector').as('saveConnector')
+    cy.intercept('GET', '/api/job**').as('getJobs')
+    cy.intercept('POST', '/api/job').as('saveJob')
+    cy.intercept('GET', '/api/job/action/prototype').as('getActionPrototype')
+    cy.intercept('POST', '/api/job/simulate').as('simulateJob')
+    cy.intercept('POST', '/api/job/run').as('runJob')
+    cy.intercept('GET', '/api/execution/job/**').as('getJobExecutions')
+    cy.intercept('DELETE', '/api/job/**').as('deleteJob')
 });
