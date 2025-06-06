@@ -15,7 +15,7 @@
         "@fortawesome/free-solid-svg-icons": "^6.2.1",
         "@fortawesome/vue-fontawesome": "^3.0.2",
         "animate.css": "^4.1.1",
-        "axios": "^1.7.4",
+        "axios": "^1.8.2",
         "markdown-it": "^13.0.1",
         "pinia": "^2.0.28",
         "vue": "^3.2.45",
@@ -25,11 +25,11 @@
     },
     "devDependencies": {
         "@rushstack/eslint-patch": "^1.1.4",
-        "@vitejs/plugin-vue": "^4.0.0",
+        "@vitejs/plugin-vue": "^5.2.3",
         "@vue/eslint-config-prettier": "^7.0.0",
         "eslint": "^8.22.0",
         "eslint-plugin-vue": "^9.3.0",
         "prettier": "^2.7.1",
-        "vite": "^4.5.3"
+        "vite": "^6.3.4"
     }
 }
