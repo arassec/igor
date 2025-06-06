@@ -13,7 +13,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Controls a concurrency group, i.e. a list of {@link Action}s that should all be performed with the same number of threads.
+ * Controls a concurrency group i.e., a list of {@link Action}s that should all be performed with the same number of threads.
  */
 @Slf4j
 public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
@@ -31,6 +31,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     /**
      * Contains the output of this concurrency-group, which models the input for the following concurrency-group.
      */
+    @Getter
     private final BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingDeque<>();
 
     /**
@@ -39,14 +40,14 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     private final ThreadPoolExecutor threadPoolExecutor;
 
     /**
-     * The ID of this concurrency-group. Only used for logging purposes to identify this concureency-group.
+     * The ID of this concurrency-group. Only used for logging purposes to identify this concurrency-group.
      */
     private final String concurrencyGroupId;
 
     /**
-     * The runnables that invoke the actions.
+     * The list of {@link ActionsExecutingRunnable}s that invoke the actions.
      */
-    private final List<ActionsExecutingRunnable> runnables = new LinkedList<>();
+    private final List<ActionsExecutingRunnable> runnableList = new LinkedList<>();
 
     /**
      * The {@link JobExecution} contains information about the state of the current job run. Required here because an exception in
@@ -64,7 +65,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      *                           actions. The output of the last action is put into the output queue.
      * @param concurrencyGroupId The ID of this concurrency-group.
      * @param jobExecution       The {@link JobExecution} containing the current state of the job run.
-     * @param numThreads         The number of threads the job' actions should execute with.
+     * @param numThreads         The number of threads the job's actions should execute with.
      */
     public ConcurrencyGroup(List<Action> actions, BlockingQueue<Map<String, Object>> inputQueue, String concurrencyGroupId,
                             JobExecution jobExecution, int numThreads) {
@@ -73,7 +74,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         this.jobExecution = jobExecution;
 
         int threads = numThreads;
-        if (actions != null && !actions.isEmpty() && actions.get(0).enforceSingleThread()) {
+        if (actions != null && !actions.isEmpty() && actions.getFirst().enforceSingleThread()) {
             threads = 1;
         }
 
@@ -91,7 +92,7 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
 
         for (var i = 0; i < threads; i++) {
             var runnable = new ActionsExecutingRunnable(actions, inputQueue, outputQueue, jobExecution);
-            runnables.add(runnable);
+            runnableList.add(runnable);
             threadPoolExecutor.execute(runnable);
         }
     }
@@ -101,26 +102,26 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
      */
     public void complete() {
         waitForEmptyInputQueue();
-        runnables.forEach(ActionsExecutingRunnable::complete);
+        runnableList.forEach(ActionsExecutingRunnable::complete);
     }
 
     /**
      * Shuts the thread pool down after all incoming data has been processed. Threads might still run after calling this method if
      * e.g. a large file is copied in an action.
      * <p>
-     * In case the job is cancelled, this method will not wait for all data to be processed, but shut the thread pool down
+     * In case the job is canceled, this method will not wait for all data to be processed, but shut the thread pool down
      * immediately.
      */
     public void shutdown() {
         waitForEmptyInputQueue();
-        runnables.forEach(ActionsExecutingRunnable::shutdown);
+        runnableList.forEach(ActionsExecutingRunnable::shutdown);
         threadPoolExecutor.shutdown();
     }
 
     /**
      * Awaits the termination of the last threads in the thread pool.
      * <p>
-     * If the job is cancelled, or in case of interruptions, all running threads will be stopped immediately.
+     * If the job is canceled, or in case of interruptions, all running threads will be stopped immediately.
      *
      * @return {@code true}, if all threads in the group have been terminated. {@code false} otherwise.
      */
@@ -145,21 +146,12 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
     }
 
     /**
-     * Returns the output queue for the following concurrency-group.
-     *
-     * @return The {@link BlockingQueue} with the output of this group's actions.
-     */
-    public BlockingQueue<Map<String, Object>> getOutputQueue() {
-        return outputQueue;
-    }
-
-    /**
      * Catches exceptions thrown by threads of this concurrency-group.
      * <p>
-     * If the job is already cancelled, this method does nothing.
+     * If the job is already canceled, this method does nothing.
      *
      * @param thread    The thread that threw the exception.
-     * @param throwable The throwbale thrown by the thread.
+     * @param throwable The throwable thrown by the thread.
      */
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
@@ -179,25 +171,26 @@ public class ConcurrencyGroup implements Thread.UncaughtExceptionHandler {
         }
 
         var waitLock = new Object();
-        ScheduledExecutorService waitCheckExecutor = Executors.newSingleThreadScheduledExecutor();
+        try (ScheduledExecutorService waitCheckExecutor = Executors.newSingleThreadScheduledExecutor()) {
 
-        waitCheckExecutor.scheduleAtFixedRate(() -> {
+            waitCheckExecutor.scheduleAtFixedRate(() -> {
+                synchronized (waitLock) {
+                    log.trace("Checking for threads to finish their work to complete concurrency-group: {} ({})",
+                        concurrencyGroupId, inputQueue.size());
+                    if (inputQueue.isEmpty()) {
+                        waitLock.notifyAll();
+                    }
+                }
+            }, 0, 100, TimeUnit.MILLISECONDS);
+
             synchronized (waitLock) {
-                log.trace("Checking for threads to finish their work to complete concurrency-group: {} ({})",
-                    concurrencyGroupId, inputQueue.size());
-                if (inputQueue.isEmpty()) {
-                    waitLock.notifyAll();
+                try {
+                    while (!inputQueue.isEmpty()) {
+                        waitLock.wait();
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
-            }
-        }, 0, 100, TimeUnit.MILLISECONDS);
-
-        synchronized (waitLock) {
-            try {
-                while (!inputQueue.isEmpty()) {
-                    waitLock.wait();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             }
         }
     }

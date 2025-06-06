@@ -112,8 +112,8 @@ class JobExecutorTest {
         // An update event must be sent:
         ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
         verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
-        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
-        assertEquals(runningJob, argCap.getValue().getJob());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().type());
+        assertEquals(runningJob, argCap.getValue().job());
     }
 
     /**
@@ -152,10 +152,10 @@ class JobExecutorTest {
         ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
         verify(applicationEventPublisher, times(2)).publishEvent(argCap.capture());
 
-        assertEquals(JobEventType.STATE_REFRESH, argCap.getAllValues().get(0).getType());
-        assertEquals(runningJob, argCap.getAllValues().get(0).getJob());
-        assertEquals(JobEventType.STATE_REFRESH, argCap.getAllValues().get(1).getType());
-        assertEquals(waitingJob, argCap.getAllValues().get(1).getJob());
+        assertEquals(JobEventType.STATE_REFRESH, argCap.getAllValues().getFirst().type());
+        assertEquals(runningJob, argCap.getAllValues().getFirst().job());
+        assertEquals(JobEventType.STATE_REFRESH, argCap.getAllValues().get(1).type());
+        assertEquals(waitingJob, argCap.getAllValues().get(1).job());
     }
 
     /**
@@ -192,8 +192,8 @@ class JobExecutorTest {
         // An update event must be sent:
         ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
         verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
-        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
-        assertEquals(job, argCap.getValue().getJob());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().type());
+        assertEquals(job, argCap.getValue().job());
     }
 
     /**
@@ -244,8 +244,8 @@ class JobExecutorTest {
         // An update event must be sent:
         ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
         verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
-        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
-        assertEquals(job, argCap.getValue().getJob());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().type());
+        assertEquals(job, argCap.getValue().job());
     }
 
     /**
@@ -320,7 +320,7 @@ class JobExecutorTest {
 
         jobExecutor.onJobTriggerEvent(jobTriggerEvent);
 
-        verify(eventTriggerMock, times(1)).processEvent(jobTriggerEvent.getEventData());
+        verify(eventTriggerMock, times(1)).processEvent(jobTriggerEvent.eventData());
     }
 
     /**

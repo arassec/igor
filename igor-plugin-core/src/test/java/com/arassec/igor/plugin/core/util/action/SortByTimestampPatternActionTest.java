@@ -36,7 +36,7 @@ class SortByTimestampPatternActionTest extends CoreActionBaseTest {
         Map<String, Object> data = createData();
         List<Map<String, Object>> processedData = action.process(data, new JobExecution());
         assertTrue(processedData.isEmpty());
-        assertEquals(data, action.getCollectedData().get(0));
+        assertEquals(data, action.getCollectedData().getFirst());
         processedData = action.process(createData(), new JobExecution());
         assertTrue(processedData.isEmpty());
         assertEquals(2, action.getCollectedData().size());
@@ -61,7 +61,7 @@ class SortByTimestampPatternActionTest extends CoreActionBaseTest {
 
         List<Map<String, Object>> completedData = action.complete();
         assertEquals(3, completedData.size());
-        assertEquals("2014-04-13T03:00:00", completedData.get(0).get("timestamp"));
+        assertEquals("2014-04-13T03:00:00", completedData.getFirst().get("timestamp"));
         assertEquals("2019-12-29T14:13:11", completedData.get(1).get("timestamp"));
         assertEquals("2019-12-29T14:13:12", completedData.get(2).get("timestamp"));
 
@@ -69,7 +69,7 @@ class SortByTimestampPatternActionTest extends CoreActionBaseTest {
 
         completedData = action.complete();
         assertEquals(3, completedData.size());
-        assertEquals("2019-12-29T14:13:12", completedData.get(0).get("timestamp"));
+        assertEquals("2019-12-29T14:13:12", completedData.getFirst().get("timestamp"));
         assertEquals("2019-12-29T14:13:11", completedData.get(1).get("timestamp"));
         assertEquals("2014-04-13T03:00:00", completedData.get(2).get("timestamp"));
 
@@ -100,7 +100,7 @@ class SortByTimestampPatternActionTest extends CoreActionBaseTest {
 
         List<Map<String, Object>> completedData = action.complete();
         assertEquals(2, completedData.size());
-        assertEquals("20191229185100-gamma.jpeg", completedData.get(0).get("filename"));
+        assertEquals("20191229185100-gamma.jpeg", completedData.getFirst().get("filename"));
         assertEquals("alpha_20200113185100_beta.jpeg", completedData.get(1).get("filename"));
     }
 

@@ -190,7 +190,7 @@ class IgorComponentRegistryTest {
     @DisplayName("Tests getting an Action instance.")
     void testGetActionInstance() {
         Action actionInstance = igorComponentRegistry.createActionInstance("unknown-type-id", null);
-        assertTrue(actionInstance instanceof MissingComponentAction);
+        assertInstanceOf(MissingComponentAction.class, actionInstance);
 
         igorComponentRegistry.createActionInstance("action-type-id", null);
         verify(applicationContextMock, times(1)).getBean(actionMock.getClass());
@@ -203,7 +203,7 @@ class IgorComponentRegistryTest {
     @DisplayName("Tests getting a Connector instance.")
     void testGetConnectorInstance() {
         Connector connectorInstance = igorComponentRegistry.createConnectorInstance("unknown-type-id", null);
-        assertTrue(connectorInstance instanceof MissingComponentConnector);
+        assertInstanceOf(MissingComponentConnector.class, connectorInstance);
 
         igorComponentRegistry.createConnectorInstance("testconnector-type-id", null);
         verify(applicationContextMock, times(1)).getBean(TestConnectorImpl.class);
@@ -230,7 +230,7 @@ class IgorComponentRegistryTest {
     @DisplayName("Tests getting a Trigger instance.")
     void testGetTriggerInstance() {
         Trigger triggerInstance = igorComponentRegistry.createTriggerInstance("unknown-type-id", null);
-        assertTrue(triggerInstance instanceof MissingComponentTrigger);
+        assertInstanceOf(MissingComponentTrigger.class, triggerInstance);
 
         igorComponentRegistry.createTriggerInstance("trigger-type-id", null);
         verify(applicationContextMock, times(1)).getBean(triggerMock.getClass());

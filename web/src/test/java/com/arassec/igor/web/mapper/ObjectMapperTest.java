@@ -27,8 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -137,12 +136,12 @@ class ObjectMapperTest {
         assertEquals("trigger-id", testTrigger.getId());
 
         assertEquals(1, testJob.getActions().size());
-        TestAction testAction = (TestAction) testJob.getActions().get(0);
+        TestAction testAction = (TestAction) testJob.getActions().getFirst();
 
         assertEquals("action-id", testAction.getId());
         assertEquals("action-name", testAction.getName());
         assertEquals("action-description", testAction.getDescription());
-        assertTrue(testAction.getTestConnector() instanceof TestConnector);
+        assertInstanceOf(TestConnector.class, testAction.getTestConnector());
     }
 
     /**
@@ -179,7 +178,7 @@ class ObjectMapperTest {
 
         Connector testConnector = objectMapper.readValue(connectorJson, Connector.class);
 
-        assertTrue(testConnector instanceof TestConnector);
+        assertInstanceOf(TestConnector.class, testConnector);
 
         assertEquals(TestConnector.CONNECTOR_ID, testConnector.getId());
         assertEquals("connector-name", testConnector.getName());

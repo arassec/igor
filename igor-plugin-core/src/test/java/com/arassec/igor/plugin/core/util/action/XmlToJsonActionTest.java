@@ -42,13 +42,13 @@ class XmlToJsonActionTest {
 
         assertEquals(1, result.size());
 
-        Map<String, Object> json = result.get(0);
+        Map<String, Object> json = result.getFirst();
 
         Map<String, Object> convertedXml = ((Map<String, Object>) CorePluginUtils.getValue(json, "data.convertedXml", Map.class).orElseThrow());
 
         assertEquals("400", convertedXml.get("status"));
         assertEquals("This is an example.", convertedXml.get("message"));
-        assertEquals("A", ((List<String>) convertedXml.get("error")).get(0));
+        assertEquals("A", ((List<String>) convertedXml.get("error")).getFirst());
         assertEquals("B", ((List<String>) convertedXml.get("error")).get(1));
         assertEquals("C", ((List<String>) convertedXml.get("error")).get(2));
     }

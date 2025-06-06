@@ -29,7 +29,7 @@ class AddDataActionTest {
         List<Map<String, Object>> result = action.process(dataItem, new JobExecution());
 
         assertEquals(1, result.size());
-        assertEquals("{a={c=d, b=12}}", result.get(0).toString());
+        assertEquals("{a={c=d, b=12}}", result.getFirst().toString());
     }
 
 }

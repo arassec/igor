@@ -25,6 +25,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -110,7 +111,7 @@ class RestControllerExceptionHandlerTest {
         ResponseEntity<Object> responseEntity = exceptionHandler.handleMethodArgumentNotValid(exception,
                 mock(HttpHeaders.class), HttpStatus.OK, mock(WebRequest.class));
 
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, Objects.requireNonNull(responseEntity).getStatusCode());
         @SuppressWarnings("unchecked")
         Map<String, Object> resultJson = (Map<String, Object>) responseEntity.getBody();
         assertNotNull(resultJson);
@@ -138,7 +139,7 @@ class RestControllerExceptionHandlerTest {
         ResponseEntity<Object> responseEntity = exceptionHandler.handleMethodArgumentNotValid(exception,
                 mock(HttpHeaders.class), HttpStatus.OK, mock(WebRequest.class));
 
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, Objects.requireNonNull(responseEntity).getStatusCode());
         assertEquals("{job-id={name=a job with the same name already exists}}",
                 String.valueOf(responseEntity.getBody()));
 
@@ -152,7 +153,7 @@ class RestControllerExceptionHandlerTest {
 
         responseEntity = exceptionHandler.handleMethodArgumentNotValid(exception,
                 mock(HttpHeaders.class), HttpStatus.OK, mock(WebRequest.class));
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, Objects.requireNonNull(responseEntity).getStatusCode());
         assertEquals("{connector-id={name=a connector with the same name already exists}}",
                 String.valueOf(responseEntity.getBody()));
     }
@@ -177,7 +178,7 @@ class RestControllerExceptionHandlerTest {
         ResponseEntity<Object> responseEntity = exceptionHandler.handleMethodArgumentNotValid(exception,
                 mock(HttpHeaders.class), HttpStatus.OK, mock(WebRequest.class));
 
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, Objects.requireNonNull(responseEntity).getStatusCode());
         @SuppressWarnings("unchecked")
         Map<String, Object> resultJson = (Map<String, Object>) responseEntity.getBody();
         assertNotNull(resultJson);

@@ -174,7 +174,7 @@ public class DefaultJobStarter implements JobStarter {
                 result.add(concurrencyList);
                 lastNumThreads = threads;
             } else {
-                result.get(result.size() - 1).add(action);
+                result.getLast().add(action);
             }
         }
 

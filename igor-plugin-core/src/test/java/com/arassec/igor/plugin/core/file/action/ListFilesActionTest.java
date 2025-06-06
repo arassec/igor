@@ -43,7 +43,7 @@ class ListFilesActionTest {
 
         assertEquals(2, result.size());
 
-        DocumentContext json = JsonPath.parse(result.get(0));
+        DocumentContext json = JsonPath.parse(result.getFirst());
         assertEquals("fileA.jpg", json.read("$."+ DataKey.DATA.getKey() + "." + ListFilesAction.FILENAME_KEY));
         assertEquals("12345", json.read("$."+ DataKey.DATA.getKey() + "." + ListFilesAction.LAST_MODIFIED_KEY));
         assertEquals("/dir/", json.read("$."+ DataKey.DATA.getKey() + "." + ListFilesAction.DIRECTORY_KEY));

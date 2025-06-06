@@ -36,7 +36,7 @@ class ExecuteCommandActionTest {
 
         assertEquals(1, result.size());
 
-        Map<String, Object> data = result.get(0);
+        Map<String, Object> data = result.getFirst();
         assertTrue(StringUtils.hasText(((String) ((Map<String, Object>) data.get("commandExecution")).get("stdout"))));
     }
 
@@ -50,13 +50,13 @@ class ExecuteCommandActionTest {
     void testProcessUnix() {
         var action = new ExecuteCommandAction();
 
-        action.setCommand("ls");
+        action.setCommand("ls -alh");
 
         List<Map<String, Object>> result = action.process(new HashMap<>(), new JobExecution());
 
         assertEquals(1, result.size());
 
-        Map<String, Object> data = result.get(0);
+        Map<String, Object> data = result.getFirst();
         assertTrue(StringUtils.hasText(((String) ((Map<String, Object>) data.get("commandExecution")).get("stdout"))));
     }
 

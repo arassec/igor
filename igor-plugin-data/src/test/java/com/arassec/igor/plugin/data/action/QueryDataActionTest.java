@@ -12,10 +12,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the {@link QueryDataAction}.
@@ -73,9 +72,9 @@ class QueryDataActionTest {
         List<Map<String, Object>> result = action.process(data, JobExecution.builder().build());
         assertEquals(1, result.size());
 
-        List<Map<String, Object>> queryResult = (List<Map<String, Object>>) result.get(0).get("query-result");
+        List<Map<String, Object>> queryResult = (List<Map<String, Object>>) result.getFirst().get("query-result");
         assertEquals(2, queryResult.size());
-        assertEquals("value-one", queryResult.get(0).get("column"));
+        assertEquals("value-one", queryResult.getFirst().get("column"));
         assertEquals("value-two", queryResult.get(1).get("column"));
     }
 
@@ -100,9 +99,9 @@ class QueryDataActionTest {
         List<Map<String, Object>> result = action.process(data, JobExecution.builder().build());
         assertEquals(1, result.size());
 
-        List<Map<String, Object>> queryResult = (List<Map<String, Object>>) result.get(0).get("query-result");
+        List<Map<String, Object>> queryResult = (List<Map<String, Object>>) result.getFirst().get("query-result");
         assertEquals(1, queryResult.size());
-        assertEquals("value", queryResult.get(0).get("column"));
+        assertEquals("value", queryResult.getFirst().get("column"));
     }
 
 }

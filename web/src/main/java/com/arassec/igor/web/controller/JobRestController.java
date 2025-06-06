@@ -333,8 +333,8 @@ public class JobRestController extends BaseRestController {
             referencedConnectors.forEach(referencedConnector -> {
                 ModelPage<Pair<String, String>> referencingJobs = connectorManager
                     .getReferencingJobs(referencedConnector.getKey(), 0, Integer.MAX_VALUE);
-                if (referencingJobs != null && referencingJobs.getItems().size() == 1 && referencingJobs.getItems().iterator()
-                    .next().getKey().equals(id)) {
+                if (referencingJobs != null && referencingJobs.getItems().size() == 1 && referencingJobs.getItems()
+                    .getFirst().getKey().equals(id)) {
                     result.add(referencedConnector);
                 }
             });
@@ -353,19 +353,19 @@ public class JobRestController extends BaseRestController {
     public void onJobEvent(JobEvent jobEvent) {
         List<SseEmitter.SseEventBuilder> events = new LinkedList<>();
 
-        if (JobEventType.STATE_CHANGE.equals(jobEvent.getType()) ||
-            JobEventType.STATE_REFRESH.equals(jobEvent.getType())) {
-            var jobExecution = determineJobExecution(jobManager, jobEvent.getJob());
+        if (JobEventType.STATE_CHANGE.equals(jobEvent.type()) ||
+            JobEventType.STATE_REFRESH.equals(jobEvent.type())) {
+            var jobExecution = determineJobExecution(jobManager, jobEvent.job());
             events.add(SseEmitter.event().name(SSE_STATE_UPDATE).data(
-                new JobListEntry(jobEvent.getJob().getId(), jobEvent.getJob().getName(),
-                    jobEvent.getJob().isActive(), (jobManager.countExecutionsOfJobInState(jobEvent.getJob().getId(),
-                    JobExecutionState.FAILED) > 0), jobEvent.getJob().isFaultTolerant(), convert(jobExecution, null))
+                new JobListEntry(jobEvent.job().getId(), jobEvent.job().getName(),
+                    jobEvent.job().isActive(), (jobManager.countExecutionsOfJobInState(jobEvent.job().getId(),
+                    JobExecutionState.FAILED) > 0), jobEvent.job().isFaultTolerant(), convert(jobExecution, null))
             ));
-            if (JobEventType.STATE_CHANGE.equals(jobEvent.getType())) {
+            if (JobEventType.STATE_CHANGE.equals(jobEvent.type())) {
                 events.add(SseEmitter.event().name(SSE_EXECUTION_OVERVIEW).data(createJobExecutionOverview()));
             }
         } else {
-            events.add(SseEmitter.event().name(SSE_CRUD).data(jobEvent.getJob().getId()));
+            events.add(SseEmitter.event().name(SSE_CRUD).data(jobEvent.job().getId()));
             events.add(SseEmitter.event().name(SSE_EXECUTION_OVERVIEW).data(createJobExecutionOverview()));
         }
 

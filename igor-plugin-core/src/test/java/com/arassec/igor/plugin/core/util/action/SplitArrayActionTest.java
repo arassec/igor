@@ -36,7 +36,7 @@ class SplitArrayActionTest {
 
         assertEquals(3, result.size());
 
-        assertEquals("a", ((Map<String, Object>) result.get(0).get("data")).get("content"));
+        assertEquals("a", ((Map<String, Object>) result.getFirst().get("data")).get("content"));
         assertEquals("b", ((Map<String, Object>) result.get(1).get("data")).get("content"));
         assertEquals("c", ((Map<String, Object>) result.get(2).get("data")).get("content"));
     }
@@ -58,7 +58,7 @@ class SplitArrayActionTest {
 
         assertEquals(2, result.size());
 
-        assertEquals("b", ((Map<String, Object>) result.get(0).get("data")).get("a"));
+        assertEquals("b", ((Map<String, Object>) result.getFirst().get("data")).get("a"));
         assertEquals("d", ((Map<String, Object>) result.get(1).get("data")).get("c"));
     }
 

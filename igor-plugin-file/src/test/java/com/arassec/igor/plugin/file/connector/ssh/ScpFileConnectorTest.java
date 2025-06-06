@@ -8,7 +8,7 @@ import java.io.IOException;
 
 /**
  * Tests the {@link ScpFileConnector}.
- *
+ * <p>
  * Sonar blocker S2187 can be ignored, because there are tests executed in the base class!
  */
 @SuppressWarnings("java:S2187")

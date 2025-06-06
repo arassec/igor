@@ -117,7 +117,7 @@ class PersistValueActionTest extends CoreActionBaseTest {
 
         assertEquals(1, result.size());
         verify(persistentValueRepositoryMock, times(0)).upsert(eq(JOB_ID), any(PersistentValue.class));
-        assertEquals("Would have persisted: igor-message-test", result.get(0).get(DataKey.SIMULATION_LOG.getKey()));
+        assertEquals("Would have persisted: igor-message-test", result.getFirst().get(DataKey.SIMULATION_LOG.getKey()));
     }
 
 }

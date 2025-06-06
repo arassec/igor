@@ -34,8 +34,8 @@ class DuplicateActionTest extends CoreActionBaseTest {
         result = action.process(data, new JobExecution());
         assertEquals(3, result.size());
 
-        assertEquals(getString(result.get(0), "$"), getString(result.get(1), "$"));
-        assertEquals(getString(result.get(0), "$"), getString(result.get(2), "$"));
+        assertEquals(getString(result.getFirst(), "$"), getString(result.get(1), "$"));
+        assertEquals(getString(result.getFirst(), "$"), getString(result.get(2), "$"));
     }
 
 }

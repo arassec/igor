@@ -14,8 +14,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@link com.arassec.igor.core.model.job.Job} mapping.
@@ -87,12 +86,12 @@ class JobMapperTest extends MapperBaseTest {
         assertEquals("trigger-id", testTrigger.getId());
 
         assertEquals(1, testJob.getActions().size());
-        TestAction testAction = (TestAction) testJob.getActions().get(0);
+        TestAction testAction = (TestAction) testJob.getActions().getFirst();
 
         assertEquals("action-id", testAction.getId());
         assertEquals("action-name", testAction.getName());
         assertEquals("action-description", testAction.getDescription());
-        assertTrue(testAction.getTestConnector() instanceof TestConnector);
+        assertInstanceOf(TestConnector.class, testAction.getTestConnector());
     }
 
 }

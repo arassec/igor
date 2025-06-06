@@ -121,7 +121,7 @@ class JobTest {
      */
     @Test
     @DisplayName("Tests calling the {@link Job#cancel()} method and waiting for actions to finish")
-    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressWarnings({"ResultOfMethodCallIgnored", "resource"})
     @SneakyThrows
     void testJobCancellationByMethod() {
         JobExecution jobExecution = new JobExecution();

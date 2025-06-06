@@ -66,7 +66,7 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
         assertEquals(1, result.getTotalPages());
         assertEquals(1, result.getItems().size());
 
-        ConnectorListEntry connectorListEntry = result.getItems().get(0);
+        ConnectorListEntry connectorListEntry = result.getItems().getFirst();
 
         assertEquals("connector-id", connectorListEntry.getId());
         assertEquals("connector-name", connectorListEntry.getName());
@@ -99,7 +99,7 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
         assertEquals(1, result.getSize());
         assertEquals(1, result.getTotalPages());
         assertEquals(1, result.getItems().size());
-        assertEquals(testConnector, result.getItems().get(0));
+        assertEquals(testConnector, result.getItems().getFirst());
     }
 
     /**
@@ -308,8 +308,8 @@ class ConnectorRestControllerTest extends RestControllerBaseTest {
         });
 
         assertEquals(2, result.getItems().size());
-        assertEquals("job1-id", result.getItems().get(0).getKey());
-        assertEquals("job1-name", result.getItems().get(0).getValue());
+        assertEquals("job1-id", result.getItems().getFirst().getKey());
+        assertEquals("job1-name", result.getItems().getFirst().getValue());
         assertEquals("job2-id", result.getItems().get(1).getKey());
         assertEquals("job2-name", result.getItems().get(1).getValue());
     }

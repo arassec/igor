@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 /**
  * Serializer for igor components in the persistence module.
@@ -155,7 +156,7 @@ public class IgorComponentPersistenceSerializer extends StdSerializer<IgorCompon
      */
     private boolean isSecured(Field field) {
         var igorParam = field.getAnnotation(IgorParam.class);
-        return igorParam.secured() && field.getType().isAssignableFrom(String.class);
+        return Objects.requireNonNull(igorParam).secured() && field.getType().isAssignableFrom(String.class);
     }
 
 }

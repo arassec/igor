@@ -49,7 +49,7 @@ class ReceiveEmailActionTest extends MessageActionBaseTest {
 
         List<Map<String, Object>> result = action.process(data, new JobExecution());
         assertEquals(1, result.size());
-        assertEquals("mail-json", ((Map<String, Object>) result.get(0).get("message")).get("mail-data"));
+        assertEquals("mail-json", ((Map<String, Object>) result.getFirst().get("message")).get("mail-data"));
     }
 
 }

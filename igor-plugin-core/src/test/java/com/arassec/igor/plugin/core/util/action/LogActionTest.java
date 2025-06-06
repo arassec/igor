@@ -40,7 +40,7 @@ class LogActionTest extends CoreActionBaseTest {
         List<Map<String, Object>> result = logAction.process(data, new JobExecution());
 
         assertEquals(1, result.size());
-        assertEquals(data, result.get(0));
+        assertEquals(data, result.getFirst());
     }
 
     /**
@@ -57,7 +57,7 @@ class LogActionTest extends CoreActionBaseTest {
         List<Map<String, Object>> result = logAction.process(data, new JobExecution());
 
         assertEquals(1, result.size());
-        assertNotNull(result.get(0).get(DataKey.SIMULATION_LOG.getKey()));
+        assertNotNull(result.getFirst().get(DataKey.SIMULATION_LOG.getKey()));
     }
 
     /**

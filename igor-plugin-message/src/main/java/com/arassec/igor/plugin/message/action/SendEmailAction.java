@@ -16,7 +16,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <h2>'Send E-Mail' Action</h2>
@@ -127,7 +130,6 @@ public class SendEmailAction extends BaseAction {
         List<String> attachmentsPrepared = new LinkedList<>();
         if (StringUtils.hasText(attachmentsResolved)) {
             attachmentsPrepared = Arrays.stream(attachmentsResolved.split("\n"))
-                .filter(Objects::nonNull)
                 .toList();
         }
 

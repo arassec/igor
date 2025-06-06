@@ -28,17 +28,7 @@ class ConnectorMapperTest extends MapperBaseTest {
     @DisplayName("Tests serializing a connector.")
     @SneakyThrows(IOException.class)
     void testSerialization() {
-        TestConnector testConnector = new TestConnector();
-        testConnector.setId(TestConnector.CONNECTOR_ID);
-        testConnector.setName("connector-name");
-        testConnector.setIntParam(1);
-        testConnector.setIntegerParam(2);
-        testConnector.setLongParam(Long.MIN_VALUE);
-        testConnector.setLongObjectParam(Long.MAX_VALUE);
-        testConnector.setBooleanParam(Boolean.TRUE);
-        testConnector.setBooleanObjectParam(Boolean.FALSE);
-        testConnector.setStringParam("string-param");
-        testConnector.setSecuredStringParam("secured-string-param");
+        TestConnector testConnector = createTestConnector();
 
         Writer serializedConnector = new StringWriter();
 
@@ -73,6 +63,26 @@ class ConnectorMapperTest extends MapperBaseTest {
         assertEquals(Boolean.FALSE, testConnector.getBooleanObjectParam());
         assertEquals("string-param", testConnector.getStringParam());
         assertEquals("TestSecurityProvider.decrypt()", testConnector.getSecuredStringParam());
+    }
+
+    /**
+     * Creates a {@link TestConnector} instance with a default configuration for testing.
+     *
+     * @return A new instance.
+     */
+    private static TestConnector createTestConnector() {
+        TestConnector testConnector = new TestConnector();
+        testConnector.setId(TestConnector.CONNECTOR_ID);
+        testConnector.setName("connector-name");
+        testConnector.setIntParam(1);
+        testConnector.setIntegerParam(2);
+        testConnector.setLongParam(Long.MIN_VALUE);
+        testConnector.setLongObjectParam(Long.MAX_VALUE);
+        testConnector.setBooleanParam(Boolean.TRUE);
+        testConnector.setBooleanObjectParam(Boolean.FALSE);
+        testConnector.setStringParam("string-param");
+        testConnector.setSecuredStringParam("secured-string-param");
+        return testConnector;
     }
 
 }

@@ -69,7 +69,7 @@ public interface JobRepository {
      *
      * @param id The job's ID.
      *
-     * @return List of connector IDs and names used by this job.
+     * @return Set of connector IDs and names used by this job.
      */
     Set<Pair<String, String>> findReferencedConnectors(String id);
 

@@ -1,10 +1,9 @@
 package com.arassec.igor.core.model.annotation.validation;
 
 import com.arassec.igor.core.model.action.MissingComponentAction;
+import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import jakarta.validation.ConstraintValidatorContext;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;

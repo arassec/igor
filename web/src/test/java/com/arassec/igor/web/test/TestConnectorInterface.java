@@ -15,6 +15,7 @@ public interface TestConnectorInterface {
      * @return An integer.
      */
     @IgorSimulationSafe
+    @SuppressWarnings("unused")
     Integer simulationSafeMethod();
 
     /**
@@ -22,6 +23,7 @@ public interface TestConnectorInterface {
      *
      * @return A String if run out of simulation mode.
      */
+    @SuppressWarnings("unused")
     String simulationUnsafeMethod();
 
     /**
@@ -29,5 +31,7 @@ public interface TestConnectorInterface {
      *
      * @return A string.
      */
+    @SuppressWarnings("unused")
     String directlyAnnotatedSimulationSafeMethod();
+
 }

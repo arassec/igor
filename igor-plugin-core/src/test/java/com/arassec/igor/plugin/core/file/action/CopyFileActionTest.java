@@ -51,7 +51,7 @@ class CopyFileActionTest extends FileActionBaseTest {
         assertEquals(1, processedData.size());
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> data = (Map<String, Object>) processedData.get(0).get(CoreDataKey.COPIED_FILE.getKey());
+        Map<String, Object> data = (Map<String, Object>) processedData.getFirst().get(CoreDataKey.COPIED_FILE.getKey());
         assertAll("Copy file information is added to the data object.",
                 () -> assertEquals("/directory/test/", data.get(CoreDataKey.SOURCE_DIRECTORY.getKey())),
                 () -> assertEquals("filename.txt", data.get(CoreDataKey.SOURCE_FILENAME.getKey())),
@@ -98,7 +98,7 @@ class CopyFileActionTest extends FileActionBaseTest {
         assertEquals(1, processedData.size());
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> data = (Map<String, Object>) processedData.get(0).get(CoreDataKey.COPIED_FILE.getKey());
+        Map<String, Object> data = (Map<String, Object>) processedData.getFirst().get(CoreDataKey.COPIED_FILE.getKey());
         assertAll("Copy file information is added to the data object.",
                 () -> assertEquals("/", data.get(CoreDataKey.SOURCE_DIRECTORY.getKey())),
                 () -> assertEquals("file", data.get(CoreDataKey.SOURCE_FILENAME.getKey())),
@@ -115,7 +115,7 @@ class CopyFileActionTest extends FileActionBaseTest {
     }
 
     /**
-     * Tests the action with  unresolved parameters.
+     * Tests the action with unresolved parameters.
      */
     @Test
     @DisplayName("Tests the action with unresolved parameters.")
@@ -134,7 +134,7 @@ class CopyFileActionTest extends FileActionBaseTest {
         List<Map<String, Object>> processedData = action.process(data, new JobExecution());
 
         assertEquals(1, processedData.size());
-        assertEquals(data, processedData.get(0));
+        assertEquals(data, processedData.getFirst());
     }
 
     /**

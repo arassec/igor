@@ -9,11 +9,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public interface JobMixin {
 
     /**
-     * The job-execution is completely hold in memory during the execution. It should not be persisted in the database.
+     * The job-execution is hold completely in memory during the execution. It should not be persisted in the database.
      *
      * @return The current {@link JobExecution}.
      */
     @JsonIgnore
+    @SuppressWarnings("unused")
     JobExecution getCurrentJobExecution();
 
     /**
@@ -22,6 +23,7 @@ public interface JobMixin {
      * @return {@code true} if the job is currently running, {@code false} otherwise.
      */
     @JsonIgnore
+    @SuppressWarnings("unused")
     boolean isRunning();
 
 }

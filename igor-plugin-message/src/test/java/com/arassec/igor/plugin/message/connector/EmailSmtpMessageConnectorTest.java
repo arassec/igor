@@ -25,7 +25,7 @@ class EmailSmtpMessageConnectorTest {
      * Creates a local SMTP server for testing.
      */
     @RegisterExtension
-    static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+    final static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
         .withConfiguration(GreenMailConfiguration.aConfig().withUser("igor", "igor"))
         .withPerMethodLifecycle(false);
 

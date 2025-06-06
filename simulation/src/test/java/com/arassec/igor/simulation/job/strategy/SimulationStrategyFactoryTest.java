@@ -6,7 +6,7 @@ import com.arassec.igor.simulation.job.proxy.ProxyProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -24,10 +24,10 @@ class SimulationStrategyFactoryTest {
         SimulationStrategyFactory factory = new SimulationStrategyFactory(new ProxyProvider());
 
         SimulationStrategy strategy = factory.determineSimulationStrategy(Job.builder().build());
-        assertTrue(strategy instanceof DefaultSimulationStrategy);
+        assertInstanceOf(DefaultSimulationStrategy.class, strategy);
 
         strategy = factory.determineSimulationStrategy(Job.builder().trigger(mock(EventTrigger.class)).build());
-        assertTrue(strategy instanceof EventTriggeredSimulationStrategy);
+        assertInstanceOf(EventTriggeredSimulationStrategy.class, strategy);
     }
 
 }

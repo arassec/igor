@@ -13,8 +13,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
@@ -23,14 +22,14 @@ import static org.mockito.Mockito.*;
  * Tests the {@link ActionsExecutingRunnable}.
  */
 @DisplayName("Tests the runnable that is responsible for actions")
-class ActionsExecutingRunnnableTest {
+class ActionsExecutingRunnableTest {
 
     /**
      * Tests input validation on instance creation.
      */
     @Test
     @DisplayName("Tests input validation.")
-    void testInputvalidation() {
+    void testInputValidation() {
         assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, null, null, null));
         LinkedBlockingQueue<Map<String, Object>> linkedBlockingQueue = new LinkedBlockingQueue<>();
         assertThrows(IllegalArgumentException.class, () -> new ActionsExecutingRunnable(null, null, linkedBlockingQueue, null));
@@ -47,7 +46,7 @@ class ActionsExecutingRunnnableTest {
         inputData.put("test", "input");
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
-        inputQueue.offer(inputData);
+        assertTrue(inputQueue.offer(inputData));
 
         Map<String, Object> outputData = new HashMap<>();
         outputData.put("foo", "bar");
@@ -73,7 +72,7 @@ class ActionsExecutingRunnnableTest {
 
         when(secondActionMock.process(eq(inputData), nullable(JobExecution.class))).thenAnswer(invocationOnMock -> List.of(outputData));
 
-        // Finally run the runnable:
+        // Finally, run the runnable:
         actionsExecutingRunnable.run();
 
         // The last action's output should be in the output queue:
@@ -123,7 +122,7 @@ class ActionsExecutingRunnnableTest {
         inputData.put("test", "input");
 
         BlockingQueue<Map<String, Object>> inputQueue = new LinkedBlockingQueue<>();
-        inputQueue.offer(inputData);
+        assertTrue(inputQueue.offer(inputData));
 
         BlockingQueue<Map<String, Object>> outputQueue = new LinkedBlockingQueue<>();
 

@@ -55,7 +55,7 @@ class FilterByRegExpActionTest extends CoreActionBaseTest {
         List<Map<String, Object>> processedData = action.process(data, new JobExecution());
 
         assertEquals(1, processedData.size());
-        assertEquals(data, processedData.get(0));
+        assertEquals(data, processedData.getFirst());
 
         // doesn't match expression:
         action.setExpression("test.*igor");

@@ -48,7 +48,7 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
 
         assertEquals(8, parameters.size());
 
-        verifyParameter(parameters.get(0), "intParam", "int", 0);
+        verifyParameter(parameters.getFirst(), "intParam", "int", 0);
         verifyParameter(parameters.get(1), "integerParam", "java.lang.Integer", null);
         verifyParameter(parameters.get(2), "longParam", "long", 0);
         verifyParameter(parameters.get(3), "longObjectParam", "java.lang.Long", null);
@@ -83,32 +83,32 @@ class ParametersRestControllerTest extends RestControllerBaseTest {
 
         assertEquals(1, parameters.size());
 
-        assertEquals("testConnector", parameters.get(0).get(WebMapperKey.NAME.getKey()));
+        assertEquals("testConnector", parameters.getFirst().get(WebMapperKey.NAME.getKey()));
 
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> categoryCandidates = (List<Map<String, Object>>) parameters.get(0).get(WebMapperKey.CATEGORY_CANDIDATES.getKey());
+        List<Map<String, Object>> categoryCandidates = (List<Map<String, Object>>) parameters.getFirst().get(WebMapperKey.CATEGORY_CANDIDATES.getKey());
         assertEquals(2, categoryCandidates.size());
-        assertEquals("one", categoryCandidates.get(0).get(WebMapperKey.KEY.getKey()));
-        assertEquals("alpha", categoryCandidates.get(0).get(WebMapperKey.VALUE.getKey()));
+        assertEquals("one", categoryCandidates.getFirst().get(WebMapperKey.KEY.getKey()));
+        assertEquals("alpha", categoryCandidates.getFirst().get(WebMapperKey.VALUE.getKey()));
         assertEquals("two", categoryCandidates.get(1).get(WebMapperKey.KEY.getKey()));
         assertEquals("beta", categoryCandidates.get(1).get(WebMapperKey.VALUE.getKey()));
 
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> typeCandidates = (List<Map<String, Object>>) categoryCandidates.get(0).get(WebMapperKey.TYPE_CANDIDATES.getKey());
+        List<Map<String, Object>> typeCandidates = (List<Map<String, Object>>) categoryCandidates.getFirst().get(WebMapperKey.TYPE_CANDIDATES.getKey());
         assertEquals(1, typeCandidates.size());
-        assertEquals("four", typeCandidates.get(0).get(WebMapperKey.KEY.getKey()));
-        assertEquals("delta", typeCandidates.get(0).get(WebMapperKey.VALUE.getKey()));
+        assertEquals("four", typeCandidates.getFirst().get(WebMapperKey.KEY.getKey()));
+        assertEquals("delta", typeCandidates.getFirst().get(WebMapperKey.VALUE.getKey()));
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> secondTypeCandidates =
                 (List<Map<String, Object>>) categoryCandidates.get(1).get(WebMapperKey.TYPE_CANDIDATES.getKey());
         assertEquals(2, secondTypeCandidates.size());
-        assertEquals("b", secondTypeCandidates.get(0).get(WebMapperKey.KEY.getKey()));
-        assertEquals("b", secondTypeCandidates.get(0).get(WebMapperKey.VALUE.getKey()));
+        assertEquals("b", secondTypeCandidates.getFirst().get(WebMapperKey.KEY.getKey()));
+        assertEquals("b", secondTypeCandidates.getFirst().get(WebMapperKey.VALUE.getKey()));
         assertEquals("three", secondTypeCandidates.get(1).get(WebMapperKey.KEY.getKey()));
         assertEquals("gamma", secondTypeCandidates.get(1).get(WebMapperKey.VALUE.getKey()));
 
-        assertEquals(true, parameters.get(0).get(WebMapperKey.CONNECTOR.getKey()));
+        assertEquals(true, parameters.getFirst().get(WebMapperKey.CONNECTOR.getKey()));
     }
 
     /**

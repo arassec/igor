@@ -124,9 +124,9 @@ class JobManagerTest {
 
         verify(jobExecutionRepository, times(2)).upsert(argCap.capture());
 
-        assertEquals(JobExecutionState.FAILED, argCap.getAllValues().get(0).getExecutionState());
-        assertNotNull(argCap.getAllValues().get(0).getFinished());
-        assertEquals("Job interrupted due to application restart!", argCap.getAllValues().get(0).getErrorCause());
+        assertEquals(JobExecutionState.FAILED, argCap.getAllValues().getFirst().getExecutionState());
+        assertNotNull(argCap.getAllValues().getFirst().getFinished());
+        assertEquals("Job interrupted due to application restart!", argCap.getAllValues().getFirst().getErrorCause());
         assertEquals(JobExecutionState.FINISHED, argCap.getAllValues().get(1).getExecutionState());
         assertNotNull(argCap.getAllValues().get(1).getFinished());
         assertNull(argCap.getAllValues().get(1).getErrorCause());
@@ -176,8 +176,8 @@ class JobManagerTest {
         // A job event must be sent:
         ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
         verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
-        assertEquals(JobEventType.SAVE, argCap.getValue().getType());
-        assertEquals(savedJob, argCap.getValue().getJob());
+        assertEquals(JobEventType.SAVE, argCap.getValue().type());
+        assertEquals(savedJob, argCap.getValue().job());
     }
 
     /**
@@ -206,8 +206,8 @@ class JobManagerTest {
         // A job event must be sent:
         ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
         verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
-        assertEquals(JobEventType.SAVE, argCap.getValue().getType());
-        assertEquals(savedJob, argCap.getValue().getJob());
+        assertEquals(JobEventType.SAVE, argCap.getValue().type());
+        assertEquals(savedJob, argCap.getValue().job());
     }
 
     /**
@@ -247,8 +247,8 @@ class JobManagerTest {
         // A job event must be sent:
         ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
         verify(applicationEventPublisher, times(2)).publishEvent(argCap.capture());
-        assertEquals(JobEventType.DELETE, argCap.getAllValues().get(1).getType());
-        assertEquals(job, argCap.getAllValues().get(1).getJob());
+        assertEquals(JobEventType.DELETE, argCap.getAllValues().get(1).type());
+        assertEquals(job, argCap.getAllValues().get(1).job());
     }
 
     /**
@@ -280,8 +280,8 @@ class JobManagerTest {
         // A job event must be sent:
         ArgumentCaptor<JobEvent> jobEventArgCap = ArgumentCaptor.forClass(JobEvent.class);
         verify(applicationEventPublisher, times(1)).publishEvent(jobEventArgCap.capture());
-        assertEquals(JobEventType.STATE_CHANGE, jobEventArgCap.getValue().getType());
-        assertEquals(job, jobEventArgCap.getValue().getJob());
+        assertEquals(JobEventType.STATE_CHANGE, jobEventArgCap.getValue().type());
+        assertEquals(job, jobEventArgCap.getValue().job());
     }
 
     /**
@@ -373,8 +373,8 @@ class JobManagerTest {
         // A job event must be sent:
         ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
         verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
-        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
-        assertEquals(job, argCap.getValue().getJob());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().type());
+        assertEquals(job, argCap.getValue().job());
     }
 
     /**
@@ -454,7 +454,7 @@ class JobManagerTest {
         assertEquals(2, resultPage.getSize());
         assertEquals(1, resultPage.getTotalPages());
         assertEquals(2, resultPage.getItems().size());
-        assertEquals(failed, resultPage.getItems().get(0));
+        assertEquals(failed, resultPage.getItems().getFirst());
         assertEquals(failedHistory, resultPage.getItems().get(1));
     }
 
@@ -486,7 +486,7 @@ class JobManagerTest {
 
         List<Job> scheduledJobs = jobManager.loadScheduled();
         assertEquals(2, scheduledJobs.size());
-        assertEquals(earlierJob, scheduledJobs.get(0));
+        assertEquals(earlierJob, scheduledJobs.getFirst());
         assertEquals(laterJob, scheduledJobs.get(1));
     }
 
@@ -564,8 +564,8 @@ class JobManagerTest {
         // A job event must be sent:
         ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
         verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
-        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
-        assertEquals(job, argCap.getValue().getJob());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().type());
+        assertEquals(job, argCap.getValue().job());
     }
 
     /**
@@ -585,8 +585,8 @@ class JobManagerTest {
         // A job event must be sent:
         ArgumentCaptor<JobEvent> argCap = ArgumentCaptor.forClass(JobEvent.class);
         verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
-        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().getType());
-        assertEquals(job, argCap.getValue().getJob());
+        assertEquals(JobEventType.STATE_CHANGE, argCap.getValue().type());
+        assertEquals(job, argCap.getValue().job());
     }
 
     /**

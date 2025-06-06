@@ -23,7 +23,7 @@ public abstract class IgorComponentPersistenceDeserializer<T extends IgorCompone
     /**
      * The component registry.
      */
-    transient IgorComponentRegistry igorComponentRegistry;
+    final transient IgorComponentRegistry igorComponentRegistry;
 
     /**
      * Security provider for secured parameters that should be decrypted during deserialization.

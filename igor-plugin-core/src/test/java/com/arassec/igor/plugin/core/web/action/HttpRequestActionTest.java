@@ -37,7 +37,7 @@ class HttpRequestActionTest {
         action.initialize(new JobExecution());
 
         assertEquals(3, action.getParsedHeaders().size());
-        assertEquals("a: b", action.getParsedHeaders().get(0));
+        assertEquals("a: b", action.getParsedHeaders().getFirst());
         assertEquals("c:d", action.getParsedHeaders().get(1));
         assertEquals("e:f", action.getParsedHeaders().get(2));
     }
@@ -117,7 +117,7 @@ class HttpRequestActionTest {
         assertEquals(1, result.size());
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> webResponse = (Map<String, Object>) result.get(0).get("webResponse");
+        Map<String, Object> webResponse = (Map<String, Object>) result.getFirst().get("webResponse");
         assertTrue(webResponse.containsKey("headers"));
 
         @SuppressWarnings("unchecked")
@@ -198,7 +198,7 @@ class HttpRequestActionTest {
 
         assertEquals(1, result.size());
         assertEquals("Would have executed 'DELETE' against: http://localhost/must-not-be-called",
-                result.get(0).get(DataKey.SIMULATION_LOG.getKey()));
+                result.getFirst().get(DataKey.SIMULATION_LOG.getKey()));
     }
 
     /**

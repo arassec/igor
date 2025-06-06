@@ -47,9 +47,9 @@ public class EventTriggeredJobStarter extends DefaultJobStarter {
     @Override
     public List<ConcurrencyGroup> process() {
         // Yet another input queue... This one is used by the trigger to put received data items in. Those are then received below
-        // to put them in the input queue of the concurrency groups (i.e. hand them over to the actions).
+        // to put them in the input queue of the concurrency groups i.e., hand them over to the actions.
         BlockingQueue<Map<String, Object>> triggerEventInputQueue = new LinkedBlockingQueue<>(1);
-        if (!concurrencyLists.isEmpty() && !concurrencyLists.get(0).isEmpty()) {
+        if (!concurrencyLists.isEmpty() && !concurrencyLists.getFirst().isEmpty()) {
             triggerEventInputQueue = new LinkedBlockingQueue<>(triggerEventInputQueueCapacity);
         }
         ((EventTrigger) trigger).setEventQueue(triggerEventInputQueue);
@@ -69,7 +69,7 @@ public class EventTriggeredJobStarter extends DefaultJobStarter {
             }
             if (eventData != null) {
                 log.debug("Job '{}' triggered by event: {}", jobExecution.getJobId(), eventData);
-                trigger.createDataItem().forEach(eventData::put); // A custom trigger might add additional data to the items.
+                eventData.putAll(trigger.createDataItem()); // A custom trigger might add additional data to the items.
                 // ...and dispatch it to the waiting actions.
                 dispatchInitialDataItem(initialInputQueue, eventData, processingFinishedCallbackSet);
                 jobExecution.setProcessedEvents(jobExecution.getProcessedEvents() + 1);

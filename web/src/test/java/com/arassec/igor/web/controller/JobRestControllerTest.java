@@ -384,8 +384,8 @@ class JobRestControllerTest extends RestControllerBaseTest {
         });
 
         assertEquals(2, result.getItems().size());
-        assertEquals("id1", result.getItems().get(0).getJobId());
-        assertEquals("name1", result.getItems().get(0).getJobName());
+        assertEquals("id1", result.getItems().getFirst().getJobId());
+        assertEquals("name1", result.getItems().getFirst().getJobName());
         assertEquals("id3", result.getItems().get(1).getJobId());
         assertEquals("name3", result.getItems().get(1).getJobName());
     }
@@ -422,8 +422,8 @@ class JobRestControllerTest extends RestControllerBaseTest {
         });
 
         assertEquals(2, result.size());
-        assertEquals("connectorA-id", result.get(0).getKey());
-        assertEquals("connectorA", result.get(0).getValue());
+        assertEquals("connectorA-id", result.getFirst().getKey());
+        assertEquals("connectorA", result.getFirst().getValue());
         assertEquals("connectorC-id", result.get(1).getKey());
         assertEquals("connectorC", result.get(1).getValue());
     }
@@ -521,7 +521,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
         verify(emitterMock, times(2)).send(argCap.capture());
 
         // First Event
-        Iterator<ResponseBodyEmitter.DataWithMediaType> eventPartsIterator = argCap.getAllValues().get(0).build().iterator();
+        Iterator<ResponseBodyEmitter.DataWithMediaType> eventPartsIterator = argCap.getAllValues().getFirst().build().iterator();
 
         ResponseBodyEmitter.DataWithMediaType eventPart = eventPartsIterator.next();
         assertEquals("event:state-update\ndata:", eventPart.getData());
@@ -573,7 +573,7 @@ class JobRestControllerTest extends RestControllerBaseTest {
         verify(emitterMock, times(2)).send(argCap.capture());
 
         // First Event
-        Iterator<ResponseBodyEmitter.DataWithMediaType> eventPartsIterator = argCap.getAllValues().get(0).build().iterator();
+        Iterator<ResponseBodyEmitter.DataWithMediaType> eventPartsIterator = argCap.getAllValues().getFirst().build().iterator();
 
         ResponseBodyEmitter.DataWithMediaType eventPart = eventPartsIterator.next();
         assertEquals("event:crud\ndata:", eventPart.getData());

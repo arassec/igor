@@ -24,7 +24,7 @@ class SimulationResultTest {
         assertNull(simulationResult.getErrorCause());
 
         simulationResult = new SimulationResult(List.of(Map.of("a", "b")), "test-error-cause");
-        assertEquals(Map.of("a", "b"), simulationResult.getResults().get(0));
+        assertEquals(Map.of("a", "b"), simulationResult.getResults().getFirst());
         assertEquals("test-error-cause", simulationResult.getErrorCause());
     }
 

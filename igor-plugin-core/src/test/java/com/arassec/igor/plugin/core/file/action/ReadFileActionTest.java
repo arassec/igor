@@ -35,7 +35,7 @@ class ReadFileActionTest extends FileActionBaseTest {
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
         assertEquals(1, result.size());
-        assertEquals("igor-junit-test", result.get(0).get(ReadFileAction.KEY_FILE_CONTENTS));
+        assertEquals("igor-junit-test", result.getFirst().get(ReadFileAction.KEY_FILE_CONTENTS));
     }
 
     /**
@@ -51,7 +51,7 @@ class ReadFileActionTest extends FileActionBaseTest {
         List<Map<String, Object>> processedData = action.process(data, new JobExecution());
 
         assertEquals(1, processedData.size());
-        assertEquals(data, processedData.get(0));
+        assertEquals(data, processedData.getFirst());
     }
 
 }

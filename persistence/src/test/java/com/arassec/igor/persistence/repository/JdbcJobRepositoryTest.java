@@ -87,7 +87,7 @@ class JdbcJobRepositoryTest {
 
         assertNotNull(savedJob.getId());
         assertNotNull(savedJob.getTrigger().getId());
-        assertNotNull(savedJob.getActions().get(0).getId());
+        assertNotNull(savedJob.getActions().getFirst().getId());
 
         ArgumentCaptor<JobEntity> argCap = ArgumentCaptor.forClass(JobEntity.class);
         verify(jobDao, times(1)).save(argCap.capture());

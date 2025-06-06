@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -55,8 +55,8 @@ class HttpFileDownloadActionTest extends CoreActionBaseTest {
     @DisplayName("Tests default values of a new instance.")
     void testDefaults() {
         HttpFileDownloadAction action = new HttpFileDownloadAction();
-        assertTrue(action.getHttpConnector() instanceof FallbackHttpConnector);
-        assertTrue(action.getTarget() instanceof FallbackFileConnector);
+        assertInstanceOf(FallbackHttpConnector.class, action.getHttpConnector());
+        assertInstanceOf(FallbackFileConnector.class, action.getTarget());
     }
 
     /**
@@ -71,7 +71,7 @@ class HttpFileDownloadActionTest extends CoreActionBaseTest {
         action.initialize(new JobExecution());
 
         assertEquals(3, action.getParsedHeaders().size());
-        assertEquals("a: b", action.getParsedHeaders().get(0));
+        assertEquals("a: b", action.getParsedHeaders().getFirst());
         assertEquals("c:d", action.getParsedHeaders().get(1));
         assertEquals("e:f", action.getParsedHeaders().get(2));
     }
@@ -127,8 +127,8 @@ class HttpFileDownloadActionTest extends CoreActionBaseTest {
         List<Map<String, Object>> result = action.process(data, new JobExecution());
 
         assertEquals(1, result.size());
-        assertEquals("filename", getString(result.get(0), "$.actionResult." + CoreDataKey.TARGET_FILENAME.getKey()));
-        assertEquals("/target/dir", getString(result.get(0), "$.actionResult." + CoreDataKey.TARGET_DIRECTORY.getKey()));
+        assertEquals("filename", getString(result.getFirst(), "$.actionResult." + CoreDataKey.TARGET_FILENAME.getKey()));
+        assertEquals("/target/dir", getString(result.getFirst(), "$.actionResult." + CoreDataKey.TARGET_DIRECTORY.getKey()));
 
         // The first response's input stream must have been closed!
         verify(inputStreamMock, times(1)).close();
@@ -172,8 +172,8 @@ class HttpFileDownloadActionTest extends CoreActionBaseTest {
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
         assertEquals(1, result.size());
-        assertEquals("file", getString(result.get(0), "$.actionResult." + CoreDataKey.TARGET_FILENAME.getKey()));
-        assertEquals("/target", getString(result.get(0), "$.actionResult." + CoreDataKey.TARGET_DIRECTORY.getKey()));
+        assertEquals("file", getString(result.getFirst(), "$.actionResult." + CoreDataKey.TARGET_FILENAME.getKey()));
+        assertEquals("/target", getString(result.getFirst(), "$.actionResult." + CoreDataKey.TARGET_DIRECTORY.getKey()));
 
         // The response's input stream must have been closed!
         verify(inputStreamMock, times(1)).close();
@@ -220,8 +220,8 @@ class HttpFileDownloadActionTest extends CoreActionBaseTest {
         List<Map<String, Object>> result = action.process(createData(), new JobExecution());
 
         assertEquals(1, result.size());
-        assertEquals("file.json", getString(result.get(0), "$.actionResult." + CoreDataKey.TARGET_FILENAME.getKey()));
-        assertEquals("/target", getString(result.get(0), "$.actionResult." + CoreDataKey.TARGET_DIRECTORY.getKey()));
+        assertEquals("file.json", getString(result.getFirst(), "$.actionResult." + CoreDataKey.TARGET_FILENAME.getKey()));
+        assertEquals("/target", getString(result.getFirst(), "$.actionResult." + CoreDataKey.TARGET_DIRECTORY.getKey()));
 
         // The first response's input stream must have been closed!
         verify(inputStreamMock, times(1)).close();

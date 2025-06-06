@@ -57,10 +57,10 @@ class ProxyProviderTest {
 
         proxyProvider.applyProxies(job);
 
-        assertTrue(job.getTrigger() instanceof TriggerProxy);
-        assertTrue(job.getActions().get(0) instanceof ActionProxy);
+        assertInstanceOf(TriggerProxy.class, job.getTrigger());
+        assertInstanceOf(ActionProxy.class, job.getActions().getFirst());
 
-        ActionProxy actionProxy = (ActionProxy) job.getActions().get(0);
+        ActionProxy actionProxy = (ActionProxy) job.getActions().getFirst();
 
         TestAction testActionDelegate = (TestAction) actionProxy.getDelegate();
 
@@ -83,7 +83,7 @@ class ProxyProviderTest {
 
         proxyProvider.applyProxies(job);
 
-        assertTrue(job.getTrigger() instanceof EventTriggerProxy);
+        assertInstanceOf(EventTriggerProxy.class, job.getTrigger());
     }
 
 }

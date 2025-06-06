@@ -49,7 +49,7 @@ public class ExecuteCommandAction extends BaseAction {
         Map<String, Object> commandExecution = new HashMap<>();
 
         try {
-            var process = Runtime.getRuntime().exec(resolvedCommand);
+            var process = Runtime.getRuntime().exec(resolvedCommand.split(" "));
 
             commandExecution.put("stdout", new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8));
             commandExecution.put("stderr", new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8));

@@ -68,7 +68,7 @@ public class WebConfiguration {
             for (var i = 1; i < messageSources.size(); i++) {
                 ((HierarchicalMessageSource) messageSources.get(i)).setParentMessageSource(messageSources.get(i - 1));
             }
-            messageSource.setParentMessageSource(messageSources.get(messageSources.size() - 1));
+            messageSource.setParentMessageSource(messageSources.getLast());
         }
         messageSource.setUseCodeAsDefaultMessage(true);
         return messageSource;

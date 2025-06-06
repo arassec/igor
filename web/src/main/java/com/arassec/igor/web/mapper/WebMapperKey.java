@@ -38,7 +38,7 @@ public enum WebMapperKey {
     DESCRIPTION("description"),
 
     /**
-     * The key key. :)
+     * The 'key' key. :)
      */
     KEY("key"),
 

@@ -20,8 +20,8 @@ class JobEventTest {
     void testCreationAndPropertyHandling() {
         Job job = Job.builder().build();
         JobEvent event = new JobEvent(JobEventType.STATE_CHANGE, job);
-        assertEquals(JobEventType.STATE_CHANGE, event.getType());
-        assertEquals(job, event.getJob());
+        assertEquals(JobEventType.STATE_CHANGE, event.type());
+        assertEquals(job, event.job());
     }
 
 }

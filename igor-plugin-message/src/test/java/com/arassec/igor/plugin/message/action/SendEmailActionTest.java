@@ -49,7 +49,7 @@ class SendEmailActionTest extends MessageActionBaseTest {
         List<Map<String, Object>> result = action.process(data, new JobExecution());
 
         assertEquals(1, result.size());
-        assertEquals(data, result.get(0));
+        assertEquals(data, result.getFirst());
 
         verify(connector, times(1)).sendMessage("igor@arassec.com", "a@b.com,c@d.org", "igor-test", "Igor mail test!",
             "text/plain", List.of("a.txt", "b.csv"));

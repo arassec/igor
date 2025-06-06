@@ -35,7 +35,7 @@ class PauseActionTest extends CoreActionBaseTest {
         ((Map<String, Object>) data.get(DataKey.META.getKey())).put(DataKey.SIMULATION.getKey(), true);
 
         List<Map<String, Object>> processedData = pauseAction.process(data, new JobExecution());
-        assertEquals("Would have paused for 666 milliseconds.", processedData.get(0).get(DataKey.SIMULATION_LOG.getKey()));
+        assertEquals("Would have paused for 666 milliseconds.", processedData.getFirst().get(DataKey.SIMULATION_LOG.getKey()));
     }
 
     /**
@@ -51,7 +51,7 @@ class PauseActionTest extends CoreActionBaseTest {
 
         List<Map<String, Object>> processedData = pauseAction.process(data, new JobExecution());
 
-        assertEquals(data, processedData.get(0));
+        assertEquals(data, processedData.getFirst());
     }
 
     /**
@@ -71,7 +71,7 @@ class PauseActionTest extends CoreActionBaseTest {
         Thread.currentThread().interrupt();
         pauseAction.process(createData(), new JobExecution());
 
-        assertEquals("Interrupted during pause action!", listAppender.list.get(0).getMessage());
+        assertEquals("Interrupted during pause action!", listAppender.list.getFirst().getMessage());
     }
 
 }

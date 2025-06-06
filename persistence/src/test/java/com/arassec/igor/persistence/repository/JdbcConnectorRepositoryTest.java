@@ -181,7 +181,7 @@ class JdbcConnectorRepositoryTest {
         when(persistenceConnectorMapper.readValue("connector-json", Connector.class)).thenReturn(new TestConnector());
 
         assertEquals(1, repository.findAll().size());
-        assertTrue(repository.findAll().get(0) instanceof TestConnector);
+        assertInstanceOf(TestConnector.class, repository.findAll().getFirst());
     }
 
     /**
@@ -230,7 +230,7 @@ class JdbcConnectorRepositoryTest {
         assertEquals(4, resultPage.getSize());
         assertEquals(5, resultPage.getTotalPages());
         assertEquals(1, resultPage.getItems().size());
-        assertTrue(resultPage.getItems().get(0) instanceof TestConnector);
+        assertInstanceOf(TestConnector.class, resultPage.getItems().getFirst());
     }
 
     /**
@@ -266,7 +266,7 @@ class JdbcConnectorRepositoryTest {
         assertEquals(4, resultPage.getSize());
         assertEquals(5, resultPage.getTotalPages());
         assertEquals(1, resultPage.getItems().size());
-        assertTrue(resultPage.getItems().get(0) instanceof TestConnector);
+        assertInstanceOf(TestConnector.class, resultPage.getItems().getFirst());
     }
 
     /**
@@ -302,8 +302,8 @@ class JdbcConnectorRepositoryTest {
         ModelPage<Pair<String, String>> referencingJobs = repository.findReferencingJobs("connector-id", 1, 2);
 
         assertEquals(1, referencingJobs.getItems().size());
-        assertEquals("job-id", referencingJobs.getItems().get(0).getKey());
-        assertEquals("job-name", referencingJobs.getItems().get(0).getValue());
+        assertEquals("job-id", referencingJobs.getItems().getFirst().getKey());
+        assertEquals("job-name", referencingJobs.getItems().getFirst().getValue());
     }
 
 }

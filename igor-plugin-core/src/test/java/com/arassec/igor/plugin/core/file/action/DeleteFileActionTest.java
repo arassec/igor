@@ -35,7 +35,7 @@ class DeleteFileActionTest extends FileActionBaseTest {
         List<Map<String, Object>> processedData = action.process(data, new JobExecution());
 
         assertEquals(1, processedData.size());
-        assertEquals(data, processedData.get(0));
+        assertEquals(data, processedData.getFirst());
 
         verify(fileConnectorMock, times(1)).delete("/directory/test/filename.txt");
     }
@@ -55,7 +55,7 @@ class DeleteFileActionTest extends FileActionBaseTest {
         List<Map<String, Object>> processedData = action.process(data, new JobExecution());
 
         assertEquals(1, processedData.size());
-        assertEquals(data, processedData.get(0));
+        assertEquals(data, processedData.getFirst());
     }
 
 }

@@ -74,9 +74,9 @@ class JobsHealthIndicatorTest {
 
         @SuppressWarnings("unchecked")
         List<Map<String, ?>> details = (List<Map<String, ?>>) health.getDetails().get("jobs");
-        assertEquals("job-id", details.get(0).get("jobId"));
-        assertEquals("job-name", details.get(0).get("jobName"));
-        assertEquals("FAILED", details.get(0).get("jobExecutionState"));
+        assertEquals("job-id", details.getFirst().get("jobId"));
+        assertEquals("job-name", details.getFirst().get("jobName"));
+        assertEquals("FAILED", details.getFirst().get("jobExecutionState"));
         assertEquals("inactive-job-id", details.get(1).get("jobId"));
         assertEquals("inactive-job-name", details.get(1).get("jobName"));
         assertEquals("FAILED", details.get(1).get("jobExecutionState"));
