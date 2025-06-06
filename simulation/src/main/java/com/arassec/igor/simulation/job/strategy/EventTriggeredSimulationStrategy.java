@@ -35,35 +35,37 @@ public class EventTriggeredSimulationStrategy extends BaseSimulationStrategy {
     public Map<String, SimulationResult> simulate(Job job, JobExecution jobExecution) {
         proxyProvider.applyProxies(job);
 
-        ExecutorService jobExecutor = Executors.newSingleThreadExecutor();
-        jobExecutor.submit(() -> job.start(jobExecution));
+        try (ExecutorService jobExecutor = Executors.newSingleThreadExecutor()) {
+            jobExecutor.submit(() -> job.start(jobExecution));
 
-        var processedEventsLock = new Object();
+            var processedEventsLock = new Object();
 
-        ScheduledExecutorService jobFinishedCheckExecutor = Executors.newSingleThreadScheduledExecutor();
-        jobFinishedCheckExecutor.scheduleAtFixedRate(() -> {
-            synchronized (processedEventsLock) {
-                if (jobExecution.getProcessedEvents() > 0 || (jobExecution.getStarted() != null && !jobExecution.isRunningOrActive())) {
-                    processedEventsLock.notifyAll();
+            try (ScheduledExecutorService jobFinishedCheckExecutor = Executors.newSingleThreadScheduledExecutor()) {
+                jobFinishedCheckExecutor.scheduleAtFixedRate(() -> {
+                    synchronized (processedEventsLock) {
+                        if (jobExecution.getProcessedEvents() > 0 || (jobExecution.getStarted() != null && !jobExecution.isRunningOrActive())) {
+                            processedEventsLock.notifyAll();
+                        }
+                    }
+                }, 0, 100, TimeUnit.MILLISECONDS);
+
+                synchronized (processedEventsLock) {
+                    try {
+                        while (jobExecution.getProcessedEvents() == 0 && (jobExecution.getStarted() == null ||
+                            jobExecution.isRunningOrActive())) {
+                            processedEventsLock.wait();
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
-            }
-        }, 0, 100, TimeUnit.MILLISECONDS);
 
-        synchronized (processedEventsLock) {
-            try {
-                while (jobExecution.getProcessedEvents() == 0 && (jobExecution.getStarted() == null ||
-                        jobExecution.isRunningOrActive())) {
-                    processedEventsLock.wait();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                job.cancel();
+
+                jobExecutor.shutdown();
+                jobFinishedCheckExecutor.shutdown();
             }
         }
-
-        job.cancel();
-
-        jobExecutor.shutdown();
-        jobFinishedCheckExecutor.shutdown();
 
         return extractSimulationResult(job, jobExecution);
     }

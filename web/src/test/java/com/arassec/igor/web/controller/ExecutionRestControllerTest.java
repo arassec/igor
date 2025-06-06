@@ -56,8 +56,11 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
                 ).build()));
 
         String streamContent = mvcResult.getResponse().getContentAsString();
-        assertEquals("data:{\"executionState\":\"RUNNING\",\"processedEvents\":0,\"workInProgress\":[]," +
-                "\"runningOrActive\":true}\n\n", streamContent);
+        assertEquals("""
+            data:{"executionState":"RUNNING","processedEvents":0,"workInProgress":[],\
+            "runningOrActive":true}
+
+            """, streamContent);
     }
 
     /**
@@ -96,7 +99,7 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
 
         when(jobManager.load("job-id")).thenReturn(Job.builder().name("job-name").build());
 
-        MvcResult mvcResult = mvcResult = mockMvc.perform(get("/api/execution/job/job-id")
+        MvcResult mvcResult = mockMvc.perform(get("/api/execution/job/job-id")
                 .param("pageNumber", "666")
                 .param("pageSize", "42")).andExpect(status().isOk()).andReturn();
         ModelPage<JobExecutionListEntry> result = convert(mvcResult, new TypeReference<>() {
@@ -107,7 +110,7 @@ class ExecutionRestControllerTest extends RestControllerBaseTest {
         assertEquals(3, result.getTotalPages());
         assertEquals(3, result.getItems().size());
 
-        JobExecutionListEntry jobExecutionListEntry = result.getItems().get(0);
+        JobExecutionListEntry jobExecutionListEntry = result.getItems().getFirst();
         assertEquals(789L, jobExecutionListEntry.getId());
         assertEquals("job-id", jobExecutionListEntry.getJobId());
         assertEquals("job-name", jobExecutionListEntry.getJobName());

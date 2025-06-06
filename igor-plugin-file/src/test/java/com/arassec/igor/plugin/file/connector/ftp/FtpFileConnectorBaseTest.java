@@ -93,7 +93,7 @@ public abstract class FtpFileConnectorBaseTest {
             SslConfigurationFactory ssl = new SslConfigurationFactory();
             ssl.setKeystoreFile(new File("src/test/resources/igor-tests-keystore.jks"));
             ssl.setKeystorePassword("password");
-            ssl.setSslProtocol("TLSv1.3");
+            ssl.setSslProtocol(new String[] {"TLSv1.3"});
 
             listenerFactory.setSslConfiguration(ssl.createSslConfiguration());
         }
