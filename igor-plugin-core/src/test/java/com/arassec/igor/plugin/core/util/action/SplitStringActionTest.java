@@ -34,9 +34,9 @@ class SplitStringActionTest {
 
         assertEquals(1, result.size());
 
-        List<String> splitted = ((List<String>) result.get(0).get("splitted"));
+        List<String> splitted = ((List<String>) result.getFirst().get("splitted"));
 
-        assertEquals("a", splitted.get(0));
+        assertEquals("a", splitted.getFirst());
         assertEquals("simple", splitted.get(1));
         assertEquals("example", splitted.get(2));
         assertEquals("string", splitted.get(3));

@@ -15,13 +15,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -70,50 +70,50 @@ public abstract class RestControllerBaseTest {
     /**
      * Mock of the {@link ObjectMapper} to convert JSON for simulated job executions.
      */
-    @MockBean
+    @MockitoBean
     @Qualifier("simulationObjectMapper")
     protected ObjectMapper simulationObjectMapper;
 
     /**
      * Repository for jobs.
      */
-    @MockBean
+    @MockitoBean
     protected JobRepository jobRepository;
 
     /**
      * Mock of the igor component registry.
      */
-    @MockBean
+    @MockitoBean
     protected IgorComponentRegistry igorComponentRegistry;
 
     /**
      * Mock of the connector repository.
      */
-    @MockBean
+    @MockitoBean
     protected ConnectorRepository connectorRepository;
 
     /**
      * Mocked manager for Jobs.
      */
-    @MockBean
+    @MockitoBean
     protected JobManager jobManager;
 
     /**
      * Manager for connectors.
      */
-    @MockBean
+    @MockitoBean
     protected ConnectorManager connectorManager;
 
     /**
      * Simulates job executions.
      */
-    @MockBean
+    @MockitoBean
     protected JobSimulator jobSimulator;
 
     /**
      * Mock for igor's component util.
      */
-    @MockBean
+    @MockitoBean
     protected IgorComponentUtil igorComponentUtil;
 
     /**

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -52,14 +53,14 @@ class EventTriggeredJobStarterTest {
         // Add a data item after initialization to proceed with the processing:
         doAnswer(invocationOnMock -> {
             log.debug("Putting dummy data item to trigger input-queue.");
-            triggerQueueReference.get().put(Map.of());
+            triggerQueueReference.get().put(new HashMap<>());
             return null;
         }).when(eventTrigger).initialize(jobExecution);
 
         // Stop the process after the data item has been processed:
         AtomicBoolean eventProcessed = new AtomicBoolean(false);
         doAnswer(invocationOnMock -> {
-            log.debug("Dummy data item has been processed. Setting job state to {}", JobExecutionState.CANCELLED.toString());
+            log.debug("Dummy data item has been processed. Setting job state to {}", JobExecutionState.CANCELLED);
             eventProcessed.set(true);
             jobExecution.setExecutionState(JobExecutionState.CANCELLED);
             return null;

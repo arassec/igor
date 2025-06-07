@@ -1,7 +1,6 @@
 package com.arassec.igor.plugin.data.connector.util;
 
 import com.arassec.igor.core.model.job.execution.JobExecution;
-import com.arassec.igor.plugin.data.connector.util.JdbcDatasourceUtil;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -199,8 +198,8 @@ class JdbcDatasourceUtilTest {
         List<Map<String, Object>> result = datasourceUtil.query(jobExecution, "datasourceConnectorId", transactionId, "query");
 
         assertEquals(1, result.size());
-        assertEquals("valueOne", result.get(0).get("columnOne"));
-        assertEquals("valueTwo", result.get(0).get("columnTwo"));
+        assertEquals("valueOne", result.getFirst().get("columnOne"));
+        assertEquals("valueTwo", result.getFirst().get("columnTwo"));
     }
 
     /**

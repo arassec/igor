@@ -44,7 +44,7 @@ public class EventTriggerProxy extends TriggerProxy implements EventTrigger {
         // This is only to display the initial data items to the user, during the simulated job execution, the original
         // ones created by the job will be used.
         Map<String, Object> dataItem = getDataItem();
-        eventData.forEach(dataItem::put);
+        dataItem.putAll(eventData);
         getCollectedData().add(dataItem);
 
         ((EventTrigger) delegate).processEvent(eventData);

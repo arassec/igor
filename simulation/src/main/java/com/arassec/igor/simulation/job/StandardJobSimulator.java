@@ -91,10 +91,10 @@ public class StandardJobSimulator implements JobSimulator {
     @EventListener
     public void onJobTriggerEvent(JobTriggerEvent jobTriggerEvent) {
         runningSimulations.stream()
-            .filter(job -> job.getId().equals(jobTriggerEvent.getJobId()))
+            .filter(job -> job.getId().equals(jobTriggerEvent.jobId()))
             .filter(job -> job.getTrigger() instanceof EventTrigger)
-            .filter(job -> ((EventTrigger) job.getTrigger()).getSupportedEventType().equals(jobTriggerEvent.getEventType()))
-            .forEach(job -> ((EventTrigger) job.getTrigger()).processEvent(jobTriggerEvent.getEventData()));
+            .filter(job -> ((EventTrigger) job.getTrigger()).getSupportedEventType().equals(jobTriggerEvent.eventType()))
+            .forEach(job -> ((EventTrigger) job.getTrigger()).processEvent(jobTriggerEvent.eventData()));
     }
 
     /**
@@ -115,7 +115,7 @@ public class StandardJobSimulator implements JobSimulator {
             .filter(isStale)
             .toList();
         staleSimulations.forEach(job -> {
-            log.debug("Cancelling simulation of job '" + job.getId() + "' due to timeout!");
+            log.debug("Cancelling simulation of job '{}' due to timeout!", job.getId());
             job.cancel();
         });
     }

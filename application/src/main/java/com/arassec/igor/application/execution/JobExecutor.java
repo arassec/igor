@@ -157,11 +157,11 @@ public class JobExecutor {
     @EventListener
     public void onJobTriggerEvent(JobTriggerEvent jobTriggerEvent) {
         currentlyProcessedJobs.values().stream()
-                .filter(job -> job.getId().equals(jobTriggerEvent.getJobId()))
+                .filter(job -> job.getId().equals(jobTriggerEvent.jobId()))
                 .filter(job -> job.getTrigger() instanceof EventTrigger)
-                .filter(job -> ((EventTrigger) job.getTrigger()).getSupportedEventType().equals(jobTriggerEvent.getEventType()))
+                .filter(job -> ((EventTrigger) job.getTrigger()).getSupportedEventType().equals(jobTriggerEvent.eventType()))
                 .findFirst()
-                .ifPresent(job -> ((EventTrigger) job.getTrigger()).processEvent(jobTriggerEvent.getEventData()));
+                .ifPresent(job -> ((EventTrigger) job.getTrigger()).processEvent(jobTriggerEvent.eventData()));
     }
 
     /**

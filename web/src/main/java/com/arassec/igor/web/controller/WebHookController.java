@@ -53,8 +53,7 @@ public class WebHookController {
      * @param allRequestParams Request params that are passed to the job.
      */
     private void handleWebHookCall(String jobId, Map<String, String> allRequestParams) {
-        Map<String, Object> params = new HashMap<>();
-        allRequestParams.forEach(params::put);
+        Map<String, Object> params = new HashMap<>(allRequestParams);
         // A bit unclean, but we don't know if the job is in simulation mode or not. By sending two events, both listeners
         // will catch the event and decide what to do...
         applicationEventPublisher.publishEvent(new JobTriggerEvent(jobId, params, EventType.WEB_HOOK));

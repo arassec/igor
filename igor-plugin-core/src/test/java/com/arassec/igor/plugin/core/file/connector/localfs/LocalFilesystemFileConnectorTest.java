@@ -49,8 +49,8 @@ class LocalFilesystemFileConnectorTest {
 
         fileInfos = fileConnector.listFiles(LOCALFS_DIR, "txt");
         assertEquals(1, fileInfos.size());
-        assertEquals("alpha.txt", fileInfos.get(0).getFilename());
-        assertNotNull(fileInfos.get(0).getLastModified());
+        assertEquals("alpha.txt", fileInfos.getFirst().getFilename());
+        assertNotNull(fileInfos.getFirst().getLastModified());
     }
 
     /**
@@ -101,12 +101,13 @@ class LocalFilesystemFileConnectorTest {
     @DisplayName("Tests deleting a file.")
     @SneakyThrows(IOException.class)
     void testDelete() {
-        Files.copy(Paths.get(LOCALFS_DIR + "/alpha.txt"), Paths.get("target/delete-file-alpha.txt"), StandardCopyOption.REPLACE_EXISTING);
-        assertTrue(Files.exists(Paths.get("target/delete-file-alpha.txt")));
+        Path deleteFileAlphaTxt = Paths.get("target/delete-file-alpha.txt");
+        Files.copy(Paths.get(LOCALFS_DIR + "/alpha.txt"), deleteFileAlphaTxt, StandardCopyOption.REPLACE_EXISTING);
+        assertTrue(Files.exists(deleteFileAlphaTxt));
 
         fileConnector.delete("target/delete-file-alpha.txt");
 
-        assertFalse(Files.exists(Paths.get("target/delete-file-alpha.txt")));
+        assertFalse(Files.exists(deleteFileAlphaTxt));
     }
 
     /**
@@ -119,15 +120,18 @@ class LocalFilesystemFileConnectorTest {
         String source = "target/move-file-alpha.txt";
         String target = "target/file-moved.txt";
 
-        Files.copy(Paths.get(LOCALFS_DIR + "/alpha.txt"), Paths.get(source), StandardCopyOption.REPLACE_EXISTING);
-        Files.deleteIfExists(Paths.get(target));
-        assertTrue(Files.exists(Paths.get(source)));
-        assertFalse(Files.exists(Paths.get(target)));
+        Path sourcePath = Paths.get(source);
+        Path targetPath = Paths.get(target);
+
+        Files.copy(Paths.get(LOCALFS_DIR + "/alpha.txt"), sourcePath, StandardCopyOption.REPLACE_EXISTING);
+        Files.deleteIfExists(targetPath);
+        assertTrue(Files.exists(sourcePath));
+        assertFalse(Files.exists(targetPath));
 
         fileConnector.move(source, target);
 
-        assertFalse(Files.exists(Paths.get(source)));
-        assertTrue(Files.exists(Paths.get(target)));
+        assertFalse(Files.exists(sourcePath));
+        assertTrue(Files.exists(targetPath));
     }
 
     /**

@@ -252,8 +252,9 @@ public class IgorParamsMdDocGenerator {
      * @return Path to the default I18N file or an empty string, if none exists.
      */
     private String determineResourceBundleBasename(String directory) {
-        if (Files.exists(Path.of(directory))) {
-            try (Stream<Path> fileCandidates = Files.list(Path.of(directory))) {
+        Path directoryPath = Path.of(directory);
+        if (Files.exists(directoryPath)) {
+            try (Stream<Path> fileCandidates = Files.list(directoryPath)) {
                 String candidate = fileCandidates
                     .map(path -> path.getFileName().toString())
                     .filter(file -> file.endsWith("-labels.properties"))

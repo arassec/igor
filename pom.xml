@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>3.5.0</version>
         <relativePath/>
     </parent>
 
@@ -110,7 +110,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>0.8.13</version>
                 <executions>
                     <execution>
                         <goals>
@@ -229,7 +229,7 @@
             <dependency>
                 <groupId>org.wiremock</groupId>
                 <artifactId>wiremock-standalone</artifactId>
-                <version>3.12.1</version>
+                <version>3.13.0</version>
                 <scope>test</scope>
             </dependency>
 
@@ -250,14 +250,14 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers</artifactId>
-                <version>1.20.6</version>
+                <version>1.21.1</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>junit-jupiter</artifactId>
-                <version>1.20.6</version>
+                <version>1.21.1</version>
                 <scope>test</scope>
             </dependency>
 
@@ -293,7 +293,7 @@
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-plugin-api</artifactId>
-                <version>3.9.8</version>
+                <version>3.9.10</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -318,7 +318,7 @@
             <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
-                <version>1.19.1</version>
+                <version>1.20.1</version>
             </dependency>
 
             <dependency>
@@ -330,7 +330,7 @@
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-core</artifactId>
-                <version>3.9.8</version>
+                <version>3.9.10</version>
             </dependency>
 
         </dependencies>

@@ -202,9 +202,9 @@ class RabbitMqMessageConnectorTest {
         verify(applicationEventPublisher, times(1)).publishEvent(argCap.capture());
 
         JobTriggerEvent event = argCap.getValue();
-        assertEquals("job-id", event.getJobId());
-        assertEquals(EventType.MESSAGE, event.getEventType());
-        assertEquals("{message=test-message, messageMeta={deliveryTag=123456}}", event.getEventData().toString());
+        assertEquals("job-id", event.jobId());
+        assertEquals(EventType.MESSAGE, event.eventType());
+        assertEquals("{message=test-message, messageMeta={deliveryTag=123456}}", event.eventData().toString());
 
         assertEquals(channelMock, rabbitMqMessageConnector.getChannels().get(123456L));
     }

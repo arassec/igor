@@ -65,7 +65,7 @@ public abstract class BaseRestController {
         if (jobExecution == null) {
             ModelPage<JobExecution> jobExecutionsOfJob = jobManager.getJobExecutionsOfJob(job.getId(), 0, 1);
             if (jobExecutionsOfJob != null && !jobExecutionsOfJob.getItems().isEmpty()) {
-                jobExecution = jobExecutionsOfJob.getItems().get(0);
+                jobExecution = jobExecutionsOfJob.getItems().getFirst();
             }
         }
         return jobExecution;

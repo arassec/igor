@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +32,8 @@ public class IgorComponentUtil {
         } else if (igorComponent instanceof MissingComponentConnector) {
             return "missing-component-connector";
         }
-        return igorComponent.getClass().getAnnotation(com.arassec.igor.application.annotation.IgorComponent.class).typeId();
+        return Objects.requireNonNull(
+            igorComponent.getClass().getAnnotation(com.arassec.igor.application.annotation.IgorComponent.class)).typeId();
     }
 
     /**
@@ -47,7 +49,8 @@ public class IgorComponentUtil {
             || igorComponent instanceof MissingComponentConnector) {
             return "core";
         }
-        String result = igorComponent.getClass().getAnnotation(com.arassec.igor.application.annotation.IgorComponent.class).categoryId();
+        String result = Objects.requireNonNull(
+            igorComponent.getClass().getAnnotation(com.arassec.igor.application.annotation.IgorComponent.class)).categoryId();
         if (StringUtils.hasText(result)) {
             return result;
         }
@@ -55,7 +58,7 @@ public class IgorComponentUtil {
     }
 
     /**
-     * Formats an igor parameter's property name into a more user readable way.
+     * Formats an igor parameter's property name into a more user-readable way.
      * <p>
      * Will convert Camel-Case property names into parts seperated by spaces while converting the first character to upper case,
      * e.g. "superDuperIgorParameter" will become "Super Duper Igor Parameter"

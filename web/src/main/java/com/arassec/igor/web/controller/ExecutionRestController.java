@@ -170,9 +170,9 @@ public class ExecutionRestController extends BaseRestController {
     public void onJobEvent(JobEvent jobEvent) {
         List<SseEmitter> deadJobStreamEmitters = new LinkedList<>();
 
-        if ((JobEventType.STATE_CHANGE.equals(jobEvent.getType())
-            || JobEventType.STATE_REFRESH.equals(jobEvent.getType()))) {
-            var jobExecution = determineJobExecution(jobManager, jobEvent.getJob());
+        if ((JobEventType.STATE_CHANGE.equals(jobEvent.type())
+            || JobEventType.STATE_REFRESH.equals(jobEvent.type()))) {
+            var jobExecution = determineJobExecution(jobManager, jobEvent.job());
             for (SseEmitter emitter : executionStreamEmitters) {
                 try {
                     emitter.send(jobExecution);

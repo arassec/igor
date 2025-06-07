@@ -90,7 +90,7 @@ class CorePluginUtilsTest {
         assertEquals(42, ((Map<String, Object>) clone.get("map")).get("number"));
         clone.clear();
         assertEquals(2, map.size());
-        assertTrue(map.get("map") instanceof Map);
+        assertInstanceOf(Map.class, map.get("map"));
     }
 
     /**

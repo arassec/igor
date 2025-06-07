@@ -178,7 +178,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
         var trigger = createTriggerInstance(igorComponentUtil.getTypeId(triggers.stream()
             .filter(triggerCandidate -> igorComponentUtil.getTypeId(triggerCandidate).equals(igorApplicationProperties.getDefaultTrigger()))
             .findFirst()
-            .orElse(triggers.get(0))), null);
+            .orElse(triggers.getFirst())), null);
         trigger.setId(UUID.randomUUID().toString());
 
         return Job.builder()
@@ -198,7 +198,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
         var action = createActionInstance(igorComponentUtil.getTypeId(actions.stream()
             .filter(actionCandidate -> igorComponentUtil.getTypeId(actionCandidate).equals(igorApplicationProperties.getDefaultAction()))
             .findFirst()
-            .orElse(actions.get(0))), null);
+            .orElse(actions.getFirst())), null);
         action.setId(UUID.randomUUID().toString());
         return action;
     }
@@ -335,6 +335,7 @@ public class IgorComponentRegistry implements InitializingBean, ApplicationConte
      *
      * @return A proxy to fill the missing connector.
      */
+    @SuppressWarnings("resource")
     private Object handleMissingConnector(Field field) {
         try {
             List<Class<?>> implementations = new LinkedList<>();

@@ -118,7 +118,7 @@ class ConnectorManagerTest {
 
         ModelPage<Connector> modelPage = connectorManager.loadAllOfType(Set.of("b"), 0, 5);
 
-        assertEquals("y", modelPage.getItems().get(0).getName());
+        assertEquals("y", modelPage.getItems().getFirst().getName());
         assertEquals("z", modelPage.getItems().get(1).getName());
     }
 

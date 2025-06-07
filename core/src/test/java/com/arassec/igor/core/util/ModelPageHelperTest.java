@@ -63,7 +63,7 @@ class ModelPageHelperTest {
         assertEquals(3, page.getSize());
         assertEquals(4, page.getTotalPages());
         assertEquals(3, page.getItems().size());
-        assertEquals(4, page.getItems().get(0));
+        assertEquals(4, page.getItems().getFirst());
         assertEquals(5, page.getItems().get(1));
         assertEquals(6, page.getItems().get(2));
     }
@@ -91,7 +91,7 @@ class ModelPageHelperTest {
         assertEquals(0, modelPage.getNumber());
         assertEquals(2, modelPage.getSize());
         assertEquals(1, modelPage.getTotalPages());
-        assertEquals("a", modelPage.getItems().get(0));
+        assertEquals("a", modelPage.getItems().getFirst());
         assertEquals("b", modelPage.getItems().get(1));
     }
 }

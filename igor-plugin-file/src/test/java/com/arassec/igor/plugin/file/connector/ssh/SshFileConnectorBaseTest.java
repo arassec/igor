@@ -105,9 +105,9 @@ abstract class SshFileConnectorBaseTest {
 
         assertEquals(2, fileInfos.size());
         assertAll("All file infos are retrieved.",
-                () -> assertTrue("alpha.txt".equals(fileInfos.get(0).getFilename())
-                        || "beta.test".equals(fileInfos.get(0).getFilename())),
-                () -> assertFalse(fileInfos.get(0).getLastModified().isBlank()),
+                () -> assertTrue("alpha.txt".equals(fileInfos.getFirst().getFilename())
+                        || "beta.test".equals(fileInfos.getFirst().getFilename())),
+                () -> assertFalse(fileInfos.getFirst().getLastModified().isBlank()),
                 () -> assertTrue("alpha.txt".equals(fileInfos.get(1).getFilename())
                         || "beta.test".equals(fileInfos.get(1).getFilename())),
                 () -> assertFalse(fileInfos.get(1).getLastModified().isBlank())
@@ -117,8 +117,8 @@ abstract class SshFileConnectorBaseTest {
 
         assertEquals(1, filteredFileInfos.size());
         assertAll("All file infos are retrieved.",
-                () -> assertEquals("beta.test", filteredFileInfos.get(0).getFilename()),
-                () -> assertFalse(filteredFileInfos.get(0).getLastModified().isBlank())
+                () -> assertEquals("beta.test", filteredFileInfos.getFirst().getFilename()),
+                () -> assertFalse(filteredFileInfos.getFirst().getLastModified().isBlank())
         );
     }
 

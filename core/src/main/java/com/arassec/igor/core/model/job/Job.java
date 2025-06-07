@@ -185,27 +185,28 @@ public class Job {
 
             var cancelLock = new Object();
 
-            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-            executor.scheduleAtFixedRate(() -> {
+            try (ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()) {
+                executor.scheduleAtFixedRate(() -> {
+                    synchronized (cancelLock) {
+                        log.trace("Checking if job {} is still running: {}", getId(), getName());
+                        if (!isRunning()) {
+                            cancelLock.notifyAll();
+                        }
+                    }
+                }, 0, 100, TimeUnit.MILLISECONDS);
+
                 synchronized (cancelLock) {
-                    log.trace("Checking if job {} is still running: {}", getId(), getName());
-                    if (!isRunning()) {
-                        cancelLock.notifyAll();
+                    try {
+                        while (isRunning()) {
+                            cancelLock.wait();
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                     }
                 }
-            }, 0, 100, TimeUnit.MILLISECONDS);
 
-            synchronized (cancelLock) {
-                try {
-                    while (isRunning()) {
-                        cancelLock.wait();
-                    }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+                executor.shutdown();
             }
-
-            executor.shutdown();
         }
     }
 

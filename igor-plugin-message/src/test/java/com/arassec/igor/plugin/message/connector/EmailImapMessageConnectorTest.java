@@ -32,7 +32,7 @@ class EmailImapMessageConnectorTest {
      * Creates a local IMAP server for testing.
      */
     @RegisterExtension
-    static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.IMAP)
+    final static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.IMAP)
         .withConfiguration(GreenMailConfiguration.aConfig().withUser("igor@arassec.com", "igor", "igor"))
         .withPerMethodLifecycle(false);
 
@@ -90,14 +90,14 @@ class EmailImapMessageConnectorTest {
 
         assertEquals(1, mails.size());
 
-        Map<String, Object> maildata = mails.get(0);
+        Map<String, Object> maildata = mails.getFirst();
 
         assertEquals("igor-test@arassec.com", maildata.get("from"));
         assertEquals(1, ((List<Map<String, Object>>) maildata.get("bodies")).size());
         // Mail body doesn't seem to be supported with GrenmailUtil.newMimeMessage()?!?
-        // assertEquals("body", ((List<Map<String, Object>>) maildata.get("bodies")).get(0).get("content"));
+        // assertEquals("body", ((List<Map<String, Object>>) maildata.get("bodies")).getFirst().get("content"));
         assertEquals(1, ((List<String>) maildata.get("recipients")).size());
-        assertEquals("igor@arassec.com", ((List<String>) maildata.get("recipients")).get(0));
+        assertEquals("igor@arassec.com", ((List<String>) maildata.get("recipients")).getFirst());
         assertEquals("igor mail test", ((Map<String, Object>) maildata.get("headers")).get("Subject"));
     }
 

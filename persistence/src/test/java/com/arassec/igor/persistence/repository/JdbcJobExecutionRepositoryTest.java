@@ -186,8 +186,8 @@ class JdbcJobExecutionRepositoryTest {
         assertEquals(3, allOfJobPage.getTotalPages());
         assertEquals(1, allOfJobPage.getItems().size());
 
-        assertEquals(666, allOfJobPage.getItems().get(0).getId());
-        assertEquals(JobExecutionState.FINISHED, allOfJobPage.getItems().get(0).getExecutionState());
+        assertEquals(666, allOfJobPage.getItems().getFirst().getId());
+        assertEquals(JobExecutionState.FINISHED, allOfJobPage.getItems().getFirst().getExecutionState());
 
         assertEquals(1, argCap.getValue().getPageNumber());
         assertEquals(2, argCap.getValue().getPageSize());
@@ -226,9 +226,9 @@ class JdbcJobExecutionRepositoryTest {
 
         List<JobExecution> allOfJobInState = repository.findAllOfJobInState("job-id", JobExecutionState.FINISHED);
 
-        assertEquals(jobExecution, allOfJobInState.get(0));
-        assertEquals(666, allOfJobInState.get(0).getId());
-        assertEquals(JobExecutionState.FINISHED, allOfJobInState.get(0).getExecutionState());
+        assertEquals(jobExecution, allOfJobInState.getFirst());
+        assertEquals(666, allOfJobInState.getFirst().getId());
+        assertEquals(JobExecutionState.FINISHED, allOfJobInState.getFirst().getExecutionState());
     }
 
     /**
@@ -263,8 +263,8 @@ class JdbcJobExecutionRepositoryTest {
         assertEquals(3, inStatePage.getTotalPages());
         assertEquals(1, inStatePage.getItems().size());
 
-        assertEquals(666, inStatePage.getItems().get(0).getId());
-        assertEquals(JobExecutionState.RUNNING, inStatePage.getItems().get(0).getExecutionState());
+        assertEquals(666, inStatePage.getItems().getFirst().getId());
+        assertEquals(JobExecutionState.RUNNING, inStatePage.getItems().getFirst().getExecutionState());
 
         assertEquals(1, argCap.getValue().getPageNumber());
         assertEquals(2, argCap.getValue().getPageSize());

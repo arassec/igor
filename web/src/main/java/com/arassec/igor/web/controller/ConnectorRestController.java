@@ -84,7 +84,7 @@ public class ConnectorRestController {
                                                        @RequestParam(value = "pageSize", required = false, defaultValue = "2147483647") int pageSize) {
         // Type-IDs are comma separated and Base64 encoded:
         Set<String> typeIds = new HashSet<>();
-        Stream.of(types.split(",")).filter(Objects::nonNull).forEach(typeId -> typeIds.add(new String(Base64.getDecoder().decode(typeId))));
+        Stream.of(types.split(",")).forEach(typeId -> typeIds.add(new String(Base64.getDecoder().decode(typeId))));
         return connectorManager.loadAllOfType(typeIds, pageNumber, pageSize);
     }
 

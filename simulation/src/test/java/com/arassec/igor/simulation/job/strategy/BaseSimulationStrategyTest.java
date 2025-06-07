@@ -53,11 +53,11 @@ class BaseSimulationStrategyTest {
 
         SimulationResult jobResult = result.get("job-id");
         assertEquals("test-job-error", jobResult.getErrorCause());
-        assertEquals(triggerData.get(0).toString(), jobResult.getResults().get(0).toString());
+        assertEquals(triggerData.getFirst().toString(), jobResult.getResults().getFirst().toString());
 
         SimulationResult actionResult = result.get("action-id");
         assertEquals("test-action-error", actionResult.getErrorCause());
-        assertEquals(actionData.get(0).toString(), actionResult.getResults().get(0).toString());
+        assertEquals(actionData.getFirst().toString(), actionResult.getResults().getFirst().toString());
     }
 
     /**

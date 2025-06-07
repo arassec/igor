@@ -56,8 +56,8 @@ class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
 
         assertEquals(3, fileInfos.size());
         assertAll("File infos are loaded via FTP.",
-                () -> assertEquals("alpha.txt", fileInfos.get(0).getFilename()),
-                () -> assertNotNull(fileInfos.get(0).getLastModified()),
+                () -> assertEquals("alpha.txt", fileInfos.getFirst().getFilename()),
+                () -> assertNotNull(fileInfos.getFirst().getLastModified()),
                 () -> assertEquals("beta.save", fileInfos.get(1).getFilename()),
                 () -> assertNotNull(fileInfos.get(1).getLastModified()),
                 () -> assertEquals("gamma.txt", fileInfos.get(2).getFilename()),
@@ -68,8 +68,8 @@ class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
 
         assertEquals(1, filteredFileInfos.size());
         assertAll("Filtered file infos are loaded via FTP.",
-                () -> assertEquals("beta.save", filteredFileInfos.get(0).getFilename()),
-                () -> assertNotNull(filteredFileInfos.get(0).getLastModified())
+                () -> assertEquals("beta.save", filteredFileInfos.getFirst().getFilename()),
+                () -> assertNotNull(filteredFileInfos.getFirst().getLastModified())
         );
 
         // List files in directory:
@@ -77,8 +77,8 @@ class FtpFileConnectorTest extends FtpFileConnectorBaseTest {
 
         assertEquals(1, subdirFileInfos.size());
         assertAll("File infos from sub-directory are loaded via FTP.",
-                () -> assertEquals("delta.txt", subdirFileInfos.get(0).getFilename()),
-                () -> assertNotNull(subdirFileInfos.get(0).getLastModified())
+                () -> assertEquals("delta.txt", subdirFileInfos.getFirst().getFilename()),
+                () -> assertNotNull(subdirFileInfos.getFirst().getLastModified())
         );
 
         // List files in not existing directory must fail safe:

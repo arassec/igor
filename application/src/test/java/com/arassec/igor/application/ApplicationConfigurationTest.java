@@ -7,8 +7,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests the {@link ApplicationConfiguration} functionality.
@@ -23,7 +22,7 @@ class ApplicationConfigurationTest {
     void testJobScheduler() {
         ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration();
         TaskScheduler taskScheduler = applicationConfiguration.jobScheduler();
-        assertTrue(taskScheduler instanceof ThreadPoolTaskScheduler);
+        assertInstanceOf(ThreadPoolTaskScheduler.class, taskScheduler);
         assertEquals("jobScheduler", ((ThreadPoolTaskScheduler) taskScheduler).getThreadNamePrefix());
         assertEquals(10, ((ThreadPoolTaskScheduler) taskScheduler).getPoolSize());
     }

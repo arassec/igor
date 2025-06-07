@@ -39,7 +39,7 @@ class CategoryRestControllerTest extends RestControllerBaseTest {
         });
 
         assertEquals(2, result.size());
-        assertEquals(new KeyLabelStore("one", "alpha"), result.get(0));
+        assertEquals(new KeyLabelStore("one", "alpha"), result.getFirst());
         assertEquals(new KeyLabelStore("two", "beta"), result.get(1));
     }
 
@@ -58,7 +58,7 @@ class CategoryRestControllerTest extends RestControllerBaseTest {
         });
 
         assertEquals(2, result.size());
-        assertEquals(new KeyLabelStore("one", "alpha"), result.get(0));
+        assertEquals(new KeyLabelStore("one", "alpha"), result.getFirst());
         assertEquals(new KeyLabelStore("two", "beta"), result.get(1));
     }
 
@@ -77,7 +77,7 @@ class CategoryRestControllerTest extends RestControllerBaseTest {
         });
 
         assertEquals(2, result.size());
-        assertEquals(new KeyLabelStore("one", "alpha"), result.get(0));
+        assertEquals(new KeyLabelStore("one", "alpha"), result.getFirst());
         assertEquals(new KeyLabelStore("two", "beta"), result.get(1));
     }
 

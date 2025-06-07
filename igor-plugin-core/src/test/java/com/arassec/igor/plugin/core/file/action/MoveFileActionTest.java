@@ -53,7 +53,7 @@ class MoveFileActionTest extends FileActionBaseTest {
         Map<String, Object> data = createData();
         List<Map<String, Object>> processedData = moveFileAction.process(data, new JobExecution());
 
-        assertEquals(data, processedData.get(0));
+        assertEquals(data, processedData.getFirst());
     }
 
 }

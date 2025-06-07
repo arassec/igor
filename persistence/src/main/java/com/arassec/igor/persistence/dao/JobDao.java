@@ -3,10 +3,8 @@ package com.arassec.igor.persistence.dao;
 import com.arassec.igor.persistence.entity.JobEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -32,14 +30,5 @@ public interface JobDao extends PagingAndSortingRepository<JobEntity, String>,
      * @return The page of entities.
      */
     Page<JobEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
-
-    /**
-     * Returns a job's name by its ID.
-     *
-     * @param id The job's ID.
-     * @return The job's name.
-     */
-    @Query(value = "SELECT name FROM job WHERE id = :id", nativeQuery = true)
-    String findNameById(@Param("id") String id);
 
 }

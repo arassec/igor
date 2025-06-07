@@ -211,7 +211,7 @@ public class DocumentationGenerator {
         /**
          * Contains all found igor components together with their respective Type-ID.
          */
-        Map<ClassOrInterfaceDeclaration, String> igorComponents = new HashMap<>();
+        final Map<ClassOrInterfaceDeclaration, String> igorComponents = new HashMap<>();
 
         /**
          * {@inheritDoc}

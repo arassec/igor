@@ -64,13 +64,13 @@ class FilterByTimestampActionTest extends CoreActionBaseTest {
         Map<String, Object> data = createData();
         data.put("timestamp", DateTimeFormatter.ofPattern(action.getTimestampFormat()).format(LocalDateTime.now()));
         List<Map<String, Object>> processedData = action.process(data, new JobExecution());
-        assertEquals(data, processedData.get(0));
+        assertEquals(data, processedData.getFirst());
 
         // Filter all older than 15 days:
         action.setAmount(15L);
 
         processedData = action.process(data, new JobExecution());
-        assertEquals(data, processedData.get(0));
+        assertEquals(data, processedData.getFirst());
 
         data.put("timestamp", "2014-04-13T03:00:00");
         processedData = action.process(data, new JobExecution());
@@ -97,7 +97,7 @@ class FilterByTimestampActionTest extends CoreActionBaseTest {
 
         data.put("timestamp", "2014-04-13T03:00:00+02:00");
         processedData = action.process(data, new JobExecution());
-        assertEquals(data, processedData.get(0));
+        assertEquals(data, processedData.getFirst());
     }
 
     /**

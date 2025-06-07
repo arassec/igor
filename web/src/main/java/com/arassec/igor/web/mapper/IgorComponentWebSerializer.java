@@ -71,14 +71,14 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField(WebMapperKey.ID.getKey(), instance.getId());
         if (instance instanceof Connector connector && connector.getName() != null) {
-            jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), ((Connector) instance).getName());
+            jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), connector.getName());
         } else if (instance instanceof Action action) {
             if (action.getName() != null) {
                 jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), action.getName());
             } else {
                 jsonGenerator.writeStringField(WebMapperKey.NAME.getKey(), "");
             }
-            if (((Action) instance).getDescription() != null) {
+            if (action.getDescription() != null) {
                 jsonGenerator.writeStringField(WebMapperKey.DESCRIPTION.getKey(), action.getDescription());
             } else {
                 jsonGenerator.writeStringField(WebMapperKey.DESCRIPTION.getKey(), "");
@@ -94,9 +94,9 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
     }
 
     /**
-     * Writes a {@link KeyLabelStore} to the serialized json.
+     * Writes a {@link KeyLabelStore} to the serialized JSON.
      *
-     * @param jsonGenerator The json generator.
+     * @param jsonGenerator The JSON generator.
      * @param name          The name of the key-label-store.
      * @param keyLabelStore The actual store to write.
      * @throws IOException In case of serialization problems.
@@ -109,9 +109,9 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
     }
 
     /**
-     * Writes a {@link KeyLabelStore} to the serialized json.
+     * Writes a {@link KeyLabelStore} to the serialized JSON.
      *
-     * @param jsonGenerator The json generator.
+     * @param jsonGenerator The JSON generator.
      * @param instance      The component instance.
      * @throws IOException In case of serialization problems.
      */
@@ -136,9 +136,9 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
     }
 
     /**
-     * Writes the component's parameters to the serialized json.
+     * Writes the component's parameters to the serialized JSON.
      *
-     * @param jsonGenerator The json generator.
+     * @param jsonGenerator The JSON generator.
      * @param instance      The component instance.
      * @throws IOException If parameters could not be written.
      */
@@ -157,17 +157,17 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
 
         List<Field> advancedParameters = parameters.stream().filter(field -> {
             IgorParam annotation = field.getAnnotation(IgorParam.class);
-            return annotation.advanced();
+            return Objects.requireNonNull(annotation).advanced();
         }).sorted((o1, o2) -> {
-            Integer first = o1.getAnnotation(IgorParam.class).sortIndex();
-            Integer second = o2.getAnnotation(IgorParam.class).sortIndex();
+            Integer first = Objects.requireNonNull(o1.getAnnotation(IgorParam.class)).sortIndex();
+            Integer second = Objects.requireNonNull(o2.getAnnotation(IgorParam.class)).sortIndex();
             return first.compareTo(second);
         }).toList();
 
         parameters.removeAll(advancedParameters);
         parameters.sort((o1, o2) -> {
-            Integer first = o1.getAnnotation(IgorParam.class).sortIndex();
-            Integer second = o2.getAnnotation(IgorParam.class).sortIndex();
+            Integer first = Objects.requireNonNull(o1.getAnnotation(IgorParam.class)).sortIndex();
+            Integer second = Objects.requireNonNull(o2.getAnnotation(IgorParam.class)).sortIndex();
             return first.compareTo(second);
         });
         parameters.addAll(advancedParameters);
@@ -187,7 +187,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                 }
                 jsonGenerator.writeStringField(WebMapperKey.DISPLAY_NAME.getKey(), displayName);
 
-                writeMetaData(jsonGenerator, annotation, field);
+                writeMetaData(jsonGenerator, Objects.requireNonNull(annotation), field);
 
                 Map<String, Set<String>> candidates = igorComponentRegistry.getConnectorParameterCategoryAndType(field.getType());
 
@@ -239,7 +239,7 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
     /**
      * Writes a connector parameter as JSON.
      *
-     * @param jsonGenerator The json generator to create the JSON.
+     * @param jsonGenerator The JSON generator to create the JSON.
      * @param value         The value of the parameter.
      * @param candidates    The possible connector implementations that can be used as parameter values.
      * @throws IOException If the parameter could not be written.
@@ -273,15 +273,14 @@ public class IgorComponentWebSerializer extends StdSerializer<IgorComponent> {
                         jsonGenerator.writeStringField(WebMapperKey.VALUE.getKey(), type.getValue());
                         jsonGenerator.writeEndObject();
                     } catch (IOException e) {
-                        log.error("Could not serialize type of connector parameter (" + type.getKey() + " / "
-                            + type.getValue() + ")", e);
+                        log.error("Could not serialize type of connector parameter ({} / {})", type.getKey(), type.getValue(), e);
                     }
                 });
                 jsonGenerator.writeEndArray();
 
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
-                log.error("Could not serialize category of connector parameter (" + category.getKey() + " / " + category.getValue() + ")", e);
+                log.error("Could not serialize category of connector parameter ({} / {})", category.getKey(), category.getValue(), e);
             }
         });
 
