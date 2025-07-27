@@ -26,7 +26,7 @@ jobs:
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - name: Build and Publish to Apache Maven Central
-        run: ./mvnw org.jacoco:jacoco-maven-plugin:prepare-agent clean deploy -Prelease -Drevision=$RELEASE_VERSION --no-transfer-progress
+        run: mvn org.jacoco:jacoco-maven-plugin:prepare-agent clean deploy -Prelease -Drevision=$RELEASE_VERSION --no-transfer-progress
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

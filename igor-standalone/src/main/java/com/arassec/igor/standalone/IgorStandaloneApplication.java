@@ -24,6 +24,12 @@ public class IgorStandaloneApplication {
     }
 
     /**
+     * Creates a new instance.
+     */
+    public IgorStandaloneApplication() {
+    }
+
+    /**
      * Creates Open-API information.
      *
      * @return An {@link OpenAPI} specification.
