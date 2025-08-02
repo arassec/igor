@@ -6,19 +6,19 @@
   "scripts": {
     "cypress:local": "cypress open --config baseUrl=http://localhost:8081 --env nginx_host=localhost,rabbitmq_host=localhost,vsftpd_host=localhost,sshd_host=localhost,sshd_port=2222,mail_host=localhost,mail_smtp_port=3025,mail_imap_port=3143",
     "cypress:e2e": "cross-env NO_COLOR=1 cypress run --env mail_smtp_port=3025,mail_imap_port=3143",
-    "env:clean": "docker-compose down && docker image prune -a -f",
-    "env:up": "docker-compose up -d",
-    "env:down": "docker-compose down",
-    "env:restart": "docker-compose down && docker-compose up -d",
+    "env:clean": "docker compose down && docker image prune -a -f",
+    "env:up": "docker compose up -d",
+    "env:down": "docker compose down",
+    "env:restart": "docker compose down && docker compose up -d",
     "e2e": "npm run env:up && npm run cypress:e2e && npm run env:down"
   },
   "author": "Andreas Sensen",
   "license": "MIT",
   "devDependencies": {
-    "cypress": "^13.7.0",
-    "cypress-file-upload": "^4.1.1"
+    "cypress": "^14.5.3",
+    "cypress-file-upload": "^5.0.8"
   },
   "dependencies": {
-    "cross-env": "^7.0.3"
+    "cross-env": "^10.0.0"
   }
 }
