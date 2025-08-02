@@ -51,7 +51,7 @@
 
         <java.version>21</java.version>
         <maven.compiler.release>21</maven.compiler.release>
-        <nodejs.version>v20.11.1</nodejs.version>
+        <nodejs.version>v22.18.0</nodejs.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
