@@ -361,6 +361,10 @@
                             <publishingServerId>central</publishingServerId>
                             <autoPublish>true</autoPublish>
                             <waitUntil>published</waitUntil>
+                            <excludeArtifacts>
+                                <!-- Maven central doesn't support Spring-Boot's executable JARs at the moment. -->
+                                <excludeArtifact>com.arassec.igor:igor-standalone</excludeArtifact>
+                            </excludeArtifacts>
                         </configuration>
                     </plugin>
                     <plugin>
