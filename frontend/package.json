@@ -16,7 +16,7 @@
         "@fortawesome/vue-fontawesome": "^3.1.1",
         "animate.css": "^4.1.1",
         "axios": "^1.13.5",
-        "markdown-it": "^14.1.0",
+        "markdown-it": "^14.1.1",
         "pinia": "^3.0.3",
         "vue": "^3.5.18",
         "vue-json-pretty": "^2.5.0",
